@@ -6,7 +6,6 @@ from itertools import chain
 from authlib.email import render_to_mail
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import CoffeePairings, User
@@ -14,14 +13,14 @@ from workbench.accounts.models import CoffeePairings, User
 
 CANDIDATES = 20
 WISHES = [
-    _("I hope you’ll enjoy it :-)"),
-    _("But even a bad cup of coffee is better than no coffee at all. – David Lynch"),
-    _("You can’t buy happiness but you can buy coffee and that’s pretty close."),
-    _("What goes best with a cup of coffee? Another cup. – Henry Rollins"),
-    _("Life is too short for bad coffee."),
-    _("May your coffee be strong and your monday be short."),
-    _("Time to drink some coffee."),
-    _("Drink coffee. Do stupid things faster with more energy."),
+    "I hope you’ll enjoy it :-)",
+    "But even a bad cup of coffee is better than no coffee at all. – David Lynch",
+    "You can’t buy happiness but you can buy coffee and that’s pretty close.",
+    "What goes best with a cup of coffee? Another cup. – Henry Rollins",
+    "Life is too short for bad coffee.",
+    "May your coffee be strong and your monday be short.",
+    "Time to drink some coffee.",
+    "Drink coffee. Do stupid things faster with more energy.",
 ]
 
 

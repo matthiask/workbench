@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-13 17:10+0100\n"
+"POT-Creation-Date: 2025-01-13 19:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -326,38 +326,6 @@ msgstr "Fachbereiche"
 #: workbench/accounts/reporting.py
 msgid "All others"
 msgstr "Alle anderen"
-
-#: workbench/accounts/tasks.py
-msgid "I hope you’ll enjoy it :-)"
-msgstr "Ich hoffe, ihr geniesst es :-)"
-
-#: workbench/accounts/tasks.py
-msgid "But even a bad cup of coffee is better than no coffee at all. – David Lynch"
-msgstr ""
-
-#: workbench/accounts/tasks.py
-msgid "You can’t buy happiness but you can buy coffee and that’s pretty close."
-msgstr ""
-
-#: workbench/accounts/tasks.py
-msgid "What goes best with a cup of coffee? Another cup. – Henry Rollins"
-msgstr ""
-
-#: workbench/accounts/tasks.py
-msgid "Life is too short for bad coffee."
-msgstr ""
-
-#: workbench/accounts/tasks.py
-msgid "May your coffee be strong and your monday be short."
-msgstr ""
-
-#: workbench/accounts/tasks.py
-msgid "Time to drink some coffee."
-msgstr ""
-
-#: workbench/accounts/tasks.py
-msgid "Drink coffee. Do stupid things faster with more energy."
-msgstr ""
 
 #: workbench/accounts/views.py workbench/templates/base.html
 msgid "Settings"
@@ -2791,6 +2759,10 @@ msgid "today"
 msgstr "heute"
 
 #: workbench/projects/forms.py
+msgid "This project has been closed on or before {} and cannot be reopened anymore."
+msgstr "Dieses Projekt wurde am oder vor dem {} geschlossen und kann nicht mehr geöffnet werden."
+
+#: workbench/projects/forms.py
 msgid "Selecting an internal type is required for internal projects."
 msgstr "Bei internen Projekten muss ein interner Typ ausgewählt werden."
 
@@ -4332,16 +4304,3 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
-
-#~ msgid "You are canceling this invoice. If clients are still expected to pay for services rendered and this invoice hasn't been sent to bookkeeping already it may be better to delete the invoice and start anew."
-#~ msgstr "Du stornierst diese Rechnung. Wenn die Kundschaft die Leistungen immer noch bezahlen sollte und diese Rechnung noch nicht an die Buchhaltung übermittelt wurde, könnte es besser sein, die Rechnung zu löschen und nochmals neu zu beginnen."
-
-#, python-format
-#~ msgid "Sent on %(invoiced_on)s but overdue"
-#~ msgstr "Versendet am %(invoiced_on)s, aber überfällig"
-
-#~ msgid "organization notes"
-#~ msgstr "Organisationnotizen"
-
-#~ msgid "Promptly"
-#~ msgstr "Zeitnah"
