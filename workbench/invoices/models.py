@@ -304,7 +304,7 @@ class Invoice(ModelWithTotal):
         if self.archived_at:
             return True
 
-        if self.invoiced_on and (freeze := FreezeDate.objects.up_to):
+        if self.invoiced_on and (freeze := FreezeDate.objects.up_to()):
             return self.invoiced_on <= freeze
 
         return False
