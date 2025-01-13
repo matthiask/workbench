@@ -109,6 +109,15 @@ class FreezingTest(TestCase):
         )
         # print(response, response.content.decode("utf-8"))
 
+        project.closed_on = dt.date(2024, 12, 31)
+        project.save()
+
+        response = self.client.get(project.urls["update"])
+        self.assertContains(
+            response,
+            "This project has been closed on or before 31.12.2024 and cannot be reopened anymore.",
+        )
+
     def test_freezed_invoice_update(self):
         invoice = factories.InvoiceFactory.create(invoiced_on=dt.date(2024, 12, 15))
         FreezeDate.objects.create(up_to=dt.date(2024, 12, 31))
