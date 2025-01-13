@@ -108,3 +108,15 @@ class FreezingTest(TestCase):
             "Cannot close a project with a date of 31.12.2024 or earlier anymore.",
         )
         # print(response, response.content.decode("utf-8"))
+
+    def test_freezed_invoice_update(self):
+        invoice = factories.InvoiceFactory.create(invoiced_on=dt.date(2024, 12, 15))
+        FreezeDate.objects.create(up_to=dt.date(2024, 12, 31))
+
+        self.client.force_login(invoice.owned_by)
+        response = self.client.get(invoice.urls["update"])
+
+        self.assertContains(
+            response,
+            "This invoice is freezed, only a small subset of fields are editable.",
+        )
