@@ -16,6 +16,7 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
@@ -310,6 +311,19 @@ class InvoiceForm(PostalAddressSelectionForm):
                 _(
                     "A negative subtotal is almost certainly an error. Did you want to create a credit?"
                 ),
+            )
+
+        if (
+            "invoiced_on" in self.changed_data
+            and (invoiced_on := data.get("invoiced_on"))
+            and (freeze := FreezeDate.objects.up_to())
+            and invoiced_on <= freeze
+        ):
+            self.add_error(
+                "invoiced_on",
+                _(
+                    "Cannot create an invoice with a date of {} or earlier anymore."
+                ).format(local_date_format(freeze)),
             )
 
         if self.instance.status > self.instance.IN_PREPARATION and set(
@@ -906,3 +920,20 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
                 organization=customer,
                 for_billing=True,
             )
+
+    def clean(self):
+        data = super().clean()
+        if (
+            "starts_on" in self.changed_data
+            and (starts_on := data.get("starts_on"))
+            and (freeze := FreezeDate.objects.up_to())
+            and starts_on <= freeze
+        ):
+            self.add_error(
+                "starts_on",
+                _(
+                    "Cannot create a recurring invoice with a start date of {} or earlier anymore."
+                ).format(local_date_format(freeze)),
+            )
+
+        return data

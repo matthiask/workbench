@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 18:00+0100\n"
+"POT-Creation-Date: 2025-01-13 17:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,7 +55,7 @@ msgstr "Pausenmeckerei"
 
 #: workbench/accounts/features.py
 msgid "Warn if user is taking an insufficient amount of breaks."
-msgstr "Warenn, wenn die Nutzer:in nicht genügend Pausen macht."
+msgstr "Warnen, wenn die Nutzer:in nicht genügend Pausen macht."
 
 #: workbench/accounts/features.py workbench/projects/models.py
 #: workbench/templates/projects/object_list.html
@@ -309,7 +309,8 @@ msgstr "Teams"
 #: workbench/invoices/models.py workbench/logbook/models.py
 #: workbench/notes/models.py workbench/offers/models.py
 #: workbench/planning/models.py workbench/projects/models.py
-#: workbench/services/models.py workbench/timer/models.py
+#: workbench/reporting/models.py workbench/services/models.py
+#: workbench/timer/models.py
 msgid "created at"
 msgstr "Erstellt um"
 
@@ -1713,6 +1714,10 @@ msgid "A negative subtotal is almost certainly an error. Did you want to create 
 msgstr "Ein negatives Zwischentotal ist fast sicher ein Fehler. Wolltest Du eine Gutschrift erstellen?"
 
 #: workbench/invoices/forms.py
+msgid "Cannot create an invoice with a date of {} or earlier anymore."
+msgstr "Kann Rechnungen mit einem Datum von {} oder früher nicht mehr erstellen."
+
+#: workbench/invoices/forms.py
 #, python-format
 msgid "You are attempting to change %(fields)s. I am trying to prevent unintentional changes. Are you sure?"
 msgstr "Du hast %(fields)s geändert. Ich versuche, unabsichtliche Änderungen zu verhindern. Bist Du sicher?"
@@ -1814,6 +1819,10 @@ msgstr "Anzahlungsrechnungen wurden von dieser Rechnung abgezogen. Diese Anzahlu
 msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 
+#: workbench/invoices/forms.py
+msgid "Cannot create a recurring invoice with a start date of {} or earlier anymore."
+msgstr "Kann Stapelrechnung mit einem Startdatum von {} oder früher nicht mehr erstellen."
+
 #: workbench/invoices/models.py
 msgid "Sent"
 msgstr "Versendet"
@@ -1900,10 +1909,6 @@ msgstr "Entweder beide Felder einfüllen oder keines."
 #: workbench/invoices/models.py
 msgid "Until date has to be after from date."
 msgstr "Bis-Datum muss später als Von-Datum sein."
-
-#: workbench/invoices/models.py
-msgid "Cannot create an invoice with a date of {} or earlier anymore."
-msgstr "Kann Rechnungen mit einem Datum von {} oder früher nicht mehr erstellen."
 
 #: workbench/invoices/models.py workbench/offers/models.py
 #, python-format
@@ -2802,6 +2807,10 @@ msgid "You are adding a flat rate to a project which already has services. Those
 msgstr "Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
 
 #: workbench/projects/forms.py
+msgid "Cannot close a project with a date of {} or earlier anymore."
+msgstr "Kann Projekte nicht mehr mit einem Datum von {} oder früher schliessen."
+
+#: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."
 msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
 
@@ -2950,6 +2959,18 @@ msgstr "Abgrenzungen"
 #: workbench/reporting/models.py
 msgid "cost centers"
 msgstr "Kostenstellen"
+
+#: workbench/reporting/models.py
+msgid "freeze up to"
+msgstr "einfrieren bis und mit"
+
+#: workbench/reporting/models.py
+msgid "freeze date"
+msgstr "Einfrierdatum"
+
+#: workbench/reporting/models.py
+msgid "freeze dates"
+msgstr "Einfrierdaten"
 
 #: workbench/reporting/utils.py workbench/templates/start.html
 #: workbench/templates/timestamps.html
@@ -3522,8 +3543,9 @@ msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/projects/project_detail.html workbench/tools/models.py
-#: workbench/tools/pdf.py
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/project_budget_statistics.html
+#: workbench/tools/models.py workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "discount"
 msgstr "Rabatt"
 

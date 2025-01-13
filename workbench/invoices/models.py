@@ -16,7 +16,6 @@ from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
-from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceBase
 from workbench.tools.formats import Z1, Z2, currency, local_date_format
 from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet
@@ -292,16 +291,6 @@ class Invoice(ModelWithTotal):
             and self.service_period_from > self.service_period_until
         ):
             errors["service_period_until"] = _("Until date has to be after from date.")
-
-        if (
-            self._state.adding
-            and self.invoiced_on
-            and (freeze := FreezeDate.objects.up_to())
-            and self.invoiced_on <= freeze
-        ):
-            errors["invoiced_on"] = _(
-                "Cannot create an invoice with a date of {} or earlier anymore."
-            ).format(local_date_format(freeze))
 
         raise_if_errors(errors, exclude)
 
