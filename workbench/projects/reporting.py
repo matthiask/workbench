@@ -51,6 +51,28 @@ def hours_per_customer(date_range, *, users=None):
     }
 
 
+def highlight_external(row):
+    if row["reached"] >= row["expected"]:
+        return row | {"highlight": "text-success"}
+    if row["reached"] < row["expected"] - 10:
+        return row | {"highlight": "text-warning"}
+    return row
+
+
+def highlight_internal(row, *, is_last):
+    if is_last and row["reached"] > row["expected"] + 5:
+        return row | {"highlight": "text-warning"}
+    if is_last:
+        return row
+
+    if row["reached"] > row["expected"]:
+        return row | {"highlight": "text-info"}
+    if row["reached"] < row["expected"] / 2:
+        return row | {"highlight": "text-warning"}
+
+    return row
+
+
 def hours_per_type(date_range, *, users=None):
     hours = defaultdict(lambda: defaultdict(lambda: Z1))
 
@@ -95,25 +117,26 @@ def hours_per_type(date_range, *, users=None):
         profitable_percentage = 100 - sum(internal_percentages)
         total = sum(row.values(), 0)
         hours_per_type = [
-            {
+            highlight_external({
                 "id": 0,
                 "type": external_type,
                 "hours": row[0],
                 "expected": profitable_percentage,
                 "reached": 100 * row[0] / total,
-                "is_internal": False,
                 "url": _logbook_url(rendered_by=u.id, internal_type=-1),
-            }
+            })
         ] + [
-            {
-                "id": type.id,
-                "type": type.name,
-                "hours": row[type.id],
-                "expected": uit[type].percentage if type in uit else 0,
-                "reached": 100 * row[type.id] / total,
-                "is_internal": True,
-                "url": _logbook_url(rendered_by=u.id, internal_type=type.id),
-            }
+            highlight_internal(
+                {
+                    "id": type.id,
+                    "type": type.name,
+                    "hours": row[type.id],
+                    "expected": uit[type].percentage if type in uit else 0,
+                    "reached": 100 * row[type.id] / total,
+                    "url": _logbook_url(rendered_by=u.id, internal_type=type.id),
+                },
+                is_last=type == internal_types[-1],
+            )
             for type in internal_types
         ]
         return {
