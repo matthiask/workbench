@@ -23,12 +23,12 @@ class AbsenceSearchForm(Form):
     u = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     reason = forms.ChoiceField(
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         choices=[("", _("All reasons")), *Absence.REASON_CHOICES],
         label="",
     )

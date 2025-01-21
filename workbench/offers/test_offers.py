@@ -566,7 +566,7 @@ class OffersTest(TestCase):
 
         self.assertEqual(
             offer.status_badge,
-            '<span class="badge badge-warning">Offered on 21.04.2020, but project closed on 21.04.2020</span>',
+            '<span class="badge bg-warning">Offered on 21.04.2020, but project closed on 21.04.2020</span>',
         )
 
     @travel("2020-05-04 12:00")
@@ -582,7 +582,7 @@ class OffersTest(TestCase):
 
         self.assertEqual(
             offer.status_badge,
-            '<span class="badge badge-warning">Offered on 04.02.2020, but not valid anymore</span>',
+            '<span class="badge bg-warning">Offered on 04.02.2020, but not valid anymore</span>',
         )
 
     def test_offers_ordering(self):

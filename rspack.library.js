@@ -1,15 +1,21 @@
 /*
 Somewhat reusable webpack configuration chunks
 
-A basic webpack file may looks as follows:
+A basic rspack file may looks as follows:
 
     module.exports = (env, argv) => {
-      const { base, devServer, assetRule, postcssRule, babelWithPreactRule } =
-        require("./webpack.library.js")(argv.mode === "production")
+      const {
+        base,
+        devServer,
+        assetRule,
+        postcssRule,
+        swcWithPreactRule,
+        resolvePreactAsReact,
+      } = require("./rspack.library.js")(argv.mode === "production")
 
       return {
         ...base,
-        // ...resolvePreactAsReact(),
+        ...resolvePreactAsReact(),
         devServer: devServer({ backendPort: env.backend }),
         module: {
           rules: [
@@ -18,14 +24,14 @@ A basic webpack file may looks as follows:
               plugins: [
                 [
                   "@csstools/postcss-global-data",
-                  { files: ["./frontend/custom-media.css"] },
+                  { files: ["./frontend/styles/custom-media.css"] },
                 ],
                 "postcss-custom-media",
                 "postcss-nesting",
                 "autoprefixer",
               ],
             }),
-            babelWithPreactRule(),
+            swcWithPreactRule(),
           ],
         },
       }
@@ -33,125 +39,122 @@ A basic webpack file may looks as follows:
 
 NOTE: PLEASE DO NOT EVER UPDATE THIS FILE WITHOUT CONTRIBUTING THE CHANGES BACK
 TO FH-FABLIB AT https://github.com/feinheit/fh-fablib
+
 */
 
 const path = require("node:path")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const HtmlInlineScriptPlugin = require("html-inline-script-webpack-plugin")
+const rspack = require("@rspack/core")
+const assert = require("node:assert/strict")
+const semver = require("semver")
+
+assert.ok(semver.satisfies(rspack.rspackVersion, ">=1.1.3"), "rspack outdated")
 
 const truthy = (...list) => list.filter((el) => !!el)
 
 module.exports = (PRODUCTION) => {
   const cwd = process.cwd()
 
-  function babelRule({ presets, plugins } = {}) {
-    const options = {
-      cacheDirectory: true,
-      presets: [
-        [
-          "@babel/preset-env",
-          { useBuiltIns: "usage", corejs: "3.33", targets: "defaults" },
-        ],
-      ],
-      plugins: plugins || [],
-    }
-    if (presets) {
-      options.presets = [...options.presets, ...presets]
-    }
-    if (plugins) {
-      options.plugins = plugins
-    }
+  function swcWithPreactRule() {
     return {
-      test: /\.m?js$/i,
-      exclude: /(node_modules)/,
-      use: {
-        loader: "babel-loader",
-        options,
+      test: /\.(j|t)sx?$/,
+      loader: "builtin:swc-loader",
+      exclude: [/[\\/]node_modules[\\/]|foundation/],
+      options: {
+        jsc: {
+          parser: {
+            syntax: "ecmascript",
+            jsx: true,
+          },
+          transform: {
+            react: {
+              runtime: "automatic",
+              importSource: "preact",
+            },
+          },
+          externalHelpers: true,
+        },
       },
+      type: "javascript/auto",
     }
   }
 
-  function miniCssExtractPlugin() {
-    return new MiniCssExtractPlugin({
-      filename: PRODUCTION ? "[name].[contenthash].css" : "[name].css",
-    })
+  function swcWithReactRule() {
+    return {
+      test: /\.(j|t)sx?$/,
+      loader: "builtin:swc-loader",
+      exclude: [/[\\/]node_modules[\\/]|foundation/],
+      options: {
+        jsc: {
+          parser: {
+            syntax: "ecmascript",
+            jsx: true,
+          },
+          transform: {
+            react: {
+              runtime: "automatic",
+              // importSource: "preact",
+            },
+          },
+          externalHelpers: true,
+        },
+      },
+      type: "javascript/auto",
+    }
   }
 
   function htmlPlugin(name = "", config = {}) {
-    const debug = PRODUCTION ? "" : "debug."
-    config = {
-      filename: name ? `${debug}${name}.html` : `${debug}[name].html`,
-      templateContent: "<head></head>",
+    return new HtmlWebpackPlugin({
+      filename: name ? `${name}.html` : "[name].html",
+      inject: false,
+      templateContent: ({ htmlWebpackPlugin }) =>
+        `${htmlWebpackPlugin.tags.headTags}`,
       ...config,
-    }
-    return new HtmlWebpackPlugin(config)
+    })
   }
 
   function htmlSingleChunkPlugin(chunk = "") {
     return htmlPlugin(chunk, chunk ? { chunks: [chunk] } : {})
   }
 
-  function htmlInlineScriptPlugin() {
-    return PRODUCTION
-      ? new HtmlInlineScriptPlugin({
-          scriptMatchPattern: [/runtime.*\.js$/],
-        })
-      : null
-  }
-
   function postcssLoaders(plugins) {
     return [
-      PRODUCTION ? MiniCssExtractPlugin.loader : { loader: "style-loader" },
+      { loader: rspack.CssExtractRspackPlugin.loader },
       { loader: "css-loader" },
       { loader: "postcss-loader", options: { postcssOptions: { plugins } } },
     ]
   }
 
+  function cssExtractPlugin() {
+    return new rspack.CssExtractRspackPlugin({
+      filename: PRODUCTION ? "[name].[contenthash].css" : "[name].css",
+      chunkFilename: PRODUCTION ? "[name].[contenthash].css" : "[name].css",
+    })
+  }
+
   return {
     truthy,
     base: {
-      mode: PRODUCTION ? "production" : "development",
-      bail: PRODUCTION,
-      devtool: PRODUCTION ? "source-map" : "eval-source-map",
+      // mode: PRODUCTION ? "production" : "development",
+      // bail: PRODUCTION,
       context: path.join(cwd, "frontend"),
       entry: { main: "./main.js" },
       output: {
-        clean: { keep: /\.html$/ },
-        path: path.join(cwd, "static"),
+        clean: PRODUCTION,
+        path: path.join(cwd, PRODUCTION ? "static" : "tmp"),
         publicPath: "/static/",
         filename: PRODUCTION ? "[name].[contenthash].js" : "[name].js",
         // Same as the default but prefixed with "_/[name]."
-        assetModuleFilename: "_/[name].[hash][ext][query]",
+        assetModuleFilename: "_/[name].[hash][ext][query][fragment]",
       },
-      plugins: truthy(
-        miniCssExtractPlugin(),
-        htmlSingleChunkPlugin(),
-        htmlInlineScriptPlugin(),
-      ),
-      optimization: PRODUCTION
-        ? {
-            minimizer: ["...", new CssMinimizerPlugin()],
-            runtimeChunk: "single",
-            splitChunks: {
-              chunks: "all",
-            },
-          }
-        : {
-            runtimeChunk: "single",
-          },
-    },
-    noSplitting: {
-      optimization: PRODUCTION
-        ? { minimizer: ["...", new CssMinimizerPlugin()] }
-        : {},
+      plugins: truthy(cssExtractPlugin(), htmlSingleChunkPlugin()),
+      target: "browserslist:defaults",
     },
     devServer(proxySettings) {
       return {
         host: "0.0.0.0",
         hot: true,
-        port: 8000,
+        port: Number(process.env.PORT || 4000),
         allowedHosts: "all",
         client: {
           overlay: {
@@ -177,15 +180,16 @@ module.exports = (PRODUCTION) => {
     },
     assetRule() {
       return {
-        test: /\.(png|woff2?|svg|eot|ttf|otf|gif|jpe?g|mp3|wav)$/i,
+        test: /\.(png|webp|woff2?|svg|eot|ttf|otf|gif|jpe?g|mp3|wav)$/i,
         type: "asset",
         parser: { dataUrlCondition: { maxSize: 512 /* bytes */ } },
       }
     },
-    postcssRule({ plugins }) {
+    postcssRule(cfg) {
       return {
         test: /\.css$/i,
-        use: postcssLoaders(plugins),
+        type: "javascript/auto",
+        use: postcssLoaders(cfg?.plugins),
       }
     },
     sassRule(options = {}) {
@@ -204,19 +208,11 @@ module.exports = (PRODUCTION) => {
             },
           },
         ],
+        type: "javascript/auto",
       }
     },
-    babelRule,
-    babelWithPreactRule() {
-      return babelRule({
-        plugins: [
-          [
-            "@babel/plugin-transform-react-jsx",
-            { runtime: "automatic", importSource: "preact" },
-          ],
-        ],
-      })
-    },
+    swcWithPreactRule,
+    swcWithReactRule,
     resolvePreactAsReact() {
       return {
         resolve: {
@@ -229,15 +225,9 @@ module.exports = (PRODUCTION) => {
         },
       }
     },
-    babelWithReactRule() {
-      return babelRule({
-        presets: [["@babel/preset-react", { runtime: "automatic" }]],
-      })
-    },
-    miniCssExtractPlugin,
     htmlPlugin,
     htmlSingleChunkPlugin,
-    htmlInlineScriptPlugin,
     postcssLoaders,
+    cssExtractPlugin,
   }
 }

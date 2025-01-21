@@ -27,7 +27,7 @@
             <tr>
               <td>{{ row.user }}</td>
               <td>
-                <span class="badge badge-{{ row.mean_logging_delay.classification.1 }}"
+                <span class="badge bg-{{ row.mean_logging_delay.classification.1 }}"
                       title="{{ row.mean_logging_delay.classification.2 }}">
                   {{ row.mean_logging_delay.classification.0 }}
                 </span>
@@ -35,7 +35,7 @@
               <td class="text-right">{{ row.logged_hours_stats.count }}</td>
               <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>
               <td class="text-right">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
-              <td class="text-right {% if row.insufficient_breaks.danger %}text-danger font-weight-bold{% endif %}">
+              <td class="text-right {% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}">
                 {{ row.insufficient_breaks.days }} / {{ row.insufficient_breaks.of }}
                 {% pie row.insufficient_breaks.days row.insufficient_breaks.of %}
               </td>

@@ -1,6 +1,6 @@
 import "./index.scss"
 
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 
 import { Absences } from "./absences"
 
@@ -31,13 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
   )
 
   const el = document.querySelector("#absences-root")
-  ReactDOM.render(
+  const root = createRoot(el)
+  root.render(
     <Absences
       absencesByPerson={absencesByPerson}
       timeBoundaries={timeBoundaries}
       dateList={dateList}
       reasonList={reasonList}
     />,
-    el,
   )
 })

@@ -26,14 +26,14 @@ class CreditEntrySearchForm(Form):
             ("processed", _("Processed")),
         ),
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     ledger = forms.ModelChoiceField(
         Ledger.objects.all(),
         required=False,
         empty_label=_("All ledgers"),
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 

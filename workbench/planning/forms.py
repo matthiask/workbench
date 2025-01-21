@@ -73,7 +73,7 @@ class PlannedWorkSearchForm(Form):
     user = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 

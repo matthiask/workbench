@@ -24,7 +24,7 @@
                   class="list-group-item list-group-item-action"
                   {{ link.attrs|safe }}
                   data-number-shortcut="{{ link.shortcut }}">
-                  {% if link.shortcut is not None %}<span class="badge badge-dark float-right mt-1">{{ link.shortcut }}</span>{% endif %}
+                  {% if link.shortcut is not None %}<span class="badge bg-dark float-right mt-1">{{ link.shortcut }}</span>{% endif %}
                   {% if link.is_pinned %}<small>&#128204;</small>{% endif %}
                   {{ link.title }}
                 </a>

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% load fineforms i18n webpack_loader workbench %}
+
+{% load fineforms i18n webpack_assets workbench %}
+
 {% block title %}
   {% translate 'Absence calendar' %} - {{ block.super }}
 {% endblock title %}
@@ -8,7 +10,7 @@
   <div class="d-flex w-100 align-items-start justify-content-between">
     <h1 class="absences-title">{% translate 'Absence calendar' %}</h1>
     <form method="get"
-          class="form-inline form-search mb-3 ml-auto mr-3"
+          class="d-flex flex-wrap form-search mb-3 ml-auto mr-3"
           data-autosubmit>
       {% if form.changed_data %}
         <a class="btn btn-info"
@@ -20,7 +22,7 @@
     </form>
     <a href="{% url 'awt_absence_create' %}"
        class="btn btn-primary"
-       data-toggle="ajaxmodal">
+       data-bs-toggle="ajaxmodal">
       {% include 'svg/plus.svg' %}
       {% translate 'absence'|capfirst %}
     </a>
@@ -29,6 +31,6 @@
   {{ absences_data|json_script:'absences-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
-    {% render_bundle "absences" %}
+    {% webpack_assets 'absences' %}
   {% endif %}
 {% endblock content %}

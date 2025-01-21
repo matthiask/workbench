@@ -1,6 +1,6 @@
 import "./index.scss"
 
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 
 import { createActivity, loadProjects } from "./actions.js"
@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
   migrateOldData(storeInstance.dispatch)
 
   const el = document.querySelector('div[role="main"]')
-  ReactDOM.render(
+  const root = createRoot(el)
+  root.render(
     <Provider store={storeInstance}>
       <Timer />
     </Provider>,
-    el,
   )
 })
 

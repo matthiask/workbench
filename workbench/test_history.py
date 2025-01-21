@@ -85,7 +85,7 @@ class HistoryTest(TestCase):
         response = self.client.get(f"/history/contacts_person/id/{person.pk}/")
         self.assertContains(
             response,
-            f'<a href="/history/contacts_organization/id/{pk}/" data-toggle="ajaxmodal">'
+            f'<a href="/history/contacts_organization/id/{pk}/" data-bs-toggle="ajaxmodal">'
             "Deleted organization instance</a>",
         )
 

@@ -28,7 +28,7 @@ def create(request, *, viewname):
                 {
                     "title": h(project),
                     "url": f"{project.urls[viewname]}?{params}",
-                    "attrs": 'data-toggle="ajaxmodal"',
+                    "attrs": 'data-bs-toggle="ajaxmodal"',
                     "shortcut": (idx + 1) % 10 if idx < 10 else None,
                     "is_pinned": getattr(project, "is_pinned", False),
                 }

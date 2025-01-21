@@ -39,7 +39,7 @@ class CampaignSearchForm(Form):
             (capfirst(_("status")), [("", _("Open")), ("closed", _("Closed"))]),
         ],
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     org = forms.ModelChoiceField(
@@ -51,7 +51,7 @@ class CampaignSearchForm(Form):
     owned_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 
@@ -179,7 +179,7 @@ class ProjectSearchForm(Form):
             ),
         ],
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     org = forms.ModelChoiceField(
@@ -191,13 +191,13 @@ class ProjectSearchForm(Form):
     type = forms.ChoiceField(
         choices=[("", _("All types")), *Project.TYPE_CHOICES],
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     owned_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 

@@ -45,7 +45,7 @@ class OrganizationSearchForm(Form):
         queryset=Group.objects.all(),
         required=False,
         empty_label=_("All groups"),
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 
@@ -78,14 +78,14 @@ class PersonSearchForm(Form):
             ),
         ],
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     g = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=False,
         empty_label=_("All groups"),
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     added_since = forms.DateField(widget=DateInput, required=False, label="")

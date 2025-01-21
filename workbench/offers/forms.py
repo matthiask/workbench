@@ -30,7 +30,7 @@ class OfferSearchForm(Form):
             (_("Exact"), Offer.STATUS_CHOICES),
         ),
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     org = forms.ModelChoiceField(
@@ -42,7 +42,7 @@ class OfferSearchForm(Form):
     owned_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 
@@ -148,7 +148,7 @@ class OfferForm(PostalAddressSelectionForm):
                 format_html(
                     "<u>{}</u><br>"
                     '<div class="form-check">'
-                    '<input type="checkbox" data-toggle-following>'
+                    '<input type="checkbox" data-bs-toggle-following>'
                     "{}"
                     "</div>",
                     _("Not offered yet"),

@@ -5,11 +5,4 @@ fl.require("1.0.20241122.2")
 fl.config.update(
     app="workbench", domain="workbench.feinheit.ch", branch="main", remote="production"
 )
-
-
-@fl.task
-def dev(ctx):
-    fl._old_dev(ctx)
-
-
-ns = fl.Collection(*fl.GENERAL, dev)
+ns = fl.Collection(*fl.GENERAL)

@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 
 const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
 const opacityClamp = (value) => clamp(0.3, value, 1)
@@ -19,7 +19,8 @@ const fixed = (s, decimalPlaces) => Number.parseFloat(s).toFixed(decimalPlaces)
 document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(document.querySelector("#planning-data").textContent)
   const el = document.querySelector("#planning-root")
-  ReactDOM.render(<Planning data={data} />, el)
+  const root = createRoot(el)
+  root.render(<Planning data={data} />)
 
   const style = data.service_types
     .map(
@@ -337,7 +338,7 @@ function Project({
           />{" "}
           <a
             className="planning--add-pw"
-            data-toggle="ajaxmodal"
+            data-bs-toggle="ajaxmodal"
             title={gettext("Add planned work")}
             href={project.creatework}
           >
@@ -489,7 +490,7 @@ const Milestones = ({ project }) => {
               column={1}
               className={"planning--title is-pw planning--small pl-5"}
             >
-              <a href={m.url} data-toggle="ajaxmodal">
+              <a href={m.url} data-bs-toggle="ajaxmodal">
                 {m.title}
               </a>
             </Cell>
@@ -520,7 +521,7 @@ const Milestones = ({ project }) => {
                   className={"planning--range planning--small is-milestone"}
                   tag="a"
                   href={m.url}
-                  data-toggle="ajaxmodal"
+                  data-bs-toggle="ajaxmodal"
                   title={`${m.title} (${m.dow})`}
                 />
               ))}
@@ -539,7 +540,7 @@ const Milestones = ({ project }) => {
                   }}
                   tag="a"
                   href={m.url}
-                  data-toggle="ajaxmodal"
+                  data-bs-toggle="ajaxmodal"
                   title={`${m.title} (${m.dow})`}
                 />
               ))}
@@ -625,7 +626,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
           work.is_provisional ? "is-provisional" : ""
         } planning--small pl-5`}
       >
-        <a href={work.url} data-toggle="ajaxmodal">
+        <a href={work.url} data-bs-toggle="ajaxmodal">
           {work.title}
         </a>
       </Cell>
@@ -674,7 +675,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
           }`}
           tag="a"
           href={work.url}
-          data-toggle="ajaxmodal"
+          data-bs-toggle="ajaxmodal"
           title={work.tooltip}
         >
           <span className="no-pr">{work.text}</span>
@@ -692,7 +693,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
             } st-${work.service_type_id}`}
             tag="a"
             href={work.url}
-            data-toggle="ajaxmodal"
+            data-bs-toggle="ajaxmodal"
             title={work.tooltip}
           >
             <span className="no-pr">{work.text}</span>
@@ -760,7 +761,7 @@ const ExternalWork = ({ idx, work }) => {
           work.is_provisional ? "is-provisional" : ""
         } planning--small pl-5`}
       >
-        <a href={work.url} data-toggle="ajaxmodal">
+        <a href={work.url} data-bs-toggle="ajaxmodal">
           {work.title} ({work.provided_by})
         </a>
       </Cell>
@@ -782,7 +783,7 @@ const ExternalWork = ({ idx, work }) => {
             className={`planning--range planning--small is-pw st-${work.service_type_id}`}
             tag="a"
             href={work.url}
-            data-toggle="ajaxmodal"
+            data-bs-toggle="ajaxmodal"
             title={work.tooltip}
           />
         ))}
@@ -883,7 +884,7 @@ const AbsencesTooltip = ({ absences }) => {
       {absences.map(([hours, description, url], idx) => (
         <p key={idx}>
           {url ? (
-            <a key={url} href={url} data-toggle="ajaxmodal">
+            <a key={url} href={url} data-bs-toggle="ajaxmodal">
               {fixed(hours, 0)}h: {description}
             </a>
           ) : (

@@ -378,7 +378,7 @@
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'vacation days' %}
                       <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=vacation"
-                         data-toggle="ajaxmodal"
+                         data-bs-toggle="ajaxmodal"
                        >
                         &plus;
                       </a>
@@ -418,7 +418,7 @@
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'sickness days' %}
                       <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=sickness"
-                         data-toggle="ajaxmodal"
+                         data-bs-toggle="ajaxmodal"
                        >
                         &plus;
                       </a>
@@ -449,7 +449,7 @@
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'Paid leave' %}
                       <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=paid"
-                         data-toggle="ajaxmodal"
+                         data-bs-toggle="ajaxmodal"
                        >
                         &plus;
                       </a>
@@ -476,7 +476,7 @@
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'School attendance of apprentices' %}
                       <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=school"
-                         data-toggle="ajaxmodal"
+                         data-bs-toggle="ajaxmodal"
                        >
                         &plus;
                       </a>

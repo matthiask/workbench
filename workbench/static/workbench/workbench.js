@@ -59,8 +59,8 @@ $(() => {
     })
   }
 
-  $(document.body).on("click", "[data-toggle]", function (event) {
-    if (this.dataset.toggle === "ajaxmodal") {
+  $(document.body).on("click", "[data-bs-toggle]", function (event) {
+    if (this.dataset.bsToggle === "ajaxmodal") {
       event.preventDefault()
       window.openModalFromUrl(this.href)
     }
@@ -279,7 +279,7 @@ $(() => {
     } else if (e.keyCode >= 48 && e.keyCode <= 57) {
       const el = _sel(`[data-number-shortcut="${(e.keyCode - 38) % 10}"]`)
       if (!el) return
-      if (el.dataset.toggle === "ajaxmodal") {
+      if (el.dataset.bsToggle === "ajaxmodal") {
         window.openModalFromUrl(el.href)
       } else {
         window.location.href = el.href

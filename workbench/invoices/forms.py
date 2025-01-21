@@ -40,7 +40,7 @@ class InvoiceSearchForm(Form):
             (_("Exact"), Invoice.STATUS_CHOICES),
         ),
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     org = forms.ModelChoiceField(
@@ -52,7 +52,7 @@ class InvoiceSearchForm(Form):
     owned_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 
@@ -567,7 +567,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 format_html(
                     "<u>{}</u><br>"
                     '<div class="form-check">'
-                    '<input type="checkbox" data-toggle-following>'
+                    '<input type="checkbox" data-bs-toggle-following>'
                     "{}"
                     "</div>",
                     offer if offer else _("Not offered yet"),
@@ -788,7 +788,7 @@ class RecurringInvoiceSearchForm(Form):
     s = forms.ChoiceField(
         choices=(("all", _("All states")), ("", _("Open")), ("closed", _("Closed"))),
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     org = forms.ModelChoiceField(
@@ -800,7 +800,7 @@ class RecurringInvoiceSearchForm(Form):
     owned_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 

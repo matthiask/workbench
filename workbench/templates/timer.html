@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% load bootstrap4 static webpack_loader %}
+
+{% load bootstrap4 static webpack_assets %}
+
 {% block title %}Timer - {{ block.super }}{% endblock %}
 
 {% block js %}
@@ -10,7 +12,7 @@
   <span id="projects-base-url" data-url="{% url 'projects_project_list' %}"></span>
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
-    {% render_bundle "timer" %}
+    {% webpack_assets "timer" %}
   {% endif %}
 {% endblock js %}
 

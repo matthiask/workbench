@@ -317,7 +317,7 @@ class ProjectBudgetStatisticsForm(Form):
             ("no-projected-gross-margin", _("No projected gross margin")),
         ],
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     closed_during_the_last_year = forms.BooleanField(
@@ -407,7 +407,7 @@ class PlayingBankForm(Form):
             ("this-year", _("Still open or closed during the current year")),
         ],
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 

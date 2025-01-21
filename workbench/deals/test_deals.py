@@ -227,7 +227,7 @@ class DealsTest(TestCase):
         """The deal badge contains expected informations"""
         self.assertEqual(
             factories.DealFactory.create().status_badge,
-            '<span class="badge badge-info">Open since 18.02.2020</span>',
+            '<span class="badge bg-info">Open since 18.02.2020</span>',
         )
         self.assertEqual(
             factories.DealFactory.create(
@@ -240,7 +240,7 @@ class DealsTest(TestCase):
                 status=Deal.OPEN,
                 probability=Deal.LOW,
             ).status_badge,
-            '<span class="badge badge-info">Open since 18.02.2020</span>',
+            '<span class="badge bg-info">Open since 18.02.2020</span>',
         )
 
     def test_xlsx(self):
@@ -290,7 +290,7 @@ class DealsTest(TestCase):
             deal.pretty_status,
             f"Decision expected on {local_date_format(today)}",
         )
-        self.assertIn("badge-info", deal.status_badge)
+        self.assertIn("bg-info", deal.status_badge)
 
         deal = Deal(decision_expected_on=in_days(-1))
 
@@ -298,16 +298,16 @@ class DealsTest(TestCase):
             deal.pretty_status,
             f"Decision expected on {local_date_format(in_days(-1))}",
         )
-        self.assertIn("badge-warning", deal.status_badge)
+        self.assertIn("bg-warning", deal.status_badge)
 
     def test_caveat_status(self):
         """The status changes after some days for inactive deals"""
         self.assertIn(
-            "badge-info",
+            "bg-info",
             Deal(created_at=timezone.now() - dt.timedelta(days=30)).status_badge,
         )
         self.assertIn(
-            "badge-caveat",
+            "bg-caveat",
             Deal(created_at=timezone.now() - dt.timedelta(days=360)).status_badge,
         )
 

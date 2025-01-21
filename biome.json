@@ -48,7 +48,7 @@
     "formatter": {
       "semicolons": "asNeeded"
     },
-    "globals": ["$"]
+    "globals": []
   },
   "json": {
     "formatter": {

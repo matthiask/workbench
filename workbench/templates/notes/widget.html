@@ -7,7 +7,7 @@
         <h5 class="mb-1">{{ note.created_by }} at {{ note.created_at|local_date_format }}</h5>
         <a href="{{ note.urls.update }}"
            class="btn btn-primary btn-sm align-self-start"
-           data-toggle="ajaxmodal">
+           data-bs-toggle="ajaxmodal">
           {% translate 'Update' %}
         </a>
       </div>
@@ -25,7 +25,7 @@
       <button type="button"
               class="btn btn-primary btn-sm align-self-start"
               data-target="#note-add-form"
-              data-toggle="collapse"
+              data-bs-toggle="collapse"
               aria-expanded="false">
         {% translate 'Toggle form' %}
       </button>

@@ -1,5 +1,7 @@
 {% extends "accounts/user_base.html" %}
-{% load i18n webpack_loader workbench %}
+
+{% load i18n webpack_assets workbench %}
+
 {% block title %}
   {% translate 'planning'|capfirst %} - {{ block.super }}
 {% endblock title %}
@@ -9,30 +11,30 @@
   {{ planning_data|json_script:'planning-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
-    {% render_bundle "planning" %}
+    {% webpack_assets "planning" %}
   {% endif %}
   <div class="row mt-5">
     <div class="col-12">
       <a href="{% url 'planning_plannedwork_create' %}"
-         data-toggle="ajaxmodal"
+         data-bs-toggle="ajaxmodal"
          class="btn btn-primary btn-sm">
         {% include 'svg/plus.svg' %}
         {% translate 'planned work'|capfirst %}
       </a>
       <a href="{% url 'planning_milestone_create' %}"
-         data-toggle="ajaxmodal"
+         data-bs-toggle="ajaxmodal"
          class="btn btn-primary btn-sm">
         {% include 'svg/plus.svg' %}
         {% translate 'milestone'|capfirst %}
       </a>
       <a href="{% url 'awt_absence_create' %}"
-         data-toggle="ajaxmodal"
+         data-bs-toggle="ajaxmodal"
          class="btn btn-primary btn-sm">
         {% include 'svg/plus.svg' %}
         {% translate 'absence'|capfirst %}
       </a>
       <a href="{% url 'history' 'planning_plannedwork' 'user_id' object.pk %}"
-         data-toggle="ajaxmodal"
+         data-bs-toggle="ajaxmodal"
          class="btn btn-primary btn-sm">
         {% translate 'History of planned work' %}
       </a>

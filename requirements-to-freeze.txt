@@ -11,7 +11,6 @@ django-debug-toolbar
 django-fast-export
 django-fineforms
 django-vanilla-views
-django-webpack-loader
 factory-boy
 gunicorn
 lxml

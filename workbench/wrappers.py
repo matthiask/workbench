@@ -35,7 +35,7 @@ class BootstrapFieldWrapper(FieldWrapper):
         else:
             cls = "form-control"
             if isinstance(widget, forms.Select):
-                cls = "custom-select"
+                cls = "form-select"
             elif isinstance(widget, forms.FileInput):
                 cls = "form-control-file"
             widget.attrs["class"] = " ".join(
@@ -58,7 +58,11 @@ class BootstrapFieldWrapper(FieldWrapper):
                 ),
                 "label_tag": self.field.label_tag(
                     label_suffix=self.label_suffix,
-                    attrs=({"class": " ".join(extra_classes + extra_label_classes)}),
+                    attrs={
+                        "class": " ".join(
+                            extra_classes + extra_label_classes + ["form-label"]
+                        )
+                    },
                 ),
                 "css_classes": self.field.css_classes(
                     extra_classes=[

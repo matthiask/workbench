@@ -3,7 +3,7 @@
 {% block search-form-buttons %}
   <a href="{{ view.model.urls.create }}"
      class="btn btn-primary"
-     data-toggle="ajaxmodal">
+     data-bs-toggle="ajaxmodal">
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name|capfirst }}
   </a>
@@ -26,7 +26,7 @@
       {% endifchanged %}
       <a href="{{ object.get_absolute_url }}"
          class="list-group-item list-group-item-action px-0"
-         data-toggle="ajaxmodal">
+         data-bs-toggle="ajaxmodal">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">{{ object|h }}</h5>
           <span>

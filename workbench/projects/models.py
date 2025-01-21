@@ -404,7 +404,7 @@ class Project(Model):
         if self.closed_on:
             css = "light"
         return format_html(
-            '<span class="badge badge-{}">{}</span>', css, self.pretty_status
+            '<span class="badge bg-{}">{}</span>', css, self.pretty_status
         )
 
     @property

@@ -891,7 +891,7 @@ class InvoicesTest(TestCase):
             f"Sent on {local_date_format(yesterday)}, due on {local_date_format(due)}",
         )
         self.assertIn(
-            "badge-warning",
+            "bg-warning",
             Invoice(
                 status=Invoice.SENT,
                 invoiced_on=yesterday,

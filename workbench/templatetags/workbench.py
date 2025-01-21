@@ -48,7 +48,7 @@ def link_or_none(object, pretty=None, none=_ndash, with_badge=False):
         return format_html(
             '<a href="{}"{}>{}{}</a>',
             object.get_absolute_url(),
-            mark_safe(' data-toggle="ajaxmodal"')
+            mark_safe(' data-bs-toggle="ajaxmodal"')
             if getattr(object, "open_in_modal", False)
             else "",
             h(pretty or object),
@@ -232,7 +232,7 @@ def history_link(instance):
             """\
 <a href="{}"
     class="tiny-icons d-inline"
-    data-toggle="ajaxmodal"
+    data-bs-toggle="ajaxmodal"
     title="{}">
 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M13 3H7c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zm-1 8H8V5h4v6zM4 4h1v1H4v6h1v1H4c-.55 0-1-.45-1-1V5c0-.55.45-1 1-1zM1 5h1v1H1v4h1v1H1c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1z"/></svg>
 </a>""",
@@ -254,7 +254,7 @@ def project_statistics_row(project_logged_hours, service_logged_hours):
 def percentage(value, one):
     return (
         format_html(
-            '<span class="font-weight-normal text-black-30">{}%</span>',
+            '<span class="fw-normal text-black-30">{}%</span>',
             round(100 * value / one),
         )
         if one

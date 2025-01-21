@@ -28,18 +28,14 @@ _AUTOCOMPLETE_TEMPLATE = """
     value="%(pretty)s" placeholder="%(placeholder)s"
     autocomplete="off"
     data-autocomplete-url="%(url)s" data-autocomplete-id="%(id)s">
-  <div class="input-group-append">
-    <button type="button" class="btn btn-primary" %(btn_attrs)s
-      data-clear="#%(id)s,#%(id)s_pretty">&times;</button>
-  </div>
+  <button type="button" class="btn btn-primary" %(btn_attrs)s
+    data-clear="#%(id)s,#%(id)s_pretty">&times;</button>
   %(plus)s
 </div>
 %(field)s
 """
 _PLUS_TEMPLATE = """
-  <div class="input-group-append">
-    <a href="%(url)s" target="_blank" class="btn btn-primary">&plus;</a>
-  </div>
+  <a href="%(url)s" target="_blank" class="btn btn-primary">&plus;</a>
 """
 
 

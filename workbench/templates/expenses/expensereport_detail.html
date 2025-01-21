@@ -11,7 +11,7 @@
           <th class="text-right">{% translate 'expenses'|capfirst %}</th>
           <td>
             {% for cost in object.expenses.all reversed %}
-              <a href="{{ cost.urls.detail }}" data-toggle="ajaxmodal">
+              <a href="{{ cost.urls.detail }}" data-bs-toggle="ajaxmodal">
                 {{ cost.rendered_on|local_date_format }}
                 <br>
                 {{ cost.service.project|h }}: {{ cost.service|h }}
@@ -43,7 +43,7 @@
            rel="noopener noreferrer">PDF</a>
         <button type="button"
                 class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                data-toggle="dropdown"
+                data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
           <span class="sr-only">Toggle Dropdown</span>

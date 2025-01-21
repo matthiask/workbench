@@ -75,16 +75,16 @@
 {% block footer %}
   <a href="{{ object.urls.update }}"
      class="btn btn-primary mr-auto"
-     data-toggle="ajaxmodal">{% translate 'Update' %}</a>
+     data-bs-toggle="ajaxmodal">{% translate 'Update' %}</a>
   <a href="{{ object.urls.move }}"
      class="btn btn-primary mr-auto"
-     data-toggle="ajaxmodal">{% translate 'Move' %}</a>
+     data-bs-toggle="ajaxmodal">{% translate 'Move' %}</a>
   <a href="{{ object.service.project.urls.createcost }}?copy={{ object.pk }}"
      class="btn btn-primary mr-auto"
-     data-toggle="ajaxmodal">
+     data-bs-toggle="ajaxmodal">
     {% translate 'Copy' %}
   </a>
   <a href="{{ object.urls.delete }}"
      class="btn btn-outline-danger"
-     data-toggle="ajaxmodal">{% translate 'Delete' %}</a>
+     data-bs-toggle="ajaxmodal">{% translate 'Delete' %}</a>
 {% endblock footer %}

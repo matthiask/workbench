@@ -69,7 +69,7 @@ class LoggedHoursSearchForm(Form):
     rendered_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     project = forms.ModelChoiceField(
@@ -212,7 +212,7 @@ class LoggedCostSearchForm(Form):
     rendered_by = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     project = forms.ModelChoiceField(
@@ -620,7 +620,7 @@ class LoggedCostForm(ModelForm):
             self.fields["expense_currency"] = forms.ChoiceField(
                 choices=[("", "----------")]
                 + [(currency, currency) for currency in rates.rates["rates"]],
-                widget=forms.Select(attrs={"class": "custom-select"}),
+                widget=forms.Select(attrs={"class": "form-select"}),
                 required=False,
                 initial=self.instance.expense_currency,
                 label=self.instance._meta.get_field("expense_currency").verbose_name,
@@ -668,7 +668,7 @@ class BreakSearchForm(Form):
     user = forms.TypedChoiceField(
         coerce=int,
         required=False,
-        widget=forms.Select(attrs={"class": "custom-select"}),
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
 

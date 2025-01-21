@@ -44,7 +44,7 @@
                     <small>{{ project.status_badge }}</small>
                   </h5>
                   <small>
-                    <a href="{{ project.urls.createhours }}" data-toggle="ajaxmodal">+{% translate 'hours' %}</a>
+                    <a href="{{ project.urls.createhours }}" data-bs-toggle="ajaxmodal">+{% translate 'hours' %}</a>
                   </small>
                 </div>
               </div>
@@ -63,7 +63,7 @@
           <div class="card-body">
             {% for birthday in birthdays %}
               <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}"
-                 class="text-nowrap {% if birthday.is_active_user %}font-weight-bold{% endif %}">
+                 class="text-nowrap {% if birthday.is_active_user %}fw-bold{% endif %}">
                 {{ birthday.given_name }} {{ birthday.family_name }} ({{ birthday.date_of_birth|local_date_format }})</a>{% if not forloop.last %},{% endif %}
             {% endfor %}
           </div>
@@ -96,7 +96,7 @@
             {% for hours in todays_hours %}
               <a class="list-group-item list-group-item-action"
                  href="{{ hours.get_absolute_url }}"
-                 data-toggle="ajaxmodal">
+                 data-bs-toggle="ajaxmodal">
                 <small class="d-flex justify-content-between">
                   <span>{{ hours.service.project_service_title }}</span>
                   <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
@@ -126,7 +126,7 @@
             {% for hours in all_users_hours %}
               <a class="list-group-item list-group-item-action"
                  href="{{ hours.get_absolute_url }}"
-                 data-toggle="ajaxmodal">
+                 data-bs-toggle="ajaxmodal">
                 <small class="d-flex justify-content-between">
                   <span>{{ hours.service.project_service_title }}</span>
                   <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>

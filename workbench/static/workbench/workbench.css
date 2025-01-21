@@ -10,7 +10,6 @@ body {
 
 .navbar-brand {
   margin-left: 0.5rem;
-  margin-right: 1rem;
 }
 
 .navbar .form-inline {
@@ -127,12 +126,11 @@ tbody th > a {
 .form-search > * {
   margin-left: 0.25rem;
 }
-.form-search .form-group {
-  margin-bottom: 0.25rem;
-}
+
 .form-search label:empty {
   display: none;
 }
+
 .form-search .widget--checkboxinput {
   align-self: center;
 }
@@ -151,7 +149,7 @@ tbody th > a {
 
 .form-help-text {
   display: block;
-  margin: -10px 0 8px;
+  margin: -8px 0 4px;
   font-size: 85%;
   color: #443 !important;
 }
@@ -198,12 +196,11 @@ tbody th > a {
   fill: lightgreen;
 }
 
-.badge-caveat,
 .bg-caveat {
   background-color: #f1e53b;
 }
 
-.badge-break {
+.bg-break {
   background-color: lightskyblue;
 }
 
@@ -347,4 +344,8 @@ tbody th > a {
   &[data-pinned="true"] {
     filter: none;
   }
+}
+
+a {
+  text-decoration: none;
 }
