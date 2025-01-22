@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
     <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
 
-    {% webpack_assets 'main' %}
+    {% if not TESTING %}{% webpack_assets 'main' %}{% endif %}
     <script src="{% static 'workbench/workbench.js' %}" defer></script>
     <script src="{% static 'workbench/lib/form-request-submit-polyfill.js' %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/date-input-polyfill@2.14.0/date-input-polyfill.dist.js" integrity="sha256-FcR3bJqClBNWiJqgW1E9yEgSRoAqRNcjOfgRfaH0LVw=" crossorigin="anonymous" async></script>
