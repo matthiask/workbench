@@ -41,6 +41,7 @@
         </form>
       </div>
       {% block objects %}
+      <div class="list-group">
         {% for object in object_list %}
           <a href="{{ object.get_absolute_url }}"
              class="list-group-item list-group-item-action">
@@ -50,6 +51,7 @@
             </div>
           </a>
         {% endfor %}
+      </div>
       {% endblock objects %}
       {% if page_obj %}
         <nav class="mt-3">

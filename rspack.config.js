@@ -24,22 +24,7 @@ module.exports = (env, argv) => {
     },
     devServer: devServer({ backendPort: env.backend }),
     module: {
-      rules: [
-        assetRule(),
-        postcssRule({
-          plugins: [
-            [
-              "@csstools/postcss-global-data",
-              { files: ["./frontend/styles/custom-media.css"] },
-            ],
-            "postcss-custom-media",
-            "postcss-nesting",
-            "autoprefixer",
-          ],
-        }),
-        sassRule(),
-        swcWithReactRule(),
-      ],
+      rules: [assetRule(), postcssRule(), sassRule(), swcWithReactRule()],
     },
     plugins: truthy(
       cssExtractPlugin(),

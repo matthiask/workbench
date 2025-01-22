@@ -567,7 +567,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 format_html(
                     "<u>{}</u><br>"
                     '<div class="form-check">'
-                    '<input type="checkbox" data-bs-toggle-following>'
+                    '<input type="checkbox" data-toggle-following>'
                     "{}"
                     "</div>",
                     offer if offer else _("Not offered yet"),

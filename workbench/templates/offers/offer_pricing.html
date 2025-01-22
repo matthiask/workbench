@@ -1,5 +1,5 @@
 {% extends "generic/object_form.html" %}
-{% load bootstrap4 fineforms formset i18n %}
+{% load django_bootstrap5 fineforms formset i18n %}
 {% block uplink %}
   {% if view.object %}
     <a href="{{ view.object.get_absolute_url }}"

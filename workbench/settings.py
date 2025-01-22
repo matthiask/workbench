@@ -36,7 +36,7 @@ INSTALLED_APPS = [
         "django.contrib.staticfiles",
         "django.contrib.postgres",
         "admin_ordering",
-        "bootstrap4",
+        "django_bootstrap5",
         "colorfield",
         "django_countries",
         "authlib",

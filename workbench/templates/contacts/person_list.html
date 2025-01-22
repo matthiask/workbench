@@ -1,5 +1,7 @@
 {% extends "contacts/object_list.html" %}
-{% load bootstrap4 i18n workbench %}
+
+{% load django_bootstrap5 i18n workbench %}
+
 {% block search-form-buttons %}
   {{ block.super }}
   {% if request.GET %}

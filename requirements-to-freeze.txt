@@ -3,7 +3,7 @@ coverage[toml]
 Django
 django-admin-ordering
 django-authlib
-django-bootstrap4
+django-bootstrap5
 django-colorfield
 django-cors-headers
 django-countries

@@ -16,7 +16,7 @@
   {{ block.super }}
   <script>
 jQuery(function($) {
-  $(document.body).on("change", "[data-bs-toggle-following]", function() {
+  $(document.body).on("change", "[data-toggle-following]", function() {
     var self = $(this),
       siblings = self.closest(".form-text").nextUntil(".form-text");
 

@@ -1,18 +1,18 @@
 <!doctype html>
-{% load bootstrap4 i18n static webpack_assets %}
+{% load django_bootstrap5 i18n static webpack_assets %}
 <html lang="{{ LANGUAGE_CODE }}">
   <head>
     <title>
       {% block title %}{{ WORKBENCH.TITLE }}{% endblock %}
     </title>
+    <script src="{% static 'workbench/lib/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
+    <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
+
     {% webpack_assets 'main' %}
-    <script src="{% static 'workbench/lib/jquery-ui.min.js' %}" defer></script>
     <script src="{% static 'workbench/workbench.js' %}" defer></script>
     <script src="{% static 'workbench/lib/form-request-submit-polyfill.js' %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/date-input-polyfill@2.14.0/date-input-polyfill.dist.js" integrity="sha256-FcR3bJqClBNWiJqgW1E9yEgSRoAqRNcjOfgRfaH0LVw=" crossorigin="anonymous" async></script>
-    <link rel="stylesheet"
-          type="text/css"
-          href="{% static 'workbench/lib/jquery-ui.min.css' %}">
     <link rel="stylesheet" href="{% static 'workbench/workbench.css' %}">
     <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
     <meta name="viewport"

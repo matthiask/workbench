@@ -1,5 +1,5 @@
 {% extends "projects/object_list.html" %}
-{% load bootstrap4 i18n workbench %}
+{% load django_bootstrap5 i18n workbench %}
 {% block objects %}
   <div class="list-group list-group-flush">
     {% for project in object_list|analyze_projects %}
