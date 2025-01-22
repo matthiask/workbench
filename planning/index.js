@@ -191,7 +191,7 @@ function TotalByWeek({ by_week, title }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-end pr-2"
+        className="planning--scale text-end pe-2"
       >
         <strong>{title}</strong>
       </Cell>
@@ -222,7 +222,7 @@ function Capacity({ total, by_user }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-end pr-2"
+        className="planning--scale text-end pe-2"
       >
         <strong>{gettext("Remaining capacity per week")}</strong>
       </Cell>
@@ -259,7 +259,7 @@ function UserCapacity({ user, capacity }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-end pr-2"
+        className="planning--scale text-end pe-2"
         tag="a"
         href={user.url}
       >
@@ -469,7 +469,7 @@ const Milestones = ({ project }) => {
         }}
         className="planning--milestones"
       />
-      <Cell row={row} column={1} className="planning--title is-milestone pl-3">
+      <Cell row={row} column={1} className="planning--title is-milestone ps-3">
         {gettext("milestones")}
       </Cell>
       {project.milestones.map((m, i) => {
@@ -488,7 +488,7 @@ const Milestones = ({ project }) => {
             <Cell
               row={row}
               column={1}
-              className={"planning--title is-pw planning--small pl-5"}
+              className={"planning--title is-pw planning--small ps-5"}
             >
               <a href={m.url} data-ajaxmodal>
                 {m.title}
@@ -555,7 +555,7 @@ function Offer({ offer, external_view, work_list }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
-  const classList = ["planning--title is-offer pl-3"]
+  const classList = ["planning--title is-offer ps-3"]
   if (offer.is_declined) classList.push("is-declined")
   if (!offer.is_accepted) classList.push("is-not-accepted")
 
@@ -583,7 +583,7 @@ function Offer({ offer, external_view, work_list }) {
           </Cell>
         </>
       ) : (
-        <Cell row={row} column={1} className="planning--title is-offer pl-3">
+        <Cell row={row} column={1} className="planning--title is-offer ps-3">
           {gettext("Not part of an offer")}
         </Cell>
       )}
@@ -624,7 +624,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
         column={1}
         className={`planning--title is-pw ${
           work.is_provisional ? "is-provisional" : ""
-        } planning--small pl-5`}
+        } planning--small ps-5`}
       >
         <a href={work.url} data-ajaxmodal>
           {work.title}
@@ -726,7 +726,7 @@ const ExternalExpenses = ({ external_work }) => {
         }}
         className="planning--external"
       />
-      <Cell row={row} column={1} className="planning--title is-external pl-3">
+      <Cell row={row} column={1} className="planning--title is-external ps-3">
         {gettext("Efforts")}
       </Cell>
       {external_work.map((work, idx) => (
@@ -755,7 +755,7 @@ const ExternalWork = ({ idx, work }) => {
         column={1}
         className={`planning--title is-pw ${
           work.is_provisional ? "is-provisional" : ""
-        } planning--small pl-5`}
+        } planning--small ps-5`}
       >
         <a href={work.url} data-ajaxmodal>
           {work.title} ({work.provided_by})
@@ -846,7 +846,7 @@ function Absences({ absences }) {
 //       <Cell
 //         row={row}
 //         column={1}
-//         className="planning--small is-project-absence pl-3"
+//         className="planning--small is-project-absence ps-3"
 //       >
 //         {user[0].name}
 //       </Cell>
@@ -898,7 +898,7 @@ function UserAbsences({ user }) {
 
   return (
     <>
-      <Cell row={row} column={1} className="planning--title is-absence pl-3">
+      <Cell row={row} column={1} className="planning--title is-absence ps-3">
         {user[0]}
       </Cell>
       {user[1].map((absences, idx) => {

@@ -132,7 +132,7 @@ export const Activity = connect((state, ownProps) => ({
           </div>
           <div className="d-flex align-items-center justify-content-between">
             <div
-              className="activity-duration pl-2"
+              className="activity-duration ps-2"
               onClick={() => {
                 overwriteSeconds(dispatch, { activity, current })
               }}
@@ -152,7 +152,7 @@ export const Activity = connect((state, ownProps) => ({
                 {icons.cog}
               </button>
               <button
-                className={`btn btn-sm ml-2 ${
+                className={`btn btn-sm ms-2 ${
                   activity.isActive ? "btn-warning" : "btn-light"
                 }`}
                 type="button"
@@ -167,7 +167,7 @@ export const Activity = connect((state, ownProps) => ({
                 {activity.isActive ? icons.pause : icons.play}
               </button>
               <button
-                className="btn btn-sm ml-2 btn-light"
+                className="btn btn-sm ms-2 btn-light"
                 disabled={!activity.project}
                 type="button"
                 onClick={() =>
@@ -181,7 +181,7 @@ export const Activity = connect((state, ownProps) => ({
                 {icons.pen}
               </button>
               <button
-                className={`btn btn-sm ml-2 ${
+                className={`btn btn-sm ms-2 ${
                   isReady ? "btn-success" : "btn-light"
                 }`}
                 disabled={!activity.project || !isReady}
