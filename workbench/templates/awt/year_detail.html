@@ -16,7 +16,7 @@
             </li>
           {% endfor %}
           {% if request.user.features.CONTROLLING %}
-            <li class="nav-item ml-auto">
+            <li class="nav-item ms-auto">
               <a class="nav-link" href="{% querystring user='active' %}">{% translate 'active users' %}</a>
             </li>
             <li class="nav-item">

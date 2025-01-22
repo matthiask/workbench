@@ -74,13 +74,13 @@
 
 {% block footer %}
   <a href="{{ object.urls.update }}"
-     class="btn btn-primary mr-auto"
+     class="btn btn-primary me-auto"
      data-ajaxmodal>{% translate 'Update' %}</a>
   <a href="{{ object.urls.move }}"
-     class="btn btn-primary mr-auto"
+     class="btn btn-primary me-auto"
      data-ajaxmodal>{% translate 'Move' %}</a>
   <a href="{{ object.service.project.urls.createcost }}?copy={{ object.pk }}"
-     class="btn btn-primary mr-auto"
+     class="btn btn-primary me-auto"
      data-ajaxmodal>
     {% translate 'Copy' %}
   </a>

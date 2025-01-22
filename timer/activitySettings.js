@@ -44,7 +44,7 @@ export const ActivitySettings = ({
         {gettext("OK")}
       </button>
       <button
-        className="btn btn-sm btn-danger ml-auto mr-1"
+        className="btn btn-sm btn-danger ms-auto mr-1"
         type="button"
         onClick={() => removeActivity()}
       >
