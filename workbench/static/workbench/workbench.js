@@ -67,7 +67,7 @@ $(() => {
     const el = e.target.closest("[data-ajaxmodal]")
     if (el) {
       e.preventDefault()
-      window.openModalFromUrl(e.target.href)
+      window.openModalFromUrl(el.href)
     }
   })
 

@@ -6,8 +6,7 @@
         <h4 class="modal-title">
           {% block title %}{{ title }}{% endblock %}
         </h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
         </button>
       </div>
       <div class="modal-body clearfix">
@@ -16,7 +15,7 @@
       </div>
       <div class="modal-footer">
         {% block footer %}
-          <button type="button" data-dismiss="modal" class="btn btn-primary">{% translate 'Close' %}</button>
+          <button type="button" data-bs-dismiss="modal" class="btn btn-primary">{% translate 'Close' %}</button>
         {% endblock footer %}
       </div>
     </div>
