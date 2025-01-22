@@ -13,6 +13,7 @@ from workbench.deals.models import Deal
 from workbench.deals.reporting import accepted_deals
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import local_date_format
+from workbench.tools.forms import WarningsForm
 from workbench.tools.validation import in_days
 
 
@@ -78,6 +79,18 @@ class DealsTest(TestCase):
                 "closing_type": factories.ClosingTypeFactory.create(
                     represents_a_win=False
                 ).pk,
+            },
+        )
+        self.assertContains(response, "closed-in-future")
+
+        response = self.client.post(
+            deal.urls["set_status"] + f"?status={Deal.DECLINED}",
+            {
+                "closed_on": in_days(300).isoformat(),
+                "closing_type": factories.ClosingTypeFactory.create(
+                    represents_a_win=False
+                ).pk,
+                WarningsForm.ignore_warnings_id: "closed-in-future",
             },
         )
         self.assertRedirects(response, deal.urls["detail"])

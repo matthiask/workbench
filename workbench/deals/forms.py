@@ -431,6 +431,14 @@ class SetStatusForm(ModelForm):
                             "error": " ".join(str(e) for e in exc.messages),
                         },
                     )
+        if (closed_on := data.get("closed_on")) and closed_on > in_days(90):
+            self.add_warning(
+                _(
+                    "Attention! The closed on date is more than tree months in the future!"
+                ),
+                code="closed-in-future",
+            )
+
         return data
 
     def save(self, *args, **kwargs):
