@@ -284,7 +284,8 @@ $(() => {
     } else if (e.keyCode >= 48 && e.keyCode <= 57) {
       const el = _sel(`[data-number-shortcut="${(e.keyCode - 38) % 10}"]`)
       if (!el) return
-      if (el.dataset.ajaxmodal) {
+      e.preventDefault()
+      if ("ajaxmodal" in el.dataset) {
         window.openModalFromUrl(el.href)
       } else {
         window.location.href = el.href
