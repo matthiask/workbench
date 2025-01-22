@@ -327,7 +327,7 @@ function Project({
         <Cell
           row={row}
           column={2}
-          style={{ color: "var(--primary)" }}
+          style={{ color: "var(--bs-primary)" }}
           className="planning--actions no-pr no-wrap"
         >
           <Collapse

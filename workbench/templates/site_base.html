@@ -20,44 +20,44 @@
     <meta name="robots" content="noindex">
     <style>
       .btn-primary {
-        background-color: var(--blue);
-        border-color: var(--blue);
+        background-color: var(--bs-blue);
+        border-color: var(--bs-blue);
       }
       .btn-primary.disabled,
       .btn-primary:disabled {
-        background-color: var(--darker);
-        border-color: var(--darker);
+        background-color: var(--bs-darker);
+        border-color: var(--bs-darker);
       }
       .bg-primary {
-        background-color: var(--blue) !important;
+        background-color: var(--bs-blue) !important;
       }
       .navbar {
-        background-color: var(--blue) !important;
+        background-color: var(--bs-blue) !important;
       }
       a {
-        color: var(--blue);
+        color: var(--bs-blue);
       }
     </style>
     {% if SPARKLES %}
       <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
       <style>
       :root {
-        --blue: #b049a5;
-        --darker: #3c034b;
+        --bs-blue: #b049a5;
+        --bs-darker: #3c034b;
       }
       </style>
     {% elif request.user.features.PRIDE and JUN14 %}
       <style>
       :root {
-        --blue: #b049a5;
-        --darker: #3c034b;
+        --bs-blue: #b049a5;
+        --bs-darker: #3c034b;
       }
       </style>
     {% else %}
       <style>
       :root {
-        --blue: #0061c8;
-        --darker: #0031a0;
+        --bs-blue: #0061c8;
+        --bs-darker: #0031a0;
       }
       </style>
     {% endif %}
