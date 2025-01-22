@@ -12,8 +12,8 @@
         <thead>
           <tr>
             <th>{% translate 'user'|capfirst %}</th>
-            <th class="text-right">{% translate 'Birthday' %}</th>
-            <th class="text-right">{% translate 'Age on birthday' %}</th>
+            <th class="text-end">{% translate 'Birthday' %}</th>
+            <th class="text-end">{% translate 'Age on birthday' %}</th>
           </tr>
         </thead>
         <tbody>
@@ -29,15 +29,15 @@
             {% endifchanged %}
             <tr>
               <td>{% link_or_none birthday.user %}</td>
-              <td class="text-right">{{ birthday.user.person.date_of_birth|local_date_format }}</td>
-              <td class="text-right">{{ birthday.age }}</td>
+              <td class="text-end">{{ birthday.user.person.date_of_birth|local_date_format }}</td>
+              <td class="text-end">{{ birthday.age }}</td>
             </tr>
           {% endfor %}
           {% for user in birthdays.users_without_birthdays %}
             <tr>
               <td>{% link_or_none user %}</td>
-              <td class="text-right">?</td>
-              <td class="text-right">?</td>
+              <td class="text-end">?</td>
+              <td class="text-end">?</td>
             </tr>
           {% endfor %}
         </tbody>

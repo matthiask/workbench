@@ -15,7 +15,7 @@
         <th>{% translate 'ledger' %}</th>
         <th>{% translate 'value date' %}</th>
         <th>{% translate 'payment notice' %}</th>
-        <th class="text-right">{% translate 'total' %}</th>
+        <th class="text-end">{% translate 'total' %}</th>
         <th>{% translate 'invoice' %}, {% translate 'notes' %}</th>
       </tr>
     </thead>
@@ -27,7 +27,7 @@
             <a href="{{ entry.get_absolute_url }}">{{ entry.value_date|local_date_format }}</a>
           </th>
           <td>{{ entry.payment_notice }}</td>
-          <td class="text-right">{{ entry.total|currency }}</td>
+          <td class="text-end">{{ entry.total|currency }}</td>
           <td>
             {% link_or_none entry.invoice none='' %}
             {{ entry.notes|linebreaksbr }}

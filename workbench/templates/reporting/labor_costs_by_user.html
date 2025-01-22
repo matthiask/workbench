@@ -10,31 +10,31 @@
   <table class="table table-sm bg-light">
     <tr>
       <th>{% translate 'user'|capfirst %}</th>
-      <th class="text-right">{% translate 'hours'|capfirst %}</th>
-      <th class="text-right">{% translate 'Undefined rate' %}</th>
-      <th class="text-right">{% translate 'Net cost' %}</th>
-      <th class="text-right">{% translate 'Productivity costs' %}</th>
+      <th class="text-end">{% translate 'hours'|capfirst %}</th>
+      <th class="text-end">{% translate 'Undefined rate' %}</th>
+      <th class="text-end">{% translate 'Net cost' %}</th>
+      <th class="text-end">{% translate 'Productivity costs' %}</th>
     </tr>
     {% for row in stats.by_user %}
       <tr>
         <td title="{{ row.user.email }}">{{ row.user }}</td>
-        <td class="text-right">{{ row.hours|hours }}</td>
-        <td class="text-right">{{ row.hours_with_rate_undefined|hours }}</td>
-        <td class="text-right">{{ row.costs|currency }}</td>
-        <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
+        <td class="text-end">{{ row.hours|hours }}</td>
+        <td class="text-end">{{ row.hours_with_rate_undefined|hours }}</td>
+        <td class="text-end">{{ row.costs|currency }}</td>
+        <td class="text-end">{{ row.costs_with_green_hours_target|currency }}</td>
       </tr>
     {% endfor %}
     <tr>
       <th>{% translate 'total'|capfirst %}</th>
-      <th class="text-right">{{ stats.hours|hours }}</th>
-      <th class="text-right">{{ stats.hours_with_rate_undefined|hours }}</th>
-      <th class="text-right">{{ stats.costs|currency }}</th>
-      <th class="text-right">{{ stats.costs_with_green_hours_target|currency }}</th>
+      <th class="text-end">{{ stats.hours|hours }}</th>
+      <th class="text-end">{{ stats.hours_with_rate_undefined|hours }}</th>
+      <th class="text-end">{{ stats.costs|currency }}</th>
+      <th class="text-end">{{ stats.costs_with_green_hours_target|currency }}</th>
     </tr>
     <tr>
       <td>{% translate 'third party costs'|capfirst %}</td>
       <td colspan="3"></td>
-      <td class="text-right">{{ stats.third_party_costs|currency }}</td>
+      <td class="text-end">{{ stats.third_party_costs|currency }}</td>
     </tr>
   </table>
 {% endblock body %}

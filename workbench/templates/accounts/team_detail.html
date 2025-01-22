@@ -9,12 +9,12 @@
       <table class="table table-striped">
         {% for name, value in object|field_value_pairs %}
           <tr>
-            <th class="text-right">{{ name }}</th>
+            <th class="text-end">{{ name }}</th>
             <td>{% link_or_none value %}</td>
           </tr>
         {% endfor %}
         <tr>
-          <th class="text-right">{{ object|label:'members' }}</th>
+          <th class="text-end">{{ object|label:'members' }}</th>
           <td>
             {% for user in object.members.active %}
               {% link_or_none user %}
@@ -36,7 +36,7 @@
         {% translate 'Absence calendar' %}
       </a>
       <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
+         class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
     </div>
   </div>
 {% endblock content %}

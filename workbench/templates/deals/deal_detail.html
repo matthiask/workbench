@@ -6,23 +6,23 @@
       <h1>{{ object|h }} {% history_link object %}</h1>
       <table class="table table-striped">
         <tr>
-          <th class="text-right">{{ object|label:'customer' }}</th>
+          <th class="text-end">{{ object|label:'customer' }}</th>
           <td>{% link_or_none object.customer %}</td>
         </tr>
         <tr>
-          <th class="text-right">{{ object|label:'contact' }}</th>
+          <th class="text-end">{{ object|label:'contact' }}</th>
           <td>{% link_or_none object.contact %}</td>
         </tr>
         <tr>
-          <th class="text-right">{{ object|label:'probability' }}</th>
+          <th class="text-end">{{ object|label:'probability' }}</th>
           <td>{{ object.get_probability_display }}</td>
         </tr>
         <tr>
-          <th class="text-right">{{ object|label:'decision_expected_on' }}</th>
+          <th class="text-end">{{ object|label:'decision_expected_on' }}</th>
           <td>{{ object.decision_expected_on|local_date_format }}</td>
         </tr>
         <tr>
-          <th class="text-right">{{ object|label:'status' }}</th>
+          <th class="text-end">{{ object|label:'status' }}</th>
           <td>
             <div class="row justify-content-between">
               <div class="col">
@@ -55,11 +55,11 @@
           </td>
         </tr>
         <tr>
-          <th class="text-right">{{ object|label:'description' }}</th>
+          <th class="text-end">{{ object|label:'description' }}</th>
           <td>{{ object.description|linebreaksbr|urlize|default:"&ndash;" }}</td>
         </tr>
         <tr>
-          <th class="text-right">{{ object|label:'value' }}</th>
+          <th class="text-end">{{ object|label:'value' }}</th>
           <td>
             <strong>{{ object.value|currency }}</strong>
             <br>
@@ -70,11 +70,11 @@
           </td>
         </tr>
         <tr>
-          <th class="text-right">{% translate 'contact person'|capfirst %}</th>
+          <th class="text-end">{% translate 'contact person'|capfirst %}</th>
           <td>{% link_or_none object.owned_by %}</td>
         </tr>
         <tr>
-          <th class="text-right">{% translate 'contributions'|capfirst %}</th>
+          <th class="text-end">{% translate 'contributions'|capfirst %}</th>
           <td>
             {% for c in object.all_contributions %}
               {{ c.user }}: {{ c.value|currency }}
@@ -84,18 +84,18 @@
         </tr>
         {% for attribute in object.attributes.select_related %}
           <tr>
-            <th class="text-right">{{ attribute.group }}</th>
+            <th class="text-end">{{ attribute.group }}</th>
             <td>{{ attribute }}</td>
           </tr>
         {% endfor %}
         <tr>
-          <th class="text-right">{{ object|label:'related_offers' }}</th>
+          <th class="text-end">{{ object|label:'related_offers' }}</th>
           <td>
             {% for offer in object.get_related_offers %}
               <div class="clearfix mb-2">
                 <form method="post"
                       action="{{ object.urls.remove_offer }}"
-                      class="float-right">
+                      class="float-end">
                   {% csrf_token %}
                   <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
                   <button type="submit"
@@ -115,7 +115,7 @@
          class="btn btn-primary"
          data-ajaxmodal>{% translate 'Link offer' %}</a>
       <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-right">
+         class="btn btn-outline-danger float-end">
         {% translate 'Delete' %}
       </a>
       {% notes object %}

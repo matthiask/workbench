@@ -15,13 +15,13 @@
         <thead>
           <tr>
             <th>{% translate 'project'|capfirst %}</th>
-            <th class="text-right">{% translate 'hours'|capfirst %}</th>
-            <th class="text-right">{% translate 'Undefined rate' %}</th>
-            <th class="text-right">{% translate 'Net cost' %}</th>
-            <th class="text-right">{% translate 'Productivity costs' %}</th>
-            <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
-            <th class="text-right">{% translate 'cost'|capfirst %}</th>
-            <th class="text-right"
+            <th class="text-end">{% translate 'hours'|capfirst %}</th>
+            <th class="text-end">{% translate 'Undefined rate' %}</th>
+            <th class="text-end">{% translate 'Net cost' %}</th>
+            <th class="text-end">{% translate 'Productivity costs' %}</th>
+            <th class="text-end">{% translate 'third party costs'|capfirst %}</th>
+            <th class="text-end">{% translate 'cost'|capfirst %}</th>
+            <th class="text-end"
                 title="{% translate 'Hours times max(hourly rate, hourly labor cost)' %}">
               {% translate 'Revenue' %}
             </th>
@@ -32,18 +32,18 @@
           {% for cc_row in stats.cost_centers %}
             <tr>
               <th>{{ cc_row.cost_center|default:_("No cost center defined") }}</th>
-              <th class="text-right">{{ cc_row.hours|hours }}</th>
-              <th class="text-right
+              <th class="text-end">{{ cc_row.hours|hours }}</th>
+              <th class="text-end
                          {% if not cc_row.hours_with_rate_undefined %}
                            text-black-30
                          {% endif %}">
                 {{ cc_row.hours_with_rate_undefined|hours }}
               </th>
-              <th class="text-right">{{ cc_row.costs|currency }}</th>
-              <th class="text-right">{{ cc_row.costs_with_green_hours_target|currency }}</th>
-              <th class="text-right">{{ cc_row.third_party_costs|currency }}</th>
-              <th class="text-right">{{ cc_row.costs_with_green_hours_target|addf:cc_row.third_party_costs|currency }}</th>
-              <th class="text-right">{{ cc_row.revenue|currency }}</th>
+              <th class="text-end">{{ cc_row.costs|currency }}</th>
+              <th class="text-end">{{ cc_row.costs_with_green_hours_target|currency }}</th>
+              <th class="text-end">{{ cc_row.third_party_costs|currency }}</th>
+              <th class="text-end">{{ cc_row.costs_with_green_hours_target|addf:cc_row.third_party_costs|currency }}</th>
+              <th class="text-end">{{ cc_row.revenue|currency }}</th>
               <td>
                 {% if cc_row.cost_center %}
                   <a href="{% querystring cost_center=cc_row.cost_center.id %}"
@@ -54,22 +54,22 @@
             {% for row in cc_row.projects %}
               <tr>
                 <td>{% link_or_none row.project %}</td>
-                <td class="text-right">
+                <td class="text-end">
                   <a href="{% url 'logbook_loggedhours_list' %}{% querystring date_from=date_range.0.isoformat date_until=date_range.1.isoformat project=row.project.id %}">
                     {{ row.hours|hours }}
                   </a>
                 </td>
-                <td class="text-right
+                <td class="text-end
                            {% if not row.hours_with_rate_undefined %}
                              text-black-30
                            {% endif %}">
                   {{ row.hours_with_rate_undefined|hours }}
                 </td>
-                <td class="text-right">{{ row.costs|currency }}</td>
-                <td class="text-right">{{ row.costs_with_green_hours_target|currency }}</td>
-                <td class="text-right">{{ row.third_party_costs|currency }}</td>
-                <td class="text-right">{{ row.costs_with_green_hours_target|addf:row.third_party_costs|currency }}</td>
-                <td class="text-right">
+                <td class="text-end">{{ row.costs|currency }}</td>
+                <td class="text-end">{{ row.costs_with_green_hours_target|currency }}</td>
+                <td class="text-end">{{ row.third_party_costs|currency }}</td>
+                <td class="text-end">{{ row.costs_with_green_hours_target|addf:row.third_party_costs|currency }}</td>
+                <td class="text-end">
                   {{ row.revenue|currency }}
                 </td>
                 <td>
@@ -85,28 +85,28 @@
             <th>
               {% translate 'total'|capfirst %}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.hours|hours }}
             </th>
-            <th class="text-right
+            <th class="text-end
                        {% if not stats.hours_with_rate_undefined %}
                          text-black-30
                        {% endif %}">
               {{ stats.hours_with_rate_undefined|hours }}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.costs|currency }}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.costs_with_green_hours_target|currency }}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.third_party_costs|currency }}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.costs_with_green_hours_target|addf:stats.third_party_costs|currency }}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.revenue|currency }}
             </th>
             <td>

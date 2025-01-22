@@ -15,7 +15,7 @@
           <th></th>
           <th class="text-nowrap">{% translate 'date'|capfirst %}</th>
           <th></th>
-          <th class="text-nowrap text-right">{% translate 'third party costs'|capfirst %}</th>
+          <th class="text-nowrap text-end">{% translate 'third party costs'|capfirst %}</th>
         </tr>
       {% endif %}
       <tr>
@@ -25,7 +25,7 @@
         <td></td>
         <td>{{ cost.rendered_on|local_date_format }}</td>
         <td></td>
-        <td class="text-right">{{ cost.third_party_costs|currency }}</td>
+        <td class="text-end">{{ cost.third_party_costs|currency }}</td>
       </tr>
     {% endfor %}
     {% for invoice in invoices %}
@@ -35,7 +35,7 @@
           <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
           <th class="text-nowrap">{% translate 'date'|capfirst %}</th>
           <th class="text-nowrap">{% translate 'total excl. tax'|capfirst %}</th>
-          <th class="text-nowrap text-right">{% translate 'third party costs'|capfirst %}</th>
+          <th class="text-nowrap text-end">{% translate 'third party costs'|capfirst %}</th>
         </tr>
       {% endif %}
       <tr>
@@ -47,9 +47,9 @@
         </td>
         <td>{{ invoice.get_type_display }}</td>
         <td>{{ invoice.invoiced_on|local_date_format }}</td>
-        <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+        <td class="text-end">{{ invoice.total_excl_tax|currency }}</td>
       </td>
-      <td class="text-right">{{ invoice.third_party_costs|currency }}</td>
+      <td class="text-end">{{ invoice.third_party_costs|currency }}</td>
     </tr>
   {% endfor %}
 </table>

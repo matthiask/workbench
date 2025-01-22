@@ -7,19 +7,19 @@
 {% block body %}
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% translate 'user'|capfirst %}</th>
+      <th class="text-end">{% translate 'user'|capfirst %}</th>
       <td>{% link_or_none object.user %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'absence'|capfirst %}</th>
+      <th class="text-end">{% translate 'absence'|capfirst %}</th>
       <td>{{ object.pretty_status }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'reason'|capfirst %}</th>
+      <th class="text-end">{% translate 'reason'|capfirst %}</th>
       <td>{{ object.get_reason_display }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'description'|capfirst %}</th>
+      <th class="text-end">{% translate 'description'|capfirst %}</th>
       <td>{{ object.description|linebreaksbr }}</td>
     </tr>
   </table>

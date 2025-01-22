@@ -11,11 +11,11 @@
     <thead>
     <tr>
       <th class="w-100">{% translate 'project'|capfirst %}</th>
-      <th class="text-nowrap text-right">{% translate 'Projected' %}</th>
-      <th class="text-nowrap text-right">{% translate 'gross margin'|capfirst %}</th>
-      <th class="text-nowrap text-right">{% translate 'Delta' %}</th>
+      <th class="text-nowrap text-end">{% translate 'Projected' %}</th>
+      <th class="text-nowrap text-end">{% translate 'gross margin'|capfirst %}</th>
+      <th class="text-nowrap text-end">{% translate 'Delta' %}</th>
       <th>&nbsp; &nbsp; &nbsp;</th>
-      {% for m in months %}<th class="text-nowrap text-right">{{ m|date:'M y' }}</th>{% endfor %}
+      {% for m in months %}<th class="text-nowrap text-end">{{ m|date:'M y' }}</th>{% endfor %}
     </tr>
     <tr>
       <th class="w-100">{% translate 'Total' %}</th>
@@ -23,7 +23,7 @@
       <th>&nbsp;</th>
       <th>&nbsp;</th>
       <th>&nbsp;</th>
-      {% for mo in monthly_overall %}<th class="text-nowrap text-right">{{ mo|currency }}</th>{% endfor %}
+      {% for mo in monthly_overall %}<th class="text-nowrap text-end">{{ mo|currency }}</th>{% endfor %}
     </tr>
     </thead>
     <tbody>
@@ -35,12 +35,12 @@
             {{ project.project.status_badge }}
           </a>
         </td>
-        <td class="text-right">{{ project.projected_total|currency }}</td>
-        <td class="text-right">{{ project.gross_margin|currency }}</td>
-        <td class="text-right">{{ project.delta|currency }}</td>
+        <td class="text-end">{{ project.projected_total|currency }}</td>
+        <td class="text-end">{{ project.gross_margin|currency }}</td>
+        <td class="text-end">{{ project.delta|currency }}</td>
         <td>&nbsp;</td>
         {% for mo in project.monthly %}
-          <td class="text-nowrap text-right">
+          <td class="text-nowrap text-end">
             {% if mo %}{{ mo|currency }}{% endif %}
           </td>
         {% endfor %}

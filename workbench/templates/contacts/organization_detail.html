@@ -6,7 +6,7 @@
       <h1>{{ object }} {% history_link object %}</h1>
       <table class="table table-striped">
         <tr>
-          <td class="text-right">{% translate 'people'|capfirst %}</td>
+          <td class="text-end">{% translate 'people'|capfirst %}</td>
           <td>
             {% for person in organization.people.all %}
               <a class="inline" href="{{ person.get_absolute_url }}">{{ person }}</a>{% if not forloop.last %},{% endif %}
@@ -14,7 +14,7 @@
           </td>
         </tr>
         <tr>
-          <td class="text-right">{{ organization|label:'groups' }}</td>
+          <td class="text-end">{{ organization|label:'groups' }}</td>
           <td>
             {% for group in organization.groups.all %}
               <a class="inline" href="{% url 'contacts_organization_list' %}?g={{ group.id }}">{{ group }}</a>{% if not forloop.last %},{% endif %}
@@ -23,15 +23,15 @@
           </td>
         </tr>
         <tr>
-          <td class="text-right">{{ object|label:'is_private_person' }}</td>
+          <td class="text-end">{{ object|label:'is_private_person' }}</td>
           <td>{{ organization.is_private_person|yesno:_("yes,no") }}</td>
         </tr>
         <tr>
-          <td class="text-right">{{ object|label:'default_billing_address' }}</td>
+          <td class="text-end">{{ object|label:'default_billing_address' }}</td>
           <td>{{ organization.default_billing_address|linebreaksbr|default:"&ndash;" }}</td>
         </tr>
         <tr>
-          <td class="text-right">{{ object|label:'notes' }}</td>
+          <td class="text-end">{{ object|label:'notes' }}</td>
           <td>{{ organization.notes|urlize|linebreaksbr|default:"&ndash;" }}</td>
         </tr>
       </table>
@@ -63,7 +63,7 @@
       </a>
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
       <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-right">
+         class="btn btn-outline-danger float-end">
         {% translate 'Delete or substitute' %}
       </a>
     </div>
@@ -78,29 +78,29 @@
           <div class="card-body">
             <table class="table table-sm">
               <tr>
-                <th class="text-right">
+                <th class="text-end">
                   <a href="{% url 'offers_offer_list' %}?org={{ object.pk }}&amp;s=all">{% translate 'Offered' %}</a>
                 </th>
                 <td>{{ object.statistics.offered|currency }}</td>
               </tr>
               <tr>
-                <th class="text-right">
+                <th class="text-end">
                   <a href="{% url 'invoices_invoice_list' %}?org={{ object.pk }}">{% translate 'Gross profit' %}</a>
                 </th>
                 <td>{{ object.statistics.invoiced|currency }}</td>
               </tr>
               <tr>
-                <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
+                <th class="text-end">{% translate 'third party costs'|capfirst %}</th>
                 <td>{{ object.statistics.third_party_costs|currency }}</td>
               </tr>
               <tr>
-                <th class="text-right">
+                <th class="text-end">
                   <a href="{% url 'logbook_loggedhours_list' %}?organization={{ object.pk }}">{% translate 'logged hours'|capfirst %}</a>
                 </th>
                 <td>{{ object.statistics.hours|hours }}</td>
               </tr>
               <tr>
-                <th class="text-right">{% translate 'Gross margin / hour' %}</th>
+                <th class="text-end">{% translate 'Gross margin / hour' %}</th>
                 <td>{{ object.statistics.gross_margin_per_hour|currency }}</td>
               </tr>
             </table>

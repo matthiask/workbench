@@ -29,15 +29,15 @@
         <h2 class="mt-5">{% translate 'facts' %}</h2>
         <table class="table">
           <tr>
-            <td class="text-right">{{ overall.available_vacation_days|days }}</td>
+            <td class="text-end">{{ overall.available_vacation_days|days }}</td>
             <th>{% translate 'vacation days available' %}</th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.absence_vacation|days }}</td>
+            <td class="text-end">{{ overall.absence_vacation|days }}</td>
             <th>{% translate 'vacation days taken' %} ({% translate 'corrected' %})</th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.absence_sickness|days }}</td>
+            <td class="text-end">{{ overall.absence_sickness|days }}</td>
             <th>
               {% translate 'sickness days' %}
               {% if overall.sickness_by_fte %}
@@ -50,27 +50,27 @@
             </th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.absence_paid|days }}</td>
+            <td class="text-end">{{ overall.absence_paid|days }}</td>
             <th>{% translate 'Paid leave' %}</th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.absence_school|days }}</td>
+            <td class="text-end">{{ overall.absence_school|days }}</td>
             <th>{% translate 'School attendance of apprentices' %}</th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.absence_correction|days }}</td>
+            <td class="text-end">{{ overall.absence_correction|days }}</td>
             <th>{% translate 'Working time correction' %}</th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.running_sum|hours:True }}</td>
+            <td class="text-end">{{ overall.running_sum|hours:True }}</td>
             <th>{% translate 'net work hours' %}</th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.vacation_days_credit|days }}</td>
+            <td class="text-end">{{ overall.vacation_days_credit|days }}</td>
             <th>{% translate 'vacation days credit' %}</th>
           </tr>
           <tr>
-            <td class="text-right">{{ overall.balance|hours:True }}</td>
+            <td class="text-end">{{ overall.balance|hours:True }}</td>
             <th>{% translate 'balance' %}</th>
           </tr>
         </table>
@@ -84,7 +84,7 @@
             <tr class="thead-light">
               <th>{{ year.year }}</th>
               {% for month in stats.months %}<th>{{ month|date:'M' }}</th>{% endfor %}
-              <th class="text-right">{% translate 'Total' %}</th>
+              <th class="text-end">{% translate 'Total' %}</th>
             </tr>
             <tr>
               <th class="text-nowrap">
@@ -94,11 +94,11 @@
                 </small>
               </th>
               {% for value in stats.target_days %}
-                <td class="text-right {% if not value %}text-black-30{% endif %}">
+                <td class="text-end {% if not value %}text-black-30{% endif %}">
                   {{ value|days }}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.target_days|days }}
               </th>
             </tr>
@@ -107,11 +107,11 @@
                 {% translate 'pensum' %}
               </th>
               {% for value in stats.percentage %}
-                <td class="text-right {% if not value %}text-black-30{% endif %}">
+                <td class="text-end {% if not value %}text-black-30{% endif %}">
                   {{ value|stringformat:'.0f' }}%
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.percentage|stringformat:'.0f' }}%
               </th>
             </tr>
@@ -120,7 +120,7 @@
                 {% translate 'vacation days available' %}
               </th>
               {% for value in stats.available_vacation_days %}
-                <td class="text-right {% if not value %}text-black-30{% endif %}">
+                <td class="text-end {% if not value %}text-black-30{% endif %}">
                   {% if value is None %}
                     &ndash;
                   {% else %}
@@ -128,7 +128,7 @@
                   {% endif %}
                 </td>
               {% endfor %}
-              <th class="text-right
+              <th class="text-end
                          {% if totals.vacation_days_override %}
                            text-black-30
                          {% endif %}">
@@ -140,11 +140,11 @@
                 <th class="text-nowrap">
                   {% translate 'vacation days override'|capfirst %}
                 </th>
-                <td colspan="12" class="text-right">
+                <td colspan="12" class="text-end">
                   {{ totals.vacation_days_override.notes }}
                   ({{ totals.vacation_days_override.pretty_days }})
                 </td>
-                <th class="text-right">
+                <th class="text-end">
                   {{ totals.available_vacation_days|days }}
                 </th>
               </tr>
@@ -161,11 +161,11 @@
                 </small>
               </th>
               {% for value in stats.target %}
-                <td class="text-right {% if not value %}text-black-30{% endif %}">
+                <td class="text-end {% if not value %}text-black-30{% endif %}">
                   {{ value|hours }}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.target|hours }}
               </th>
             </tr>
@@ -174,11 +174,11 @@
                 {% translate 'vacation days taken' %}
               </th>
               {% for value in stats.absence_vacation %}
-                <td class="text-left {% if not value %}text-black-30{% endif %}">
+                <td class="text-start {% if not value %}text-black-30{% endif %}">
                   {{ value|days }}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.absence_vacation|days }}
               </th>
             </tr>
@@ -187,11 +187,11 @@
                 {% translate 'sickness days' %}
               </th>
               {% for value in stats.absence_sickness %}
-                <td class="text-left {% if not value %}text-black-30{% endif %}">
+                <td class="text-start {% if not value %}text-black-30{% endif %}">
                   {{ value|days }}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.absence_sickness|days }}
               </th>
             </tr>
@@ -201,11 +201,11 @@
                   {% translate 'Paid leave' %}
                 </th>
                 {% for value in stats.absence_paid %}
-                  <td class="text-left {% if not value %}text-black-30{% endif %}">
+                  <td class="text-start {% if not value %}text-black-30{% endif %}">
                     {{ value|days }}
                   </td>
                 {% endfor %}
-                <th class="text-right">
+                <th class="text-end">
                   {{ totals.absence_paid|days }}
                 </th>
               </tr>
@@ -216,11 +216,11 @@
                   {% translate 'School attendance of apprentices' %}
                 </th>
                 {% for value in stats.absence_school %}
-                  <td class="text-left {% if not value %}text-black-30{% endif %}">
+                  <td class="text-start {% if not value %}text-black-30{% endif %}">
                     {{ value|days }}
                   </td>
                 {% endfor %}
-                <th class="text-right">
+                <th class="text-end">
                   {{ totals.absence_school|days }}
                 </th>
               </tr>
@@ -231,11 +231,11 @@
                   {% translate 'Working time correction' %}
                 </th>
                 {% for value in stats.absence_correction %}
-                  <td class="text-left {% if not value %}text-black-30{% endif %}">
+                  <td class="text-start {% if not value %}text-black-30{% endif %}">
                     {{ value|days }}
                   </td>
                 {% endfor %}
-                <th class="text-right">
+                <th class="text-end">
                   {{ totals.absence_correction|days }}
                 </th>
               </tr>
@@ -246,11 +246,11 @@
                   {% translate 'vacation days correction' %}
                 </th>
                 {% for value in stats.vacation_days_correction %}
-                  <td class="text-left {% if not value %}text-black-30{% endif %}">
+                  <td class="text-start {% if not value %}text-black-30{% endif %}">
                     {{ value|days }}
                   </td>
                 {% endfor %}
-                <th class="text-right">
+                <th class="text-end">
                   {{ totals.vacation_days_correction|days }}
                 </th>
               </tr>
@@ -260,11 +260,11 @@
                 {% translate 'countable absence hours' %}
               </th>
               {% for value in data.absences_time %}
-                <td class="text-right {% if not value %}text-black-30{% endif %}">
+                <td class="text-end {% if not value %}text-black-30{% endif %}">
                   {{ value|hours }}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.absences_time|hours }}
               </th>
             </tr>
@@ -273,11 +273,11 @@
                 {% translate 'logged hours' %}
               </th>
               {% for value in stats.hours %}
-                <td class="text-right {% if not value %}text-black-30{% endif %}">
+                <td class="text-end {% if not value %}text-black-30{% endif %}">
                   {{ value|hours }}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.hours|hours }}
               </th>
             </tr>
@@ -286,11 +286,11 @@
                 {% translate 'working time' %}
               </th>
               {% for value in data.working_time %}
-                <td class="text-right {% if not value %}text-black-30{% endif %}">
+                <td class="text-end {% if not value %}text-black-30{% endif %}">
                   {{ value|hours }}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.working_time|hours }}
               </th>
             </tr>
@@ -299,7 +299,7 @@
                 {% translate 'net work hours per month' %}
               </th>
               {% for value in monthly_sums %}
-                <td class="text-right">
+                <td class="text-end">
                   {% if value is not None %}{{ value|hours }}{% endif %}
                 </td>
               {% endfor %}
@@ -311,11 +311,11 @@
                 {% translate 'running net work hours' %}
               </th>
               {% for value in running_sums %}
-                <td class="text-right">
+                <td class="text-end">
                   {% if value is not None %}{{ value|hours }}{% endif %}
                 </td>
               {% endfor %}
-              <th class="text-right">
+              <th class="text-end">
                 {{ totals.running_sum|hours }}
               </th>
             </tr>
@@ -324,7 +324,7 @@
                 <th class="text-nowrap">
                   {% translate 'vacation days credit' %}
                 </th>
-                <th colspan="13" class="text-right">
+                <th colspan="13" class="text-end">
                   {{ totals.vacation_days_credit|days }}
                 </th>
               </tr>
@@ -333,7 +333,7 @@
               <th class="text-nowrap">
                 {% translate 'balance' %}
               </th>
-              <th colspan="13" class="text-right">
+              <th colspan="13" class="text-end">
                 {{ totals.balance|hours }}
               </th>
             </tr>

@@ -14,7 +14,7 @@
             aria-expanded="false">
       <span class="visually-hidden">Toggle Dropdown</span>
     </button>
-    <div class="dropdown-menu dropdown-menu-right">
+    <div class="dropdown-menu dropdown-menu-end">
       <a class="dropdown-item"
          href="{% querystring export='pdf' disposition='attachment' %}">{% translate 'Download' %}</a>
     </div>
@@ -39,7 +39,7 @@
           <div class="col-md-6">{{ invoice.contact.name_with_organization|default:invoice.customer }}</div>
           <div class="col-md-2">{{ invoice.get_type_display }}</div>
           <div class="col-md-1">{{ invoice.invoiced_on|local_date_format }}</div>
-          <div class="col-md-3 text-md-right">
+          <div class="col-md-3 text-md-end">
             {{ invoice.total_excl_tax|currency }} exkl. /
             {{ invoice.total|currency }}
           </div>

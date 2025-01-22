@@ -10,16 +10,16 @@
   <table class="table table-striped">
     {% for name, value in object|field_value_pairs:'project,created_at,title,milestone,service_type' %}
       <tr>
-        <th class="text-right">{{ name }}</th>
+        <th class="text-end">{{ name }}</th>
         <td>{% link_or_none value %}</td>
       </tr>
     {% endfor %}
     <tr>
-      <th class="text-right">{{ object|label:'notes' }}</th>
+      <th class="text-end">{{ object|label:'notes' }}</th>
       <td>{{ object.notes|urlize|linebreaksbr }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'Periods' %}</th>
+      <th class="text-end">{% translate 'Periods' %}</th>
       <td>
         {% for range in object.ranges %}
           {{ range.pretty }}

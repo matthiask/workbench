@@ -20,17 +20,17 @@
             {% translate 'Logged' %}
             <br>
           </td>
-          <th class="text-right">
+          <th class="text-end">
             {{ stats.planned|hours }}
             <br>
             {{ stats.logged|hours }}
             <br>
           </th>
-          <td class="text-right">
+          <td class="text-end">
             <br>
             {% percentage stats.logged stats.planned %}
           </td>
-          {% for week in stats.weeks %}<th class="text-right">{{ week.date|date:'d.m.' }}</th>{% endfor %}
+          {% for week in stats.weeks %}<th class="text-end">{{ week.date|date:'d.m.' }}</th>{% endfor %}
         </tr>
         {% for customer_row in stats.per_customer %}
           <tr>
@@ -44,18 +44,18 @@
               {% translate 'Logged' %}
               <br>
             </td>
-            <th class="text-right">
+            <th class="text-end">
               <span class="{% if not customer_row.planned %}text-black-30{% endif %}">{{ customer_row.planned|hours }}</span>
               <br>
               <span class="{% if not customer_row.logged %}text-black-30{% endif %}">{{ customer_row.logged|hours }}</span>
               <br>
             </th>
-            <td class="text-right">
+            <td class="text-end">
               <br>
               {% percentage customer_row.logged customer_row.planned %}
             </td>
             {% for week_row in customer_row.per_week %}
-              <td class="text-right
+              <td class="text-end
                          {% if not week_row.planned and not week_row.logged %}
                            text-black-30
                          {% endif %}"

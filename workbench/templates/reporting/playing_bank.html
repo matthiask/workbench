@@ -15,19 +15,19 @@
         <thead class="sticky">
           <tr>
             <th>{% translate 'project'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'offered'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'logged (past)'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'logged (future)'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'invoiced'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'delta'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'offered'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'logged (past)'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'logged (future)'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'invoiced'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'delta'|capfirst %}</th>
           </tr>
           <tr>
             <th></th>
-            <th class="text-nowrap text-right">{{ statistics.total_offered|currency }}</th>
-            <th class="text-nowrap text-right">{{ statistics.total_logged.past|currency }}</th>
-            <th class="text-nowrap text-right">{{ statistics.total_logged.future|currency }}</th>
-            <th class="text-nowrap text-right">{{ statistics.total_invoiced|currency }}</th>
-            <th class="text-nowrap text-right">
+            <th class="text-nowrap text-end">{{ statistics.total_offered|currency }}</th>
+            <th class="text-nowrap text-end">{{ statistics.total_logged.past|currency }}</th>
+            <th class="text-nowrap text-end">{{ statistics.total_logged.future|currency }}</th>
+            <th class="text-nowrap text-end">{{ statistics.total_invoiced|currency }}</th>
+            <th class="text-nowrap text-end">
               {{ statistics.total_minus|currency:True }}<br>
               {{ statistics.total_plus|currency:True }}<br>
             </th>
@@ -39,19 +39,19 @@
               <td>
                 {% link_or_none row.project with_badge=True %}
               </td>
-              <td class="text-right {% if not row.offered %}text-black-30{% endif %}">{{ row.offered|currency }}</td>
-              <td class="text-right {% if not row.logged.past %}text-black-30{% endif %}">
+              <td class="text-end {% if not row.offered %}text-black-30{% endif %}">{{ row.offered|currency }}</td>
+              <td class="text-end {% if not row.logged.past %}text-black-30{% endif %}">
                 <a href="{% url 'logbook_loggedcost_list' %}?project={{ row.project.pk }}">
                   {{ row.logged.past|currency }}
                 </a>
               </td>
-              <td class="text-right {% if not row.logged.future %}text-black-30{% endif %}">
+              <td class="text-end {% if not row.logged.future %}text-black-30{% endif %}">
                 <a href="{% url 'logbook_loggedcost_list' %}?project={{ row.project.pk }}">
                   {{ row.logged.future|currency }}
                 </a>
               </td>
-              <td class="text-right {% if not row.invoiced %}text-black-30{% endif %}">{{ row.invoiced|currency }}</td>
-              <td class="text-right {% if not row.delta %}text-black-30{% endif %}">{{ row.delta|currency:True }}</td>
+              <td class="text-end {% if not row.invoiced %}text-black-30{% endif %}">{{ row.invoiced|currency }}</td>
+              <td class="text-end {% if not row.delta %}text-black-30{% endif %}">{{ row.delta|currency:True }}</td>
             </tr>
           {% endfor %}
         </tbody>

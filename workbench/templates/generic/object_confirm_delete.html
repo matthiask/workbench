@@ -17,10 +17,8 @@
           {% ff_errors form %}
           {% ff_fields form %}
         {% endif %}
-        {% buttons %}
         <a href="{{ object.get_absolute_url }}" class="btn btn-primary">{% translate 'cancel' %}</a>
-        <button type="submit" class="btn btn-danger float-right">{% translate 'delete' %}</button>
-      {% endbuttons %}
+        <button type="submit" class="btn btn-danger float-end">{% translate 'delete' %}</button>
     </form>
   </div>
 </div>

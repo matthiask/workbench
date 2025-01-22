@@ -15,9 +15,9 @@
         <thead class="sticky">
           <tr>
             <th class="w-100">{% translate 'invoice'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'invoiced on'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'total excl. tax'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'total'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'invoiced on'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'total excl. tax'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'total'|capfirst %}</th>
           </tr>
         </thead>
         <tbody>
@@ -31,17 +31,17 @@
                   {{ invoice.status_badge }}
                 </a>
               </td>
-              <td class="text-right">{{ invoice.invoiced_on|local_date_format }}</td>
-              <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
-              <td class="text-right">{{ invoice.total|currency }}</td>
+              <td class="text-end">{{ invoice.invoiced_on|local_date_format }}</td>
+              <td class="text-end">{{ invoice.total_excl_tax|currency }}</td>
+              <td class="text-end">{{ invoice.total|currency }}</td>
             </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <th>{% translate 'total'|capfirst %}</th>
           <th></th>
-          <th class="text-right">{{ open_items_list.total_excl_tax|currency }}</th>
-          <th class="text-right">{{ open_items_list.total|currency }}</th>
+          <th class="text-end">{{ open_items_list.total_excl_tax|currency }}</th>
+          <th class="text-end">{{ open_items_list.total|currency }}</th>
         </tfoot>
       </table>
       <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
@@ -62,15 +62,15 @@
         <thead>
           <tr>
             <th>{% translate 'week'|capfirst %}</th>
-            <th class="text-right">{% translate 'total excl. tax'|capfirst %}</th>
-            <th class="text-right">{% translate 'total'|capfirst %}</th>
+            <th class="text-end">{% translate 'total excl. tax'|capfirst %}</th>
+            <th class="text-end">{% translate 'total'|capfirst %}</th>
         </thead>
         <tbody>
           {% for week, per_week in open_items_list.weeks %}
             <tr>
               <td>KW{{ week|date:'W Y' }}</td>
-              <td class="text-right">{{ per_week.total_excl_tax|currency }}</td>
-              <td class="text-right">{{ per_week.total|currency }}</td>
+              <td class="text-end">{{ per_week.total_excl_tax|currency }}</td>
+              <td class="text-end">{{ per_week.total|currency }}</td>
             </tr>
           {% endfor %}
         </tbody>

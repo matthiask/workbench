@@ -21,53 +21,53 @@
         <thead class="sticky">
           <tr>
             <th>{% translate 'project'|capfirst %}</th>
-            <th class="text-right" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</th>
-            <th class="text-right">{% translate 'discount'|capfirst %}</th>
-            <th class="text-right">{% translate 'logbook'|capfirst %}</th>
-            <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
-            <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
-            <th class="text-right">{% translate 'service hours'|capfirst %}</th>
-            <th class="text-right">&Delta;</th>
-            <th class="text-right" colspan="2">{% translate 'projected gross margin'|capfirst %}</th>
+            <th class="text-end" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</th>
+            <th class="text-end">{% translate 'discount'|capfirst %}</th>
+            <th class="text-end">{% translate 'logbook'|capfirst %}</th>
+            <th class="text-end">{% translate 'third party costs'|capfirst %}</th>
+            <th class="text-end">{% translate 'invoiced'|capfirst %}</th>
+            <th class="text-end">{% translate 'service hours'|capfirst %}</th>
+            <th class="text-end">&Delta;</th>
+            <th class="text-end" colspan="2">{% translate 'projected gross margin'|capfirst %}</th>
           </tr>
           <tr>
             <th colspan="8"></th>
-            <th class="text-right">{% translate 'total' %}</th>
-            <th class="text-right">{{ statistics.cutoff_date|date:'d.m.' }}</th>
+            <th class="text-end">{% translate 'total' %}</th>
+            <th class="text-end">{{ statistics.cutoff_date|date:'d.m.' }}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <th></th>
-            <th class="text-right">{{ statistics.overall.sold|currency }}</th>
-            <th class="text-right">{{ statistics.overall.discount|currency }}</th>
-            <th class="text-right">{{ statistics.overall.logbook|currency }}</th>
-            <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
-            <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
-            <th class="text-right text-nowrap">
+            <th class="text-end">{{ statistics.overall.sold|currency }}</th>
+            <th class="text-end">{{ statistics.overall.discount|currency }}</th>
+            <th class="text-end">{{ statistics.overall.logbook|currency }}</th>
+            <th class="text-end">{{ statistics.overall.third_party_costs|currency }}</th>
+            <th class="text-end">{{ statistics.overall.invoiced|currency }}</th>
+            <th class="text-end text-nowrap">
               {{ statistics.overall.hours|hours }} / {{ statistics.overall.service_hours|hours }}
               {% bar statistics.overall.hours statistics.overall.service_hours %}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ statistics.overall.delta_positive|currency:True }}
               <br>
               {{ statistics.overall.delta_negative|currency:True }}
             </th>
-            <th class="text-right {% if not statistics.overall.projected_gross_margin %}text-black-30{% endif %}">{{ statistics.overall.projected_gross_margin|currency }}</th>
-            <th class="text-right {% if not statistics.overall.projected_gross_margin_on_cutoff_date %}text-black-30{% endif %}">{{ statistics.overall.projected_gross_margin_on_cutoff_date|currency }}</th>
+            <th class="text-end {% if not statistics.overall.projected_gross_margin %}text-black-30{% endif %}">{{ statistics.overall.projected_gross_margin|currency }}</th>
+            <th class="text-end {% if not statistics.overall.projected_gross_margin_on_cutoff_date %}text-black-30{% endif %}">{{ statistics.overall.projected_gross_margin_on_cutoff_date|currency }}</th>
           </tr>
           {% for project in statistics.statistics %}
             <tr>
               <td>{% link_or_none project.project with_badge=True %}</td>
-              <td class="text-right
+              <td class="text-end
                          {% if not project.sold %}
                            text-black-30
                          {% endif %}">{{ project.sold|currency }}</td>
-              <td class="text-right
+              <td class="text-end
                          {% if not project.discount %}
                            text-black-30
                          {% endif %}">{{ project.discount|currency }}</td>
-              <td class="text-right text-nowrap
+              <td class="text-end text-nowrap
                          {% if not project.logbook and not project.effort_hours_with_rate_undefined %}
                            text-black-30
                          {% endif %}">
@@ -78,24 +78,24 @@
                   </span>
                 {% endif %}
               </td>
-              <td class="text-right
+              <td class="text-end
                          {% if not project.third_party_costs %}
                            text-black-30
                          {% endif %}">
                 {{ project.third_party_costs|currency }}
               </td>
-              <td class="text-right
+              <td class="text-end
                          {% if not project.invoiced %}
                            text-black-30
                          {% endif %}">{{ project.invoiced|currency }}</td>
-              <td class="text-right text-nowrap">
+              <td class="text-end text-nowrap">
                 {{ project.hours|hours }} /
                 {{ project.service_hours|hours }}
                 {% bar project.hours project.service_hours %}
               </td>
-              <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
-              <td class="text-right {% if not project.projected_gross_margin %}text-black-30{% endif %}">{{ project.projected_gross_margin|currency }}</td>
-              <td class="text-right {% if not project.projected_gross_margin_on_cutoff_date %}text-black-30{% endif %}">{{ project.projected_gross_margin_on_cutoff_date|currency }}</td>
+              <td class="text-end {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
+              <td class="text-end {% if not project.projected_gross_margin %}text-black-30{% endif %}">{{ project.projected_gross_margin|currency }}</td>
+              <td class="text-end {% if not project.projected_gross_margin_on_cutoff_date %}text-black-30{% endif %}">{{ project.projected_gross_margin_on_cutoff_date|currency }}</td>
             </tr>
           {% endfor %}
         </tbody>

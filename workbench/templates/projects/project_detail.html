@@ -60,7 +60,7 @@
 
                   {% if gs.has_budget_retainer_offers %}
                     <tr>
-                      <th class="text-right">{% translate 'Budget retainment' %}</th>
+                      <th class="text-end">{% translate 'Budget retainment' %}</th>
                       <td>
                         {{ gs.budget_retainer_total|currency }} {% translate 'sold' %}
                         {% if gs.budget_retainer_discount %}({% blocktranslate with discount=gs.budget_retainer_discount|currency %}incl. {{ discount }} discount{% endblocktranslate %}){% endif %}
@@ -72,7 +72,7 @@
                   {% endif %}
 
                   <tr>
-                    <th class="text-right">{% translate 'Total costs' %}</th>
+                    <th class="text-end">{% translate 'Total costs' %}</th>
                     <td>
                       {{ gs.total_logged_cost|currency }}
                       {% if gs.total_logged_hours_rate_undefined %}
@@ -93,7 +93,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <th class="text-right">{% translate 'Not archived' %}</th>
+                    <th class="text-end">{% translate 'Not archived' %}</th>
                     <td>
                       {{ project.not_archived_total.total|currency }}
                       {% if project.not_archived_total.hours_rate_undefined %}
@@ -115,12 +115,12 @@
                     </td>
                   </tr>
                   <tr>
-                    <th class="text-right">{% translate 'Total invoiced excl. tax' %}</th>
+                    <th class="text-end">{% translate 'Total invoiced excl. tax' %}</th>
                     <td>{{ project.project_invoices_total_excl_tax|currency }}</td>
                   </tr>
                   {% if request.user.features.PROJECTED_GROSS_MARGIN %}
                     <tr>
-                      <th class="text-right">{% translate 'projected gross margin'|capfirst %}</th>
+                      <th class="text-end">{% translate 'projected gross margin'|capfirst %}</th>
                       <td>
                         {% for pi in project.projected_invoices.all %}
                           {{ pi.invoiced_on|local_date_format }}: {{ pi.gross_margin|currency }}
@@ -167,7 +167,7 @@
                     aria-expanded="false">
               {% translate 'Project offers' %}
             </button>
-            <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-end">
               <h6 class="dropdown-header">{% translate 'offers PDF'|capfirst %}</h6>
               <a class="dropdown-item"
                  href="{{ object.urls.offers_pdf }}"
@@ -187,7 +187,7 @@
           </span>
         {% endif %}
         <a href="{{ project.urls.delete }}"
-           class="btn btn-outline-danger float-right">
+           class="btn btn-outline-danger float-end">
           {% translate 'Delete' %}
         </a>
       </div>
@@ -255,7 +255,7 @@
                           Toggle Dropdown
                         </span>
                       </button>
-                      <div class="dropdown-menu dropdown-menu-right">
+                      <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item"
                            href="{{ offer.urls.pdf }}?disposition=attachment">
                           {% translate 'Download' %}
@@ -273,7 +273,7 @@
                               aria-expanded="false">
                         {% translate 'planning'|capfirst %}
                       </button>
-                      <div class="dropdown-menu dropdown-menu-right"
+                      <div class="dropdown-menu dropdown-menu-end"
                            aria-labelledby="offer-planning-dropdown-{{ offer.pk }}">
                         <a class="dropdown-item"
                            href="{{ project.urls.creatework }}?plan_offer={{ offer.pk }}"
@@ -296,7 +296,7 @@
                               aria-expanded="false">
                         {% translate 'offer'|capfirst %}
                       </button>
-                      <div class="dropdown-menu dropdown-menu-right"
+                      <div class="dropdown-menu dropdown-menu-end"
                            aria-labelledby="offer-dropdown-{{ offer.pk }}">
                         <a class="dropdown-item" href="{{ offer.urls.update }}">
                           {% translate 'Update' %}
@@ -375,7 +375,7 @@
                     <a name="service{{ row.service.pk }}" class="anchor">
                     </a>
                   </div>
-                  <div class="float-right">
+                  <div class="float-end">
                     <span class="btn btn-primary btn-sm"
                           title="{% translate 'Sort' %}"
                           data-sortable-grabber>
@@ -391,7 +391,7 @@
                                 aria-expanded="false">
                           {% translate 'planning'|capfirst %}
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right"
+                        <div class="dropdown-menu dropdown-menu-end"
                              aria-labelledby="service-planning-dropdown-{{ row.service.pk }}">
                           <a class="dropdown-item"
                              href="{{ project.urls.creatework }}?service={{ row.service.pk }}"
@@ -411,7 +411,7 @@
                                 aria-expanded="false">
                           {% translate 'service'|capfirst %}
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right"
+                        <div class="dropdown-menu dropdown-menu-end"
                              aria-labelledby="service-dropdown-{{ row.service.pk }}">
                           <a class="dropdown-item"
                              href="{{ row.service.urls.update }}"
@@ -497,7 +497,7 @@
                       {% bar row.logged_cost row.service.cost %}
                     {% endif %}
                   </span>
-                  <span class="col-md-4 text-right">
+                  <span class="col-md-4 text-end">
                     {% if row.service.is_logging_allowed %}
                       {% if row.service.pk %}
                         <a href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
@@ -547,7 +547,7 @@
                   <div class="col-md-2">
                     {{ invoice.get_type_display }}
                   </div>
-                  <div class="col-md-3 text-md-right">
+                  <div class="col-md-3 text-md-end">
                     {{ invoice.total_excl_tax|currency }} exkl. /
                     {{ invoice.total|currency }}
                   </div>

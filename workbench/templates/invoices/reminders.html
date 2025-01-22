@@ -12,9 +12,9 @@
         <thead class="sticky">
           <tr>
             <th class="text-nowrap">{% translate 'invoice'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'Total excl. tax' %}</th>
-            <th class="text-nowrap text-right">{% translate 'invoiced on'|capfirst %}</th>
-            <th class="text-nowrap text-right">{% translate 'Last reminded on' %}</th>
+            <th class="text-nowrap text-end">{% translate 'Total excl. tax' %}</th>
+            <th class="text-nowrap text-end">{% translate 'invoiced on'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'Last reminded on' %}</th>
             <th></th>
           </tr>
         </thead>
@@ -23,7 +23,7 @@
           {% for contact, invoices in contact_invoices.items %}
           <tr>
             <th colspan="3" class="inline-links">{% link_or_none customer %} / {% link_or_none contact %}</th>
-            <td class="text-right">
+            <td class="text-end">
               {% if contact.id %}
                 <form method="post" class="d-inline">
                   {% csrf_token %}
@@ -32,7 +32,7 @@
                 </form>
               {% endif %}
             </td>
-            <td colspan="1" class="text-nowrap text-right">
+            <td colspan="1" class="text-nowrap text-end">
               {% if contact.id %}
                 <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'dunning letter' %}</a>
 
@@ -44,10 +44,10 @@
           {% for invoice in invoices %}
           <tr>
             <td>{% link_or_none invoice %}</td>
-            <td class="text-nowrap text-right">{{ invoice.total_excl_tax|currency }}</td>
-            <td class="text-nowrap text-right">{{ invoice.invoiced_on|local_date_format }}</td>
-            <td class="text-nowrap text-right">{{ invoice.last_reminded_on|local_date_format|default:_("Not reminded yet") }}</td>
-            <td class="text-right"><a href="{{ invoice.urls.pdf }}?disposition=attachment">PDF</a></td>
+            <td class="text-nowrap text-end">{{ invoice.total_excl_tax|currency }}</td>
+            <td class="text-nowrap text-end">{{ invoice.invoiced_on|local_date_format }}</td>
+            <td class="text-nowrap text-end">{{ invoice.last_reminded_on|local_date_format|default:_("Not reminded yet") }}</td>
+            <td class="text-end"><a href="{{ invoice.urls.pdf }}?disposition=attachment">PDF</a></td>
           </tr>
           {% endfor %}
           {% endfor %}

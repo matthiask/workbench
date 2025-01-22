@@ -32,12 +32,12 @@ class ReportingTest(TestCase):
         self.assertRedirects(response, "/report/open-items-list/")
         self.assertEqual(messages(response), ["Form was invalid."])
         response = self.client.get("/report/open-items-list/")
-        self.assertContains(response, '<th class="text-right">300.00</th>')
+        self.assertContains(response, '<th class="text-end">300.00</th>')
 
         response = self.client.get(
             f"/report/open-items-list/?cutoff_date={in_days(-1).isoformat()}"
         )
-        self.assertContains(response, '<th class="text-right">0.00</th>')
+        self.assertContains(response, '<th class="text-end">0.00</th>')
 
         self.assertEqual(
             self.client.get("/report/open-items-list/?export=xlsx").status_code, 200

@@ -31,9 +31,9 @@
         <th></th>
         <th>{% translate 'Total' %}</th>
         {% for type in stats.types %}
-          <th class="text-right">{% translate 'Hours' %}</th>
-          <th class="text-right">{% translate 'Target value' %}</th>
-          <th class="text-right">{% translate 'Reached' %}</th>
+          <th class="text-end">{% translate 'Hours' %}</th>
+          <th class="text-end">{% translate 'Target value' %}</th>
+          <th class="text-end">{% translate 'Reached' %}</th>
         {% endfor %}
         <th></th>
       </tr>
@@ -42,23 +42,23 @@
       {% for row in stats.users %}
         <tr>
           <th class="text-nowrap">{{ row.user }}</th>
-          <th class="text-right"><a href="{{ row.url }}">{{ row.total|hours }}</a></th>
+          <th class="text-end"><a href="{{ row.url }}">{{ row.total|hours }}</a></th>
           {% for type in row.hours_per_type %}
-            <td class="text-right {% if not type.hours %}text-black-30{% endif %}"><a href="{{ type.url }}">{{ type.hours|hours }}</a></td>
-            <td class="text-right {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".1f" }}%</td>
-            <td class="text-right {% if not type.reached %}text-black-30{% endif %} {{ type.highlight }}">{{ type.reached|stringformat:".1f" }}%</td>
+            <td class="text-end {% if not type.hours %}text-black-30{% endif %}"><a href="{{ type.url }}">{{ type.hours|hours }}</a></td>
+            <td class="text-end {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".1f" }}%</td>
+            <td class="text-end {% if not type.reached %}text-black-30{% endif %} {{ type.highlight }}">{{ type.reached|stringformat:".1f" }}%</td>
           {% endfor %}
-          <th class="text-right"></th>
+          <th class="text-end"></th>
         </tr>
       {% endfor %}
     </tbody>
     <tfoot>
       <tr>
         <th>{% translate 'Total' %}</th>
-        <th class="text-right"><a href="{{ stats.logbook_url }}">{{ stats.total.total|hours }}</a></th>
+        <th class="text-end"><a href="{{ stats.logbook_url }}">{{ stats.total.total|hours }}</a></th>
         {% for row in stats.overall %}
-          <th class="text-right"><a href="{{ row.url }}">{{ row.hours|hours }}</a></th>
-          <th class="text-right" colspan="2">{% percentage row.hours stats.total.total %}</th>
+          <th class="text-end"><a href="{{ row.url }}">{{ row.hours|hours }}</a></th>
+          <th class="text-end" colspan="2">{% percentage row.hours stats.total.total %}</th>
         {% endfor %}
       </tr>
     </tfoot>

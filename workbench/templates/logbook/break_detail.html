@@ -7,18 +7,18 @@
 {% block body %}
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{{ object|label:'user' }}</th>
+      <th class="text-end">{{ object|label:'user' }}</th>
       <td>{% link_or_none object.user %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'break'|capfirst %}</th>
+      <th class="text-end">{% translate 'break'|capfirst %}</th>
       <td>
         {{ object.starts_at|local_date_format:'H:i' }} –
         {{ object.ends_at|local_date_format:'H:i' }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{{ object|label:'description' }}</th>
+      <th class="text-end">{{ object|label:'description' }}</th>
       <td>{{ object.description|linebreaksbr|default:'–' }}</td>
     </tr>
   </table>

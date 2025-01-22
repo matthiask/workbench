@@ -13,7 +13,7 @@
           <tr>
             <th>{% translate 'user'|capfirst %}</th>
             <th>{% translate 'Started on' %}</th>
-            <th class="text-right">{% translate 'Work anniversary' %}</th>
+            <th class="text-end">{% translate 'Work anniversary' %}</th>
             <th>{% translate 'On' %}</th>
           </tr>
         </thead>
@@ -37,7 +37,7 @@
                   &ndash;
                 {% endif %}
               </td>
-              <td class="text-right">
+              <td class="text-end">
                 {% if anniversary.anniversary %}
                   {{ anniversary.anniversary }}.
                 {% else %}

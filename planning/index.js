@@ -191,7 +191,7 @@ function TotalByWeek({ by_week, title }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-right pr-2"
+        className="planning--scale text-end pr-2"
       >
         <strong>{title}</strong>
       </Cell>
@@ -222,7 +222,7 @@ function Capacity({ total, by_user }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-right pr-2"
+        className="planning--scale text-end pr-2"
       >
         <strong>{gettext("Remaining capacity per week")}</strong>
       </Cell>
@@ -259,7 +259,7 @@ function UserCapacity({ user, capacity }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-right pr-2"
+        className="planning--scale text-end pr-2"
         tag="a"
         href={user.url}
       >
@@ -369,7 +369,7 @@ function Project({
         {project.range}
       </Cell>
       {external_view || (
-        <Cell row={row} column={4} className="planning--small text-right">
+        <Cell row={row} column={4} className="planning--small text-end">
           {fixed(project.planned_hours, 0)}h
         </Cell>
       )}
@@ -417,7 +417,7 @@ function WorkedHours({ project }) {
       <Cell row={row} column={1} className="planning--title is-worked no-pr">
         {gettext("Logged hours")}
       </Cell>
-      <Cell row={row} column={4} className="planning--small text-right">
+      <Cell row={row} column={4} className="planning--small text-end">
         {fixed(sum, 0)}h
       </Cell>
 
@@ -506,7 +506,7 @@ const Milestones = ({ project }) => {
               <Cell
                 row={row}
                 column={4}
-                className={"planning--small text-right is-pr"}
+                className={"planning--small text-end is-pr"}
               >
                 {`${fixed(m.hours, 0)}h`}
               </Cell>
@@ -596,7 +596,7 @@ function Offer({ offer, external_view, work_list }) {
         {offer.range}
       </Cell>
       {external_view || (
-        <Cell row={row} column={4} className="planning--small text-right">
+        <Cell row={row} column={4} className="planning--small text-end">
           {fixed(offer.planned_hours, 0)}h
         </Cell>
       )}
@@ -649,11 +649,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
         {work.range}
       </Cell>
       {work.planned_hours > 0 && (
-        <Cell
-          row={row}
-          column={4}
-          className={"planning--small text-right is-pr"}
-        >
+        <Cell row={row} column={4} className={"planning--small text-end is-pr"}>
           {`${fixed(work.planned_hours, 0)}h`}
         </Cell>
       )}

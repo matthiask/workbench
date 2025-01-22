@@ -6,22 +6,22 @@
       <table class="table table-striped">
         {% for name, value in object|field_value_pairs:'email,is_active,_short_name,_full_name,language,working_time_model,person' %}
           <tr>
-            <th class="text-right">{{ name }}</th>
+            <th class="text-end">{{ name }}</th>
             <td>{% link_or_none value %}</td>
           </tr>
         {% endfor %}
         {% if user.features.PLANNING %}
           <tr>
-            <th class="text-right">{% translate 'planning hours per day'|capfirst %}</th>
+            <th class="text-end">{% translate 'planning hours per day'|capfirst %}</th>
             <td>{{ user.planning_hours_per_day|hours }}</td>
           </tr>
         {% endif %}
         <tr>
-          <th class="text-right">{% translate 'person'|capfirst %}</th>
+          <th class="text-end">{% translate 'person'|capfirst %}</th>
           <td>{% link_or_none object.person %}</td>
         </tr>
         <tr>
-          <th class="text-right">{% translate 'teams'|capfirst %}</th>
+          <th class="text-end">{% translate 'teams'|capfirst %}</th>
           <td>
             {% for team in object.teams.all %}
               {% link_or_none team %}

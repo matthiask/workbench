@@ -15,16 +15,16 @@
         <thead>
           <tr>
             <th>{% translate 'user'|capfirst %}</th>
-            <th class="text-right">{% translate 'profitable'|capfirst %}</th>
+            <th class="text-end">{% translate 'profitable'|capfirst %}</th>
             <th></th>
-            <th class="text-right">{% translate 'overdrawn'|capfirst %}</th>
+            <th class="text-end">{% translate 'overdrawn'|capfirst %}</th>
             <th></th>
-            <th class="text-right">{% translate 'maintenance'|capfirst %}</th>
+            <th class="text-end">{% translate 'maintenance'|capfirst %}</th>
             <th></th>
-            <th class="text-right">{% translate 'internal'|capfirst %}</th>
+            <th class="text-end">{% translate 'internal'|capfirst %}</th>
             <th></th>
-            <th class="text-right">{% translate 'total'|capfirst %}</th>
-            <th class="text-right">{% translate 'green'|capfirst %}</th>
+            <th class="text-end">{% translate 'total'|capfirst %}</th>
+            <th class="text-end">{% translate 'green'|capfirst %}</th>
           </tr>
         </thead>
         <tbody>
@@ -35,16 +35,16 @@
               {% else %}
                 <th>{% translate 'total'|capfirst %}</th>
               {% endif %}
-              <td class="text-right">{{ stats.profitable|hours }}</td>
+              <td class="text-end">{{ stats.profitable|hours }}</td>
               <td>{% percentage stats.profitable stats.total %}</td>
-              <td class="text-right">{{ stats.overdrawn|hours }}</td>
+              <td class="text-end">{{ stats.overdrawn|hours }}</td>
               <td>{% percentage stats.overdrawn stats.total %}</td>
-              <td class="text-right">{{ stats.maintenance|hours }}</td>
+              <td class="text-end">{{ stats.maintenance|hours }}</td>
               <td>{% percentage stats.maintenance stats.total %}</td>
-              <td class="text-right">{{ stats.internal|hours }}</td>
+              <td class="text-end">{{ stats.internal|hours }}</td>
               <td>{% percentage stats.internal stats.total %}</td>
-              <td class="text-right">{{ stats.total|hours }}</td>
-              <td class="text-right">{{ stats.percentage|stringformat:'d' }}% {% pie stats.percentage 100 type="good" %}</td>
+              <td class="text-end">{{ stats.total|hours }}</td>
+              <td class="text-end">{{ stats.percentage|stringformat:'d' }}% {% pie stats.percentage 100 type="good" %}</td>
             </tr>
           {% endfor %}
         </tbody>

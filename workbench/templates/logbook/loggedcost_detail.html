@@ -8,29 +8,29 @@
 {% block body %}
   <table class="table table-striped">
     <tr>
-      <th class="text-right">{% translate 'project'|capfirst %}</th>
+      <th class="text-end">{% translate 'project'|capfirst %}</th>
       <td>{% link_or_none object.service.project %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'service'|capfirst %}</th>
+      <th class="text-end">{% translate 'service'|capfirst %}</th>
       <td>{% link_or_none object.service %}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'created'|capfirst %}</th>
+      <th class="text-end">{% translate 'created'|capfirst %}</th>
       <td>
         {{ object.created_at|local_date_format }} {% translate 'by' %}
         {{ object.created_by.get_short_name }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'rendered'|capfirst %}</th>
+      <th class="text-end">{% translate 'rendered'|capfirst %}</th>
       <td>
         {{ object.rendered_on|local_date_format }} {% translate 'by' %}
         {{ object.rendered_by.get_short_name }}
       </td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'cost'|capfirst %}</th>
+      <th class="text-end">{% translate 'cost'|capfirst %}</th>
       <td>
         {{ object.cost|currency }}
         {% if object.third_party_costs %}
@@ -47,16 +47,16 @@
     </tr>
     {% if object.are_expenses %}
       <tr>
-        <th class="text-right">{% translate 'expense report'|capfirst %}</th>
+        <th class="text-end">{% translate 'expense report'|capfirst %}</th>
         <td>{% link_or_none object.expense_report %}</td>
       </tr>
     {% endif %}
     <tr>
-      <th class="text-right">{% translate 'description'|capfirst %}</th>
+      <th class="text-end">{% translate 'description'|capfirst %}</th>
       <td>{{ object.description|linebreaksbr }}</td>
     </tr>
     <tr>
-      <th class="text-right">{% translate 'invoicing'|capfirst %}</th>
+      <th class="text-end">{% translate 'invoicing'|capfirst %}</th>
       <td>
         {% if object.invoice_service %}
           {% link_or_none object.invoice_service %}

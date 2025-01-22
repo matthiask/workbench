@@ -17,7 +17,7 @@
             <th>{% translate 'deal'|capfirst %}</th>
             <th>{% translate 'customer'|capfirst %}</th>
             <th>{% translate 'Reason for losing' %}</th>
-            <th class="text-nowrap text-right">{% translate 'value'|capfirst %}</th>
+            <th class="text-nowrap text-end">{% translate 'value'|capfirst %}</th>
           </tr>
         </thead>
         <tbody>
@@ -31,7 +31,7 @@
                 {{ deal.closing_type }}
                 {% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}
               </td>
-              <td class="text-right">{{ deal.value|currency }}</td>
+              <td class="text-end">{{ deal.value|currency }}</td>
             </tr>
           {% endfor %}
         </tbody>

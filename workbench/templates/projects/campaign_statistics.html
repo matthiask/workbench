@@ -11,7 +11,7 @@
   <table>
     {% for rate, hours in object.logged_hours_per_effort_rate %}
       <tr {% if rate is None %}class="text-warning"{% endif %}>
-        <td class="text-right">{{ hours|hours }} &nbsp;</td>
+        <td class="text-end">{{ hours|hours }} &nbsp;</td>
         <td>
           {% if rate is None %}
             {% translate 'undefined rate' %}

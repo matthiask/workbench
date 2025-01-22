@@ -12,8 +12,8 @@
       <th class="w-100">{% translate 'invoice'|capfirst %}</th>
       <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
       <th class="text-nowrap">{% translate 'invoiced on'|capfirst %}</th>
-      <th class="text-nowrap text-right">{% translate 'total'|capfirst %}</th>
-      <th class="text-nowrap text-right">{% translate 'total excl. tax'|capfirst %}</th>
+      <th class="text-nowrap text-end">{% translate 'total'|capfirst %}</th>
+      <th class="text-nowrap text-end">{% translate 'total excl. tax'|capfirst %}</th>
     </tr>
     {% for invoice in invoices %}
       <tr>
@@ -25,8 +25,8 @@
         </td>
         <td>{{ invoice.get_type_display }}</td>
         <td>{{ invoice.invoiced_on|local_date_format }}</td>
-        <td class="text-right">{{ invoice.total|currency }}</td>
-        <td class="text-right">{{ invoice.total_excl_tax|currency }}</td>
+        <td class="text-end">{{ invoice.total|currency }}</td>
+        <td class="text-end">{{ invoice.total_excl_tax|currency }}</td>
       </tr>
     {% endfor %}
   </table>

@@ -25,7 +25,7 @@
                 <h5 class="mb-1">{{ object|h }}</h5>
                 <div class="row">
                   <div class="col-md-9">{{ object.contact.name_with_organization|default:object.customer }}</div>
-                  <div class="col-md-3 text-md-right">{{ object.value|currency }}</div>
+                  <div class="col-md-3 text-md-end">{{ object.value|currency }}</div>
                 </div>
                 {{ object.overview_attributes }}
               </a>

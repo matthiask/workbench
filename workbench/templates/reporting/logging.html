@@ -16,10 +16,10 @@
           <tr>
             <th>{% translate 'user'|capfirst %}</th>
             <th>{% translate 'Point in time of logging' %}</th>
-            <th class="text-right">{% translate 'Count' %}</th>
-            <th class="text-right">{% translate 'Sum' %}</th>
-            <th class="text-right">{% translate 'Average' %}</th>
-            <th class="text-right">{% translate 'Days with insufficient breaks' %}</th>
+            <th class="text-end">{% translate 'Count' %}</th>
+            <th class="text-end">{% translate 'Sum' %}</th>
+            <th class="text-end">{% translate 'Average' %}</th>
+            <th class="text-end">{% translate 'Days with insufficient breaks' %}</th>
           </tr>
         </thead>
         <tbody>
@@ -32,10 +32,10 @@
                   {{ row.mean_logging_delay.classification.0 }}
                 </span>
               </td>
-              <td class="text-right">{{ row.logged_hours_stats.count }}</td>
-              <td class="text-right">{{ row.logged_hours_stats.sum|hours }}</td>
-              <td class="text-right">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
-              <td class="text-right {% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}">
+              <td class="text-end">{{ row.logged_hours_stats.count }}</td>
+              <td class="text-end">{{ row.logged_hours_stats.sum|hours }}</td>
+              <td class="text-end">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
+              <td class="text-end {% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}">
                 {{ row.insufficient_breaks.days }} / {{ row.insufficient_breaks.of }}
                 {% pie row.insufficient_breaks.days row.insufficient_breaks.of %}
               </td>
@@ -44,16 +44,16 @@
           <tr>
             <th>{% translate 'total'|capfirst %}</th>
             <th></th>
-            <th class="text-right">{{ logbook_stats.logged_hours_stats.count }}</th>
-            <th class="text-right">{{ logbook_stats.logged_hours_stats.sum|hours }}</th>
-            <th class="text-right">
+            <th class="text-end">{{ logbook_stats.logged_hours_stats.count }}</th>
+            <th class="text-end">{{ logbook_stats.logged_hours_stats.sum|hours }}</th>
+            <th class="text-end">
               {% if logbook_stats.logged_hours_stats.avg is None %}
                 &ndash;
               {% else %}
                 {{ logbook_stats.logged_hours_stats.avg|stringformat:'.2f' }}h
               {% endif %}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ logbook_stats.insufficient_breaks.days }} / {{ logbook_stats.insufficient_breaks.of }}
               {% pie logbook_stats.insufficient_breaks.days logbook_stats.insufficient_breaks.of %}
             </th>

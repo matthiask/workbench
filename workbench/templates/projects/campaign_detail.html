@@ -9,12 +9,12 @@
       <table class="table">
         {% for name, value in object|field_value_pairs %}
           <tr>
-            <th class="text-right">{{ name }}</th>
+            <th class="text-end">{{ name }}</th>
             <td>{% link_or_none value %}</td>
           </tr>
         {% endfor %}
         <tr>
-          <th class="text-right">{% translate 'projects'|capfirst %}</th>
+          <th class="text-end">{% translate 'projects'|capfirst %}</th>
           <td>
             {% if request.user.features.CONTROLLING %}
               {% with statistics=object.statistics %}
@@ -22,29 +22,29 @@
                   <thead class="sticky">
                     <tr>
                       <th>{% translate 'project'|capfirst %}</th>
-                      <th class="text-right" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</th>
-                      <th class="text-right">{% translate 'logbook'|capfirst %}</th>
-                      <th class="text-right">{% translate 'third party costs'|capfirst %}</th>
-                      <th class="text-right">{% translate 'invoiced'|capfirst %}</th>
-                      <th class="text-right">{% translate 'Not archived' %}</th>
-                      <th class="text-right">&Delta;</th>
+                      <th class="text-end" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</th>
+                      <th class="text-end">{% translate 'logbook'|capfirst %}</th>
+                      <th class="text-end">{% translate 'third party costs'|capfirst %}</th>
+                      <th class="text-end">{% translate 'invoiced'|capfirst %}</th>
+                      <th class="text-end">{% translate 'Not archived' %}</th>
+                      <th class="text-end">&Delta;</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <th></th>
-                      <th class="text-right">{{ statistics.overall.sold|currency }}</th>
-                      <th class="text-right">
+                      <th class="text-end">{{ statistics.overall.sold|currency }}</th>
+                      <th class="text-end">
                         {{ statistics.overall.logbook|currency }}
                         {% bar statistics.overall.logbook statistics.overall.sold %}
                       </th>
-                      <th class="text-right">{{ statistics.overall.third_party_costs|currency }}</th>
-                      <th class="text-right">{{ statistics.overall.invoiced|currency }}</th>
-                      <th class="text-right text-nowrap">
+                      <th class="text-end">{{ statistics.overall.third_party_costs|currency }}</th>
+                      <th class="text-end">{{ statistics.overall.invoiced|currency }}</th>
+                      <th class="text-end text-nowrap">
                         {{ statistics.overall.hours|hours }} / {{ statistics.overall.service_hours|hours }}
                         {% bar statistics.overall.hours statistics.overall.service_hours %}
                       </th>
-                      <th class="text-right">
+                      <th class="text-end">
                         {{ statistics.overall.delta_positive|currency:True }}
                         <br>
                         {{ statistics.overall.delta_negative|currency:True }}
@@ -53,11 +53,11 @@
                     {% for project in statistics.statistics %}
                       <tr>
                         <td>{% link_or_none project.project with_badge=True %}</td>
-                        <td class="text-right
+                        <td class="text-end
                                    {% if not project.sold %}
                                      text-black-30
                                    {% endif %}">{{ project.sold|currency }}</td>
-                        <td class="text-right text-nowrap
+                        <td class="text-end text-nowrap
                                    {% if not project.logbook and not project.effort_hours_with_rate_undefined %}
                                      text-black-30
                                    {% endif %}">
@@ -69,22 +69,22 @@
                           {% endif %}
                           {% bar project.logbook project.sold %}
                         </td>
-                        <td class="text-right
+                        <td class="text-end
                                    {% if not project.third_party_costs %}
                                      text-black-30
                                    {% endif %}">
                           {{ project.third_party_costs|currency }}
                         </td>
-                        <td class="text-right
+                        <td class="text-end
                                    {% if not project.invoiced %}
                                      text-black-30
                                    {% endif %}">{{ project.invoiced|currency }}</td>
-                        <td class="text-right text-nowrap">
+                        <td class="text-end text-nowrap">
                           {{ project.hours|hours }} /
                           {{ project.service_hours|hours }}
                           {% bar project.hours project.service_hours %}
                         </td>
-                        <td class="text-right {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
+                        <td class="text-end {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -126,7 +126,7 @@
         </a>
       {% endif %}
       <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-right">
+         class="btn btn-outline-danger float-end">
         {% translate 'Delete' %}
       </a>
     </div>

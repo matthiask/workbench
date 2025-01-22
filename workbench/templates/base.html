@@ -172,7 +172,7 @@
         </li>
       {% endmark_current %}
 
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown ms-auto">
         <a class="nav-link dropdown-toggle"
            href="#"
            id="userDropdown"
@@ -182,7 +182,7 @@
            aria-expanded="false">
           Hi, {{ request.user.get_short_name }}!
         </a>
-        <div class="dropdown-menu dropdown-menu-right"
+        <div class="dropdown-menu dropdown-menu-end"
              aria-labelledby="userDropdown">
           <div class="dropdown-header">
             {{ request.user.get_full_name }}

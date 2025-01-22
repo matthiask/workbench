@@ -8,7 +8,7 @@
       <h1>{{ object|h }} {% history_link object %}</h1>
       <table class="table table-striped">
         <tr>
-          <th class="text-right">{% translate 'expenses'|capfirst %}</th>
+          <th class="text-end">{% translate 'expenses'|capfirst %}</th>
           <td>
             {% for cost in object.expenses.all reversed %}
               <a href="{{ cost.urls.detail }}" data-ajaxmodal>
@@ -27,11 +27,11 @@
           </td>
         </tr>
         <tr>
-          <th class="text-right">{% translate 'status'|capfirst %}</th>
+          <th class="text-end">{% translate 'status'|capfirst %}</th>
           <td>{{ object.status_badge }}</td>
         </tr>
         <tr>
-          <th class="text-right">{% translate 'total'|capfirst %}</th>
+          <th class="text-end">{% translate 'total'|capfirst %}</th>
           <td>{{ object.total|currency }}</td>
         </tr>
       </table>
@@ -48,13 +48,13 @@
                 aria-expanded="false">
           <span class="visually-hidden">Toggle Dropdown</span>
         </button>
-        <div class="dropdown-menu dropdown-menu-right">
+        <div class="dropdown-menu dropdown-menu-end">
           <a class="dropdown-item"
              href="{{ object.urls.pdf }}?disposition=attachment">{% translate 'Download' %}</a>
         </div>
       </span>
       <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-right">{% translate 'Delete' %}</a>
+         class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
     </div>
   </div>
 {% endblock content %}

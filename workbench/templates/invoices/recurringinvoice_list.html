@@ -12,7 +12,7 @@
         <div class="row">
           <div class="col-md-7">{{ invoice.contact.name_with_organization|default:invoice.customer }}</div>
           <div class="col-md-2">{{ invoice.pretty_status }}</div>
-          <div class="col-md-3 text-md-right">{{ invoice.total_excl_tax|currency }} exkl.</div>
+          <div class="col-md-3 text-md-end">{{ invoice.total_excl_tax|currency }} exkl.</div>
         </div>
       </a>
     {% endfor %}

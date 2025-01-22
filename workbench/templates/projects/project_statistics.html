@@ -11,7 +11,7 @@
   <table>
     {% for rate, hours in object.grouped_services.logged_hours_per_effort_rate %}
       <tr {% if rate is None %}class="text-warning"{% endif %}>
-        <td class="text-right">{{ hours|hours }} &nbsp;</td>
+        <td class="text-end">{{ hours|hours }} &nbsp;</td>
         <td>
           {% if rate is None %}
             {% translate 'undefined rate' %}
@@ -30,20 +30,20 @@
       <th>{% translate 'Logged' %}</th>
       <th></th>
       {% for user, hours in object.grouped_services.logged_hours_per_user %}
-        <th class="text-right">{{ user.get_short_name }}</th>
+        <th class="text-end">{{ user.get_short_name }}</th>
       {% endfor %}
     </tr>
     <tr>
       <th>{% translate 'Total' %}</th>
-      <th class="text-right">{{ object.grouped_services.service_hours|hours }}</th>
-      <th class="text-right">
+      <th class="text-end">{{ object.grouped_services.service_hours|hours }}</th>
+      <th class="text-end">
         <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}">
           {{ object.grouped_services.logged_hours|hours }}
         </a>
       </th>
       <th class="progress-cell">{% bar object.grouped_services.logged_hours object.grouped_services.service_hours %}</th>
       {% for user, hours in object.grouped_services.logged_hours_per_user %}
-        <th class="text-right">
+        <th class="text-end">
           <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;rendered_by={{ user.pk }}">
             {{ hours|hours }}
           </a>
@@ -54,16 +54,16 @@
       <tr><th>&nbsp;</th></tr>
       <tr>
         <th>{% link_or_none offer %}</th>
-        <th class="text-right">{{ offer_data.logged_hours|hours }}</th>
-        <th class="text-right">{{ offer_data.service_hours|hours }}</th>
+        <th class="text-end">{{ offer_data.logged_hours|hours }}</th>
+        <th class="text-end">{{ offer_data.service_hours|hours }}</th>
         <th class="progress-cell">{% bar offer_data.logged_hours offer_data.service_hours %}</th>
       </tr>
       {% for row in offer_data.services %}
         {% if row.logged_hours or row.service.service_hours %}
           <tr>
             <th>{{ row.service.title }}</th>
-            <th class="text-right">{{ row.service.service_hours|hours }}</th>
-            <th class="text-right">
+            <th class="text-end">{{ row.service.service_hours|hours }}</th>
+            <th class="text-end">
               <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}">{{ row.logged_hours|hours }}</a>
             </th>
             <th class="progress-cell">
@@ -73,7 +73,7 @@
             </th>
             {% project_statistics_row object.grouped_services.logged_hours_per_user row.logged_hours_per_user as user_row %}
             {% for user, hours in user_row %}
-              <td class="text-right">
+              <td class="text-end">
                 {% if hours %}
                   <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}">
                     {{ hours|hours }}

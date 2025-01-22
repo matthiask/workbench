@@ -14,7 +14,7 @@
           <div class="col-md-4 text-truncate">
             {{ object.project.contact.name_with_organization|default:object.project.customer }}
           </div>
-          <div class="col-md-3 text-truncate text-md-right">
+          <div class="col-md-3 text-truncate text-md-end">
             {{ object.total_excl_tax|currency }} exkl. /
             {{ object.total|currency }}
           </div>

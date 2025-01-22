@@ -21,7 +21,7 @@
       {% ifchanged object.day %}
         <h5 class="mt-3 mb-3 d-flex justify-content-between">
           <span>{{ object.day|local_date_format }}</span>
-          {# <span class="text-right">{{ sum }}h</span> #}
+          {# <span class="text-end">{{ sum }}h</span> #}
         </h5>
       {% endifchanged %}
       <a href="{{ object.get_absolute_url }}"
@@ -36,8 +36,8 @@
         </div>
         <div class="row">
           <div class="col-md-4">{{ object.user.get_full_name }}</div>
-          {# <div class="col-md-4 text-right">{{ object.pretty_status }}</div> #}
-          {# <div class="col-md-4 text-right">{{ object.get_reason_display }}</div> #}
+          {# <div class="col-md-4 text-end">{{ object.pretty_status }}</div> #}
+          {# <div class="col-md-4 text-end">{{ object.get_reason_display }}</div> #}
         </div>
       </a>
     {% endfor %}

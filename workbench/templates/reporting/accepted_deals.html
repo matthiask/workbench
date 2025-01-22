@@ -16,10 +16,10 @@
           <tr>
             <th>{% translate 'month'|capfirst %}</th>
             {% for row in stats.by_valuetype %}
-              <th class="text-right">{{ row.type }}</th>
+              <th class="text-end">{{ row.type }}</th>
               <th></th>
             {% endfor %}
-            <th class="text-right">{% translate 'total'|capfirst %}</th>
+            <th class="text-end">{% translate 'total'|capfirst %}</th>
             <th></th>
           </tr>
         </thead>
@@ -28,22 +28,22 @@
             <tr>
               <td>{{ row.month|date:'F Y' }}</td>
               {% for value in row.values %}
-                <td class="text-right">{{ value.value|currency }}</td>
+                <td class="text-end">{{ value.value|currency }}</td>
                 <td></td>
               {% endfor %}
-              <td class="text-right">{{ row.sum|currency }}</td>
+              <td class="text-end">{{ row.sum|currency }}</td>
               <td></td>
             </tr>
           {% endfor %}
           <tr>
             <th>{% translate 'total'|capfirst %}</th>
             {% for row in stats.by_valuetype %}
-              <th class="text-right">{{ row.sum|currency }}</th>
+              <th class="text-end">{{ row.sum|currency }}</th>
               <th>
                 <div style="margin:-5px 0;display:inline-block">{% pie row.sum row.target type='good' size=28 %}</div>
               </th>
             {% endfor %}
-            <th class="text-right">{{ stats.sum|currency }}</th>
+            <th class="text-end">{{ stats.sum|currency }}</th>
             <th>
               <div style="margin:-5px 0;display:inline-block">{% pie stats.sum stats.target type='good' size=28 %}</div>
             </th>
@@ -51,19 +51,19 @@
           <tr>
             <th>{% translate 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }} {% translate 'weeks' %})</th>
             {% for row in stats.by_valuetype %}
-              <th class="text-right">{{ row.target|currency }}</th>
+              <th class="text-end">{{ row.target|currency }}</th>
               <th></th>
             {% endfor %}
-            <th class="text-right">{{ stats.target|currency }}</th>
+            <th class="text-end">{{ stats.target|currency }}</th>
             <th></th>
           </tr>
           <tr>
             <th>{% translate 'median age' %}</th>
             {% for row in stats.by_valuetype %}
-              <th class="text-right">{% if row.median_age is not None %}{{ row.median_age }} {% translate 'days' %}{% endif %}</th>
+              <th class="text-end">{% if row.median_age is not None %}{{ row.median_age }} {% translate 'days' %}{% endif %}</th>
               <th></th>
             {% endfor %}
-            <th class="text-right">{% if stats.median_age is not None %}{{ stats.median_age }} {% translate 'days' %}{% endif %}</th>
+            <th class="text-end">{% if stats.median_age is not None %}{{ stats.median_age }} {% translate 'days' %}{% endif %}</th>
             <th></th>
         </tbody>
       </table>
@@ -73,9 +73,9 @@
         <thead>
           <tr>
             <th>{% translate 'user'|capfirst %}</th>
-            <th class="text-right">{% translate 'count'|capfirst %}</th>
+            <th class="text-end">{% translate 'count'|capfirst %}</th>
             <th></th>
-            <th class="text-right">{% translate 'value'|capfirst %}</th>
+            <th class="text-end">{% translate 'value'|capfirst %}</th>
           </tr>
         </thead>
         <tbody>
@@ -85,15 +85,15 @@
                 <a href="deals/{% querystring user=row.user.id %}"
                    data-ajaxmodal>{{ row.user }}</a>
               </td>
-              <td class="text-right">
+              <td class="text-end">
                 {{ row.count }}
               </td>
-              <td class="text-right">
+              <td class="text-end">
                 <div style="margin:-5px 0;display:inline-block">
                   {% pie row.sum stats.sum type='good' size=28 %}
                 </div>
               </td>
-              <td class="text-right">
+              <td class="text-end">
                 {{ row.sum|currency }}
               </td>
             </tr>
@@ -102,12 +102,12 @@
             <th>
               {% translate 'total'|capfirst %}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.count }}
             </th>
             <th>
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.sum|currency }}
             </th>
           </tr>
@@ -119,14 +119,14 @@
         <thead>
           <tr>
             <th>{% translate 'deal'|capfirst %}</th>
-            <th class="text-right">{% translate 'value'|capfirst %}</th>
+            <th class="text-end">{% translate 'value'|capfirst %}</th>
           </tr>
         </thead>
         <tbody>
           {% for deal in stats.deals %}
             <tr>
               <td>{% link_or_none deal with_badge=True %}</td>
-              <td class="text-right">
+              <td class="text-end">
                 {{ deal.value|currency }}
               </td>
             </tr>
@@ -135,7 +135,7 @@
             <th>
               {% translate 'total'|capfirst %}
             </th>
-            <th class="text-right">
+            <th class="text-end">
               {{ stats.sum|currency }}
             </th>
           </tr>
