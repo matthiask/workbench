@@ -1,18 +1,8 @@
-import { applyMiddleware, compose, createStore } from "redux"
+import { compose, createStore } from "redux"
 import persistState from "redux-localstorage"
-import logger from "redux-logger"
-import thunk from "redux-thunk"
 import reducer from "./reducers"
 
 const VERSION = 3
-
-const initialTitle = document.title
-const notifier = (store) => (next) => (action) => {
-  const state = next(action)
-  const { current } = store.getState()
-  document.title = `${current ? "▶ " : ""}${initialTitle}`
-  return state
-}
 
 const serialize = (data) => {
   return JSON.stringify({ ...data, _v: VERSION })
@@ -68,12 +58,6 @@ export function configureStore() {
         serialize,
         deserialize,
       }),
-      applyMiddleware(
-        notifier,
-        // remotePersister,
-        thunk,
-        logger,
-      ),
     ),
   )
 

@@ -84,37 +84,24 @@ export const Activity = connect((state, ownProps) => ({
         </div>
         <div className="activity-body">
           <div className="form-group">
-            <div className="input-group input-group-sm">
-              <AsyncSelect
-                className="select"
-                classNamePrefix="select"
-                defaultOptions={projects}
-                loadOptions={async (inputValue, callback) => {
-                  callback(await fetchProjects(inputValue))
-                }}
-                onChange={(value) => {
-                  dispatchUpdate({
-                    title: value.label.replace(/^[-0-9\s]+/, ""),
-                    project: value,
-                    service: null,
-                  })
-                  setServices([])
-                }}
-                placeholder={gettext("Select or search project...")}
-                value={activity.project}
-              />
-              {activity.project && (
-                <div className="input-group-append">
-                  <a
-                    href={`/projects/${activity.project.value}/`}
-                    className="input-group-text"
-                    title={gettext("Go to the project")}
-                  >
-                    {icons.arrow}
-                  </a>
-                </div>
-              )}
-            </div>
+            <AsyncSelect
+              className="select"
+              classNamePrefix="select"
+              defaultOptions={projects}
+              loadOptions={async (inputValue, callback) => {
+                callback(await fetchProjects(inputValue))
+              }}
+              onChange={(value) => {
+                dispatchUpdate({
+                  title: value.label.replace(/^[-0-9\s]+/, ""),
+                  project: value,
+                  service: null,
+                })
+                setServices([])
+              }}
+              placeholder={gettext("Select or search project...")}
+              value={activity.project}
+            />
           </div>
           <div className="form-group">
             <Select
@@ -146,7 +133,9 @@ export const Activity = connect((state, ownProps) => ({
           <div className="d-flex align-items-center justify-content-between">
             <div
               className="activity-duration pl-2"
-              onClick={() => overwriteSeconds(dispatch, { activity, current })}
+              onClick={() => {
+                overwriteSeconds(dispatch, { activity, current })
+              }}
               style={{ cursor: "cell" }}
             >
               {prettyDuration(activity.seconds)}
