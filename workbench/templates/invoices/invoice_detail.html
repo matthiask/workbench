@@ -74,7 +74,7 @@
                     </td>
                     <td class="text-right">{{ service.service_cost|currency }}</td>
                     <td>
-                      <a href="{{ service.urls.update }}" data-bs-toggle="ajaxmodal">{% include 'svg/pencil.svg' %}</a>
+                      <a href="{{ service.urls.update }}" data-ajaxmodal>{% include 'svg/pencil.svg' %}</a>
                     </td>
                   </tr>
                 {% endfor %}

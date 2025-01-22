@@ -20,7 +20,7 @@
       {% endif %}
       <tr>
         <td>
-          <a data-bs-toggle="ajaxmodal" href="{{ cost.get_absolute_url }}">{{ cost.service }}: {{ cost }}</a>
+          <a data-ajaxmodal href="{{ cost.get_absolute_url }}">{{ cost.service }}: {{ cost }}</a>
         </td>
         <td></td>
         <td>{{ cost.rendered_on|local_date_format }}</td>

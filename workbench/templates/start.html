@@ -44,7 +44,7 @@
                     <small>{{ project.status_badge }}</small>
                   </h5>
                   <small>
-                    <a href="{{ project.urls.createhours }}" data-bs-toggle="ajaxmodal">+{% translate 'hours' %}</a>
+                    <a href="{{ project.urls.createhours }}" data-ajaxmodal>+{% translate 'hours' %}</a>
                   </small>
                 </div>
               </div>
@@ -96,7 +96,7 @@
             {% for hours in todays_hours %}
               <a class="list-group-item list-group-item-action"
                  href="{{ hours.get_absolute_url }}"
-                 data-bs-toggle="ajaxmodal">
+                 data-ajaxmodal>
                 <small class="d-flex justify-content-between">
                   <span>{{ hours.service.project_service_title }}</span>
                   <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
@@ -126,7 +126,7 @@
             {% for hours in all_users_hours %}
               <a class="list-group-item list-group-item-action"
                  href="{{ hours.get_absolute_url }}"
-                 data-bs-toggle="ajaxmodal">
+                 data-ajaxmodal>
                 <small class="d-flex justify-content-between">
                   <span>{{ hours.service.project_service_title }}</span>
                   <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>

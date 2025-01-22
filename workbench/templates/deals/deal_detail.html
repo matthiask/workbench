@@ -35,17 +35,17 @@
                 {% endif %}
               </div>
               <div class="col-auto">
-                <a data-bs-toggle="ajaxmodal"
+                <a data-ajaxmodal
                    href="{{ object.urls.set_status }}?status={{ object.OPEN }}"
                    class="btn btn-sm btn-info">
                   {% translate 'open'|capfirst %}
                 </a>
-                <a data-bs-toggle="ajaxmodal"
+                <a data-ajaxmodal
                    href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}"
                    class="btn btn-sm btn-success">
                   {% translate 'accepted'|capfirst %}
                 </a>
-                <a data-bs-toggle="ajaxmodal"
+                <a data-ajaxmodal
                    href="{{ object.urls.set_status }}?status={{ object.DECLINED }}"
                    class="btn btn-sm btn-danger">
                   {% translate 'declined'|capfirst %}
@@ -113,7 +113,7 @@
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
       <a href="{{ object.urls.add_offer }}"
          class="btn btn-primary"
-         data-bs-toggle="ajaxmodal">{% translate 'Link offer' %}</a>
+         data-ajaxmodal>{% translate 'Link offer' %}</a>
       <a href="{{ object.urls.delete }}"
          class="btn btn-outline-danger float-right">
         {% translate 'Delete' %}

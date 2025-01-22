@@ -3,7 +3,7 @@
 {% block search-form-buttons %}
   <a href="{{ view.model.urls.create }}"
      class="btn btn-primary"
-     data-bs-toggle="ajaxmodal">
+     data-ajaxmodal>
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name|capfirst }}
   </a>
@@ -13,7 +13,7 @@
   {% for object in object_list %}
     <a href="{{ object.get_absolute_url }}"
        class="list-group-item list-group-item-action"
-       data-bs-toggle="ajaxmodal">
+       data-ajaxmodal>
       <div class="d-flex w-100 justify-content-between">
         <h5 class="mb-1">{{ object|h }}</h5>
         {{ object.status_badge }}

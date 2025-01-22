@@ -6,9 +6,9 @@
       {% block title %}{{ WORKBENCH.TITLE }}{% endblock %}
     </title>
     {% webpack_assets 'main' %}
-    <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'workbench/workbench.js' %}"></script>
-    <script src="{% static 'workbench/lib/form-request-submit-polyfill.js' %}"></script>
+    <script src="{% static 'workbench/lib/jquery-ui.min.js' %}" defer></script>
+    <script src="{% static 'workbench/workbench.js' %}" defer></script>
+    <script src="{% static 'workbench/lib/form-request-submit-polyfill.js' %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/date-input-polyfill@2.14.0/date-input-polyfill.dist.js" integrity="sha256-FcR3bJqClBNWiJqgW1E9yEgSRoAqRNcjOfgRfaH0LVw=" crossorigin="anonymous" async></script>
     <link rel="stylesheet"
           type="text/css"

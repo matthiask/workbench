@@ -57,16 +57,16 @@
 {% block footer %}
   <a href="{{ object.urls.update }}"
      class="btn btn-primary"
-     data-bs-toggle="ajaxmodal">{% translate 'Update' %}</a>
+     data-ajaxmodal>{% translate 'Update' %}</a>
   <a href="{{ object.urls.move }}"
      class="btn btn-primary"
-     data-bs-toggle="ajaxmodal">{% translate 'Move' %}</a>
+     data-ajaxmodal>{% translate 'Move' %}</a>
   <a href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}"
      class="btn btn-primary mr-auto"
-     data-bs-toggle="ajaxmodal">
+     data-ajaxmodal>
     {% translate 'Copy' %}
   </a>
   <a href="{{ object.urls.delete }}"
      class="btn btn-outline-danger"
-     data-bs-toggle="ajaxmodal">{% translate 'Delete' %}</a>
+     data-ajaxmodal>{% translate 'Delete' %}</a>
 {% endblock footer %}

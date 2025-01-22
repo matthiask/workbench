@@ -138,7 +138,7 @@ class Prettifier:
 
         if model in HISTORY:
             pretty = format_html(
-                '<a href="{}" data-bs-toggle="ajaxmodal">{}</a>',
+                '<a href="{}" data-ajaxmodal>{}</a>',
                 reverse("history", args=(model._meta.db_table, "id", value)),
                 pretty,
             )

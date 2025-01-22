@@ -19,7 +19,7 @@
       {% for hours in instances %}
         <a class="list-group-item list-group-item-action px-0"
            href="{{ hours.get_absolute_url }}"
-           data-bs-toggle="ajaxmodal">
+           data-ajaxmodal>
           <small class="d-flex justify-content-between">
             <span>{{ hours.service.project_service_title }}</span>
             <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>

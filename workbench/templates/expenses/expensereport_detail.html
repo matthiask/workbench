@@ -11,7 +11,7 @@
           <th class="text-right">{% translate 'expenses'|capfirst %}</th>
           <td>
             {% for cost in object.expenses.all reversed %}
-              <a href="{{ cost.urls.detail }}" data-bs-toggle="ajaxmodal">
+              <a href="{{ cost.urls.detail }}" data-ajaxmodal>
                 {{ cost.rendered_on|local_date_format }}
                 <br>
                 {{ cost.service.project|h }}: {{ cost.service|h }}

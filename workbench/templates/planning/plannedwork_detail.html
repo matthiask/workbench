@@ -40,14 +40,14 @@
 
 {% block footer %}
   <a href="{{ object.urls.update }}"
-     data-bs-toggle="ajaxmodal"
+     data-ajaxmodal
      class="btn btn-primary">{% translate 'Update' %}</a>
   <a href="{{ object.project.urls.creatework }}?copy={{ object.pk }}"
-     data-bs-toggle="ajaxmodal"
+     data-ajaxmodal
      class="btn btn-primary mr-auto">
     {% translate 'Copy' %}
   </a>
   <a href="{{ object.urls.delete }}"
-     data-bs-toggle="ajaxmodal"
+     data-ajaxmodal
      class="btn btn-outline-danger">{% translate 'Delete' %}</a>
 {% endblock footer %}

@@ -144,7 +144,7 @@
            class="btn btn-primary">{% translate 'Copy' %}</a>
         <a href="{{ object.urls.statistics }}"
            class="btn btn-primary"
-           data-bs-toggle="ajaxmodal">{% translate 'Statistics' %}</a>
+           data-ajaxmodal>{% translate 'Statistics' %}</a>
         {% if request.user.features.PLANNING %}
           <a href="{{ object.urls.planning }}" class="btn btn-primary">
             {% include 'svg/project.svg' %}
@@ -275,7 +275,7 @@
                            aria-labelledby="offer-planning-dropdown-{{ offer.pk }}">
                         <a class="dropdown-item"
                            href="{{ project.urls.creatework }}?plan_offer={{ offer.pk }}"
-                           data-bs-toggle="ajaxmodal">
+                           data-ajaxmodal>
                           {% translate 'Plan work' %}
                         </a>
                       </div>
@@ -304,7 +304,7 @@
                         </a>
                         <a class="dropdown-item"
                            href="{{ offer.urls.copy }}"
-                           data-bs-toggle="ajaxmodal">
+                           data-ajaxmodal>
                           {% translate 'Copy' %}
                         </a>
                         <a class="dropdown-item" href="{{ offer.urls.delete }}">
@@ -393,7 +393,7 @@
                              aria-labelledby="service-planning-dropdown-{{ row.service.pk }}">
                           <a class="dropdown-item"
                              href="{{ project.urls.creatework }}?service={{ row.service.pk }}"
-                             data-bs-toggle="ajaxmodal">
+                             data-ajaxmodal>
                             {% translate 'Plan work' %}
                           </a>
                         </div>
@@ -413,22 +413,22 @@
                              aria-labelledby="service-dropdown-{{ row.service.pk }}">
                           <a class="dropdown-item"
                              href="{{ row.service.urls.update }}"
-                             data-bs-toggle="ajaxmodal">
+                             data-ajaxmodal>
                             {% translate 'Update' %}
                           </a>
                           <a class="dropdown-item"
                              href="{{ row.service.urls.reassign_logbook }}"
-                             data-bs-toggle="ajaxmodal">
+                             data-ajaxmodal>
                             {% translate 'Reassign logbook entries' %}
                           </a>
                           <a class="dropdown-item"
                              href="{{ row.service.urls.delete }}"
-                             data-bs-toggle="ajaxmodal">
+                             data-ajaxmodal>
                             {% translate 'Delete' %}
                           </a>
                           <a class="dropdown-item"
                              href="{{ row.service.urls.move }}"
-                             data-bs-toggle="ajaxmodal">
+                             data-ajaxmodal>
                             {% translate 'Move to other project' %}
                           </a>
                           {% if row.service.pk and not row.service.effort_rate %}
@@ -499,13 +499,13 @@
                     {% if row.service.is_logging_allowed %}
                       {% if row.service.pk %}
                         <a href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
-                           data-bs-toggle="ajaxmodal">
+                           data-ajaxmodal>
                           {% include "svg/plus.svg" %}
                           {% translate 'Hours' %}
                         </a>
                       {% endif %}
                       <a href="{{ project.urls.createcost }}?service={{ row.service.pk|default:'' }}"
-                         data-bs-toggle="ajaxmodal">
+                         data-ajaxmodal>
                         {% include "svg/plus.svg" %}
                         {% translate 'Cost' %}
                       </a>
@@ -596,20 +596,20 @@
       </a>
       <a href="{{ project.urls.createservice }}"
          class="btn btn-primary"
-         data-bs-toggle="ajaxmodal">
+         data-ajaxmodal>
         {% include "svg/plus.svg" %}
         {% translate 'service'|capfirst %}
       </a>
     {% endif %}
     <a href="{{ project.urls.createhours }}"
        class="btn btn-primary"
-       data-bs-toggle="ajaxmodal">
+       data-ajaxmodal>
       {% include "svg/plus.svg" %}
       {% translate 'Hours' %}
     </a>
     <a href="{{ project.urls.createcost }}"
        class="btn btn-primary"
-       data-bs-toggle="ajaxmodal"
+       data-ajaxmodal
        data-createcost>
       {% include "svg/plus.svg" %}
       {% translate 'Cost' %}
@@ -622,12 +622,12 @@
 {% block fixed-add-button %}
   <a href="{{ project.urls.createhours }}"
      data-createhours
-     data-bs-toggle="ajaxmodal"
+     data-ajaxmodal
      class="btn btn-primary fixed-btn"
      title="{% translate 'log hours' %}">
   </a>
   <a href="{% url 'logbook_break_create' %}"
-     data-bs-toggle="ajaxmodal"
+     data-ajaxmodal
      class="btn btn-primary fixed-btn break"
      title="{% translate 'took a break' %}">
   </a>

@@ -29,41 +29,41 @@
   <div class="row mt-5">
     <div class="col-12">
       <a href="{{ object.urls.creatework }}"
-         data-bs-toggle="ajaxmodal"
+         data-ajaxmodal
          class="btn btn-primary btn-sm">
         {% include 'svg/plus.svg' %}
         {% translate 'planned work'|capfirst %}
       </a>
       <a href="{{ object.urls.createexternalwork }}"
-         data-bs-toggle="ajaxmodal"
+         data-ajaxmodal
          class="btn btn-primary btn-sm">
         {% include 'svg/plus.svg' %}
         {% translate 'external work'|capfirst %}
       </a>
       <a href="{{ object.urls.createmilestone }}"
-         data-bs-toggle="ajaxmodal"
+         data-ajaxmodal
          class="btn btn-primary btn-sm">
         {% include 'svg/plus.svg' %}
         {% translate 'milestone'|capfirst %}
       </a>
       <a href="{% url 'awt_absence_create' %}"
-         data-bs-toggle="ajaxmodal"
+         data-ajaxmodal
          class="btn btn-primary btn-sm">
         {% include 'svg/plus.svg' %}
         {% translate 'absence'|capfirst %}
       </a>
       <a href="{{ object.urls.planning_batch_update }}"
-         data-bs-toggle="ajaxmodal"
+         data-ajaxmodal
          class="btn btn-primary btn-sm">
         {% translate 'Batch update' %}
       </a>
       <a href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}"
-         data-bs-toggle="ajaxmodal"
+         data-ajaxmodal
          class="btn btn-primary btn-sm">
         {% translate 'History of planned work' %}
       </a>
       <a href="{% url 'history' 'planning_milestone' 'project_id' object.pk %}"
-         data-bs-toggle="ajaxmodal"
+         data-ajaxmodal
          class="btn btn-primary btn-sm">
         {% translate 'History of milestones' %}
       </a>

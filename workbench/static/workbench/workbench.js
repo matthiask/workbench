@@ -25,44 +25,49 @@ $(() => {
   const initModal = (data) => {
     dismissModals()
 
-    const $data = $(data)
+    const div = document.createElement("div")
+    div.innerHTML = data
+    const el = div.querySelector(".modal")
+    if (el) {
+      document.body.append(div)
+      const modal = new bootstrap.Modal(el, {
+        backdrop: div.querySelector("form[method=post]") ? "static" : true,
+      })
+      el.addEventListener("hide.bs.modal", () => {
+        div.remove()
+      })
+      modal.show()
 
-    $data.modal({
-      backdrop: $data.find("form[method=post]").length ? "static" : true,
-    })
-
-    setTimeout(() => {
-      const fields = $(".modal").find("input, select")
-      if (fields.filter("[autofocus]").length) {
-        fields.filter("[autofocus]").focus()
-      } else {
-        fields.filter(":visible").first().focus()
-      }
-    }, 100)
+      setTimeout(() => {
+        const first = el.querySelector(":is(input, select):not([type=hidden])")
+        first?.focus()
+      }, 100)
+    }
 
     initWidgets()
   }
 
   window.initModal = initModal
   window.openModalFromUrl = (url) => {
-    $.ajax({
-      url,
-      success(data) {
-        initModal(data)
-      },
-      error() {
-        alert(gettext("Unable to open the form"))
-      },
-      xhrFields: {
-        withCredentials: true,
-      },
+    fetch(url, {
+      credentials: "include",
+      headers: { "x-requested-with": "XMLHttpRequest" },
     })
+      .then((response) => response.text())
+      .then((html) => {
+        initModal(html)
+      })
+      .catch((e) => {
+        console.error(e)
+        alert(gettext("Unable to open the form"))
+      })
   }
 
-  $(document.body).on("click", "[data-bs-toggle]", function (event) {
-    if (this.dataset.bsToggle === "ajaxmodal") {
-      event.preventDefault()
-      window.openModalFromUrl(this.href)
+  document.body.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-ajaxmodal]")
+    if (el) {
+      e.preventDefault()
+      window.openModalFromUrl(e.target.href)
     }
   })
 
@@ -279,7 +284,7 @@ $(() => {
     } else if (e.keyCode >= 48 && e.keyCode <= 57) {
       const el = _sel(`[data-number-shortcut="${(e.keyCode - 38) % 10}"]`)
       if (!el) return
-      if (el.dataset.bsToggle === "ajaxmodal") {
+      if (el.dataset.ajaxmodal) {
         window.openModalFromUrl(el.href)
       } else {
         window.location.href = el.href

@@ -14,7 +14,7 @@
     {% for cost in object_list %}
       <a class="list-group-item list-group-item-action px-0"
          href="{{ cost.get_absolute_url }}"
-         data-bs-toggle="ajaxmodal">
+         data-ajaxmodal>
         <small class="d-flex justify-content-between">
           <span>{{ cost.service.project_service_title }}</span>
           <span>{{ cost.rendered_by.get_short_name }} / {{ cost.rendered_on|local_date_format }}</span>

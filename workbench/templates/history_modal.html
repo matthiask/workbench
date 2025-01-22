@@ -11,7 +11,7 @@
   {% endif %}
   <small class="d-block">
     {% for verbose_name_plural, url in related %}
-      <a href="{{ url }}" data-bs-toggle="ajaxmodal">{{ verbose_name_plural }}</a>
+      <a href="{{ url }}" data-ajaxmodal>{{ verbose_name_plural }}</a>
     {% endfor %}
   </small>
 {% endblock title %}

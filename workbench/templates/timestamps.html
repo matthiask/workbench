@@ -69,27 +69,27 @@
                 <div class="ml-auto">
                   {% if slice.hours_create_url %}
                     <a href="{{ slice.hours_create_url }}"
-                       data-bs-toggle="ajaxmodal"
+                       data-ajaxmodal
                        class="btn btn-sm align-self-start btn-primary">
                       {% translate 'hours'|capfirst %}
                     </a>
                   {% endif %}
                   {% if not forloop.first and slice.break_create_url %}
                     <a href="{{ slice.break_create_url }}"
-                       data-bs-toggle="ajaxmodal"
+                       data-ajaxmodal
                        class="btn btn-sm align-self-start btn-primary">
                       {% translate 'break'|capfirst %}
                     </a>
                   {% endif %}
                   {% if slice.logged_hours %}
                     <a href="{{ slice.logged_hours.get_absolute_url }}"
-                       data-bs-toggle="ajaxmodal"
+                       data-ajaxmodal
                        class="btn btn-sm btn-outline-primary">
                       {% translate 'hours'|capfirst %}
                     </a>
                   {% elif slice.logged_break %}
                     <a href="{{ slice.logged_break.get_absolute_url }}"
-                       data-bs-toggle="ajaxmodal"
+                       data-ajaxmodal
                        class="btn btn-sm btn-outline-primary">
                       {% translate 'break'|capfirst %}
                     </a>

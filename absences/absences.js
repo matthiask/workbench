@@ -116,7 +116,7 @@ const Absence = ({ absence, person }) => {
   return (
     <a
       href={`/absences/${absence.id}/`}
-      data-bs-toggle="ajaxmodal"
+      data-ajaxmodal
       className={`absence absence--${absence.reason}`}
       style={style}
       title={`${absence.reasonDisplay} – ${absence.description}`}

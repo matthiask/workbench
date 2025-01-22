@@ -271,12 +271,12 @@
 {% block fixed-add-button %}
   <a href="{% url 'logbook_loggedhours_create' %}"
      data-createhours
-     data-bs-toggle="ajaxmodal"
+     data-ajaxmodal
      class="btn btn-primary fixed-btn hours"
      title="{% translate 'log hours' %}">
   </a>
   <a href="{% url 'logbook_break_create' %}"
-     data-bs-toggle="ajaxmodal"
+     data-ajaxmodal
      class="btn btn-primary fixed-btn break"
      title="{% translate 'took a break' %}">
   </a>

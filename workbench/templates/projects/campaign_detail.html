@@ -110,7 +110,7 @@
          class="btn btn-primary">{% translate 'Copy' %}</a>
         <a href="{{ object.urls.statistics }}"
            class="btn btn-primary"
-           data-bs-toggle="ajaxmodal">{% translate 'Statistics' %}</a>
+           data-ajaxmodal>{% translate 'Statistics' %}</a>
       <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}"
          class="btn btn-primary">
         {% translate 'logged hours'|capfirst %}
