@@ -110,8 +110,8 @@
               <div class="dropdown-header">{% translate 'working time'|capfirst %}</div>
               <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% translate 'annual working time'|capfirst %}</a>
               <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% translate 'Absence calendar' %}</a>
-              <div class="dropdown-divider"></div>
               {% if request.user.features.CONTROLLING %}
+                <div class="dropdown-divider"></div>
                 <div class="dropdown-header">{% translate 'controlling'|capfirst %}</div>
                 <a class="dropdown-item" href="{% url 'report_key_data' %}">{% translate 'Key data' %}</a>
                 <a class="dropdown-item"
@@ -146,9 +146,9 @@
                 <a class="dropdown-item" href="{% url 'report_logging' %}">
                   {% translate 'Logging statistics' %}
                 </a>
-                <div class="dropdown-divider"></div>
               {% endif %} {# CONTROLLING #}
               {% if request.user.features.DEALS %}
+                <div class="dropdown-divider"></div>
                 <div class="dropdown-header">
                   {% translate 'deals'|capfirst %}
                 </div>
@@ -161,9 +161,9 @@
                 <a class="dropdown-item" href="{% url 'report_deal_history' %}">
                   {% translate 'Deal history' %}
                 </a>
-                <div class="dropdown-divider"></div>
               {% endif %}
               {% if request.user.features.LABOR_COSTS %}
+                <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'report_labor_costs' %}">
                   {% translate 'Labor costs' %}
                 </a>
