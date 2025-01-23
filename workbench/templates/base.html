@@ -18,238 +18,237 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-      <ul class="navbar-nav flex-grow-1">
-        <li class="nav-item">
-          <form method="GET" action="{% url 'search' %}">
-            <input class="form-control"
-                   type="search"
-                   placeholder="{% translate 'Search'|capfirst %}"
-                   aria-label="{% translate 'Search'|capfirst %}"
-                   name="q"
-                   value="{{ request.GET.q }}">
-          </form>
-        </li>
-        {% mark_current request.path %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'projects_project_list' %}">{% translate 'projects'|capfirst %}</a>
-        </li>
-        {% if request.user.features.CONTROLLING %}
+        <ul class="navbar-nav flex-grow-1">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% translate 'invoices'|capfirst %}</a>
+            <form method="GET" action="{% url 'search' %}">
+              <input class="form-control"
+                     type="search"
+                     placeholder="{% translate 'Search' %}"
+                     aria-label="{% translate 'Search' %}"
+                     name="q"
+                     value="{{ request.GET.q }}">
+            </form>
           </li>
-        {% endif %}
-        {% if request.user.features.DEALS %}
+          {% mark_current request.path %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'deals_deal_list' %}">{% translate 'deals'|capfirst %}</a>
+            <a class="nav-link" href="{% url 'projects_project_list' %}">{% translate 'projects'|capfirst %}</a>
           </li>
-        {% endif %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'contacts' %}">{% translate 'contacts'|capfirst %}</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle"
-             href="#"
-             id="logbookDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-haspopup="true"
-             aria-expanded="false">
-            {% translate 'logbook'|capfirst %}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="logbookDropdown">
-            <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% translate 'logged hours'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'logbook_loggedcost_list' %}">{% translate 'logged costs'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'logbook_break_list' %}">{% translate 'breaks'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'awt_absence_list' %}">{% translate 'absences'|capfirst %}</a>
-            {# <div class="dropdown-divider"></div> #}
-          </div>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle"
-             href="#"
-             id="bookkeepingDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-haspopup="true"
-             aria-expanded="false">
-            {% translate 'bookkeeping'|capfirst %}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
-            {% if request.user.features.CONTROLLING %}
-              <a class="dropdown-item"
-                 href="{% url 'invoices_recurringinvoice_list' %}">
-                {% translate 'recurring invoices'|capfirst %}
-              </a>
-              <a class="dropdown-item"
-                 href="{% url 'credit_control_creditentry_list' %}">
-                {% translate 'credit entries'|capfirst %}
-              </a>
-              <a class="dropdown-item" href="{% url 'report_open_items_list' %}">
-                {% translate 'Open items list' %}
-              </a>
-            {% endif %}
-            {% if request.user.features.BOOKKEEPING %}
-              <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% translate 'Reminders' %}</a>
-            {% endif %}
-            {% if request.user.features.EXPENSES %}
-              <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% translate 'expense reports'|capfirst %}</a>
-            {% endif %}
-          </div>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle"
-             href="#"
-             id="reportsDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-haspopup="true"
-             aria-expanded="false">
-            {% translate 'reports'|capfirst %}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="reportsDropdown">
-            <div class="dropdown-header">{% translate 'working time'|capfirst %}</div>
-            <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% translate 'annual working time'|capfirst %}</a>
-            <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% translate 'Absence calendar' %}</a>
-            <div class="dropdown-divider"></div>
-            {% if request.user.features.CONTROLLING %}
-              <div class="dropdown-header">{% translate 'controlling'|capfirst %}</div>
-              <a class="dropdown-item" href="{% url 'report_key_data' %}">{% translate 'Key data' %}</a>
-              <a class="dropdown-item"
-                 href="{% url 'report_project_budget_statistics' %}">
-                {% translate 'Project budget statistics' %}
-              </a>
-              <a class="dropdown-item"
-                 href="{% url 'report_projected_gross_margin' %}">
-                {% translate 'projected gross margin'|capfirst %}
-              </a>
-              <a class="dropdown-item"
-                 href="{% url 'report_third_party_costs' %}">
-                {% translate 'Playing bank' %}
-              </a>
-              <div class="dropdown-divider"></div>
-              <div class="dropdown-header">
-                {% translate 'logbook'|capfirst %}
-              </div>
-              <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">
-                {% translate 'Hours per customer'|capfirst %}
-              </a>
-              <a class="dropdown-item" href="{% url 'report_hours_per_type' %}">
-                {% translate 'Hours per type'|capfirst %}
-              </a>
-              <a class="dropdown-item"
-                 href="{% url 'report_planning_vs_logbook' %}?team=-{{ request.user.pk }}">
-                {% translate 'Planning vs Logbook' %}
-              </a>
-              <a class="dropdown-item" href="{% url 'report_green_hours' %}">
-                {% translate 'Green hours' %}
-              </a>
-              <a class="dropdown-item" href="{% url 'report_logging' %}">
-                {% translate 'Logging statistics' %}
-              </a>
-              <div class="dropdown-divider"></div>
-            {% endif %} {# CONTROLLING #}
-            {% if request.user.features.DEALS %}
-              <div class="dropdown-header">
-                {% translate 'deals'|capfirst %}
-              </div>
-              <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">
-                {% translate 'Accepted deals' %}
-              </a>
-              <a class="dropdown-item" href="{% url 'report_declined_deals' %}">
-                {% translate 'Declined deals' %}
-              </a>
-              <a class="dropdown-item" href="{% url 'report_deal_history' %}">
-                {% translate 'Deal history' %}
-              </a>
-              <div class="dropdown-divider"></div>
-            {% endif %}
-            {% if request.user.features.LABOR_COSTS %}
-              <a class="dropdown-item" href="{% url 'report_labor_costs' %}">
-                {% translate 'Labor costs' %}
-              </a>
-            {% endif %}
-          </div>
-        </li>
-      {% endmark_current %}
-
-      <li class="nav-item dropdown ms-auto">
-        <a class="nav-link dropdown-toggle"
-           href="#"
-           id="userDropdown"
-           role="button"
-           data-bs-toggle="dropdown"
-           aria-haspopup="true"
-           aria-expanded="false">
-          Hi, {{ request.user.get_short_name }}!
-        </a>
-        <div class="dropdown-menu dropdown-menu-end"
-             aria-labelledby="userDropdown">
-          <div class="dropdown-header">
-            {{ request.user.get_full_name }}
-          </div>
-          <a class="dropdown-item" href="{% url 'accounts_update' %}">
-            {% translate 'Settings' %}
-          </a>
-          {% if request.user.features.PLANNING %}
-            <a class="dropdown-item" href="{{ request.user.urls.planning }}">
-              {% translate 'planned work'|capfirst %}
-            </a>
+          {% if request.user.features.CONTROLLING %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'invoices_invoice_list' %}">{% translate 'invoices'|capfirst %}</a>
+            </li>
           {% endif %}
-          <div class="dropdown-divider">
-          </div>
-          <div class="dropdown-header">
-            {% translate 'Time tracking' %}
-          </div>
-          <a class="dropdown-item" href="{% url 'timer' %}">
-            {% translate 'Timer' %}
+          {% if request.user.features.DEALS %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'deals_deal_list' %}">{% translate 'deals'|capfirst %}</a>
+            </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'contacts' %}">{% translate 'contacts'|capfirst %}</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               id="logbookDropdown"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+              {% translate 'logbook'|capfirst %}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="logbookDropdown">
+              <a class="dropdown-item" href="{% url 'logbook_loggedhours_list' %}">{% translate 'logged hours'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'logbook_loggedcost_list' %}">{% translate 'logged costs'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'logbook_break_list' %}">{% translate 'breaks'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'awt_absence_list' %}">{% translate 'absences'|capfirst %}</a>
+              {# <div class="dropdown-divider"></div> #}
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               id="bookkeepingDropdown"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+              {% translate 'bookkeeping'|capfirst %}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
+              {% if request.user.features.CONTROLLING %}
+                <a class="dropdown-item"
+                   href="{% url 'invoices_recurringinvoice_list' %}">
+                  {% translate 'recurring invoices'|capfirst %}
+                </a>
+                <a class="dropdown-item"
+                   href="{% url 'credit_control_creditentry_list' %}">
+                  {% translate 'credit entries'|capfirst %}
+                </a>
+                <a class="dropdown-item" href="{% url 'report_open_items_list' %}">
+                  {% translate 'Open items list' %}
+                </a>
+              {% endif %}
+              {% if request.user.features.BOOKKEEPING %}
+                <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% translate 'Reminders' %}</a>
+              {% endif %}
+              {% if request.user.features.EXPENSES %}
+                <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% translate 'expense reports'|capfirst %}</a>
+              {% endif %}
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               id="reportsDropdown"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+              {% translate 'reports'|capfirst %}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="reportsDropdown">
+              <div class="dropdown-header">{% translate 'working time'|capfirst %}</div>
+              <a class="dropdown-item" href="{% url 'awt_year_report' %}">{% translate 'annual working time'|capfirst %}</a>
+              <a class="dropdown-item" href="{% url 'awt_absence_calendar' %}">{% translate 'Absence calendar' %}</a>
+              <div class="dropdown-divider"></div>
+              {% if request.user.features.CONTROLLING %}
+                <div class="dropdown-header">{% translate 'controlling'|capfirst %}</div>
+                <a class="dropdown-item" href="{% url 'report_key_data' %}">{% translate 'Key data' %}</a>
+                <a class="dropdown-item"
+                   href="{% url 'report_project_budget_statistics' %}">
+                  {% translate 'Project budget statistics' %}
+                </a>
+                <a class="dropdown-item"
+                   href="{% url 'report_projected_gross_margin' %}">
+                  {% translate 'projected gross margin'|capfirst %}
+                </a>
+                <a class="dropdown-item"
+                   href="{% url 'report_third_party_costs' %}">
+                  {% translate 'Playing bank' %}
+                </a>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-header">
+                  {% translate 'logbook'|capfirst %}
+                </div>
+                <a class="dropdown-item" href="{% url 'report_hours_per_customer' %}">
+                  {% translate 'Hours per customer'|capfirst %}
+                </a>
+                <a class="dropdown-item" href="{% url 'report_hours_per_type' %}">
+                  {% translate 'Hours per type'|capfirst %}
+                </a>
+                <a class="dropdown-item"
+                   href="{% url 'report_planning_vs_logbook' %}?team=-{{ request.user.pk }}">
+                  {% translate 'Planning vs Logbook' %}
+                </a>
+                <a class="dropdown-item" href="{% url 'report_green_hours' %}">
+                  {% translate 'Green hours' %}
+                </a>
+                <a class="dropdown-item" href="{% url 'report_logging' %}">
+                  {% translate 'Logging statistics' %}
+                </a>
+                <div class="dropdown-divider"></div>
+              {% endif %} {# CONTROLLING #}
+              {% if request.user.features.DEALS %}
+                <div class="dropdown-header">
+                  {% translate 'deals'|capfirst %}
+                </div>
+                <a class="dropdown-item" href="{% url 'report_accepted_deals' %}">
+                  {% translate 'Accepted deals' %}
+                </a>
+                <a class="dropdown-item" href="{% url 'report_declined_deals' %}">
+                  {% translate 'Declined deals' %}
+                </a>
+                <a class="dropdown-item" href="{% url 'report_deal_history' %}">
+                  {% translate 'Deal history' %}
+                </a>
+                <div class="dropdown-divider"></div>
+              {% endif %}
+              {% if request.user.features.LABOR_COSTS %}
+                <a class="dropdown-item" href="{% url 'report_labor_costs' %}">
+                  {% translate 'Labor costs' %}
+                </a>
+              {% endif %}
+            </div>
+          </li>
+        {% endmark_current %}
+
+        <li class="nav-item dropdown ms-auto">
+          <a class="nav-link dropdown-toggle"
+             href="#"
+             id="userDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-haspopup="true"
+             aria-expanded="false">
+            Hi, {{ request.user.get_short_name }}!
           </a>
-          <a class="dropdown-item" href="{% url 'timestamps' %}">
-            {% translate 'timestamps'|capfirst %}
-          </a>
-          <a class="dropdown-item" href="{{ request.user.urls.statistics }}">
-            {% translate 'Statistics' %}
-          </a>
-          <div class="dropdown-divider">
-          </div>
-          <div class="dropdown-header">
-            {% translate 'accounts'|capfirst %}
-          </div>
-          <a class="dropdown-item" href="{% url 'accounts_user_list' %}">
-            {% translate 'users'|capfirst %}
-          </a>
-          <a class="dropdown-item" href="{% url 'accounts_team_list' %}">
-            {% translate 'teams'|capfirst %}
-          </a>
-          <div class="dropdown-divider">
-          </div>
-          <a class="dropdown-item" href="{% url 'notes_note_list' %}">
-            {% translate 'notes'|capfirst %}
-          </a>
-          <a class="dropdown-item" href="{% url 'report_work_anniversaries' %}">
-            {% translate 'Work anniversaries' %}
-          </a>
-          <a class="dropdown-item" href="{% url 'report_birthdays' %}">
-            {% translate 'Birthdays' %}
-          </a>
-          <a class="dropdown-item" href="{% url 'shortcuts' %}">
-            {% translate 'Keyboard shortcuts' %}
-          </a>
-          {% if request.user.is_admin %}
+          <div class="dropdown-menu dropdown-menu-end"
+               aria-labelledby="userDropdown">
+            <div class="dropdown-header">
+              {{ request.user.get_full_name }}
+            </div>
+            <a class="dropdown-item" href="{% url 'accounts_update' %}">
+              {% translate 'Settings' %}
+            </a>
+            {% if request.user.features.PLANNING %}
+              <a class="dropdown-item" href="{{ request.user.urls.planning }}">
+                {% translate 'planned work'|capfirst %}
+              </a>
+            {% endif %}
             <div class="dropdown-divider">
             </div>
-            <a class="dropdown-item" href="{% url 'admin:index' %}">
-              {% translate 'Admin panel' %}
+            <div class="dropdown-header">
+              {% translate 'Time tracking' %}
+            </div>
+            <a class="dropdown-item" href="{% url 'timer' %}">
+              {% translate 'Timer' %}
             </a>
-          {% endif %}
-          <div class="dropdown-divider">
+            <a class="dropdown-item" href="{% url 'timestamps' %}">
+              {% translate 'timestamps'|capfirst %}
+            </a>
+            <a class="dropdown-item" href="{{ request.user.urls.statistics }}">
+              {% translate 'Statistics' %}
+            </a>
+            <div class="dropdown-divider">
+            </div>
+            <div class="dropdown-header">
+              {% translate 'accounts'|capfirst %}
+            </div>
+            <a class="dropdown-item" href="{% url 'accounts_user_list' %}">
+              {% translate 'users'|capfirst %}
+            </a>
+            <a class="dropdown-item" href="{% url 'accounts_team_list' %}">
+              {% translate 'teams'|capfirst %}
+            </a>
+            <div class="dropdown-divider">
+            </div>
+            <a class="dropdown-item" href="{% url 'notes_note_list' %}">
+              {% translate 'notes'|capfirst %}
+            </a>
+            <a class="dropdown-item" href="{% url 'report_work_anniversaries' %}">
+              {% translate 'Work anniversaries' %}
+            </a>
+            <a class="dropdown-item" href="{% url 'report_birthdays' %}">
+              {% translate 'Birthdays' %}
+            </a>
+            <a class="dropdown-item" href="{% url 'shortcuts' %}">
+              {% translate 'Keyboard shortcuts' %}
+            </a>
+            {% if request.user.is_admin %}
+              <div class="dropdown-divider">
+              </div>
+              <a class="dropdown-item" href="{% url 'admin:index' %}">
+                {% translate 'Admin panel' %}
+              </a>
+            {% endif %}
+            <div class="dropdown-divider">
+            </div>
+            <a class="dropdown-item" href="{% url 'logout' %}">
+              {% translate 'Sign out' %}
+            </a>
           </div>
-          <a class="dropdown-item" href="{% url 'logout' %}">
-            {% translate 'Sign out' %}
-          </a>
-        </div>
-      </li>
-    </ul>
-
+        </li>
+      </ul>
 
     </div>
   </div>
