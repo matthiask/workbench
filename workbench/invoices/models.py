@@ -371,7 +371,7 @@ class Invoice(ModelWithTotal):
             css = "warning"
 
         return format_html(
-            '<span class="badge bg-{}">{}</span>', css, self.pretty_status
+            '<span class="badge text-bg-{}">{}</span>', css, self.pretty_status
         )
 
     @property
@@ -694,7 +694,7 @@ class RecurringInvoice(ModelWithTotal):
     @property
     def status_badge(self):
         return format_html(
-            '<span class="badge bg-{}">{}</span>',
+            '<span class="badge text-bg-{}">{}</span>',
             "light" if self.ends_on else "secondary",
             self.pretty_status,
         )

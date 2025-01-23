@@ -1,6 +1,6 @@
 <!doctype html>
 {% load django_bootstrap5 i18n static webpack_assets %}
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="{{ LANGUAGE_CODE }}" data-bs-theme="dark">
   <head>
     <title>
       {% block title %}{{ WORKBENCH.TITLE }}{% endblock %}
@@ -14,50 +14,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="robots" content="noindex">
-    <style>
-      .btn-primary {
-        background-color: var(--bs-blue);
-        border-color: var(--bs-blue);
-      }
-      .btn-primary.disabled,
-      .btn-primary:disabled {
-        background-color: var(--bs-darker);
-        border-color: var(--bs-darker);
-      }
-      .bg-primary {
-        background-color: var(--bs-blue) !important;
-      }
-      .navbar {
-        background-color: var(--bs-blue) !important;
-      }
-      a {
-        color: var(--bs-blue);
-      }
-    </style>
-    {% if SPARKLES %}
-      <script src="{% static 'workbench/lib/sparkles.js' %}"></script>
-      <style>
-      :root {
-        --bs-blue: #b049a5;
-        --bs-darker: #3c034b;
-      }
-      </style>
-    {% elif request.user.features.PRIDE and JUN14 %}
-      <style>
-      :root {
-        --bs-blue: #b049a5;
-        --bs-darker: #3c034b;
-      }
-      </style>
-    {% else %}
-      <style>
-      :root {
-        --bs-blue: #0061c8;
-        --bs-darker: #0031a0;
-      }
-      </style>
-    {% endif %}
-    {% if request.user.features.PRIDE and JUN %}
+    {% if request.user.features.PRIDE and JUN or request.user.features.PRIDE and MAR08 %}
       <style>
       body::before {
         content: "";

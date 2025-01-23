@@ -250,7 +250,7 @@ class Deal(Model):
                 css = "info"
 
         return format_html(
-            '<span class="badge bg-{}">{}</span>', css, self.pretty_status
+            '<span class="badge text-bg-{}">{}</span>', css, self.pretty_status
         )
 
     @property

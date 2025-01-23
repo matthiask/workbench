@@ -227,7 +227,7 @@ class DealsTest(TestCase):
         """The deal badge contains expected informations"""
         self.assertEqual(
             factories.DealFactory.create().status_badge,
-            '<span class="badge bg-info">Open since 18.02.2020</span>',
+            '<span class="badge text-bg-info">Open since 18.02.2020</span>',
         )
         self.assertEqual(
             factories.DealFactory.create(
@@ -240,7 +240,7 @@ class DealsTest(TestCase):
                 status=Deal.OPEN,
                 probability=Deal.LOW,
             ).status_badge,
-            '<span class="badge bg-info">Open since 18.02.2020</span>',
+            '<span class="badge text-bg-info">Open since 18.02.2020</span>',
         )
 
     def test_xlsx(self):

@@ -220,12 +220,12 @@
                   &nbsp;
                   {{ offer.status_badge }}
                   {% if offer.work_completed_on %}
-                    <small class="badge bg-success">
+                    <small class="badge text-bg-success">
                       {% translate 'work completed on'|capfirst %} {{ offer.work_completed_on|local_date_format }}
                     </small>
                   {% endif %}
                   {% if offer.is_budget_retainer %}
-                    <small class="badge bg-info">
+                    <small class="badge text-bg-info">
                       {% translate 'is budget retainer' %}
                     </small>
                   {% endif %}
@@ -317,7 +317,7 @@
                     {% if offer.should_collapse %}
                       <a href="#"
                          data-bs-toggle="collapse"
-                         data-target=".offer-{{ offer.id }}-collapsed"
+                         data-bs-target=".offer-{{ offer.id }}-collapsed"
                          aria-expanded="false"
                          class="btn btn-primary btn-sm">
                         {% translate 'Show' %}

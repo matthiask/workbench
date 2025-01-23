@@ -627,7 +627,7 @@ class ProjectsTest(TestCase):
         project.refresh_from_db()
         self.assertEqual(
             project.status_badge,
-            '<span class="badge bg-light">Order, closed on 31.12.2019</span>',
+            '<span class="badge text-bg-light">Order, closed on 31.12.2019</span>',
         )
 
     def test_initialize_customer_contact(self):

@@ -12,7 +12,7 @@ def workbench(request):
         "FEATURES": FEATURES,
         "DEBUG": settings.DEBUG,
         "TESTING": settings.TESTING,
-        "SPARKLES": (today.month, today.day) == (3, 8),
+        "MAR08": (today.month, today.day) == (3, 8),
         "JUN14": (today.month, today.day) == (6, 14),
         "JUN": today.month == 6,
     }

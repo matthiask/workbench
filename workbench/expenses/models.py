@@ -91,7 +91,7 @@ class ExpenseReport(Model):
     @property
     def status_badge(self):
         return format_html(
-            '<span class="badge bg-{}">{}</span>',
+            '<span class="badge text-bg-{}">{}</span>',
             "light" if self.closed_on else "info",
             self.pretty_status,
         )
