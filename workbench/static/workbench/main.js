@@ -8,11 +8,6 @@ function _sel(sel) {
   return document.querySelector(sel)
 }
 
-/* eslint-disable-next-line */
-function _cl(el, cl, add) {
-  el.classList[add ? "add" : "remove"](cl)
-}
-
 function doSubmit(el) {
   el.closest("form").requestSubmit()
 }
@@ -356,6 +351,16 @@ $(() => {
     fetch(`${url}?pinned=${e.target.dataset.pinned === "true" ? "" : "pinned"}`)
       .then((r) => r.json())
       .then((data) => (e.target.dataset.pinned = data.pinned))
+  })
+
+  document.body.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-new-service]")
+    if (el) {
+      e.preventDefault()
+      el.classList.add("invisible")
+      _sel("#new-service").classList.remove("d-none")
+      _sel("#id_modal-service").value = ""
+    }
   })
 })
 

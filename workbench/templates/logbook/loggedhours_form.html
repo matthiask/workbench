@@ -38,7 +38,7 @@
   {% if form.service_title and form.hide_new_service %}
     <button type="button"
             class="btn btn-primary me-auto"
-            onclick="_cl(this, 'invisible', true);_cl(_sel('#new-service'), 'd-none', false);_sel('#id_modal-service').value=''">
+            data-new-service>
       {% translate 'new service' %}
     </button>
   {% endif %}
