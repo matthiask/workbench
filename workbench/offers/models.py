@@ -277,9 +277,9 @@ class Offer(ModelWithTotal):
         else:
             css = {
                 self.IN_PREPARATION: "info",
-                self.SERVICE_GROUP: "default",
+                self.SERVICE_GROUP: "light",
                 self.OFFERED: "success",
-                self.ACCEPTED: "default",
+                self.ACCEPTED: "light",
                 self.DECLINED: "danger",
             }[self.status]
 

@@ -361,7 +361,7 @@ class Invoice(ModelWithTotal):
         css = {
             self.IN_PREPARATION: "info",
             self.SENT: "success",
-            self.PAID: "default",
+            self.PAID: "light",
             self.CANCELED: "danger",
         }[self.status]
 
