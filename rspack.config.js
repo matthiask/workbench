@@ -17,7 +17,7 @@ module.exports = (env, argv) => {
     ...base,
     context: path.resolve(process.cwd()),
     entry: {
-      main: "./workbench/static/workbench/app.js",
+      main: "./workbench/static/workbench/main.js",
       timer: "./timer/index.js",
       absences: "./absences/index.js",
       planning: "./planning/index.js",

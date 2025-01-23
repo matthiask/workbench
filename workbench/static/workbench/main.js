@@ -1,3 +1,8 @@
+import * as bootstrap from "bootstrap"
+import "./main.scss"
+
+window.bootstrap = bootstrap
+
 /* global $ */
 function _sel(sel) {
   return document.querySelector(sel)
