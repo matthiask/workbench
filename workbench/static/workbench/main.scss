@@ -49,13 +49,12 @@ body {
   margin-right: 0 !important;
 }
 
-.navbar-brand {
-  margin-left: 0.5rem;
-}
-
 .navbar form input {
-  width: 10em;
+  width: 8em;
+  margin-top: 0.2rem;
   margin-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 @media screen and (max-width: 575px) {
