@@ -108,16 +108,8 @@ small > a.active {
   text-decoration: underline;
 }
 
-.nopad {
-  padding: 0 !important;
-}
-
 .table .table {
   background: transparent;
-}
-
-.move {
-  text-decoration: none;
 }
 
 .table tbody th > a:not(.btn) /* override */,
@@ -186,10 +178,6 @@ tbody th > a {
   margin: -8px 0 4px;
   font-size: 85%;
   color: #443 !important;
-}
-
-.navbar-brand svg {
-  transform: scale(1.7) translateY(-1px);
 }
 
 .progress-line {
@@ -316,11 +304,6 @@ tbody th > a {
   font-weight: bold;
 }
 
-.besides {
-  font-size: 85%;
-  color: #555;
-}
-
 .dropdown-menu.show {
   z-index: 9999;
 }
@@ -373,4 +356,8 @@ tbody th > a {
 
 a {
   text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
