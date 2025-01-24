@@ -140,10 +140,18 @@ tbody th > a {
   align-items: flex-start;
   margin-bottom: 1rem;
 }
+
 .form-search input,
 .form-search select {
   max-width: 10em;
 }
+
+.form-search .form-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .form-search > * {
   margin-left: 0.25rem;
 }

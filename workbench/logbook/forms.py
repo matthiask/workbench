@@ -86,7 +86,7 @@ class LoggedHoursSearchForm(Form):
     )
     date_from = forms.DateField(widget=DateInput, required=False, label="")
     date_until = forms.DateField(
-        widget=DateInput, required=False, label=mark_safe("&ndash;&nbsp;")
+        widget=DateInput, required=False, label=mark_safe("&ndash;")
     )
     service = forms.ModelChoiceField(
         queryset=Service.objects.all(),
@@ -230,7 +230,7 @@ class LoggedCostSearchForm(Form):
     expenses = forms.BooleanField(required=False, label=_("expenses"))
     date_from = forms.DateField(widget=DateInput, required=False, label="")
     date_until = forms.DateField(
-        widget=DateInput, required=False, label=mark_safe("&ndash;&nbsp;")
+        widget=DateInput, required=False, label=mark_safe("&ndash;")
     )
     service = forms.ModelChoiceField(
         queryset=Service.objects.all(),
