@@ -18,18 +18,6 @@ $font-family-sans-serif: system-ui;
 
 @import "~bootstrap/scss/bootstrap";
 
-h3,
-h4,
-h5,
-h6,
-.h3,
-.h4,
-.h5,
-.h6,
-.badge {
-  letter-spacing: 0.0125em;
-}
-
 body {
   overflow-y: scroll;
 }
@@ -42,28 +30,23 @@ body {
   padding-bottom: 0.25rem;
 }
 
-@media screen and (max-width: 575px) {
-  .navbar.sticky-top {
-    position: static;
-  }
-}
-
 .w-third {
   width: 33% !important;
 }
+@media screen and (max-width: 575px) {
+  .w-third {
+    width: 66% !important;
+  }
+}
+
 .table .progress-cell {
   min-width: 6rem;
   padding: 8px 1rem 10px 0.5rem;
   vertical-align: bottom;
 }
+
 .progress-cell .progress {
   height: 1em;
-}
-
-@media screen and (max-width: 575px) {
-  .w-third {
-    width: 66% !important;
-  }
 }
 
 .container-fluid[role="main"] {

@@ -7,7 +7,7 @@
 {% endblock title %}
 
 {% block body %}
-  <h2>{% translate 'Logged hours per hourly rate' %}</h2>
+  <h5>{% translate 'Logged hours per hourly rate' %}</h5>
   <table>
     {% for rate, hours in object.grouped_services.logged_hours_per_effort_rate %}
       <tr {% if rate is None %}class="text-warning"{% endif %}>
@@ -22,7 +22,7 @@
       </tr>
     {% endfor %}
   </table>
-  <h2>{% translate 'Logged hours per user' %}</h2>
+  <h5>{% translate 'Logged hours per user' %}</h5>
   <table class="table table-sm table-responsive">
     <tr>
       <th></th>
@@ -51,7 +51,6 @@
       {% endfor %}
     </tr>
     {% for offer, offer_data in object.grouped_services.offers %}
-      <tr><th>&nbsp;</th></tr>
       <tr>
         <th>{% link_or_none offer %}</th>
         <th class="text-end">{{ offer_data.logged_hours|hours }}</th>
