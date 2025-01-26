@@ -34,12 +34,6 @@ body {
   overflow-y: scroll;
 }
 
-.navbar {
-  /* hacky fix for some bootstrap modal oddity */
-  padding-right: 8px !important;
-  margin-right: 0 !important;
-}
-
 .navbar form input {
   width: 8em;
   margin-top: 0.2rem;
