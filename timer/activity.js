@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Draggable from "react-draggable"
 import { connect } from "react-redux"
 import Select from "react-select"
@@ -50,6 +50,8 @@ export const Activity = connect((state, ownProps) => ({
     activity.service &&
     activity.seconds > 0
 
+  const ref = useRef()
+
   return (
     <Draggable
       handle=".js-drag-handle"
@@ -69,12 +71,14 @@ export const Activity = connect((state, ownProps) => ({
           top: data.y,
         })
       }
+      nodeRef={ref}
     >
       <form
         className={`activity ${
           activity.isActive ? "is-active" : ""
         } card px-2 py-2`}
         style={{ backgroundColor: activity.color }}
+        ref={ref}
       >
         <div
           className="py-2 px-2 text-truncate js-drag-handle"
