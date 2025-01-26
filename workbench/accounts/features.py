@@ -31,6 +31,7 @@ class FEATURES(str, Enum):
     COFFEE = "COFFEE"
     CONTROLLING = "CONTROLLING"
     DEALS = "DEALS"
+    DISABLE_AWT_MONITORING = "DISABLE_AWT_MONITORING"
     EXPENSES = "EXPENSES"
     FOREIGN_CURRENCIES = "FOREIGN_CURRENCIES"
     INTERNAL_TYPES = "INTERNAL_TYPES"
@@ -75,6 +76,10 @@ LABELS = {
     FEATURES.DEALS: {
         "label": _("Deals"),
         "help_text": _("Allow managing the acquisition pipeline."),
+    },
+    FEATURES.DISABLE_AWT_MONITORING: {
+        "label": _("Disable annual working time monitoring"),
+        "help_text": _("Disable the annual working time warnings for this user."),
     },
     FEATURES.EXPENSES: {
         "label": _("Expenses"),

@@ -503,6 +503,7 @@ class AWTTest(TestCase):
     @travel("2021-09-06 12:00")
     @override_settings(
         FEATURES={
+            FEATURES.DISABLE_AWT_MONITORING: F.NEVER,
             FEATURES.AWT_WARNING_ALL: F.USER,
             FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
         }

@@ -6,6 +6,7 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
 from django.utils.datastructures import OrderedSet
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.models import Absence, Employment, VacationDaysOverride, Year
 from workbench.awt.utils import days_per_month, monthly_days
@@ -338,7 +339,9 @@ def annual_working_time_warnings():
             "monthly_sum": row["monthly_sums"][month.month - 1],
         }
         for row in awt["statistics"]
-        if row["user"].is_active and abs(row["running_sums"][month.month - 1]) > 40
+        if row["user"].is_active
+        and not row["user"].features[FEATURES.DISABLE_AWT_MONITORING]
+        and abs(row["running_sums"][month.month - 1]) > 40
     ]
     return {"month": month, "warnings": warnings}
 
