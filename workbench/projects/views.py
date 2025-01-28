@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from xlsxdocument import XLSXDocument
 
 from workbench import generic
+from workbench.logbook.forms import LogbookBatchForm
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
@@ -175,3 +176,30 @@ def cost_by_month_and_service_xlsx(request, pk):
     xlsx.add_sheet(_("Statistics"))
     xlsx.table(None, rows)
     return xlsx.to_response(f"project-{project.id}.xlsx")
+
+
+def logbook_batch_update(request, pk, *, model):
+    project = get_object_or_404(Project, pk=pk)
+    queryset = model.objects.filter(service__project=project).select_related(
+        "rendered_by", "service"
+    )
+
+    if service := request.GET.get("service"):
+        queryset = queryset.filter(service=service)
+
+    kw = {
+        "data": request.POST if request.method == "POST" else None,
+        "request": request,
+        "project": project,
+        "entries": queryset,
+    }
+    form = LogbookBatchForm(**kw)
+    if form.is_valid():
+        form.process()
+        return redirect(project)
+
+    return render(
+        request,
+        "projects/logbook_batch_update.html",
+        {"form": form, "project": project, "title": _("Logbook batch update")},
+    )

@@ -35,6 +35,7 @@ from workbench.projects.views import (
     OffersRenumberView,
     assign_service_type,
     cost_by_month_and_service_xlsx,
+    logbook_batch_update,
     projects,
     select,
     services,
@@ -201,6 +202,18 @@ urlpatterns = [
             template_name_suffix="_projected_invoices_form",
         ),
         name="projects_project_projected_invoices",
+    ),
+    path(
+        "<int:pk>/logbook-batch-update-hours/",
+        logbook_batch_update,
+        {"model": LoggedHours},
+        name="projects_project_logbook_batch_update_hours",
+    ),
+    path(
+        "<int:pk>/logbook-batch-update-costs/",
+        logbook_batch_update,
+        {"model": LoggedCost},
+        name="projects_project_logbook_batch_update_costs",
     ),
     path(
         "<int:pk>/delete/",

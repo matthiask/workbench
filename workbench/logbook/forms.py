@@ -820,3 +820,38 @@ class LoggedCostMoveForm(LoggedMoveForm):
     class Meta:
         model = LoggedCost
         fields = ["service"]
+
+
+class EntriesChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return obj.pretty()
+
+
+class LogbookBatchForm(Form):
+    def __init__(self, *args, **kwargs):
+        self._project = kwargs.pop("project")
+        self._entries = kwargs.pop("entries")
+        super().__init__(*args, **kwargs)
+
+        self.fields["entries"] = EntriesChoiceField(
+            self._entries.reverse(),
+            label=_("Entries"),
+            widget=forms.SelectMultiple(attrs={"size": min(30, len(self._entries))}),
+        )
+
+        self.fields["service"] = forms.ModelChoiceField(
+            self._project.services.logging(),
+            label=_("Move to service"),
+            required=False,
+        )
+
+    def process(self):
+        data = self.cleaned_data
+        entries = data["entries"]
+
+        if service := data.get("service"):
+            for entry in entries:
+                entry.service = service
+
+        for entry in entries:
+            entry.save()

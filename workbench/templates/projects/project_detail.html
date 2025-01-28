@@ -163,6 +163,7 @@
             <button type="button"
                     class="btn btn-primary dropdown-toggle"
                     data-bs-toggle="dropdown"
+                    data-bs-display="static"
                     aria-haspopup="true"
                     aria-expanded="false">
               {% translate 'Project offers' %}
@@ -249,6 +250,7 @@
                       <button type="button"
                               class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split"
                               data-bs-toggle="dropdown"
+                              data-bs-display="static"
                               aria-haspopup="true"
                               aria-expanded="false">
                         <span class="visually-hidden">
@@ -269,6 +271,7 @@
                               type="button"
                               id="offer-planning-dropdown-{{ offer.pk }}"
                               data-bs-toggle="dropdown"
+                              data-bs-display="static"
                               aria-haspopup="true"
                               aria-expanded="false">
                         {% translate 'planning'|capfirst %}
@@ -292,6 +295,7 @@
                               type="button"
                               id="offer-dropdown-{{ offer.pk }}"
                               data-bs-toggle="dropdown"
+                              data-bs-display="static"
                               aria-haspopup="true"
                               aria-expanded="false">
                         {% translate 'offer'|capfirst %}
@@ -387,6 +391,7 @@
                                 type="button"
                                 id="service-planning-dropdown-{{ row.service.pk }}"
                                 data-bs-toggle="dropdown"
+                                data-bs-display="static"
                                 aria-haspopup="true"
                                 aria-expanded="false">
                           {% translate 'planning'|capfirst %}
@@ -407,6 +412,7 @@
                                 type="button"
                                 id="service-dropdown-{{ row.service.pk }}"
                                 data-bs-toggle="dropdown"
+                                data-bs-display="static"
                                 aria-haspopup="true"
                                 aria-expanded="false">
                           {% translate 'service'|capfirst %}
@@ -432,6 +438,14 @@
                              href="{{ row.service.urls.move }}"
                              data-ajaxmodal>
                             {% translate 'Move to other project' %}
+                          </a>
+                          <a class="dropdown-item"
+                             href="{{ project.urls.logbook_batch_update_hours }}?service={{ row.service.pk }}">
+                            {% translate 'Logbook batch update' %}: {% translate 'Hours' %}
+                          </a>
+                          <a class="dropdown-item"
+                             href="{{ project.urls.logbook_batch_update_costs }}?service={{ row.service.pk }}">
+                            {% translate 'Logbook batch update' %}: {% translate 'Costs' %}
                           </a>
                           {% if row.service.pk and not row.service.effort_rate %}
                             <div class="dropdown-divider">
@@ -563,6 +577,7 @@
                   type="button"
                   id="invoice-dropdown-button"
                   data-bs-toggle="dropdown"
+                  data-bs-display="static"
                   aria-haspopup="true"
                   aria-expanded="false">
             {% include "svg/plus.svg" %}

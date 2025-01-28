@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 17:11+0100\n"
+"POT-Creation-Date: 2025-01-28 08:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,10 +91,6 @@ msgstr "Beschreibung"
 #: conf/strings.js
 msgid "Efforts"
 msgstr "Aufwände"
-
-#: conf/strings.js
-msgid "Go to the project"
-msgstr "Zum Projekt gehen"
 
 #: conf/strings.js
 msgid "is provisional"
@@ -180,7 +176,7 @@ msgstr "Timer"
 msgid "Today"
 msgstr "Heute"
 
-#: conf/strings.js workbench/static/workbench/workbench.js
+#: conf/strings.js workbench/static/workbench/main.js
 msgid "Unable to open the form"
 msgstr "Konnte Formular nicht öffnen"
 
@@ -201,3 +197,6 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
+
+#~ msgid "Go to the project"
+#~ msgstr "Zum Projekt gehen"

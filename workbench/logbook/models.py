@@ -9,7 +9,12 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.projects.models import Service
-from workbench.tools.formats import hours_and_minutes
+from workbench.tools.formats import (
+    currency,
+    hours,
+    hours_and_minutes,
+    local_date_format,
+)
 from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import logbook_lock, raise_if_errors
@@ -79,6 +84,9 @@ class LoggedHours(Model):
                 instance.service.project_id if instance else ""
             )
         return None
+
+    def pretty(self):
+        return f"{local_date_format(self.rendered_on)} {self.rendered_by.get_short_name()} {hours(self.hours)}: {self}"
 
 
 class LoggedCostQuerySet(SearchQuerySet):
@@ -181,6 +189,9 @@ class LoggedCost(Model):
             if self.expense_cost is None:
                 errors["expense_cost"] = _("Either fill in all fields or none.")
         raise_if_errors(errors, exclude)
+
+    def pretty(self):
+        return f"{local_date_format(self.rendered_on)} {self.rendered_by.get_short_name()} {currency(self.cost)}: {self.service}: {self.description}"
 
 
 @model_urls

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-13 19:26+0100\n"
+"POT-Creation-Date: 2025-01-28 08:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,6 +85,14 @@ msgstr "Geschäfte"
 #: workbench/accounts/features.py
 msgid "Allow managing the acquisition pipeline."
 msgstr "Erlaubt das Management der Akquise-Pipeline."
+
+#: workbench/accounts/features.py
+msgid "Disable annual working time monitoring"
+msgstr "Arbeitszeit-Überwachung deaktivieren"
+
+#: workbench/accounts/features.py
+msgid "Disable the annual working time warnings for this user."
+msgstr "Die Arbeitszeit-Überwachung für diese Nutzer:in deaktivieren."
 
 #: workbench/accounts/features.py
 msgid "Expenses"
@@ -1308,6 +1316,10 @@ msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
 msgid "Setting the status of offer \"%(offer)s\" to \"%(status)s\" is not possible because of the following errors: %(error)s"
 msgstr "Wegen folgenden Fehlern ist es nicht möglich, den Status der Offerte \"%(offer)s\" auf \"%(status)s\" zu setzen: %(error)s"
 
+#: workbench/deals/forms.py
+msgid "Attention! The closed on date is more than tree months in the future!"
+msgstr "Achtung! Das Abschlussdatum liegt mehr als drei Monate in der Zukunft!"
+
 #: workbench/deals/models.py
 msgid "is required"
 msgstr "ist obligatorisch"
@@ -1642,6 +1654,7 @@ msgstr "%s Rechnungen in der Auswahl, das sind zu viele."
 #: workbench/templates/offers/offer_form.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/logbook_batch_update.html
 #: workbench/templates/projects/project_projected_invoices_form.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/playing_bank.html
@@ -2202,6 +2215,14 @@ msgstr "Kann archivierte Logbucheinträge nicht verschieben."
 #: workbench/logbook/forms.py
 msgid "Cannot move logbook entries of closed projects."
 msgstr "Kann Logbucheinträge von geschlossenen Projekten nicht verschieben."
+
+#: workbench/logbook/forms.py
+msgid "Entries"
+msgstr "Einträge"
+
+#: workbench/logbook/forms.py
+msgid "Move to service"
+msgstr "Zu Leistung verschieben"
 
 #: workbench/logbook/models.py
 msgid "rendered by"
@@ -2919,6 +2940,10 @@ msgstr "Offerte oder Leistungsgruppe"
 #: workbench/templates/projects/project_statistics.html
 msgid "Statistics"
 msgstr "Statistik"
+
+#: workbench/projects/views.py workbench/templates/projects/project_detail.html
+msgid "Logbook batch update"
+msgstr "Logbuch-Batch-Bearbeitung"
 
 #: workbench/reporting/models.py workbench/reporting/views.py
 msgid "cutoff date"
@@ -3772,6 +3797,10 @@ msgstr "Logbucheinträge neu zuweisen"
 #: workbench/templates/projects/project_detail.html
 msgid "Move to other project"
 msgstr "Zu anderem Projekt verschieben"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Costs"
+msgstr "Kosten"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Assign service type"

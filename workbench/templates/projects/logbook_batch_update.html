@@ -1,0 +1,15 @@
+{% extends "generic/object_form.html" %}
+
+{% load i18n %}
+
+{% block uplink %}
+  {% if project %}
+    <a href="{{ project.get_absolute_url }}"
+       class="btn btn-primary btn-sm uplink">
+      {% include 'svg/chevron-left.svg' %}
+      {% translate 'project' %}
+    </a>
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock uplink %}
