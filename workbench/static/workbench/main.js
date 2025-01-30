@@ -354,12 +354,20 @@ $(() => {
   })
 
   document.body.addEventListener("click", (e) => {
-    const el = e.target.closest("[data-new-service]")
+    let el = e.target.closest("[data-new-service]")
     if (el) {
       e.preventDefault()
       el.classList.add("invisible")
       _sel("#new-service").classList.remove("d-none")
       _sel("#id_modal-service").value = ""
+    }
+
+    el = e.target.closest("[data-foreign-currency]")
+    if (el) {
+      e.preventDefault()
+      el.classList.add("invisible")
+      _sel("#foreign-currency").classList.remove("d-none")
+      _sel("#id_modal-are_expenses").checked = true
     }
   })
 })

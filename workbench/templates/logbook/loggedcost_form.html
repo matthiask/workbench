@@ -11,7 +11,7 @@
 {% block body %}
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
-  <div class="form-row">
+  <div class="row">
     <div class="col-6">{% ff_field form.rendered_by %}</div>
     <div class="col-6">{% ff_field form.rendered_on %}</div>
   </div>
@@ -20,14 +20,10 @@
     {% ff_field form.are_expenses %}
   {% endif %}
   {% if form.expense_currency %}
-    <div class="form-row align-items-end
-                {% if not form.instance.expense_cost %}
-                  d-none
-                {% endif %}"
-         id="foreign-currency">
+    <div class="row align-items-end {% if not form.instance.expense_cost %}d-none{% endif %}" id="foreign-currency">
       <div class="col-3">{% ff_field form.expense_currency %}</div>
       <div class="col-6">{% ff_field form.expense_cost %}</div>
-      <div class="col-3" style="margin-bottom:1rem">
+      <div class="col-3" style="margin-bottom:0.5rem">
         <button type="button" class="btn btn-primary" data-convert>{% translate 'convert' %}</button>
       </div>
     </div>
@@ -39,9 +35,7 @@
 
 {% block footer %}
   {% if form.expense_currency and not form.instance.expense_cost %}
-    <button type="button"
-            class="btn btn-primary me-auto"
-            data-new-service>
+    <button type="button" class="btn btn-primary me-auto" data-foreign-currency>
       {% translate 'expenses in foreign currency' %}
     </button>
   {% endif %}
