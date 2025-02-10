@@ -22,10 +22,30 @@ class InvoicePDFView(generic.DetailView):
         self.object = self.get_object()
 
         if "new" in request.GET:
+            import io  # noqa: PLC0415
+
+            from django.conf import settings  # noqa: PLC0415
+            from django.utils.text import capfirst  # noqa: PLC0415
+            from django.utils.translation import gettext as _  # noqa: PLC0415
+            from qrbill.bill import QRBill  # noqa: PLC0415
+
+            bill = QRBill(
+                amount=str(self.object.total),
+                additional_information="{}: {}".format(
+                    capfirst(_("invoice")), self.object.code
+                ),
+                language=settings.WORKBENCH.PDF_LANGUAGE,
+                **settings.WORKBENCH.QRBILL,
+            )
+
+            with io.StringIO() as f:
+                bill.as_svg(f)
+                qr = f.getvalue()
+
             return render_to_pdf(
                 request,
                 "invoices/invoice_pdf.html",
-                {"object": self.object},
+                {"object": self.object, "qr": qr},
                 filename=f"{self.object.code}.pdf",
             )
 
