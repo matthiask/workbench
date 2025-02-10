@@ -10,6 +10,7 @@ from django.utils.translation import gettext, ngettext
 from workbench import generic
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.tools.new_pdf import render_to_pdf
 from workbench.tools.pdf import pdf_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -19,6 +20,14 @@ class InvoicePDFView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+
+        if "new" in request.GET:
+            return render_to_pdf(
+                request,
+                "invoices/invoice_pdf.html",
+                {"object": self.object},
+                filename=f"{self.object.code}.pdf",
+            )
 
         pdf, response = pdf_response(
             self.object.code,
