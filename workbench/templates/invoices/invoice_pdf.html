@@ -1,0 +1,172 @@
+{% load i18n static workbench %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon"
+          href="frontend/img/favicon.png"
+          type="image/png">
+    <title>
+      {% block title %}{% endblock %}
+    </title>
+<style>
+
+@page {
+  /* width/height according to the format */
+  size: A4;
+
+  /* margins on every page */
+  margin-top: 20.0mm;
+  margin-right: 20.0mm;
+  margin-bottom: 25.0mm;
+  margin-left: 20.0mm;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+
+@page {
+  @top-left {
+    content: '{{ WORKBENCH.PDF_COMPANY }}';
+  }
+  @bottom-left {
+    content: "{{ WORKBENCH.PDF_ADDRESS }}";
+  }
+  @bottom-right {
+    /* content: "Seite " counter(page) " / " counter(pages); */
+    content: "{% translate 'Page' %} " counter(page);
+  }
+}
+
+@page qr {
+  @bottom-left {
+    content: "";
+  }
+  @bottom-right {
+    content: "";
+  }
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.services,
+.total {
+  width: 100%;
+}
+
+.total td:nth-child(n+2),
+.total th:nth-child(n+2) {
+  text-align: right;
+}
+
+.qr {
+  page-break-before: always;
+  page: qr;
+
+  svg {
+    position: absolute;
+    bottom: -25mm;
+    right: -20mm;
+    left: -20mm;
+  }
+}
+
+</style>
+  </head>
+  <body>
+
+    <address>
+      {{ object.postal_address|linebreaksbr }}
+    </address>
+
+    <h1>{{ object.title }}</h1>
+
+    <table class="details">
+      <tr>
+        <th>{% translate 'invoice' %}</th>
+        <td>{{ object.code }}</td>
+      </tr>
+      <tr>
+        <th>{% translate 'date' %}</th>
+        <td>{{ object.invoiced_on|local_date_format|default:_("NO DATE YET") }}</td>
+      </tr>
+      {% if object.service_period %}
+        <tr>
+          <th>{% translate 'Service period' %}</th>
+          <td>{{ object.service_period }}</td>
+        </tr>
+      {% endif %}
+      <tr>
+        <th>{% translate 'Our reference' %}</th>
+        <td>{{ object.owned_by.get_full_name }}</td>
+      </tr>
+      <tr>
+        <th>{% translate 'MwSt.-Nr.' %}</th>
+        <td>{{ WORKBENCH.PDF_VAT_NO }}</td>
+      </tr>
+    </table>
+
+    <p>{{ object.description|linebreaksbr }}</p>
+
+    {# FIXME show_service_details #}
+    <h2>{% translate 'Services' %}</h2>
+    <table class="services">
+      {% for service in object.services.all %}
+      <tr>
+        <td>
+          <strong>{{ service.title }}</strong>
+          {% if service.is_optional %}{% translate "(optional)" %}{% endif %}
+          <br>
+          {{ service.description|linebreaksbr }}
+          <br>
+          {{ service.effort_hours|hours }} {{ service.effort_type }} à {{ service.effort_rate|currency }}/h
+          {{ service.cost|currency }} {% translate 'fixed costs' %}
+        </td>
+
+        <td>
+          {{ service.service_cost }}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    {# FIXME credit #}
+
+    <table class="total">
+      <tr>
+        <th>{% translate 'subtotal' %}</th>
+        <th>{{ object.subtotal|currency }}</th>
+      </tr>
+      <tr>
+        <th>{% translate 'discount' %}</th>
+        <th>-{{ object.discount|currency }}</th>
+      </tr>
+      {% if object.down_payment_total %}
+      {% for invoice in object.down_payment_invoices.all %}
+        <tr>
+          <th>{% translate 'Down payment' %}: {{ invoice|truncatechars:60 }} ({{ invoice.invoiced_on|local_date_format }})</th>
+          <th>-{{ invoice.total_excl_tax|currency }}</th>
+        </tr>
+      {% endfor %}
+      {% endif %}
+      {% if object.liable_to_vat %}
+        <tr>
+          <th>{% translate 'tax' %}</th>
+          <th>{{ object.tax_amount|currency }}</th>
+        </tr>
+      {% endif %}
+      <tr>
+        <th>{{ object.total_title }}</th>
+        <th>{{ object.total|currency }}</th>
+      </tr>
+    </table>
+
+    {% if qr %}<div class="qr">{{ qr|safe }}</div>{% endif %}
+
+  </body>
+</html>

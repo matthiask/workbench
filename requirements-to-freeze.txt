@@ -26,5 +26,6 @@ speckenv
 svglib
 time-machine
 vobject
+weasyprint
 whitenoise
 xlsxdocument
