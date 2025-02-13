@@ -41,6 +41,7 @@ class FEATURES(str, Enum):
     PLANNING = "PLANNING"
     PRIDE = "PRIDE"
     PROJECTED_GROSS_MARGIN = "PROJECTED_GROSS_MARGIN"
+    WEBHOOKS = "WEBHOOKS"
     WORKING_TIME_CORRECTION = "WORKING_TIME_CORRECTION"
 
 
@@ -113,6 +114,9 @@ LABELS = {
     },
     FEATURES.PROJECTED_GROSS_MARGIN: {
         "label": capfirst(_("projected gross margin")),
+    },
+    FEATURES.WEBHOOKS: {
+        "label": capfirst(_("webhooks")),
     },
     FEATURES.WORKING_TIME_CORRECTION: {
         "label": capfirst(_("Working time correction")),

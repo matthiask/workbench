@@ -60,6 +60,7 @@ INSTALLED_APPS = [
         "workbench.reporting",
         "workbench.services",
         "workbench.timer",
+        "workbench.webhooks",
         "debug_toolbar" if DEBUG_TOOLBAR else "",
     ]
     if a
@@ -238,6 +239,7 @@ WORKBENCH = {
             FEATURES.PLANNING: F.ALWAYS,
             FEATURES.PRIDE: F.ALWAYS,
             FEATURES.PROJECTED_GROSS_MARGIN: F.ALWAYS,
+            FEATURES.WEBHOOKS: F.NEVER,
             FEATURES.WORKING_TIME_CORRECTION: F.USER,
         },
         READ_WRITE_ADMIN=False,
