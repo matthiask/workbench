@@ -119,7 +119,9 @@ class FreezingTest(TestCase):
         )
 
     def test_freezed_invoice_update(self):
-        invoice = factories.InvoiceFactory.create(invoiced_on=dt.date(2024, 12, 15))
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=dt.date(2024, 12, 15), status=Invoice.SENT
+        )
         FreezeDate.objects.create(up_to=dt.date(2024, 12, 31))
 
         self.client.force_login(invoice.owned_by)
