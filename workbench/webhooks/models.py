@@ -28,7 +28,13 @@ class WebhookConfiguration(models.Model):
         ContentType, on_delete=models.PROTECT, related_name="webhooks"
     )
     webhook_url = models.URLField(_("webhook url"))
-    forward_fields = models.JSONField(_("forward fields"), blank=True)
+    forward_fields = models.JSONField(
+        _("forward fields"),
+        blank=True,
+        help_text=_(
+            'JSON representation of fields to be submitted. E.g. \'["email", "person.given_name", "person.family_name"]\''
+        ),
+    )
 
     def __str__(self):
         return str(self.title)
