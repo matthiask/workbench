@@ -8,8 +8,16 @@
 
 {% block js %}
   <script>
-    $(function() {
-      window.openModalFromUrl("{{ url }}")
-    })
+    (() => {
+      const handler = () => {
+        if (window.openModalFromUrl) {
+          window.openModalFromUrl("{{ url }}")
+        } else {
+          setTimeout(handler, 100)
+        }
+      }
+
+      handler()
+    })()
   </script>
 {% endblock js %}
