@@ -315,6 +315,7 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if (
             ("invoiced_on" in self.changed_data or "status" in self.changed_data)
+            and (self.instance._orig_status < self.instance.SENT)
             and (invoiced_on := data.get("invoiced_on"))
             and (freeze := FreezeDate.objects.up_to())
             and invoiced_on <= freeze
