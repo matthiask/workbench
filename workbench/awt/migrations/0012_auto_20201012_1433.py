@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                     ("vacation", "vacation"),
                     ("sickness", "sickness"),
                     ("paid", "paid leave (e.g. civilian service, maternity etc.)"),
+                    ("school", "School attendance of apprentices"),
                     ("other", "other reasons (no working time)"),
                     ("correction", "Working time correction"),
                 ],
