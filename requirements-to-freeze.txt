@@ -10,6 +10,7 @@ django-countries
 django-debug-toolbar
 django-fast-export
 django-fineforms
+django-pglocks
 django-vanilla-views
 factory-boy
 gunicorn

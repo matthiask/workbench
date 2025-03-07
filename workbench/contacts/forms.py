@@ -31,6 +31,7 @@ from workbench.tools.models import ProtectedError, SlowCollector
 from workbench.tools.substitute_with import substitute_with
 from workbench.tools.vcard import person_to_vcard, render_vcard_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
+from workbench.webhooks.forwarding import WebhookForwardForm
 
 
 class OrganizationSearchForm(Form):
@@ -97,8 +98,8 @@ class PersonSearchForm(Form):
         if not data.get("s"):
             queryset = queryset.active()
         elif data.get("s") == "any-projects-deals":
-            from workbench.deals.models import Deal
-            from workbench.projects.models import Project
+            from workbench.deals.models import Deal  # noqa: PLC0415
+            from workbench.projects.models import Project  # noqa: PLC0415
 
             cutoff = timezone.now() - dt.timedelta(days=5 * 366)
             queryset = queryset.filter(
@@ -111,7 +112,7 @@ class PersonSearchForm(Form):
             ).active()
 
         if added_since := data.get("added_since"):
-            from workbench.audit.models import LoggedAction
+            from workbench.audit.models import LoggedAction  # noqa: PLC0415
 
             queryset = queryset.filter(
                 id__in=[
@@ -255,8 +256,8 @@ class PersonForm(ModelForm):
                 code="short-salutation",
             )
         if self.instance.pk and "organization" in self.changed_data:
-            from workbench.invoices.models import Invoice
-            from workbench.projects.models import Project
+            from workbench.invoices.models import Invoice  # noqa: PLC0415
+            from workbench.projects.models import Project  # noqa: PLC0415
 
             related = []
             invoices = Invoice.objects.filter(contact=self.instance).count()
@@ -320,6 +321,7 @@ PhoneNumberFormset = inlineformset_factory(
 EmailAddressFormset = inlineformset_factory(
     Person,
     EmailAddress,
+    form=WebhookForwardForm,
     fields=("type", "email"),
     extra=0,
     widgets={
