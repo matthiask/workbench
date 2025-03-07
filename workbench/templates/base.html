@@ -200,11 +200,11 @@
             <div class="dropdown-header">
               {% translate 'Time tracking' %}
             </div>
-            <a class="dropdown-item" href="{% url 'timer' %}">
-              {% translate 'Timer' %}
-            </a>
             <a class="dropdown-item" href="{% url 'timestamps' %}">
               {% translate 'timestamps'|capfirst %}
+            </a>
+            <a class="dropdown-item" href="{% url 'timer' %}">
+              {% translate 'Timer' %}
             </a>
             <a class="dropdown-item" href="{{ request.user.urls.statistics }}">
               {% translate 'Statistics' %}
