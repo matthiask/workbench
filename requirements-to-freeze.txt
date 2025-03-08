@@ -12,7 +12,7 @@ django-fast-export
 django-fineforms
 django-vanilla-views
 factory-boy
-gunicorn
+granian
 lxml
 more-itertools
 pdfdocument
