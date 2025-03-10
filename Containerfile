@@ -11,4 +11,4 @@ RUN python -m whitenoise.compress static
 RUN useradd -U -d /src deploy
 USER deploy
 EXPOSE 8000
-CMD ["venv/bin/python", "-m", "granian", "--interface", "wsgi", "wsgi:application", "--workers", "2", "--host", "0.0.0.0", "--port", "8000", "--respawn-failed-workers"]
+CMD ["granian", "--interface", "wsgi", "wsgi:application", "--workers", "2", "--host", "0.0.0.0", "--port", "8000", "--respawn-failed-workers"]
