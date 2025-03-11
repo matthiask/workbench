@@ -55,7 +55,8 @@ begin
     regexp_replace(
       unaccent(concat_ws(' ', {fields})),
       '[^0-9A-Za-z]+',
-      ' '
+      ' ',
+      'g'
     )
   );
   return new;
