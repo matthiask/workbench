@@ -2,18 +2,13 @@ import datetime as dt
 
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import override
-from mailchimp3 import MailChimp
+from requests import HTTPError, api
 
 from workbench.audit.models import LoggedAction
-from workbench.contacts.models import EmailAddress, Person, PostalAddress
+from workbench.contacts.models import EmailAddress, Person
 
 
-API_KEY = settings.MAILCHIMP_API_KEY
-LIST_ID = settings.MAILCHIMP_LIST_ID  # target list
-
-
-def upload_changes_to_mailchimp():
+def upload_contacts_to_brevo():
     # Determine persons that need to be updated. Get machting emails
     # and addresses
     since = timezone.now().replace(hour=0, minute=0, second=0)
@@ -22,14 +17,14 @@ def upload_changes_to_mailchimp():
     person_ids = {
         int(row.row_data["id"])
         for row in LoggedAction.objects.filter(
-            created_at__gte=since, table_name=Person._meta.db_table
+            created_at__gte=since, table_name=Person._meta.db_table, action="I"
         )
     }
 
     person_ids |= {
         int(row.row_data["person_id"])
         for row in LoggedAction.objects.filter(
-            created_at__gte=since, table_name=EmailAddress._meta.db_table
+            created_at__gte=since, table_name=EmailAddress._meta.db_table, action="I"
         )
     }
 
@@ -38,17 +33,9 @@ def upload_changes_to_mailchimp():
     emails = {
         obj.person_id: obj
         for obj in EmailAddress.objects.filter(person__in=persons_to_sync).order_by(
-            "weight", "id"
+            "-weight", "-id"
         )
     }
-    addresses = {
-        obj.person_id: obj
-        for obj in PostalAddress.objects.filter(person__in=persons_to_sync).order_by(
-            "weight", "id"
-        )
-    }
-
-    client = MailChimp(API_KEY)
 
     # Update person by person
     for person in persons_to_sync:
@@ -58,35 +45,26 @@ def upload_changes_to_mailchimp():
         if not email:
             continue
 
-        # construct merge fields (will be extendend below)
-        merge_fields = {
-            # "TITLE": person.salutation,
-            "FNAME": person.given_name,
-            "LNAME": person.family_name,
-            "ANREDE": person.salutation,
-            "DUODERSIE": "Du" if person.address_on_first_name_terms else "Sie",
+        logged_action = LoggedAction.objects.get(
+            table_name=Person._meta.db_table, row_data__id=person.id, action="I"
+        )
+
+        if not logged_action:
+            continue
+
+        forward_data = {
+            "email": email.email,
+            "given_name": person.given_name,
+            "family_name": person.family_name,
+            "salutation": person.address,
+            "full_salutation": person.salutation,
+            "primary_contact": person.primary_contact.get_full_name(),
+            "created_at": str(logged_action.created_at),
+            "groups": ", ".join([g.title for g in person.groups.all()]),
         }
 
-        # get address
-        address = addresses.get(person.id)
-        if address:
-            with override(None):
-                merge_fields["ADDRESS"] = "  ".join([
-                    f"{address.street} {address.house_number}",
-                    address.address_suffix,
-                    address.city,
-                    "",  # Region
-                    address.postal_code,
-                    address.country.code,
-                ])
-
-        # save to mailchimp
-        client.lists.members.create_or_update(
-            LIST_ID,
-            email.email,
-            {
-                "email_address": email.email,
-                "status_if_new": "subscribed",
-                "merge_fields": merge_fields,
-            },
-        )
+        # send to brevo
+        try:
+            api.post(settings.BREVO_WEBHOOK_URL, json=forward_data)
+        except HTTPError as err:
+            print(err)
