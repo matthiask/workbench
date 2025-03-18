@@ -479,3 +479,5 @@ if TESTING:  # pragma: no cover
     PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
     DATABASES["default"]["TEST"] = {"SERIALIZE": False}
     FEATURES = defaultdict(lambda: F.ALWAYS, {"COFFEE": F.USER, "LATE_LOGGING": F.USER})
+
+BREVO_WEBHOOK_URL = env("BREVO_WEBHOOK_URL")
