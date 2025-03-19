@@ -61,6 +61,7 @@ def upload_contacts_to_brevo():
             "primary_contact": person.primary_contact.get_full_name(),
             "created_at": str(logged_action.created_at),
             "groups": ", ".join([g.title for g in person.groups.all()]),
+            "organization": person.organization.name if person.organization else "",
         }
 
         # send to brevo
