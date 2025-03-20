@@ -86,6 +86,15 @@ urlpatterns = [
         ),
         name="invoices_service_update",
     ),
+    path(
+        "services/<int:pk>/delete/",
+        controlling_only(
+            generic.DeleteView.as_view(
+                model=Service, template_name="modal_confirm_delete.html"
+            ),
+        ),
+        name="invoices_service_delete",
+    ),
     path("reminders/", bookkeeping_only(views.reminders), name="invoices_reminders"),
     path(
         "reminders/<int:contact_id>/",

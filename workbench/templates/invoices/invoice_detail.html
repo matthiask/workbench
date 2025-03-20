@@ -74,7 +74,8 @@
                     </td>
                     <td class="text-end">{{ service.service_cost|currency }}</td>
                     <td>
-                      <a href="{{ service.urls.update }}" data-ajaxmodal>{% include 'svg/pencil.svg' %}</a>
+                      <a class="inline" href="{{ service.urls.update }}" data-ajaxmodal>{% include 'svg/pencil.svg' %}</a>
+                      <a class="inline" href="{{ service.urls.delete }}" data-ajaxmodal>{% include 'svg/trashcan.svg' %}</a>
                     </td>
                   </tr>
                 {% endfor %}

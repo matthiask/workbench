@@ -578,6 +578,18 @@ class Service(ServiceBase):
             return instance.get_absolute_url() if instance else "invoices_invoice_list"
         return None
 
+    def delete(self, *args, **kwargs):
+        invoice = self.invoice
+
+        self.loggedhours_set.update(invoice_service=None, archived_at=None)
+        self.loggedcost_set.update(invoice_service=None, archived_at=None)
+
+        super().delete(*args, **kwargs)
+
+        invoice.save()  # Recalculate total
+
+    delete.alters_data = True
+
 
 class RecurringInvoiceQuerySet(SearchQuerySet):
     def renewal_candidates(self):
