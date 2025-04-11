@@ -2,6 +2,7 @@ import datetime as dt
 from collections import defaultdict
 
 from django.contrib import messages
+from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils.text import slugify
@@ -132,7 +133,8 @@ def reminders(request):
     invoices = (
         Invoice.objects.overdue()
         .select_related("customer", "contact__organization", "owned_by", "project")
-        .order_by("customer", "contact")
+        # .order_by("customer", "contact")
+        .order_by(F("last_reminded_on").asc(nulls_first=True), "invoiced_on")
     )
 
     nested = {}
