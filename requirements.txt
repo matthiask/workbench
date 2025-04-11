@@ -12,7 +12,7 @@ django==5.2
 django-admin-ordering==0.20.0
 django-authlib==0.17.2
 django-bootstrap5==25.1
-django-colorfield==0.12.0
+django-colorfield==0.13.0
 django-cors-headers==4.7.0
 django-countries==7.6.1
 django-debug-toolbar==5.1.0
@@ -23,10 +23,10 @@ django-vanilla-views==3.0.0
 et-xmlfile==2.0.0
 factory-boy==3.3.3
 faker==37.1.0
-granian==2.2.0
+granian==2.2.3
 idna==3.10
 iso3166==2.1.1
-lxml==5.3.1
+lxml==5.3.2
 more-itertools==10.6.0
 oauthlib==3.2.2
 openpyxl==3.1.5
@@ -52,9 +52,9 @@ svglib==1.5.1
 svgwrite==1.4.3
 time-machine==2.16.0
 tinycss2==1.4.0
-typing-extensions==4.13.0
+typing-extensions==4.13.2
 tzdata==2025.2
-urllib3==2.3.0
+urllib3==2.4.0
 vobject==0.9.9
 webencodings==0.5.1
 whitenoise==6.9.0
