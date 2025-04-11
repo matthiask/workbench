@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from xlsxdocument import XLSXDocument
 
 from workbench import generic
+from workbench.invoices.models import Service as InvoiceService
 from workbench.logbook.forms import LogbookBatchForm
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
@@ -110,8 +111,28 @@ def cost_by_month_and_service_xlsx(request, pk):
     project_costs = defaultdict(lambda: Z2)
     service_costs = defaultdict(lambda: defaultdict(lambda: Z2))
     offer_costs = defaultdict(lambda: defaultdict(lambda: Z2))
+
+    service_budget = defaultdict(lambda: Z2)
+    offer_budget = defaultdict(lambda: Z2)
+
+    service_invoiced = defaultdict(lambda: Z2)
+    offer_invoiced = defaultdict(lambda: Z2)
+
     offers = defaultdict(set)
     months = set()
+
+    for service in Service.objects.filter(project=project).select_related("offer"):
+        service_budget[service] = service.service_cost
+        if service.offer:
+            offers[service.offer].add(service)
+            offer_budget[service.offer] = service.offer.total_excl_tax
+
+    for service in InvoiceService.objects.filter(
+        invoice__project=project, project_service__isnull=False
+    ).select_related("project_service__offer"):
+        service_invoiced[service.project_service] = service.service_cost
+        if offer := service.project_service.offer:
+            offer_invoiced[offer] += service.service_cost
 
     for hours in LoggedHours.objects.filter(service__project=project).select_related(
         "service__offer"
@@ -142,10 +163,12 @@ def cost_by_month_and_service_xlsx(request, pk):
     rows.extend((
         [_("Cost by month and service")],
         ["", _("cost"), "", _("cost")]
-        + [local_date_format(month, fmt="F Y") for month in months],
+        + [local_date_format(month, fmt="F Y") for month in months]
+        + [_("Budgeted"), _("Invoiced")],
         [_("project")],
         [project, sum(project_costs.values()), "", ""]
-        + [project_costs.get(month) for month in months],
+        + [project_costs.get(month) for month in months]
+        + [sum(offer_budget.values()), sum(offer_invoiced.values())],
         [],
         [_("offer or service group"), "", _("service"), ""],
     ))
@@ -159,6 +182,10 @@ def cost_by_month_and_service_xlsx(request, pk):
                 "",
             ]
             + [offer_costs[offer].get(month) for month in months]
+            + [
+                offer_budget[offer],
+                offer_invoiced[offer],
+            ]
         )
         for service in sorted(services):
             rows.append(
@@ -169,6 +196,10 @@ def cost_by_month_and_service_xlsx(request, pk):
                     sum(service_costs[service].values()),
                 ]
                 + [service_costs[service].get(month) for month in months]
+                + [
+                    service_budget[service],
+                    service_invoiced[service],
+                ]
             )
         rows.append([])
 

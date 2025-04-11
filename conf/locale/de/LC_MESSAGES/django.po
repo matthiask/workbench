@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-28 08:30+0100\n"
+"POT-Creation-Date: 2025-04-11 11:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2927,6 +2927,10 @@ msgid "Cost by month and service"
 msgstr "Kosten nach Monat und Leistung"
 
 #: workbench/projects/views.py
+msgid "Budgeted"
+msgstr "Budgetiert"
+
+#: workbench/projects/views.py
 msgid "offer or service group"
 msgstr "Offerte oder Leistungsgruppe"
 
@@ -3348,15 +3352,15 @@ msgstr "Personalaufwand"
 msgid "Time tracking"
 msgstr "Zeiterfassung"
 
-#: workbench/templates/base.html
-msgid "Timer"
-msgstr "Timer"
-
 #: workbench/templates/base.html workbench/templates/shortcuts.html
 #: workbench/templates/start.html workbench/templates/timestamps.html
 #: workbench/timer/models.py
 msgid "timestamps"
 msgstr "Zeitmarken"
+
+#: workbench/templates/base.html
+msgid "Timer"
+msgstr "Timer"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/work_anniversaries.html
