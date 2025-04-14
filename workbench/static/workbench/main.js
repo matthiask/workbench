@@ -526,12 +526,17 @@ function initWidgets() {
   for (const el of document.querySelectorAll("[data-service-progress]")) {
     const select = el.querySelector("select")
     const bars = [...el.querySelectorAll(".progress-bar")]
+    const numbers = el.querySelector("[data-numbers]")
     const data = JSON.parse(el.querySelector("script").textContent)
 
     const update = () => {
       const row = data[select.value]
-      const percentage = row?.service_hours
-        ? (100 * row.logged_hours) / row.service_hours
+      const { logged_hours, service_hours } = row || {
+        logged_hours: 0,
+        service_hours: 0,
+      }
+      const percentage = service_hours
+        ? (100 * logged_hours) / service_hours
         : 0
 
       const f = percentage > 100 ? 100 / percentage : 1
@@ -540,6 +545,8 @@ function initWidgets() {
       bars[1].style.width =
         percentage > 75 ? `${f * Math.min(25, percentage - 75)}%` : "0%"
       bars[2].style.width = percentage > 100 ? `${percentage - 100}%` : "0%"
+
+      numbers.textContent = `${logged_hours.toFixed(1)}h / ${service_hours.toFixed(1)}h`
     }
 
     update()
