@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         activate("de")
 
-        found_issues, updated_issues, estimates = update_service_estimates()
+        up_to_date_issues, updated_issues, estimates = update_service_estimates()
 
         if not updated_issues:
             return
@@ -27,11 +27,13 @@ class Command(BaseCommand):
         mail = render_to_mail(
             "projects/update_service_estimates",
             {
-                "found_issues": found_issues,
-                "updated_issues": updated_issues,
+                "up_to_date_issues": sorted(up_to_date_issues.items()),
+                "updated_issues": sorted(updated_issues.items()),
                 "missing_issues": sorted(
                     (issue_url, estimates[issue_url])
-                    for issue_url in set(estimates) - found_issues
+                    for issue_url in set(estimates)
+                    - set(up_to_date_issues)
+                    - set(updated_issues)
                 ),
                 "WORKBENCH": settings.WORKBENCH,
             },
@@ -44,8 +46,8 @@ def update_service_estimates():
     set_user_name("GitHub estimates integration")
 
     offers = set()
-    found_issues = set()
-    updated_issues = set()
+    up_to_date_issues = {}
+    updated_issues = {}
     estimates = {}
 
     for project_url in settings.GITHUB_PROJECT_URLS:
@@ -69,16 +71,16 @@ def update_service_estimates():
                 if issue_url.lower() not in service.description.lower():
                     continue
 
-                found_issues.add((issue_url, estimate, service))
-                if service.effort_hours != estimate:
+                if service.effort_hours == estimate:
+                    up_to_date_issues[issue_url] = service
+                else:
                     service.effort_hours = estimate
                     service.save(skip_related_model=True)
                     offers.add(service.offer)
-
-                    updated_issues.add((issue_url, estimate, service))
+                    updated_issues[issue_url] = service
 
     offers.discard(None)
     for offer in offers:
         offer.save()
 
-    return found_issues, updated_issues, estimates
+    return up_to_date_issues, updated_issues, estimates
