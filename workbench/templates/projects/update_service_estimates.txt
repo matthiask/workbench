@@ -1,0 +1,22 @@
+{% load workbench %}
+Aktualisierung der Schätzungen für Leistungen
+
+Aktualisierte Leistungen:
+
+{% for issue_url, estimate, service in updated_issues %}{{ issue_url }} ({{ estimate|hours }})
+{{ WORKBENCH.URL }}{{ service.get_absolute_url }}
+{% endfor %}
+
+Gefundene Leistungen:
+
+{% for issue_url, estimate, service in found_issues %}{{ issue_url }} ({{ estimate|hours }})
+{{ WORKBENCH.URL }}{{ service.get_absolute_url }}
+{% endfor %}
+
+Issues ohne gefundene Leistungen:
+Eventuell ist der Grund dafür, dass die entsprechenden Leistungen
+geschlossenen Projekten oder Offerten zugeordnet sind, welche nicht
+mehr in Vorbereitung sind.
+
+{% for issue_url, estimate in missing_issues %}{{ issue_url }} ({{ estimate|hours }})
+{% endfor %}

@@ -21,11 +21,43 @@ file on the production server)::
     OAUTH2_CLIENT_ID=...
     OAUTH2_CLIENT_SECRET=...
 
+    # For the GitHub estimates importer:
+    GITHUB_API_TOKEN=...
+    GITHUB_PROJECT_URLS=["https://github.com/orgs/your-org/projects/1"]
+
 Prerequisites
 =============
 
 * At least Python 3.11
 * A local PostgreSQL instance
+
+GitHub Integration
+==================
+
+Workbench can automatically import time estimates from GitHub Project boards into service effort hours.
+To use this feature:
+
+1. Add a GitHub API token in your .env file with ``GITHUB_API_TOKEN=your_token_here`` (the token must have 'repo' scope to access private repositories)
+2. Add GitHub project board URLs in your .env file with ``GITHUB_PROJECT_URLS=["https://github.com/orgs/your-org/projects/1"]``
+3. Include GitHub issue URLs in your service descriptions (e.g., "See https://github.com/owner/repo/issues/123")
+4. The system will automatically update effort hours daily based on time estimates found in the GitHub project board
+
+The integration works as follows:
+
+1. It fetches all cards from the specified GitHub project boards
+2. For each card that contains an issue reference and hour estimate, it searches for matching services
+3. When a service description contains the corresponding issue URL, it updates the service's effort_hours
+
+The integration looks for time estimates in GitHub Project custom fields (primary method)
+
+- Searches for number fields with names containing 'hour', 'time', 'estimate', or 'duration'
+- Works with both classic GitHub Projects and the new GitHub Projects (beta)
+
+You can run the update manually with the command:
+
+.. code-block:: bash
+
+    python manage.py update_service_estimates
 
 Local setup
 ===========

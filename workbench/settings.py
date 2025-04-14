@@ -21,6 +21,8 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@feinheit.ch"
 RECURRING_INVOICES_CC = env("RECURRING_INVOICES_CC", default=[])
+GITHUB_API_TOKEN = env("GITHUB_API_TOKEN", default="")
+GITHUB_PROJECT_URLS = env("GITHUB_PROJECT_URLS", default=[])
 
 DEBUG_TOOLBAR = DEBUG and not TESTING
 
