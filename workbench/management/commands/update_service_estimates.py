@@ -1,7 +1,6 @@
 from authlib.email import render_to_mail
 from django.conf import settings
 from django.core.management import BaseCommand
-from django.db.models import Q
 from django.utils.translation import activate
 
 from workbench.accounts.middleware import set_user_name
@@ -53,16 +52,12 @@ def update_service_estimates():
     for project_url in settings.GITHUB_PROJECT_URLS:
         estimates |= issue_estimates_from_github_project(project_url)
 
-        q = Q(id=0)
-        for issue_url in estimates:
-            q |= Q(description__icontains=issue_url)
-
         editable = (
             Service.objects.filter(
                 project__in=Project.objects.open(),
             )
             .editable()
-            .filter(q)
+            .filter(description__icontains="github.com")
             .select_related("offer")
         )
 
