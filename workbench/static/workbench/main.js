@@ -39,8 +39,21 @@ $(() => {
       modal.show()
 
       setTimeout(() => {
-        const first = el.querySelector(":is(input, select):not([type=hidden])")
-        first?.focus()
+        // Explicit autofocus? Do nothing.
+        if (el.querySelector("[autofocus]")) {
+          return
+        }
+
+        // Else find first input or select field which isn't a child of a
+        // hidden element.
+        for (const input of el.querySelectorAll(
+          ":is(input, select):not([type=hidden])",
+        )) {
+          if (!input.closest(".d-none")) {
+            input.focus()
+            return
+          }
+        }
       }, 100)
     }
 
