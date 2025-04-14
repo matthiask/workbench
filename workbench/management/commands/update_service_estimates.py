@@ -1,3 +1,4 @@
+import sentry_sdk
 from authlib.email import render_to_mail
 from django.conf import settings
 from django.core.management import BaseCommand
@@ -15,30 +16,31 @@ class Command(BaseCommand):
             type=str,
         )
 
-    def handle(self, **options):
+    def handle(self, *, mailto, **options):
         activate("de")
 
-        up_to_date_issues, updated_issues, estimates = update_service_estimates()
+        try:
+            up_to_date_issues, updated_issues, estimates = update_service_estimates()
+        except Exception as exc:
+            sentry_sdk.capture_exception(exc)
 
-        if not updated_issues:
-            return
-
-        mail = render_to_mail(
-            "projects/update_service_estimates",
-            {
-                "up_to_date_issues": sorted(up_to_date_issues.items()),
-                "updated_issues": sorted(updated_issues.items()),
-                "missing_issues": sorted(
-                    (issue_url, estimates[issue_url])
-                    for issue_url in set(estimates)
-                    - set(up_to_date_issues)
-                    - set(updated_issues)
-                ),
-                "WORKBENCH": settings.WORKBENCH,
-            },
-            to=options["mailto"].split(","),
-        )
-        mail.send()
+        if updated_issues and mailto:
+            mail = render_to_mail(
+                "projects/update_service_estimates",
+                {
+                    "up_to_date_issues": sorted(up_to_date_issues.items()),
+                    "updated_issues": sorted(updated_issues.items()),
+                    "missing_issues": sorted(
+                        (issue_url, estimates[issue_url])
+                        for issue_url in set(estimates)
+                        - set(up_to_date_issues)
+                        - set(updated_issues)
+                    ),
+                    "WORKBENCH": settings.WORKBENCH,
+                },
+                to=mailto.split(","),
+            )
+            mail.send()
 
 
 def update_service_estimates():
