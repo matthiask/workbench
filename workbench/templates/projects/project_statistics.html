@@ -60,10 +60,10 @@
       {% for row in offer_data.services %}
         {% if row.logged_hours or row.service.service_hours %}
           <tr>
-            <th>{{ row.service.title }}</th>
-            <th class="text-end">{{ row.service.service_hours|hours }}</th>
+            <th style="padding-left:16px">{{ row.service.title }}</th>
+            <th class="text-end {% if not row.service.service_hours %}text-black-30{% endif %}">{{ row.service.service_hours|hours }}</th>
             <th class="text-end">
-              <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}">{{ row.logged_hours|hours }}</a>
+              <a {% if not row.logged_hours %}class="text-black-30"{% endif %} href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}">{{ row.logged_hours|hours }}</a>
             </th>
             <th class="progress-cell">
               {% if row.service.allow_logging or row.logged_hours %}
