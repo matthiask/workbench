@@ -2,24 +2,28 @@
 Aktualisierung der Schätzungen für Leistungen
 
 Aktualisierte Leistungen:
-
-{% for issue_url, service in updated_issues %}{{ issue_url }} ({{ service.effort_hours|hours }})
-{{ WORKBENCH.URL }}{{ service.get_absolute_url }}
-{% empty %}-
+{% for issue_url, service in updated_issues %}{% ifchanged service.project %}
+{{ service.project }}
+{{ WORKBENCH.URL }}{{ service.project.get_absolute_url }}
+{% endifchanged %}{{ issue_url }} ({{ service.effort_hours|hours }})
+{% empty %}
+-
 {% endfor %}
 
 Schon aktuelle Leistungen:
-
-{% for issue_url, service in up_to_date_issues %}{{ issue_url }} ({{ service.effort_hours|hours }})
-{{ WORKBENCH.URL }}{{ service.get_absolute_url }}
-{% empty %}-
+{% for issue_url, service in up_to_date_issues %}{% ifchanged service.project %}
+{{ service.project }}
+{{ WORKBENCH.URL }}{{ service.project.get_absolute_url }}
+{% endifchanged %}{{ issue_url }} ({{ service.effort_hours|hours }})
+{% empty %}
+-
 {% endfor %}
 
 Issues ohne gefundene Leistungen:
-Eventuell ist der Grund dafür, dass die entsprechenden Leistungen
-geschlossenen Projekten oder Offerten zugeordnet sind, welche nicht
-mehr in Vorbereitung sind.
+Mögliche Gründe: Projekt geschlossen, Offerte nicht mehr in Vorbereitung, oder
+Workbench-Leistung entweder nicht erfasst oder Link fehlt.
 
 {% for issue_url, estimate in missing_issues %}{{ issue_url }} ({{ estimate|hours }})
-{% empty %}-
+{% empty %}
+-
 {% endfor %}

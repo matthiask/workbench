@@ -60,7 +60,7 @@ def update_service_estimates():
             )
             .editable()
             .filter(description__icontains="github.com")
-            .select_related("offer")
+            .select_related("offer", "project__owned_by")
         )
 
         for service in editable:
