@@ -3,7 +3,7 @@ import datetime as dt
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.html import mark_safe
@@ -416,6 +416,17 @@ class LoggedHoursForm(ModelForm):
         else:
             if self.project.flat_rate is not None:
                 self.fields.pop("service_type")
+
+        self.progress_on_selectable_services = {
+            row["id"]: {
+                "service_hours": float(row["service_hours"]),
+                "logged_hours": float(row["loggedhours__hours__sum"] or 0),
+            }
+            for row in self.project.services.logging()
+            .order_by()
+            .values("id", "service_hours")
+            .annotate(Sum("loggedhours__hours"))
+        }
 
     def clean(self):
         data = super().clean()

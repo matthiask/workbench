@@ -1,5 +1,7 @@
 {% extends "modalform.html" %}
-{% load fineforms i18n %}
+
+{% load fineforms i18n workbench %}
+
 {% block title %}
   {% if view.project %}
     {{ view.project.title }}
@@ -29,7 +31,16 @@
     <div class="col-6">{% ff_field form.rendered_by %}</div>
     <div class="col-6">{% ff_field form.rendered_on %}</div>
   </div>
-  {% ff_field form.service %}
+  <div data-service-progress style="margin-bottom:8px">
+    {% ff_field form.service %}
+    <div class="progress progress-line">
+      <div class="progress-bar bg-success" role="progressbar"></div>
+      <div class="progress-bar bg-caveat" role="progressbar"></div>
+      <div class="progress-bar bg-danger" role="progressbar"></div>
+    </div>
+    {{ form.progress_on_selectable_services|json_script }}
+  </div>
+
   {% ff_field form.hours %}
   {% ff_field form.description %}
 {% endblock body %}
