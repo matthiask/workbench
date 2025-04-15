@@ -433,10 +433,19 @@ class PlannedWorkBatchForm(Form):
             label=_("Is work provisional?"),
             required=False,
         )
+        self.fields["delete"] = forms.BooleanField(
+            label=_("Delete planned work entries?"),
+            required=False,
+        )
 
     def process(self):
         data = self.cleaned_data
         work = data["work"]
+
+        if data.get("delete"):
+            work.delete()
+            return
+
         if move_by_weeks := data.get("move_by_weeks"):
             delta = dt.timedelta(days=7 * move_by_weeks)
             for unit in work:
