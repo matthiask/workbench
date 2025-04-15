@@ -42,6 +42,7 @@ def annual_working_time_warnings_mails():
             "awt/awt_warning_mail",
             {"stats": stats, "WORKBENCH": settings.WORKBENCH},
             to=[user.email for user in warning_all],
+            reply_to=[user.email for user in warning_all],
         ).send()
 
     for row in stats["warnings"]:
@@ -54,4 +55,5 @@ def annual_working_time_warnings_mails():
                     "WORKBENCH": settings.WORKBENCH,
                 },
                 to=[row["user"].email],
+                reply_to=[user.email for user in warning_all],
             ).send()

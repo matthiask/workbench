@@ -51,6 +51,7 @@ def create_recurring_invoices_and_notify():
             body,
             to=[owner.email],
             cc=settings.RECURRING_INVOICES_CC,
+            reply_to=[owner.email],
         )
         mail.send()
 
@@ -99,6 +100,7 @@ Wenn Du die Rechnungen nicht stellen kannst, aktualisiere bitte
 die geplanten Rechnungen oder schliesse das Projekt.
 """,
             to=[user.email],
+            reply_to=[user.email],
         ).send()
 
 
@@ -123,6 +125,7 @@ def autodunning():
                 "Please update the list of credit entries. Generating dunning letters doesn't make sense without up-to-date payment information."
             ),
             to=managers,
+            reply_to=managers,
         ).send()
         return
 
@@ -137,6 +140,7 @@ def autodunning():
             _("Auto dunning"),
             _("No overdue invoices with missing recent reminders."),
             to=managers,
+            reply_to=managers,
         ).send()
         return
 
@@ -167,6 +171,7 @@ def autodunning():
         )),
         to=managers,
         cc=cc,
+        reply_to=managers,
     )
     mail.send()
 

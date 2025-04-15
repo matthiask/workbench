@@ -314,6 +314,7 @@ def changes_mails():
                 "WORKBENCH": settings.WORKBENCH,
             },
             to=[user.email],
+            reply_to=[user.email],
         )
         mail.send()
 

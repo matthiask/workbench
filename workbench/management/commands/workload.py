@@ -226,6 +226,7 @@ class Command(BaseCommand):
                 "Workload",
                 "",
                 to=options["mailto"].split(","),
+                reply_to=options["mailto"].split(","),
             )
             with io.BytesIO() as f:
                 xlsx.workbook.save(f)

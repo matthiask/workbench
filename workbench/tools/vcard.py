@@ -52,7 +52,10 @@ def is_ios(user_agent):
 def render_vcard_response(request, vcard, subject=""):
     if is_ios(request.headers.get("User-Agent") or ""):
         mail = EmailMultiAlternatives(
-            ": ".join(filter(None, ("vCard", subject))), "", to=[request.user.email]
+            ": ".join(filter(None, ("vCard", subject))),
+            "",
+            to=[request.user.email],
+            reply_to=[request.user.email],
         )
         mail.attach("vcard.vcf", vcard, "text/x-vCard")
         mail.send(fail_silently=True)

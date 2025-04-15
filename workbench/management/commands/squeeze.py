@@ -400,6 +400,7 @@ class Command(BaseCommand):
                 "Squeeze",
                 body,
                 to=options["mailto"].split(","),
+                reply_to=options["mailto"].split(","),
             )
             with io.BytesIO() as f:
                 xlsx.workbook.save(f)

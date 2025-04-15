@@ -39,6 +39,7 @@ class Command(BaseCommand):
                     "WORKBENCH": settings.WORKBENCH,
                 },
                 to=mailto.split(","),
+                reply_to=mailto.split(","),
             )
             mail.send()
 
