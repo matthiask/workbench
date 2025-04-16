@@ -101,4 +101,9 @@ urlpatterns = [
         bookkeeping_only(views.dunning_letter),
         name="invoices_dunning_letter",
     ),
+    path(
+        "reminders/<int:contact_id>/send/",
+        bookkeeping_only(views.send_reminder),
+        name="invoices_send_reminder",
+    ),
 ]

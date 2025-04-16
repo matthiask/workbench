@@ -1,6 +1,8 @@
 import datetime as dt
+import io
 from decimal import Decimal
 
+from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -20,7 +22,7 @@ from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
-from workbench.tools.pdf import pdf_response
+from workbench.tools.pdf import PDFDocument, pdf_response
 from workbench.tools.validation import in_days
 
 
@@ -938,3 +940,35 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             )
 
         return data
+
+
+class SendReminderForm(Form):
+    def __init__(self, *args, **kwargs):
+        self.contact = kwargs.pop("contact")
+        super().__init__(*args, **kwargs)
+
+        self.invoices = (
+            Invoice.objects.overdue()
+            .filter(contact=self.contact)
+            .select_related("customer", "contact__organization", "owned_by", "project")
+        )
+        self.emails = self.contact.emailaddresses.values_list("email", flat=True)
+
+        self.fields["email"] = forms.EmailField(label=_("email"))
+
+    def process(self):
+        mail = render_to_mail(
+            "invoices/reminder_mail",
+            {"WORKBENCH": settings.WORKBENCH},
+            from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
+            to=[self.cleaned_data["email"]],
+            bcc=[self.request.user.email, settings.WORKBENCH.REMINDER_FROM_EMAIL],
+        )
+        with io.BytesIO() as buf:
+            pdf = PDFDocument(buf)
+            pdf.dunning_letter(invoices=self.invoices)
+            pdf.generate()
+            mail.attach("Zahlungserinnerung.pdf", buf.getvalue(), "application/pdf")
+        mail.send()
+
+        self.invoices.update(last_reminded_on=dt.date.today())

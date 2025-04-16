@@ -3,12 +3,14 @@ from collections import defaultdict
 
 from django.contrib import messages
 from django.db.models import F
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.utils.translation import gettext, ngettext
 
 from workbench import generic
+from workbench.contacts.models import Person
+from workbench.invoices.forms import SendReminderForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.tools.pdf import pdf_response
@@ -167,3 +169,19 @@ def dunning_letter(request, contact_id):
         return response
     messages.error(request, gettext("No overdue invoices for this contact."))
     return redirect("invoices_reminders")
+
+
+def send_reminder(request, contact_id):
+    contact = get_object_or_404(Person, pk=contact_id)
+    args = (request.POST,) if request.method == "POST" else ()
+    form = SendReminderForm(*args, contact=contact, request=request)
+
+    if form.is_valid():
+        form.process()
+        return HttpResponse("OK", status=202)
+
+    return render(
+        request,
+        "invoices/send_reminder.html",
+        {"form": form, "title": gettext("Send reminder")},
+    )

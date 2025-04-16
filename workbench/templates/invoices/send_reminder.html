@@ -1,0 +1,21 @@
+{% extends "modalform.html" %}
+
+{% load i18n workbench %}
+
+{% block body %}
+{{ block.super }}
+
+<h5 class="mt-4">{% translate 'invoices'|capfirst %}</h5>
+<ul>
+  {% for invoice in form.invoices %}
+    <li>{% link_or_none invoice %}</li>
+  {% endfor %}
+</ul>
+
+<h5 class="mt-4">{% translate 'email addresses'|capfirst %}</h5>
+<ul>
+  {% for email in form.emails %}
+  <li>{{ email }} (<a href="javascript:navigator.clipboard.writeText('{{ email }}')">{% translate 'copy' %}</a>)</li>
+  {% endfor %}
+</ul>
+{% endblock body %}

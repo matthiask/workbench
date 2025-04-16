@@ -632,6 +632,8 @@ class PDFDocument(_PDFDocument):
         self.generate()
 
     def dunning_letter(self, *, invoices):
+        invoices = list(invoices)
+
         self.init_letter()
         self.p(invoices[-1].postal_address)
         self.next_frame()

@@ -1,0 +1,10 @@
+Zahlungserinnerung von {{ WORKBENCH.PDF_COMPANY }}
+
+Sehr geehrte Damen und Herren
+
+Gemäss unserer Liste der offenen Posten wurden fällige Rechnungen bis heute nicht beglichen. Sie finden die Zahlungserinnerung inkl. Originalrechnung im Anhang. Sollte sich Ihre Zahlung mit unserer Zahlungserinnerung gekreuzt haben, hat sich für uns alles erledigt.
+
+Falls Sie Fragen haben, stehen wir Ihnen gerne zur Verfügung.
+
+Vielen Dank und freundliche Grüsse
+{{ WORKBENCH.PDF_COMPANY }}

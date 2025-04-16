@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-11 11:58+0200\n"
+"POT-Creation-Date: 2025-04-16 09:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -200,6 +200,7 @@ msgid "Inactive"
 msgstr "Inaktiv"
 
 #: workbench/accounts/models.py workbench/contacts/models.py
+#: workbench/invoices/forms.py
 msgid "email"
 msgstr "Email"
 
@@ -939,6 +940,7 @@ msgid "email address"
 msgstr "Emailadresse"
 
 #: workbench/contacts/models.py workbench/templates/contacts/person_form.html
+#: workbench/templates/invoices/send_reminder.html
 msgid "email addresses"
 msgstr "Emailadressen"
 
@@ -1140,6 +1142,7 @@ msgstr "Zahlungseingänge"
 #: workbench/credit_control/reporting.py workbench/invoices/apps.py
 #: workbench/invoices/models.py workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/invoices/send_reminder.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/shortcuts.html
 msgid "invoices"
@@ -2118,6 +2121,10 @@ msgstr[1] "%s Rechnungen erstellt."
 msgid "No overdue invoices for this contact."
 msgstr "Keine überfälligen Rechnungen für diese Kontaktperson."
 
+#: workbench/invoices/views.py
+msgid "Send reminder"
+msgstr "Zahlungserinnerung verschicken"
+
 #: workbench/logbook/forms.py workbench/timer/models.py
 msgid "<detected>"
 msgstr "<entdeckt>"
@@ -2616,6 +2623,10 @@ msgstr "Zu Projekt verschieben"
 msgid "Is work provisional?"
 msgstr "Ist die Arbeit provisorisch?"
 
+#: workbench/planning/forms.py
+msgid "Delete planned work entries?"
+msgstr "Geplante Arbeit löschen?"
+
 #: workbench/planning/models.py
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/tools/pdf.py
@@ -2929,6 +2940,10 @@ msgstr "Kosten nach Monat und Leistung"
 #: workbench/projects/views.py
 msgid "Budgeted"
 msgstr "Budgetiert"
+
+#: workbench/projects/views.py workbench/tools/xlsx.py
+msgid "Invoiced"
+msgstr "Verrechnet"
 
 #: workbench/projects/views.py
 msgid "offer or service group"
@@ -3572,12 +3587,16 @@ msgid "Last reminded on"
 msgstr "Zuletzt erinnert am"
 
 #: workbench/templates/invoices/reminders.html
-msgid "reminded today"
-msgstr "heute erinnert"
+msgid "Reminder"
+msgstr "Zahlungserinnerung"
 
 #: workbench/templates/invoices/reminders.html
-msgid "dunning letter"
-msgstr "Zahlungserinnerung"
+msgid "Generate"
+msgstr "Generieren"
+
+#: workbench/templates/invoices/reminders.html
+msgid "Select recipient"
+msgstr "Empfänger:in auswählen"
 
 #: workbench/templates/invoices/reminders.html
 msgid "Contact missing"
@@ -3586,6 +3605,10 @@ msgstr "Ansprechperson fehlt"
 #: workbench/templates/invoices/reminders.html
 msgid "Not reminded yet"
 msgstr "Noch nicht erinnert"
+
+#: workbench/templates/invoices/send_reminder.html
+msgid "copy"
+msgstr "kopieren"
 
 #: workbench/templates/invoices/service_form.html
 #: workbench/templates/projects/service_form.html
@@ -3829,10 +3852,6 @@ msgstr "Leistungen aus Offerte"
 #: workbench/templates/projects/project_projected_invoices_form.html
 msgid "Update projected gross margin"
 msgstr "Geplanten Umsatz bearbeiten"
-
-#: workbench/templates/projects/project_statistics.html
-msgid "Logged hours per user"
-msgstr "Erfasste Stunden pro Nutzer:in"
 
 #: workbench/templates/projects/project_statistics.html
 msgid "Scheduled"
@@ -4314,10 +4333,6 @@ msgid "Logbook"
 msgstr "Logbuch"
 
 #: workbench/tools/xlsx.py
-msgid "Invoiced"
-msgstr "Verrechnet"
-
-#: workbench/tools/xlsx.py
 msgid "Total hours"
 msgstr "Stunden insgesamt"
 
@@ -4337,3 +4352,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Send"
+#~ msgstr "Versenden"
+
+#~ msgid "Generate dunning letter"
+#~ msgstr "Zahlungserinnerung generieren"
+
+#~ msgid "reminded today"
+#~ msgstr "heute erinnert"
+
+#~ msgid "Logged hours per user"
+#~ msgstr "Erfasste Stunden pro Nutzer:in"

@@ -220,6 +220,7 @@ WORKBENCH = {
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
         URL="https://workbench.feinheit.ch",
+        REMINDER_FROM_EMAIL="buchhaltung@feinheit.ch",
         FEATURES={
             FEATURES.AUTODUNNING: F.USER,
             FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
@@ -286,6 +287,7 @@ WORKBENCH = {
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
         URL="https://workbench.diebruchpiloten.com",
+        REMINDER_FROM_EMAIL=None,
         FEATURES={
             FEATURES.AUTODUNNING: F.USER,
             FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
@@ -354,6 +356,7 @@ WORKBENCH = {
             "bolditalic": font("HelveticaNeueBoldItalic.ttf"),
         },
         URL="https://workbench.blindflugstudios.com",
+        REMINDER_FROM_EMAIL=None,
         FEATURES={
             FEATURES.AUTODUNNING: F.USER,
             FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
@@ -408,6 +411,7 @@ WORKBENCH = {
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
         URL="https://workbench-test.feinheit.ch",
+        REMINDER_FROM_EMAIL=None,
         FEATURES={
             FEATURES.AUTODUNNING: F.USER,
             FEATURES.AWT_WARNING_INDIVIDUAL: F.USER,
