@@ -39,8 +39,9 @@ $(() => {
       modal.show()
 
       setTimeout(() => {
-        // Explicit autofocus? Do nothing.
-        if (el.querySelector("[autofocus]")) {
+        // Force a focus on first autofocus element
+        for (const input of el.querySelectorAll("[autofocus]")) {
+          input.focus()
           return
         }
 
