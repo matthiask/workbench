@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 15:08+0200\n"
+"POT-Creation-Date: 2025-04-16 15:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -800,8 +800,12 @@ msgid "Any projects or deals in the last 5 years"
 msgstr "Irgendwelche Projekte oder Geschäfte in den letzten 5 Jahren"
 
 #: workbench/contacts/forms.py
-msgid "Missing salutation"
-msgstr "Fehlende Anrede"
+msgid "Missing salutation (only w/email)"
+msgstr "Fehlende Anrede (nur mit Emailadresse)"
+
+#: workbench/contacts/forms.py
+msgid "Missing email address"
+msgstr "Fehlende Emailadresse"
 
 #: workbench/contacts/forms.py
 msgid "substitute with"
