@@ -8,7 +8,8 @@ from django.db.models.expressions import RawSQL
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
+from django.utils.timesince import timesince
+from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
@@ -344,6 +345,12 @@ class Invoice(ModelWithTotal):
         if self.status == self.PAID:
             return _("Paid on %(closed_on)s") % d
         return self.get_status_display()
+
+    @property
+    def pretty_last_reminded_on(self):
+        if self.last_reminded_on:
+            return f"{local_date_format(self.last_reminded_on)} ({timesince(self.last_reminded_on, depth=1)})"
+        return gettext("Not reminded yet")
 
     def payment_reminders_sent_at(self):
         from workbench.tools.history import (  # noqa: PLC0415
