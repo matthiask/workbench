@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 09:08+0200\n"
+"POT-Creation-Date: 2025-04-16 15:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -798,6 +798,10 @@ msgstr "Definierte Suche"
 #: workbench/contacts/forms.py
 msgid "Any projects or deals in the last 5 years"
 msgstr "Irgendwelche Projekte oder Geschäfte in den letzten 5 Jahren"
+
+#: workbench/contacts/forms.py
+msgid "Missing salutation"
+msgstr "Fehlende Anrede"
 
 #: workbench/contacts/forms.py
 msgid "substitute with"
@@ -1918,6 +1922,10 @@ msgstr "Versendet am %(invoiced_on)s"
 #, python-format
 msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
+
+#: workbench/invoices/models.py
+msgid "Not reminded yet"
+msgstr "Noch nicht erinnert"
 
 #: workbench/invoices/models.py
 #, python-format
@@ -3601,10 +3609,6 @@ msgstr "Empfänger:in auswählen"
 #: workbench/templates/invoices/reminders.html
 msgid "Contact missing"
 msgstr "Ansprechperson fehlt"
-
-#: workbench/templates/invoices/reminders.html
-msgid "Not reminded yet"
-msgstr "Noch nicht erinnert"
 
 #: workbench/templates/invoices/send_reminder.html
 msgid "copy"

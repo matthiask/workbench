@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _, ngettext
 
+from workbench.accounts.models import User
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -74,6 +75,10 @@ class PersonSearchForm(Form):
                         "any-projects-deals",
                         _("Any projects or deals in the last 5 years"),
                     ),
+                    (
+                        "missing-salutation",
+                        _("Missing salutation"),
+                    ),
                 ],
             ),
         ],
@@ -88,7 +93,19 @@ class PersonSearchForm(Form):
         widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
+    primary_contact = forms.TypedChoiceField(
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="",
+    )
     added_since = forms.DateField(widget=DateInput, required=False, label="")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["primary_contact"].choices = User.objects.choices(
+            collapse_inactive=True, myself=True
+        )
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -109,6 +126,8 @@ class PersonSearchForm(Form):
                     )
                 )
             ).active()
+        elif data.get("s") == "missing-salutation":
+            queryset = queryset.filter(salutation="")
 
         if added_since := data.get("added_since"):
             from workbench.audit.models import LoggedAction
@@ -123,6 +142,8 @@ class PersonSearchForm(Form):
                     )
                 ],
             )
+
+        queryset = self.apply_owned_by(queryset, attribute="primary_contact")
         return self.apply_renamed(queryset, "g", "groups").select_related(
             "organization"
         )
