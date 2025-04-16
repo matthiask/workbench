@@ -962,6 +962,11 @@ class SendReminderForm(Form):
             {"WORKBENCH": settings.WORKBENCH},
             from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
             to=[self.cleaned_data["email"]],
+            cc=list({
+                invoice.owned_by.email
+                for invoice in self.invoices
+                if invoice.owned_by.is_active
+            }),
             bcc=[self.request.user.email, settings.WORKBENCH.REMINDER_FROM_EMAIL],
         )
         with io.BytesIO() as buf:
