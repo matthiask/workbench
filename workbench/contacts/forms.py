@@ -77,7 +77,11 @@ class PersonSearchForm(Form):
                     ),
                     (
                         "missing-salutation",
-                        _("Missing salutation"),
+                        _("Missing salutation (only w/email)"),
+                    ),
+                    (
+                        "missing-email",
+                        _("Missing email address"),
                     ),
                 ],
             ),
@@ -127,7 +131,11 @@ class PersonSearchForm(Form):
                 )
             ).active()
         elif data.get("s") == "missing-salutation":
-            queryset = queryset.filter(salutation="")
+            queryset = queryset.active().filter(
+                salutation="", emailaddresses__isnull=False
+            )
+        elif data.get("s") == "missing-email":
+            queryset = queryset.active().filter(emailaddresses__isnull=True)
 
         if added_since := data.get("added_since"):
             from workbench.audit.models import LoggedAction
