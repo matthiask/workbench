@@ -1,3 +1,4 @@
+import datetime as dt
 from collections import defaultdict
 from itertools import starmap
 from types import SimpleNamespace
@@ -6,10 +7,11 @@ from django.db.models import Sum
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
+from workbench.awt.reporting import employment_percentages
 from workbench.contacts.models import Organization
 from workbench.logbook.models import LoggedHours
 from workbench.projects.models import InternalType, InternalTypeUser, Project
-from workbench.tools.formats import Z1
+from workbench.tools.formats import Z1, Z2
 from workbench.tools.forms import querystring
 
 
@@ -184,8 +186,80 @@ def hours_per_type(date_range, *, users=None):
     }
 
 
+def hours_per_type_distribution(year):
+    user_internal_types = defaultdict(dict)
+    for m2m in InternalTypeUser.objects.select_related("internal_type"):
+        user_internal_types[m2m.user_id][m2m.internal_type] = m2m
+
+    ep = employment_percentages(until_year=year)
+
+    months = [dt.date(year, month, 1) for month in range(1, 13)]
+
+    fte_per_field = defaultdict(lambda: Z2)
+    fte_per_field_and_type = defaultdict(lambda: defaultdict(lambda: Z2))
+
+    for user, user_ep in ep.items():
+        for month in months:
+            if percentage := user_ep[month]:
+                fte_per_field[user.specialist_field] += percentage / 100 / 12
+
+    for user in User.objects.select_related("specialist_field"):
+        field = fte_per_field_and_type[user.specialist_field]
+
+        for type, typeuser in user_internal_types[user.id].items():
+            for month in months:
+                field[type] += ep[user][month] / 12 * typeuser.percentage / 10000
+
+    external_type = SimpleNamespace(id=0, name=_("External"), description="")
+    internal_types = list(InternalType.objects.all())
+
+    table = [
+        [
+            "Fachbereich",
+            external_type.name,
+            *(type.name for type in internal_types),
+            "Total",
+        ]
+    ]
+
+    overall = sum(fte_per_field.values()) / 100
+
+    internal_total_per_type = defaultdict(lambda: Z2)
+    for field, types in sorted(fte_per_field_and_type.items()):
+        if not fte_per_field[field]:
+            continue
+
+        internal = [types[type] for type in internal_types]
+        table.append([
+            field.name if field else "??",
+            ((fte_per_field[field] - sum(internal)) / overall).quantize(Z2),
+            *((number / overall).quantize(Z2) for number in internal),
+            (fte_per_field[field] / overall).quantize(Z2),
+        ])
+
+        for type, total in types.items():
+            internal_total_per_type[type] += total
+
+    table.append([
+        "Gesamtes Team",
+        (
+            (sum(fte_per_field.values()) - sum(internal_total_per_type.values()))
+            / overall
+        ).quantize(Z2),
+        *(
+            (internal_total_per_type[type] / overall).quantize(Z2)
+            for type in internal_types
+        ),
+        (sum(fte_per_field.values()) / overall).quantize(Z2),
+    ])
+
+    # return fte_per_field, fte_per_field_and_type
+    return table
+
+
 def test():  # pragma: no cover
-    import datetime as dt
+    # pprint(hours_per_type([dt.date(2022, 1, 1), dt.date(2022, 12, 31)]))
+
     from pprint import pprint
 
-    pprint(hours_per_type([dt.date(2022, 1, 1), dt.date(2022, 12, 31)]))
+    pprint(hours_per_type_distribution(2025))

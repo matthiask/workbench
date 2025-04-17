@@ -416,6 +416,7 @@ class CoffeePairings(models.Model):
         verbose_name_plural = _("coffee pairings")
 
 
+@total_ordering
 class SpecialistField(models.Model):
     name = models.CharField(_("name"), max_length=100)
 
@@ -426,3 +427,6 @@ class SpecialistField(models.Model):
 
     def __str__(self):
         return self.name
+
+    def __lt__(self, other):
+        return self.name < other.name if isinstance(other, SpecialistField) else 1

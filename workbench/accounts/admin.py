@@ -90,6 +90,7 @@ class UserAdmin(UserAdmin):
         "planning_hours_per_day",
         "last_login",
         "person",
+        "specialist_field",
         "_features",
     )
     list_filter = (
