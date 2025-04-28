@@ -372,8 +372,17 @@ $(() => {
     if (el) {
       e.preventDefault()
       el.classList.add("invisible")
-      _sel("#new-service").classList.remove("d-none")
-      _sel("#id_modal-service").value = ""
+
+      // Reset the service dropdown and emit a change event for the progress
+      // bar update.
+      const select = _sel("#id_modal-service")
+      select.value = ""
+      select.dispatchEvent(new InputEvent("change", { bubbles: true }))
+
+      // Show the new-service fields and focus the first input element.
+      const container = _sel("#new-service")
+      container.classList.remove("d-none")
+      container.querySelector("input").focus()
     }
 
     el = e.target.closest("[data-foreign-currency]")
