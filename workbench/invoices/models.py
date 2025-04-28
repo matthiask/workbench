@@ -386,6 +386,12 @@ class Invoice(ModelWithTotal):
         )
 
     @property
+    def subtotal_title(self):
+        if self.type == self.DOWN_PAYMENT:
+            return _("Down payment")
+        return _("subtotal")
+
+    @property
     def total_title(self):
         if self.type == self.DOWN_PAYMENT:
             return (

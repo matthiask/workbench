@@ -369,11 +369,20 @@ class PDFDocument(_PDFDocument):
             # + list(chain.from_iterable(fn(service) for service in services)),
 
     def table_total(self, instance, *, optional_total=None):
-        transform = lambda x: x  # noqa
-        if getattr(instance, "type", None) == Invoice.CREDIT:
-            transform = lambda x: -x  # noqa
+        def transform(x):
+            return x
 
-        total = [(_("subtotal"), currency(transform(instance.subtotal).quantize(Z)))]
+        if getattr(instance, "type", None) == Invoice.CREDIT:
+
+            def transform(x):
+                return -x
+
+        total = [
+            (
+                instance.subtotal_title,
+                currency(transform(instance.subtotal).quantize(Z)),
+            )
+        ]
         if instance.discount:
             total.append((
                 _("discount"),
@@ -557,10 +566,10 @@ class PDFDocument(_PDFDocument):
             self.next_frame()
 
     def append_qr_bill(self, invoice):
-        import tempfile
+        import tempfile  # noqa: PLC0415
 
-        from qrbill.bill import CombinedAddress, QRBill
-        from svglib.svglib import svg2rlg
+        from qrbill.bill import CombinedAddress, QRBill  # noqa: PLC0415
+        from svglib.svglib import svg2rlg  # noqa: PLC0415
 
         bill = QRBill(
             amount=str(invoice.total),
