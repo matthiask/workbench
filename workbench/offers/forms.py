@@ -148,8 +148,8 @@ class OfferForm(PostalAddressSelectionForm):
                 format_html(
                     "<u>{}</u><br>"
                     '<div class="form-check">'
-                    '<input type="checkbox" data-toggle-following>'
-                    "{}"
+                    '<input type="checkbox" data-toggle-following id="offer-none">'
+                    '<label for="offer-none">{}</label>'
                     "</div>",
                     _("Not offered yet"),
                     _("Select all"),

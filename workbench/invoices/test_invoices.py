@@ -192,6 +192,7 @@ class InvoicesTest(TestCase):
         self.assertContains(response, "2.0h logged but no hourly rate defined.")
         self.assertContains(response, "<strong>with-rate</strong><br>600.00")
         self.assertContains(response, "id_show_service_details")
+        self.assertNotContains(response, f'value="{service4.pk}"')
 
         cost.service = service1
         cost.save()
@@ -210,11 +211,12 @@ class InvoicesTest(TestCase):
                     service1.pk,
                     service2.pk,
                     service3.pk,
-                    service4.pk,
                 ],
                 "disable_logging": 0,
             },
         )
+        print(response, response.content.decode("utf-8"))
+        self.assertEqual(response.status_code, 302)
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertEqual(invoice.subtotal, 610)

@@ -559,21 +559,36 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     )
                 return currency(row["logged_cost"])
 
+            def filter(services):
+                for row in services:
+                    if row["service"].effort_rate is not None and row["not_archived"]:
+                        yield row
+                    elif row["logged_hours"]:
+                        yield row
+                    elif row["logged_cost"]:
+                        yield row
+
         else:
 
             def amount(row):
                 return currency(row["service"].service_cost)
 
+            def filter(services):
+                yield from services
+
         choices = []
         for offer, offer_data in self.project.grouped_services["offers"]:
+            id = f"offer-{offer.pk if offer else 'none'}"
             choices.append((
                 format_html(
                     "<u>{}</u><br>"
                     '<div class="form-check">'
-                    '<input type="checkbox" data-toggle-following>'
-                    "{}"
+                    '<input type="checkbox" data-toggle-following id="{}">'
+                    '<label for="{}">{}</label>'
                     "</div>",
                     offer if offer else _("Not offered yet"),
+                    id,
+                    id,
                     _("Select all"),
                 ),
                 [
@@ -589,7 +604,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                             amount(row),
                         ),
                     )
-                    for row in offer_data["services"]
+                    for row in filter(offer_data["services"])
                 ],
             ))
         self.fields["selected_services"] = forms.MultipleChoiceField(

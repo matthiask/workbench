@@ -275,10 +275,14 @@ tbody th > a {
 }
 
 .widget--checkboxselectmultiple .my-2 {
-  column-width: 15rem;
+  /* column-width: 15rem; */
 }
 .widget--checkboxselectmultiple .my-2 .form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
   margin: 0 0 0.25rem 0;
+  padding-left: 0;
 }
 .widget--checkboxselectmultiple input:checked ~ label {
   font-weight: bold;
