@@ -101,6 +101,9 @@ def default_tax_rate():
 
 
 class ModelWithTotal(Model):
+    subtotal_title = _("subtotal")
+    total_title = _("total")
+
     subtotal = MoneyField(_("subtotal"), default=Z2)
     discount = MoneyField(_("discount"), default=Z2)
     liable_to_vat = models.BooleanField(
