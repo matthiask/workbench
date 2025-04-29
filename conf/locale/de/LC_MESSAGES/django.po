@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 15:16+0200\n"
+"POT-Creation-Date: 2025-04-29 11:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,8 @@ msgstr "Spesenerfassung und -rückerstattung."
 msgid "Foreign currencies for expenses"
 msgstr "Fremdwährungen für Spesen."
 
-#: workbench/accounts/features.py workbench/projects/models.py
+#: workbench/accounts/features.py
+#: workbench/management/commands/internal_types.py workbench/projects/models.py
 msgid "internal types"
 msgstr "Interne Typen"
 
@@ -1931,6 +1932,14 @@ msgstr "Bezahlt am %(closed_on)s"
 msgid "Not reminded yet"
 msgstr "Noch nicht erinnert"
 
+#: workbench/invoices/models.py workbench/templates/invoices/reminders.html
+msgid "Total excl. tax"
+msgstr "Total exkl. MwSt."
+
+#: workbench/invoices/models.py
+msgid "Subtotal"
+msgstr "Zwischentotal"
+
 #: workbench/invoices/models.py
 #, python-format
 msgid "Down payment total %(currency)s incl. tax"
@@ -2710,9 +2719,9 @@ msgid "%.1fh per week"
 msgstr "%.1fh pro Woche"
 
 #: workbench/planning/reporting.py
-#, python-format
-msgid "KW %s-%s"
-msgstr "KW %s-%s"
+#, python-brace-format
+msgid "KW {from}-{until}"
+msgstr "KW {from}-{until}"
 
 #: workbench/planning/updates.py
 msgid "Deleted"
@@ -3565,7 +3574,7 @@ msgstr "Zeitraum"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/tools/models.py workbench/tools/pdf.py
+#: workbench/tools/models.py
 msgid "subtotal"
 msgstr "Zwischentotal"
 
@@ -3589,10 +3598,6 @@ msgstr "Kopieren"
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "Create invoices"
 msgstr "Rechnungen erstellen"
-
-#: workbench/templates/invoices/reminders.html
-msgid "Total excl. tax"
-msgstr "Total exkl. MwSt."
 
 #: workbench/templates/invoices/reminders.html
 msgid "Last reminded on"
@@ -4360,6 +4365,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "KW %s-%s"
+#~ msgstr "KW %s-%s"
 
 #~ msgid "Send"
 #~ msgstr "Versenden"

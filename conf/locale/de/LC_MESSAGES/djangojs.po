@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-28 08:30+0100\n"
+"POT-Creation-Date: 2025-04-29 11:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,15 +56,15 @@ msgstr "Sa"
 msgid "(closed)"
 msgstr "(geschlossen)"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "(declined)"
 msgstr "(abgelehnt)"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "(not accepted yet)"
 msgstr "(noch nicht akzeptiert)"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Absences and public holidays"
 msgstr "Abwesenheiten und öffentliche Feiertage"
 
@@ -72,7 +72,7 @@ msgstr "Abwesenheiten und öffentliche Feiertage"
 msgid "Activity"
 msgstr "Aktivität"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Add planned work"
 msgstr "Geplante Arbeit hinzufügen"
 
@@ -88,11 +88,11 @@ msgstr "Tage"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Efforts"
 msgstr "Aufwände"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "is provisional"
 msgstr "ist provisorisch"
 
@@ -100,15 +100,15 @@ msgstr "ist provisorisch"
 msgid "Logged hours"
 msgstr "Erfasste Stunden"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "milestones"
 msgstr "Meilensteine"
 
-#: conf/strings.js
+#: conf/strings.js timer/activity.js
 msgid "No project selected"
 msgstr "Kein Projekt ausgewählt"
 
-#: conf/strings.js
+#: conf/strings.js timer/activity.js
 msgid "No services available"
 msgstr "Keine Leistungen verfügbar"
 
@@ -116,7 +116,7 @@ msgstr "Keine Leistungen verfügbar"
 msgid "Not part of an offer"
 msgstr "Nicht Teil einer Offerte"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Of which provisional"
 msgstr "Davon provisorisch"
 
@@ -124,7 +124,7 @@ msgstr "Davon provisorisch"
 msgid "OK"
 msgstr "OK"
 
-#: conf/strings.js
+#: conf/strings.js timer/activity.js
 msgid "Open logged hours form"
 msgstr "Öffne das Stundenformular"
 
@@ -132,15 +132,15 @@ msgstr "Öffne das Stundenformular"
 msgid "Overwrite seconds"
 msgstr "Sekunden überschreiben"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Planned hours per week"
 msgstr "Geplante Stunden pro Woche"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Remaining capacity per week"
 msgstr "Verbleibende Kapazität pro Woche"
 
-#: conf/strings.js timer/activitySettings.js
+#: conf/strings.js
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -148,19 +148,19 @@ msgstr "Entfernen"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: conf/strings.js
+#: conf/strings.js timer/activity.js
 msgid "Select or search project..."
 msgstr "Projekt auswählen oder suchen..."
 
-#: conf/strings.js
+#: conf/strings.js timer/activity.js
 msgid "Select service..."
 msgstr "Leistung auswählen..."
 
-#: conf/strings.js
+#: conf/strings.js timer/activity.js
 msgid "Send to logbook"
 msgstr "Sende ins Logbuch"
 
-#: conf/strings.js
+#: conf/strings.js timer/activity.js
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -193,7 +193,7 @@ msgstr "KW%s"
 msgid "What outcome do you seek?"
 msgstr "Welches Ergebnis strebst Du an?"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
