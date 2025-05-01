@@ -22,7 +22,7 @@ from workbench.tools.validation import monday, raise_if_errors
 
 @model_urls
 class PublicHoliday(Model):
-    date = models.DateField(_("date"))
+    date = models.DateField(_("date"), unique=True)
     name = models.CharField(_("name"), max_length=200)
     fraction = models.DecimalField(
         _("fraction of day which is free"), default=1, max_digits=5, decimal_places=2

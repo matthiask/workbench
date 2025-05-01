@@ -18,3 +18,5 @@ dist
 node_modules
 tmp
 /*.xlsx
+
+**/.claude/settings.local.json
