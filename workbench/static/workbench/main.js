@@ -159,10 +159,7 @@ $(() => {
     let timeout
 
     // Calling debounce returns a new anonymous function
-    return function () {
-      // reference the context and args for the setTimeout function
-      const args = arguments
-
+    return function (...args) {
       // Should the function be called now? If immediate is true
       //   and not already in a timeout then the answer is: Yes
       const callNow = immediate && !timeout

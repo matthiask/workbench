@@ -8,8 +8,8 @@ export function initOneWindow() {
 
   window.addEventListener("storage", (e) => {
     if (e.key === STORAGE_KEY) {
-      /* eslint-disable-next-line */
-      document.body.innerHTML = document.body.innerHTML // Remove all behaviors
+      // biome-ignore lint/correctness/noSelfAssign: Remove all behaviors
+      document.body.innerHTML = document.body.innerHTML
       document.querySelector('div[role="main"]').classList.add("deactivated")
     }
   })
