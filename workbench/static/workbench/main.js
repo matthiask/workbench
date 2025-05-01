@@ -585,9 +585,7 @@ window.addInlineForm = function addInlineForm(slug, onComplete) {
 
   form.removeClass("empty").attr("id", `${slug}-${newId}`)
 
-  for (let i = 0; i < attributes.length; ++i) {
-    const attr = attributes[i]
-
+  for (const attr of attributes) {
     form.find(`*[${attr}*=__prefix__]`).each(function () {
       const el = $(this)
       el.attr(attr, el.attr(attr).replace(/__prefix__/, newId))
