@@ -12,7 +12,7 @@ import {
   sendLogbook,
 } from "./actions.js"
 import { ActivitySettings } from "./activitySettings.js"
-import { OUTCOME, gettext } from "./i18n.js"
+import { gettext, OUTCOME } from "./i18n.js"
 import * as icons from "./icons.js"
 import { clamp, prettyDuration } from "./utils.js"
 
@@ -203,22 +203,22 @@ export const Activity = connect((state, ownProps) => ({
             </div>
           </div>
         </div>
-        {showSettings ? (
-          <ActivitySettings
-            title={activity.title}
-            color={activity.color}
-            dispatchUpdate={dispatchUpdate}
-            closeSettings={() => setShowSettings(false)}
-            removeActivity={() => {
-              dispatch({ type: "REMOVE_ACTIVITY", id: activity.id })
-            }}
-            resetActivity={() => {
-              if (activity.isActive) dispatch({ type: "STOP", current })
-              dispatchUpdate({ seconds: 0 })
-              setShowSettings(false)
-            }}
-          />
-        ) : null}
+        {showSettings
+          ? <ActivitySettings
+              title={activity.title}
+              color={activity.color}
+              dispatchUpdate={dispatchUpdate}
+              closeSettings={() => setShowSettings(false)}
+              removeActivity={() => {
+                dispatch({ type: "REMOVE_ACTIVITY", id: activity.id })
+              }}
+              resetActivity={() => {
+                if (activity.isActive) dispatch({ type: "STOP", current })
+                dispatchUpdate({ seconds: 0 })
+                setShowSettings(false)
+              }}
+            />
+          : null}
       </form>
     </Draggable>
   )
