@@ -117,7 +117,7 @@ class UserAdmin(UserAdmin):
     raw_id_fields = ["person", "pinned_projects"]
     readonly_fields = ["last_login"]
     search_fields = ("email", "_short_name", "_full_name")
-    ordering = ("email",)
+    ordering = ("-is_active", "email")
     filter_horizontal = ()
     inlines = [EmploymentInline, VacationDaysOverrideInline]
 
