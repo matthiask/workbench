@@ -135,7 +135,8 @@ export const Activity = connect((state, ownProps) => ({
             />
           </div>
           <div className="d-flex align-items-center justify-content-between">
-            <div
+            <button
+              type="button"
               className="activity-duration ps-2"
               onClick={() => {
                 overwriteSeconds(dispatch, { activity, current })
@@ -143,7 +144,7 @@ export const Activity = connect((state, ownProps) => ({
               style={{ cursor: "cell" }}
             >
               {prettyDuration(activity.seconds)}
-            </div>
+            </button>
             <div>
               <button
                 className={`btn btn-light btn-sm ${

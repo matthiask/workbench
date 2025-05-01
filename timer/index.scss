@@ -56,6 +56,11 @@ div[role="main"] {
 }
 
 .activity-duration {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
   text-align: center;
   font-size: 1.5rem;
 }
