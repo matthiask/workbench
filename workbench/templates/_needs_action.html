@@ -1,7 +1,13 @@
 {% load i18n workbench %}
 <div class="card mb-3 d-none d-md-block">
   <div class="card-header" style="background-color:#ffcfb0">
-    <h3 class="my-0">{% if needs_action_list %}{{ user }}{% else %}{% translate 'Possibly requiring action' %}{% endif %}</h3>
+    <h3 class="my-0 d-flex align-items-center justify-content-between">
+      {% if needs_action_list %}{{ user }}
+      {% else %}
+      {% translate 'Possibly requiring action' %}
+      <small><a href="{% url 'needs_action' %}">{% translate 'Everyone' %}</a></small>
+      {% endif %}
+    </h3>
   </div>
   <div class="card-body">
     {% for row in needs_action %}
