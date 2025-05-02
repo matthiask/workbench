@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
-import datetime
+import datetime as dt
 from decimal import Decimal as D
+from urllib.request import urlopen
+
+import bs4
 
 
 # ----------------------------------------------------------------------------#
@@ -130,40 +133,73 @@ class EasterDay:
         else:
             month = 3
             day = os
-        return datetime.date(self.year, month, day)
+        return dt.date(self.year, month, day)
 
 
 def get_public_holidays(year):
     easter = EasterDay(year).get_date()
 
     return {
-        datetime.date(year, 1, 1): ["Neujahr", D("1")],
-        datetime.date(year, 1, 2): ["Berchtoldstag", D("1")],
-        easter - datetime.timedelta(days=3): ["Gründonnerstag", D("0.25")],
-        easter - datetime.timedelta(days=2): ["Karfreitag", D("1")],
+        dt.date(year, 1, 1): ["Neujahr", D("1")],
+        dt.date(year, 1, 2): ["Berchtoldstag", D("1")],
+        easter - dt.timedelta(days=3): ["Gründonnerstag", D("0.25")],
+        easter - dt.timedelta(days=2): ["Karfreitag", D("1")],
         easter: ["Ostersonntag", D("1")],
-        easter + datetime.timedelta(days=1): ["Ostermontag", D("1")],
-        datetime.date(year, 5, 1): ["Tag der Arbeit", D("1")],
-        easter + datetime.timedelta(days=38): ["Mittwoch vor Auffahrt", D("0.25")],
-        easter + datetime.timedelta(days=39): ["Auffahrt", D("1")],
-        easter + datetime.timedelta(days=49): ["Pfingstsonntag", D("1")],
-        easter + datetime.timedelta(days=50): ["Pfingstmontag", D("1")],
-        datetime.date(year, 8, 1): ["Nationalfeiertag", D("1")],
-        datetime.date(year, 12, 24): ["Heiligabend", D("0.5")],
-        datetime.date(year, 12, 25): ["Weihnachtstag", D("1")],
-        datetime.date(year, 12, 26): ["Stephanstag", D("1")],
-        datetime.date(year, 12, 31): ["Silvester", D("0.25")],
+        easter + dt.timedelta(days=1): ["Ostermontag", D("1")],
+        dt.date(year, 5, 1): ["Tag der Arbeit", D("1")],
+        easter + dt.timedelta(days=38): ["Mittwoch vor Auffahrt", D("0.25")],
+        easter + dt.timedelta(days=39): ["Auffahrt", D("1")],
+        easter + dt.timedelta(days=49): ["Pfingstsonntag", D("1")],
+        easter + dt.timedelta(days=50): ["Pfingstmontag", D("1")],
+        dt.date(year, 8, 1): ["Nationalfeiertag", D("1")],
+        dt.date(year, 12, 24): ["Heiligabend", D("0.5")],
+        dt.date(year, 12, 25): ["Weihnachtstag", D("1")],
+        dt.date(year, 12, 26): ["Stephanstag", D("1")],
+        dt.date(year, 12, 31): ["Silvester", D("0.25")],
     }
 
 
+def get_zurich_holidays():
+    sources = {
+        "Knabenschiessen": [
+            "https://www.feiertagskalender.ch/kalender.php?geo=3055&jahr=2026&klasse=4&ft_id=60&hl=de",
+            D("0.5"),
+        ],
+        "Sechseläuten": [
+            "https://www.feiertagskalender.ch/kalender.php?geo=3055&jahr=2026&klasse=4&ft_id=20&hl=de",
+            D("0.5"),
+        ],
+    }
+
+    days = {}
+
+    for name, (url, fraction) in sources.items():
+        with urlopen(url) as response:
+            html = response.read()
+            soup = bs4.BeautifulSoup(html, "lxml")
+
+            cells = soup.select("table.table-striped tr td:first-child")
+            for cell in cells:
+                try:
+                    day = dt.datetime.strptime(cell.text, "%d.%m.%Y").date()
+                except ValueError:
+                    continue
+
+                days[day] = [name, fraction]
+
+    return days
+
+
 if __name__ == "__main__":
-    year = datetime.date.today().year
+    year = dt.date.today().year
+
+    days = get_zurich_holidays()
     for i in range(year, year + 3):
-        days = get_public_holidays(i)
-        print(
-            "\n".join(
-                "{}: {}".format(day.strftime("%d.%m.%Y"), name)
-                for day, name in sorted(days.items())
-            )
+        days |= get_public_holidays(i)
+    print(
+        "\n".join(
+            "{}: {}".format(day.strftime("%d.%m.%Y"), name)
+            for day, name in sorted(days.items())
         )
-        print()
+    )
+    print()
