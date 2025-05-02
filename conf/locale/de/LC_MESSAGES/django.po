@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-29 11:07+0200\n"
+"POT-Creation-Date: 2025-05-02 15:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1749,6 +1749,11 @@ msgstr "Bist Du sicher, dass der MwSt.-Satz korrekt ist? Der Zeitraum der Leistu
 #: workbench/invoices/forms.py
 msgid "Are you sure the tax rate is correct? The service period ends before 2024 but you have selected the new tax rate."
 msgstr "Bist Du sicher, dass der MwSt.-Satz korrekt ist? Der Zeitraum der Leistungserbringung endet vor 2024 aber Du hast den neuen MwSt.-Satz gewählt."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Total of accepted offers: {accepted}. Use {percentages}."
+msgstr "Total der akzeptieren Offerten: {accepted}. Verrechne {percentages}."
 
 #: workbench/invoices/forms.py
 msgid "This project already has an invoice in preparation."

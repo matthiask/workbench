@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.utils.html import format_html
+from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
@@ -524,6 +524,23 @@ class CreateProjectInvoiceForm(InvoiceForm):
             self.add_services_field()
             self.fields.pop("service_period_from")
             self.fields.pop("service_period_until")
+
+        if self.instance.type in {self.instance.DOWN_PAYMENT, self.instance.FIXED}:
+            accepted = sum(
+                (offer.total for offer in self.instance.project.offers.accepted()),
+                Z2,
+            )
+            self.fields["subtotal"].help_text = mark_safe(
+                _("Total of accepted offers: {accepted}. Use {percentages}.").format(
+                    accepted=currency(accepted),
+                    percentages=mark_safe(
+                        ", ".join(
+                            f'<a href="#" data-field-value="{(accepted / 100 * percentage).quantize(Z2)}">{percentage}%</a>'
+                            for percentage in (50, 100)
+                        )
+                    ),
+                )
+            )
 
         if (
             self.request.method == "GET"
