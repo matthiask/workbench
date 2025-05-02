@@ -8,24 +8,7 @@
   <div class="row gx-3 justify-content-center">
     <div class="col-lg-6">
 
-      {% if needs_action %}
-        <div class="card mb-3 d-none d-md-block">
-          <div class="card-header" style="background-color:#ffcfb0">
-            <h3 class="my-0">{% translate 'Possibly requiring action' %}</h3>
-          </div>
-          <div class="card-body">
-            {% for row in needs_action %}
-              <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
-                <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
-              </h4>
-              {% for object in row.objects %}
-                {% link_or_none object with_badge=True %}
-                <br>
-              {% endfor %}
-            {% endfor %}
-          </div>
-        </div>
-      {% endif %}
+      {% if needs_action %}{% include '_needs_action.html' %}{% endif %}
 
       <div class="card mb-3">
         <div class="card-header">

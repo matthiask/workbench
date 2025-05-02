@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load i18n workbench %}
+
+{% block title %}
+  {% translate 'needs action'|capfirst %} - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+  <div class="row gx-3 justify-content-center">
+    <div class="col-lg-6">
+
+      <h1>{% translate 'Possibly requiring action' %}</h1>
+
+      {% for row in needs_action_list %}
+        {% if row.needs_action %}{% include '_needs_action.html' with needs_action=row.needs_action user=row.user %}{% endif %}
+      {% endfor %}
+
+    </div>
+  </div>
+{% endblock content %}

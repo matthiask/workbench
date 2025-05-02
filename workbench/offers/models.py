@@ -60,7 +60,8 @@ class OfferQuerySet(SearchQuerySet):
 
     def maybe_actionable(self, *, user):
         return self.filter(
-            Q(status__lt=Offer.SERVICE_GROUP),
+            Q(status__lt=Offer.ACCEPTED),
+            ~Q(status=Offer.SERVICE_GROUP),
             Q(owned_by=user) | Q(owned_by__is_active=False),
         ).select_related("project", "owned_by")
 

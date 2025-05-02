@@ -1,0 +1,17 @@
+{% load i18n workbench %}
+<div class="card mb-3 d-none d-md-block">
+  <div class="card-header" style="background-color:#ffcfb0">
+    <h3 class="my-0">{% if needs_action_list %}{{ user }}{% else %}{% translate 'Possibly requiring action' %}{% endif %}</h3>
+  </div>
+  <div class="card-body">
+    {% for row in needs_action %}
+      <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
+        <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
+      </h4>
+      {% for object in row.objects %}
+        {% link_or_none object with_badge=True %}
+        <br>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>

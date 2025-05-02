@@ -10,6 +10,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
+from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal
@@ -63,7 +64,9 @@ def _needs_action(user):
         "type": "old_projects",
         "verbose_name_plural": _("Old projects"),
         "url": Project.urls["list"] + "?s=old-projects",
-        "objects": Project.objects.old_projects().own_or_inactive(user),
+        "objects": Project.objects.old_projects()
+        .own_or_inactive(user)
+        .select_related("owned_by"),
     })
 
     return [row for row in rows if row["objects"]]
@@ -127,6 +130,22 @@ def start(request):
             "todays_hours": _todays_hours(request.user),
             "all_users_hours": _all_users_hours(),
             "birthdays": _birthdays(),
+        },
+    )
+
+
+def needs_action(request):
+    return render(
+        request,
+        "needs_action.html",
+        {
+            "needs_action_list": [
+                {
+                    "user": user,
+                    "needs_action": _needs_action(user),
+                }
+                for user in User.objects.active()
+            ]
         },
     )
 

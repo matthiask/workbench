@@ -13,6 +13,7 @@ admin.site.enable_nav_sidebar = False
 
 urlpatterns = [
     path("", views.start),
+    path("needs-action/", views.needs_action, name="needs_action"),
     path("404/", render, {"template_name": "404.html"}),
     path("shortcuts/", render, {"template_name": "shortcuts.html"}, name="shortcuts"),
     re_path(r"^admin/", admin.site.urls),

@@ -180,7 +180,7 @@ class PlannedWorkQuerySet(SearchQuerySet):
             | Q(project__owned_by=user, project__suppress_planning_update_mails=False),
             Q(is_provisional=True),
             Q(weeks__overlap=weeks),
-        )
+        ).select_related("project__owned_by", "user")
 
 
 @model_urls
