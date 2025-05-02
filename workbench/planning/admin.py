@@ -4,7 +4,9 @@ from workbench.tools import admin
 
 @admin.register(models.PublicHoliday)
 class PublicHolidayAdmin(admin.ReadWriteModelAdmin):
+    date_hierarchy = "date"
     list_display = ["date", "name", "fraction"]
+    list_filter = ["name"]
 
 
 @admin.register(models.Milestone)
