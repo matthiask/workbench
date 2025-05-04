@@ -90,6 +90,7 @@
               {% endif %}
               {% if request.user.features.BOOKKEEPING %}
                 <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% translate 'Reminders' %}</a>
+                <a class="dropdown-item" href="{% url 'credit_control_export_debtors' %}">{% translate 'Export debtors' %}</a>
               {% endif %}
               {% if request.user.features.EXPENSES %}
                 <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% translate 'expense reports'|capfirst %}</a>

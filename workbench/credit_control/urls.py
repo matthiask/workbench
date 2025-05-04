@@ -11,6 +11,7 @@ from workbench.credit_control.models import CreditEntry
 from workbench.credit_control.views import (
     AccountStatementUploadView,
     AssignCreditEntriesView,
+    export_debtors,
 )
 
 
@@ -65,5 +66,10 @@ urlpatterns = [
         "assign/",
         bookkeeping_only(AssignCreditEntriesView.as_view(model=CreditEntry)),
         name="credit_control_creditentry_assign",
+    ),
+    path(
+        "export-debtors/",
+        bookkeeping_only(export_debtors),
+        name="credit_control_export_debtors",
     ),
 ]

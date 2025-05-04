@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-02 15:12+0200\n"
+"POT-Creation-Date: 2025-05-04 16:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -423,6 +423,7 @@ msgid "Impressive planning skills or wrong date? Absence starts in more than one
 msgstr "Beeindruckende Planungsfähigkeiten oder falsches Datum? Abwesenheit beginnt in mehr als einem Jahr."
 
 #: workbench/awt/forms.py workbench/reporting/views.py
+#: workbench/templates/_needs_action.html
 msgid "Everyone"
 msgstr "Alle"
 
@@ -439,7 +440,7 @@ msgstr "Position"
 msgid "working time models"
 msgstr "Arbeitszeitmodelle"
 
-#: workbench/awt/models.py
+#: workbench/awt/models.py workbench/credit_control/forms.py
 msgid "year"
 msgstr "Jahr"
 
@@ -1071,6 +1072,10 @@ msgstr "Fremdkosten"
 msgid "This invoice has already been assigned to a previous credit entry in this form."
 msgstr "Diese Rechnung wurde schon einem anderen Zahlungseingang in diesem Formular zugewiesen."
 
+#: workbench/credit_control/forms.py
+msgid "Archive invoices up to"
+msgstr "Rechnungen archivieren bis zum"
+
 #: workbench/credit_control/models.py
 msgid "ZKB CSV"
 msgstr "ZKB CSV"
@@ -1231,6 +1236,10 @@ msgstr "%(class)s wurden erfolgreich geändert."
 #: workbench/templates/credit_control/creditentry_list.html
 msgid "Assign credit entries"
 msgstr "Zahlungseingänge zuweisen"
+
+#: workbench/credit_control/views.py workbench/templates/base.html
+msgid "Export debtors"
+msgstr "Debitoren exportieren"
 
 #: workbench/deals/apps.py workbench/deals/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
@@ -3140,6 +3149,10 @@ msgstr "Zurück zum Start"
 msgid "No history found"
 msgstr "Keine Geschichte gefunden"
 
+#: workbench/templates/_needs_action.html workbench/templates/needs_action.html
+msgid "Possibly requiring action"
+msgstr "Benötigen evtl. eine Aktion"
+
 #: workbench/templates/accounts/coffee_mail.txt
 msgid "Coffee and donut break"
 msgstr "Kaffee- und Donut-Pause"
@@ -3503,6 +3516,15 @@ msgstr "Abbruch"
 msgid "invoice total"
 msgstr "Rechnungstotal"
 
+#: workbench/templates/credit_control/export_debtors.html
+#: workbench/templates/generic/object_form.html
+msgid "continue"
+msgstr "Weiter"
+
+#: workbench/templates/credit_control/export_debtors.html
+msgid "Export"
+msgstr "Exportieren"
+
 #: workbench/templates/deals/deal_detail.html
 msgid "open"
 msgstr "offen"
@@ -3552,10 +3574,6 @@ msgstr "Warnungen ignorieren"
 #: workbench/templates/modal_confirm_delete.html
 msgid "delete"
 msgstr "Löschen"
-
-#: workbench/templates/generic/object_form.html
-msgid "continue"
-msgstr "Weiter"
 
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
@@ -3679,6 +3697,10 @@ msgstr "Neue Leistung"
 #: workbench/templates/modal.html
 msgid "Close"
 msgstr "Schliessen"
+
+#: workbench/templates/needs_action.html
+msgid "needs action"
+msgstr "Benötigt eine Aktion"
 
 #: workbench/templates/notes/note_notification.txt
 #, python-format
@@ -4122,10 +4144,6 @@ msgstr "Pause erfassen"
 #: workbench/templates/start.html
 msgid "dashboard"
 msgstr "Dashboard"
-
-#: workbench/templates/start.html
-msgid "Possibly requiring action"
-msgstr "Benötigen evtl. eine Aktion"
 
 #: workbench/templates/start.html
 msgid "active projects"

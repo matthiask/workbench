@@ -1,3 +1,4 @@
+import datetime as dt
 import re
 
 from django import forms
@@ -8,7 +9,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
 
 
 class CreditEntrySearchForm(Form):
@@ -254,3 +255,15 @@ class AssignCreditEntriesForm(forms.Form):
                 entry.invoice.closed_on = entry.value_date
                 entry.invoice.payment_notice = entry.payment_notice
                 entry.invoice.save()
+
+
+class ExportDebtorsForm(Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["year"] = forms.IntegerField(
+            label=_("year"), initial=dt.date.today().year
+        )
+        self.fields["archive"] = forms.DateField(
+            label=_("Archive invoices up to"), widget=DateInput, required=False
+        )

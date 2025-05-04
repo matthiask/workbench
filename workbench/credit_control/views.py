@@ -1,9 +1,16 @@
+import datetime as dt
+
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext as _, ngettext
 
 from workbench import generic
-from workbench.credit_control.forms import AssignCreditEntriesForm
+from workbench.credit_control.forms import AssignCreditEntriesForm, ExportDebtorsForm
+from workbench.credit_control.reporting import paid_debtors_zip
+from workbench.invoices.models import Invoice
+from workbench.reporting.models import FreezeDate
 
 
 class AccountStatementUploadView(generic.CreateView):
@@ -48,3 +55,39 @@ class AssignCreditEntriesView(generic.CreateView):
     def get_context_data(self, **kwargs):
         kwargs.setdefault("title", _("Assign credit entries"))
         return super().get_context_data(**kwargs)
+
+
+def export_debtors(request):
+    args = (request.POST,) if request.method == "POST" else ()
+    form = ExportDebtorsForm(*args, request=request)
+
+    if form.is_valid():
+        data = form.cleaned_data
+        response = HttpResponse(
+            content_type="application/octet-stream",
+            headers={
+                "content-disposition": f'attachment; filename="debtors-{data["year"]}.zip"',
+            },
+        )
+
+        date_range = [dt.date(data["year"], 1, 1), dt.date(data["year"], 12, 31)]
+        paid_debtors_zip(date_range, file=response, qr=False)
+
+        if archive := data.get("archive"):
+            (
+                Invoice.objects.filter(
+                    invoiced_on__lte=archive, archived_at__isnull=True
+                )
+                .exclude(status=Invoice.IN_PREPARATION)
+                .update(archived_at=timezone.now())
+            )
+
+            FreezeDate.objects.create(up_to=archive)
+
+        return response
+
+    return render(
+        request,
+        "credit_control/export_debtors.html",
+        {"form": form, "title": _("Export debtors")},
+    )
