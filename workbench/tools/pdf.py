@@ -147,10 +147,10 @@ class PDFDocument(_PDFDocument):
         self.style.tableAgreementColumns = (
             3 * cm,
             0.5 * cm,
-            4 * cm,
+            6 * cm,
             0.5 * cm,
-            4 * cm,
-            self.bounds.E - self.bounds.W - 12 * cm,
+            6 * cm,
+            self.bounds.E - self.bounds.W - 16 * cm,
         )
 
         frame_kwargs = {
