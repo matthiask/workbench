@@ -201,14 +201,13 @@ WORKBENCH = {
             ),
             ["Ort, Datum", "Name, Vorname", "Funktion", "Unterschriften"],
         ],
-        PDF_LOGO_SETTINGS=None,
-        # PDF_LOGO_SETTINGS=(
-        #     "feinheit_logo_15_30_mini.png",
-        #     {
-        #         "width": 30,
-        #         "height": 4,
-        #     },
-        # ),
+        PDF_LOGO_SETTINGS=(
+            "feinheit-logo-b-rgb-cropped.png",
+            {
+                "width": 17.4,
+                "height": 4,
+            },
+        ),
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
             " der Rechnungsnummer %(code)s als Zahlungszweck bis zum %(due)s"

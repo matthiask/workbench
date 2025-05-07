@@ -22,7 +22,6 @@ from pdfdocument.document import (
 from pdfdocument.utils import pdf_response as _pdf_response
 
 from workbench.invoices.models import Invoice
-from workbench.settings import BASE_DIR
 from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.models import CalculationModel
 
@@ -245,9 +244,9 @@ class PDFDocument(_PDFDocument):
         def _fn(canvas, doc):
             canvas.saveState()
 
-            if logo := getattr(settings.WORKBENCH, "PDF_LOGO_SETTINGS", None):
+            if logo := settings.WORKBENCH.PDF_LOGO_SETTINGS:
                 canvas.drawImage(
-                    BASE_DIR / "workbench" / "reporting" / "images" / logo[0],
+                    settings.BASE_DIR / "workbench" / "reporting" / "images" / logo[0],
                     pdf.bounds.W,
                     pdf.bounds.outsideN,
                     logo[1]["width"] * mm,
