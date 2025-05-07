@@ -193,6 +193,14 @@ WORKBENCH = {
             " Geschäftsbedingungen der Feinheit AG."
             " Die jeweils aktuelle Version finden Sie auf www.feinheit.ch/agb/."
         ),
+        PDF_OFFER_AGREEMENT=[
+            "Der Kunde - %s",
+            (
+                "Wir bestätigen die Offerte zu den genannten Konditionen und"
+                " erteilen der Feinheit AG den oben beschriebenen Auftrag."
+            ),
+            ["Ort, Datum", "Name, Vorname", "Funktion", "Unterschriften"],
+        ],
         PDF_INVOICE_PAYMENT=(
             "Wir bedanken uns für die Überweisung des Betrags mit Angabe"
             " der Rechnungsnummer %(code)s als Zahlungszweck bis zum %(due)s"
@@ -202,6 +210,13 @@ WORKBENCH = {
             "Die Gutschrift wird bis zum %(due)s in Auftrag gegeben."
             " Herzlichen Dank für Ihre Geduld."
         ),
+        # PDF_LOGO_SETTINGS=(
+        #     "feinheit_logo_15_30_mini.png",
+        #     {
+        #         "width": 30,
+        #         "height": 4,
+        #     },
+        # ),
         QRBILL={
             "account": "CH5200700114802208551",
             "creditor": {

@@ -106,6 +106,13 @@ class PDFDocument(_PDFDocument):
             *self.style.table,
             ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
         )
+        self.style.tableAgreement = (
+            *self.style.table,
+            ("TOPPADDING", (0, 0), (-1, -1), 5 * mm),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 2 * mm),
+            ("LINEBELOW", (2, 0), (2, -2), 0.2, colors.black),
+            ("LINEBELOW", (4, 0), (4, -2), 0.2, colors.black),
+        )
 
         self.style.tableHeadLine = (
             *self.style.table,
@@ -137,6 +144,14 @@ class PDFDocument(_PDFDocument):
             16 * mm,
             16 * mm,
         )
+        self.style.tableAgreementColumns = (
+            3 * cm,
+            0.5 * cm,
+            4 * cm,
+            0.5 * cm,
+            4 * cm,
+            self.bounds.E - self.bounds.W - 12 * cm,
+        )
 
         frame_kwargs = {
             "showBoundary": self.show_boundaries,
@@ -144,13 +159,6 @@ class PDFDocument(_PDFDocument):
             "rightPadding": 0,
             "topPadding": 0,
             "bottomPadding": 0,
-        }
-
-        self.logo_dimensions = {
-            "x": self.bounds.W,
-            "y": self.bounds.N,
-            "width": 93 * mm,
-            "height": 12 * mm,
         }
 
         self.address_frame = Frame(
@@ -507,6 +515,20 @@ class PDFDocument(_PDFDocument):
         )
         self.spacer(2 * mm)
         self.p(settings.WORKBENCH.PDF_OFFER_TERMS)
+
+        if agreement := settings.WORKBENCH.PDF_OFFER_AGREEMENT:
+            self.start_keeptogether()
+            self.spacer(2 * mm)
+            self.p(agreement[0] % offer.project.customer.name)
+            self.spacer(2 * mm)
+            self.p(agreement[1])
+            self.spacer(4 * mm)
+            self.table(
+                [(a, "", "", "", "", "") for a in agreement[2]],
+                self.style.tableAgreementColumns,
+                self.style.tableAgreement,
+            )
+            self.end_keeptogether()
 
     def process_invoice(self, invoice, *, qr=True):
         title = _("invoice")
