@@ -1,0 +1,6 @@
+{% load i18n workbench %}{% autoescape off %}
+✨✨✨ {% translate 'Work anniversaries notice' %} ✨✨✨
+
+{% for user, years in users %}{{ user }}: {{ years }} {% translate 'years' %} ({{ user.date_of_employment|local_date_format }})
+{% endfor %}
+{% endautoescape %}

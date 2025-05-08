@@ -99,3 +99,36 @@ def coffee_invites():
             to=[user.email for user in group],
             reply_to=[user.email for user in group],
         ).send()
+
+
+def work_anniversaries_notice():
+    today = dt.date.today()
+    if today.day != 1:
+        return
+
+    users = [
+        (user, (today - user.date_of_employment).days / 365.24 + (1 / 12))
+        for user in User.objects.active().filter(date_of_employment__isnull=False)
+    ]
+
+    # 5/10/15/etc work anniversary upcoming in the next three months
+    users = [
+        (user, int(years))
+        for user, years in users
+        if years >= 5 and 0 <= years % 5 <= 3 / 12
+    ]
+
+    if users:
+        render_to_mail(
+            "accounts/work_anniversaries_notice",
+            {
+                "users": users,
+                "WORKBENCH": settings.WORKBENCH,
+            },
+            to=[
+                user.email
+                for user in User.objects.active().filter(
+                    _features__overlap=["BOOKKEEPING"]
+                )
+            ],
+        ).send()
