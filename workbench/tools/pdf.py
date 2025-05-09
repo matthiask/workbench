@@ -515,6 +515,7 @@ class PDFDocument(_PDFDocument):
         self.spacer(2 * mm)
         self.p(settings.WORKBENCH.PDF_OFFER_TERMS)
 
+    def add_agreement(self, offer):
         if agreement := settings.WORKBENCH.PDF_OFFER_AGREEMENT:
             self.start_keeptogether()
             self.spacer(2 * mm)
@@ -676,6 +677,7 @@ class PDFDocument(_PDFDocument):
             self.process_offer(offer)
             self.restart()
 
+        self.add_agreement(offers[0])
         self.generate()
 
     def dunning_letter(self, *, invoices):

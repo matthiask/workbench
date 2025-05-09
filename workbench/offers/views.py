@@ -24,6 +24,7 @@ class OfferPDFView(generic.DetailView):
         try:
             pdf.init_letter()
             pdf.process_offer(self.object)
+            pdf.add_agreement(self.object)
             pdf.generate()
         except Exception as exc:
             messages.error(
