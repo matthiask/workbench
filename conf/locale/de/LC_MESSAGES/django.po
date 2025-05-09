@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 16:00+0200\n"
+"POT-Creation-Date: 2025-05-09 11:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,8 +26,9 @@ msgid "accounts"
 msgstr "Konten"
 
 #: workbench/accounts/features.py
-msgid "Feature not available"
-msgstr "Feature nicht verfügbar"
+#, python-brace-format
+msgid "You do not have access to the required feature '{feature}'."
+msgstr "Du hast keinen Zugriff auf das notwendige Feature '{feature}'."
 
 #: workbench/accounts/features.py workbench/invoices/tasks.py
 msgid "Auto dunning"
@@ -496,7 +497,9 @@ msgstr "Dezember"
 msgid "working time per day"
 msgstr "Arbeitszeit pro Tag"
 
-#: workbench/awt/models.py workbench/templates/reporting/key_data.html
+#: workbench/awt/models.py
+#: workbench/templates/accounts/work_anniversaries_notice.txt
+#: workbench/templates/reporting/key_data.html
 msgid "years"
 msgstr "Jahre"
 
@@ -3253,6 +3256,10 @@ msgstr "Stunden pro Woche"
 msgid "Hours per customer"
 msgstr "Stunden pro Kundschaft"
 
+#: workbench/templates/accounts/work_anniversaries_notice.txt
+msgid "Work anniversaries notice"
+msgstr "Hinweis auf Jubiläum"
+
 #: workbench/templates/awt/absence_calendar.html
 #: workbench/templates/generic/object_list.html
 #: workbench/templates/reporting/project_budget_statistics.html
@@ -3329,19 +3336,6 @@ msgid "from %(date)s"
 msgstr "Ab %(date)s"
 
 #: workbench/templates/base.html
-msgid "bookkeeping"
-msgstr "Buchhaltung"
-
-#: workbench/templates/base.html
-#: workbench/templates/reporting/open_items_list.html
-msgid "Open items list"
-msgstr "Offene-Posten-Liste"
-
-#: workbench/templates/base.html workbench/templates/invoices/reminders.html
-msgid "Reminders"
-msgstr "Zahlungserinnerungen"
-
-#: workbench/templates/base.html
 msgid "reports"
 msgstr "Berichte"
 
@@ -3362,6 +3356,11 @@ msgstr "Projekt-Budgetstatistik"
 #: workbench/templates/reporting/playing_bank.html
 msgid "Playing bank"
 msgstr "Bank spielen"
+
+#: workbench/templates/base.html
+#: workbench/templates/reporting/open_items_list.html
+msgid "Open items list"
+msgstr "Offene-Posten-Liste"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/hours_per_type.html
@@ -3401,6 +3400,14 @@ msgstr "Geschichte der Geschäfte"
 #: workbench/templates/reporting/labor_costs_by_user.html
 msgid "Labor costs"
 msgstr "Personalaufwand"
+
+#: workbench/templates/base.html
+msgid "Payments"
+msgstr "Zahlungen"
+
+#: workbench/templates/base.html workbench/templates/invoices/reminders.html
+msgid "Reminders"
+msgstr "Zahlungserinnerungen"
 
 #: workbench/templates/base.html
 msgid "Time tracking"
@@ -4388,6 +4395,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Feature not available"
+#~ msgstr "Feature nicht verfügbar"
+
+#~ msgid "bookkeeping"
+#~ msgstr "Buchhaltung"
 
 #, python-format
 #~ msgid "KW %s-%s"

@@ -3,6 +3,7 @@ from functools import wraps
 
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
@@ -13,7 +14,14 @@ def feature_required(feature):
         def require_feature(request, *args, **kwargs):
             if request.user.features[feature]:
                 return view(request, *args, **kwargs)
-            messages.warning(request, _("Feature not available"))
+            messages.warning(
+                request,
+                _("You do not have access to the required feature '{feature}'.").format(
+                    feature=LABELS[feature]["label"]
+                ),
+            )
+            if request.is_ajax():
+                return render(request, "modal.html")
             return HttpResponseRedirect("/")
 
         return require_feature

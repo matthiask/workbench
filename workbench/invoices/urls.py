@@ -95,7 +95,7 @@ urlpatterns = [
         ),
         name="invoices_service_delete",
     ),
-    path("reminders/", bookkeeping_only(views.reminders), name="invoices_reminders"),
+    path("reminders/", views.reminders, name="invoices_reminders"),
     path(
         "reminders/<int:contact_id>/",
         bookkeeping_only(views.dunning_letter),

@@ -67,39 +67,6 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle"
                href="#"
-               id="bookkeepingDropdown"
-               role="button"
-               data-bs-toggle="dropdown"
-               aria-haspopup="true"
-               aria-expanded="false">
-              {% translate 'bookkeeping'|capfirst %}
-            </a>
-            <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
-              {% if request.user.features.CONTROLLING %}
-                <a class="dropdown-item"
-                   href="{% url 'invoices_recurringinvoice_list' %}">
-                  {% translate 'recurring invoices'|capfirst %}
-                </a>
-                <a class="dropdown-item"
-                   href="{% url 'credit_control_creditentry_list' %}">
-                  {% translate 'credit entries'|capfirst %}
-                </a>
-                <a class="dropdown-item" href="{% url 'report_open_items_list' %}">
-                  {% translate 'Open items list' %}
-                </a>
-              {% endif %}
-              {% if request.user.features.BOOKKEEPING %}
-                <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% translate 'Reminders' %}</a>
-                <a class="dropdown-item" href="{% url 'credit_control_export_debtors' %}">{% translate 'Export debtors' %}</a>
-              {% endif %}
-              {% if request.user.features.EXPENSES %}
-                <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% translate 'expense reports'|capfirst %}</a>
-              {% endif %}
-            </div>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
-               href="#"
                id="reportsDropdown"
                role="button"
                data-bs-toggle="dropdown"
@@ -126,6 +93,9 @@
                 <a class="dropdown-item"
                    href="{% url 'report_third_party_costs' %}">
                   {% translate 'Playing bank' %}
+                </a>
+                <a class="dropdown-item" href="{% url 'report_open_items_list' %}">
+                  {% translate 'Open items list' %}
                 </a>
                 <div class="dropdown-divider"></div>
                 <div class="dropdown-header">
@@ -169,6 +139,34 @@
                   {% translate 'Labor costs' %}
                 </a>
               {% endif %}
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               id="bookkeepingDropdown"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+              {% translate 'Payments'|capfirst %}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="bookkeepingDropdown">
+              {% if request.user.features.EXPENSES %}
+                <a class="dropdown-item" href="{% url 'expenses_expensereport_list' %}">{% translate 'expense reports'|capfirst %}</a>
+              {% endif %}
+              {% if request.user.features.CONTROLLING %}
+                <a class="dropdown-item"
+                   href="{% url 'invoices_recurringinvoice_list' %}">
+                  {% translate 'recurring invoices'|capfirst %}
+                </a>
+                <a class="dropdown-item"
+                   href="{% url 'credit_control_creditentry_list' %}">
+                  {% translate 'credit entries'|capfirst %}
+                </a>
+              {% endif %}
+              <a class="dropdown-item" href="{% url 'invoices_reminders' %}">{% translate 'Reminders' %}</a>
+              <a class="dropdown-item" href="{% url 'credit_control_export_debtors' %}">{% translate 'Export debtors' %}</a>
             </div>
           </li>
         {% endmark_current %}
