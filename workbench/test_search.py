@@ -18,25 +18,25 @@ class SearchTest(TestCase):
         response = self.client.get("/search/?q=Test")
         self.assertContains(response, project.get_absolute_url())
 
-        self.assertContains(response, "projects")
-        self.assertContains(response, "organizations")
-        self.assertContains(response, "people")
-        self.assertContains(response, "invoices")
-        self.assertContains(response, "recurring-invoices")
-        self.assertContains(response, "offers")
-        self.assertContains(response, "deals")
+        self.assertContains(response, "/projects/?q=Test")
+        self.assertContains(response, "/contacts/organizations/?q=Test")
+        self.assertContains(response, "/contacts/people/?q=Test")
+        self.assertContains(response, "/invoices/?q=Test")
+        self.assertContains(response, "/recurring-invoices/?q=Test")
+        self.assertContains(response, "/projects/offers/?q=Test")
+        self.assertContains(response, "/deals/?q=Test")
 
         with override_settings(FEATURES={"CONTROLLING": F.NEVER}):
             response = self.client.get("/search/?q=Test")
             self.assertContains(response, project.get_absolute_url())
 
-            self.assertContains(response, "projects")
-            self.assertContains(response, "organizations")
-            self.assertContains(response, "people")
-            self.assertNotContains(response, "invoices")
-            self.assertNotContains(response, "recurring-invoices")
-            self.assertNotContains(response, "offers")
-            self.assertNotContains(response, "deals")
+            self.assertContains(response, "/projects/?q=Test")
+            self.assertContains(response, "/contacts/organizations/?q=Test")
+            self.assertContains(response, "/contacts/people/?q=Test")
+            self.assertNotContains(response, "/invoices/?q=Test")
+            self.assertNotContains(response, "/recurring-invoices/?q=Test")
+            self.assertNotContains(response, "/projects/offers/?q=Test")
+            self.assertNotContains(response, "/deals/?q=Test")
 
     def test_process_query(self):
         """Specific testing of query->tsquery conversion"""

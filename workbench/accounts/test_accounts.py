@@ -88,9 +88,12 @@ class AccountsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        response = self.client.get(reverse("report_open_items_list"))
+        response = self.client.get(reverse("credit_control_creditentry_upload"))
         self.assertRedirects(response, "/")
-        self.assertEqual(messages(response), ["Feature not available"])
+        self.assertEqual(
+            messages(response),
+            ["You do not have access to the required feature 'Bookkeeping'."],
+        )
 
     @override_settings(
         FEATURES={"yes": F.ALWAYS, "no": F.NEVER, "maybe": F.USER, "invalid": 42}
