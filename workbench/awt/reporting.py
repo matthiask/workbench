@@ -347,6 +347,9 @@ def annual_working_time_warnings():
 
 
 def vacation_planning_warnings(row):
+    if not row["user"].is_active:
+        return row | {"vacation_planning": {"fine": True}}
+
     available = row["totals"]["available_vacation_days"]
     vacation_absences = row["absences"]["absence_vacation"]
     planned = sum((absence.days for absence in vacation_absences), Z2)
