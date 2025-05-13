@@ -47,7 +47,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--year",
             type=int,
-            default=dt.date.today().year,
+            default=None,
         )
         parser.add_argument(
             "--range",
@@ -63,10 +63,17 @@ class Command(BaseCommand):
         activate("de")
 
         last_month_end = dt.date.today().replace(day=1) - dt.timedelta(days=1)
-        date_range = options["range"] or [
-            dt.date(options["year"], 1, 1),
-            min(last_month_end, dt.date(options["year"], 12, 31)),
-        ]
+        date_range = options["range"] or (
+            [
+                dt.date(options["year"], 1, 1),
+                min(last_month_end, dt.date(options["year"], 12, 31)),
+            ]
+            if options["year"]
+            else [
+                dt.date(last_month_end.year, 1, 1),
+                min(last_month_end, dt.date(last_month_end.year, 12, 31)),
+            ]
+        )
 
         if options["last_month"]:
             date_range = [
