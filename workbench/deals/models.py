@@ -263,9 +263,15 @@ class Deal(Model):
         for contribution in self.contributions.all():
             contributors[contribution.user] = contribution.weight
         total = sum(contributors.values(), 0)
+        pretty = {100: "💪💪", 50: "💪"}
+
         return sorted(
             (
-                {"user": user, "value": self.value * weight / total}
+                {
+                    "user": user,
+                    "value": self.value * weight / total,
+                    "pretty": pretty.get(weight),
+                }
                 for user, weight in contributors.items()
             ),
             key=lambda row: row["value"],

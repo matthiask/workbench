@@ -511,17 +511,17 @@ class DealsTest(TestCase):
         deal.values.create(type=factories.ValueTypeFactory.create(), value=42)
         deal.save()
 
-        c1 = deal.contributions.create(user=deal.owned_by, weight=300)
+        c1 = deal.contributions.create(user=deal.owned_by, weight=75)
         other = factories.UserFactory.create()
-        c2 = deal.contributions.create(user=other)
+        c2 = deal.contributions.create(user=other, weight=25)
 
         self.assertEqual(
             deal.all_contributions,
             [
-                {"user": deal.owned_by, "value": Decimal("31.50")},
-                {"user": other, "value": Decimal("10.50")},
+                {"user": deal.owned_by, "value": Decimal("31.50"), "pretty": None},
+                {"user": other, "value": Decimal("10.50"), "pretty": None},
             ],
         )
 
-        self.assertEqual(str(c1), f"{deal.owned_by}: 300")
-        self.assertEqual(str(c2), f"{other}: 100")
+        self.assertEqual(str(c1), f"{deal.owned_by}: 75")
+        self.assertEqual(str(c2), f"{other}: 25")

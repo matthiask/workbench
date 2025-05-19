@@ -77,7 +77,7 @@
           <th class="text-end">{% translate 'contributions'|capfirst %}</th>
           <td>
             {% for c in object.all_contributions %}
-              {{ c.user }}: {{ c.value|currency }}
+              {{ c.user }}: {% if c.pretty %}{{ c.pretty }}{% else %}{{ c.value|currency }}{% endif %}
               <br>
             {% endfor %}
           </td>
