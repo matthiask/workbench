@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-09 11:28+0200\n"
+"POT-Creation-Date: 2025-05-19 08:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2931,6 +2931,10 @@ msgstr "Planungsupdate-Mails für dieses Projekt für alle unterdrücken"
 #: workbench/projects/models.py
 msgid "Leave this empty if you do not want to close the project yet."
 msgstr "Bitte leer lassen, falls Du das Projekt noch nicht schliessen willst."
+
+#: workbench/projects/models.py
+msgid "This project uses budget retaining offers. The logged cost is significantly larger than the allocated cost."
+msgstr "Dieses Projekt verwendet Offerten, welche das Budget zurückhalten. Die aufgeschriebenen Kosten sind wesentlich höher als die freigegebenen Kosten."
 
 #: workbench/projects/models.py
 #, python-format

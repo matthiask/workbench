@@ -594,10 +594,22 @@ class Project(Model):
                 ),
                 Z2,
             ),
+            "warnings": [],
         }
+
         stats["budget_retainment"] = (
             stats["budget_retainer_total"] - stats["total_service_cost"]
         )
+
+        if stats["budget_retainment"] > 0 and stats["total_logged_cost"] > stats[
+            "total_service_cost"
+        ] * Decimal("1.1"):
+            stats["warnings"].append(
+                _(
+                    "This project uses budget retaining offers. The logged cost is significantly larger than the allocated cost."
+                )
+            )
+
         return stats
 
     @cached_property

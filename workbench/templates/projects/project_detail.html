@@ -1,9 +1,18 @@
 {% extends "generic/object_detail.html" %}
 
-{% load i18n mark_current static workbench %}
+{% load django_bootstrap5 i18n mark_current static workbench %}
 
 {% block content %}
+
 {% with gs=project.grouped_services %}
+  {% if gs.warnings %}
+    <div class="my-3">
+      {% for warning in gs.warnings %}
+        {% bootstrap_alert warning alert_type='warning' %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <div class="row">
     <div class="col-md-12">
       <h1>
