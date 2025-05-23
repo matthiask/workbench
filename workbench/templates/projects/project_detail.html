@@ -465,7 +465,7 @@
                             {% for service_type in view.default_service_types %}
                               <a class="dropdown-item"
                                  href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}">
-                                <div class="d-flex w-100 justify-content-between">
+                                <div class="d-flex w-100 justify-content-between gap-3">
                                   <span>
                                     {{ service_type.title }}
                                   </span>
