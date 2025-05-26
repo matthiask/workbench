@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.tools.formats import Z1, days, hours
+from workbench.tools.reporting import query
 
 
 def classify_logging_delay(delay):
@@ -61,9 +62,8 @@ GROUP BY rendered_by_id
 
 
 def insufficient_breaks(date_range):
-    with connections["default"].cursor() as cursor:
-        cursor.execute(
-            """
+    result = query(
+        """
 with breaks as (
     select
         user_id,
@@ -95,7 +95,12 @@ combined as (
         and breaks.day=logged_hours.day
 ),
 insufficient_breaks as (
-    select * from combined
+    select
+        user_id,
+        day,
+        hours,
+        break_seconds
+    from combined
     where
         hours >= 9 and break_seconds < 3600
         or hours >= 7 and break_seconds < 1800
@@ -103,26 +108,32 @@ insufficient_breaks as (
 )
 select
     user_id,
-    count(*),
-    (
-        select count(*)
-        from insufficient_breaks
-        where insufficient_breaks.user_id=logged_hours.user_id
-    )
+    count(*) as of,
+    coalesce(
+        (
+            select array_agg(day order by day)
+            from insufficient_breaks
+            where insufficient_breaks.user_id=logged_hours.user_id
+        ),
+        '{}'::date[]
+    ) as days
 from logged_hours
 group by user_id
-            """,
-            [*date_range, *date_range],
-        )
+        """,
+        [*date_range, *date_range],
+        as_dict=True,
+    )
 
-        return {
-            user_id: {
-                "days": days,
-                "of": of,
-                "danger": days / of > 0.2 if of else False,
-            }
-            for user_id, of, days in cursor
+    return {
+        row["user_id"]: row
+        | {
+            "days_count": len(row["days"]),
+            "danger": len(days) / of > 0.2
+            if (days := row["days"]) and (of := row["of"])
+            else False,
         }
+        for row in result
+    }
 
 
 def logbook_stats(date_range):
@@ -151,7 +162,9 @@ def logbook_stats(date_range):
             "avg": lhs_sum / lhs_count if lhs_count else None,
         },
         "insufficient_breaks": {
-            "days": sum((user["insufficient_breaks"]["days"] for user in users), 0),
+            "days_count": sum(
+                (user["insufficient_breaks"]["days_count"] for user in users), 0
+            ),
             "of": sum((user["insufficient_breaks"]["of"] for user in users), 0),
         },
     }

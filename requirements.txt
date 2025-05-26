@@ -5,8 +5,8 @@ beautifulsoup4==4.13.4
 certifi==2025.4.26
 chardet==5.2.0
 charset-normalizer==3.4.2
-click==8.2.0
-coverage==7.8.0
+click==8.2.1
+coverage==7.8.2
 cssselect2==0.8.0
 deprecated==1.2.18
 django==5.2.1
@@ -24,7 +24,7 @@ django-vanilla-views==3.0.0
 et-xmlfile==2.0.0
 factory-boy==3.3.3
 faker==37.3.0
-granian==2.2.6
+granian==2.3.1
 idna==3.10
 importlib-metadata==8.6.1
 iso3166==2.1.1
@@ -57,7 +57,7 @@ svglib==1.5.1
 svgwrite==1.4.3
 time-machine==2.16.0
 tinycss2==1.4.0
-typing-extensions==4.13.2
+typing-extensions==4.14.0rc1
 tzdata==2025.2
 urllib3==2.4.0
 vobject==0.9.9
