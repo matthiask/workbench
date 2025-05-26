@@ -48,7 +48,7 @@
                         <div class="modal-body text-start fw-normal">
                           {% if row.user == request.user %}
                             {% for day in row.insufficient_breaks.days %}
-                              <a href="{% url 'timestamps' %}?date={{ day.isoformat }}">{{ day|local_date_format:'D d.m.Y' }}</a><br>
+                              <a href="{% url 'timestamps' %}?day={{ day.isoformat }}">{{ day|local_date_format:'D d.m.Y' }}</a><br>
                             {% endfor %}
                           {% else %}
                             {% for day in row.insufficient_breaks.days %}
