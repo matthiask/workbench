@@ -35,7 +35,7 @@
               <td class="text-end">{{ row.logged_hours_stats.count }}</td>
               <td class="text-end">{{ row.logged_hours_stats.sum|hours }}</td>
               <td class="text-end">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
-              <td class="text-end {% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}">
+              <td class="text-end">
                 {% if row.insufficient_breaks.days %}
                   <div class="modal fade" id="insufficient_breaks-{{ row.user.id }}">
                     <div class="modal-dialog">
@@ -63,7 +63,7 @@
                     </div>
                   </div>
 
-                  <a href="#" data-bs-toggle="modal" data-bs-target="#insufficient_breaks-{{ row.user.id }}">
+                  <a href="#" data-bs-toggle="modal" data-bs-target="#insufficient_breaks-{{ row.user.id }}" class="{% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}">
                   {{ row.insufficient_breaks.days_count }} / {{ row.insufficient_breaks.of }}
                   {% pie row.insufficient_breaks.days_count row.insufficient_breaks.of %}
                   </a>
