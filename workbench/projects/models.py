@@ -677,6 +677,14 @@ class Project(Model):
 
 
 class ServiceQuerySet(SearchQuerySet):
+    def choices_with_pins(self, *, project, user):
+        choices = self.choices()
+        if pinned := self.filter(id__in=user.pinned_services.filter(project=project)):
+            choices.insert(
+                1, (_("Pinned"), [(service.id, str(service)) for service in pinned])
+            )
+        return choices
+
     def choices(self):
         offers = defaultdict(list)
         for service in self.select_related("offer__project", "offer__owned_by"):

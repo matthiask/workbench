@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 08:38+0200\n"
+"POT-Creation-Date: 2025-05-28 11:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -264,6 +264,10 @@ msgstr "Fachbereich"
 #: workbench/accounts/models.py
 msgid "pinned projects"
 msgstr "Gepinnte Projekte"
+
+#: workbench/accounts/models.py
+msgid "pinned services"
+msgstr "Gepinnte Leistungen"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
@@ -2942,6 +2946,10 @@ msgid "All offers of project %(project)s are declined. You might want to close t
 msgstr "Alle Offerten des Projektes %(project)s sind abgelehnt. Vielleicht möchtest Du das Projekt jetzt schliessen?"
 
 #: workbench/projects/models.py
+msgid "Pinned"
+msgstr "Angepinnt"
+
+#: workbench/projects/models.py
 msgid "allow logging"
 msgstr "Leistungserfassung erlauben"
 
@@ -3705,7 +3713,7 @@ msgstr "Spesen in Fremdwährung"
 msgid "new service"
 msgstr "Neue Leistung"
 
-#: workbench/templates/modal.html
+#: workbench/templates/modal.html workbench/templates/reporting/logging.html
 msgid "Close"
 msgstr "Schliessen"
 

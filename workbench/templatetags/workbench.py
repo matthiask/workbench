@@ -16,7 +16,7 @@ from workbench.deals.models import Deal
 from workbench.logbook.models import LoggedHours
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
-from workbench.projects.models import Service
+from workbench.projects.models import Project, Service
 from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
 from workbench.tools.forms import querystring as _qs
 from workbench.tools.history import EVERYTHING
@@ -314,8 +314,22 @@ def analyze_projects(object_list):
 
 
 @register.inclusion_tag("accounts/pin.html")
-def project_pin(*, project, user):
-    return {
-        "object": project,
-        "pinned": user.pinned_projects.filter(id=project.id).exists(),
-    }
+def pin(object, user):
+    match object:
+        case Project():
+            pinned = user.pinned_projects.filter(id=object.id).exists()
+        case Service():
+            name = f"_pinned_services_cache_{object.project_id}"
+            if not hasattr(user, name):
+                setattr(
+                    user,
+                    name,
+                    set(
+                        user.pinned_services.filter(
+                            project_id=object.project_id
+                        ).values_list("id", flat=True)
+                    ),
+                )
+            pinned = object.id in getattr(user, name)
+
+    return {"object": object, "pinned": pinned}

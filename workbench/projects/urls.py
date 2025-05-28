@@ -1,3 +1,4 @@
+from django.db.models import BooleanField, Case, When
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import include, path
 from django.utils.translation import gettext_lazy as _
@@ -52,7 +53,20 @@ def autocomplete_filter(*, request, queryset):
 
 
 def service_autocomplete_filter(*, request, queryset):
-    return queryset.logging() if request.GET.get("logging") else queryset
+    if request.GET.get("logging"):
+        queryset = queryset.logging()
+
+        # Order by pinned services first, then by the rest
+        pinned_service_ids = request.user.pinned_services.values_list("id", flat=True)
+        queryset = queryset.annotate(
+            is_pinned=Case(
+                When(id__in=pinned_service_ids, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        ).order_by("-is_pinned", "project__title", "title")
+
+    return queryset
 
 
 urlpatterns = [
@@ -262,6 +276,12 @@ urlpatterns = [
         "service/<int:pk>/",
         lambda request, pk: redirect(get_object_or_404(Service, pk=pk)),
         name="projects_service_detail",
+    ),
+    path(
+        "service/<int:pk>/pin/",
+        pin,
+        {"model": Service, "attribute": "pinned_services"},
+        name="projects_service_pin",
     ),
     path(
         "service/<int:pk>/update/",

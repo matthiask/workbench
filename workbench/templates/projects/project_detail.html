@@ -16,7 +16,7 @@
   <div class="row">
     <div class="col-md-12">
       <h1>
-        {% project_pin project=object user=request.user %}
+        {% pin object request.user %}
         {{ project|h }} {% history_link project %}
         <span style="font-size:14px">{{ object.status_badge }}</span>
       </h1>
@@ -483,6 +483,7 @@
                   </div>
                 {% endif %}
                 <h5 class="mb-1">
+                  {% pin row.service request.user %}
                   {{ row.service.title }}
                   {% if row.service.is_optional %}
                     <em>({% translate 'optional' %})</em>

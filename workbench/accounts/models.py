@@ -165,6 +165,9 @@ class User(Model, AbstractBaseUser):
     pinned_projects = models.ManyToManyField(
         "projects.Project", blank=True, verbose_name=_("pinned projects")
     )
+    pinned_services = models.ManyToManyField(
+        "projects.Service", blank=True, verbose_name=_("pinned services")
+    )
 
     objects = UserManager()
 

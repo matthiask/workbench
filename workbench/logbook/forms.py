@@ -391,7 +391,11 @@ class LoggedHoursForm(ModelForm):
             self.project = kwargs["instance"].service.project
 
         super().__init__(*args, **kwargs)
-        self.fields["service"].choices = self.project.services.logging().choices()
+        self.fields[
+            "service"
+        ].choices = self.project.services.logging().choices_with_pins(
+            project=self.project, user=self.request.user
+        )
         self.fields["service"].required = False
         if len(self.fields["service"].choices) > 1 and not self.request.POST.get(
             "modal-service_title"
