@@ -114,7 +114,7 @@ class UserAdmin(UserAdmin):
         )
     ]
     radio_fields = {"language": admin.HORIZONTAL}
-    raw_id_fields = ["person", "pinned_projects"]
+    raw_id_fields = ["person", "pinned_projects", "pinned_services"]
     readonly_fields = ["last_login"]
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("-is_active", "email")
