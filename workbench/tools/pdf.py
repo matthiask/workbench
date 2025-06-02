@@ -11,6 +11,7 @@ from pdfdocument.document import (
     MarkupParagraph,
     NextPageTemplate,
     PageTemplate,
+    Paragraph,
     PDFDocument as _PDFDocument,
     cm,
     colors,
@@ -730,7 +731,16 @@ als gegenstandslos zu betrachten.</p>
             (self.bounds.E - self.bounds.W - 40 * mm, 24 * mm, 16 * mm),
             (*self.style.tableHead, ("ALIGN", (1, 0), (1, -1), "LEFT")),
         )
+        self.bottom_table(
+            [
+                (Paragraph("Beilagen", self.style.bold),),
+                (Paragraph("- Rechnungen im Original", self.style.normal),),
+            ],
+            (self.bounds.E - self.bounds.W,),
+            self.style.table,
+        )
         self.restart()
+
         for invoice in invoices:
             self.init_invoice_letter(page_fn=self.stationery())
             self.process_invoice(invoice)
