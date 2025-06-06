@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0-beta.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.0-beta.5/schema.json",
   "formatter": {
     "enabled": true,
     "useEditorconfig": true
@@ -13,7 +13,8 @@
       },
       "complexity": {
         "noUselessStringConcat": "error",
-        "noUselessUndefinedInitialization": "error"
+        "noUselessUndefinedInitialization": "error",
+        "useNumericLiterals": "error"
       },
       "correctness": {
         "noUndeclaredVariables": "error",
@@ -21,7 +22,6 @@
         "noUnusedFunctionParameters": "error",
         "noUnusedImports": "error",
         "noUnusedVariables": "error",
-        "useArrayLiterals": "error",
         "useHookAtTopLevel": "error",
         "noUnknownTypeSelector": "error"
       },
@@ -37,7 +37,6 @@
         "noCommaOperator": "error",
         "useNodejsImportProtocol": "error",
         "useAsConstAssertion": "error",
-        "useNumericLiterals": "error",
         "useEnumInitializers": "error",
         "useSelfClosingElements": "error",
         "useConst": "error",
@@ -54,7 +53,8 @@
         "useExportType": "error",
         "noUselessElse": "error",
         "useShorthandFunctionType": "error",
-        "useCollapsedIf": "error"
+        "useCollapsedIf": "error",
+        "useArrayLiterals": "error"
       },
       "suspicious": {
         "noArrayIndexKey": "warn",

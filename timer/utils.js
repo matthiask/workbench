@@ -1,9 +1,9 @@
 export function createIdentifier() {
-  return `${new Date().getTime()}.${Math.floor(Math.random() * 10000)}`
+  return `${Date.now()}.${Math.floor(Math.random() * 10000)}`
 }
 
 export function timestamp() {
-  return new Date().getTime() / 1000
+  return Date.now() / 1000
 }
 
 export function clamp(value, min, max) {
