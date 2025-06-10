@@ -45,7 +45,7 @@ pytz==2025.2
 qrbill==1.1.0
 qrcode==8.2
 reportlab==4.4.1
-requests==2.32.3
+requests==2.32.4
 requests-oauthlib==2.0.0
 sentry-sdk==3.0.0a1
 six==1.17.0
