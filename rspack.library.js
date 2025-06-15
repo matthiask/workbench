@@ -43,6 +43,7 @@ TO FH-FABLIB AT https://github.com/feinheit/fh-fablib
 */
 
 const path = require("node:path")
+const fs = require("node:fs")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const rspack = require("@rspack/core")
 const assert = require("node:assert/strict")
@@ -51,6 +52,20 @@ const semver = require("semver")
 assert.ok(semver.satisfies(rspack.rspackVersion, ">=1.1.3"), "rspack outdated")
 
 const truthy = (...list) => list.filter((el) => !!el)
+
+function coreJsVersion() {
+  try {
+    const { version } = JSON.parse(
+      fs.readFileSync(
+        path.join(__dirname, "node_modules/core-js/package.json"),
+      ),
+    )
+    const [major, minor] = version.split(".")
+    return `${major}.${minor}`
+  } catch (_err) {
+    return "3"
+  }
+}
 
 module.exports = (PRODUCTION) => {
   const cwd = process.cwd()
@@ -73,6 +88,10 @@ module.exports = (PRODUCTION) => {
             },
           },
           externalHelpers: true,
+        },
+        env: {
+          mode: "usage",
+          coreJs: coreJsVersion(),
         },
       },
       type: "javascript/auto",
@@ -97,6 +116,10 @@ module.exports = (PRODUCTION) => {
             },
           },
           externalHelpers: true,
+        },
+        env: {
+          mode: "usage",
+          coreJs: coreJsVersion(),
         },
       },
       type: "javascript/auto",
