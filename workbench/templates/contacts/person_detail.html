@@ -37,6 +37,10 @@
       {% endfor %}
     </div>
     <div class="col-lg-4">
+      <strong>{{ person|label:'primary_contact' }}</strong>
+      <br>
+      {{ person.primary_contact }}
+      <br>
       <strong>{{ person|label:'date_of_birth' }}</strong>
       <br>
       {{ person.date_of_birth|local_date_format|default:'&ndash;' }}

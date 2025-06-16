@@ -23,6 +23,10 @@
           </td>
         </tr>
         <tr>
+          <td class="text-end">{{ object|label:'primary_contact' }}</td>
+          <td>{{ organization.primary_contact }}</td>
+        </tr>
+        <tr>
           <td class="text-end">{{ object|label:'is_private_person' }}</td>
           <td>{{ organization.is_private_person|yesno:_("yes,no") }}</td>
         </tr>
