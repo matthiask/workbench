@@ -527,11 +527,16 @@ class CreateProjectInvoiceForm(InvoiceForm):
 
         if self.instance.type in {self.instance.DOWN_PAYMENT, self.instance.FIXED}:
             accepted = sum(
-                (offer.total for offer in self.instance.project.offers.accepted()),
+                (
+                    offer.total_excl_tax
+                    for offer in self.instance.project.offers.accepted()
+                ),
                 Z2,
             )
             self.fields["subtotal"].help_text = mark_safe(
-                _("Total of accepted offers: {accepted}. Use {percentages}.").format(
+                _(
+                    "Total excl. tax of accepted offers: {accepted}. Use {percentages}."
+                ).format(
                     accepted=currency(accepted),
                     percentages=mark_safe(
                         ", ".join(

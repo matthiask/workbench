@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-28 11:53+0200\n"
+"POT-Creation-Date: 2025-06-18 17:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1195,7 +1195,7 @@ msgstr "Ansprechperson"
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/templates/reporting/open_items_list.html workbench/tools/models.py
 msgid "total excl. tax"
-msgstr "Total exkl. MwSt."
+msgstr "Total exkl. MwSt"
 
 #: workbench/credit_control/reporting.py workbench/deals/models.py
 #: workbench/expenses/forms.py workbench/expenses/views.py
@@ -1555,7 +1555,7 @@ msgstr "Erstellt von"
 #: workbench/expenses/models.py workbench/logbook/models.py
 #: workbench/services/models.py
 msgid "Total incl. tax for third-party services."
-msgstr "Total inkl. MwSt. bei Fremdleistungen."
+msgstr "Total inkl. MwSt bei Fremdleistungen."
 
 #: workbench/expenses/models.py workbench/expenses/views.py
 #: workbench/logbook/models.py
@@ -1760,16 +1760,16 @@ msgstr "Du versuchst, die Rechnung zu storieren. Es könnte sauberer sein, die R
 
 #: workbench/invoices/forms.py
 msgid "Are you sure the tax rate is correct? The service period extends into 2024 but you have selected the old tax rate."
-msgstr "Bist Du sicher, dass der MwSt.-Satz korrekt ist? Der Zeitraum der Leistungserbringung reicht ins 2024 aber Du hast den alten MwSt.-Satz gewählt."
+msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistungserbringung reicht ins 2024 aber Du hast den alten MwSt-Satz gewählt."
 
 #: workbench/invoices/forms.py
 msgid "Are you sure the tax rate is correct? The service period ends before 2024 but you have selected the new tax rate."
-msgstr "Bist Du sicher, dass der MwSt.-Satz korrekt ist? Der Zeitraum der Leistungserbringung endet vor 2024 aber Du hast den neuen MwSt.-Satz gewählt."
+msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistungserbringung endet vor 2024 aber Du hast den neuen MwSt-Satz gewählt."
 
 #: workbench/invoices/forms.py
 #, python-brace-format
-msgid "Total of accepted offers: {accepted}. Use {percentages}."
-msgstr "Total der akzeptieren Offerten: {accepted}. Verrechne {percentages}."
+msgid "Total excl. tax of accepted offers: {accepted}. Use {percentages}."
+msgstr "Total exkl. MwSt der akzeptieren Offerten: {accepted}. Verrechne {percentages}."
 
 #: workbench/invoices/forms.py
 msgid "This project already has an invoice in preparation."
@@ -1955,7 +1955,7 @@ msgstr "Noch nicht erinnert"
 
 #: workbench/invoices/models.py workbench/templates/invoices/reminders.html
 msgid "Total excl. tax"
-msgstr "Total exkl. MwSt."
+msgstr "Total exkl. MwSt"
 
 #: workbench/invoices/models.py
 msgid "Subtotal"
@@ -1964,7 +1964,7 @@ msgstr "Zwischentotal"
 #: workbench/invoices/models.py
 #, python-format
 msgid "Down payment total %(currency)s incl. tax"
-msgstr "Total %(currency)s inkl. MwSt. Akonto"
+msgstr "Total %(currency)s inkl. MwSt Akonto"
 
 #: workbench/invoices/models.py
 #, python-format
@@ -1974,7 +1974,7 @@ msgstr "Total %(currency)s Akonto"
 #: workbench/invoices/models.py
 #, python-format
 msgid "Credit total %(currency)s incl. tax"
-msgstr "Gutschrift Total %(currency)s inkl. MwSt."
+msgstr "Gutschrift Total %(currency)s inkl. MwSt"
 
 #: workbench/invoices/models.py
 #, python-format
@@ -1984,7 +1984,7 @@ msgstr "Gutschrift Total %(currency)s"
 #: workbench/invoices/models.py workbench/offers/models.py
 #, python-format
 msgid "Total %(currency)s incl. tax"
-msgstr "Total %(currency)s inkl. MwSt."
+msgstr "Total %(currency)s inkl. MwSt"
 
 #: workbench/invoices/models.py
 msgid "Archived invoices cannot be deleted."
@@ -2601,7 +2601,7 @@ msgstr "Offeriert am %(offered_on)s"
 #: workbench/offers/models.py
 #, python-format
 msgid "Total %(currency)s excl. tax for optional services"
-msgstr "Total %(currency)s exkl. MwSt. für optionale Leistungen"
+msgstr "Total %(currency)s exkl. MwSt für optionale Leistungen"
 
 #: workbench/offers/models.py
 #, python-format
@@ -3842,7 +3842,7 @@ msgstr "Gesamtkosten"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Total invoiced excl. tax"
-msgstr "Total verrechnet exkl. MwSt."
+msgstr "Total verrechnet exkl. MwSt"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Project offers"
@@ -3973,7 +3973,7 @@ msgstr "Erfasste Stunden in offenen Aufträgen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Sent invoices total excl. tax"
-msgstr "Total exkl. MwSt. aller offenen Rechnungen"
+msgstr "Total exkl. MwSt aller offenen Rechnungen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Total excl. tax of all invoices due today or earlier"
@@ -3981,7 +3981,7 @@ msgstr "Total exkl. MwSt aller fälligen Rechnungen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Open offers total excl. tax"
-msgstr "Total exkl. MwSt. aller offenen Offerten"
+msgstr "Total exkl. MwSt aller offenen Offerten"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Average employment duration of current users"
@@ -4314,7 +4314,7 @@ msgstr "zB Rechnungen für ausländische Institutionen sind nicht mehrwertsteuer
 
 #: workbench/tools/models.py
 msgid "tax rate"
-msgstr "MwSt.-Satz"
+msgstr "MwSt-Satz"
 
 #: workbench/tools/models.py
 msgid "8.1% (2024 and onwards)"
@@ -4331,7 +4331,7 @@ msgstr "Leistungsdetails anzeigen"
 #: workbench/tools/models.py
 #, python-format
 msgid "%s excl. tax"
-msgstr "%s exkl. MwSt."
+msgstr "%s exkl. MwSt"
 
 #: workbench/tools/pdf.py
 #, python-format
@@ -4348,7 +4348,7 @@ msgstr "Fixkosten"
 
 #: workbench/tools/pdf.py
 msgid "tax"
-msgstr "MwSt."
+msgstr "MwSt"
 
 #: workbench/tools/pdf.py
 msgid "Our reference"
