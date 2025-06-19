@@ -58,7 +58,7 @@ time-machine==2.16.0
 tinycss2==1.4.0
 typing-extensions==4.14.0
 tzdata==2025.2
-urllib3==2.4.0
+urllib3==2.5.0
 vobject==0.9.9
 webencodings==0.5.1
 whitenoise==6.9.0
