@@ -12,7 +12,9 @@ from django.db.models import Sum
 from django.utils.translation import activate, gettext as _
 
 from workbench.accounts.models import User
+from workbench.awt.models import Absence
 from workbench.awt.reporting import employment_percentages
+from workbench.awt.utils import monthly_days
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -59,7 +61,7 @@ class Command(BaseCommand):
             type=str,
         )
 
-    def handle(self, **options):
+    def handle(self, **options):  # noqa: C901
         activate("de")
 
         last_month_end = dt.date.today().replace(day=1) - dt.timedelta(days=1)
@@ -245,6 +247,35 @@ class Command(BaseCommand):
         for m2m in InternalTypeUser.objects.select_related("internal_type"):
             user_internal_types[m2m.user_id][m2m.internal_type] = m2m
         types = list(InternalType.objects.all())
+
+        included_absences = defaultdict(Decimal)
+        for absence in Absence.objects.filter(
+            date_from__gte=date_range[1],
+            date_until__lte=date_range[0],
+            reason__in=[
+                # Vacations are always included
+                Absence.VACATION,
+                # It would be nice to count sickness, but ...
+                # Absence.SICKNESS,
+                # Include paid absences since some of them are paid for by the state
+                Absence.PAID,
+                # Include school attendance of apprentices
+                Absence.SCHOOL,
+                # Don't include other absences (no working time), otherwise we'd also
+                # have to subtract if people do too much work
+                # Absence.OTHER,
+                # Don't include working time corrections
+                # Absence.CORRECTION,
+            ],
+        ):
+            period_length = (date_range[1] - date_range[0]).days + 1
+            absence_days = (
+                (absence.ends_on - absence.starts_on).days + 1 if absence.ends_on else 1
+            )
+            for _month, _days in monthly_days(absence.starts_on, absence.ends_on):
+                included_absences[absence.user_id] += (
+                    absence.days / absence_days / period_length
+                )
 
         def user_expectation(user, row, employment_percentage):
             internal_percentages = [
