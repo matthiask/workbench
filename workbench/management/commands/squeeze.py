@@ -8,7 +8,7 @@ from itertools import chain
 
 from django.core.mail import EmailMultiAlternatives
 from django.core.management import BaseCommand
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.utils.translation import activate, gettext as _
 
 from workbench.accounts.models import User
@@ -250,32 +250,47 @@ class Command(BaseCommand):
 
         included_absences = defaultdict(Decimal)
         for absence in Absence.objects.filter(
-            date_from__gte=date_range[1],
-            date_until__lte=date_range[0],
-            reason__in=[
-                # Vacations are always included
-                Absence.VACATION,
-                # It would be nice to count sickness, but ...
-                # Absence.SICKNESS,
-                # Include paid absences since some of them are paid for by the state
-                Absence.PAID,
-                # Include school attendance of apprentices
-                Absence.SCHOOL,
-                # Don't include other absences (no working time), otherwise we'd also
-                # have to subtract if people do too much work
-                # Absence.OTHER,
-                # Don't include working time corrections
-                # Absence.CORRECTION,
-            ],
-        ):
+            Q(ends_on__isnull=True, starts_on__range=date_range)
+            | (
+                Q(ends_on__isnull=False)
+                & Q(starts_on__lte=date_range[1], ends_on__gte=date_range[0])
+            ),
+            Q(
+                reason__in=[
+                    # Vacations are always included
+                    Absence.VACATION,
+                    # It would be nice to count sickness, but ...
+                    # Absence.SICKNESS,
+                    # Include paid absences since some of them are paid for by the state
+                    Absence.PAID,
+                    # Include school attendance of apprentices
+                    Absence.SCHOOL,
+                    # Don't include other absences (no working time), otherwise we'd also
+                    # have to subtract if people do too much work
+                    # Absence.OTHER,
+                ]
+            )
+            | Q(
+                # Include working time corrections (unpaid leaves)
+                reason=Absence.CORRECTION,
+                days__gt=0,
+            ),
+        ).select_related("user"):
             period_length = (date_range[1] - date_range[0]).days + 1
             absence_days = (
                 (absence.ends_on - absence.starts_on).days + 1 if absence.ends_on else 1
             )
-            for _month, _days in monthly_days(absence.starts_on, absence.ends_on):
-                included_absences[absence.user_id] += (
-                    absence.days / absence_days / period_length
+            print(absence, period_length, absence_days)
+            for _month, days in monthly_days(
+                absence.starts_on, absence.ends_on or absence.starts_on
+            ):
+                included_absences[absence.user] += (
+                    days * absence.days / absence_days / period_length
                 )
+
+        from pprint import pprint
+
+        pprint(included_absences)
 
         def user_expectation(user, row, employment_percentage):
             internal_percentages = [
