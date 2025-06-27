@@ -25,12 +25,15 @@ from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-def working_hours_estimation(date_range):
+EXPECTED_AVERAGE_HOURLY_RATE = Decimal(150)
+WORKING_TIME_PER_DAY = Decimal(8)
+WORKING_DAYS_PER_YEAR = Decimal(250)
+DAYS_PER_YEAR = Decimal("365.24")
+
+
+def working_days_estimation(date_range):
     days = (date_range[1] - date_range[0]).days + 1
-    work_days_ratio = Decimal(250) / 365  # ~250 working days per year
-    vacation_ratio = Decimal(47) / 52  # 5 weeks vacation per year
-    working_time_per_day = Decimal(8)
-    return days * work_days_ratio * vacation_ratio * working_time_per_day
+    return days * WORKING_DAYS_PER_YEAR / DAYS_PER_YEAR
 
 
 def range_type(arg_value):
@@ -38,9 +41,6 @@ def range_type(arg_value):
         groups = [int(group) for group in matches.groups()]
         return [dt.date(*groups[:3]), dt.date(*groups[3:])]
     raise argparse.ArgumentTypeError("invalid value")
-
-
-EXPECTED_AVERAGE_HOURLY_RATE = 150
 
 
 class Command(BaseCommand):
@@ -251,7 +251,7 @@ class Command(BaseCommand):
             user_internal_types[m2m.user_id][m2m.internal_type] = m2m
         types = list(InternalType.objects.all())
 
-        included_absences = defaultdict(Decimal)
+        absence_days_per_user = defaultdict(lambda: Decimal(1))
         for absence in Absence.objects.filter(
             Q(ends_on__isnull=True, starts_on__range=date_range)
             | (
@@ -260,7 +260,7 @@ class Command(BaseCommand):
             ),
             Q(
                 reason__in=[
-                    # Vacations are always included
+                    # Vacations are always included (XXX even if too many days!)
                     Absence.VACATION,
                     # It would be nice to count sickness, but ...
                     # Absence.SICKNESS,
@@ -279,21 +279,15 @@ class Command(BaseCommand):
                 days__gt=0,
             ),
         ).select_related("user"):
-            period_length = (date_range[1] - date_range[0]).days + 1
-            absence_days = (
-                (absence.ends_on - absence.starts_on).days + 1 if absence.ends_on else 1
+            months = list(
+                monthly_days(absence.starts_on, absence.ends_on or absence.starts_on)
             )
-            print(absence, period_length, absence_days)
-            for _month, days in monthly_days(
-                absence.starts_on, absence.ends_on or absence.starts_on
-            ):
-                included_absences[absence.user] += (
-                    days * absence.days / absence_days / period_length
-                )
-
-        from pprint import pprint
-
-        pprint(included_absences)
+            absence_day_per_period_day = absence.days / sum(m[1] for m in months)
+            for month, days in months:
+                if date_range[0] <= month <= date_range[1]:
+                    absence_days_per_user[absence.user] += (
+                        days * absence_day_per_period_day
+                    )
 
         def user_expectation(user, row, employment_percentage):
             internal_percentages = [
@@ -306,7 +300,8 @@ class Command(BaseCommand):
             external_percentage = 100 * hptu[user]["external"] / hptu[user]["total"]
             expected_gross_margin = (
                 EXPECTED_AVERAGE_HOURLY_RATE
-                * working_hours_estimation(date_range)
+                * WORKING_TIME_PER_DAY
+                * (working_days_estimation(date_range) - absence_days_per_user[user])
                 * Decimal(profitable_percentage)
                 / 100
                 * Decimal(employment_percentage)
@@ -346,6 +341,7 @@ class Command(BaseCommand):
                 "",
                 _("Target value: gross margin"),
                 "",
+                _("included absence days"),
             ],
             [
                 _("Total"),
@@ -372,6 +368,7 @@ class Command(BaseCommand):
                 _("Delta"),
                 _("Target value w/ {}/h").format(EXPECTED_AVERAGE_HOURLY_RATE),
                 _("Delta"),
+                "",
             ],
             [],
             *sorted(
@@ -398,10 +395,11 @@ class Command(BaseCommand):
                         "",
                         100,
                         *user_expectation(user, row, average_percentage(user)),
+                        absence_days_per_user[user],
                     ]
                     for user, row in users.items()
                 ),
-                key=lambda row: row[-1],
+                key=lambda row: row[-2],
                 reverse=True,
             ),
         ]
