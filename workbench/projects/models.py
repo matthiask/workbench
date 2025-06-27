@@ -691,13 +691,7 @@ class ServiceQuerySet(SearchQuerySet):
             offers[service.offer].append((service.id, str(service)))
         return [("", "----------")] + [
             (offer or _("Not offered yet"), services)
-            for offer, services in sorted(
-                offers.items(),
-                key=lambda item: (
-                    item[0] and item[0].offered_on or dt.date.max,
-                    item[0] and item[0].pk or 1e100,
-                ),
-            )
+            for offer, services in sorted(offers.items())
         ]
 
     def budgeted(self):
