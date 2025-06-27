@@ -46,10 +46,6 @@ const path = require("node:path")
 const fs = require("node:fs")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const rspack = require("@rspack/core")
-const assert = require("node:assert/strict")
-const semver = require("semver")
-
-assert.ok(semver.satisfies(rspack.rspackVersion, ">=1.1.3"), "rspack outdated")
 
 const truthy = (...list) => list.filter((el) => !!el)
 
