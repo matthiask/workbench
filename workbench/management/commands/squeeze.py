@@ -40,6 +40,9 @@ def range_type(arg_value):
     raise argparse.ArgumentTypeError("invalid value")
 
 
+EXPECTED_AVERAGE_HOURLY_RATE = 150
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
@@ -302,7 +305,7 @@ class Command(BaseCommand):
             profitable_percentage = 100 + sum(internal_percentages)
             external_percentage = 100 * hptu[user]["external"] / hptu[user]["total"]
             expected_gross_margin = (
-                150
+                EXPECTED_AVERAGE_HOURLY_RATE
                 * working_hours_estimation(date_range)
                 * Decimal(profitable_percentage)
                 / 100
@@ -367,7 +370,7 @@ class Command(BaseCommand):
                 "",
                 100 * hpt["total"]["external"] / hpt["total"]["total"],
                 _("Delta"),
-                _("Target value w/ 150/h"),
+                _("Target value w/ {}/h").format(EXPECTED_AVERAGE_HOURLY_RATE),
                 _("Delta"),
             ],
             [],

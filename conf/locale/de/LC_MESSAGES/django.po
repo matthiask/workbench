@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-18 17:40+0200\n"
+"POT-Creation-Date: 2025-06-27 10:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2451,8 +2451,8 @@ msgid "Delta"
 msgstr "Delta"
 
 #: workbench/management/commands/squeeze.py
-msgid "Target value w/ 150/h"
-msgstr "Richtwert mit 150/h"
+msgid "Target value w/ {}/h"
+msgstr "Richtwert mit {}/h"
 
 #: workbench/management/commands/squeeze.py
 msgid "<unknown>"
