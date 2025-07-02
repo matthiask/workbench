@@ -188,8 +188,7 @@ class InvoicesTest(TestCase):
 
         self.assertContains(response, "<strong>cost-only</strong><br>10.00")
         self.assertContains(response, "1.0h logged but no hourly rate defined.")
-        self.assertContains(response, "<strong>no-rate</strong><br>0.00")
-        self.assertContains(response, "2.0h logged but no hourly rate defined.")
+        self.assertNotContains(response, "no-rate")
         self.assertContains(response, "<strong>with-rate</strong><br>600.00")
         self.assertContains(response, "id_show_service_details")
         self.assertNotContains(response, f'value="{service4.pk}"')
@@ -209,7 +208,7 @@ class InvoicesTest(TestCase):
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [
                     service1.pk,
-                    service2.pk,
+                    # service2.pk,  not available,
                     service3.pk,
                 ],
                 "disable_logging": 0,
@@ -228,7 +227,7 @@ class InvoicesTest(TestCase):
         self.assertEqual(hours.invoice_service.invoice, invoice)
 
         self.assertEqual(service1.invoice_services.get().invoice, invoice)
-        self.assertEqual(service2.invoice_services.get().invoice, invoice)
+        self.assertFalse(service2.invoice_services.exists())
         self.assertEqual(service3.invoice_services.get().invoice, invoice)
         self.assertEqual(service4.invoice_services.count(), 0)
 
