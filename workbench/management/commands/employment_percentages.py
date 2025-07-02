@@ -4,6 +4,7 @@ from itertools import islice
 
 from django.core.mail import EmailMultiAlternatives
 from django.core.management import BaseCommand
+from django.utils.translation import gettext as _
 
 from workbench.awt.reporting import employment_percentages
 from workbench.invoices.utils import recurring
@@ -54,7 +55,7 @@ class Command(BaseCommand):
 
         if options["mailto"]:
             mail = EmailMultiAlternatives(
-                "Workload",
+                _("employment percentages"),
                 "",
                 to=options["mailto"].split(","),
                 reply_to=options["mailto"].split(","),
