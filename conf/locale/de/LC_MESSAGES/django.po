@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-27 10:19+0200\n"
+"POT-Creation-Date: 2025-07-03 09:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2380,6 +2380,10 @@ msgstr "%(object)s verschieben"
 msgid "Select project for logging"
 msgstr "Projekt für Erfassung auswählen"
 
+#: workbench/management/commands/employment_percentages.py
+msgid "employment percentages"
+msgstr "Stellenprozent"
+
 #: workbench/management/commands/squeeze.py
 msgid "offered (only open projects)"
 msgstr "Offeriert (nur offene Projekte)"
@@ -2443,6 +2447,10 @@ msgstr "externe Prozente"
 #: workbench/management/commands/squeeze.py
 msgid "Target value: gross margin"
 msgstr "Erwartung Umsatz"
+
+#: workbench/management/commands/squeeze.py
+msgid "included absence days"
+msgstr "berücksichtigte Abwesenheitstage"
 
 #: workbench/management/commands/squeeze.py
 #: workbench/templates/reporting/projected_gross_margin.html
