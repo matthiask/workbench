@@ -71,6 +71,11 @@
          class="btn btn-primary btn-sm">
         {% translate 'External planning view' %}
       </a>
+      <a href="{% url 'projects_project_planning_gantt_xlsx' object.pk %}"
+         class="btn btn-primary btn-sm">
+        {% include 'svg/cloud-download.svg' %}
+        {% translate 'Download Gantt Chart' %}
+      </a>
     </div>
   </div>
 {% endblock content %}

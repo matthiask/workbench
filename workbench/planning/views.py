@@ -7,6 +7,7 @@ from workbench.accounts.models import Team, User
 from workbench.planning import reporting
 from workbench.planning.forms import PlannedWorkBatchForm
 from workbench.planning.models import PlannedWork
+from workbench.planning.xlsx import PlanningXLSXDocument
 from workbench.projects.models import Campaign, Project
 from workbench.tools.validation import in_days
 
@@ -110,3 +111,12 @@ def planning_batch_update(request, *, pk, kind):
         form.process()
         return HttpResponse("OK", status=202)
     return render(request, "planning/batch_update.html", {"form": form})
+
+
+def project_planning_gantt_xlsx(request, pk):
+    project = get_object_or_404(Project.objects.all(), pk=pk)
+
+    doc = PlanningXLSXDocument()
+    doc.gantt_chart(project)
+
+    return doc.to_response(f"gantt-{project.title}-{project.pk}.xlsx")

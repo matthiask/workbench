@@ -19,6 +19,7 @@ from workbench.planning.views import (
     planning_batch_update,
     project_planning,
     project_planning_external,
+    project_planning_gantt_xlsx,
 )
 from workbench.projects.forms import (
     CampaignDeleteForm,
@@ -172,6 +173,11 @@ urlpatterns = [
         "<int:pk>/planning/",
         project_planning,
         name="projects_project_planning",
+    ),
+    path(
+        "<int:pk>/planning/gantt-xlsx/",
+        project_planning_gantt_xlsx,
+        name="projects_project_planning_gantt_xlsx",
     ),
     path(
         "<int:pk>/planning/batch-update/",
