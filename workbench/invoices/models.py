@@ -419,7 +419,9 @@ class Invoice(ModelWithTotal):
             )
         ]
 
-    def create_services_from_logbook(self, project_services):
+    def create_services_from_logbook(
+        self, project_services, *, logbook_cutoff_date=None
+    ):
         assert self.project, "cannot call create_services_from_logbook without project"
 
         for position, ps in enumerate(self._ordered_services(project_services)):
@@ -429,6 +431,14 @@ class Invoice(ModelWithTotal):
             not_archived_costs = ps.loggedcosts.filter(
                 archived_at__isnull=True
             ).order_by()
+
+            if logbook_cutoff_date:
+                not_archived_effort = not_archived_effort.filter(
+                    rendered_on__lte=logbook_cutoff_date
+                )
+                not_archived_costs = not_archived_costs.filter(
+                    rendered_on__lte=logbook_cutoff_date
+                )
 
             hours = not_archived_effort.aggregate(Sum("hours"))["hours__sum"] or Z1
             cost = not_archived_costs.aggregate(Sum("cost"))["cost__sum"] or Z2

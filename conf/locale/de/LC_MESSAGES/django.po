@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-03 09:23+0200\n"
+"POT-Creation-Date: 2025-07-10 09:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1255,12 +1255,14 @@ msgstr "Geschäfte"
 
 #: workbench/deals/forms.py workbench/deals/models.py
 #: workbench/invoices/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py workbench/reporting/views.py
+#: workbench/planning/xlsx.py workbench/projects/forms.py
+#: workbench/reporting/views.py
 msgid "Open"
 msgstr "Offen"
 
 #: workbench/deals/forms.py workbench/expenses/forms.py
-#: workbench/invoices/forms.py workbench/projects/forms.py
+#: workbench/invoices/forms.py workbench/planning/xlsx.py
+#: workbench/projects/forms.py
 msgid "Closed"
 msgstr "Abgeschlossen"
 
@@ -1385,10 +1387,12 @@ msgid "closing types"
 msgstr "Abschlusstypen"
 
 #: workbench/deals/models.py workbench/offers/models.py
+#: workbench/planning/xlsx.py
 msgid "Accepted"
 msgstr "Akzeptiert"
 
 #: workbench/deals/models.py workbench/offers/models.py
+#: workbench/planning/xlsx.py
 msgid "Declined"
 msgstr "Abgelehnt"
 
@@ -1782,6 +1786,15 @@ msgstr "Das ist die Schlussrechnung, schliesse das Projekt"
 #: workbench/invoices/forms.py
 msgid "You'll still be able to log hours for a few days. You can always reopen the project later."
 msgstr "Die Stundenerfassung ist während wenigen Tagen immer noch möglich. Das Projekt kannst Du später auch wieder öffnen."
+
+#: workbench/invoices/forms.py
+msgid "Logbook cutoff date"
+msgstr "Logbuch-Abgrenzungstermin"
+
+#: workbench/invoices/forms.py
+msgid "Only include logbook entries up to this date. The service totals shown below may be too high if using this."
+msgstr ""
+"Logbucheinträge nur bis und mit diesem Datum berücksichtigen. Die unten angezeigten Leistungspositionen sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -2180,7 +2193,8 @@ msgstr "Keine Offerte"
 msgid "Not archived"
 msgstr "Nicht archiviert"
 
-#: workbench/logbook/forms.py workbench/projects/reporting.py
+#: workbench/logbook/forms.py workbench/planning/xlsx.py
+#: workbench/projects/reporting.py
 msgid "External"
 msgstr "Extern"
 
@@ -2771,6 +2785,91 @@ msgstr "Bearbeitet"
 #: workbench/planning/views.py
 msgid "Please define at least one milestone."
 msgstr "Bitte definiere mindestens einen Meilenstein."
+
+#: workbench/planning/xlsx.py
+msgid "Type"
+msgstr "Typ"
+
+#: workbench/planning/xlsx.py
+msgid "Title"
+msgstr "Titel"
+
+#: workbench/planning/xlsx.py
+msgid "User/Provider"
+msgstr "Mitarbeiter:in"
+
+#: workbench/planning/xlsx.py
+msgid "Service Type"
+msgstr "Leistungstyp"
+
+#: workbench/planning/xlsx.py workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/hours_per_type.html
+msgid "Hours"
+msgstr "Stunden"
+
+#: workbench/planning/xlsx.py workbench/timer/models.py
+msgid "Start"
+msgstr "Start"
+
+#: workbench/planning/xlsx.py
+msgid "End"
+msgstr "Ende"
+
+#: workbench/planning/xlsx.py
+msgid "Status"
+msgstr "Status"
+
+#: workbench/planning/xlsx.py
+msgid "Milestone"
+msgstr "Meilenstein"
+
+#: workbench/planning/xlsx.py
+msgid "Provisional"
+msgstr "Provisorisch"
+
+#: workbench/planning/xlsx.py
+msgid "Planned Work"
+msgstr "Geplante Arbeit"
+
+#: workbench/planning/xlsx.py
+msgid "External Work"
+msgstr "Kundenarbeit"
+
+#: workbench/planning/xlsx.py
+msgid "Project"
+msgstr "Projekt"
+
+#: workbench/planning/xlsx.py
+msgid "Total Planned Hours"
+msgstr "Total geplante Stunden"
+
+#: workbench/planning/xlsx.py
+msgid "Total Milestones"
+msgstr "Total Meilensteine"
+
+#: workbench/planning/xlsx.py
+msgid "Total External Work Items"
+msgstr "Total Kundenarbeit"
+
+#: workbench/planning/xlsx.py
+msgid "Date"
+msgstr "Datum"
+
+#: workbench/planning/xlsx.py
+msgid "Estimated Hours"
+msgstr "Geschätzte Stunden"
+
+#: workbench/planning/xlsx.py
+msgid "Phase Duration"
+msgstr "Dauer der Phase"
+
+#: workbench/planning/xlsx.py
+msgid "User"
+msgstr "Mitarbeiter:in"
+
+#: workbench/planning/xlsx.py
+msgid "Total Capacity"
+msgstr "Gesamtkapazität"
 
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
@@ -3783,6 +3882,10 @@ msgstr "Geschichte der geplanten Arbeit"
 msgid "History of milestones"
 msgstr "Geschichte der Meilensteine"
 
+#: workbench/templates/planning/project_planning.html
+msgid "Download Gantt Chart"
+msgstr "Gantt-Chart herunterladen"
+
 #: workbench/templates/planning/project_planning_external.html
 msgid "back to project planning"
 msgstr "Zurück zum Projektplan"
@@ -3817,11 +3920,6 @@ msgstr "ohne Stundensatz"
 #: workbench/templates/projects/project_statistics.html
 msgid "Logged hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/hours_per_type.html
-msgid "Hours"
-msgstr "Stunden"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Cost"
@@ -4243,10 +4341,6 @@ msgstr "Tiefe Wahrscheinlichkeit"
 #: workbench/templatetags/workbench.py
 msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
-
-#: workbench/timer/models.py
-msgid "Start"
-msgstr "Start"
 
 #: workbench/timer/models.py
 msgid "Stop"

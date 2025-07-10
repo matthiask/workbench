@@ -21,7 +21,7 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, hours, local_date_format
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
 from workbench.tools.pdf import PDFDocument, pdf_response
 from workbench.tools.validation import in_days
 
@@ -568,6 +568,14 @@ class CreateProjectInvoiceForm(InvoiceForm):
     def add_services_field(self):
         source = self.request.GET.get("source")
         if source == "logbook":
+            self.fields["logbook_cutoff_date"] = forms.DateField(
+                widget=DateInput,
+                required=False,
+                label=_("Logbook cutoff date"),
+                help_text=_(
+                    "Only include logbook entries up to this date. The service totals shown below may be too high if using this."
+                ),
+            )
 
             def amount(row):
                 if row["service"].effort_rate is not None:
@@ -625,6 +633,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     for row in filter(offer_data["services"])
                 ],
             ))
+
         self.fields["selected_services"] = forms.MultipleChoiceField(
             choices=choices,
             label=_("services"),
@@ -648,7 +657,10 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 id__in=self.cleaned_data["selected_services"]
             ).select_related("offer")
             if self.request.GET.get("source") == "logbook":
-                instance.create_services_from_logbook(services)
+                instance.create_services_from_logbook(
+                    services,
+                    logbook_cutoff_date=self.cleaned_data.get("logbook_cutoff_date"),
+                )
             else:
                 instance.create_services_from_offer(services)
             if self.cleaned_data["disable_logging"]:
