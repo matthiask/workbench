@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0-beta.5/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
   "formatter": {
     "enabled": true,
     "useEditorconfig": true
@@ -14,7 +14,9 @@
       "complexity": {
         "noUselessStringConcat": "error",
         "noUselessUndefinedInitialization": "error",
-        "useNumericLiterals": "error"
+        "useNumericLiterals": "error",
+        "noCommaOperator": "error",
+        "noArguments": "error"
       },
       "correctness": {
         "noUndeclaredVariables": "error",
@@ -34,7 +36,6 @@
         "useConsistentBuiltinInstantiation": "error",
         "useForOf": "warn",
         "useLiteralEnumMembers": "error",
-        "noCommaOperator": "error",
         "useNodejsImportProtocol": "error",
         "useAsConstAssertion": "error",
         "useEnumInitializers": "error",
@@ -48,7 +49,6 @@
         "useTemplate": "error",
         "noNonNullAssertion": "error",
         "useDefaultParameterLast": "error",
-        "noArguments": "error",
         "useImportType": "error",
         "useExportType": "error",
         "noUselessElse": "error",
