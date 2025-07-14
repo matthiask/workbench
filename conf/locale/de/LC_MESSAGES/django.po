@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-10 09:39+0200\n"
+"POT-Creation-Date: 2025-07-14 13:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1793,8 +1793,7 @@ msgstr "Logbuch-Abgrenzungstermin"
 
 #: workbench/invoices/forms.py
 msgid "Only include logbook entries up to this date. The service totals shown below may be too high if using this."
-msgstr ""
-"Logbucheinträge nur bis und mit diesem Datum berücksichtigen. Die unten angezeigten Leistungspositionen sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
+msgstr "Logbucheinträge nur bis und mit diesem Datum berücksichtigen. Die unten angezeigten Leistungspositionen sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -3961,6 +3960,10 @@ msgstr "Offerten-PDF"
 #: workbench/templates/projects/project_detail.html
 msgid "Show"
 msgstr "Anzeigen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Download with signature line"
+msgstr "Herunterladen mit Unterschriftszeile"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Renumber offers"

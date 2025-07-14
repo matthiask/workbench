@@ -628,7 +628,7 @@ class PDFDocument(_PDFDocument):
             drawing = svg2rlg(f.name)
             self.story.append(drawing)
 
-    def offers_pdf(self, *, project, offers):
+    def offers_pdf(self, *, project, offers, signature_line=False):
         self.init_letter()
         self.p(offers[-1].postal_address)
         self.next_frame()
@@ -678,7 +678,8 @@ class PDFDocument(_PDFDocument):
             self.process_offer(offer)
             self.restart()
 
-        self.add_agreement(offers[0])
+        if signature_line:
+            self.add_agreement(offers[0])
         self.generate()
 
     def dunning_letter(self, *, invoices):

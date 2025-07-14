@@ -24,7 +24,8 @@ class OfferPDFView(generic.DetailView):
         try:
             pdf.init_letter()
             pdf.process_offer(self.object)
-            pdf.add_agreement(self.object)
+            if request.GET.get("signature_line"):
+                pdf.add_agreement(self.object)
             pdf.generate()
         except Exception as exc:
             messages.error(
@@ -50,7 +51,11 @@ class ProjectOfferPDFView(generic.DetailView):
             self.object.code,
             as_attachment=request.GET.get("disposition") == "attachment",
         )
-        pdf.offers_pdf(project=self.object, offers=offers)
+        pdf.offers_pdf(
+            project=self.object,
+            offers=offers,
+            signature_line=request.GET.get("signature_line"),
+        )
 
         return response
 

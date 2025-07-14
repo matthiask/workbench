@@ -187,6 +187,8 @@
               </a>
               <a class="dropdown-item"
                  href="{{ object.urls.offers_pdf }}?disposition=attachment">{% translate 'Download' %}</a>
+              <a class="dropdown-item"
+                 href="{{ object.urls.offers_pdf }}?disposition=attachment&amp;signature_line=yes">{% translate 'Download with signature line' %}</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item"
                  href="{{ object.urls.renumber_offers }}"
@@ -270,6 +272,10 @@
                         <a class="dropdown-item"
                            href="{{ offer.urls.pdf }}?disposition=attachment">
                           {% translate 'Download' %}
+                        </a>
+                        <a class="dropdown-item"
+                           href="{{ offer.urls.pdf }}?disposition=attachment&amp;signature_line=yes">
+                          {% translate 'Download with signature line' %}
                         </a>
                       </div>
                     </span>
