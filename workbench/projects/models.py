@@ -212,7 +212,11 @@ class ProjectQuerySet(SearchQuerySet):
 
         return (
             self.open()
-            .filter(id__in=LoggedHours.objects.order_by().values("service__project"))
+            .filter(
+                id__in=LoggedHours.objects.filter(archived_at__isnull=True)
+                .order_by()
+                .values("service__project")
+            )
             .exclude(
                 id__in=LoggedHours.objects.order_by()
                 .filter(rendered_on__gte=in_days(-60))
