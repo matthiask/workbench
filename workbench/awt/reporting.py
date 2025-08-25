@@ -356,10 +356,14 @@ def vacation_planning_warnings(row):
 
     vacation_planning = {
         "ratio": planned / available if available else 1,
+        # Only warn about two weeks if there's a vacation entitlement in at
+        # least 7 months in the given year.
         "two_weeks": any(
             absence.ends_on and (absence.ends_on - absence.starts_on).days >= 13
             for absence in vacation_absences
-        ),
+        )
+        if sum(1 for days in row["months"]["available_vacation_days"] if days > 0) > 6
+        else True,
     }
     vacation_planning["fine"] = (
         vacation_planning["ratio"] >= Decimal("0.5") and vacation_planning["two_weeks"]
