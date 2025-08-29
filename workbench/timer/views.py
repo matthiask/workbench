@@ -163,11 +163,12 @@ def timestamps(request, form):
 
     is_this_week = day >= monday()
     weekly_hours = request.user.hours["week"]
+    week_range = [monday(day), monday(day) + dt.timedelta(days=7)]
     if not is_this_week:
         weekly_hours = (
             request.user.loggedhours.filter(
-                rendered_on__gte=monday(day),
-                rendered_on__lt=monday(day) + dt.timedelta(days=7),
+                rendered_on__gte=week_range[0],
+                rendered_on__lt=week_range[1],
             )
             .order_by()
             .aggregate(hours=Sum("hours"))["hours"]
@@ -180,6 +181,7 @@ def timestamps(request, form):
             "slices": slices,
             "hours": hours,
             "weekly_hours": weekly_hours,
+            "week_range": week_range,
             "day": day,
             "previous": day - dt.timedelta(days=1),
             "next": day + dt.timedelta(days=1) if day < today else None,

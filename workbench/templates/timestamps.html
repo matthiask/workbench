@@ -13,17 +13,22 @@
             {% translate "timestamps"|capfirst %}
             <small>
               {% if is_today %}
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}&amp;date_until={% now 'Y-m-d' %}">
                   {{ request.user.hours.today|hours }} {% translate 'today' %}
                 </a>
                 /
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}">
                   {{ request.user.hours.week|hours }} {% translate 'this week' %}
                 </a>
-              {% elif is_this_week %}
-                {{ day|local_date_format:'l d.m.Y' }} / {{ hours|hours }} / {{ request.user.hours.week|hours }} {% translate 'this week' %}
               {% else %}
-                {{ day|local_date_format:'l d.m.Y' }} / {{ hours|hours }} / {{ weekly_hours|hours }} {% translate 'during the week' %}
+                {{ day|local_date_format:'l d.m.Y' }} /
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ day.isoformat }}&amp;date_until={{ day.isoformat }}">{{ hours|hours }}</a> /
+                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}">
+                  {{ weekly_hours|hours }}
+                  {% if is_this_week %}{% translate 'this week' %}
+                  {% else %}{% translate 'during the week' %}
+                  {% endif %}
+                </a>
               {% endif %}
             </small>
           </h3>
