@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.12-slim as backend
+FROM --platform=linux/amd64 python:3.13-slim as backend
 WORKDIR /src
 ENV PYTHONUNBUFFERED 1
 ENV VIRTUAL_ENV=/usr/local
