@@ -107,7 +107,7 @@ def work_anniversaries_notice():
         return
 
     users = [
-        (user, (today - user.date_of_employment).days / 365.24 + (1 / 12))
+        (user, (today - user.date_of_employment).days / 365.24 + (3 / 12))
         for user in User.objects.active().filter(date_of_employment__isnull=False)
     ]
 
