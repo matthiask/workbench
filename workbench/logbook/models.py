@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib import messages
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -59,7 +60,9 @@ class LoggedHours(Model):
     archived_at = models.DateTimeField(_("archived at"), blank=True, null=True)
 
     class Meta:
-        indexes = [models.Index(fields=["-rendered_on"])]
+        indexes = [
+            models.Index(F("rendered_on").desc(), name="logbook_hours_rendered_on")
+        ]
         ordering = ("-rendered_on", "-created_at")
         verbose_name = _("logged hours")
         verbose_name_plural = _("logged hours")
@@ -152,6 +155,9 @@ class LoggedCost(Model):
     objects = LoggedCostQuerySet.as_manager()
 
     class Meta:
+        indexes = [
+            models.Index(F("rendered_on").desc(), name="logbook_cost_rendered_on")
+        ]
         ordering = ("-rendered_on", "-created_at")
         verbose_name = _("logged cost")
         verbose_name_plural = _("logged costs")
