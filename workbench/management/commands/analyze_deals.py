@@ -178,8 +178,8 @@ class Command(BaseCommand):
         ]
         second = ["", "", ""]
         for value_type in value_type_list:
-            first.extend((value_type.title if value_type else None, ""))
-            second.extend(("Verkauft", "Gearbeitet"))
+            first.extend((value_type.title if value_type else None, "", ""))
+            second.extend(("Verkauft", "Gearbeitet", "Ratio"))
 
         table = []
         for c in customer_stats:
@@ -189,9 +189,12 @@ class Command(BaseCommand):
                 c["gross_margin_projection"],
             ]
             for value_type in value_type_list:
+                accepted = c["accepted_by_value_type"][value_type]
+                rendered = c["rendered_by_value_type"][value_type]
                 row.extend((
-                    c["accepted_by_value_type"][value_type],
-                    c["rendered_by_value_type"][value_type],
+                    accepted,
+                    rendered,
+                    rendered / accepted if accepted else None,
                 ))
             table.append(row)
 
