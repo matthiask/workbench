@@ -132,4 +132,4 @@ class TeamAdmin(admin.ModelAdmin):
 
 @admin.register(SpecialistField)
 class SpecialistFieldAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["name", "value_type"]

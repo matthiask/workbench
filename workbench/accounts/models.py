@@ -422,6 +422,13 @@ class CoffeePairings(models.Model):
 @total_ordering
 class SpecialistField(models.Model):
     name = models.CharField(_("name"), max_length=100)
+    value_type = models.ForeignKey(
+        "deals.ValueType",
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        verbose_name=_("value type"),
+    )
 
     class Meta:
         ordering = ["name"]
