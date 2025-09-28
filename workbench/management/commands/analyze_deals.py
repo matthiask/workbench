@@ -1,7 +1,9 @@
 import datetime as dt
+import io
 from collections import defaultdict
 from pprint import pprint
 
+from django.core.mail import EmailMultiAlternatives
 from django.core.management import BaseCommand
 from django.db.models import Sum
 
@@ -19,6 +21,10 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--from", type=dt.date.fromisoformat)
         parser.add_argument("--until", type=dt.date.fromisoformat)
+        parser.add_argument(
+            "--mailto",
+            type=str,
+        )
 
     def handle(self, **options):
         date_range = [
@@ -191,4 +197,22 @@ class Command(BaseCommand):
 
         xlsx.table(None, [first, second, *table])
         filename = f"analyze-deals-{date_range[0]}-{date_range[1]}.xlsx"
-        xlsx.workbook.save(filename)
+
+        if options["mailto"]:
+            mail = EmailMultiAlternatives(
+                "Geschäfte und Werttypen",
+                "",
+                to=options["mailto"].split(","),
+                reply_to=options["mailto"].split(","),
+            )
+            with io.BytesIO() as f:
+                xlsx.workbook.save(f)
+                f.seek(0)
+                mail.attach(
+                    filename,
+                    f.getvalue(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+            mail.send()
+        else:
+            xlsx.workbook.save(filename)
