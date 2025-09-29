@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "@rspack/cli": "^1.5.2",
-    "@rspack/core": "^1.5.2",
+    "@rspack/cli": "^1.5.7",
+    "@rspack/core": "^1.5.7",
     "@swc/helpers": "^0.5.17",
     "autoprefixer": "^10.4.21",
     "bootstrap": "^5.3.8",
@@ -10,7 +10,7 @@
     "css-loader": "^7.1.2",
     "html-webpack-plugin": "^5.6.4",
     "popper.js": "^1.16.1",
-    "postcss-loader": "^8.1.1",
+    "postcss-loader": "^8.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-draggable": "^4.5.0",
@@ -19,7 +19,7 @@
     "redux": "^5.0.1",
     "redux-localstorage": "^0.4.1",
     "redux-thunk": "^3.1.0",
-    "sass-embedded": "^1.91.0",
+    "sass-embedded": "^1.93.2",
     "sass-loader": "^16.0.5"
   },
   "prettier": {

@@ -86,7 +86,9 @@ function Planning({ data }) {
     )
 
     Array.from(document.querySelectorAll(".planning--title a")).forEach(
-      (el) => (el.title = el.textContent),
+      (el) => {
+        el.title = el.textContent
+      },
     )
   }, [rowCtx.current, rowCtx.firstProjectRow])
 
@@ -100,25 +102,25 @@ function Planning({ data }) {
         }}
       >
         {data.weeks.map((_, idx) => {
-          return idx % 2
-            ? null
-            : <Cell
-                key={idx}
-                row="1"
-                rowspan="-1"
-                column={FIRST_DATA_COLUMN + idx}
-                className="planning--stripe4"
-              />
-        })}
-        {data.this_week_index === null
-          ? null
-          : <Cell
-              key="this_week_index"
+          return idx % 2 ? null : (
+            <Cell
+              key={idx}
               row="1"
               rowspan="-1"
-              column={FIRST_DATA_COLUMN + data.this_week_index}
-              className="planning--this-week"
-            />}
+              column={FIRST_DATA_COLUMN + idx}
+              className="planning--stripe4"
+            />
+          )
+        })}
+        {data.this_week_index === null ? null : (
+          <Cell
+            key="this_week_index"
+            row="1"
+            rowspan="-1"
+            column={FIRST_DATA_COLUMN + data.this_week_index}
+            className="planning--this-week"
+          />
+        )}
         {months(data.weeks).map((month, idx) => (
           <Cell
             key={idx}
@@ -479,12 +481,12 @@ const Milestones = ({ project }) => {
 
         return (
           <Fragment key={i}>
-            {isEven
-              ? <div
-                  style={{ gridRow: row, gridColumn: "1 / -1" }}
-                  className="planning--stripe3"
-                />
-              : null}
+            {isEven ? (
+              <div
+                style={{ gridRow: row, gridColumn: "1 / -1" }}
+                className="planning--stripe3"
+              />
+            ) : null}
             <Cell
               row={row}
               column={1}
@@ -568,19 +570,21 @@ function Offer({ offer, external_view, work_list }) {
         }}
         className="planning--stripe2"
       />
-      {offer.id
-        ? <Cell row={row} column={1} className={classList.join(" ")}>
-            <a href={offer.url} target="_blank" rel="noopener noreferrer">
-              {offer.title}
-              {offer.is_declined ? gettext("(declined)") : ""}
-              {!offer.is_accepted && !offer.is_declined
-                ? gettext("(not accepted yet)")
-                : ""}
-            </a>
-          </Cell>
-        : <Cell row={row} column={1} className="planning--title is-offer ps-3">
-            {gettext("Not part of an offer")}
-          </Cell>}
+      {offer.id ? (
+        <Cell row={row} column={1} className={classList.join(" ")}>
+          <a href={offer.url} target="_blank" rel="noopener noreferrer">
+            {offer.title}
+            {offer.is_declined ? gettext("(declined)") : ""}
+            {!offer.is_accepted && !offer.is_declined
+              ? gettext("(not accepted yet)")
+              : ""}
+          </a>
+        </Cell>
+      ) : (
+        <Cell row={row} column={1} className="planning--title is-offer ps-3">
+          {gettext("Not part of an offer")}
+        </Cell>
+      )}
       <Cell
         row={row}
         column={3}
@@ -607,12 +611,12 @@ function Work({ work, hours_per_week, absences, isEven }) {
 
   return (
     <>
-      {isEven
-        ? <div
-            style={{ gridRow: row, gridColumn: "1 / -1" }}
-            className="planning--stripe3"
-          />
-        : null}
+      {isEven ? (
+        <div
+          style={{ gridRow: row, gridColumn: "1 / -1" }}
+          className="planning--stripe3"
+        />
+      ) : null}
       <Cell
         row={row}
         column={1}
@@ -624,16 +628,16 @@ function Work({ work, hours_per_week, absences, isEven }) {
           {work.title}
         </a>
       </Cell>
-      {work.is_provisional
-        ? <Cell
-            row={row}
-            column={2}
-            className={"planning--small is-pw"}
-            title={gettext("is provisional")}
-          >
-            {pgettext("provisional", "prov.")}
-          </Cell>
-        : null}
+      {work.is_provisional ? (
+        <Cell
+          row={row}
+          column={2}
+          className={"planning--small is-pw"}
+          title={gettext("is provisional")}
+        >
+          {pgettext("provisional", "prov.")}
+        </Cell>
+      ) : null}
       <Cell
         row={row}
         column={3}
@@ -703,6 +707,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
               </Cell>
             )
           }
+          return null
         })}
     </>
   )
@@ -738,12 +743,12 @@ const ExternalWork = ({ idx, work }) => {
 
   return (
     <>
-      {isEven
-        ? <div
-            style={{ gridRow: row, gridColumn: "1 / -1" }}
-            className="planning--stripe3"
-          />
-        : null}
+      {isEven ? (
+        <div
+          style={{ gridRow: row, gridColumn: "1 / -1" }}
+          className="planning--stripe3"
+        />
+      ) : null}
       <Cell
         row={row}
         column={1}
@@ -873,11 +878,13 @@ const AbsencesTooltip = ({ absences }) => {
     <div className="description-popup no-pr">
       {absences.map(([hours, description, url], idx) => (
         <p key={idx}>
-          {url
-            ? <a key={url} href={url} data-ajaxmodal>
-                {fixed(hours, 0)}h: {description}
-              </a>
-            : `${fixed(hours, 0)}h: ${description}`}
+          {url ? (
+            <a key={url} href={url} data-ajaxmodal>
+              {fixed(hours, 0)}h: {description}
+            </a>
+          ) : (
+            `${fixed(hours, 0)}h: ${description}`
+          )}
         </p>
       ))}
     </div>
@@ -987,23 +994,25 @@ const Collapse = ({ name, collapse, toggleCollapse }) => {
         className="planning--collapse__input"
       />
       <label htmlFor={name}>
-        {collapse
-          ? <svg
-              className="planning--collapse__icon"
-              focusable="false"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-            >
-              <path d="m7 10 5 5 5-5z" />
-            </svg>
-          : <svg
-              className="planning--collapse__icon"
-              focusable="false"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-            >
-              <path d="m7 14 5-5 5 5z" />
-            </svg>}
+        {collapse ? (
+          <svg
+            className="planning--collapse__icon"
+            focusable="false"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+          >
+            <path d="m7 10 5 5 5-5z" />
+          </svg>
+        ) : (
+          <svg
+            className="planning--collapse__icon"
+            focusable="false"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+          >
+            <path d="m7 14 5-5 5 5z" />
+          </svg>
+        )}
       </label>
     </>
   )

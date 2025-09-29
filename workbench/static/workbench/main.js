@@ -200,9 +200,9 @@ $(() => {
   $(".form-search").each(() => {
     let params = new URLSearchParams(window.location.search.slice(1))
     // Also see workbench/generic.py
-    ;["disposition", "error", "export", "page"].forEach((key) =>
-      params.delete(key),
-    )
+    ;["disposition", "error", "export", "page"].forEach((key) => {
+      params.delete(key)
+    })
     params = params.toString()
     const key = `search-${window.location.pathname}`
     window.localStorage.setItem(key, params ? `?${params}` : "")
@@ -354,7 +354,9 @@ $(() => {
     const inputs = Array.from(
       this.closest(".widget--checkboxselectmultiple").querySelectorAll("input"),
     )
-    inputs.forEach((el) => (el.checked = arr.includes(el.value)))
+    inputs.forEach((el) => {
+      el.checked = arr.includes(el.value)
+    })
   })
 
   $(document.body).on("click", "[data-pin]", (e) => {

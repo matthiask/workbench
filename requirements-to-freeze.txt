@@ -23,7 +23,7 @@ qrbill
 reportlab
 sentry-sdk
 speckenv
-svglib
+svglib!=1.6.0  # Avoid pycairo for now
 time-machine
 vobject
 whitenoise
