@@ -7,6 +7,6 @@ fl.config.update(
     domain="workbench.feinheit.ch",
     branch="main",
     remote="production",
-    python="3.13",
+    python="3.14",
 )
 ns = fl.Collection(*fl.GENERAL)
