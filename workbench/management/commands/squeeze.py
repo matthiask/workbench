@@ -439,11 +439,61 @@ class Command(BaseCommand):
             ),
         ]
 
+        organizations = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1})
+        for project_id, project_data in projects.items():
+            if "project" in project_data:
+                project = project_data["project"]
+                org_name = str(project.customer)
+
+                margin = max((
+                    project_data["offered"],
+                    project_data["projected"],
+                    project_data["invoiced"],
+                ))
+                hours = max((
+                    project_data["hours_offered"],
+                    project_data["hours_logged"],
+                ))
+
+                if hours:
+                    for user, user_hours in project_data[
+                        "hours_in_range_by_user"
+                    ].items():
+                        user_margin = user_hours / hours * margin
+                        organizations[org_name]["margin"] += user_margin
+                        organizations[org_name]["hours_in_range"] += user_hours
+
+        organizations_table = [
+            [
+                _("organization"),
+                _("relevant gross margin"),
+                _("relevant hours"),
+                _("rate"),
+            ],
+            *sorted(
+                (
+                    [
+                        name,
+                        row["margin"],
+                        row["hours_in_range"],
+                        row["margin"] / row["hours_in_range"]
+                        if row["hours_in_range"]
+                        else 0,
+                    ]
+                    for name, row in organizations.items()
+                ),
+                key=lambda row: row[-1],
+                reverse=True,
+            ),
+        ]
+
         xlsx = WorkbenchXLSXDocument()
         xlsx.add_sheet(_("users").replace(":", "_"))
         xlsx.table(None, header + users_table)
         xlsx.add_sheet(_("specialist fields"))
         xlsx.table(None, header + fields_table)
+        xlsx.add_sheet(_("organizations"))
+        xlsx.table(None, header + organizations_table)
         xlsx.add_sheet(_("projects"))
         xlsx.table(None, header + projects_table)
 
