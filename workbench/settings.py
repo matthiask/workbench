@@ -194,7 +194,7 @@ WORKBENCH = {
             " Die jeweils aktuelle Version finden Sie auf www.feinheit.ch/agb/."
         ),
         PDF_OFFER_AGREEMENT=[
-            "Der Kunde - %s",
+            "Die Kundschaft - %s",
             (
                 "Wir bestätigen die Offerte zu den genannten Konditionen und"
                 " erteilen der Feinheit AG den oben beschriebenen Auftrag."
