@@ -32,7 +32,7 @@ class InternalType(OrderableModel):
         verbose_name_plural = _("internal types")
 
     def __str__(self):
-        return f"{self.name} ({self.description})"
+        return f"{self.name} ({self.description}, {self.percentage:.1f}%)"
 
 
 class InternalTypeUser(models.Model):

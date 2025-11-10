@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.features import FEATURES, LABELS, F
 from workbench.accounts.models import SpecialistField, Team, User
 from workbench.awt.models import Employment, VacationDaysOverride
+from workbench.projects.models import InternalTypeUser
 
 
 class FeaturesWidget(forms.TextInput):
@@ -62,6 +63,11 @@ class VacationDaysOverrideInline(admin.TabularInline):
     model = VacationDaysOverride
     extra = 0
     radio_fields = {"type": admin.HORIZONTAL}
+
+
+class InternalTypeUserInline(admin.TabularInline):
+    model = InternalTypeUser
+    extra = 0
 
 
 class FeatureFilter(admin.SimpleListFilter):
@@ -119,7 +125,7 @@ class UserAdmin(UserAdmin):
     search_fields = ("email", "_short_name", "_full_name")
     ordering = ("-is_active", "email")
     filter_horizontal = ()
-    inlines = [EmploymentInline, VacationDaysOverrideInline]
+    inlines = [EmploymentInline, VacationDaysOverrideInline, InternalTypeUserInline]
 
 
 admin.site.unregister(Group)  # We are not using stock users or groups.

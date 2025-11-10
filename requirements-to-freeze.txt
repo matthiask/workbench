@@ -21,7 +21,7 @@ Pillow
 psycopg[binary]
 qrbill
 reportlab
-sentry-sdk
+sentry-sdk<3
 speckenv
 svglib!=1.6.0  # Avoid pycairo for now
 time-machine
