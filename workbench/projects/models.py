@@ -679,6 +679,32 @@ class Project(Model):
     def is_logbook_locked(self):
         return self.closed_on and self.closed_on < in_days(-14)
 
+    def create_invoice_warnings(self, invoice_type):
+        invoice_class = self.invoices.model
+        warnings = []
+        if self.invoices.filter(status=invoice_class.IN_PREPARATION).exists():
+            warnings.append((
+                "already-one-in-preparation",
+                _("This project already has an invoice in preparation."),
+            ))
+
+        types = list(self.invoices.invoiced().order_by().values_list("type", flat=True))
+        if invoice_type == invoice_class.FIXED and invoice_class.SERVICES in types:
+            warnings.append((
+                "type-change",
+                _(
+                    "This project already used service invoices but you are now creating a fixed amount invoice. Take care to not send invoices for the same services twice!"
+                ),
+            ))
+        if invoice_type == invoice_class.SERVICES and invoice_class.FIXED in types:
+            warnings.append((
+                "type-change",
+                _(
+                    "This project already used fixed amount invoices but you are now creating a services invoice. Take care to not send invoices for the same services twice!"
+                ),
+            ))
+        return warnings
+
 
 class ServiceQuerySet(SearchQuerySet):
     def choices_with_pins(self, *, project, user):

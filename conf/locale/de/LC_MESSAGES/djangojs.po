@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-18 17:41+0200\n"
+"POT-Creation-Date: 2025-11-11 09:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: absences/absences.js conf/strings.js
+msgid "Description"
+msgstr "Beschreibung"
+
+#: absences/absences.js conf/strings.js
+msgid "Days"
+msgstr "Tage"
+
+#: absences/absences.js conf/strings.js
+#, javascript-format
+msgid "Week %s"
+msgstr "KW%s"
 
 #: absences/utils.js conf/strings.js
 msgctxt "one letter Sunday"
@@ -52,7 +65,7 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "(closed)"
 msgstr "(geschlossen)"
 
@@ -80,14 +93,6 @@ msgstr "Geplante Arbeit hinzufügen"
 msgid "Concurrent absences"
 msgstr "Parallele Absenzen"
 
-#: conf/strings.js
-msgid "Days"
-msgstr "Tage"
-
-#: conf/strings.js
-msgid "Description"
-msgstr "Beschreibung"
-
 #: conf/strings.js planning/index.js
 msgid "Efforts"
 msgstr "Aufwände"
@@ -96,7 +101,7 @@ msgstr "Aufwände"
 msgid "is provisional"
 msgstr "ist provisorisch"
 
-#: conf/strings.js
+#: conf/strings.js planning/index.js
 msgid "Logged hours"
 msgstr "Erfasste Stunden"
 
@@ -140,7 +145,7 @@ msgstr "Geplante Stunden pro Woche"
 msgid "Remaining capacity per week"
 msgstr "Verbleibende Kapazität pro Woche"
 
-#: conf/strings.js
+#: conf/strings.js timer/activitySettings.js
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -183,11 +188,6 @@ msgstr "Konnte Formular nicht öffnen"
 #: conf/strings.js timer/actions.js
 msgid "Unable to submit the logbook entry"
 msgstr "Konnte Logbucheintrag nicht abschicken"
-
-#: conf/strings.js
-#, javascript-format
-msgid "Week %s"
-msgstr "KW%s"
 
 #: conf/strings.js timer/i18n.js
 msgid "What outcome do you seek?"

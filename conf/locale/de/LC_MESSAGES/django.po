@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-14 13:40+0200\n"
+"POT-Creation-Date: 2025-11-11 09:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -332,6 +332,10 @@ msgstr "Erstellt um"
 #: workbench/accounts/models.py
 msgid "coffee pairings"
 msgstr "Kaffee-Paare"
+
+#: workbench/accounts/models.py workbench/deals/models.py
+msgid "value type"
+msgstr "Werttyp"
 
 #: workbench/accounts/models.py workbench/management/commands/squeeze.py
 #: workbench/management/commands/workload.py
@@ -882,11 +886,12 @@ msgstr "Hauptkontakt"
 msgid "Mainly useful for organizations with a centralized accounts payable departement."
 msgstr "Hauptsächlich nützlich für Organisationen mit einem zentralen Kreditoreneingang."
 
-#: workbench/contacts/models.py
+#: workbench/contacts/models.py workbench/management/commands/squeeze.py
 msgid "organization"
 msgstr "Organisation"
 
-#: workbench/contacts/models.py workbench/templates/contacts/object_list.html
+#: workbench/contacts/models.py workbench/management/commands/squeeze.py
+#: workbench/templates/contacts/object_list.html
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -1496,10 +1501,6 @@ msgid "weekly target"
 msgstr "Wochenziel"
 
 #: workbench/deals/models.py
-msgid "value type"
-msgstr "Werttyp"
-
-#: workbench/deals/models.py
 msgid "value types"
 msgstr "Werttypen"
 
@@ -1774,10 +1775,6 @@ msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistun
 #, python-brace-format
 msgid "Total excl. tax of accepted offers: {accepted}. Use {percentages}."
 msgstr "Total exkl. MwSt der akzeptieren Offerten: {accepted}. Verrechne {percentages}."
-
-#: workbench/invoices/forms.py
-msgid "This project already has an invoice in preparation."
-msgstr "Dieses Projekt hat schon eine Rechnung in Vorbereitung."
 
 #: workbench/invoices/forms.py
 msgid "This is the final invoice, close the project"
@@ -3050,6 +3047,18 @@ msgstr "Dieses Projekt verwendet Offerten, welche das Budget zurückhalten. Die 
 #, python-format
 msgid "All offers of project %(project)s are declined. You might want to close the project now?"
 msgstr "Alle Offerten des Projektes %(project)s sind abgelehnt. Vielleicht möchtest Du das Projekt jetzt schliessen?"
+
+#: workbench/projects/models.py
+msgid "This project already has an invoice in preparation."
+msgstr "Dieses Projekt hat schon eine Rechnung in Vorbereitung."
+
+#: workbench/projects/models.py
+msgid "This project already used service invoices but you are now creating a fixed amount invoice. Take care to not send invoices for the same services twice!"
+msgstr "Auf diesem Projekt wurden schon Rechnungen des Typs \"Leistungen\" gestellt, Du erstellst nun eine Fixbetragsrechnung. Pass auf, dass Du nicht Dienstleistungen zweimal in Rechnung stellst!"
+
+#: workbench/projects/models.py
+msgid "This project already used fixed amount invoices but you are now creating a services invoice. Take care to not send invoices for the same services twice!"
+msgstr "Auf diesem Projekt wurden schon Rechnungen des Typs \"Fixbetrag\" gestellt, Du erstellst nun eine Leistungsabrechnung. Pass auf, dass Du nicht Dienstleistungen zweimal in Rechnung stellst!"
 
 #: workbench/projects/models.py
 msgid "Pinned"

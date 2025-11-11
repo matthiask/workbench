@@ -547,13 +547,11 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 )
             )
 
-        if (
-            self.request.method == "GET"
-            and self.project.invoices.filter(status=Invoice.IN_PREPARATION).exists()
+        if self.request.method == "GET" and (
+            warnings := self.project.create_invoice_warnings(invoice_type)
         ):
-            messages.warning(
-                self.request, _("This project already has an invoice in preparation.")
-            )
+            for _code, warning in warnings:
+                messages.warning(self.request, warning)
 
         if not self.project.closed_on:
             self.fields["close_project"] = forms.BooleanField(
