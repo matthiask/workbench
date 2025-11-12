@@ -26,5 +26,4 @@ speckenv
 svglib!=1.6.0  # Avoid pycairo for now
 time-machine
 vobject
-whitenoise
 xlsxdocument
