@@ -36,12 +36,12 @@ repos:
       - id: django-upgrade
         args: [--target-version, "5.1"]
   -   repo: https://github.com/adamchainz/djade-pre-commit
-      rev: 1.6.0
+      rev: 1.7.0
       hooks:
       -   id: djade
           args: [--target-version, "5.1"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.4
+    rev: v0.14.10
     hooks:
       - id: ruff
         args: [--unsafe-fixes]
@@ -55,7 +55,7 @@ repos:
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.3.4
+    rev: v2.3.10
     hooks:
       - id: biome-check
         args: [--unsafe]

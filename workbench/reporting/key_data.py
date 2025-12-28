@@ -18,7 +18,8 @@ from workbench.tools.formats import Z1, Z2
 def gross_profit_by_month(date_range):
     profit = defaultdict(lambda: Z2)
     for result in (
-        Invoice.objects.invoiced()
+        Invoice.objects
+        .invoiced()
         .order_by()
         .filter(invoiced_on__range=date_range)
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
@@ -33,7 +34,8 @@ def third_party_costs_by_month(date_range):
     costs = defaultdict(lambda: Z2)
 
     for result in (
-        LoggedCost.objects.filter(
+        LoggedCost.objects
+        .filter(
             rendered_on__range=date_range,
             third_party_costs__isnull=False,
             invoice_service__isnull=True,
@@ -46,7 +48,8 @@ def third_party_costs_by_month(date_range):
         costs[(result["year"], result["month"])] -= result["third_party_costs__sum"]
 
     for result in (
-        Invoice.objects.invoiced()
+        Invoice.objects
+        .invoiced()
         .filter(~Q(type=Invoice.DOWN_PAYMENT))
         .order_by()
         .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
@@ -132,7 +135,8 @@ def gross_margin_by_month(date_range):
 
 def service_hours_in_open_orders():
     return (
-        Service.objects.budgeted()
+        Service.objects
+        .budgeted()
         .filter(project__type=Project.ORDER, project__closed_on__isnull=True)
         .order_by()
         .aggregate(h=Sum("service_hours"))["h"]
@@ -147,7 +151,8 @@ def projected_gross_margin():
         project__in=open_projects
     ).select_related("project__owned_by")
     invoices = (
-        Invoice.objects.invoiced()
+        Invoice.objects
+        .invoiced()
         .filter(project__in=open_projects)
         .select_related("project__owned_by")
     )
@@ -219,7 +224,8 @@ def unsent_projected_invoices(cutoff_date):
 
 def logged_hours_in_open_orders():
     return (
-        LoggedHours.objects.filter(
+        LoggedHours.objects
+        .filter(
             service__project__type=Project.ORDER,
             service__project__closed_on__isnull=True,
         )
@@ -231,7 +237,8 @@ def logged_hours_in_open_orders():
 
 def sent_invoices_total():
     return (
-        Invoice.objects.filter(status=Invoice.SENT)
+        Invoice.objects
+        .filter(status=Invoice.SENT)
         .order_by()
         .aggregate(t=Sum("total_excl_tax"))["t"]
         or Z2
@@ -240,7 +247,8 @@ def sent_invoices_total():
 
 def due_invoices_total():
     return (
-        Invoice.objects.filter(status=Invoice.SENT, due_on__lte=dt.date.today())
+        Invoice.objects
+        .filter(status=Invoice.SENT, due_on__lte=dt.date.today())
         .order_by()
         .aggregate(t=Sum("total_excl_tax"))["t"]
         or Z2

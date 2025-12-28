@@ -51,7 +51,8 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         users = (
-            User.objects.active()
+            User.objects
+            .active()
             .select_related("specialist_field")
             .order_by("specialist_field", "_full_name")
         )

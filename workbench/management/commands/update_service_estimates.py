@@ -56,7 +56,8 @@ def update_service_estimates():
         estimates |= issue_estimates_from_github_project(project_url)
 
         editable = (
-            Service.objects.filter(
+            Service.objects
+            .filter(
                 project__in=Project.objects.open(),
             )
             .editable()

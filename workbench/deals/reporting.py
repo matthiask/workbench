@@ -13,7 +13,8 @@ from workbench.tools.history import EVERYTHING, changes
 
 def accepted_deals(date_range, *, users=None):
     queryset = (
-        Deal.objects.filter(status=Deal.ACCEPTED, closed_on__range=date_range)
+        Deal.objects
+        .filter(status=Deal.ACCEPTED, closed_on__range=date_range)
         .select_related("customer", "contact__organization", "owned_by")
         .prefetch_related(
             Prefetch(
@@ -115,7 +116,8 @@ def accepted_deals(date_range, *, users=None):
 
 def declined_deals(date_range, *, users=None):
     return (
-        Deal.objects.filter(status=Deal.DECLINED, closed_on__range=date_range)
+        Deal.objects
+        .filter(status=Deal.DECLINED, closed_on__range=date_range)
         .select_related("customer", "contact__organization", "owned_by")
         .prefetch_related(
             Prefetch("values", queryset=Value.objects.select_related("type"))

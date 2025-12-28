@@ -124,7 +124,8 @@ def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
             projects[project_id]["revenue"] += revenue
 
     for row in (
-        logged_costs.filter(third_party_costs__isnull=False)
+        logged_costs
+        .filter(third_party_costs__isnull=False)
         .values("service__project")
         .annotate(cost=Sum("third_party_costs"))
     ):

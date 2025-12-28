@@ -208,7 +208,8 @@ class AssignCreditEntriesForm(forms.Form):
                             ))
                         ),
                     )
-                    for invoice in Invoice.objects.open()
+                    for invoice in Invoice.objects
+                    .open()
                     .filter(total=entry.total)
                     .select_related(
                         "contact__organization", "customer", "owned_by", "project"

@@ -166,7 +166,8 @@ def timestamps(request, form):
     week_range = [monday(day), monday(day) + dt.timedelta(days=7)]
     if not is_this_week:
         weekly_hours = (
-            request.user.loggedhours.filter(
+            request.user.loggedhours
+            .filter(
                 rendered_on__gte=week_range[0],
                 rendered_on__lt=week_range[1],
             )

@@ -11,7 +11,8 @@ def forwards(apps, schema_editor):
     ProjectedInvoice = apps.get_model("invoices", "ProjectedInvoice")
 
     queryset = (
-        Invoice.objects.filter(project__isnull=False)
+        Invoice.objects
+        .filter(project__isnull=False)
         .order_by()
         .annotate(gross_margin=F("total_excl_tax") - F("third_party_costs"))
         .values("project")

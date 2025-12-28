@@ -64,7 +64,8 @@ def _needs_action(user):
         "type": "old_projects",
         "verbose_name_plural": _("Old projects"),
         "url": Project.urls["list"] + "?s=old-projects",
-        "objects": Project.objects.old_projects()
+        "objects": Project.objects
+        .old_projects()
         .own_or_inactive(user)
         .select_related("owned_by"),
     })
@@ -74,7 +75,8 @@ def _needs_action(user):
 
 def _todays_hours(user):
     return (
-        LoggedHours.objects.filter(rendered_by=user, rendered_on=dt.date.today())
+        LoggedHours.objects
+        .filter(rendered_by=user, rendered_on=dt.date.today())
         .select_related("service__project__owned_by", "rendered_by", "timestamp")
         .order_by("-created_at")[:15]
     )
@@ -82,7 +84,8 @@ def _todays_hours(user):
 
 def _all_users_hours():
     return (
-        LoggedHours.objects.filter(rendered_on__gte=in_days(-7))
+        LoggedHours.objects
+        .filter(rendered_on__gte=in_days(-7))
         .select_related("service__project__owned_by", "rendered_by", "timestamp")
         .order_by("-created_at")[:20]
     )

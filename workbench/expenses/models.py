@@ -60,7 +60,8 @@ class ExpenseReport(Model):
     @classmethod
     def allow_create(cls, request):
         if (
-            LoggedCost.objects.expenses(user=request.user)
+            LoggedCost.objects
+            .expenses(user=request.user)
             .filter(expense_report__isnull=True)
             .exists()
         ):

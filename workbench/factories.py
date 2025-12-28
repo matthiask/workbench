@@ -246,7 +246,7 @@ class LoggedCostFactory(DjangoModelFactory):
 class BreakFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     starts_at = factory.LazyAttribute(
-        lambda a: (timezone.now() - dt.timedelta(seconds=3600))
+        lambda a: timezone.now() - dt.timedelta(seconds=3600)
     )
     ends_at = factory.LazyAttribute(lambda a: timezone.now())
     description = "Brk"

@@ -12,7 +12,8 @@ from workbench.tools.formats import Z2
 def playing_bank(projects):
     logged = defaultdict(lambda: {"past": Z2, "future": Z2})
     for row in (
-        LoggedCost.objects.order_by()
+        LoggedCost.objects
+        .order_by()
         .extra(select={"_is_future": f"rendered_on > '{dt.date.today().isoformat()}'"})
         .filter(third_party_costs__isnull=False)
         .exclude(third_party_costs=0)
@@ -25,7 +26,8 @@ def playing_bank(projects):
 
     invoiced = {
         row["project"]: row["third_party_costs__sum"]
-        for row in Invoice.objects.invoiced()
+        for row in Invoice.objects
+        .invoiced()
         .order_by()
         .filter(project__isnull=False)
         .exclude(third_party_costs=0)
@@ -34,7 +36,8 @@ def playing_bank(projects):
     }
     offered = {
         row["project"]: row["third_party_costs__sum"]
-        for row in Service.objects.order_by()
+        for row in Service.objects
+        .order_by()
         .filter(third_party_costs__isnull=False)
         .exclude(third_party_costs=0)
         .values("project")

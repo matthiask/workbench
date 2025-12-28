@@ -19,7 +19,8 @@ class Command(BaseCommand):
     def handle(self, **options):
         # Get accepted offers with their services
         offers = (
-            Offer.objects.accepted()
+            Offer.objects
+            .accepted()
             .select_related("project", "owned_by")
             .prefetch_related("services")
         )

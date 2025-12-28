@@ -148,8 +148,10 @@ class ExpensesTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                "Please close the expense report first. Generating PDFs"
-                " for open expense reports isn't allowed."
+                (
+                    "Please close the expense report first. Generating PDFs"
+                    " for open expense reports isn't allowed."
+                )
             ],
         )
 

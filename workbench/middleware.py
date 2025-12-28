@@ -8,8 +8,8 @@ from django.urls import reverse
 FALLBACKS = None
 
 
-HttpRequest.is_ajax = (
-    lambda self: self.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest"
+HttpRequest.is_ajax = lambda self: (
+    self.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest"
 )
 
 

@@ -24,9 +24,8 @@ class UserFilter(admin.SimpleListFilter):
         return sorted(
             dict(
                 choice(user_name)
-                for user_name in LoggedAction.objects.values_list(
-                    "user_name", flat=True
-                )
+                for user_name in LoggedAction.objects
+                .values_list("user_name", flat=True)
                 .order_by()
                 .distinct()
             ).items(),

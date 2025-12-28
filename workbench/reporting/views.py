@@ -47,7 +47,8 @@ class OpenItemsForm(Form):
 
     def open_items_list(self):
         open_items = (
-            Invoice.objects.invoiced()
+            Invoice.objects
+            .invoiced()
             .filter(
                 Q(invoiced_on__lte=self.cleaned_data["cutoff_date"]),
                 Q(closed_on__gt=self.cleaned_data["cutoff_date"])
@@ -111,7 +112,8 @@ def key_data_gross_profit(request, date_range):
         "reporting/key_data_gross_profit.html",
         {
             "date_range": date_range,
-            "invoices": Invoice.objects.invoiced()
+            "invoices": Invoice.objects
+            .invoiced()
             .filter(invoiced_on__range=date_range)
             .order_by("invoiced_on", "id")
             .select_related("project", "owned_by"),
@@ -126,14 +128,16 @@ def key_data_third_party_costs(request, date_range):
         "reporting/key_data_third_party_costs.html",
         {
             "date_range": date_range,
-            "third_party_costs": LoggedCost.objects.filter(
+            "third_party_costs": LoggedCost.objects
+            .filter(
                 rendered_on__range=date_range,
                 third_party_costs__isnull=False,
                 invoice_service__isnull=True,
             )
             .order_by("rendered_on", "id")
             .select_related("service"),
-            "invoices": Invoice.objects.invoiced()
+            "invoices": Invoice.objects
+            .invoiced()
             .filter(~Q(type=Invoice.DOWN_PAYMENT))
             .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
             .order_by("invoiced_on", "id")
@@ -334,7 +338,8 @@ class ProjectBudgetStatisticsForm(Form):
 
         users = [(user.id, user) for user in User.objects.filter(is_active=True)]
         open_project_owners = set(
-            Project.objects.open()
+            Project.objects
+            .open()
             .external()
             .order_by()
             .values_list("owned_by", flat=True)

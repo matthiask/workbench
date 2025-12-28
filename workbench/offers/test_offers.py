@@ -277,9 +277,11 @@ class OffersTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                "Offers can only be created from projects. Go to the project"
-                " and add services first, then you'll be able to create the offer"
-                " itself."
+                (
+                    "Offers can only be created from projects. Go to the project"
+                    " and add services first, then you'll be able to create the offer"
+                    " itself."
+                )
             ],
         )
 
@@ -547,8 +549,10 @@ class OffersTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                f"All offers of project {offer.project} are declined. You might "
-                "want to close the project now?",
+                (
+                    f"All offers of project {offer.project} are declined. You might "
+                    "want to close the project now?"
+                ),
                 f"Offer '{offer}' has been updated successfully.",
             ],
         )

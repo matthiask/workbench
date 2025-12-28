@@ -69,7 +69,8 @@ class CampaignQuerySet(SearchQuerySet):
     def open(self):
         return self.filter(
             Q(
-                id__in=Project.objects.open()
+                id__in=Project.objects
+                .open()
                 .filter(campaign__isnull=False)
                 .values("campaign")
             )
@@ -78,7 +79,8 @@ class CampaignQuerySet(SearchQuerySet):
     def closed(self):
         return self.filter(
             ~Q(
-                id__in=Project.objects.open()
+                id__in=Project.objects
+                .open()
                 .filter(campaign__isnull=False)
                 .values("campaign")
             )
@@ -146,7 +148,8 @@ class Campaign(Model):
         from workbench.logbook.models import LoggedHours  # noqa: PLC0415
 
         return (
-            LoggedHours.objects.filter(service__project__campaign=self)
+            LoggedHours.objects
+            .filter(service__project__campaign=self)
             .values("service__effort_rate")
             .annotate(Sum("hours"))
             .values_list("service__effort_rate", "hours__sum")
@@ -180,7 +183,8 @@ class ProjectQuerySet(SearchQuerySet):
         from workbench.invoices.models import Invoice  # noqa: PLC0415
 
         return self.exclude(
-            id__in=Invoice.objects.invoiced()
+            id__in=Invoice.objects
+            .invoiced()
             .filter(project__isnull=False)
             .values("project")
         )
@@ -211,14 +215,17 @@ class ProjectQuerySet(SearchQuerySet):
         from workbench.logbook.models import LoggedHours  # noqa: PLC0415
 
         return (
-            self.open()
+            self
+            .open()
             .filter(
-                id__in=LoggedHours.objects.filter(archived_at__isnull=True)
+                id__in=LoggedHours.objects
+                .filter(archived_at__isnull=True)
                 .order_by()
                 .values("service__project")
             )
             .exclude(
-                id__in=LoggedHours.objects.order_by()
+                id__in=LoggedHours.objects
+                .order_by()
                 .filter(rendered_on__gte=in_days(-60))
                 .values("service__project")
             )
@@ -449,7 +456,8 @@ class Project(Model):
         logged_hours_per_effort_rate = defaultdict(lambda: Z1)
 
         for row in (
-            LoggedHours.objects.order_by()
+            LoggedHours.objects
+            .order_by()
             .filter(service__project=self)
             .values("service", "rendered_by")
             .annotate(Sum("hours"))
@@ -461,7 +469,8 @@ class Project(Model):
 
         logged_cost_per_service = {
             row["service"]: row["cost__sum"]
-            for row in LoggedCost.objects.order_by()
+            for row in LoggedCost.objects
+            .order_by()
             .filter(service__project=self)
             .values("service")
             .annotate(Sum("cost"))
@@ -469,7 +478,8 @@ class Project(Model):
 
         not_archived_logged_hours_per_service = {
             row["service"]: row["hours__sum"]
-            for row in LoggedHours.objects.order_by()
+            for row in LoggedHours.objects
+            .order_by()
             .filter(
                 service__project=self,
                 archived_at__isnull=True,
@@ -480,7 +490,8 @@ class Project(Model):
         }
         not_archived_logged_cost_per_service = {
             row["service"]: row["cost__sum"]
-            for row in LoggedCost.objects.order_by()
+            for row in LoggedCost.objects
+            .order_by()
             .filter(service__project=self, archived_at__isnull=True)
             .values("service")
             .annotate(Sum("cost"))
@@ -640,7 +651,8 @@ class Project(Model):
         hours_rate_undefined = Z1
 
         for row in (
-            LoggedHours.objects.order_by()
+            LoggedHours.objects
+            .order_by()
             .filter(service__project=self, archived_at__isnull=True)
             .values("service__effort_rate")
             .annotate(Sum("hours"))
@@ -651,7 +663,8 @@ class Project(Model):
                 total += row["hours__sum"] * row["service__effort_rate"]
 
         total += (
-            LoggedCost.objects.order_by()
+            LoggedCost.objects
+            .order_by()
             .filter(service__project=self, archived_at__isnull=True)
             .aggregate(Sum("cost"))["cost__sum"]
             or Z2

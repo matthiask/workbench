@@ -17,9 +17,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     cutoff_dttm = timezone.make_aware(dt.datetime.combine(cutoff_date, dt.time.max))
 
     costs = (
-        LoggedCost.objects.filter(
-            service__project__in=projects, rendered_on__lte=cutoff_dttm
-        )
+        LoggedCost.objects
+        .filter(service__project__in=projects, rendered_on__lte=cutoff_dttm)
         .order_by()
         .values("service__project")
     )
@@ -35,9 +34,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     }
 
     hours = (
-        LoggedHours.objects.filter(
-            service__project__in=projects, rendered_on__lte=cutoff_dttm
-        )
+        LoggedHours.objects
+        .filter(service__project__in=projects, rendered_on__lte=cutoff_dttm)
         .order_by()
         .values("service__project", "service__effort_rate")
         .annotate(Sum("hours"))
@@ -59,7 +57,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
 
     service_hours = {
         row["project"]: row["service_hours__sum"]
-        for row in Service.objects.budgeted()
+        for row in Service.objects
+        .budgeted()
         .filter(project__in=projects)
         .order_by()
         .values("project")
@@ -68,7 +67,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
 
     sold_per_project = {
         row["project"]: row["total_excl_tax__sum"]
-        for row in Offer.objects.accepted()
+        for row in Offer.objects
+        .accepted()
         .filter(project__in=projects, is_budget_retainer=False)
         .order_by()
         .values("project")
@@ -76,7 +76,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     }
     discount_per_project = {
         row["project"]: -row["discount__sum"]
-        for row in Offer.objects.not_declined()
+        for row in Offer.objects
+        .not_declined()
         .filter(project__in=projects, is_budget_retainer=False)
         .order_by()
         .values("project")
@@ -84,7 +85,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     }
     invoiced_per_project = {
         row["project"]: row["total_excl_tax__sum"]
-        for row in Invoice.objects.invoiced()
+        for row in Invoice.objects
+        .invoiced()
         .filter(project__in=projects, invoiced_on__lte=cutoff_date)
         .order_by()
         .values("project")
@@ -94,9 +96,8 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     projected_gross_margin_on_cutoff_date = {}
     projected_gross_margin = defaultdict(lambda: Z2)
     for row in (
-        ProjectedInvoice.objects.filter(
-            project__in=projects, project__closed_on__isnull=True
-        )
+        ProjectedInvoice.objects
+        .filter(project__in=projects, project__closed_on__isnull=True)
         .annotate(
             before_cutoff_date=models.ExpressionWrapper(
                 models.Q(invoiced_on__lte=cutoff_date),

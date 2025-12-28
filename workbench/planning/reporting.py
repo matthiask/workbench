@@ -201,7 +201,8 @@ class Planning:
 
     def add_worked_hours(self, queryset):
         for row in (
-            queryset.filter(service__project__in=self._project_ids)
+            queryset
+            .filter(service__project__in=self._project_ids)
             .values("service__project", "service__offer", "rendered_on")
             .annotate(Sum("hours"))
         ):
@@ -577,12 +578,14 @@ on week=ph_week
                     starmap(self._project_record, self._projects_offers.items()),
                 ),
                 key=lambda row: (
-                    row["project"]["date_from"],
-                    row["project"]["date_until"],
-                    -row["project"]["planned_hours"],
-                )
-                if row["project"]["date_from"] and row["project"]["date_until"]
-                else (),
+                    (
+                        row["project"]["date_from"],
+                        row["project"]["date_until"],
+                        -row["project"]["planned_hours"],
+                    )
+                    if row["project"]["date_from"] and row["project"]["date_until"]
+                    else ()
+                ),
             ),
             "by_week": [self._by_week[week] for week in self.weeks],
             "by_week_provisional": [

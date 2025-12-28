@@ -55,7 +55,8 @@ def annual_working_time_view(request):
             "object": year,
             "year": year,
             "years": sorted(
-                Year.objects.filter(year__lte=this_year + 1)
+                Year.objects
+                .filter(year__lte=this_year + 1)
                 .order_by()
                 .values_list("year", flat=True)
                 .distinct(),

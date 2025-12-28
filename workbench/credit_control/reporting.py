@@ -33,7 +33,8 @@ def paid_debtors_zip(date_range, *, file, qr=False):
     xlsx = WorkbenchXLSXDocument()
 
     invoices = (
-        Invoice.objects.filter(invoiced_on__range=date_range)
+        Invoice.objects
+        .filter(invoiced_on__range=date_range)
         .exclude(status=Invoice.IN_PREPARATION)
         .order_by("invoiced_on", "id")
         .select_related("project", "owned_by")
@@ -115,7 +116,8 @@ def paid_debtors_zip(date_range, *, file, qr=False):
                     invoice.closed_on,
                     invoice.payment_notice,
                 )
-                for invoice in Invoice.objects.filter(status=Invoice.CANCELED)
+                for invoice in Invoice.objects
+                .filter(status=Invoice.CANCELED)
                 .order_by("closed_on", "id")
                 .select_related("project", "owned_by")
             ],
@@ -124,7 +126,8 @@ def paid_debtors_zip(date_range, *, file, qr=False):
         for ledger in Ledger.objects.all():
             rows = []
             for entry in (
-                CreditEntry.objects.filter(ledger=ledger, value_date__range=date_range)
+                CreditEntry.objects
+                .filter(ledger=ledger, value_date__range=date_range)
                 .order_by("value_date")
                 .select_related("invoice__project", "invoice__owned_by")
             ):

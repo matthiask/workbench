@@ -244,8 +244,10 @@ class ProjectsTest(TestCase):
             dict(response.context_data["form"].errors),
             {
                 "contact": [
-                    "The contact Vorname Nachname"
-                    " does not belong to The Organization Ltd."
+                    (
+                        "The contact Vorname Nachname"
+                        " does not belong to The Organization Ltd."
+                    )
                 ]
             },
         )

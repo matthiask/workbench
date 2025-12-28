@@ -75,9 +75,8 @@ def export_debtors(request):
 
         if archive := data.get("archive"):
             (
-                Invoice.objects.filter(
-                    invoiced_on__lte=archive, archived_at__isnull=True
-                )
+                Invoice.objects
+                .filter(invoiced_on__lte=archive, archived_at__isnull=True)
                 .exclude(status=Invoice.IN_PREPARATION)
                 .update(archived_at=timezone.now())
             )

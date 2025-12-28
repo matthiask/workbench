@@ -109,7 +109,8 @@ class Command(BaseCommand):
         user_dict = {u.id: u for u in User.objects.all()}
 
         logged = (
-            LoggedHours.objects.filter(rendered_on__range=date_range)
+            LoggedHours.objects
+            .filter(rendered_on__range=date_range)
             .order_by()
             .values("rendered_by", "service__project")
             .annotate(Sum("hours"))
@@ -122,7 +123,8 @@ class Command(BaseCommand):
             users[u]["hours_in_range"] += row["hours__sum"]
 
         total_hours = (
-            LoggedHours.objects.order_by()
+            LoggedHours.objects
+            .order_by()
             .filter(service__project__in=projects.keys())
             .values("service__project")
             .annotate(Sum("hours"))
@@ -131,7 +133,8 @@ class Command(BaseCommand):
             projects[row["service__project"]]["hours_logged"] = row["hours__sum"]
 
         offered_hours = (
-            Service.objects.order_by()
+            Service.objects
+            .order_by()
             .budgeted()
             .filter(project__in=projects.keys(), project__closed_on__isnull=True)
             .values("project")
@@ -141,7 +144,8 @@ class Command(BaseCommand):
             projects[row["project"]]["hours_offered"] = row["service_hours__sum"]
 
         invoiced_per_project = (
-            Invoice.objects.invoiced()
+            Invoice.objects
+            .invoiced()
             .filter(project__in=projects.keys())
             .order_by()
             .values("project")
@@ -156,7 +160,8 @@ class Command(BaseCommand):
         # invoiced yet. Maybe we're double counting here but I'd rather have a
         # pessimistic outlook here.
         for row in (
-            LoggedCost.objects.filter(
+            LoggedCost.objects
+            .filter(
                 service__project__in=projects.keys(),
                 third_party_costs__isnull=False,
                 invoice_service__isnull=True,
@@ -180,7 +185,8 @@ class Command(BaseCommand):
         for offer in offers:
             projects[offer.project_id]["offered"] += offer.total_excl_tax
         for row in (
-            Service.objects.filter(offer__in=offers, third_party_costs__isnull=False)
+            Service.objects
+            .filter(offer__in=offers, third_party_costs__isnull=False)
             .order_by()
             .values("project")
             .annotate(Sum("third_party_costs"))

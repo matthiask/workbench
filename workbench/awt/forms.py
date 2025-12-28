@@ -134,7 +134,8 @@ class CalendarFilterForm(Form):
             + [
                 (str(year), str(year))
                 for year in sorted(
-                    Year.objects.filter(year__lte=dt.date.today().year)
+                    Year.objects
+                    .filter(year__lte=dt.date.today().year)
                     .order_by()
                     .values_list("year", flat=True)
                     .distinct(),

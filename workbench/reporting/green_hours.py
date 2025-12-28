@@ -49,7 +49,8 @@ WHERE service.hours / logged.hours < 1
     user_ids = set()
 
     for row in (
-        LoggedHours.objects.filter(rendered_on__range=date_range)
+        LoggedHours.objects
+        .filter(rendered_on__range=date_range)
         .order_by()
         .values("service__project", "rendered_by")
         .annotate(Sum("hours"))

@@ -144,7 +144,8 @@ def annual_working_time(year, *, users):
             month_data["employments"].add(employment)
 
     for row in (
-        LoggedHours.objects.order_by()
+        LoggedHours.objects
+        .order_by()
         .filter(rendered_by__in=months.users_with_wtm, rendered_on__year=year)
         .values("rendered_by")
         .annotate(month=ExtractMonth("rendered_on"))

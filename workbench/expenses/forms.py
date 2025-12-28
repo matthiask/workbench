@@ -107,7 +107,8 @@ class ExpenseReportForm(ModelForm):
                     else "",
                 ),
             )
-            for cost in self.fields["expenses"]
+            for cost in self
+            .fields["expenses"]
             .queryset.select_related("service__project__owned_by")
             .order_by("rendered_on", "pk")
         ]

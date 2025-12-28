@@ -309,8 +309,10 @@ class AWTTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                "No annual working time defined for user Hans"
-                " with working time model Test."
+                (
+                    "No annual working time defined for user Hans"
+                    " with working time model Test."
+                )
             ],
         )
 
@@ -359,8 +361,10 @@ class AWTTest(TestCase):
             (
                 "__all__",
                 [
-                    "Either provide both hourly labor costs"
-                    " and green hours target or none."
+                    (
+                        "Either provide both hourly labor costs"
+                        " and green hours target or none."
+                    )
                 ],
             )
         ]

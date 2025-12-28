@@ -618,7 +618,8 @@ class RecurringInvoiceQuerySet(SearchQuerySet):
     def renewal_candidates(self):
         today = dt.date.today()
         return (
-            self.annotate(_start=Coalesce("next_period_starts_on", "starts_on"))
+            self
+            .annotate(_start=Coalesce("next_period_starts_on", "starts_on"))
             .filter(
                 Q(_start__lte=today - F("create_invoice_on_day")),
                 Q(ends_on__isnull=True) | Q(ends_on__gte=F("_start")),

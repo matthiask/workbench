@@ -89,8 +89,10 @@ def search(queryset, terms):
     return (
         queryset.extra(
             where=[
-                f"{queryset.model._meta.db_table}.fts_document"
-                " @@ to_tsquery('pg_catalog.german', unaccent(%s))"
+                (
+                    f"{queryset.model._meta.db_table}.fts_document"
+                    " @@ to_tsquery('pg_catalog.german', unaccent(%s))"
+                )
             ],
             params=[process_query(terms)],
         )

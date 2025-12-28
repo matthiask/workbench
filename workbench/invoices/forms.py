@@ -991,7 +991,8 @@ class SendReminderForm(Form):
         super().__init__(*args, **kwargs)
 
         self.invoices = (
-            Invoice.objects.overdue()
+            Invoice.objects
+            .overdue()
             .filter(contact=self.contact)
             .select_related("customer", "contact__organization", "owned_by", "project")
         )

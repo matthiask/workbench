@@ -446,7 +446,8 @@ def _get_project_v2_cards(
                     "body": content.get("body"),
                     "state": content.get("state"),
                     "repo": content.get("repository", {}).get("name"),
-                    "owner": content.get("repository", {})
+                    "owner": content
+                    .get("repository", {})
                     .get("owner", {})
                     .get("login"),
                 }

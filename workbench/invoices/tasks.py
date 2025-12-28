@@ -130,7 +130,8 @@ def autodunning():
         return
 
     invoices = (
-        Invoice.objects.autodunning()
+        Invoice.objects
+        .autodunning()
         .select_related("customer", "contact__organization", "owned_by", "project")
         .order_by("customer", "contact")
     )

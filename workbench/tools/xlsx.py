@@ -27,9 +27,9 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 (capfirst(_("project")), lambda hours: hours.service.project),
                 (
                     capfirst(_("invoice")),
-                    lambda hours: hours.invoice_service.invoice
-                    if hours.invoice_service
-                    else None,
+                    lambda hours: (
+                        hours.invoice_service.invoice if hours.invoice_service else None
+                    ),
                 ),
             ],
         )
@@ -182,9 +182,9 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 (capfirst(_("project")), lambda cost: cost.service.project),
                 (
                     capfirst(_("invoice")),
-                    lambda cost: cost.invoice_service.invoice
-                    if cost.invoice_service
-                    else None,
+                    lambda cost: (
+                        cost.invoice_service.invoice if cost.invoice_service else None
+                    ),
                 ),
             ],
         )

@@ -41,7 +41,8 @@ class Command(BaseCommand):
         # pprint(specialist_fields)
 
         accepted = (
-            Deal.objects.filter(status=Deal.ACCEPTED, closed_on__range=date_range)
+            Deal.objects
+            .filter(status=Deal.ACCEPTED, closed_on__range=date_range)
             .prefetch_related("values")
             .select_related("customer")
         )
@@ -57,9 +58,8 @@ class Command(BaseCommand):
             customer__in=per_customer_and_value_type.keys()
         )
         projected = dict(
-            ProjectedInvoice.objects.filter(
-                project__in=projects, project__closed_on__isnull=True
-            )
+            ProjectedInvoice.objects
+            .filter(project__in=projects, project__closed_on__isnull=True)
             .order_by()
             .values("project")
             .annotate(gross_margin=Sum("gross_margin"))
@@ -68,7 +68,8 @@ class Command(BaseCommand):
 
         invoiced = defaultdict(lambda: Z2)
         invoiced_per_project = (
-            Invoice.objects.invoiced()
+            Invoice.objects
+            .invoiced()
             .filter(project__in=projects)
             .order_by()
             .values("project")
@@ -83,7 +84,8 @@ class Command(BaseCommand):
         # invoiced yet. Maybe we're double counting here but I'd rather have a
         # pessimistic outlook here.
         for row in (
-            LoggedCost.objects.filter(
+            LoggedCost.objects
+            .filter(
                 service__project__in=projects,
                 third_party_costs__isnull=False,
                 invoice_service__isnull=True,
@@ -99,7 +101,8 @@ class Command(BaseCommand):
         }
 
         hours = (
-            LoggedHours.objects.order_by()
+            LoggedHours.objects
+            .order_by()
             .filter(service__project__in=projects)
             .values("service__project", "rendered_by__specialist_field__value_type")
             .annotate(Sum("hours"))

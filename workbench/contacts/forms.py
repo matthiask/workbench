@@ -419,9 +419,8 @@ class PostalAddressSelectionForm(ModelForm):
                 ))
             postal_addresses.extend(
                 (pa.type, pa.postal_address)
-                for pa in PostalAddress.objects.filter(
-                    person__organization=organization
-                )
+                for pa in PostalAddress.objects
+                .filter(person__organization=organization)
                 .exclude(person=person)
                 .exclude(person__is_archived=True)
                 .select_related("person__organization")

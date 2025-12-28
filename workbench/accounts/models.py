@@ -227,7 +227,8 @@ class User(Model, AbstractBaseUser):
     def hours(self):
         per_day = {
             row["rendered_on"]: row["hours__sum"]
-            for row in self.loggedhours.filter(rendered_on__gte=monday())
+            for row in self.loggedhours
+            .filter(rendered_on__gte=monday())
             .order_by()
             .values("rendered_on")
             .annotate(Sum("hours"))
@@ -244,7 +245,8 @@ class User(Model, AbstractBaseUser):
 
         pinned = [
             obj.project
-            for obj in self.pinned_projects.through.objects.filter(user=self)
+            for obj in self.pinned_projects.through.objects
+            .filter(user=self)
             .select_related(
                 "project__customer",
                 "project__contact__organization",
@@ -257,10 +259,12 @@ class User(Model, AbstractBaseUser):
 
         return chain(
             pinned,
-            Project.objects.filter(
+            Project.objects
+            .filter(
                 Q(
                     closed_on__isnull=True,
-                    id__in=self.loggedhours.filter(rendered_on__gte=in_days(-3))
+                    id__in=self.loggedhours
+                    .filter(rendered_on__gte=in_days(-3))
                     .values("service__project")
                     .annotate(Count("id"))
                     .filter(id__count__gte=3)
@@ -339,7 +343,8 @@ select max(created_at) from sq
 
         day = day or dt.date.today()
         hours = (
-            self.loggedhours.filter(rendered_on=day)
+            self.loggedhours
+            .filter(rendered_on=day)
             .order_by()
             .aggregate(h=Sum("hours"))["h"]
             or Z1

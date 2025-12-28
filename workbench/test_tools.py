@@ -69,8 +69,10 @@ class ToolsTest(TestCase):
         self.assertEqual(
             messages(response),
             [
-                f"Cannot delete '{project}' because of related objects (Any service: Bla)."
-                ""
+                (
+                    f"Cannot delete '{project}' because of related objects (Any service: Bla)."
+                    ""
+                )
             ],
         )
 

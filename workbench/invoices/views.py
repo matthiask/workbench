@@ -133,7 +133,8 @@ def reminders(request):
         return HttpResponseRedirect(".")
 
     invoices = (
-        Invoice.objects.overdue()
+        Invoice.objects
+        .overdue()
         .select_related("customer", "contact__organization", "owned_by", "project")
         # .order_by("customer", "contact")
         .order_by(F("last_reminded_on").asc(nulls_first=True), "invoiced_on")
@@ -156,7 +157,8 @@ def reminders(request):
 
 def dunning_letter(request, contact_id):
     if invoices := list(
-        Invoice.objects.overdue()
+        Invoice.objects
+        .overdue()
         .filter(contact=contact_id)
         .select_related("customer", "contact__organization", "owned_by", "project")
     ):

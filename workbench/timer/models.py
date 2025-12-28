@@ -150,9 +150,11 @@ class TimestampQuerySet(models.QuerySet):
         # recent.
         entries = sorted(
             entries,
-            key=lambda timestamp: timestamp.logged_break.ends_at
-            if timestamp.logged_break
-            else timestamp.created_at,
+            key=lambda timestamp: (
+                timestamp.logged_break.ends_at
+                if timestamp.logged_break
+                else timestamp.created_at
+            ),
         )
 
         # 1. Create slices
