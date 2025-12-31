@@ -518,6 +518,26 @@
                     </td>
                   </tr>
                 {% endfor %}
+
+                <tr class="thead-light">
+                  <th colspan="3">
+                    {% translate 'other reasons (no working time)' %}
+                    <small>{% translate 'Only shown for completeness.' %}</small>
+                  </th>
+                </tr>
+                {% for absence in data.other_absences %}
+                  <tr>
+                    <td>
+                      {{ absence.pretty_period }}
+                    </td>
+                    <td>
+                      {{ absence.days|days }}
+                    </td>
+                    <td>
+                      {% link_or_none absence %}
+                    </td>
+                  </tr>
+                {% endfor %}
               </table>
             </div>
           </div>

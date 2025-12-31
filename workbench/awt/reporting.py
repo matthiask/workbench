@@ -221,6 +221,12 @@ def annual_working_time(year, *, users):
         if vacation_days > 0:
             vacation_days_credit[user_id] = vacation_days
 
+    other_absences = defaultdict(list)
+    for absence in Absence.objects.filter(
+        user__in=months.users_with_wtm, starts_on__year=year, is_working_time=False
+    ):
+        other_absences[absence.user_id].append(absence)
+
     def absences_time(data):
         return [
             sum(
@@ -264,6 +270,7 @@ def annual_working_time(year, *, users):
                 "user": user,
                 "months": month_data,
                 "absences": absences[user.id],
+                "other_absences": other_absences[user.id],
                 "employments": reversed(month_data["employments"]),
                 "working_time": wt,
                 "absences_time": at,

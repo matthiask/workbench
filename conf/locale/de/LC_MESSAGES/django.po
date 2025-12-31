@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-11 09:31+0100\n"
+"POT-Creation-Date: 2025-12-31 16:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -297,6 +297,7 @@ msgid "You should take (and log!) a break of at least %(minutes)s minutes when w
 msgstr "Du musst eine Pause von mindestens %(minutes)s Minuten machen (und erfassen!), wenn Du mehr als %(hours)s Stunden arbeitest."
 
 #: workbench/accounts/models.py
+#, python-brace-format
 msgid "You have {} unlogged timestamps from this week only. You should probably go and check them."
 msgstr "Du hast {} nicht erfasste Zeitmarken, nur von dieser Woche. Du solltest diese vermutlich prüfen gehen."
 
@@ -595,7 +596,7 @@ msgstr "Bezahlter Urlaub (zB Zivildienst, Elternurlaub, Zügeln etc.)"
 msgid "School attendance of apprentices"
 msgstr "Schulbesuch durch Auszubildende"
 
-#: workbench/awt/models.py
+#: workbench/awt/models.py workbench/templates/awt/year_detail.html
 msgid "other reasons (no working time)"
 msgstr "Andere Gründe (keine Arbeitszeit)"
 
@@ -1728,6 +1729,7 @@ msgid "A negative subtotal is almost certainly an error. Did you want to create 
 msgstr "Ein negatives Zwischentotal ist fast sicher ein Fehler. Wolltest Du eine Gutschrift erstellen?"
 
 #: workbench/invoices/forms.py
+#, python-brace-format
 msgid "Cannot create an invoice with a date of {} or earlier anymore."
 msgstr "Kann Rechnungen mit einem Datum von {} oder früher nicht mehr erstellen."
 
@@ -1843,6 +1845,7 @@ msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 
 #: workbench/invoices/forms.py
+#, python-brace-format
 msgid "Cannot create a recurring invoice with a start date of {} or earlier anymore."
 msgstr "Kann Stapelrechnung mit einem Startdatum von {} oder früher nicht mehr erstellen."
 
@@ -2105,6 +2108,7 @@ msgid "For your information"
 msgstr "Zur Kenntnisnahme"
 
 #: workbench/invoices/views.py workbench/offers/views.py
+#, python-brace-format
 msgid "Unable to generate the PDF: {}"
 msgstr "Konnte das PDF nicht generieren: {}"
 
@@ -2469,6 +2473,7 @@ msgid "Delta"
 msgstr "Delta"
 
 #: workbench/management/commands/squeeze.py
+#, python-brace-format
 msgid "Target value w/ {}/h"
 msgstr "Richtwert mit {}/h"
 
@@ -2936,6 +2941,7 @@ msgid "today"
 msgstr "heute"
 
 #: workbench/projects/forms.py
+#, python-brace-format
 msgid "This project has been closed on or before {} and cannot be reopened anymore."
 msgstr "Dieses Projekt wurde am oder vor dem {} geschlossen und kann nicht mehr geöffnet werden."
 
@@ -2956,6 +2962,7 @@ msgid "You are adding a flat rate to a project which already has services. Those
 msgstr "Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
 
 #: workbench/projects/forms.py
+#, python-brace-format
 msgid "Cannot close a project with a date of {} or earlier anymore."
 msgstr "Kann Projekte nicht mehr mit einem Datum von {} oder früher schliessen."
 
@@ -3461,6 +3468,10 @@ msgstr "Bitte mindestens einmal zwei Wochen Ferien am Stück einplanen."
 #, python-format
 msgid "from %(date)s"
 msgstr "Ab %(date)s"
+
+#: workbench/templates/awt/year_detail.html
+msgid "Only shown for completeness."
+msgstr "Nur der Vollständigkeit halber aufgeführt."
 
 #: workbench/templates/base.html
 msgid "reports"
