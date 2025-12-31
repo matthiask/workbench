@@ -1,13 +1,13 @@
-FROM --platform=linux/amd64 python:3.14-slim as backend
+# See https://docs.astral.sh/uv/guides/integration/docker/#available-images
+FROM --platform=linux/amd64 ghcr.io/astral-sh/uv:python3.14-trixie as backend
 WORKDIR /src
 ENV PYTHONUNBUFFERED 1
-ENV VIRTUAL_ENV=/usr/local
 ADD requirements.txt .
-RUN pip install uv && uv pip install -r requirements.txt --system
+RUN uv venv && uv pip install -r requirements.txt
 ADD . /src
 COPY conf/_env .env
-RUN python manage.py collectstatic --noinput && rm .env
+RUN uv run python manage.py collectstatic --noinput && rm .env
 RUN useradd -U -d /src deploy
 USER deploy
 EXPOSE 8000
-CMD ["granian", "--interface", "wsgi", "wsgi:application", "--workers", "2", "--host", "0.0.0.0", "--port", "8000", "--respawn-failed-workers", "--static-path-mount", "/src/static/", "--static-path-expires", "720d"]
+CMD ["uv", "run", "granian", "--interface", "wsgi", "wsgi:application", "--workers", "2", "--host", "0.0.0.0", "--port", "8000", "--respawn-failed-workers", "--static-path-mount", "/src/static/", "--static-path-expires", "720d"]
