@@ -5,7 +5,7 @@ beautifulsoup4==4.14.3
 certifi==2025.11.12
 charset-normalizer==3.4.4
 click==8.3.1
-coverage==7.13.0
+coverage==7.13.1
 cssselect2==0.8.0
 django==6.0
 django-admin-ordering==0.20.0
@@ -21,7 +21,7 @@ django-js-asset==3.1.2
 django-vanilla-views==3.0.0
 et-xmlfile==2.0.0
 factory-boy==3.3.3
-faker==39.0.0
+faker==40.1.0
 granian==2.6.0
 idna==3.11
 iso3166==2.1.1

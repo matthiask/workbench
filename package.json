@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "@rspack/cli": "^1.6.8",
-    "@rspack/core": "^1.6.8",
+    "@rspack/cli": "^1.7.0",
+    "@rspack/core": "^1.7.0",
     "@swc/helpers": "^0.5.18",
     "autoprefixer": "^10.4.23",
     "bootstrap": "^5.3.8",
