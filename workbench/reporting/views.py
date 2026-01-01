@@ -212,7 +212,9 @@ def key_data_view(request):
             year["gross_margin"] / year["fte"] if year["fte"] else None
         )
 
-    gmp_factor = Decimal("365.24") / Decimal((today - dt.date(today.year, 1, 1)).days)
+    gmp_factor = Decimal("365.24") / (
+        1 + Decimal((today - dt.date(today.year, 1, 1)).days)
+    )
     gm = gross_margin_by_years[today.year]
     gross_margin_projection = {
         "gross_profit": gm["gross_profit"] * gmp_factor,
