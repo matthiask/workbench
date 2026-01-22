@@ -123,6 +123,11 @@ LOCALE_PATHS = [BASE_DIR / "conf" / "locale"]
 AUTHENTICATION_BACKENDS = ["authlib.backends.EmailBackend"]
 
 DATABASES = {"default": django_database_url(env("DATABASE_URL", required=True))}
+DATABASES["default"] |= {
+    "CONN_HEALTH_CHECKS": True,
+    "CONN_MAX_AGE": 300,
+    "DISABLE_SERVER_SIDE_CURSORS": True,
+}
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 ATOMIC_REQUESTS = True
 
