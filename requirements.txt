@@ -14,7 +14,7 @@ django-bootstrap5==26.1
 django-colorfield==0.14.0
 django-cors-headers==4.9.0
 django-countries==8.2.0
-django-debug-toolbar==6.1.0
+django-debug-toolbar==6.2.0
 django-fast-export==0.1.1
 django-fineforms==0.7.0
 django-js-asset==3.1.2
@@ -30,7 +30,7 @@ more-itertools==10.8.0
 oauthlib==3.3.1
 openpyxl==3.1.5
 pdfdocument==4.0.0
-phonenumbers==9.0.21
+phonenumbers==9.0.22
 pillow==12.1.0
 psycopg==3.3.2
 psycopg-binary==3.3.2
@@ -42,9 +42,9 @@ qrcode==8.2
 reportlab==4.4.9
 requests==2.32.5
 requests-oauthlib==2.0.0
-sentry-sdk==2.49.0
+sentry-sdk==2.50.0
 six==1.17.0
-soupsieve==2.8.1
+soupsieve==2.8.3
 speckenv==6.2
 sqlparse==0.5.5
 svglib==1.5.1
