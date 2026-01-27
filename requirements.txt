@@ -5,7 +5,7 @@ beautifulsoup4==4.14.3
 certifi==2026.1.4
 charset-normalizer==3.4.4
 click==8.3.1
-coverage==7.13.1
+coverage==7.13.2
 cssselect2==0.8.0
 django==6.0.1
 django-admin-ordering==0.20.0
