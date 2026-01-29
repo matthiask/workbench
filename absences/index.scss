@@ -86,6 +86,46 @@ $z-index: (
     calc(var(--day-count) * ((var(--day-column-width) + var(--grid-gap)))) 100%;
 }
 
+[data-bs-theme="dark"] .absences {
+  background:
+    /* Person Row Divider */
+    repeating-linear-gradient(
+      to bottom,
+      #555 0,
+      #555 var(--grid-gap),
+      transparent 0,
+      transparent calc(var(--person-row-height) + var(--grid-gap))
+    ),
+    /* Name Column */
+      linear-gradient(
+        to right,
+        #1a1a1a 0,
+        #1a1a1a calc(var(--name-column-width) + var(--grid-gap))
+      ),
+    /* Week Columns */
+      repeating-linear-gradient(
+        to right,
+        #2a2a3a 0,
+        #2a2a3a calc((var(--day-column-width) + var(--grid-gap)) * 7),
+        #1a1a1a 0,
+        #1a1a1a calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
+      );
+  background-position:
+    0 var(--scale-row-height),
+    0,
+    calc(
+        var(--name-column-width) + var(--grid-gap) + var(--day-column-offset) *
+          ((var(--day-column-width) + var(--grid-gap)))
+      )
+      0;
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size:
+    100%
+      calc(var(--person-count) * (var(--person-row-height) + var(--grid-gap))),
+    calc(var(--name-column-width) + var(--grid-gap)) auto,
+    calc(var(--day-count) * ((var(--day-column-width) + var(--grid-gap)))) 100%;
+}
+
 .absences__scale-tick {
   grid-row: scale / span 1;
 
@@ -122,6 +162,11 @@ $z-index: (
 
   overflow: hidden;
   white-space: nowrap;
+}
+
+[data-bs-theme="dark"] .absences__person {
+  border-right: #555 var(--grid-gap) solid;
+  background-color: #1a1a1a;
 }
 
 .absence {
@@ -181,6 +226,16 @@ $z-index: (
 
   hr {
     border-color: $alto;
+  }
+}
+
+[data-bs-theme="dark"] .absence__popup {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #555;
+
+  hr {
+    border-color: #555;
   }
 }
 
