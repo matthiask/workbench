@@ -375,3 +375,7 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+[data-bs-theme="dark"] .navbar {
+  background-color: #0d0d0d !important;
+}

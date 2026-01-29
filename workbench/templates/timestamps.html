@@ -69,7 +69,7 @@
                   {% if slice.elapsed_hours %}({{ slice.elapsed_hours|hours:True }}){% endif %}
                   {{ slice.description }}
                   {% if slice.comment %}<em>{{ slice.comment }}</em>{% endif %}
-                  {% if slice.project %}<br><small class="text-black-50">{{ slice.project }}</small>{% endif %}
+                  {% if slice.project %}<br><small class="text-body-secondary">{{ slice.project }}</small>{% endif %}
                 </div>
                 <div class="ms-auto">
                   {% if slice.hours_create_url %}
