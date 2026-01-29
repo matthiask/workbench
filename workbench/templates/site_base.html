@@ -5,6 +5,23 @@
     <title>
       {% block title %}{{ WORKBENCH.TITLE }}{% endblock %}
     </title>
+    <script>
+      // Set theme immediately to prevent flash of wrong theme
+      (function() {
+        const getStoredTheme = () => window.localStorage.getItem('theme');
+        const getSystemTheme = () => {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+        const getActiveTheme = () => {
+          const storedTheme = getStoredTheme();
+          if (storedTheme === 'light' || storedTheme === 'dark') {
+            return storedTheme;
+          }
+          return getSystemTheme();
+        };
+        document.documentElement.setAttribute('data-bs-theme', getActiveTheme());
+      })();
+    </script>
     <script src="{% static 'workbench/lib/jquery.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
     <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>

@@ -44,6 +44,42 @@
       </table>
       <script src="{% static 'workbench/lib/chart.js' %}"></script>
 
+      <script>
+    // Helper function to adjust colors based on theme
+    function getChartColor(lightColor, darkColor) {
+      const theme = document.documentElement.getAttribute('data-bs-theme');
+      return theme === 'dark' ? darkColor : lightColor;
+    }
+
+    // Define color sets for light and dark modes
+    const chartColors = {
+      set1: {
+        bg: getChartColor('rgba(30, 0, 100, 0.3)', 'rgba(120, 100, 200, 0.5)'),
+        border: getChartColor('rgba(30, 0, 100, 0.3)', 'rgba(120, 100, 200, 0.6)')
+      },
+      set2: {
+        bg: getChartColor('rgba(100, 30, 50, 0.3)', 'rgba(220, 120, 150, 0.5)'),
+        border: getChartColor('rgba(100, 30, 50, 0.4)', 'rgba(220, 120, 150, 0.6)')
+      },
+      set3: {
+        bg: getChartColor('rgba(0, 150, 0, 0.3)', 'rgba(100, 220, 100, 0.5)'),
+        border: getChartColor('rgba(0, 150, 0, 0.4)', 'rgba(100, 220, 100, 0.6)')
+      },
+      set4: {
+        bg: getChartColor('rgba(0, 0, 150, 0.3)', 'rgba(100, 150, 255, 0.5)'),
+        border: getChartColor('rgba(0, 0, 150, 0.4)', 'rgba(100, 150, 255, 0.6)')
+      },
+      projected: {
+        bg: getChartColor('rgba(100, 180, 180, 0.4)', 'rgba(150, 220, 220, 0.5)'),
+        border: getChartColor('rgba(100, 180, 180, 0.6)', 'rgba(150, 220, 220, 0.7)')
+      },
+      green: getChartColor('rgba(0, 150, 0, 0.4)', 'rgba(100, 220, 100, 0.5)'),
+      brown: getChartColor('rgba(50, 40, 30, 0.4)', 'rgba(180, 160, 140, 0.5)'),
+      orange: getChartColor('rgba(150, 50, 30, 0.4)', 'rgba(255, 150, 120, 0.5)'),
+      blue: getChartColor('rgba(0, 0, 150, 0.4)', 'rgba(100, 150, 255, 0.5)')
+    };
+      </script>
+
       <h2 class="mt-5">{% translate 'Revenue minus third party costs and accruals' %}</h2>
       <canvas id="invoiced-corrected" width="1200" height="450"></canvas>
       <script>
@@ -56,8 +92,8 @@
           {
             label: "{{ year }}",
             data: [{% for value in month_data %}{{ value|stringformat:"d" }},{% endfor %}],
-            backgroundColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
-            borderColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            backgroundColor: {% cycle 'chartColors.set1.bg' 'chartColors.set2.bg' 'chartColors.set3.bg' 'chartColors.set4.bg' %},
+            borderColor: {% cycle 'chartColors.set1.border' 'chartColors.set2.border' 'chartColors.set3.border' 'chartColors.set4.border' %},
             type: "{% cycle 'line' 'line' 'line' 'bar' %}",
             stack: "{% cycle '' '' '' 'this' %}",
           },
@@ -65,8 +101,8 @@
           {
             label: "{% translate 'projected gross margin'|capfirst %}",
             data: [{% for pi in projected_gross_margin %}{{ pi|stringformat:'d' }},{% endfor %}],
-            backgroundColor: "rgba(100, 180, 180, 0.4)",
-            borderColor: "rgba(100, 180, 180, 0.6)",
+            backgroundColor: chartColors.projected.bg,
+            borderColor: chartColors.projected.border,
             type: "bar",
             stack: "this",
           },
@@ -102,8 +138,8 @@
           {
             label: "{{ year }}",
             data: [{% for quarter in quarters %}{{ quarter|stringformat:"d" }},{% endfor %}],
-            backgroundColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.3)' 'rgba(0, 150, 0, 0.3)' 'rgba(0, 0, 150, 0.3)' %}",
-            borderColor: "{% cycle 'rgba(30, 0, 100, 0.3)' 'rgba(100, 30, 50, 0.4)' 'rgba(0, 150, 0, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            backgroundColor: {% cycle 'chartColors.set1.bg' 'chartColors.set2.bg' 'chartColors.set3.bg' 'chartColors.set4.bg' %},
+            borderColor: {% cycle 'chartColors.set1.border' 'chartColors.set2.border' 'chartColors.set3.border' 'chartColors.set4.border' %},
             type: "{% cycle 'line' 'line' 'line' 'bar' %}",
             stack: "{% cycle '' '' '' 'this' %}",
           },
@@ -251,7 +287,7 @@
           {
             label: "{{ dataset.label }}",
             data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }},{% endfor %}],
-            backgroundColor: "{% cycle 'rgba(0, 150, 0, 0.4)' 'rgba(50, 40, 30, 0.4)' 'rgba(150, 50, 30, 0.4)' 'rgba(0, 0, 150, 0.4)' %}",
+            backgroundColor: {% cycle 'chartColors.green' 'chartColors.brown' 'chartColors.orange' 'chartColors.blue' %},
             fill: true,
           },
           {% endfor %}

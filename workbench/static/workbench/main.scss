@@ -62,6 +62,10 @@ body {
   display: inline-block;
   font-size: 0.5em;
   vertical-align: top;
+
+  svg {
+    fill: currentColor;
+  }
 }
 
 .btn {
@@ -102,7 +106,7 @@ tbody th > a {
   position: sticky;
   z-index: 1;
   top: 47px;
-  background: white;
+  background: var(--bs-body-bg);
 }
 
 .inline {
@@ -157,7 +161,7 @@ tbody th > a {
   display: block;
   margin: -8px 0 4px;
   font-size: 85%;
-  color: #443 !important;
+  color: var(--bs-secondary-color) !important;
 }
 
 .progress-line {
@@ -191,24 +195,50 @@ tbody th > a {
   fill: #325d88;
 }
 
+[data-bs-theme="dark"] .pie .pie-circle {
+  fill: #5a8ec0;
+}
+
 .pie .pie-arc {
   fill: #f47c3c;
 }
+
+[data-bs-theme="dark"] .pie .pie-arc {
+  fill: #ff9d6b;
+}
+
 .pie.good .pie-arc {
   fill: lightgreen;
+}
+
+[data-bs-theme="dark"] .pie.good .pie-arc {
+  fill: #90ee90;
 }
 
 .bg-caveat {
   background-color: #f1e53b;
 }
 
+[data-bs-theme="dark"] .bg-caveat {
+  background-color: #a69d2b;
+}
+
 .bg-break {
   background-color: lightskyblue;
+}
+
+[data-bs-theme="dark"] .bg-break {
+  background-color: #4a7b8f;
 }
 
 .text-black-30,
 .text-black-30 a {
   color: rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .text-black-30,
+[data-bs-theme="dark"] .text-black-30 a {
+  color: rgba(255, 255, 255, 0.3) !important;
 }
 
 .text-break {
