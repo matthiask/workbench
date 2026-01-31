@@ -13,11 +13,16 @@ from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 def annual_working_time_pdf(statistics):
+    year = statistics["statistics"][0]["months"]["year"]
+
     if len(statistics["statistics"]) == 1:
         response = HttpResponse(
             user_stats_pdf(statistics["statistics"][0]), content_type="application/pdf"
         )
-        response["Content-Disposition"] = 'attachment; filename="awt.pdf"'
+        user = statistics["statistics"][0]["user"]
+        response["Content-Disposition"] = (
+            f'attachment; filename="{user.get_short_name()}-{year.year}.pdf"'
+        )
         return response
 
     with io.BytesIO() as buf:
@@ -47,7 +52,7 @@ def annual_working_time_pdf(statistics):
                 xlsx.workbook.save(x)
                 zf.writestr("statistics.xlsx", x.getvalue())
         response = HttpResponse(buf.getvalue(), content_type="application/octet-stream")
-        response["Content-Disposition"] = 'attachment; filename="awt.zip"'
+        response["Content-Disposition"] = f'attachment; filename="awt-{year.year}.zip"'
         return response
 
 
