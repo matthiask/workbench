@@ -150,6 +150,11 @@ div[role="main"] {
   border-color: #555;
 }
 
+[data-bs-theme="dark"] .select__input-container,
+[data-bs-theme="dark"] .select__single-value {
+  color: #e0e0e0;
+}
+
 .form-group textarea {
   height: 78px;
 }
