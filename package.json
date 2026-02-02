@@ -4,7 +4,7 @@
     "@rspack/cli": "^1.7.4",
     "@rspack/core": "^1.7.4",
     "@swc/helpers": "^0.5.18",
-    "autoprefixer": "^10.4.23",
+    "autoprefixer": "^10.4.24",
     "bootstrap": "^5.3.8",
     "core-js": "^3.48.0",
     "css-loader": "^7.1.3",
