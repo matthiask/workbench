@@ -2,8 +2,9 @@
 FROM --platform=linux/amd64 ghcr.io/astral-sh/uv:debian as backend
 WORKDIR /src
 ENV PYTHONUNBUFFERED 1
+ENV UV_PYTHON_INSTALL_DIR=/opt/uv
 ADD pyproject.toml uv.lock .
-RUN uv sync
+RUN --mount=type=cache,target=/root/.cache/uv uv sync
 ADD . /src
 COPY conf/_env .env
 RUN uv run python manage.py collectstatic --noinput && rm .env
