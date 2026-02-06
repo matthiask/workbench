@@ -726,7 +726,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         if pk := request.GET.get("contact"):
             try:
                 contact = Person.objects.get(pk=pk)
-            except (Person.DoesNotExist, TypeError, ValueError):
+            except Person.DoesNotExist, TypeError, ValueError:
                 self.pre_form = True
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
@@ -734,7 +734,7 @@ class CreatePersonInvoiceForm(PostalAddressSelectionForm):
         elif pk := request.GET.get("customer"):
             try:
                 customer = Organization.objects.get(pk=pk)
-            except (Organization.DoesNotExist, TypeError, ValueError):
+            except Organization.DoesNotExist, TypeError, ValueError:
                 self.pre_form = True
             else:
                 initial.update({"customer": customer})
@@ -910,7 +910,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         if pk := request.GET.get("copy"):
             try:
                 invoice = RecurringInvoice.objects.get(pk=pk)
-            except (RecurringInvoice.DoesNotExist, TypeError, ValueError):
+            except RecurringInvoice.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({
@@ -931,7 +931,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         elif pk := request.GET.get("contact"):
             try:
                 contact = Person.objects.get(pk=pk)
-            except (Person.DoesNotExist, TypeError, ValueError):
+            except Person.DoesNotExist, TypeError, ValueError:
                 self.pre_form = True
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
@@ -939,7 +939,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         elif pk := request.GET.get("customer"):
             try:
                 customer = Organization.objects.get(pk=pk)
-            except (Organization.DoesNotExist, TypeError, ValueError):
+            except Organization.DoesNotExist, TypeError, ValueError:
                 self.pre_form = True
             else:
                 initial.update({"customer": customer})

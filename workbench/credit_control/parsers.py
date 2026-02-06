@@ -41,7 +41,7 @@ def parse_zkb_csv(data):
             day = dt.datetime.strptime(row[day_column], "%d.%m.%Y").date()
             amount = row[amount_column] and Decimal(row[amount_column])
             reference = row[reference_column]
-        except (AttributeError, IndexError, ValueError):
+        except AttributeError, IndexError, ValueError:
             continue
         if day and amount:
             entries.append({
@@ -90,7 +90,7 @@ def parse_postfinance_csv(data):
             continue
         try:
             day = parse_date(row[4])
-        except (IndexError, ValueError):
+        except IndexError, ValueError:
             continue
         if day is None or not row[2]:  # Only credit
             continue

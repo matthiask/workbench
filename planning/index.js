@@ -90,7 +90,7 @@ function Planning({ data }) {
         el.title = el.textContent
       },
     )
-  }, [rowCtx.current, rowCtx.firstProjectRow])
+  }, [rowCtx.current, rowCtx.firstProjectRow, rowCtx])
 
   return (
     <RowContext.Provider value={rowCtx}>

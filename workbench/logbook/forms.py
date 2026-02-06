@@ -359,7 +359,7 @@ class LoggedHoursForm(ModelForm):
             if pk := request.GET.get("copy"):
                 try:
                     hours = LoggedHours.objects.get(pk=pk)
-                except (LoggedHours.DoesNotExist, TypeError, ValueError):
+                except LoggedHours.DoesNotExist, TypeError, ValueError:
                     pass
                 else:
                     initial.update({
@@ -432,7 +432,7 @@ class LoggedHoursForm(ModelForm):
             .annotate(Sum("loggedhours__hours"))
         }
 
-    def clean(self):
+    def clean(self):  # noqa: C901
         data = super().clean()
         errors = {}
         if not data.get("service") and not data.get("service_title"):
@@ -587,7 +587,7 @@ class LoggedCostForm(ModelForm):
             if pk := request.GET.get("copy"):
                 try:
                     cost = LoggedCost.objects.get(pk=pk)
-                except (LoggedHours.DoesNotExist, TypeError, ValueError):
+                except LoggedHours.DoesNotExist, TypeError, ValueError:
                     pass
                 else:
                     initial.update({

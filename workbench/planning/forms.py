@@ -130,7 +130,7 @@ class PlannedWorkForm(ModelForm):
         if offer_id := request.GET.get("plan_offer"):
             try:
                 offer = self.project.offers.get(pk=offer_id)
-            except (self.project.offers.model.DoesNotExist, TypeError, ValueError):
+            except self.project.offers.model.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({
@@ -145,7 +145,7 @@ class PlannedWorkForm(ModelForm):
         if service_id := request.GET.get("service"):
             try:
                 service = self.project.services.get(pk=service_id)
-            except (self.project.services.model.DoesNotExist, TypeError, ValueError):
+            except self.project.services.model.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({
@@ -157,7 +157,7 @@ class PlannedWorkForm(ModelForm):
         if pk := request.GET.get("copy"):
             try:
                 pw = PlannedWork.objects.get(pk=pk)
-            except (PlannedWork.DoesNotExist, TypeError, ValueError):
+            except PlannedWork.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({
@@ -306,7 +306,7 @@ class ExternalWorkForm(ModelForm):
         if service_id := request.GET.get("service"):
             try:
                 service = self.project.services.get(pk=service_id)
-            except (self.project.services.model.DoesNotExist, TypeError, ValueError):
+            except self.project.services.model.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({

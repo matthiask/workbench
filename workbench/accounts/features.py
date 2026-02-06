@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum, StrEnum, auto
 from functools import wraps
 
 from django.contrib import messages
@@ -29,7 +29,7 @@ def feature_required(feature):
     return decorator
 
 
-class FEATURES(str, Enum):
+class FEATURES(StrEnum):
     AUTODUNNING = "AUTODUNNING"
     AWT_WARNING_INDIVIDUAL = "AWT_WARNING_INDIVIDUAL"
     AWT_WARNING_ALL = "AWT_WARNING_ALL"

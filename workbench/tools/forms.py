@@ -50,7 +50,7 @@ class Autocomplete(forms.TextInput):
         if value is None:
             value = ""
         final_attrs = self.build_attrs(attrs, {"type": "hidden", "name": name})
-        if value != "":
+        if value:
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs["value"] = force_str(self.format_value(value))
 
@@ -58,7 +58,7 @@ class Autocomplete(forms.TextInput):
         try:
             if value:
                 pretty = str(self.model.objects.get(pk=value))
-        except (self.model.DoesNotExist, TypeError, ValueError):
+        except self.model.DoesNotExist, TypeError, ValueError:
             pass
 
         if final_attrs.get("disabled"):
@@ -111,7 +111,7 @@ class WarningsForm:
         """
         self.warnings[code] = warning
 
-    def is_valid(self, ignore_warnings=False):
+    def is_valid(self, *, ignore_warnings=False):
         """
         ``is_valid()`` override which returns ``False`` for forms with warnings
         if these warnings haven't been explicitly ignored

@@ -97,7 +97,7 @@ class CampaignForm(ModelForm):
         if pk := request.GET.get("copy"):
             try:
                 campaign = Campaign.objects.get(pk=pk)
-            except (Campaign.DoesNotExist, TypeError, ValueError):
+            except Campaign.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({
@@ -114,7 +114,7 @@ class CampaignForm(ModelForm):
         elif pk := request.GET.get("customer"):
             try:
                 customer = Organization.objects.get(pk=pk)
-            except (Organization.DoesNotExist, TypeError, ValueError):
+            except Organization.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({"customer": customer})
@@ -273,7 +273,7 @@ class ProjectForm(ModelForm):
         if pk := request.GET.get("copy"):
             try:
                 project = Project.objects.get(pk=pk)
-            except (Project.DoesNotExist, TypeError, ValueError):
+            except Project.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({
@@ -294,7 +294,7 @@ class ProjectForm(ModelForm):
         elif pk := request.GET.get("contact"):
             try:
                 contact = Person.objects.get(pk=pk)
-            except (Person.DoesNotExist, TypeError, ValueError):
+            except Person.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
@@ -302,7 +302,7 @@ class ProjectForm(ModelForm):
         elif pk := request.GET.get("customer"):
             try:
                 customer = Organization.objects.get(pk=pk)
-            except (Organization.DoesNotExist, TypeError, ValueError):
+            except Organization.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({"customer": customer})

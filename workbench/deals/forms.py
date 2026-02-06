@@ -162,7 +162,7 @@ class DealForm(ModelForm):
         if pk := request.GET.get("contact"):
             try:
                 contact = Person.objects.get(pk=pk)
-            except (Person.DoesNotExist, TypeError, ValueError):
+            except Person.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({"customer": contact.organization, "contact": contact})
@@ -170,7 +170,7 @@ class DealForm(ModelForm):
         elif pk := request.GET.get("customer"):
             try:
                 customer = Organization.objects.get(pk=pk)
-            except (Organization.DoesNotExist, TypeError, ValueError):
+            except Organization.DoesNotExist, TypeError, ValueError:
                 pass
             else:
                 initial.update({"customer": customer})

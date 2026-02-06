@@ -1,9 +1,9 @@
 # See https://docs.astral.sh/uv/guides/integration/docker/#available-images
-FROM --platform=linux/amd64 ghcr.io/astral-sh/uv:python3.14-trixie as backend
+FROM --platform=linux/amd64 ghcr.io/astral-sh/uv:debian as backend
 WORKDIR /src
 ENV PYTHONUNBUFFERED 1
-ADD requirements.txt .
-RUN uv venv && uv pip install -r requirements.txt
+ADD pyproject.toml uv.lock .
+RUN uv sync
 ADD . /src
 COPY conf/_env .env
 RUN uv run python manage.py collectstatic --noinput && rm .env

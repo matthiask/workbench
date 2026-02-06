@@ -47,7 +47,7 @@ class NoteForm(ModelForm):
                 data["content_object"] = data["content_type"].get_object_for_this_type(
                     pk=data["object_id"]
                 )
-            except (KeyError, ObjectDoesNotExist):
+            except KeyError, ObjectDoesNotExist:
                 self.add_error(
                     "__all__",
                     _("Unable to determine the object this note should be added to."),
