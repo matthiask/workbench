@@ -403,6 +403,7 @@ $(() => {
 
   // Widgets
   initWidgets()
+  initSortableTables()
 
   // Some special cases...
   $(document.body).on("click", "[data-hours-button]", function () {
@@ -697,4 +698,70 @@ window.addInlineForm = function addInlineForm(slug, onComplete) {
   if (onComplete) onComplete(form)
 
   return false
+}
+
+function initSortableTables() {
+  for (const table of document.querySelectorAll("table[data-sortable]")) {
+    const tbody = table.querySelector("tbody")
+    const headers = [...table.querySelectorAll("thead th")]
+
+    const parseVal = (cell) => {
+      const text = cell.textContent.trim()
+      if (!text) return null
+      const num = Number.parseFloat(text)
+      return Number.isNaN(num) ? text.toLowerCase() : num
+    }
+
+    const setIndicator = (th, direction) => {
+      th.querySelector(".sort-indicator")?.remove()
+      const indicator = document.createElement("span")
+      indicator.className = "sort-indicator ms-1 opacity-50"
+      indicator.textContent =
+        direction === "asc" ? "▲" : direction === "desc" ? "▼" : "⇅"
+      if (direction) indicator.classList.remove("opacity-50")
+      th.appendChild(indicator)
+    }
+
+    for (const th of headers) {
+      if (th.hasAttribute("data-no-sort")) continue
+
+      th.style.cursor = "pointer"
+      if (th.dataset.sortInitial) {
+        th.dataset.sort = th.dataset.sortInitial
+        setIndicator(th, th.dataset.sortInitial)
+      } else {
+        setIndicator(th, null)
+      }
+
+      const colIndex = headers.indexOf(th)
+      th.addEventListener("click", () => {
+        const defaultDesc = th.dataset.sortDefault === "desc"
+        const currentSort = th.dataset.sort
+        const asc = currentSort ? currentSort === "desc" : !defaultDesc
+
+        for (const h of headers) {
+          if (h.hasAttribute("data-no-sort")) continue
+          delete h.dataset.sort
+          setIndicator(h, null)
+        }
+
+        th.dataset.sort = asc ? "asc" : "desc"
+        setIndicator(th, asc ? "asc" : "desc")
+
+        const sorted = Array.from(tbody.querySelectorAll("tr")).sort((a, b) => {
+          const aVal = parseVal(a.cells[colIndex])
+          const bVal = parseVal(b.cells[colIndex])
+          if (aVal === null) return 1
+          if (bVal === null) return -1
+          if (typeof aVal === "number" && typeof bVal === "number") {
+            return asc ? aVal - bVal : bVal - aVal
+          }
+          return asc
+            ? String(aVal).localeCompare(String(bVal))
+            : String(bVal).localeCompare(String(aVal))
+        })
+        for (const row of sorted) tbody.appendChild(row)
+      })
+    }
+  }
 }

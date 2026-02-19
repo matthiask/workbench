@@ -323,7 +323,7 @@ order by ph.date
 
         for wl in work_list:
             wl.update({
-                "absences": [
+                "absences": [  # noqa: B035
                     [a for a in self._absences[user][idx] if h > 0]
                     for idx, h in enumerate(wl["hours_per_week"])
                 ]
@@ -766,9 +766,27 @@ group by customer_id, week
     }
     weeks = sorted(seen_weeks)
 
+    def _css_class(p, lo, diff):
+        if not p and lo:
+            return "text-warning"
+        if p and not lo:
+            return "text-warning"
+        if p or lo:
+            abs_diff = abs(diff)
+            ratio = float(abs_diff / max(p, lo))
+            if abs_diff >= 16 or ratio >= 0.2:
+                return "text-danger"
+            if abs_diff >= 8 or ratio >= 0.1:
+                return "text-warning"
+        return ""
+
     def _customer(planned, logged):
-        ret = [
-            {
+        ret = []
+        for customer_id in planned.keys() | logged.keys():
+            p = sum(planned[customer_id].values(), Z1)
+            lo = sum(logged[customer_id].values(), Z1)
+            diff = lo - p
+            ret.append({
                 "customer": customers[customer_id],
                 "per_week": [
                     {
@@ -778,12 +796,12 @@ group by customer_id, week
                     }
                     for week in weeks
                 ],
-                "planned": sum(planned[customer_id].values(), Z1),
-                "logged": sum(logged[customer_id].values(), Z1),
-            }
-            for customer_id in planned.keys() | logged.keys()
-        ]
-        return sorted(ret, key=lambda row: (-row["planned"], -row["logged"]))
+                "planned": p,
+                "logged": lo,
+                "diff": diff,
+                "css_class": _css_class(p, lo, diff),
+            })
+        return sorted(ret, key=lambda row: -abs(row["diff"]))
 
     ret = {
         "per_customer": _customer(planned, logged),
@@ -791,6 +809,7 @@ group by customer_id, week
     }
     ret["planned"] = sum((c["planned"] for c in ret["per_customer"]), Z1)
     ret["logged"] = sum((c["logged"] for c in ret["per_customer"]), Z1)
+    ret["diff"] = ret["logged"] - ret["planned"]
     return ret
 
 
@@ -853,25 +872,25 @@ SELECT MIN(week), MAX(week) FROM sq
 
 
 def test():  # pragma: no cover
-    from pprint import pprint
+    from pprint import pprint  # noqa: PLC0415
 
     if False:
-        from workbench.accounts.models import User
+        from workbench.accounts.models import User  # noqa: PLC0415
 
         pprint(user_planning(User.objects.get(pk=1)))
 
     if False:
-        from workbench.accounts.models import Team
+        from workbench.accounts.models import Team  # noqa: PLC0415
 
         pprint(team_planning(Team.objects.get(pk=1)))
 
     if False:
-        from workbench.projects.models import Project
+        from workbench.projects.models import Project  # noqa: PLC0415
 
         pprint(project_planning(Project.objects.get(pk=8238)))
 
     if True:
-        from workbench.accounts.models import User
+        from workbench.accounts.models import User  # noqa: PLC0415
 
         pprint(
             planning_vs_logbook(
