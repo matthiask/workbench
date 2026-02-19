@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react"
+
 import { gettext } from "./i18n.js"
 
 export const ActivitySettings = ({
@@ -9,9 +11,30 @@ export const ActivitySettings = ({
   removeActivity,
   resetActivity,
 }) => {
+  const ref = useRef()
+  const colorRef = useRef()
+
+  useEffect(() => {
+    const dismissColorPicker = () =>
+      colorRef.current?.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+      )
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        dismissColorPicker()
+        closeSettings()
+      }
+    }
+    document.addEventListener("mousedown", handler)
+    return () => {
+      dismissColorPicker()
+      document.removeEventListener("mousedown", handler)
+    }
+  }, [closeSettings])
+
   const colors = ["#ffffff", ...otherColors.filter((c) => c !== "#ffffff")]
   return (
-    <div className="activity-settings">
+    <div className="activity-settings" ref={ref}>
       <div className="form-group">
         <input
           type="text"
@@ -23,6 +46,7 @@ export const ActivitySettings = ({
       </div>
       <div className="form-group">
         <input
+          ref={colorRef}
           type="color"
           className="form-control form-control-color w-100"
           value={color}

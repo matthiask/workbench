@@ -42,7 +42,10 @@ export const Activity = connect((state, ownProps) => ({
     fetchServices(activity.project.value).then((data) => setServices(data))
   }, [activity.project])
 
-  const activityTitle = activity.title || gettext("Activity")
+  const activityTitle =
+    activity.title ||
+    activity.project?.label.replace(/^[-0-9\s]+/, "") ||
+    gettext("Activity")
 
   const isReady =
     activity.description?.length &&
