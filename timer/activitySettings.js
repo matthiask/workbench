@@ -17,6 +17,7 @@ export const ActivitySettings = ({
           type="text"
           className="activity-title form-control"
           value={title}
+          placeholder="Titel"
           onChange={(e) => dispatchUpdate({ title: e.target.value })}
         />
       </div>
