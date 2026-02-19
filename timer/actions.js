@@ -171,11 +171,37 @@ export async function sendLogbook(dispatch, { activity, current }) {
   }
 }
 
+const formatForPrompt = (s) => {
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = Math.floor(s % 60)
+  const pad = (n) => String(n).padStart(2, "0")
+  return `${h}:${pad(m)}:${pad(sec)}`
+}
+
+const parseTimeInput = (input) => {
+  const parts = input.trim().split(":")
+  if (parts.length === 3) {
+    const [h, m, s] = parts.map(Number)
+    if ([h, m, s].some(Number.isNaN)) return Number.NaN
+    return h * 3600 + m * 60 + s
+  }
+  if (parts.length === 2) {
+    // m:s — one colon is NOT interpreted as h:m
+    const [m, s] = parts.map(Number)
+    if ([m, s].some(Number.isNaN)) return Number.NaN
+    return m * 60 + s
+  }
+  return Number.parseInt(input, 10)
+}
+
 export function overwriteSeconds(dispatch, { activity, current }) {
-  const seconds = Number.parseInt(
-    prompt(gettext("Overwrite seconds"), Math.ceil(activity.seconds)),
-    10,
+  const input = prompt(
+    gettext("Overwrite time (h:m:s or m:s or seconds)"),
+    formatForPrompt(Math.ceil(activity.seconds)),
   )
+  if (input === null) return
+  const seconds = parseTimeInput(input)
   if (!Number.isNaN(seconds)) {
     dispatch({
       type: "UPDATE_ACTIVITY",
