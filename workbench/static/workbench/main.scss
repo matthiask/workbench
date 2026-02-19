@@ -379,3 +379,14 @@ a:hover {
 [data-bs-theme="dark"] .navbar {
   background-color: #0d0d0d !important;
 }
+
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    max-height: calc(100svh - 3.5rem);
+    overflow-y: auto;
+  }
+
+  body:has(.navbar-collapse.show) .fixed-btn {
+    display: none;
+  }
+}
