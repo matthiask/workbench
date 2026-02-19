@@ -2,7 +2,7 @@ import { compose, createStore } from "redux"
 import persistState from "redux-localstorage"
 import reducer from "./reducers"
 
-const VERSION = 3
+const VERSION = 4
 
 const serialize = (data) => {
   return JSON.stringify({ ...data, _v: VERSION })
@@ -14,6 +14,9 @@ const deserialize = (blob) => {
     if (!parsed || !parsed._v) return {}
     const { _v, ...data } = parsed
     if (_v === VERSION) {
+      return data
+    }
+    if (_v === 3) {
       return data
     }
     if (_v === 2) {
@@ -34,9 +37,15 @@ const deserialize = (blob) => {
   return {
     ...data,
     activities: Object.fromEntries(
-      Object.entries(data.activities).filter(
-        ([id]) => id && id !== "null" && id !== "undefined",
-      ),
+      Object.entries(data.activities || {})
+        .filter(([id]) => id && id !== "null" && id !== "undefined")
+        .map(([id, activity]) => [
+          id,
+          {
+            ...activity,
+            color: activity.color || "#ffffff",
+          },
+        ]),
     ),
   }
 }

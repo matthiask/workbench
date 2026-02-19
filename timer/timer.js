@@ -37,6 +37,10 @@ export const Timer = connect(({ activities, current }) => ({
     activities.reduce((sum, activity) => sum + activity.seconds, 0),
   )
 
+  const usedColors = [
+    ...new Set(activities.map((a) => a.color).filter(Boolean)),
+  ]
+
   return (
     <>
       <CreateActivity />
@@ -49,7 +53,11 @@ export const Timer = connect(({ activities, current }) => ({
       </div>
       <div className="activity-list">
         {activities.map((activity) => (
-          <Activity key={activity.id} activity={activity} />
+          <Activity
+            key={activity.id}
+            activity={activity}
+            usedColors={usedColors}
+          />
         ))}
       </div>
     </>

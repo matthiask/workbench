@@ -1,4 +1,3 @@
-import { COLORS } from "./colors.js"
 import { gettext } from "./i18n.js"
 import { containsJSON, createIdentifier } from "./utils.js"
 
@@ -18,7 +17,7 @@ export function createActivity(dispatch, fields = {}) {
       id: createIdentifier(),
       left: 10 * Math.floor((Math.random() * (window.innerWidth - 300)) / 10),
       top: 10 * Math.floor((Math.random() * (window.innerHeight - 300)) / 10),
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      color: "#ffffff",
       ...fields,
     },
   })

@@ -29,7 +29,7 @@ export const Activity = connect((state, ownProps) => ({
   activity: ownProps.activity,
   current: state.current,
   projects: state.projects,
-}))(({ activity, current, projects, dispatch }) => {
+}))(({ activity, current, projects, dispatch, usedColors }) => {
   const dispatchUpdate = createUpdater({ id: activity.id, dispatch })
 
   // State vars
@@ -208,6 +208,7 @@ export const Activity = connect((state, ownProps) => ({
           <ActivitySettings
             title={activity.title}
             color={activity.color}
+            otherColors={usedColors || []}
             dispatchUpdate={dispatchUpdate}
             closeSettings={() => setShowSettings(false)}
             removeActivity={() => {
