@@ -58,9 +58,7 @@ class ServiceBase(Model):
         verbose_name_plural = _("services")
 
     def __str__(self):
-        return Truncator(": ".join(filter(None, (self.title, self.description)))).chars(
-            100
-        )
+        return ": ".join(filter(None, (self.title, self.description)))
 
     def __lt__(self, other):
         return self.position < other.position if isinstance(other, ServiceBase) else 1
