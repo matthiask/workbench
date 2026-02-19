@@ -1,5 +1,5 @@
 import { gettext } from "./i18n.js"
-import { containsJSON, createIdentifier } from "./utils.js"
+import { containsJSON, createIdentifier, timestamp } from "./utils.js"
 
 const BASE_URL = document.getElementById("projects-base-url").dataset.url
 const ACTIVE_PROJECTS = () => `${BASE_URL}projects/`
@@ -193,6 +193,22 @@ const parseTimeInput = (input) => {
     return m * 60 + s
   }
   return Number.parseInt(input, 10)
+}
+
+export function overwriteBreakElapsed(dispatch, activity) {
+  const input = prompt(
+    gettext("Overwrite elapsed time (h:m:s or m:s or seconds)"),
+    formatForPrompt(Math.ceil(timestamp() - activity.startedAt)),
+  )
+  if (input === null) return
+  const seconds = parseTimeInput(input)
+  if (!Number.isNaN(seconds)) {
+    dispatch({
+      type: "UPDATE_ACTIVITY",
+      id: activity.id,
+      fields: { startedAt: timestamp() - seconds },
+    })
+  }
 }
 
 export function overwriteSeconds(dispatch, { activity, current }) {

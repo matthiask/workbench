@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import Draggable from "react-draggable"
 import { connect } from "react-redux"
 
-import { saveBreak } from "./actions.js"
+import { overwriteBreakElapsed, saveBreak } from "./actions.js"
 import { ActivitySettings } from "./activitySettings.js"
 import { gettext } from "./i18n.js"
 import * as icons from "./icons.js"
@@ -84,9 +84,18 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
               />
             </div>
             <div className="d-flex align-items-center justify-content-between">
-              <span className="activity-duration ps-2">
-                {isRunning ? prettyDuration(elapsed) : "—"}
-              </span>
+              {isRunning ? (
+                <button
+                  type="button"
+                  className="activity-duration ps-2"
+                  onClick={() => overwriteBreakElapsed(dispatch, activity)}
+                  style={{ cursor: "cell" }}
+                >
+                  {prettyDuration(elapsed)}
+                </button>
+              ) : (
+                <span className="activity-duration ps-2">—</span>
+              )}
               <div>
                 <button
                   className={`btn btn-light btn-sm ${showSettings ? "active" : ""}`}
