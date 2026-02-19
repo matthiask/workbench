@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { connect } from "react-redux"
 
 import { Activity } from "./activity.js"
+import { BreakActivity } from "./breakActivity.js"
 import { CreateActivity } from "./createActivity.js"
 import { gettext } from "./i18n.js"
 import { prettyDuration, timestamp } from "./utils.js"
@@ -34,7 +35,9 @@ export const Timer = connect(({ activities, current }) => ({
   })
 
   const totalSeconds = Math.ceil(
-    activities.reduce((sum, activity) => sum + activity.seconds, 0),
+    activities
+      .filter((a) => a.type !== "break")
+      .reduce((sum, activity) => sum + activity.seconds, 0),
   )
 
   const usedColors = [
@@ -52,13 +55,21 @@ export const Timer = connect(({ activities, current }) => ({
         {gettext("Timer")}: {prettyDuration(totalSeconds)}
       </div>
       <div className="activity-list">
-        {activities.map((activity) => (
-          <Activity
-            key={activity.id}
-            activity={activity}
-            usedColors={usedColors}
-          />
-        ))}
+        {activities.map((activity) =>
+          activity.type === "break" ? (
+            <BreakActivity
+              key={activity.id}
+              activity={activity}
+              usedColors={usedColors}
+            />
+          ) : (
+            <Activity
+              key={activity.id}
+              activity={activity}
+              usedColors={usedColors}
+            />
+          ),
+        )}
       </div>
     </>
   )

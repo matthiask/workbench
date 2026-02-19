@@ -8,6 +8,60 @@ const SERVICES = (id) => `${BASE_URL}${id}/services/`
 const CREATE_HOURS = (id) => `${BASE_URL}${id}/createhours/`
 const endpoint = (fn, ...args) => fn(...args)
 
+export function createBreak(dispatch) {
+  dispatch({
+    type: "ADD_ACTIVITY",
+    activity: {
+      type: "break",
+      description: "",
+      startedAt: null,
+      id: createIdentifier(),
+      left: 10 * Math.floor((Math.random() * (window.innerWidth - 300)) / 10),
+      top: 10 * Math.floor((Math.random() * (window.innerHeight - 300)) / 10),
+      color: "#ffffff",
+    },
+  })
+}
+
+const BREAK_URL = "/logbook/breaks/create/"
+const pad = (n) => String(n).padStart(2, "0")
+const formatDate = (d) =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+const formatTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`
+
+export async function saveBreak(dispatch, activity, { reload = true } = {}) {
+  const startedAt = new Date(activity.startedAt * 1000)
+  const endedAt = new Date()
+
+  const body = new FormData()
+  body.append("modal-day", formatDate(endedAt))
+  body.append("modal-starts_at", formatTime(startedAt))
+  body.append("modal-ends_at", formatTime(endedAt))
+  if (activity.description)
+    body.append("modal-description", activity.description)
+
+  const headers = new Headers()
+  headers.append("X-Requested-With", "XMLHttpRequest")
+  headers.append("X-CSRFToken", document.cookie.match(/\bcsrftoken=(.+?)\b/)[1])
+
+  const response = await fetch(BREAK_URL, {
+    credentials: "include",
+    method: "POST",
+    body,
+    headers,
+  })
+  if (response.status === 201) {
+    dispatch({
+      type: "UPDATE_ACTIVITY",
+      id: activity.id,
+      fields: { startedAt: null, description: "" },
+    })
+    if (reload) window.location.reload()
+  } else {
+    window.initModal(await response.text())
+  }
+}
+
 export function createActivity(dispatch, fields = {}) {
   dispatch({
     type: "ADD_ACTIVITY",
