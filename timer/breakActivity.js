@@ -23,6 +23,12 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
     const isRunning = !!activity.startedAt
 
     // Update clock each second while running
+    // Note that this is slightly inconsistent. If we could reuse the "current"
+    // logic in timer.js by marking the break as active it would look nicer,
+    // but the auto-save effect below needs both the *previous* current (to know
+    // whether this break was running before) and the *latest* startedAt (to
+    // reflect any elapsed-time overwrites). Satisfying both at once requires
+    // extra refs and makes the logic harder to follow than keeping it separate.
     useEffect(() => {
       if (!isRunning) return
       const interval = setInterval(() => updateState({}), 1000)
