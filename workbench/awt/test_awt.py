@@ -117,30 +117,30 @@ class AWTTest(TestCase):
 
         awt = annual_working_time(year.year, users=[user])["statistics"][0]
 
-        self.assertAlmostEqual(awt["totals"]["target_days"], Decimal("360"))
-        self.assertAlmostEqual(awt["totals"]["percentage"], Decimal("85"))
+        self.assertAlmostEqual(awt["totals"]["target_days"], Decimal(360))
+        self.assertAlmostEqual(awt["totals"]["percentage"], Decimal(85))
         # 3/4 * 20 + 1/4 * 25 = 21.25
         self.assertAlmostEqual(
             awt["totals"]["available_vacation_days"], Decimal("21.25")
         )
 
-        self.assertAlmostEqual(awt["totals"]["hours"], Decimal("1000"))
-        self.assertAlmostEqual(awt["totals"]["absence_vacation"], Decimal("60"))
+        self.assertAlmostEqual(awt["totals"]["hours"], Decimal(1000))
+        self.assertAlmostEqual(awt["totals"]["absence_vacation"], Decimal(60))
         # 21.25 - 50 - 10 = -38.75
         self.assertAlmostEqual(
             awt["totals"]["vacation_days_correction"], Decimal("-38.75")
         )
-        self.assertAlmostEqual(awt["totals"]["absence_sickness"], Decimal("0"))
-        self.assertAlmostEqual(awt["totals"]["absence_paid"], Decimal("10"))
+        self.assertAlmostEqual(awt["totals"]["absence_sickness"], Decimal(0))
+        self.assertAlmostEqual(awt["totals"]["absence_paid"], Decimal(10))
 
         # 3/4 * 80% * 360 + 1/4 * 100% * 360 = 306
-        self.assertAlmostEqual(awt["totals"]["target"], Decimal("306") * 8)
+        self.assertAlmostEqual(awt["totals"]["target"], Decimal(306) * 8)
 
         # 1000 / 8 + 21.25 + 10 = 125 + 21.25 + 10 = 156.25
         self.assertAlmostEqual(awt["totals"]["working_time"], Decimal("156.25") * 8)
 
         # 306 * 8 - 1000 - 21.25 * 8 - 10 * 8 = 1198
-        self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal("-1198"))
+        self.assertAlmostEqual(awt["totals"]["running_sum"], Decimal(-1198))
 
         # Now, test that the PDF does not crash
         self.client.force_login(user)

@@ -206,8 +206,8 @@ class StatisticsTest(TestCase):
         gh = green_hours.green_hours([dt.date(2019, 1, 1), dt.date(2019, 3, 31)])
         overall = gh[-1]
         self.assertEqual(overall[0], 0)
-        self.assertEqual(overall[1]["total"], Decimal("80"))
-        self.assertEqual(overall[1]["maintenance"], Decimal("20"))
+        self.assertEqual(overall[1]["total"], Decimal(80))
+        self.assertEqual(overall[1]["maintenance"], Decimal(20))
         self.assertAlmostEqual(overall[1]["profitable"], Decimal("23.33333333"))
         self.assertAlmostEqual(overall[1]["overdrawn"], Decimal("26.66666666"))
         self.assertAlmostEqual(overall[1]["percentage"], Decimal("54.16666666"))

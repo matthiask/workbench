@@ -2,7 +2,10 @@
 name = "workbench"
 version = "0.0.1"
 requires-python = ">=3.14"
-classifiers = [ "Programming Language :: Python :: 3 :: Only", "Programming Language :: Python :: 3.14" ]
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+]
 dependencies = [
   "beautifulsoup4>=4.14.3",
   "coverage[toml]>=7.13.3",
@@ -39,7 +42,6 @@ dependencies = [
 [tool.ruff]
 target-version = "py314"
 preview = true
-
 fix = true
 show-fixes = true
 lint.extend-select = [
@@ -103,8 +105,12 @@ lint.extend-select = [
 lint.extend-ignore = [
   # Allow zip() without strict=
   "B905",
+  # datetime.date.today is fine
+  "DTZ011",
   # No line length errors
   "E501",
+  # Mutable class attributes are fine
+  "RUF012",
   # Percent-formatting is fine
   "UP031",
 ]
@@ -130,17 +136,15 @@ lint.isort.combine-as-imports = true
 lint.isort.lines-after-imports = 2
 lint.mccabe.max-complexity = 15
 
-[tool.coverage.report]
-skip_covered = true
-show_missing = true
-
-[tool.coverage.run]
-branch = true
-omit = [
+[tool.coverage]
+run.branch = true
+run.omit = [
   "*migrate*",
   "*migrations*",
   "*venv*",
 ]
+report.show_missing = true
+report.skip_covered = true
 
 [tool.pyright]
 venvPath = ".venv"

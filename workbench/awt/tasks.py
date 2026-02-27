@@ -15,9 +15,7 @@ def is_previous_month_locked_starting_today():
         return False
     if day == logbook_lock() and day.month == 1 and day.day != 1:
         return False
-    if day.day > 7:
-        return False
-    return True
+    return not day.day > 7
 
 
 def annual_working_time_warnings_mails():

@@ -93,7 +93,6 @@ class DealSearchForm(Form):
     def response(self, request, queryset):
         if request.GET.get("export") == "xlsx":
             xlsx = WorkbenchXLSXDocument()
-            additional = []
             values = {
                 (v.deal_id, v.type_id): v.value
                 for v in Value.objects.filter(deal__in=queryset)
@@ -105,16 +104,20 @@ class DealSearchForm(Form):
                 )
             }
 
-            for vt in ValueType.objects.all():
-                additional.append((
+            additional = [
+                (
                     f"{Value._meta.verbose_name}: {vt}",
                     (lambda deal, id=vt.id: values.get((deal.id, id))),
-                ))
-            for ag in AttributeGroup.objects.all():
-                additional.append((
+                )
+                for vt in ValueType.objects.all()
+            ]
+            additional.extend(
+                (
                     f"{Attribute._meta.verbose_name}: {ag}",
                     (lambda deal, id=ag.id: attributes.get((deal.id, id))),
-                ))
+                )
+                for ag in AttributeGroup.objects.all()
+            )
             xlsx.table_from_queryset(queryset, additional=additional)
             return xlsx.to_response("deals.xlsx")
         return None

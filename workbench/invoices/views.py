@@ -82,8 +82,8 @@ class InvoiceXLSXView(generic.DetailView):
                 "",
                 "",
             ])
-            for entry in hours[service.id]:
-                data.append([
+            data.extend(
+                [
                     "",
                     entry.description,
                     entry.rendered_on,
@@ -91,9 +91,11 @@ class InvoiceXLSXView(generic.DetailView):
                     "",
                     entry.hours,
                     entry.hours * service.effort_rate if service.effort_rate else "",
-                ])
-            for entry in cost[service.id]:
-                data.append([
+                ]
+                for entry in hours[service.id]
+            )
+            data.extend(
+                [
                     "",
                     entry.description,
                     entry.rendered_on,
@@ -101,7 +103,9 @@ class InvoiceXLSXView(generic.DetailView):
                     "",
                     "",
                     entry.cost,
-                ])
+                ]
+                for entry in cost[service.id]
+            )
             data.append([])
 
         xlsx = WorkbenchXLSXDocument()

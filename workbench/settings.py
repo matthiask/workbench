@@ -185,12 +185,7 @@ WORKBENCH = {
         CURRENCY="CHF",
         PDF_LANGUAGE="de",
         PDF_COMPANY="Feinheit AG",
-        PDF_ADDRESS=" · ".join([
-            "Feinheit AG",
-            "Fabrikstrasse 54, 8005 Zürich",
-            "Effingerstrasse 2, 3011 Bern",
-            "www.feinheit.ch",
-        ]),
+        PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54, 8005 Zürich · Effingerstrasse 2, 3011 Bern · www.feinheit.ch",
         PDF_VAT_NO="CHE-113.948.417 MWST",
         PDF_OFFER_TERMS=(
             "Bestandteil dieser Offerte sind die zum Zeitpunkt"

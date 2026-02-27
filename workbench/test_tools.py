@@ -37,14 +37,14 @@ class ToolsTest(TestCase):
     def test_model_with_total(self):
         """The calculation of totals excl. and incl. tax work"""
         m = CalculationModel(
-            subtotal=Decimal("20"), discount=Decimal("5"), tax_rate=Decimal("8.0")
+            subtotal=Decimal(20), discount=Decimal(5), tax_rate=Decimal("8.0")
         )
         m._calculate_total()
 
         self.assertAlmostEqual(m._round_5cents(Decimal("1.02")), Decimal("1.00"))
         self.assertAlmostEqual(m._round_5cents(Decimal("1.03")), Decimal("1.05"))
         self.assertAlmostEqual(m.tax_amount, Decimal("1.20"))
-        self.assertAlmostEqual(m.total_excl_tax, Decimal("15"))
+        self.assertAlmostEqual(m.total_excl_tax, Decimal(15))
         self.assertAlmostEqual(m.total, Decimal("16.20"))
 
         self.assertEqual(m.pretty_total_excl, "15.00 excl. tax (5.00 discount)")
@@ -81,11 +81,11 @@ class ToolsTest(TestCase):
         for value, result in [
             (Decimal("42.22"), "42.2h"),
             (Decimal("42.27"), "42.3h"),
-            (Decimal("3"), "3.0h"),
-            (Decimal("-123"), "-123.0h"),
+            (Decimal(3), "3.0h"),
+            (Decimal(-123), "-123.0h"),
             (Decimal("0.003"), "0.0h"),
             (Decimal("-0.003"), "0.0h"),
-            (Decimal("12345"), "12’345.0h"),
+            (Decimal(12345), "12’345.0h"),
             (None, "0.0h"),
         ]:
             with self.subTest(value=value, result=result):

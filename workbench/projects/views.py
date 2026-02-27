@@ -187,20 +187,20 @@ def cost_by_month_and_service_xlsx(request, pk):
                 offer_invoiced[offer],
             ]
         )
-        for service in sorted(services):
-            rows.append(
-                [
-                    "",
-                    "",
-                    service,
-                    sum(service_costs[service].values()),
-                ]
-                + [service_costs[service].get(month) for month in months]
-                + [
-                    service_budget[service],
-                    service_invoiced[service],
-                ]
-            )
+        rows.extend(
+            [
+                "",
+                "",
+                service,
+                sum(service_costs[service].values()),
+            ]
+            + [service_costs[service].get(month) for month in months]
+            + [
+                service_budget[service],
+                service_invoiced[service],
+            ]
+            for service in sorted(services)
+        )
         rows.append([])
 
     xlsx = XLSXDocument()

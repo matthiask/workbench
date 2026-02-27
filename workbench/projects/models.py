@@ -576,7 +576,7 @@ class Project(Model):
                     for rate, hours in logged_hours_per_effort_rate.items()
                     if hours
                 ),
-                key=lambda row: row[0] or Decimal("9999999"),
+                key=lambda row: row[0] or Decimal(9999999),
                 reverse=True,
             ),
             "logged_cost": logged_cost[self],

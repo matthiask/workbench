@@ -130,12 +130,14 @@ class Command(BaseCommand):
                 hours["absences"],
             ]
 
-        for user in users:
-            user_table.append([
+        user_table.extend(
+            [
                 user,
                 user.specialist_field,
                 *chainify(_user_week_workload(week, user) for week in weeks),
-            ])
+            ]
+            for user in users
+        )
 
         sf_table = [
             [

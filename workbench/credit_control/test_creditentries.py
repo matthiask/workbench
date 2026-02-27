@@ -100,9 +100,7 @@ class CreditEntriesTest(TestCase):
             messages(response), ["Found 2 credit entries.", "Created 0 credit entries."]
         )
 
-        invoice = factories.InvoiceFactory.create(
-            subtotal=Decimal("4000"), _code="00001"
-        )
+        invoice = factories.InvoiceFactory.create(subtotal=Decimal(4000), _code="00001")
         self.assertAlmostEqual(invoice.total, Decimal("4308.00"))
         response = self.client.get("/credit-control/assign/")
         self.assertContains(response, "<strong><small>00001</small>")

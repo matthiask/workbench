@@ -36,7 +36,7 @@ class ReportingTest(TestCase):
         self.assertEqual(len(stats["users"]), 2)
         self.assertEqual(
             stats["users"][0]["logged_hours_stats"],
-            {"avg": Decimal("1"), "count": 1, "sum": Decimal("1.0")},
+            {"avg": Decimal(1), "count": 1, "sum": Decimal("1.0")},
         )
 
     def test_classify_logging_delay(self):

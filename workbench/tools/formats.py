@@ -6,7 +6,7 @@ from django.utils.timezone import is_naive, localtime, make_aware
 from django.utils.translation import ngettext
 
 
-Z0 = Decimal("0")
+Z0 = Decimal(0)
 Z1 = Decimal("0.0")
 Z2 = Decimal("0.00")
 

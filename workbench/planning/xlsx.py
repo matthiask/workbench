@@ -73,8 +73,9 @@ class PlanningXLSXDocument:
 
         # Add week headers
         week_start_col = len(headers) + 1
-        for week_data in planning_data["weeks"]:
-            headers.append(f"KW {week_data['week']}")
+        headers.extend(
+            f"KW {week_data['week']}" for week_data in planning_data["weeks"]
+        )
 
         # Write headers
         for col, header in enumerate(headers, 1):
@@ -147,8 +148,7 @@ class PlanningXLSXDocument:
                         )  # Default blue
 
                         # Remove # from color if present
-                        if service_type_color.startswith("#"):
-                            service_type_color = service_type_color[1:]
+                        service_type_color = service_type_color.removeprefix("#")
 
                         # Write basic info
                         ws.cell(row=current_row, column=1, value=_("Planned Work"))
@@ -223,8 +223,7 @@ class PlanningXLSXDocument:
             column_letter = get_column_letter(column[0].column)
             for cell in column:
                 try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
+                    max_length = max(max_length, len(str(cell.value)))
                 except Exception:
                     pass
             adjusted_width = min(max_length + 2, 50)

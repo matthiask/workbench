@@ -74,7 +74,7 @@ class Model(models.Model):
         return self.get_status_display() if hasattr(self, "get_status_display") else ""
 
 
-ONE = Decimal("1")
+ONE = Decimal(1)
 
 
 MoneyField = partial(

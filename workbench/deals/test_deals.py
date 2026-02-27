@@ -420,16 +420,16 @@ class DealsTest(TestCase):
         self.assertEqual(
             stats["by_valuetype"],
             [
-                {"type": vt2, "target": None, "sum": Decimal("400"), "median_age": 0},
-                {"type": vt1, "target": None, "sum": Decimal("200"), "median_age": 0},
+                {"type": vt2, "target": None, "sum": Decimal(400), "median_age": 0},
+                {"type": vt1, "target": None, "sum": Decimal(200), "median_age": 0},
             ],
         )
         self.assertEqual(len(stats["by_user"]), 1)
         self.assertEqual(stats["count"], 1)
-        self.assertEqual(stats["sum"], Decimal("600"))
+        self.assertEqual(stats["sum"], Decimal(600))
 
         stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)], users=[])
-        self.assertEqual(stats["sum"], Decimal("0"))
+        self.assertEqual(stats["sum"], Decimal(0))
 
         response = self.client.get("/report/declined-deals/")
         self.assertContains(response, "Declined deals")

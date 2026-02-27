@@ -414,8 +414,8 @@ class PDFDocument(_PDFDocument):
                 currency(-transform(instance.discount).quantize(Z)),
             ))
         if getattr(instance, "down_payment_total", None):
-            for invoice in instance.down_payment_invoices.all():
-                total.append((
+            total.extend(
+                (
                     MarkupParagraph(
                         "{}: {} ({})".format(
                             _("Down payment"),
@@ -427,7 +427,9 @@ class PDFDocument(_PDFDocument):
                         self.style.normal,
                     ),
                     currency(-transform(invoice.total_excl_tax).quantize(Z)),
-                ))
+                )
+                for invoice in instance.down_payment_invoices.all()
+            )
         if instance.liable_to_vat:
             total.append((
                 "{:0.1f}% {}".format(instance.tax_rate, _("tax")),

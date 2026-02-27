@@ -140,21 +140,21 @@ def get_public_holidays(year):
     easter = EasterDay(year).get_date()
 
     return {
-        dt.date(year, 1, 1): ["Neujahr", D("1")],
-        dt.date(year, 1, 2): ["Berchtoldstag", D("1")],
+        dt.date(year, 1, 1): ["Neujahr", D(1)],
+        dt.date(year, 1, 2): ["Berchtoldstag", D(1)],
         easter - dt.timedelta(days=3): ["Gründonnerstag", D("0.25")],
-        easter - dt.timedelta(days=2): ["Karfreitag", D("1")],
-        easter: ["Ostersonntag", D("1")],
-        easter + dt.timedelta(days=1): ["Ostermontag", D("1")],
-        dt.date(year, 5, 1): ["Tag der Arbeit", D("1")],
+        easter - dt.timedelta(days=2): ["Karfreitag", D(1)],
+        easter: ["Ostersonntag", D(1)],
+        easter + dt.timedelta(days=1): ["Ostermontag", D(1)],
+        dt.date(year, 5, 1): ["Tag der Arbeit", D(1)],
         easter + dt.timedelta(days=38): ["Mittwoch vor Auffahrt", D("0.25")],
-        easter + dt.timedelta(days=39): ["Auffahrt", D("1")],
-        easter + dt.timedelta(days=49): ["Pfingstsonntag", D("1")],
-        easter + dt.timedelta(days=50): ["Pfingstmontag", D("1")],
-        dt.date(year, 8, 1): ["Nationalfeiertag", D("1")],
+        easter + dt.timedelta(days=39): ["Auffahrt", D(1)],
+        easter + dt.timedelta(days=49): ["Pfingstsonntag", D(1)],
+        easter + dt.timedelta(days=50): ["Pfingstmontag", D(1)],
+        dt.date(year, 8, 1): ["Nationalfeiertag", D(1)],
         dt.date(year, 12, 24): ["Heiligabend", D("0.5")],
-        dt.date(year, 12, 25): ["Weihnachtstag", D("1")],
-        dt.date(year, 12, 26): ["Stephanstag", D("1")],
+        dt.date(year, 12, 25): ["Weihnachtstag", D(1)],
+        dt.date(year, 12, 26): ["Stephanstag", D(1)],
         dt.date(year, 12, 31): ["Silvester", D("0.25")],
     }
 

@@ -320,13 +320,14 @@ def _get_project_v2_cards(
     fields = project_data.get("fields", {}).get("nodes", [])
 
     # Find the field IDs that might contain time estimates
-    estimate_field_ids = []
-    for field in fields:
+    estimate_field_ids = [
+        field.get("id")
+        for field in fields
         if any(
             term in field.get("name", "").lower()
             for term in ["hour", "time", "estimate", "duration"]
-        ):
-            estimate_field_ids.append(field.get("id"))
+        )
+    ]
 
     # Get items in the project with their field values
     items_query = {

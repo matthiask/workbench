@@ -352,7 +352,7 @@ class TimestampsTest(TestCase):
 
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 3)
-        self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
+        self.assertEqual(slices[1].elapsed_hours, Decimal(2))
 
     def test_start_break(self):
         """Start a break, log the break -- further logbook entries should use
@@ -382,7 +382,7 @@ class TimestampsTest(TestCase):
 
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 3)
-        self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
+        self.assertEqual(slices[1].elapsed_hours, Decimal(2))
 
         self.assertFalse(slices[1].has_associated_log)
         self.assertIn("detected_ends_at", slices[1].hours_create_url)
@@ -423,7 +423,7 @@ class TimestampsTest(TestCase):
 
         slices = Timestamp.objects.slices(user)
         self.assertEqual(len(slices), 3)
-        self.assertEqual(slices[1].elapsed_hours, Decimal("2"))
+        self.assertEqual(slices[1].elapsed_hours, Decimal(2))
 
         self.assertFalse(slices[1].has_associated_log)
         self.assertIn("detected_ends_at", slices[1].break_create_url)

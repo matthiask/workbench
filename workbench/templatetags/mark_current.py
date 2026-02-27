@@ -34,14 +34,15 @@ def mark_current(navigation, current):
         line, both get marked.
     """
     current_tokens = current.split("/")
-    tokens = []
 
     low = 1
     if len(current_tokens) > 2:
         low = 2
 
-    for i in range(low, len(current_tokens)):
-        tokens.append(re.escape("/".join(current_tokens[0:i]) + "/"))
+    tokens = [
+        re.escape("/".join(current_tokens[0:i]) + "/")
+        for i in range(low, len(current_tokens))
+    ]
 
     current_matcher = re.compile('href="(' + "|".join(tokens) + ')"')
 

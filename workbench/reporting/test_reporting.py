@@ -51,15 +51,15 @@ class ReportingTest(TestCase):
         lcp = lc["cost_centers"][0]["projects"]
 
         self.assertEqual(len(lcp), 1)
-        self.assertAlmostEqual(lcp[0]["costs"], Decimal("100"))
+        self.assertAlmostEqual(lcp[0]["costs"], Decimal(100))
         self.assertAlmostEqual(
             lcp[0]["costs_with_green_hours_target"], Decimal("133.3333333")
         )
         self.assertEqual(lcp[0]["hours"], 2)
         self.assertEqual(lcp[0]["hours_with_rate_undefined"], 1)
 
-        self.assertEqual(lcp[0]["third_party_costs"], Decimal("10"))
-        self.assertEqual(lcp[0]["revenue"], Decimal("115"))
+        self.assertEqual(lcp[0]["third_party_costs"], Decimal(10))
+        self.assertEqual(lcp[0]["revenue"], Decimal(115))
 
     def test_teams_filter(self):
         """Filtering by teams and individuals"""

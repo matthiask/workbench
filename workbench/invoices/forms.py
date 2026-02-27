@@ -299,9 +299,7 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if from_status == to_status:
             return False
-        if from_status > to_status or from_status >= Invoice.PAID:
-            return True
-        return False
+        return bool(from_status > to_status or from_status >= Invoice.PAID)
 
     def clean(self):
         data = super().clean()

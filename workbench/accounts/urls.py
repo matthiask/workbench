@@ -13,7 +13,6 @@ urlpatterns = [
     path("accounts/login/", views.login, name="login"),
     path("accounts/oauth2/", views.oauth2, name="accounts_oauth2"),
     path("accounts/logout/", views.logout, name="logout"),
-    #
     path(
         "users/",
         generic.ListView.as_view(

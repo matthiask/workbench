@@ -89,7 +89,7 @@ class InvoicesTest(TestCase):
 
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
-        self.assertAlmostEqual(invoice.subtotal, Decimal("2500"))
+        self.assertAlmostEqual(invoice.subtotal, Decimal(2500))
 
     def test_create_service_invoice_from_offer(self):
         """Service invoice creation from offers (services) works and results in
@@ -280,7 +280,7 @@ class InvoicesTest(TestCase):
         )
 
         cost.refresh_from_db()
-        self.assertAlmostEqual(cost.cost, Decimal("20"))
+        self.assertAlmostEqual(cost.cost, Decimal(20))
         invoice.refresh_from_db()
         self.assertAlmostEqual(invoice.subtotal, 610)  # unchanged
 
@@ -439,7 +439,7 @@ class InvoicesTest(TestCase):
         )
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
-        self.assertAlmostEqual(invoice.total_excl_tax, Decimal("100"))
+        self.assertAlmostEqual(invoice.total_excl_tax, Decimal(100))
         self.assertAlmostEqual(invoice.total, Decimal("107.7"))
 
     def test_customer_create_invoice(self):

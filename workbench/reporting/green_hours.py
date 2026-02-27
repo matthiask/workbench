@@ -208,7 +208,7 @@ ORDER BY th.month
         # Advance through resultsets until we get to the one returning tuples.
         import psycopg.pq  # noqa: PLC0415
 
-        while not cursor.pgresult.status == psycopg.pq.ExecStatus.TUPLES_OK:
+        while cursor.pgresult.status != psycopg.pq.ExecStatus.TUPLES_OK:
             cursor.nextset()
 
         return [
