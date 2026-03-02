@@ -75,7 +75,7 @@ def process_query(s):
     to_tsquery.
     """
     # Thanks https://www.fusionbox.com/blog/detail/partial-word-search-with-postgres-full-text-search-in-django/632/
-    query = re.sub(r"[^-+@\w]+", " ", s).strip()
+    query = re.sub(r"[^+@\w]+", " ", s).strip()
     if query:
         query = re.sub(r"\s+", " & ", query)
         # Support prefix search on the last word. A tsquery of 'toda:*' will
