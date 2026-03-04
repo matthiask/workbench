@@ -23,12 +23,12 @@
       <table class="table table-sm table-striped" data-sortable>
         <thead>
           <tr>
-            <th>{% translate 'Customer' %}</th>
+            <th data-no-sort>{% translate 'Customer' %}</th>
             <th data-no-sort style="min-width: 8rem"></th>
             <th class="text-end" data-sort-default="desc">{% translate 'Planned' %}</th>
             <th class="text-end" data-sort-default="desc" data-sort-initial="desc">{% translate 'Logged' %}</th>
-            <th class="text-end" data-sort-default="desc">{% translate 'Diff' %}</th>
-            <th class="text-end" data-sort-default="desc">{% translate 'Allocation' %}</th>
+            <th class="text-end" data-sort-default="desc" data-sort-abs>{% translate 'Diff' %}</th>
+            <th class="text-end" data-no-sort>{% translate 'Allocation' %}</th>
           </tr>
         </thead>
         <tfoot>
@@ -53,7 +53,7 @@
                 <span class="{% if not customer_row.logged %}text-black-30{% endif %}">{{ customer_row.logged|hours }}</span>
               </td>
               <td class="text-end {{ customer_row.css_class }}">{{ customer_row.diff|hours }}</td>
-              <td class="text-end {{ customer_row.allocation_css_class }}{% if customer_row.allocation_marginal %} opacity-50{% endif %}" data-sort-value="{{ customer_row.allocation_abs }}">{% if customer_row.allocation is not None %}{{ customer_row.allocation }}%{% else %}∞{% endif %}</td>
+              <td class="text-end {{ customer_row.allocation_css_class }}{% if customer_row.allocation_marginal %} opacity-50{% endif %}">{% if customer_row.allocation is not None %}{{ customer_row.allocation }}%{% else %}∞{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>

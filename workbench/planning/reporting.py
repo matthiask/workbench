@@ -827,21 +827,20 @@ def _add_allocation(c, total_planned, total_logged):
     if total_planned and total_logged and c["planned"]:
         ratio = (c["logged"] / total_logged) / (c["planned"] / total_planned) * 100
         c["allocation"] = ratio.quantize(Z0)
-        c["allocation_abs"] = abs(ratio - 100).quantize(Z0)
+        dev = abs(ratio - 100).quantize(Z0)
     elif c["logged"]:
         # Time logged with no planned allocation — maximally over-served
         c["allocation"] = None
-        c["allocation_abs"] = Decimal(9999)
+        dev = Decimal(9999)
     else:
         c["allocation"] = Decimal(0).quantize(Z0)
-        c["allocation_abs"] = Decimal(100).quantize(Z0)
+        dev = Decimal(100)
     # Marginal threshold uses a square-root curve so it scales with the
     # dataset without growing too fast: ~1.6h for a single week (40h),
     # ~25h for a team-year (10 000h). Clients below this are visually
     # de-emphasised since their allocation ratio is noise, not signal.
     marginal_threshold = total_planned.sqrt() * Decimal("0.25")
     c["allocation_marginal"] = c["planned"] < marginal_threshold
-    dev = c["allocation_abs"]
     if dev >= 20:
         c["allocation_css_class"] = "text-danger"
     elif dev >= 10:

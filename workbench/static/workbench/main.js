@@ -706,15 +706,10 @@ function initSortableTables() {
     const headers = [...table.querySelectorAll("thead th")]
 
     const parseVal = (cell) => {
-      const sortVal = cell.dataset.sortValue
-      if (sortVal !== undefined) {
-        const num = Number.parseFloat(sortVal)
-        return Number.isNaN(num) ? sortVal.toLowerCase() : num
-      }
-      const text = cell.textContent.trim()
-      if (!text) return null
-      const num = Number.parseFloat(text)
-      return Number.isNaN(num) ? text.toLowerCase() : num
+      const raw = cell.dataset.sortValue ?? cell.textContent.trim()
+      if (!raw) return null
+      const num = Number.parseFloat(raw.replace(/[^0-9.-]/g, ""))
+      return Number.isNaN(num) ? raw.toLowerCase() : num
     }
 
     const setIndicator = (th, direction) => {
@@ -756,12 +751,17 @@ function initSortableTables() {
         th.dataset.sort = asc ? "asc" : "desc"
         setIndicator(th, asc ? "asc" : "desc")
 
+        const absSort = th.hasAttribute("data-sort-abs")
         const sorted = Array.from(tbody.querySelectorAll("tr")).sort((a, b) => {
-          const aVal = parseVal(a.cells[colIndex])
-          const bVal = parseVal(b.cells[colIndex])
+          let aVal = parseVal(a.cells[colIndex])
+          let bVal = parseVal(b.cells[colIndex])
           if (aVal === null) return 1
           if (bVal === null) return -1
           if (typeof aVal === "number" && typeof bVal === "number") {
+            if (absSort) {
+              aVal = Math.abs(aVal)
+              bVal = Math.abs(bVal)
+            }
             return asc ? aVal - bVal : bVal - aVal
           }
           return asc
