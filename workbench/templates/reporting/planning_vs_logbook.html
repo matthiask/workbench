@@ -11,15 +11,24 @@
       <form method="get" class="mb-3" data-autosubmit>
         {% ff_fields form %}
       </form>
+      <p class="small text-muted">
+        {% blocktranslate with ratio=stats.overall_ratio %}
+          <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.
+          100% means the client received exactly their proportional slice of your time.
+          Below 100% means under-served; above 100% means over-served.
+          ∞ means time was logged with no planned allocation.
+          The overall logged/planned ratio for this period is {{ ratio }}%, which is the baseline these allocations are normalised against.
+        {% endblocktranslate %}
+      </p>
       <table class="table table-sm table-striped" data-sortable>
         <thead>
           <tr>
             <th>{% translate 'Customer' %}</th>
             <th data-no-sort style="min-width: 8rem"></th>
             <th class="text-end" data-sort-default="desc">{% translate 'Planned' %}</th>
-            <th class="text-end" data-sort-default="desc">{% translate 'Logged' %}</th>
-            <th class="text-end" data-sort-default="desc" data-sort-initial="desc">{% translate 'Diff' %}</th>
-            <th data-sort-default="desc"></th>
+            <th class="text-end" data-sort-default="desc" data-sort-initial="desc">{% translate 'Logged' %}</th>
+            <th class="text-end" data-sort-default="desc">{% translate 'Diff' %}</th>
+            <th class="text-end" data-sort-default="desc">{% translate 'Allocation' %}</th>
           </tr>
         </thead>
         <tfoot>
@@ -29,7 +38,7 @@
             <th class="text-end">{{ stats.planned|hours }}</th>
             <th class="text-end">{{ stats.logged|hours }}</th>
             <th class="text-end">{{ stats.diff|hours }}</th>
-            <th>{% percentage stats.logged stats.planned %}</th>
+            <th class="text-end">{{ stats.overall_ratio }}%</th>
           </tr>
         </tfoot>
         <tbody>
@@ -44,7 +53,7 @@
                 <span class="{% if not customer_row.logged %}text-black-30{% endif %}">{{ customer_row.logged|hours }}</span>
               </td>
               <td class="text-end {{ customer_row.css_class }}">{{ customer_row.diff|hours }}</td>
-              <td>{% percentage customer_row.logged customer_row.planned %}</td>
+              <td class="text-end {{ customer_row.allocation_css_class }}" data-sort-value="{{ customer_row.allocation_abs }}">{% if customer_row.allocation is not None %}{{ customer_row.allocation }}%{% else %}∞{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>

@@ -706,6 +706,11 @@ function initSortableTables() {
     const headers = [...table.querySelectorAll("thead th")]
 
     const parseVal = (cell) => {
+      const sortVal = cell.dataset.sortValue
+      if (sortVal !== undefined) {
+        const num = Number.parseFloat(sortVal)
+        return Number.isNaN(num) ? sortVal.toLowerCase() : num
+      }
       const text = cell.textContent.trim()
       if (!text) return null
       const num = Number.parseFloat(text)
@@ -722,13 +727,16 @@ function initSortableTables() {
       th.appendChild(indicator)
     }
 
+    let initialTh = null
+
     for (const th of headers) {
       if (th.hasAttribute("data-no-sort")) continue
 
       th.style.cursor = "pointer"
       if (th.dataset.sortInitial) {
-        th.dataset.sort = th.dataset.sortInitial
-        setIndicator(th, th.dataset.sortInitial)
+        th.dataset.sort = th.dataset.sortInitial === "desc" ? "asc" : "desc"
+        setIndicator(th, null)
+        initialTh = th
       } else {
         setIndicator(th, null)
       }
@@ -763,5 +771,7 @@ function initSortableTables() {
         for (const row of sorted) tbody.appendChild(row)
       })
     }
+
+    if (initialTh) initialTh.click()
   }
 }

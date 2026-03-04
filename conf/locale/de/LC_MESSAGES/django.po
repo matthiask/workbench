@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-31 16:26+0100\n"
+"POT-Creation-Date: 2026-03-04 08:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -297,7 +297,6 @@ msgid "You should take (and log!) a break of at least %(minutes)s minutes when w
 msgstr "Du musst eine Pause von mindestens %(minutes)s Minuten machen (und erfassen!), wenn Du mehr als %(hours)s Stunden arbeitest."
 
 #: workbench/accounts/models.py
-#, python-brace-format
 msgid "You have {} unlogged timestamps from this week only. You should probably go and check them."
 msgstr "Du hast {} nicht erfasste Zeitmarken, nur von dieser Woche. Du solltest diese vermutlich prüfen gehen."
 
@@ -1729,7 +1728,6 @@ msgid "A negative subtotal is almost certainly an error. Did you want to create 
 msgstr "Ein negatives Zwischentotal ist fast sicher ein Fehler. Wolltest Du eine Gutschrift erstellen?"
 
 #: workbench/invoices/forms.py
-#, python-brace-format
 msgid "Cannot create an invoice with a date of {} or earlier anymore."
 msgstr "Kann Rechnungen mit einem Datum von {} oder früher nicht mehr erstellen."
 
@@ -1845,7 +1843,6 @@ msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 
 #: workbench/invoices/forms.py
-#, python-brace-format
 msgid "Cannot create a recurring invoice with a start date of {} or earlier anymore."
 msgstr "Kann Stapelrechnung mit einem Startdatum von {} oder früher nicht mehr erstellen."
 
@@ -2108,7 +2105,6 @@ msgid "For your information"
 msgstr "Zur Kenntnisnahme"
 
 #: workbench/invoices/views.py workbench/offers/views.py
-#, python-brace-format
 msgid "Unable to generate the PDF: {}"
 msgstr "Konnte das PDF nicht generieren: {}"
 
@@ -2473,7 +2469,6 @@ msgid "Delta"
 msgstr "Delta"
 
 #: workbench/management/commands/squeeze.py
-#, python-brace-format
 msgid "Target value w/ {}/h"
 msgstr "Richtwert mit {}/h"
 
@@ -2941,7 +2936,6 @@ msgid "today"
 msgstr "heute"
 
 #: workbench/projects/forms.py
-#, python-brace-format
 msgid "This project has been closed on or before {} and cannot be reopened anymore."
 msgstr "Dieses Projekt wurde am oder vor dem {} geschlossen und kann nicht mehr geöffnet werden."
 
@@ -2962,7 +2956,6 @@ msgid "You are adding a flat rate to a project which already has services. Those
 msgstr "Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
 
 #: workbench/projects/forms.py
-#, python-brace-format
 msgid "Cannot close a project with a date of {} or earlier anymore."
 msgstr "Kann Projekte nicht mehr mit einem Datum von {} oder früher schliessen."
 
@@ -4214,8 +4207,41 @@ msgid "week"
 msgstr "Woche"
 
 #: workbench/templates/reporting/planning_vs_logbook.html
+#, python-format
+msgid ""
+"\n"
+"          <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.\n"
+"          100%% means the client received exactly their proportional slice of your time.\n"
+"          Below 100%% means under-served; above 100%% means over-served.\n"
+"          ∞ means time was logged with no planned allocation.\n"
+"          The overall logged/planned ratio for this period is %(ratio)s%%, which is the baseline these allocations are normalised against.\n"
+"        "
+msgstr ""
+"\n"
+"          <strong>Zuteilung</strong> zeigt den Anteil der erfassten Stunden jeder Kundschaft geteilt durch ihren Anteil an den geplanten Stunden.\n"
+"          100%% bedeutet, dass die Kundschaft genau ihren proportionalen Anteil der Zeit erhalten hat.\n"
+"          Unter 100%% bedeutet unterversorgt; über 100%% bedeutet überversorgt.\n"
+"          ∞ bedeutet, dass Stunden ohne geplante Zuteilung erfasst wurden.\n"
+"          Das gesamte Erfasst/Geplant-Verhältnis für diesen Zeitraum beträgt %(ratio)s%%, was die Grundlage für die Normalisierung dieser Zuteilungen ist.\n"
+"        "
+
+#: workbench/templates/reporting/planning_vs_logbook.html
+#, fuzzy
+#| msgid "customer"
+msgid "Customer"
+msgstr "Kundschaft"
+
+#: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Planned"
 msgstr "Geplant"
+
+#: workbench/templates/reporting/planning_vs_logbook.html
+msgid "Diff"
+msgstr ""
+
+#: workbench/templates/reporting/planning_vs_logbook.html
+msgid "Allocation"
+msgstr "Zuteilung"
 
 #: workbench/templates/reporting/playing_bank.html
 msgid "offered"

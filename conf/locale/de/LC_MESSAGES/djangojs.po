@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-11 09:29+0100\n"
+"POT-Creation-Date: 2026-03-04 08:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: absences/absences.js conf/strings.js
+#: absences/absences.js conf/strings.js timer/breakActivity.js
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -30,37 +30,37 @@ msgstr "Tage"
 msgid "Week %s"
 msgstr "KW%s"
 
-#: absences/utils.js conf/strings.js
+#: absences/utils.js conf/strings.js tmp/absences.js
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "So"
 
-#: absences/utils.js conf/strings.js
+#: absences/utils.js conf/strings.js tmp/absences.js
 msgctxt "one letter Monday"
 msgid "M"
 msgstr "Mo"
 
-#: absences/utils.js conf/strings.js
+#: absences/utils.js conf/strings.js tmp/absences.js
 msgctxt "one letter Tuesday"
 msgid "T"
 msgstr "Di"
 
-#: absences/utils.js conf/strings.js
+#: absences/utils.js conf/strings.js tmp/absences.js
 msgctxt "one letter Wednesday"
 msgid "W"
 msgstr "Mi"
 
-#: absences/utils.js conf/strings.js
+#: absences/utils.js conf/strings.js tmp/absences.js
 msgctxt "one letter Thursday"
 msgid "T"
 msgstr "Do"
 
-#: absences/utils.js conf/strings.js
+#: absences/utils.js conf/strings.js tmp/absences.js
 msgctxt "one letter Friday"
 msgid "F"
 msgstr "Fr"
 
-#: absences/utils.js conf/strings.js
+#: absences/utils.js conf/strings.js tmp/absences.js
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
@@ -88,6 +88,10 @@ msgstr "Aktivität"
 #: conf/strings.js planning/index.js
 msgid "Add planned work"
 msgstr "Geplante Arbeit hinzufügen"
+
+#: conf/strings.js timer/breakActivity.js timer/createActivity.js
+msgid "Break"
+msgstr ""
 
 #: conf/strings.js
 msgid "Concurrent absences"
@@ -134,8 +138,12 @@ msgid "Open logged hours form"
 msgstr "Öffne das Stundenformular"
 
 #: conf/strings.js timer/actions.js
-msgid "Overwrite seconds"
-msgstr "Sekunden überschreiben"
+msgid "Overwrite elapsed time (h:m:s or m:s or seconds)"
+msgstr ""
+
+#: conf/strings.js timer/actions.js
+msgid "Overwrite time (h:m:s or m:s or seconds)"
+msgstr ""
 
 #: conf/strings.js planning/index.js
 msgid "Planned hours per week"
@@ -153,6 +161,10 @@ msgstr "Entfernen"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
+#: conf/strings.js timer/breakActivity.js
+msgid "Save break"
+msgstr ""
+
 #: conf/strings.js timer/activity.js
 msgid "Select or search project..."
 msgstr "Projekt auswählen oder suchen..."
@@ -165,9 +177,13 @@ msgstr "Leistung auswählen..."
 msgid "Send to logbook"
 msgstr "Sende ins Logbuch"
 
-#: conf/strings.js timer/activity.js
+#: conf/strings.js timer/activity.js timer/breakActivity.js
 msgid "Settings"
 msgstr "Einstellungen"
+
+#: conf/strings.js timer/breakActivity.js
+msgid "Start break"
+msgstr ""
 
 #: conf/strings.js timer/timer.js
 msgid "This week"
@@ -197,6 +213,9 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
+
+#~ msgid "Overwrite seconds"
+#~ msgstr "Sekunden überschreiben"
 
 #~ msgid "Go to the project"
 #~ msgstr "Zum Projekt gehen"

@@ -1,5 +1,6 @@
 import datetime as dt
 from collections import defaultdict
+from decimal import Decimal
 from itertools import islice, starmap, takewhile
 
 from django.db import connections
@@ -15,7 +16,7 @@ from workbench.logbook.models import LoggedHours
 from workbench.planning.models import ExternalWork, Milestone, PlannedWork
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
-from workbench.tools.formats import Z1, Z2, hours, local_date_format
+from workbench.tools.formats import Z0, Z1, Z2, hours, local_date_format
 from workbench.tools.reporting import query
 from workbench.tools.validation import in_days, monday
 
@@ -695,6 +696,21 @@ def project_planning_external(project):
     return project_planning(project, external_view=True)
 
 
+def _diff_css_class(p, lo, diff):
+    if not p and lo:
+        return "text-warning"
+    if p and not lo:
+        return "text-warning"
+    if p or lo:
+        abs_diff = abs(diff)
+        ratio = float(abs_diff / max(p, lo))
+        if abs_diff >= 16 or ratio >= 0.2:
+            return "text-danger"
+        if abs_diff >= 8 or ratio >= 0.1:
+            return "text-warning"
+    return ""
+
+
 def planning_vs_logbook(date_range, *, users):
     planned = defaultdict(dict)
     logged = defaultdict(dict)
@@ -766,20 +782,6 @@ group by customer_id, week
     }
     weeks = sorted(seen_weeks)
 
-    def _css_class(p, lo, diff):
-        if not p and lo:
-            return "text-warning"
-        if p and not lo:
-            return "text-warning"
-        if p or lo:
-            abs_diff = abs(diff)
-            ratio = float(abs_diff / max(p, lo))
-            if abs_diff >= 16 or ratio >= 0.2:
-                return "text-danger"
-            if abs_diff >= 8 or ratio >= 0.1:
-                return "text-warning"
-        return ""
-
     def _customer(planned, logged):
         ret = []
         for customer_id in planned.keys() | logged.keys():
@@ -799,7 +801,7 @@ group by customer_id, week
                 "planned": p,
                 "logged": lo,
                 "diff": diff,
-                "css_class": _css_class(p, lo, diff),
+                "css_class": _diff_css_class(p, lo, diff),
             })
         return sorted(ret, key=lambda row: -abs(row["diff"]))
 
@@ -810,7 +812,36 @@ group by customer_id, week
     ret["planned"] = sum((c["planned"] for c in ret["per_customer"]), Z1)
     ret["logged"] = sum((c["logged"] for c in ret["per_customer"]), Z1)
     ret["diff"] = ret["logged"] - ret["planned"]
+
+    total_planned = ret["planned"]
+    total_logged = ret["logged"]
+    ret["overall_ratio"] = (
+        (total_logged / total_planned * 100).quantize(Z0) if total_planned else None
+    )
+    for c in ret["per_customer"]:
+        _add_allocation(c, total_planned, total_logged)
     return ret
+
+
+def _add_allocation(c, total_planned, total_logged):
+    if total_planned and total_logged and c["planned"]:
+        ratio = (c["logged"] / total_logged) / (c["planned"] / total_planned) * 100
+        c["allocation"] = ratio.quantize(Z0)
+        c["allocation_abs"] = abs(ratio - 100).quantize(Z0)
+    elif c["logged"]:
+        # Time logged with no planned allocation — maximally over-served
+        c["allocation"] = None
+        c["allocation_abs"] = Decimal(9999)
+    else:
+        c["allocation"] = Decimal(0).quantize(Z0)
+        c["allocation_abs"] = Decimal(100).quantize(Z0)
+    dev = c["allocation_abs"]
+    if dev >= 20:
+        c["allocation_css_class"] = "text-danger"
+    elif dev >= 10:
+        c["allocation_css_class"] = "text-warning"
+    else:
+        c["allocation_css_class"] = ""
 
 
 def campaign_planning_external(campaign):
