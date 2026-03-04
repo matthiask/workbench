@@ -53,7 +53,7 @@
                 <span class="{% if not customer_row.logged %}text-black-30{% endif %}">{{ customer_row.logged|hours }}</span>
               </td>
               <td class="text-end {{ customer_row.css_class }}">{{ customer_row.diff|hours }}</td>
-              <td class="text-end {{ customer_row.allocation_css_class }}" data-sort-value="{{ customer_row.allocation_abs }}">{% if customer_row.allocation is not None %}{{ customer_row.allocation }}%{% else %}∞{% endif %}</td>
+              <td class="text-end {{ customer_row.allocation_css_class }}{% if customer_row.allocation_marginal %} opacity-50{% endif %}" data-sort-value="{{ customer_row.allocation_abs }}">{% if customer_row.allocation is not None %}{{ customer_row.allocation }}%{% else %}∞{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>
