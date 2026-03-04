@@ -11,13 +11,13 @@
       <form method="get" class="mb-3" data-autosubmit>
         {% ff_fields form %}
       </form>
-      <p class="small text-muted">
-        {% blocktranslate with ratio=stats.overall_ratio %}
+      <p>
+        {% blocktranslate with ratio=stats.overall_ratio logged=stats.logged|hours planned=stats.planned|hours %}
           <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.
           100% means the client received exactly their proportional slice of your time.
           Below 100% means under-served; above 100% means over-served.
           ∞ means time was logged with no planned allocation.
-          The overall logged/planned ratio for this period is {{ ratio }}%, which is the baseline these allocations are normalised against.
+          The overall logged/planned ratio for this period is <strong>{{ ratio }}%</strong> ({{ logged }} logged / {{ planned }} planned), which is the baseline these allocations are normalised against.
         {% endblocktranslate %}
       </p>
       <table class="table table-sm table-striped" data-sortable>
@@ -38,7 +38,7 @@
             <th class="text-end">{{ stats.planned|hours }}</th>
             <th class="text-end">{{ stats.logged|hours }}</th>
             <th class="text-end">{{ stats.diff|hours }}</th>
-            <th class="text-end">{{ stats.overall_ratio }}%</th>
+            <th class="text-end">100%</th>
           </tr>
         </tfoot>
         <tbody>
