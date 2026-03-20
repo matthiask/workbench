@@ -4,7 +4,6 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
-      - id: check-builtin-literals
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: check-toml
@@ -15,7 +14,7 @@ repos:
       - id: trailing-whitespace
       - id: file-contents-sorter
         args: [--ignore-case]
-        files: requirements-to-freeze.txt
+        files: "requirements-to-freeze.txt|scripts/.*\\.txt"
   - repo: local
     hooks:
       - id: django-check
@@ -26,7 +25,8 @@ repos:
         always_run: true
       - id: prettier
         name: prettier
-        entry: npx prettier@3.6.2 --no-semi --write
+        entry: >-
+          bash -c 'if command -v mise &>/dev/null; then mise x -- prettier --no-semi --write "$@"; elif command -v npx &>/dev/null; then npx prettier --no-semi --write "$@"; else echo "error: neither mise nor npx found" >&2; exit 1; fi' --
         language: system
         types_or: [scss]
         require_serial: true
@@ -34,20 +34,20 @@ repos:
     rev: 1.30.0
     hooks:
       - id: django-upgrade
-        args: [--target-version, "5.1"]
+        args: [--target-version, "6.0"]
   -   repo: https://github.com/adamchainz/djade-pre-commit
       rev: 1.9.0
       hooks:
       -   id: djade
-          args: [--target-version, "5.1"]
+          args: [--target-version, "6.0"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.4
+    rev: v0.15.7
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--unsafe-fixes]
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.16.2
+    rev: v2.20.0
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
@@ -55,7 +55,7 @@ repos:
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.4.5
+    rev: v2.4.8
     hooks:
       - id: biome-check
         args: [--unsafe]

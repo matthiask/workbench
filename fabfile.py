@@ -1,7 +1,7 @@
 import fh_fablib as fl
 
 
-fl.require("1.0.20250710")
+fl.require("1.0.20260320")
 fl.config.update(
     app="workbench",
     domain="workbench.feinheit.ch",
@@ -23,20 +23,4 @@ def dev(ctx):
     )
 
 
-@fl.task
-def update(ctx):
-    fl.run_local(ctx, "uv sync")
-    fl.run_local(ctx, "uv run manage.py migrate")
-
-
-@fl.task
-def upgrade(ctx):
-    venv = fl.config.base / ".venv"
-    fl.run_local(ctx, f"rm -rf {venv}")
-    fl.run_local(ctx, f"uv venv --python {fl.config.python}")
-    fl.run_local(ctx, "uv lock --upgrade")
-    fl.run_local(ctx, "uv run manage.py migrate")
-    fl.run_local(ctx, "prek install -f")
-
-
-ns = fl.Collection(*fl.GENERAL, dev, update, upgrade)
+ns = fl.Collection(*fl.GENERAL, dev)

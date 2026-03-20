@@ -212,19 +212,18 @@ module.exports = (PRODUCTION) => {
       }
     },
     sassRule(options = {}) {
-      let { cssLoaders } = options
-      if (!cssLoaders) cssLoaders = postcssLoaders(["autoprefixer"])
+      const cssLoaders = options.cssLoaders || postcssLoaders(["autoprefixer"])
+      const includePaths = options.includePaths || [
+        path.resolve(path.join(cwd, "node_modules")),
+      ]
+      const silenceDeprecations = options.silenceDeprecations || []
       return {
         test: /\.scss$/i,
         use: [
           ...cssLoaders,
           {
             loader: "sass-loader",
-            options: {
-              sassOptions: {
-                includePaths: [path.resolve(path.join(cwd, "node_modules"))],
-              },
-            },
+            options: { sassOptions: { includePaths, silenceDeprecations } },
           },
         ],
         type: "javascript/auto",

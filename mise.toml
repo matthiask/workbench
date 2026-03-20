@@ -1,0 +1,7 @@
+[settings]
+yes = true
+
+[tools]
+node = "lts"
+prettier = "latest"
+yarn = "1"

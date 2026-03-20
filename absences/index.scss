@@ -57,13 +57,13 @@ $z-index: (
       transparent calc(var(--person-row-height) + var(--grid-gap))
     ),
     /* Name Column */
-      linear-gradient(
+    linear-gradient(
         to right,
         $white 0,
         $white calc(var(--name-column-width) + var(--grid-gap))
       ),
     /* Week Columns */
-      repeating-linear-gradient(
+    repeating-linear-gradient(
         to right,
         $zircon 0,
         $zircon calc((var(--day-column-width) + var(--grid-gap)) * 7),
@@ -97,13 +97,13 @@ $z-index: (
       transparent calc(var(--person-row-height) + var(--grid-gap))
     ),
     /* Name Column */
-      linear-gradient(
+    linear-gradient(
         to right,
         #1a1a1a 0,
         #1a1a1a calc(var(--name-column-width) + var(--grid-gap))
       ),
     /* Week Columns */
-      repeating-linear-gradient(
+    repeating-linear-gradient(
         to right,
         #2a2a3a 0,
         #2a2a3a calc((var(--day-column-width) + var(--grid-gap)) * 7),
