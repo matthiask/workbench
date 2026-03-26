@@ -422,6 +422,7 @@ def squeeze_data(date_range):  # noqa: C901
 
     totals = {
         "employment_percentage": total_employment_percentage,
+        "absence_days": sum(ud["absence_days"] for ud in user_list),
         "margin": all_users_margin,
         "hours_in_range": all_users_hours_in_range,
         "rate": all_users_margin / all_users_hours_in_range

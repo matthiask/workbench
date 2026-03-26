@@ -240,8 +240,8 @@
               <tr>
                 <th>{% translate 'Total' %}</th>
                 <th></th>
-                <th class="text-end">{{ data.totals.employment_percentage|stringformat:".1f" }}%</th>
-                <th></th>
+                <th class="text-end">{{ data.totals.employment_percentage|stringformat:".0f" }}%</th>
+                <th class="text-end">{{ data.totals.absence_days|stringformat:".1f" }}</th>
                 <th class="text-end">{{ data.totals.hours_in_range|hours }}</th>
                 <th class="text-end">{{ data.totals.rate|currency }}</th>
                 <th class="text-end">{{ data.totals.margin|currency }}</th>
