@@ -210,8 +210,8 @@
                 <tr>
                   <td>{{ ud.user }}</td>
                   <td>{{ ud.specialist_field|default:_("<unknown>") }}</td>
-                  <td class="text-end">{{ ud.employment_percentage|floatformat:1 }}%</td>
-                  <td class="text-end">{{ ud.absence_days|floatformat:1 }}</td>
+                  <td class="text-end">{{ ud.employment_percentage|stringformat:".0f" }}%</td>
+                  <td class="text-end">{{ ud.absence_days|stringformat:".1f" }}</td>
                   <td class="text-end">{{ ud.hours_in_range|hours }}</td>
                   <td class="text-end">{{ ud.rate|currency }}</td>
                   <td class="text-end">
@@ -224,10 +224,10 @@
                       {{ ud.margin|currency }}
                     {% endif %}
                   </td>
-                  <td class="text-end">{{ ud.external_percentage|floatformat:1 }}%</td>
-                  <td class="text-end">{{ ud.profitable_percentage }}%</td>
+                  <td class="text-end">{{ ud.external_percentage|stringformat:".1f" }}%</td>
+                  <td class="text-end">{{ ud.profitable_percentage|stringformat:".1f" }}%</td>
                   <td class="text-end {% if ud.delta_external_percentage < 0 %}text-danger{% endif %}">
-                    {{ ud.delta_external_percentage|floatformat:1 }}%
+                    {{ ud.delta_external_percentage|stringformat:".1f" }}%
                   </td>
                   <td class="text-end">{{ ud.expected_gross_margin|currency }}</td>
                   <td class="text-end {% if ud.delta < 0 %}text-danger{% endif %}">
@@ -240,12 +240,12 @@
               <tr>
                 <th>{% translate 'Total' %}</th>
                 <th></th>
-                <th class="text-end">{{ data.totals.employment_percentage|floatformat:1 }}%</th>
+                <th class="text-end">{{ data.totals.employment_percentage|stringformat:".1f" }}%</th>
                 <th></th>
                 <th class="text-end">{{ data.totals.hours_in_range|hours }}</th>
                 <th class="text-end">{{ data.totals.rate|currency }}</th>
                 <th class="text-end">{{ data.totals.margin|currency }}</th>
-                <th class="text-end">{{ data.totals.external_percentage|floatformat:1 }}%</th>
+                <th class="text-end">{{ data.totals.external_percentage|stringformat:".1f" }}%</th>
                 <th></th>
                 <th></th>
                 <th></th>
