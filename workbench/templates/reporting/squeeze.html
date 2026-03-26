@@ -35,7 +35,7 @@
                   <div class="modal-body">
                     <dl class="row small mb-3">
                       <dt class="col-6">{% translate 'Gross margin' %}</dt>
-                      <dd class="col-6 text-end">{{ p.margin|currency }}</dd>
+                      <dd class="col-6 text-end">{{ p.gross_margin|currency }}</dd>
                       <dt class="col-6">{% translate 'Hours' %}</dt>
                       <dd class="col-6 text-end">{{ p.hours|hours }}</dd>
                       <dt class="col-6">{% translate 'Rate' %}</dt>
@@ -58,7 +58,7 @@
                             <td>{{ user }}</td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
                             <td class="text-end">{% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}</td>
-                            <td class="text-end">{{ contrib.margin|currency }}</td>
+                            <td class="text-end">{{ contrib.gross_margin|currency }}</td>
                             <td class="text-end">{{ contrib.rate|currency }}</td>
                           </tr>
                         {% endfor %}
@@ -68,7 +68,7 @@
                           <th>{% translate 'Total' %}</th>
                           <th class="text-end">{{ p.hours_in_range|hours }}</th>
                           <th class="text-end">{% if p.hours_rate_unknown %}{{ p.hours_rate_unknown|hours }}{% endif %}</th>
-                          <th class="text-end">{{ p.margin_in_range|currency }}</th>
+                          <th class="text-end">{{ p.gross_margin_in_range|currency }}</th>
                           <th class="text-end">{{ p.rate|currency }}</th>
                         </tr>
                       </tfoot>
@@ -102,6 +102,17 @@
                 <th class="text-end">{% translate 'Period hours' %}</th>
                 <th class="text-end">{% translate 'Period gross margin' %}</th>
               </tr>
+              <tr>
+                <th>{% translate 'Total' %}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="text-end">{{ data.project_totals.hours_in_range|hours }}</th>
+                <th class="text-end">{{ data.project_totals.gross_margin_in_range|currency }}</th>
+              </tr>
             </thead>
             <tbody>
               {% for p in data.projects %}
@@ -110,7 +121,7 @@
                   <td class="text-end">{{ p.offered|currency }}</td>
                   <td class="text-end">{{ p.projected|currency }}</td>
                   <td class="text-end">{{ p.invoiced|currency }}</td>
-                  <td class="text-end">{{ p.margin|currency }}</td>
+                  <td class="text-end">{{ p.gross_margin|currency }}</td>
                   <td class="text-end">{{ p.hours|hours }}</td>
                   <td class="text-end">{{ p.rate|currency }}</td>
                   <td class="text-end">{{ p.hours_in_range|hours }}</td>
@@ -119,14 +130,27 @@
                       <a href="#"
                          data-bs-toggle="modal"
                          data-bs-target="#project-users-{{ p.project.pk }}"
-                         title="{% translate 'User breakdown' %}">{{ p.margin_in_range|currency }}</a>
+                         title="{% translate 'User breakdown' %}">{{ p.gross_margin_in_range|currency }}</a>
                     {% else %}
-                      {{ p.margin_in_range|currency }}
+                      {{ p.gross_margin_in_range|currency }}
                     {% endif %}
                   </td>
                 </tr>
               {% endfor %}
             </tbody>
+            <tfoot>
+              <tr>
+                <th>{% translate 'Total' %}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="text-end">{{ data.project_totals.hours_in_range|hours }}</th>
+                <th class="text-end">{{ data.project_totals.gross_margin_in_range|currency }}</th>
+              </tr>
+            </tfoot>
           </table>
         </div>
 
@@ -157,7 +181,7 @@
                             <td>{% link_or_none project with_badge=True %}</td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
                             <td class="text-end">{% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}</td>
-                            <td class="text-end">{{ contrib.margin|currency }}</td>
+                            <td class="text-end">{{ contrib.gross_margin|currency }}</td>
                             <td class="text-end">{{ contrib.rate|currency }}</td>
                           </tr>
                         {% endfor %}
@@ -167,7 +191,7 @@
                           <th>{% translate 'Total' %}</th>
                           <th class="text-end">{{ ud.hours_in_range|hours }}</th>
                           <th class="text-end">{% if ud.hours_rate_unknown %}{{ ud.hours_rate_unknown|hours }}{% endif %}</th>
-                          <th class="text-end">{{ ud.margin|currency }}</th>
+                          <th class="text-end">{{ ud.gross_margin|currency }}</th>
                           <th class="text-end">{{ ud.rate|currency }}</th>
                         </tr>
                       </tfoot>
@@ -208,7 +232,7 @@
             <tbody>
               {% for ud in data.users %}
                 <tr>
-                  <td>{{ ud.user }}</td>
+                  <td>{% link_or_none ud.user %}</td>
                   <td>{{ ud.specialist_field|default:_("<unknown>") }}</td>
                   <td class="text-end">{{ ud.employment_percentage|stringformat:".0f" }}%</td>
                   <td class="text-end">{{ ud.absence_days|stringformat:".1f" }}</td>
@@ -219,9 +243,9 @@
                       <a href="#"
                          data-bs-toggle="modal"
                          data-bs-target="#user-projects-{{ ud.user.pk }}"
-                         title="{% translate 'Project breakdown' %}">{{ ud.margin|currency }}</a>
+                         title="{% translate 'Project breakdown' %}">{{ ud.gross_margin|currency }}</a>
                     {% else %}
-                      {{ ud.margin|currency }}
+                      {{ ud.gross_margin|currency }}
                     {% endif %}
                   </td>
                   <td class="text-end">{{ ud.external_percentage|stringformat:".1f" }}%</td>
@@ -244,7 +268,7 @@
                 <th class="text-end">{{ data.totals.absence_days|stringformat:".1f" }}</th>
                 <th class="text-end">{{ data.totals.hours_in_range|hours }}</th>
                 <th class="text-end">{{ data.totals.rate|currency }}</th>
-                <th class="text-end">{{ data.totals.margin|currency }}</th>
+                <th class="text-end">{{ data.totals.gross_margin|currency }}</th>
                 <th class="text-end">{{ data.totals.external_percentage|stringformat:".1f" }}%</th>
                 <th></th>
                 <th></th>
@@ -273,7 +297,7 @@
                 <tr>
                   <td>{{ f.name }}</td>
                   <td>{{ f.users }}</td>
-                  <td class="text-end">{{ f.margin|currency }}</td>
+                  <td class="text-end">{{ f.gross_margin|currency }}</td>
                   <td class="text-end">{{ f.hours_in_range|hours }}</td>
                   <td class="text-end">{{ f.rate|currency }}</td>
                 </tr>
@@ -297,8 +321,8 @@
             <tbody>
               {% for o in data.organizations %}
                 <tr>
-                  <td>{{ o.name }}</td>
-                  <td class="text-end">{{ o.margin|currency }}</td>
+                  <td>{% link_or_none o.organization %}</td>
+                  <td class="text-end">{{ o.gross_margin|currency }}</td>
                   <td class="text-end">{{ o.hours_in_range|hours }}</td>
                   <td class="text-end">{{ o.rate|currency }}</td>
                 </tr>

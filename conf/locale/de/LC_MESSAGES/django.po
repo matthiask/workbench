@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-26 10:10+0100\n"
+"POT-Creation-Date: 2026-03-26 17:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3119,22 +3119,16 @@ msgid "rate"
 msgstr "Ansatz"
 
 #: workbench/reporting/squeeze.py
-#, fuzzy
-#| msgid "planned hours"
 msgid "period hours"
-msgstr "geplante Stunden"
+msgstr "Stunden im Zeitraum"
 
 #: workbench/reporting/squeeze.py
-#, fuzzy
-#| msgid "projected gross margin"
 msgid "period gross margin"
-msgstr "geplanter Umsatz"
+msgstr "Umsatz im Zeitraum"
 
 #: workbench/reporting/squeeze.py
-#, fuzzy
-#| msgid "undefined rate"
 msgid "period rate"
-msgstr "ohne Stundensatz"
+msgstr "Stundensatz im Zeitraum"
 
 #: workbench/reporting/squeeze.py
 #, python-brace-format
@@ -3142,10 +3136,8 @@ msgid "hours at default rate ({}/h)"
 msgstr "Stunden zum Standardansatz ({}/h)"
 
 #: workbench/reporting/squeeze.py
-#, fuzzy
-#| msgid "hourly rate"
 msgid "hours at default rate"
-msgstr "Stundensatz"
+msgstr "Stunden zum Standardansatz"
 
 #: workbench/reporting/squeeze.py
 msgid "employment percentage YTD"
@@ -4285,8 +4277,6 @@ msgstr ""
 "        "
 
 #: workbench/templates/reporting/planning_vs_logbook.html
-#, fuzzy
-#| msgid "customer"
 msgid "Customer"
 msgstr "Kundschaft"
 
@@ -4323,10 +4313,8 @@ msgid "Squeeze"
 msgstr "Squeeze"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "Export"
 msgid "Export XLSX"
-msgstr "Exportieren"
+msgstr "XLSX exportieren"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Rate"
@@ -4342,10 +4330,8 @@ msgid "Hours without rate: default of %(rate)s/h applied"
 msgstr "Stunden ohne Stundensatz: Standard von %(rate)s/h angewendet"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "Project"
 msgid "Projects"
-msgstr "Projekt"
+msgstr "Projekte"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "estimated"
@@ -4368,38 +4354,31 @@ msgid "User breakdown"
 msgstr "Aufschlüsselung nach Person"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "User"
 msgid "Users"
-msgstr "Mitarbeiter:in"
+msgstr "Mitarbeiter:innen"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "specialist field"
 msgid "Specialist field"
 msgstr "Fachbereich"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy, python-format
-#| msgid "employment"
+#, python-format
 msgid "Employment %%"
-msgstr "Anstellungsverhältnis"
+msgstr "Anstellungsverhältnis %%"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Absence days"
 msgstr "Abwesenheitstage"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy, python-format
-#| msgid "External"
+#, python-format
 msgid "External %%"
-msgstr "Extern"
+msgstr "Extern %%"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy, python-format
-#| msgid "Target value"
+#, python-format
 msgid "Target ext. %%"
-msgstr "Richtwert"
+msgstr "Richtwert extern %%"
 
 #: workbench/templates/reporting/squeeze.html
 #, python-format
@@ -4415,28 +4394,20 @@ msgid "Project breakdown"
 msgstr "Aufschlüsselung nach Projekt"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "specialist fields"
 msgid "Specialist fields"
 msgstr "Fachbereiche"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "organizations"
 msgid "Organizations"
 msgstr "Organisationen"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "organization"
 msgid "Organization"
 msgstr "Organisation"
 
 #: workbench/templates/reporting/squeeze.html
-#, fuzzy
-#| msgid "No contact selected."
 msgid "No data for the selected period."
-msgstr "Kein Kontakt ausgewählt."
+msgstr "Keine Daten für den ausgewählten Zeitraum."
 
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Started on"

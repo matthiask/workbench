@@ -53,7 +53,7 @@ def squeeze_data(date_range):  # noqa: C901
     )
     users = defaultdict(
         lambda: {
-            "margin": Z2,
+            "gross_margin": Z2,
             "hours_in_range": Z1,
             "by_project": {},
         }
@@ -203,16 +203,16 @@ def squeeze_data(date_range):  # noqa: C901
                 user_margin = user_weighted / total_weighted_in_range * period_margin
                 contrib = {
                     "hours": user_hours,
-                    "margin": user_margin,
+                    "gross_margin": user_margin,
                     "rate": user_margin / user_hours,
                     "hours_rate_unknown": user_data["hours_rate_unknown"],
                 }
-                users[u]["margin"] += user_margin
+                users[u]["gross_margin"] += user_margin
                 users[u]["by_project"][p["project"]] = contrib
                 by_user[u] = contrib
 
         hours_in_range = sum(d["hours"] for d in by_user.values())
-        margin_in_range = sum(d["margin"] for d in by_user.values())
+        gross_margin_in_range = sum(d["gross_margin"] for d in by_user.values())
         hours_rate_unknown = sum(d["hours_rate_unknown"] for d in by_user.values())
         by_user = dict(
             sorted(by_user.items(), key=lambda item: item[1]["hours"], reverse=True)
@@ -223,18 +223,18 @@ def squeeze_data(date_range):  # noqa: C901
             "offered": offered,
             "projected": projected,
             "invoiced": invoiced,
-            "margin": margin,
+            "gross_margin": margin,
             "hours_offered": hours_offered,
             "hours_logged": hours_logged,
             "hours": hours,
             "rate": margin / hours if hours else Z2,
             "by_user": by_user,
             "hours_in_range": hours_in_range,
-            "margin_in_range": margin_in_range,
+            "gross_margin_in_range": gross_margin_in_range,
             "hours_rate_unknown": hours_rate_unknown,
         })
 
-    project_list.sort(key=lambda r: r["margin_in_range"], reverse=True)
+    project_list.sort(key=lambda r: r["gross_margin_in_range"], reverse=True)
 
     all_users = sorted(users.keys())
     ep = employment_percentages()
@@ -303,7 +303,7 @@ def squeeze_data(date_range):  # noqa: C901
             100 * external_hours / total_hours_user if total_hours_user else Z0
         )
         invoiced_per_external_hour = (
-            row["margin"]
+            row["gross_margin"]
             / row["hours_in_range"]
             / (1 - internal_hours / total_hours_user)
             if external_hours
@@ -319,7 +319,7 @@ def squeeze_data(date_range):  # noqa: C901
             * Decimal(employment_percentage)
             / 100
         )
-        delta = row["margin"] - expected_gross_margin
+        delta = row["gross_margin"] - expected_gross_margin
 
         # internal_type_percentages: list of (InternalType, negative_percentage_or_0)
         # where negative_percentage mirrors the internal_percentages list values
@@ -331,9 +331,9 @@ def squeeze_data(date_range):  # noqa: C901
             if user.specialist_field
             else None,
             "employment_percentage": employment_percentage,
-            "margin": row["margin"],
+            "gross_margin": row["gross_margin"],
             "hours_in_range": row["hours_in_range"],
-            "rate": row["margin"] / row["hours_in_range"]
+            "rate": row["gross_margin"] / row["hours_in_range"]
             if row["hours_in_range"]
             else Z2,
             "internal_hours": internal_hours,
@@ -362,10 +362,12 @@ def squeeze_data(date_range):  # noqa: C901
     user_list.sort(key=lambda r: r["delta"], reverse=True)
 
     # Build specialist fields
-    fields_dict = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1, "names": []})
+    fields_dict = defaultdict(
+        lambda: {"gross_margin": Z2, "hours_in_range": Z1, "names": []}
+    )
     for ud in user_list:
         field = ud["specialist_field"] or "<unbekannt>"
-        fields_dict[field]["margin"] += ud["margin"]
+        fields_dict[field]["gross_margin"] += ud["gross_margin"]
         fields_dict[field]["hours_in_range"] += ud["hours_in_range"]
         fields_dict[field]["names"].append(str(ud["user"]))
 
@@ -374,9 +376,9 @@ def squeeze_data(date_range):  # noqa: C901
             {
                 "name": name,
                 "users": ", ".join(sorted(d["names"])),
-                "margin": d["margin"],
+                "gross_margin": d["gross_margin"],
                 "hours_in_range": d["hours_in_range"],
-                "rate": d["margin"] / d["hours_in_range"]
+                "rate": d["gross_margin"] / d["hours_in_range"]
                 if d["hours_in_range"]
                 else Z2,
             }
@@ -387,33 +389,40 @@ def squeeze_data(date_range):  # noqa: C901
     )
 
     # Build organizations
-    organizations = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1})
+    organizations = defaultdict(lambda: {"gross_margin": Z2, "hours_in_range": Z1})
     for p in project_list:
         hours = p["hours"]
         if hours:
-            org_name = str(p["project"].customer)
+            org = p["project"].customer
             for u_data in p["by_user"].values():
-                organizations[org_name]["margin"] += u_data["margin"]
-                organizations[org_name]["hours_in_range"] += u_data["hours"]
+                organizations[org]["gross_margin"] += u_data["gross_margin"]
+                organizations[org]["hours_in_range"] += u_data["hours"]
 
     org_list = sorted(
         [
             {
-                "name": name,
-                "margin": d["margin"],
+                "organization": organization,
+                "name": str(organization),
+                "gross_margin": d["gross_margin"],
                 "hours_in_range": d["hours_in_range"],
-                "rate": d["margin"] / d["hours_in_range"]
+                "rate": d["gross_margin"] / d["hours_in_range"]
                 if d["hours_in_range"]
                 else Z2,
             }
-            for name, d in organizations.items()
+            for organization, d in organizations.items()
         ],
         key=lambda r: r["rate"],
         reverse=True,
     )
 
+    # Project totals
+    project_totals = {
+        "hours_in_range": sum(p["hours_in_range"] for p in project_list),
+        "gross_margin_in_range": sum(p["gross_margin_in_range"] for p in project_list),
+    }
+
     # Totals
-    all_users_margin = sum(ud["margin"] for ud in user_list)
+    all_users_gross_margin = sum(ud["gross_margin"] for ud in user_list)
     all_users_hours_in_range = sum(ud["hours_in_range"] for ud in user_list)
     total_employment_percentage = sum(average_percentage(u) for u in all_users)
     total_internal = hpt["total"]["internal"]
@@ -423,9 +432,9 @@ def squeeze_data(date_range):  # noqa: C901
     totals = {
         "employment_percentage": total_employment_percentage,
         "absence_days": sum(ud["absence_days"] for ud in user_list),
-        "margin": all_users_margin,
+        "gross_margin": all_users_gross_margin,
         "hours_in_range": all_users_hours_in_range,
-        "rate": all_users_margin / all_users_hours_in_range
+        "rate": all_users_gross_margin / all_users_hours_in_range
         if all_users_hours_in_range
         else Z2,
         "internal_hours": total_internal,
@@ -435,7 +444,7 @@ def squeeze_data(date_range):  # noqa: C901
         if total_total
         else Z0,
         "invoiced_per_external_hour": (
-            all_users_margin
+            all_users_gross_margin
             / all_users_hours_in_range
             / (1 - total_internal / total_total)
             if total_external
@@ -446,6 +455,7 @@ def squeeze_data(date_range):  # noqa: C901
     return {
         "date_range": date_range,
         "projects": project_list,
+        "project_totals": project_totals,
         "users": user_list,
         "fields": field_list,
         "organizations": org_list,
@@ -553,7 +563,7 @@ def build_xlsx(data):
             "",
             totals["hours_in_range"],
             totals["rate"],
-            totals["margin"],
+            totals["gross_margin"],
             "",
             totals["internal_hours"],
             totals["external_hours"],
@@ -592,7 +602,7 @@ def build_xlsx(data):
             [
                 f["name"],
                 f["users"],
-                f["margin"],
+                f["gross_margin"],
                 f["hours_in_range"],
                 f["rate"],
             ]
@@ -610,7 +620,7 @@ def build_xlsx(data):
         *[
             [
                 o["name"],
-                o["margin"],
+                o["gross_margin"],
                 o["hours_in_range"],
                 o["rate"],
             ]
