@@ -80,7 +80,7 @@ def get_project_cards(
     return _get_classic_project_cards(owner, repo, project_number, headers)
 
 
-def _get_classic_project_cards(
+def _get_classic_project_cards(  # noqa: C901
     owner: str, repo: str, project_number: str, headers: dict[str, str]
 ) -> list[dict[str, Any]]:
     """Get cards from a classic GitHub project."""
@@ -118,8 +118,8 @@ def _get_classic_project_cards(
                     if str(project.get("number")) == project_number:
                         project_id = project.get("id")
                         break
-    except Exception as e:
-        logger.exception(f"Error finding project {project_number}: {e!s}")
+    except Exception:
+        logger.exception("Error finding project %s", project_number)
 
     # If all else fails, try using the project number as the ID directly
     # This is less reliable but might work in some cases
@@ -218,7 +218,7 @@ def _get_classic_project_cards(
     return cards
 
 
-def _get_project_v2_cards(
+def _get_project_v2_cards(  # noqa: C901
     owner: str, project_number: str, headers: dict[str, str]
 ) -> list[dict[str, Any]]:
     """Get cards from a GitHub Projects v2."""

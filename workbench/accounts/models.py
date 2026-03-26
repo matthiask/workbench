@@ -37,7 +37,7 @@ class UserFeatures:
             setting = settings.FEATURES[key]
         except KeyError:
             if key not in KNOWN_FEATURES:
-                raise UnknownFeature("Unknown feature: %r" % key)
+                raise UnknownFeature("Unknown feature: %r" % key) from None
 
             return False
         if setting is F.ALWAYS:
@@ -422,6 +422,9 @@ class CoffeePairings(models.Model):
     class Meta:
         verbose_name = _("coffee pairings")
         verbose_name_plural = _("coffee pairings")
+
+    def __str__(self):
+        return f"Coffee pairings {self.created_at}"
 
 
 @total_ordering

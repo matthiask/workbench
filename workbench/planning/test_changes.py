@@ -31,11 +31,7 @@ class ChangesTest(TestCase):
         pw = factories.PlannedWorkFactory.create(weeks=[in_days(0)])
         pw.project.delete()
 
-        c = updates.changes(since=timezone.now() - dt.timedelta(days=1))
-
-        from pprint import pprint
-
-        pprint(c)
+        updates.changes(since=timezone.now() - dt.timedelta(days=1))
 
     @travel("2021-10-18")
     def test_updates(self):
@@ -60,10 +56,6 @@ class ChangesTest(TestCase):
 
         c = updates.changes(since=timezone.now() - dt.timedelta(days=1))
         self.assertEqual(set(c), {original_pw_user, pw.user})
-
-        from pprint import pprint
-
-        pprint(c)
 
         updates.changes_mails()
         self.assertEqual(len(mail.outbox), 2)

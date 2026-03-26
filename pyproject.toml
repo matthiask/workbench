@@ -105,12 +105,20 @@ lint.extend-select = [
 lint.extend-ignore = [
   # Allow zip() without strict=
   "B905",
+  # strptime() always calls .date() immediately, timezone irrelevant
+  "DTZ007",
   # datetime.date.today is fine
   "DTZ011",
   # No line length errors
   "E501",
+  # Deferred imports for circular import avoidance are a common Django pattern
+  "PLC0415",
   # Mutable class attributes are fine
   "RUF012",
+  # Nested ifs are sometimes clearer than long combined conditions
+  "SIM102",
+  # Creating custom exception classes for one-off raises is over-engineering
+  "TRY002",
   # Percent-formatting is fine
   "UP031",
 ]

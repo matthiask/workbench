@@ -41,7 +41,7 @@ class PlanningXLSXDocument:
             # Calculate luminance
             luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
             return luminance < 0.5
-        except Exception:
+        except Exception:  # noqa: BLE001
             return False
 
     def gantt_chart(self, project):  # noqa: C901
@@ -224,7 +224,7 @@ class PlanningXLSXDocument:
             for cell in column:
                 try:
                     max_length = max(max_length, len(str(cell.value)))
-                except Exception:
+                except Exception:  # noqa: BLE001, S110
                     pass
             adjusted_width = min(max_length + 2, 50)
             ws.column_dimensions[column_letter].width = adjusted_width

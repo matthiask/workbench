@@ -39,7 +39,7 @@ _ndash = mark_safe("&ndash;")
 
 
 @register.simple_tag
-def link_or_none(object, pretty=None, none=_ndash, with_badge=False):
+def link_or_none(object, pretty=None, none=_ndash, with_badge=False):  # noqa: FBT002
     if object == 0:
         return object
     if not object:
@@ -99,14 +99,14 @@ def field_value_pairs(object, fields=None):
 @register.filter
 def h(object):
     if hasattr(object, "__html__"):
-        return object.__html__()
+        return object.__html__()  # noqa: PLC2801
     return object
 
 
 @register.filter
 def group_hours_by_day(iterable):
-    for day, instances in groupby(iterable, lambda logged: logged.rendered_on):
-        instances = list(instances)
+    for day, instances_iter in groupby(iterable, lambda logged: logged.rendered_on):
+        instances = list(instances_iter)
         yield (day, sum((item.hours for item in instances), Z1), instances)
 
 
@@ -155,8 +155,8 @@ def group_deals_by_probability(iterable, should_group):
         }
         return
 
-    for group, deals in groupby(iterable, deal_group):
-        deals = list(deals)
+    for group, deals_iter in groupby(iterable, deal_group):
+        deals = list(deals_iter)
         yield {
             "title": group[1],
             "deals": deals,

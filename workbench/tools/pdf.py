@@ -608,10 +608,10 @@ class PDFDocument(_PDFDocument):
             self.next_frame()
 
     def append_qr_bill(self, invoice):
-        import tempfile  # noqa: PLC0415
+        import tempfile
 
-        from qrbill.bill import CombinedAddress, QRBill  # noqa: PLC0415
-        from svglib.svglib import svg2rlg  # noqa: PLC0415
+        from qrbill.bill import CombinedAddress, QRBill
+        from svglib.svglib import svg2rlg
 
         bill = QRBill(
             amount=str(invoice.total),

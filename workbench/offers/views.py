@@ -27,7 +27,7 @@ class OfferPDFView(generic.DetailView):
             if request.GET.get("signature_line"):
                 pdf.add_agreement(self.object)
             pdf.generate()
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             messages.error(
                 request, gettext("Unable to generate the PDF: {}").format(exc)
             )

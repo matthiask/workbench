@@ -61,7 +61,7 @@ class UserForm(ModelForm):
                 initial=user.features[FEATURES.COFFEE],
             )
 
-    def save(self, commit=True):
+    def save(self, commit=True):  # noqa: FBT002
         instance = super().save(commit=False)
         if "feature_coffee" in self.fields and self.cleaned_data["feature_coffee"]:
             instance._features = sorted(set(instance._features) | {FEATURES.COFFEE})

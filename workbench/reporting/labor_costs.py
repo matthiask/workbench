@@ -151,10 +151,10 @@ def labor_costs_by_cost_center(date_range):
     )
 
     cost_centers = []
-    for cost_center, cc_projects in groupby(
+    for cost_center, cc_projects_iter in groupby(
         sorted_projects, lambda row: row["project"].cost_center
     ):
-        cc_projects = list(cc_projects)
+        cc_projects = list(cc_projects_iter)
         cc_row = {key: sum(row[key] for row in cc_projects) for key in PROJECT_KEYS}
         cc_row.update({"cost_center": cost_center, "projects": cc_projects})
         cost_centers.append(cc_row)

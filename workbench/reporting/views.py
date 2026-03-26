@@ -244,9 +244,9 @@ def key_data_view(request):
             "total": Z2,
         }
 
-        for key, months in groupby(gh, key=lambda row: row["month"].year):
+        for key, months_iter in groupby(gh, key=lambda row: row["month"].year):
             this = zero.copy()
-            months = list(months)
+            months = list(months_iter)
             for month in months:
                 this["profitable"] += month["profitable"]
                 this["overdrawn"] += month["overdrawn"]
@@ -421,7 +421,7 @@ class PlayingBankForm(Form):
     def queryset(self):
         data = self.cleaned_data
         queryset = Project.objects.all()
-        if data.get("s") == "":
+        if data.get("s") == "":  # noqa: PLC1901
             queryset = queryset.open()
         elif data.get("s") == "this-year":
             queryset = queryset.filter(

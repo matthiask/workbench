@@ -164,3 +164,6 @@ class ModelWithTotal(Model):
 class CalculationModel(ModelWithTotal):
     class Meta:
         managed = False
+
+    def __str__(self):
+        return str(self.total)

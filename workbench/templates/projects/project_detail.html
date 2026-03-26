@@ -81,7 +81,7 @@
                   {% endif %}
 
                   <tr>
-                    <th class="text-end">{% translate 'Total costs' %}</th>
+                    <th class="text-end">{% translate 'logged costs'|capfirst %}</th>
                     <td>
                       {{ gs.total_logged_cost|currency }}
                       {% if gs.total_logged_hours_rate_undefined %}
@@ -89,18 +89,30 @@
                           (+{{ gs.total_logged_hours_rate_undefined|hours }})
                         </span>
                       {% endif %}
-                      /
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-end">{% translate 'service cost'|capfirst %}</th>
+                    <td>
                       {{ gs.total_service_cost|currency }}
                       {% if gs.total_service_hours_rate_undefined %}
                         <span class="text-warning" title="{% translate 'undefined rate' %}">
                           (+{{ gs.total_service_hours_rate_undefined|hours }})
                         </span>
                       {% endif %}
-                      {% if not gs.has_budget_retainer_offers and gs.total_discount %}
-                        (-{{ gs.total_discount|currency }} {% translate 'discount' %})
-                      {% endif %}
+                      <br>
+                      <small class="text-muted">
+                        {% translate "Accepted offers" %}: {{ gs.accepted_offers_service_cost|currency }},
+                        {% translate "Not offered yet" %}: {{ gs.not_offered_service_cost|currency }}
+                      </small>
                     </td>
                   </tr>
+                  {% if not gs.has_budget_retainer_offers and gs.total_discount %}
+                    <tr>
+                      <th class="text-end">{% translate 'discount'|capfirst %}</th>
+                      <td>{{ gs.total_discount|currency }}</td>
+                    </tr>
+                  {% endif %}
                   <tr>
                     <th class="text-end">{% translate 'Not archived' %}</th>
                     <td>
@@ -108,9 +120,9 @@
                       {% if project.not_archived_total.hours_rate_undefined %}
                         <span class="text-warning" title="{% translate 'undefined rate' %}">
                           (+{{ project.not_archived_total.hours_rate_undefined|hours }})
-                        {% endif %}
-                      </span>
-                      (
+                        </span>
+                      {% endif %}
+
                       <a class="inline"
                          href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;not_archived=1">
                         {% translate "hours" %}
@@ -120,7 +132,6 @@
                          href="{% url 'logbook_loggedcost_list' %}?project={{ project.pk }}&amp;not_archived=1">
                         {% translate "cost" %}
                       </a>
-                      )
                     </td>
                   </tr>
                   <tr>

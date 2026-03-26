@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.admin import (  # noqa
+from django.contrib.admin import (  # noqa: F401
     HORIZONTAL,
     VERTICAL,
     ModelAdmin as ReadWriteModelAdmin,

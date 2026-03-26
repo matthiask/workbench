@@ -32,7 +32,7 @@ class InvoicePDFView(generic.DetailView):
             pdf.init_invoice_letter()
             pdf.process_invoice(self.object)
             pdf.generate()
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             messages.error(
                 request, gettext("Unable to generate the PDF: {}").format(exc)
             )

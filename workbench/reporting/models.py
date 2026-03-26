@@ -11,7 +11,7 @@ from workbench.tools.models import MoneyField
 
 class AccrualsQuerySet(models.QuerySet):
     def accruals(self, cutoff_date):
-        from workbench.reporting.project_budget_statistics import (  # noqa: PLC0415
+        from workbench.reporting.project_budget_statistics import (
             project_budget_statistics,
         )
 

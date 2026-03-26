@@ -908,25 +908,25 @@ SELECT MIN(week), MAX(week) FROM sq
 
 
 def test():  # pragma: no cover
-    from pprint import pprint  # noqa: PLC0415
+    from pprint import pprint
 
     if False:
-        from workbench.accounts.models import User  # noqa: PLC0415
+        from workbench.accounts.models import User
 
         pprint(user_planning(User.objects.get(pk=1)))
 
     if False:
-        from workbench.accounts.models import Team  # noqa: PLC0415
+        from workbench.accounts.models import Team
 
         pprint(team_planning(Team.objects.get(pk=1)))
 
     if False:
-        from workbench.projects.models import Project  # noqa: PLC0415
+        from workbench.projects.models import Project
 
         pprint(project_planning(Project.objects.get(pk=8238)))
 
     if True:
-        from workbench.accounts.models import User  # noqa: PLC0415
+        from workbench.accounts.models import User
 
         pprint(
             planning_vs_logbook(

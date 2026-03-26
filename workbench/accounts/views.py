@@ -81,7 +81,7 @@ def oauth2(request):
 
     try:
         user_data = client.get_user_data()
-    except Exception:
+    except Exception:  # noqa: BLE001
         messages.error(request, _("Error while fetching user data. Please try again."))
         return redirect("login")
 

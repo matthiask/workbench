@@ -21,7 +21,7 @@ def annual_working_time_view(request):
     this_year = dt.date.today().year
     try:
         year = int(request.GET.get("year", this_year))
-    except Exception:
+    except Exception:  # noqa: BLE001
         return redirect(".")
 
     user = request.GET.get("user")

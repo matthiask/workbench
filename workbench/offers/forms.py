@@ -259,7 +259,7 @@ class OfferPricingForm(ModelForm):
             + [formset.is_valid() for formset in self.formsets.values()]
         )
 
-    def save(self, commit=True):
+    def save(self, commit=True):  # noqa: FBT002
         for formset in self.formsets.values():
             formset.save()
         return super().save()
@@ -268,7 +268,7 @@ class OfferPricingForm(ModelForm):
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = "__all__"
+        fields = "__all__"  # noqa: DJ007
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -276,7 +276,7 @@ class ServiceForm(forms.ModelForm):
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
 
-    def save(self, commit=True):
+    def save(self, commit=True):  # noqa: FBT002
         instance = super().save(commit=False)
         instance.save(skip_related_model=True)
         return instance

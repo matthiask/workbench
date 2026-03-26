@@ -95,7 +95,7 @@ def full_time_equivalents_by_month():
     return months
 
 
-def annual_working_time(year, *, users):
+def annual_working_time(year, *, users):  # noqa: C901
     absences = defaultdict(
         lambda: {
             "absence_vacation": [],

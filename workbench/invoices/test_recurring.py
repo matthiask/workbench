@@ -304,7 +304,7 @@ class RecurringTest(TestCase):
 
         self.assertEqual(set(RecurringInvoice.objects.renewal_candidates()), {r1, r4})
 
-        r2, r3  # Using those variables
+        _ = r2, r3
 
     def test_positive_create_invoice_on_day(self):
         """Invoice creation can be moved within the period"""

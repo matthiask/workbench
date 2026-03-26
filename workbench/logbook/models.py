@@ -188,9 +188,9 @@ class LoggedCost(Model):
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
         errors = {}
-        expense = (self.expense_currency != "", self.expense_cost is not None)
+        expense = (self.expense_currency != "", self.expense_cost is not None)  # noqa: PLC1901
         if any(expense) and not all(expense):
-            if self.expense_currency == "":
+            if self.expense_currency == "":  # noqa: PLC1901
                 errors["expense_currency"] = _("Either fill in all fields or none.")
             if self.expense_cost is None:
                 errors["expense_cost"] = _("Either fill in all fields or none.")

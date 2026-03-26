@@ -51,7 +51,7 @@ class LoggedActionAdmin(admin.ModelAdmin):
     def id(self, instance):
         try:
             return instance.row_data["id"]
-        except Exception:
+        except Exception:  # noqa: BLE001
             return None
 
     def data(self, instance):

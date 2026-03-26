@@ -66,7 +66,7 @@ def do_mark_current(parser, token):
     except ValueError:
         raise template.TemplateSyntaxError(
             "%r tag requires one argument" % token.contents.split()[0]
-        )
+        ) from None
 
     nodelist = parser.parse(("endmark_current",))
     parser.delete_first_token()

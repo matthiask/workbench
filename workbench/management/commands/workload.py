@@ -49,7 +49,7 @@ class Command(BaseCommand):
             type=str,
         )
 
-    def handle(self, **options):
+    def handle(self, **options):  # noqa: C901
         users = (
             User.objects
             .active()

@@ -90,6 +90,7 @@ function Planning({ data }) {
         el.title = el.textContent
       },
     )
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowCtx is a plain object rebuilt on each render; effect must run every time
   }, [rowCtx.current, rowCtx.firstProjectRow, rowCtx])
 
   return (

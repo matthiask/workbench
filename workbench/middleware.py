@@ -14,7 +14,7 @@ HttpRequest.is_ajax = lambda self: (
 
 
 def initialize_fallbacks():
-    global FALLBACKS
+    global FALLBACKS  # noqa: PLW0603
 
     if FALLBACKS:
         return

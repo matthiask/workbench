@@ -209,7 +209,7 @@ def history(request, db_table, attribute, id):
     if attribute == "id":
         try:
             instance = model._base_manager.get(**{attribute: id})
-        except Exception:
+        except Exception:  # noqa: BLE001
             instance = None
             title = model._meta.verbose_name
 

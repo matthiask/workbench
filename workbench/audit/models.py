@@ -36,7 +36,7 @@ class LoggedAction(models.Model):
 
     event_id = models.IntegerField(primary_key=True)
     table_name = models.TextField()
-    user_name = models.TextField(null=True)
+    user_name = models.TextField(null=True)  # noqa: DJ001
     created_at = models.DateTimeField()
     action = models.CharField(max_length=1, choices=ACTION_TYPES)
     row_data = HStoreField(null=True)

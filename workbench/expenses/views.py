@@ -124,12 +124,12 @@ def convert(request):
     if not form.is_valid():
         try:
             error = strip_tags(str(form.errors["__all__"]))
-        except Exception:
+        except Exception:  # noqa: BLE001
             error = _("Failure while determining the exchange rate.")
         return JsonResponse({"cost": "", "error": error})
     try:
         rates = ExchangeRates.objects.for_day(form.cleaned_data["day"])
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         # Request timeout, response format not JSON, etc...
         return JsonResponse({
             "cost": "",

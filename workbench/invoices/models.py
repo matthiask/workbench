@@ -353,7 +353,7 @@ class Invoice(ModelWithTotal):
         return gettext("Not reminded yet")
 
     def payment_reminders_sent_at(self):
-        from workbench.tools.history import (  # noqa: PLC0415
+        from workbench.tools.history import (
             changes,  # Avoid a circular import
         )
 

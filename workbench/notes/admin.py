@@ -8,7 +8,7 @@ from workbench.tools import admin
 def content_object_url(instance):
     try:
         url = instance.get_absolute_url()
-    except Exception:
+    except Exception:  # noqa: BLE001
         return instance.content_type.name
     else:
         return format_html('<a href="{}">{}</a>', url, instance.content_type.name)

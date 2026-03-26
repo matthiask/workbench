@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
         try:
             up_to_date_issues, updated_issues, estimates = update_service_estimates()
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             sentry_sdk.capture_exception(exc)
 
         if updated_issues and mailto:

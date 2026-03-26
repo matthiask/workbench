@@ -273,7 +273,7 @@ class PhoneNumber(PersonDetail):
                 phonenumbers.parse(self.phone_number),
                 phonenumbers.PhoneNumberFormat.INTERNATIONAL,
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             return self.phone_number
 
 

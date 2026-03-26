@@ -446,7 +446,7 @@ class Command(BaseCommand):
         ]
 
         organizations = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1})
-        for project_id, project_data in projects.items():
+        for project_data in projects.values():
             if "project" in project_data:
                 project = project_data["project"]
                 org_name = str(project.customer)
@@ -462,9 +462,7 @@ class Command(BaseCommand):
                 ))
 
                 if hours:
-                    for user, user_hours in project_data[
-                        "hours_in_range_by_user"
-                    ].items():
+                    for user_hours in project_data["hours_in_range_by_user"].values():
                         user_margin = user_hours / hours * margin
                         organizations[org_name]["margin"] += user_margin
                         organizations[org_name]["hours_in_range"] += user_hours

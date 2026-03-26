@@ -29,15 +29,15 @@ def _fmt(*, fmt, value, exp, plus_sign=False):
     return fmt.format("+" if plus_sign and value > 0 else "", value).replace(",", "’")
 
 
-def currency(value, plus_sign=False):
+def currency(value, plus_sign=False):  # noqa: FBT002
     return _fmt(fmt="{}{:,.2f}", value=value, exp=Z2, plus_sign=plus_sign)
 
 
-def days(value, plus_sign=False):
+def days(value, plus_sign=False):  # noqa: FBT002
     return _fmt(fmt="{}{:,.2f}d", value=value, exp=Z2, plus_sign=plus_sign)
 
 
-def hours(value, plus_sign=False):
+def hours(value, plus_sign=False):  # noqa: FBT002
     return _fmt(fmt="{}{:,.1f}h", value=value, exp=Z1, plus_sign=plus_sign)
 
 

@@ -123,9 +123,9 @@ class ServiceBase(Model):
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
         errors = {}
-        effort = (self.effort_type != "", self.effort_rate is not None)
+        effort = (self.effort_type != "", self.effort_rate is not None)  # noqa: PLC1901
         if any(effort) and not all(effort):
-            if self.effort_type == "":
+            if self.effort_type == "":  # noqa: PLC1901
                 errors["effort_type"] = _("Either fill in all fields or none.")
             if self.effort_rate is None:
                 errors["effort_rate"] = _("Either fill in all fields or none.")

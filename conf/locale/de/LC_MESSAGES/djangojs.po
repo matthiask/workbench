@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-04 08:41+0100\n"
+"POT-Creation-Date: 2026-03-26 08:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,37 +30,37 @@ msgstr "Tage"
 msgid "Week %s"
 msgstr "KW%s"
 
-#: absences/utils.js conf/strings.js tmp/absences.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "So"
 
-#: absences/utils.js conf/strings.js tmp/absences.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Monday"
 msgid "M"
 msgstr "Mo"
 
-#: absences/utils.js conf/strings.js tmp/absences.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Tuesday"
 msgid "T"
 msgstr "Di"
 
-#: absences/utils.js conf/strings.js tmp/absences.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Wednesday"
 msgid "W"
 msgstr "Mi"
 
-#: absences/utils.js conf/strings.js tmp/absences.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Thursday"
 msgid "T"
 msgstr "Do"
 
-#: absences/utils.js conf/strings.js tmp/absences.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Friday"
 msgid "F"
 msgstr "Fr"
 
-#: absences/utils.js conf/strings.js tmp/absences.js
+#: absences/utils.js conf/strings.js
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"

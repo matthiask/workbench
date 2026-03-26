@@ -129,7 +129,7 @@ class Campaign(Model):
 
     @cached_property
     def statistics(self):
-        from workbench.reporting.project_budget_statistics import (  # noqa: PLC0415
+        from workbench.reporting.project_budget_statistics import (
             project_budget_statistics,
         )
 
@@ -145,7 +145,7 @@ class Campaign(Model):
 
     @cached_property
     def logged_hours_per_effort_rate(self):
-        from workbench.logbook.models import LoggedHours  # noqa: PLC0415
+        from workbench.logbook.models import LoggedHours
 
         return (
             LoggedHours.objects
@@ -180,7 +180,7 @@ class ProjectQuerySet(SearchQuerySet):
         return self.filter(type=Project.ORDER)
 
     def without_invoices(self):
-        from workbench.invoices.models import Invoice  # noqa: PLC0415
+        from workbench.invoices.models import Invoice
 
         return self.exclude(
             id__in=Invoice.objects
@@ -190,12 +190,12 @@ class ProjectQuerySet(SearchQuerySet):
         )
 
     def with_accepted_offers(self):
-        from workbench.offers.models import Offer  # noqa: PLC0415
+        from workbench.offers.models import Offer
 
         return self.filter(id__in=Offer.objects.accepted().values("project"))
 
     def solely_declined_offers(self):
-        from workbench.offers.models import Offer  # noqa: PLC0415
+        from workbench.offers.models import Offer
 
         return self.filter(
             Q(id__in=Offer.objects.values("project"))
@@ -212,7 +212,7 @@ class ProjectQuerySet(SearchQuerySet):
         )
 
     def old_projects(self):
-        from workbench.logbook.models import LoggedHours  # noqa: PLC0415
+        from workbench.logbook.models import LoggedHours
 
         return (
             self
@@ -238,7 +238,7 @@ class ProjectQuerySet(SearchQuerySet):
         return self.exclude(customer=F("contact__organization"))
 
     def no_projected_gross_margin(self):
-        from workbench.invoices.models import ProjectedInvoice  # noqa: PLC0415
+        from workbench.invoices.models import ProjectedInvoice
 
         return self.filter(
             ~Q(pk__in=ProjectedInvoice.objects.values_list("project")),
@@ -247,7 +247,7 @@ class ProjectQuerySet(SearchQuerySet):
         )
 
     def empty_logbook(self):
-        from workbench.logbook.models import LoggedCost, LoggedHours  # noqa: PLC0415
+        from workbench.logbook.models import LoggedCost, LoggedHours
 
         return self.open().exclude(
             Q(
@@ -428,8 +428,8 @@ class Project(Model):
     @cached_property
     def grouped_services(self):
         # Avoid circular imports
-        from workbench.deals.models import Deal  # noqa: PLC0415
-        from workbench.logbook.models import LoggedCost, LoggedHours  # noqa: PLC0415
+        from workbench.deals.models import Deal
+        from workbench.logbook.models import LoggedCost, LoggedHours
 
         # Logged vs. service hours
         service_hours = defaultdict(lambda: Z1)
@@ -439,6 +439,7 @@ class Project(Model):
         logged_cost = defaultdict(lambda: Z2)
         # Project logbook vs. project service cost (hours and cost)
         total_service_cost = Z2
+        accepted_offers_service_cost = Z2
         total_logged_cost = Z2
         total_service_hours_rate_undefined = Z1
         total_logged_hours_rate_undefined = Z1
@@ -542,6 +543,8 @@ class Project(Model):
                 service_hours[service.project] += service.service_hours
                 service_cost[service.project] += service.cost or Z2
                 total_service_cost += service.service_cost
+                if service.offer and service.offer.is_accepted:
+                    accepted_offers_service_cost += service.service_cost
 
             if service.effort_rate is not None:
                 total_logged_cost += service.effort_rate * row["logged_hours"]
@@ -583,6 +586,9 @@ class Project(Model):
             "service_hours": service_hours[self],
             "service_cost": service_cost[self],
             "total_service_cost": total_service_cost,
+            "accepted_offers_service_cost": accepted_offers_service_cost,
+            "not_offered_service_cost": total_service_cost
+            - accepted_offers_service_cost,
             "total_logged_cost": total_logged_cost,
             "total_service_hours_rate_undefined": total_service_hours_rate_undefined,
             "total_logged_hours_rate_undefined": total_logged_hours_rate_undefined,
@@ -645,7 +651,7 @@ class Project(Model):
     @cached_property
     def not_archived_total(self):
         # Avoid circular imports
-        from workbench.logbook.models import LoggedCost, LoggedHours  # noqa: PLC0415
+        from workbench.logbook.models import LoggedCost, LoggedHours
 
         total = Z2
         hours_rate_undefined = Z1
@@ -672,7 +678,7 @@ class Project(Model):
         return {"total": total, "hours_rate_undefined": hours_rate_undefined}
 
     def solely_declined_offers_warning(self, *, request):
-        from workbench.offers.models import Offer  # noqa: PLC0415
+        from workbench.offers.models import Offer
 
         if self.closed_on:
             return
@@ -738,7 +744,7 @@ class ServiceQuerySet(SearchQuerySet):
         ]
 
     def budgeted(self):
-        from workbench.offers.models import Offer  # noqa: PLC0415
+        from workbench.offers.models import Offer
 
         return self.filter(
             (
@@ -749,7 +755,7 @@ class ServiceQuerySet(SearchQuerySet):
         )
 
     def logging(self):
-        from workbench.offers.models import Offer  # noqa: PLC0415
+        from workbench.offers.models import Offer
 
         return self.filter(
             Q(allow_logging=True),
@@ -762,7 +768,7 @@ class ServiceQuerySet(SearchQuerySet):
         )
 
     def editable(self):
-        from workbench.offers.models import Offer  # noqa: PLC0415
+        from workbench.offers.models import Offer
 
         return self.filter(
             Q(offer__isnull=True) | Q(offer__status=Offer.IN_PREPARATION)

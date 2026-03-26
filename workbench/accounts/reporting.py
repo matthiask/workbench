@@ -58,7 +58,7 @@ ORDER BY series.week
     hours_per_customer = defaultdict(dict)
     total_hours_per_customer = defaultdict(int)
 
-    for week, customer, hours in query(
+    for week, customer_raw, hours in query(
         """
 WITH sq AS (
     SELECT
@@ -79,7 +79,7 @@ ORDER BY series.week
         """,
         [user.id, from_, from_, monday() + dt.timedelta(days=6)],
     ):
-        customer = customer.split("\n")[0]
+        customer = customer_raw.split("\n")[0]
         hours_per_customer[week][customer] = hours
         total_hours_per_customer[customer] += hours
 
