@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-26 08:41+0100\n"
+"POT-Creation-Date: 2026-03-26 10:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -153,6 +153,14 @@ msgstr "Planung"
 msgid "pride"
 msgstr "Pride"
 
+#: workbench/accounts/features.py
+msgid "productivity"
+msgstr "Produktivität"
+
+#: workbench/accounts/features.py
+msgid "Access to per-user productivity reports including gross margin breakdown."
+msgstr "Zugriff auf nutzer:innenspezifische Produktivitätsberichte inkl. Aufteilung des bereinigten Umsatzes"
+
 #: workbench/accounts/features.py workbench/invoices/models.py
 #: workbench/templates/base.html
 #: workbench/templates/projects/project_detail.html
@@ -256,8 +264,8 @@ msgstr "Anstellungsbeginn"
 msgid "token"
 msgstr "Token"
 
-#: workbench/accounts/models.py workbench/management/commands/squeeze.py
-#: workbench/management/commands/workload.py
+#: workbench/accounts/models.py workbench/management/commands/workload.py
+#: workbench/reporting/squeeze.py
 msgid "specialist field"
 msgstr "Fachbereich"
 
@@ -271,9 +279,9 @@ msgstr "Gepinnte Leistungen"
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
-#: workbench/logbook/models.py workbench/management/commands/squeeze.py
-#: workbench/management/commands/workload.py workbench/planning/models.py
-#: workbench/projects/models.py workbench/templates/accounts/user_base.html
+#: workbench/logbook/models.py workbench/management/commands/workload.py
+#: workbench/planning/models.py workbench/projects/models.py
+#: workbench/reporting/squeeze.py workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/birthdays.html
@@ -285,8 +293,8 @@ msgstr "Gepinnte Leistungen"
 msgid "user"
 msgstr "Nutzer:in"
 
-#: workbench/accounts/models.py workbench/management/commands/squeeze.py
-#: workbench/management/commands/workload.py workbench/reporting/views.py
+#: workbench/accounts/models.py workbench/management/commands/workload.py
+#: workbench/reporting/squeeze.py workbench/reporting/views.py
 #: workbench/templates/base.html
 msgid "users"
 msgstr "Nutzer:innen"
@@ -338,8 +346,8 @@ msgstr "Kaffee-Paare"
 msgid "value type"
 msgstr "Werttyp"
 
-#: workbench/accounts/models.py workbench/management/commands/squeeze.py
-#: workbench/management/commands/workload.py
+#: workbench/accounts/models.py workbench/management/commands/workload.py
+#: workbench/reporting/squeeze.py
 msgid "specialist fields"
 msgstr "Fachbereiche"
 
@@ -703,11 +711,12 @@ msgstr "Stundensaldo fortlaufend"
 msgid "vacation days credit"
 msgstr "Guthaben an Ferientagen"
 
-#: workbench/awt/pdf.py workbench/management/commands/squeeze.py
+#: workbench/awt/pdf.py workbench/reporting/squeeze.py
 #: workbench/templates/awt/year_detail.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/hours_per_type.html
 #: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/templates/reporting/squeeze.html
 msgid "Total"
 msgstr "Total"
 
@@ -752,8 +761,8 @@ msgid "countable absence hours"
 msgstr "Anrechenbare Abwesenheitsstunden"
 
 #: workbench/awt/pdf.py workbench/logbook/models.py
-#: workbench/management/commands/squeeze.py
-#: workbench/templates/awt/year_detail.html workbench/templates/base.html
+#: workbench/reporting/squeeze.py workbench/templates/awt/year_detail.html
+#: workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/projects/campaign_detail.html workbench/timer/models.py
 msgid "logged hours"
@@ -887,11 +896,11 @@ msgstr "Hauptkontakt"
 msgid "Mainly useful for organizations with a centralized accounts payable departement."
 msgstr "Hauptsächlich nützlich für Organisationen mit einem zentralen Kreditoreneingang."
 
-#: workbench/contacts/models.py workbench/management/commands/squeeze.py
+#: workbench/contacts/models.py workbench/reporting/squeeze.py
 msgid "organization"
 msgstr "Organisation"
 
-#: workbench/contacts/models.py workbench/management/commands/squeeze.py
+#: workbench/contacts/models.py workbench/reporting/squeeze.py
 #: workbench/templates/contacts/object_list.html
 msgid "organizations"
 msgstr "Organisationen"
@@ -1676,9 +1685,9 @@ msgid "%s invoices in selection, that's too many."
 msgstr "%s Rechnungen in der Auswahl, das sind zu viele."
 
 #: workbench/invoices/forms.py workbench/invoices/models.py
-#: workbench/management/commands/squeeze.py workbench/offers/models.py
-#: workbench/planning/models.py workbench/projects/models.py
-#: workbench/projects/views.py
+#: workbench/offers/models.py workbench/planning/models.py
+#: workbench/projects/models.py workbench/projects/views.py
+#: workbench/reporting/squeeze.py
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/invoices/invoice_detail.html
@@ -2082,7 +2091,7 @@ msgstr "%(periodicity)s seit %(from)s"
 msgid "Next period starts on %(start)s, invoice will be created on %(create)s"
 msgstr "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erstellt."
 
-#: workbench/invoices/models.py workbench/management/commands/squeeze.py
+#: workbench/invoices/models.py workbench/reporting/squeeze.py
 #: workbench/templates/reporting/projected_gross_margin.html
 msgid "gross margin"
 msgstr "Umsatz bereinigt"
@@ -2135,7 +2144,7 @@ msgid "hourly rate"
 msgstr "Stundensatz"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
-#: workbench/management/commands/squeeze.py workbench/services/models.py
+#: workbench/reporting/squeeze.py workbench/services/models.py
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_list.html
@@ -2399,97 +2408,6 @@ msgstr "Projekt für Erfassung auswählen"
 msgid "employment percentages"
 msgstr "Stellenprozent"
 
-#: workbench/management/commands/squeeze.py
-msgid "offered (only open projects)"
-msgstr "Offeriert (nur offene Projekte)"
-
-#: workbench/management/commands/squeeze.py
-msgid "projected gross margin (only open projects)"
-msgstr "geplanter Umsatz (nur offene Projekte)"
-
-#: workbench/management/commands/squeeze.py
-msgid "invoiced without third party costs"
-msgstr "Verrechnet minus Fremdkosten"
-
-#: workbench/management/commands/squeeze.py
-msgid "relevant gross margin"
-msgstr "relevanter Umsatz"
-
-#: workbench/management/commands/squeeze.py
-msgid "offered hours (only open projects)"
-msgstr "offerierte Stunden (nur offene Projekte)"
-
-#: workbench/management/commands/squeeze.py
-msgid "relevant hours"
-msgstr "relevante Stunden"
-
-#: workbench/management/commands/squeeze.py
-msgid "rate"
-msgstr "Ansatz"
-
-#: workbench/management/commands/squeeze.py
-msgid "employment percentage YTD"
-msgstr "Stellenprozent YTD"
-
-#: workbench/management/commands/squeeze.py
-msgid "internal hours"
-msgstr "interne Stunden"
-
-#: workbench/management/commands/squeeze.py
-msgid "external hours"
-msgstr "externe Stunden"
-
-#: workbench/management/commands/squeeze.py
-msgid "total hours"
-msgstr "Stunden insgesamt"
-
-#: workbench/management/commands/squeeze.py
-msgid "invoiced per external hour"
-msgstr "Verrechnet pro externer Stunde"
-
-#: workbench/management/commands/squeeze.py
-msgid "starting point"
-msgstr "Ausgangspunkt"
-
-#: workbench/management/commands/squeeze.py
-msgid "Target value: external percentage"
-msgstr "Erwartung externe Prozente"
-
-#: workbench/management/commands/squeeze.py
-msgid "external percentage"
-msgstr "externe Prozente"
-
-#: workbench/management/commands/squeeze.py
-msgid "Target value: gross margin"
-msgstr "Erwartung Umsatz"
-
-#: workbench/management/commands/squeeze.py
-msgid "included absence days"
-msgstr "berücksichtigte Abwesenheitstage"
-
-#: workbench/management/commands/squeeze.py
-#: workbench/templates/reporting/projected_gross_margin.html
-#: workbench/tools/xlsx.py
-msgid "Delta"
-msgstr "Delta"
-
-#: workbench/management/commands/squeeze.py
-#, python-brace-format
-msgid "Target value w/ {}/h"
-msgstr "Richtwert mit {}/h"
-
-#: workbench/management/commands/squeeze.py
-msgid "<unknown>"
-msgstr "<unbekannt>"
-
-#: workbench/management/commands/squeeze.py workbench/projects/apps.py
-#: workbench/projects/models.py workbench/templates/base.html
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/object_list.html
-#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
-msgid "projects"
-msgstr "Projekte"
-
 #: workbench/management/commands/workload.py
 msgid "workload"
 msgstr "Arbeitslast"
@@ -2561,6 +2479,7 @@ msgstr "Leistungsgruppe"
 
 #: workbench/offers/models.py
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/reporting/squeeze.html
 msgid "Offered"
 msgstr "Offeriert"
 
@@ -2806,6 +2725,7 @@ msgstr "Leistungstyp"
 
 #: workbench/planning/xlsx.py workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/hours_per_type.html
+#: workbench/templates/reporting/squeeze.html
 msgid "Hours"
 msgstr "Stunden"
 
@@ -2837,7 +2757,7 @@ msgstr "Geplante Arbeit"
 msgid "External Work"
 msgstr "Kundenarbeit"
 
-#: workbench/planning/xlsx.py
+#: workbench/planning/xlsx.py workbench/templates/reporting/squeeze.html
 msgid "Project"
 msgstr "Projekt"
 
@@ -2865,13 +2785,21 @@ msgstr "Geschätzte Stunden"
 msgid "Phase Duration"
 msgstr "Dauer der Phase"
 
-#: workbench/planning/xlsx.py
+#: workbench/planning/xlsx.py workbench/templates/reporting/squeeze.html
 msgid "User"
 msgstr "Mitarbeiter:in"
 
 #: workbench/planning/xlsx.py
 msgid "Total Capacity"
 msgstr "Gesamtkapazität"
+
+#: workbench/projects/apps.py workbench/projects/models.py
+#: workbench/reporting/squeeze.py workbench/templates/base.html
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/object_list.html
+#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
+msgid "projects"
+msgstr "Projekte"
 
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
@@ -3114,7 +3042,8 @@ msgstr "Kosten nach Monat und Leistung"
 msgid "Budgeted"
 msgstr "Budgetiert"
 
-#: workbench/projects/views.py workbench/tools/xlsx.py
+#: workbench/projects/views.py workbench/templates/reporting/squeeze.html
+#: workbench/tools/xlsx.py
 msgid "Invoiced"
 msgstr "Verrechnet"
 
@@ -3160,6 +3089,122 @@ msgstr "Einfrierdatum"
 #: workbench/reporting/models.py
 msgid "freeze dates"
 msgstr "Einfrierdaten"
+
+#: workbench/reporting/squeeze.py
+msgid "offered (only open projects)"
+msgstr "Offeriert (nur offene Projekte)"
+
+#: workbench/reporting/squeeze.py
+msgid "projected gross margin (only open projects)"
+msgstr "geplanter Umsatz (nur offene Projekte)"
+
+#: workbench/reporting/squeeze.py
+msgid "invoiced without third party costs"
+msgstr "Verrechnet minus Fremdkosten"
+
+#: workbench/reporting/squeeze.py
+msgid "gross margin (estimated)"
+msgstr "Deckungsbeitrag (geschätzt)"
+
+#: workbench/reporting/squeeze.py
+msgid "offered hours (only open projects)"
+msgstr "offerierte Stunden (nur offene Projekte)"
+
+#: workbench/reporting/squeeze.py
+msgid "relevant hours"
+msgstr "relevante Stunden"
+
+#: workbench/reporting/squeeze.py
+msgid "rate"
+msgstr "Ansatz"
+
+#: workbench/reporting/squeeze.py
+#, fuzzy
+#| msgid "planned hours"
+msgid "period hours"
+msgstr "geplante Stunden"
+
+#: workbench/reporting/squeeze.py
+#, fuzzy
+#| msgid "projected gross margin"
+msgid "period gross margin"
+msgstr "geplanter Umsatz"
+
+#: workbench/reporting/squeeze.py
+#, fuzzy
+#| msgid "undefined rate"
+msgid "period rate"
+msgstr "ohne Stundensatz"
+
+#: workbench/reporting/squeeze.py
+#, python-brace-format
+msgid "hours at default rate ({}/h)"
+msgstr "Stunden zum Standardansatz ({}/h)"
+
+#: workbench/reporting/squeeze.py
+#, fuzzy
+#| msgid "hourly rate"
+msgid "hours at default rate"
+msgstr "Stundensatz"
+
+#: workbench/reporting/squeeze.py
+msgid "employment percentage YTD"
+msgstr "Stellenprozent YTD"
+
+#: workbench/reporting/squeeze.py
+msgid "included absence days"
+msgstr "berücksichtigte Abwesenheitstage"
+
+#: workbench/reporting/squeeze.py
+msgid "internal hours"
+msgstr "interne Stunden"
+
+#: workbench/reporting/squeeze.py
+msgid "external hours"
+msgstr "externe Stunden"
+
+#: workbench/reporting/squeeze.py
+msgid "total hours"
+msgstr "Stunden insgesamt"
+
+#: workbench/reporting/squeeze.py
+msgid "invoiced per external hour"
+msgstr "Verrechnet pro externer Stunde"
+
+#: workbench/reporting/squeeze.py
+msgid "starting point"
+msgstr "Ausgangspunkt"
+
+#: workbench/reporting/squeeze.py
+msgid "Target value: external percentage"
+msgstr "Erwartung externe Prozente"
+
+#: workbench/reporting/squeeze.py
+msgid "external percentage"
+msgstr "externe Prozente"
+
+#: workbench/reporting/squeeze.py
+msgid "Target value: gross margin"
+msgstr "Erwartung Umsatz"
+
+#: workbench/reporting/squeeze.py
+#: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/templates/reporting/squeeze.html workbench/tools/xlsx.py
+msgid "Delta"
+msgstr "Delta"
+
+#: workbench/reporting/squeeze.py
+#, python-brace-format
+msgid "Target value w/ {}/h"
+msgstr "Richtwert mit {}/h"
+
+#: workbench/reporting/squeeze.py
+msgid "relevant gross margin"
+msgstr "relevanter Umsatz"
+
+#: workbench/reporting/squeeze.py workbench/templates/reporting/squeeze.html
+msgid "<unknown>"
+msgstr "<unbekannt>"
 
 #: workbench/reporting/utils.py workbench/templates/start.html
 #: workbench/templates/timestamps.html
@@ -3240,6 +3285,11 @@ msgstr "Vordefinierte Periode setzen"
 #: workbench/reporting/views.py
 msgid "Set date"
 msgstr "Datum setzen"
+
+#: workbench/reporting/views.py
+#, python-format
+msgid "Invoices for the selected period may not be complete yet (cutoff: %(cutoff)s)."
+msgstr "Die Rechnungen für den gewählten Zeitraum sind möglicherweise noch nicht vollständig (Stichtag: %(cutoff)s)."
 
 #: workbench/services/models.py
 msgid "color"
@@ -3673,6 +3723,7 @@ msgid "Export"
 msgstr "Exportieren"
 
 #: workbench/templates/deals/deal_detail.html
+#: workbench/templates/reporting/squeeze.html
 msgid "open"
 msgstr "offen"
 
@@ -3842,6 +3893,7 @@ msgid "new service"
 msgstr "Neue Leistung"
 
 #: workbench/templates/modal.html workbench/templates/reporting/logging.html
+#: workbench/templates/reporting/squeeze.html
 msgid "Close"
 msgstr "Schliessen"
 
@@ -4127,11 +4179,13 @@ msgid "Revenue minus third party costs and accruals per FTE"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen pro FTE"
 
 #: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/squeeze.html
 msgid "Gross margin"
 msgstr "Umsatz bereinigt"
 
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/templates/reporting/squeeze.html
 msgid "Projected"
 msgstr "Geplant"
 
@@ -4242,7 +4296,7 @@ msgstr "Geplant"
 
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Diff"
-msgstr ""
+msgstr "Differenz"
 
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Allocation"
@@ -4263,6 +4317,126 @@ msgstr "Erfasst (Zukunft)"
 #: workbench/templates/reporting/playing_bank.html
 msgid "delta"
 msgstr "Delta"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Squeeze"
+msgstr "Squeeze"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "Export"
+msgid "Export XLSX"
+msgstr "Exportieren"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Rate"
+msgstr "Ansatz"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Without rate"
+msgstr "Ohne Stundensatz"
+
+#: workbench/templates/reporting/squeeze.html
+#, python-format
+msgid "Hours without rate: default of %(rate)s/h applied"
+msgstr "Stunden ohne Stundensatz: Standard von %(rate)s/h angewendet"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "Project"
+msgid "Projects"
+msgstr "Projekt"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "estimated"
+msgstr "geschätzt"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Relevant hours"
+msgstr "Relevante Stunden"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Period hours"
+msgstr "Stunden im Zeitraum"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Period gross margin"
+msgstr "Deckungsbeitrag im Zeitraum"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "User breakdown"
+msgstr "Aufschlüsselung nach Person"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "User"
+msgid "Users"
+msgstr "Mitarbeiter:in"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "specialist field"
+msgid "Specialist field"
+msgstr "Fachbereich"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy, python-format
+#| msgid "employment"
+msgid "Employment %%"
+msgstr "Anstellungsverhältnis"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Absence days"
+msgstr "Abwesenheitstage"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy, python-format
+#| msgid "External"
+msgid "External %%"
+msgstr "Extern"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy, python-format
+#| msgid "Target value"
+msgid "Target ext. %%"
+msgstr "Richtwert"
+
+#: workbench/templates/reporting/squeeze.html
+#, python-format
+msgid "Δ ext. %%"
+msgstr "Δ ext. %%"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Expected margin"
+msgstr "Erwarteter Deckungsbeitrag"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Project breakdown"
+msgstr "Aufschlüsselung nach Projekt"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "specialist fields"
+msgid "Specialist fields"
+msgstr "Fachbereiche"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "organizations"
+msgid "Organizations"
+msgstr "Organisationen"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "organization"
+msgid "Organization"
+msgstr "Organisation"
+
+#: workbench/templates/reporting/squeeze.html
+#, fuzzy
+#| msgid "No contact selected."
+msgid "No data for the selected period."
+msgstr "Kein Kontakt ausgewählt."
 
 #: workbench/templates/reporting/work_anniversaries.html
 msgid "Started on"
@@ -4563,6 +4737,14 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, fuzzy
+#~| msgid "offered"
+#~ msgid "Hours offered"
+#~ msgstr "Offeriert"
+
+#~ msgid "Hours logged"
+#~ msgstr "Erfasste Stunden"
 
 #~ msgid "Total costs"
 #~ msgstr "Gesamtkosten"

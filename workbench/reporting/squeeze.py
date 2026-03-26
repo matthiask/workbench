@@ -234,7 +234,7 @@ def squeeze_data(date_range):  # noqa: C901
             "hours_rate_unknown": hours_rate_unknown,
         })
 
-    project_list.sort(key=lambda r: r["margin"], reverse=True)
+    project_list.sort(key=lambda r: r["margin_in_range"], reverse=True)
 
     all_users = sorted(users.keys())
     ep = employment_percentages()
@@ -474,7 +474,7 @@ def build_xlsx(data):
             _("offered (only open projects)"),
             _("projected gross margin (only open projects)"),
             _("invoiced without third party costs"),
-            _("relevant gross margin"),
+            _("gross margin (estimated)"),
             _("offered hours (only open projects)"),
             _("logged hours"),
             _("relevant hours"),
@@ -513,7 +513,7 @@ def build_xlsx(data):
         ],
         *sorted(
             (_project_xlsx_row(p, all_users) for p in project_list),
-            key=lambda row: row[4],
+            key=lambda row: row[10],
             reverse=True,
         ),
     ]
@@ -523,9 +523,10 @@ def build_xlsx(data):
             _("user"),
             _("specialist field"),
             _("employment percentage YTD"),
-            _("relevant gross margin"),
+            _("included absence days"),
             _("relevant hours"),
             _("rate"),
+            _("gross margin"),
             "",
             _("internal hours"),
             _("external hours"),
@@ -542,16 +543,16 @@ def build_xlsx(data):
             "",
             _("Target value: gross margin"),
             "",
-            _("included absence days"),
             _("hours at default rate ({}/h)").format(EXPECTED_AVERAGE_HOURLY_RATE),
         ],
         [
             _("Total"),
             "",
             totals["employment_percentage"],
-            totals["margin"],
+            "",
             totals["hours_in_range"],
             totals["rate"],
+            totals["margin"],
             "",
             totals["internal_hours"],
             totals["external_hours"],
@@ -569,12 +570,11 @@ def build_xlsx(data):
             _("Target value w/ {}/h").format(EXPECTED_AVERAGE_HOURLY_RATE),
             _("Delta"),
             "",
-            "",
         ],
         [],
         *sorted(
             (_user_xlsx_row(ud, types) for ud in user_list),
-            key=lambda row: row[-3],
+            key=lambda row: row[-2],
             reverse=True,
         ),
     ]
@@ -618,14 +618,14 @@ def build_xlsx(data):
     ]
 
     xlsx = WorkbenchXLSXDocument()
+    xlsx.add_sheet(_("projects"))
+    xlsx.table(None, header + projects_table)
     xlsx.add_sheet(_("users").replace(":", "_"))
     xlsx.table(None, header + users_table)
     xlsx.add_sheet(_("specialist fields"))
     xlsx.table(None, header + fields_table)
     xlsx.add_sheet(_("organizations"))
     xlsx.table(None, header + organizations_table)
-    xlsx.add_sheet(_("projects"))
-    xlsx.table(None, header + projects_table)
 
     return xlsx
 
@@ -668,9 +668,10 @@ def _user_xlsx_row(ud, types):
         user,
         ud["specialist_field"] or _("<unknown>"),
         ud["employment_percentage"],
-        ud["margin"],
+        ud["absence_days"],
         ud["hours_in_range"],
         ud["rate"],
+        ud["margin"],
         "",
         ud["internal_hours"],
         ud["external_hours"],
@@ -685,6 +686,5 @@ def _user_xlsx_row(ud, types):
         ud["external_percentage"] - ud["profitable_percentage"],
         ud["expected_gross_margin"],
         ud["delta"],
-        ud["absence_days"],
         ud["hours_rate_unknown"] or "",
     ]
