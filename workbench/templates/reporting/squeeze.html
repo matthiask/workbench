@@ -49,17 +49,17 @@
                   <td>{{ ud.user }}</td>
                   <td>{{ ud.specialist_field|default:_("<unknown>") }}</td>
                   <td class="text-end">{{ ud.employment_percentage|floatformat:1 }}%</td>
-                  <td class="text-end">{{ ud.margin|currency }}</td>
                   <td class="text-end">
                     {% if ud.by_project %}
                       <a href="#"
                          data-bs-toggle="modal"
                          data-bs-target="#user-projects-{{ ud.user.pk }}"
-                         title="{% translate 'Project breakdown' %}">{{ ud.hours_in_range|hours }}</a>
+                         title="{% translate 'Project breakdown' %}">{{ ud.margin|currency }}</a>
                     {% else %}
-                      {{ ud.hours_in_range|hours }}
+                      {{ ud.margin|currency }}
                     {% endif %}
                   </td>
+                  <td class="text-end">{{ ud.hours_in_range|hours }}</td>
                   <td class="text-end">{{ ud.rate|currency }}</td>
                   <td class="text-end">{{ ud.external_percentage|floatformat:1 }}%</td>
                   <td class="text-end">{{ ud.profitable_percentage }}%</td>
@@ -161,6 +161,7 @@
                         <tr>
                           <th>{% translate 'Project' %}</th>
                           <th class="text-end">{% translate 'Hours' %}</th>
+                          <th class="text-end">{% translate 'Without rate' %}</th>
                           <th class="text-end">{% translate 'Gross margin' %}</th>
                           <th class="text-end">{% translate 'Rate' %}</th>
                         </tr>
@@ -168,11 +169,9 @@
                       <tbody>
                         {% for project, contrib in ud.by_project.items %}
                           <tr>
-                            <td>
-                              {% link_or_none project %}
-                              {% if contrib.hours_rate_unknown %}*{% endif %}
-                            </td>
+                            <td>{% link_or_none project %}</td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
+                            <td class="text-end">{% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}</td>
                             <td class="text-end">{{ contrib.margin|currency }}</td>
                             <td class="text-end">{{ contrib.rate|currency }}</td>
                           </tr>
@@ -182,13 +181,14 @@
                         <tr>
                           <th>{% translate 'Total' %}</th>
                           <th class="text-end">{{ ud.hours_in_range|hours }}</th>
+                          <th class="text-end">{% if ud.hours_rate_unknown %}{{ ud.hours_rate_unknown|hours }}{% endif %}</th>
                           <th class="text-end">{{ ud.margin|currency }}</th>
                           <th class="text-end">{{ ud.rate|currency }}</th>
                         </tr>
                       </tfoot>
                     </table>
                     {% if ud.hours_rate_unknown %}
-                      <p class="text-muted small mt-2">* {% blocktranslate with hours=ud.hours_rate_unknown|hours rate=data.default_hourly_rate|currency %}{{ hours }} without hourly rate; default of {{ rate }}/h applied{% endblocktranslate %}</p>
+                      <p class="text-muted small mt-2">{% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of {{ rate }}/h applied{% endblocktranslate %}</p>
                     {% endif %}
                   </div>
                   <div class="modal-footer">
@@ -224,6 +224,7 @@
                         <tr>
                           <th>{% translate 'User' %}</th>
                           <th class="text-end">{% translate 'Hours' %}</th>
+                          <th class="text-end">{% translate 'Without rate' %}</th>
                           <th class="text-end">{% translate 'Gross margin' %}</th>
                           <th class="text-end">{% translate 'Rate' %}</th>
                         </tr>
@@ -231,11 +232,9 @@
                       <tbody>
                         {% for user, contrib in p.by_user.items %}
                           <tr>
-                            <td>
-                              {{ user }}
-                              {% if contrib.hours_rate_unknown %}*{% endif %}
-                            </td>
+                            <td>{{ user }}</td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
+                            <td class="text-end">{% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}</td>
                             <td class="text-end">{{ contrib.margin|currency }}</td>
                             <td class="text-end">{{ contrib.rate|currency }}</td>
                           </tr>
@@ -245,13 +244,14 @@
                         <tr>
                           <th>{% translate 'Total' %}</th>
                           <th class="text-end">{{ p.hours_in_range|hours }}</th>
+                          <th class="text-end">{% if p.hours_rate_unknown %}{{ p.hours_rate_unknown|hours }}{% endif %}</th>
                           <th class="text-end">{{ p.margin_in_range|currency }}</th>
                           <th class="text-end">{{ p.rate|currency }}</th>
                         </tr>
                       </tfoot>
                     </table>
                     {% if p.hours_rate_unknown %}
-                      <p class="text-muted small mt-2">* {% blocktranslate with hours=p.hours_rate_unknown|hours rate=data.default_hourly_rate|currency %}{{ hours }} without hourly rate; default of {{ rate }}/h applied{% endblocktranslate %}</p>
+                      <p class="text-muted small mt-2">{% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of {{ rate }}/h applied{% endblocktranslate %}</p>
                     {% endif %}
                   </div>
                   <div class="modal-footer">
@@ -288,21 +288,21 @@
                   <td class="text-end">{{ p.offered|currency }}</td>
                   <td class="text-end">{{ p.projected|currency }}</td>
                   <td class="text-end">{{ p.invoiced|currency }}</td>
-                  <td class="text-end">{{ p.margin|currency }}</td>
-                  <td class="text-end">{{ p.hours_offered|hours }}</td>
-                  <td class="text-end">{{ p.hours_logged|hours }}</td>
-                  <td class="text-end">{{ p.hours|hours }}</td>
-                  <td class="text-end">{{ p.rate|currency }}</td>
                   <td class="text-end">
                     {% if p.by_user %}
                       <a href="#"
                          data-bs-toggle="modal"
                          data-bs-target="#project-users-{{ p.project.pk }}"
-                         title="{% translate 'User breakdown' %}">{{ p.hours_in_range|hours }}</a>
-                    {% elif p.hours_in_range %}
-                      {{ p.hours_in_range|hours }}
+                         title="{% translate 'User breakdown' %}">{{ p.margin|currency }}</a>
+                    {% else %}
+                      {{ p.margin|currency }}
                     {% endif %}
                   </td>
+                  <td class="text-end">{{ p.hours_offered|hours }}</td>
+                  <td class="text-end">{{ p.hours_logged|hours }}</td>
+                  <td class="text-end">{{ p.hours|hours }}</td>
+                  <td class="text-end">{{ p.rate|currency }}</td>
+                  <td class="text-end">{{ p.hours_in_range|hours }}</td>
                 </tr>
               {% endfor %}
             </tbody>

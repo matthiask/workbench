@@ -96,22 +96,16 @@ def squeeze_data(date_range):  # noqa: C901
         }
         users[u]["hours_in_range"] += row["hours_sum"]
 
-    # Total all-time hours and weighted hours per project (used as attribution denominator)
+    # Total all-time logged hours per project (used as attribution denominator)
     total_hours = (
         LoggedHours.objects
         .order_by()
         .filter(service__project__in=projects.keys())
         .values("service__project")
-        .annotate(
-            hours__sum=Sum("hours"),
-            weighted_hours=Sum(_weighted_hours_expr),
-        )
+        .annotate(hours__sum=Sum("hours"))
     )
     for row in total_hours:
         projects[row["service__project"]]["hours_logged"] = row["hours__sum"]
-        projects[row["service__project"]]["weighted_hours_logged"] = row[
-            "weighted_hours"
-        ]
 
     offered_hours = (
         Service.objects
@@ -188,14 +182,25 @@ def squeeze_data(date_range):  # noqa: C901
         hours_logged = p["hours_logged"]
         hours = max((hours_offered, hours_logged))
 
-        weighted_hours_logged = p.get("weighted_hours_logged") or Z2
+        # Total weighted hours in the period across all users for this project.
+        # Used to distribute the period slice between users by rate-weighted hours.
+        total_weighted_in_range = sum(
+            d["weighted_hours"] for d in p["hours_in_range_by_user"].values()
+        )
+        hours_in_range_total = sum(
+            d["hours"] for d in p["hours_in_range_by_user"].values()
+        )
+        # Period slice: same denominator as the old hours-only formula so that
+        # the total attributed margin is unchanged; rate-weighting only affects
+        # how that slice is divided between users.
+        period_margin = hours_in_range_total / hours * margin if hours else Z2
 
         by_user = {}
-        if weighted_hours_logged:
+        if total_weighted_in_range and hours:
             for u, user_data in p["hours_in_range_by_user"].items():
                 user_hours = user_data["hours"]
                 user_weighted = user_data["weighted_hours"]
-                user_margin = user_weighted / weighted_hours_logged * margin
+                user_margin = user_weighted / total_weighted_in_range * period_margin
                 contrib = {
                     "hours": user_hours,
                     "margin": user_margin,
