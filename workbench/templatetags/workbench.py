@@ -39,16 +39,15 @@ _ndash = mark_safe("&ndash;")
 
 
 @register.simple_tag
-def link_or_none(object, pretty=None, none=_ndash, with_badge=False, css_class=""):  # noqa: FBT002
+def link_or_none(object, pretty=None, none=_ndash, with_badge=False):  # noqa: FBT002
     if object == 0:
         return object
     if not object:
         return none
     if hasattr(object, "get_absolute_url"):
         return format_html(
-            '<a href="{}"{}{}>{}{}</a>',
+            '<a href="{}"{}>{}{}</a>',
             object.get_absolute_url(),
-            format_html(' class="{}"', css_class) if css_class else "",
             mark_safe(" data-ajaxmodal")
             if getattr(object, "open_in_modal", False)
             else "",
