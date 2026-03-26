@@ -168,7 +168,10 @@
                       <tbody>
                         {% for project, contrib in ud.by_project.items %}
                           <tr>
-                            <td>{% link_or_none project %}</td>
+                            <td>
+                              {% link_or_none project %}
+                              {% if contrib.hours_rate_unknown %}*{% endif %}
+                            </td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
                             <td class="text-end">{{ contrib.margin|currency }}</td>
                             <td class="text-end">{{ contrib.rate|currency }}</td>
@@ -184,6 +187,9 @@
                         </tr>
                       </tfoot>
                     </table>
+                    {% if ud.hours_rate_unknown %}
+                      <p class="text-muted small mt-2">* {% blocktranslate with hours=ud.hours_rate_unknown|hours rate=data.default_hourly_rate|currency %}{{ hours }} without hourly rate; default of {{ rate }}/h applied{% endblocktranslate %}</p>
+                    {% endif %}
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
@@ -225,7 +231,10 @@
                       <tbody>
                         {% for user, contrib in p.by_user.items %}
                           <tr>
-                            <td>{{ user }}</td>
+                            <td>
+                              {{ user }}
+                              {% if contrib.hours_rate_unknown %}*{% endif %}
+                            </td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
                             <td class="text-end">{{ contrib.margin|currency }}</td>
                             <td class="text-end">{{ contrib.rate|currency }}</td>
@@ -241,6 +250,9 @@
                         </tr>
                       </tfoot>
                     </table>
+                    {% if p.hours_rate_unknown %}
+                      <p class="text-muted small mt-2">* {% blocktranslate with hours=p.hours_rate_unknown|hours rate=data.default_hourly_rate|currency %}{{ hours }} without hourly rate; default of {{ rate }}/h applied{% endblocktranslate %}</p>
+                    {% endif %}
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>

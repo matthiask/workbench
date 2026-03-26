@@ -2,7 +2,17 @@ from collections import defaultdict
 from decimal import Decimal
 from itertools import chain
 
-from django.db.models import Q, Sum
+from django.db.models import (
+    Case,
+    DecimalField,
+    ExpressionWrapper,
+    F,
+    Q,
+    Sum,
+    Value,
+    When,
+)
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
@@ -50,29 +60,58 @@ def squeeze_data(date_range):  # noqa: C901
     )
     user_dict = {u.id: u for u in User.objects.all()}
 
+    # hours × COALESCE(effort_rate, default) gives a rate-weighted hours value
+    _weighted_hours_expr = ExpressionWrapper(
+        F("hours")
+        * Coalesce(F("service__effort_rate"), Value(EXPECTED_AVERAGE_HOURLY_RATE)),
+        output_field=DecimalField(max_digits=14, decimal_places=4),
+    )
+    # Hours where no effort_rate was set (default rate was applied)
+    _hours_rate_unknown_expr = Sum(
+        Case(
+            When(service__effort_rate__isnull=True, then=F("hours")),
+            default=Value(Decimal(0)),
+            output_field=DecimalField(max_digits=10, decimal_places=1),
+        )
+    )
+
     logged = (
         LoggedHours.objects
         .filter(rendered_on__range=date_range)
         .order_by()
         .values("rendered_by", "service__project")
-        .annotate(Sum("hours"))
+        .annotate(
+            hours_sum=Sum("hours"),
+            weighted_hours=Sum(_weighted_hours_expr),
+            hours_rate_unknown=_hours_rate_unknown_expr,
+        )
     )
     for row in logged:
         p = projects[row["service__project"]]
         u = user_dict[row["rendered_by"]]
+        p["hours_in_range_by_user"][u] = {
+            "hours": row["hours_sum"],
+            "weighted_hours": row["weighted_hours"],
+            "hours_rate_unknown": row["hours_rate_unknown"] or Decimal(0),
+        }
+        users[u]["hours_in_range"] += row["hours_sum"]
 
-        p["hours_in_range_by_user"][u] = row["hours__sum"]
-        users[u]["hours_in_range"] += row["hours__sum"]
-
+    # Total all-time hours and weighted hours per project (used as attribution denominator)
     total_hours = (
         LoggedHours.objects
         .order_by()
         .filter(service__project__in=projects.keys())
         .values("service__project")
-        .annotate(Sum("hours"))
+        .annotate(
+            hours__sum=Sum("hours"),
+            weighted_hours=Sum(_weighted_hours_expr),
+        )
     )
     for row in total_hours:
         projects[row["service__project"]]["hours_logged"] = row["hours__sum"]
+        projects[row["service__project"]]["weighted_hours_logged"] = row[
+            "weighted_hours"
+        ]
 
     offered_hours = (
         Service.objects
@@ -149,21 +188,27 @@ def squeeze_data(date_range):  # noqa: C901
         hours_logged = p["hours_logged"]
         hours = max((hours_offered, hours_logged))
 
+        weighted_hours_logged = p.get("weighted_hours_logged") or Z2
+
         by_user = {}
-        if hours:
-            for u, user_hours in p["hours_in_range_by_user"].items():
-                user_margin = user_hours / hours * margin
-                users[u]["margin"] += user_margin
+        if weighted_hours_logged:
+            for u, user_data in p["hours_in_range_by_user"].items():
+                user_hours = user_data["hours"]
+                user_weighted = user_data["weighted_hours"]
+                user_margin = user_weighted / weighted_hours_logged * margin
                 contrib = {
                     "hours": user_hours,
                     "margin": user_margin,
                     "rate": user_margin / user_hours,
+                    "hours_rate_unknown": user_data["hours_rate_unknown"],
                 }
+                users[u]["margin"] += user_margin
                 users[u]["by_project"][p["project"]] = contrib
                 by_user[u] = contrib
 
         hours_in_range = sum(d["hours"] for d in by_user.values())
         margin_in_range = sum(d["margin"] for d in by_user.values())
+        hours_rate_unknown = sum(d["hours_rate_unknown"] for d in by_user.values())
         by_user = dict(
             sorted(by_user.items(), key=lambda item: item[1]["hours"], reverse=True)
         )
@@ -181,6 +226,7 @@ def squeeze_data(date_range):  # noqa: C901
             "by_user": by_user,
             "hours_in_range": hours_in_range,
             "margin_in_range": margin_in_range,
+            "hours_rate_unknown": hours_rate_unknown,
         })
 
     project_list.sort(key=lambda r: r["margin"], reverse=True)
@@ -303,6 +349,9 @@ def squeeze_data(date_range):  # noqa: C901
                     reverse=True,
                 )
             ),
+            "hours_rate_unknown": sum(
+                c["hours_rate_unknown"] for c in row["by_project"].values()
+            ),
         })
 
     user_list.sort(key=lambda r: r["delta"], reverse=True)
@@ -397,6 +446,7 @@ def squeeze_data(date_range):  # noqa: C901
         "totals": totals,
         "all_users": all_users,
         "types": types,
+        "default_hourly_rate": EXPECTED_AVERAGE_HOURLY_RATE,
     }
 
 
@@ -424,7 +474,11 @@ def build_xlsx(data):
             _("logged hours"),
             _("relevant hours"),
             _("rate"),
-            *list(chain.from_iterable((str(u), "") for u in all_users)),
+            _("period hours"),
+            _("period gross margin"),
+            _("period rate"),
+            _("hours at default rate ({}/h)").format(EXPECTED_AVERAGE_HOURLY_RATE),
+            *list(chain.from_iterable((str(u), "", "", "") for u in all_users)),
         ],
         [
             "",
@@ -436,8 +490,20 @@ def build_xlsx(data):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
             *list(
-                chain.from_iterable((_("hours"), _("gross margin")) for _u in all_users)
+                chain.from_iterable(
+                    (
+                        _("hours"),
+                        _("gross margin"),
+                        _("rate"),
+                        _("hours at default rate"),
+                    )
+                    for _u in all_users
+                )
             ),
         ],
         *sorted(
@@ -472,6 +538,7 @@ def build_xlsx(data):
             _("Target value: gross margin"),
             "",
             _("included absence days"),
+            _("hours at default rate ({}/h)").format(EXPECTED_AVERAGE_HOURLY_RATE),
         ],
         [
             _("Total"),
@@ -497,11 +564,12 @@ def build_xlsx(data):
             _("Target value w/ {}/h").format(EXPECTED_AVERAGE_HOURLY_RATE),
             _("Delta"),
             "",
+            "",
         ],
         [],
         *sorted(
             (_user_xlsx_row(ud, types) for ud in user_list),
-            key=lambda row: row[-2],
+            key=lambda row: row[-3],
             reverse=True,
         ),
     ]
@@ -559,11 +627,12 @@ def build_xlsx(data):
 
 def _project_xlsx_row(p, all_users):
     hours = p["hours"]
+    hours_in_range = p["hours_in_range"]
 
     def user_cells(u):
-        if by_user_data := p["by_user"].get(u):
-            return (by_user_data["hours"], by_user_data["margin"])
-        return ("", "")
+        if d := p["by_user"].get(u):
+            return (d["hours"], d["margin"], d["rate"], d["hours_rate_unknown"] or "")
+        return ("", "", "", "")
 
     return [
         p["project"],
@@ -575,6 +644,10 @@ def _project_xlsx_row(p, all_users):
         p["hours_logged"],
         hours,
         p["rate"],
+        hours_in_range,
+        p["margin_in_range"],
+        p["margin_in_range"] / hours_in_range if hours_in_range else "",
+        p["hours_rate_unknown"] or "",
         *list(chain.from_iterable(user_cells(u) for u in all_users)),
     ]
 
@@ -608,4 +681,5 @@ def _user_xlsx_row(ud, types):
         ud["expected_gross_margin"],
         ud["delta"],
         ud["absence_days"],
+        ud["hours_rate_unknown"] or "",
     ]
