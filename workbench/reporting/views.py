@@ -609,3 +609,17 @@ def birthdays_view(request):
         "reporting/birthdays.html",
         {"birthdays": birthdays()},
     )
+
+
+@filter_form(DateRangeFilterForm)
+def squeeze_view(request, form):
+    from workbench.reporting.squeeze import build_xlsx, squeeze_data
+
+    date_range = [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
+    data = squeeze_data(date_range)
+
+    if request.GET.get("export") == "xlsx":
+        xlsx = build_xlsx(data)
+        return xlsx.to_response(f"squeeze-{date_range[0]}-{date_range[1]}.xlsx")
+
+    return render(request, "reporting/squeeze.html", {"form": form, "data": data})

@@ -1,0 +1,611 @@
+from collections import defaultdict
+from decimal import Decimal
+from itertools import chain
+
+from django.db.models import Q, Sum
+from django.utils.translation import gettext as _
+
+from workbench.accounts.models import User
+from workbench.awt.models import Absence
+from workbench.awt.reporting import employment_percentages
+from workbench.awt.utils import monthly_days
+from workbench.invoices.models import Invoice, ProjectedInvoice
+from workbench.invoices.utils import recurring
+from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.offers.models import Offer
+from workbench.projects.models import InternalType, InternalTypeUser, Project, Service
+from workbench.projects.reporting import hours_per_type
+from workbench.tools.formats import Z0, Z1, Z2, local_date_format
+from workbench.tools.xlsx import WorkbenchXLSXDocument
+
+
+EXPECTED_AVERAGE_HOURLY_RATE = Decimal(150)
+WORKING_TIME_PER_DAY = Decimal(8)
+WORKING_DAYS_PER_YEAR = Decimal(250)
+DAYS_PER_YEAR = Decimal("365.24")
+
+
+def working_days_estimation(date_range):
+    days = (date_range[1] - date_range[0]).days + 1
+    return days * WORKING_DAYS_PER_YEAR / DAYS_PER_YEAR
+
+
+def squeeze_data(date_range):  # noqa: C901
+    projects = defaultdict(
+        lambda: {
+            "invoiced": Z2,
+            "projected": Z2,
+            "offered": Z2,
+            "hours_logged": Z1,
+            "hours_offered": Z1,
+            "hours_in_range_by_user": {},
+        }
+    )
+    users = defaultdict(
+        lambda: {
+            "margin": Z2,
+            "hours_in_range": Z1,
+            "by_project": {},
+        }
+    )
+    user_dict = {u.id: u for u in User.objects.all()}
+
+    logged = (
+        LoggedHours.objects
+        .filter(rendered_on__range=date_range)
+        .order_by()
+        .values("rendered_by", "service__project")
+        .annotate(Sum("hours"))
+    )
+    for row in logged:
+        p = projects[row["service__project"]]
+        u = user_dict[row["rendered_by"]]
+
+        p["hours_in_range_by_user"][u] = row["hours__sum"]
+        users[u]["hours_in_range"] += row["hours__sum"]
+
+    total_hours = (
+        LoggedHours.objects
+        .order_by()
+        .filter(service__project__in=projects.keys())
+        .values("service__project")
+        .annotate(Sum("hours"))
+    )
+    for row in total_hours:
+        projects[row["service__project"]]["hours_logged"] = row["hours__sum"]
+
+    offered_hours = (
+        Service.objects
+        .order_by()
+        .budgeted()
+        .filter(project__in=projects.keys(), project__closed_on__isnull=True)
+        .values("project")
+        .annotate(Sum("service_hours"))
+    )
+    for row in offered_hours:
+        projects[row["project"]]["hours_offered"] = row["service_hours__sum"]
+
+    invoiced_per_project = (
+        Invoice.objects
+        .invoiced()
+        .filter(project__in=projects.keys())
+        .order_by()
+        .values("project")
+        .annotate(Sum("total_excl_tax"), Sum("third_party_costs"))
+    )
+    for row in invoiced_per_project:
+        projects[row["project"]]["invoiced"] = (
+            row["total_excl_tax__sum"] - row["third_party_costs__sum"]
+        )
+
+    # Subtract third party costs from logged costs which have not been
+    # invoiced yet. Maybe we're double counting here but I'd rather have a
+    # pessimistic outlook here.
+    for row in (
+        LoggedCost.objects
+        .filter(
+            service__project__in=projects.keys(),
+            third_party_costs__isnull=False,
+            invoice_service__isnull=True,
+        )
+        .order_by()
+        .values("service__project")
+        .annotate(Sum("third_party_costs"))
+    ):
+        projects[row["service__project"]]["invoiced"] -= row["third_party_costs__sum"]
+
+    for pi in ProjectedInvoice.objects.filter(
+        project__in=projects.keys(), project__closed_on__isnull=True
+    ):
+        projects[pi.project_id]["projected"] += pi.gross_margin
+
+    offers = Offer.objects.accepted().filter(
+        project__in=projects.keys(), project__closed_on__isnull=True
+    )
+    for offer in offers:
+        projects[offer.project_id]["offered"] += offer.total_excl_tax
+    for row in (
+        Service.objects
+        .filter(offer__in=offers, third_party_costs__isnull=False)
+        .order_by()
+        .values("project")
+        .annotate(Sum("third_party_costs"))
+    ):
+        projects[row["project"]]["offered"] -= row["third_party_costs__sum"]
+
+    for project_id, project in Project.objects.in_bulk(projects.keys()).items():
+        projects[project_id]["project"] = project
+
+    # Compute per-project margin, hours, rate, and per-user attribution
+    project_list = []
+    for p in projects.values():
+        if "project" not in p:
+            continue
+        offered = p["offered"]
+        projected = p["projected"]
+        invoiced = p["invoiced"]
+        margin = max((offered, projected, invoiced))
+        hours_offered = p["hours_offered"]
+        hours_logged = p["hours_logged"]
+        hours = max((hours_offered, hours_logged))
+
+        by_user = {}
+        if hours:
+            for u, user_hours in p["hours_in_range_by_user"].items():
+                user_margin = user_hours / hours * margin
+                users[u]["margin"] += user_margin
+                contrib = {
+                    "hours": user_hours,
+                    "margin": user_margin,
+                    "rate": user_margin / user_hours,
+                }
+                users[u]["by_project"][p["project"]] = contrib
+                by_user[u] = contrib
+
+        hours_in_range = sum(d["hours"] for d in by_user.values())
+        margin_in_range = sum(d["margin"] for d in by_user.values())
+        by_user = dict(
+            sorted(by_user.items(), key=lambda item: item[1]["hours"], reverse=True)
+        )
+
+        project_list.append({
+            "project": p["project"],
+            "offered": offered,
+            "projected": projected,
+            "invoiced": invoiced,
+            "margin": margin,
+            "hours_offered": hours_offered,
+            "hours_logged": hours_logged,
+            "hours": hours,
+            "rate": margin / hours if hours else Z2,
+            "by_user": by_user,
+            "hours_in_range": hours_in_range,
+            "margin_in_range": margin_in_range,
+        })
+
+    project_list.sort(key=lambda r: r["margin"], reverse=True)
+
+    all_users = sorted(users.keys())
+    ep = employment_percentages()
+
+    def average_percentage(user):
+        percentages = []
+        for month in recurring(date_range[0], "monthly"):
+            if month > date_range[1]:
+                break
+            percentages.append(ep[user].get(month, Z0))
+        return sum(percentages, Z0) / len(percentages)
+
+    hpt = hours_per_type(date_range, users=users.keys())
+    hptu = {row["user"]: row for row in hpt["users"]}
+
+    user_internal_types = defaultdict(dict)
+    for m2m in InternalTypeUser.objects.select_related("internal_type"):
+        user_internal_types[m2m.user_id][m2m.internal_type] = m2m
+    types = list(InternalType.objects.all())
+
+    absence_days_per_user = defaultdict(lambda: Decimal(1))
+    for absence in Absence.objects.filter(
+        Q(ends_on__isnull=True, starts_on__range=date_range)
+        | (
+            Q(ends_on__isnull=False)
+            & Q(starts_on__lte=date_range[1], ends_on__gte=date_range[0])
+        ),
+        Q(
+            reason__in=[
+                Absence.VACATION,
+                Absence.PAID,
+                Absence.SCHOOL,
+            ]
+        )
+        | Q(
+            reason=Absence.CORRECTION,
+            days__gt=0,
+        ),
+    ).select_related("user"):
+        months = list(
+            monthly_days(absence.starts_on, absence.ends_on or absence.starts_on)
+        )
+        absence_day_per_period_day = absence.days / sum(m[1] for m in months)
+        for month, days in months:
+            if date_range[0] <= month <= date_range[1]:
+                absence_days_per_user[absence.user] += days * absence_day_per_period_day
+
+    # Build user dicts
+    user_list = []
+    for user, row in users.items():
+        employment_percentage = average_percentage(user)
+        hptu_row = hptu.get(user, {"internal": Z1, "external": Z1, "total": Z1})
+        internal_hours = hptu_row["internal"]
+        external_hours = hptu_row["external"]
+        total_hours_user = hptu_row["total"]
+
+        # internal_percentages: negative values e.g. -20 for 20% internal time
+        internal_percentages = [
+            -user_internal_types[user.id][type].percentage
+            if type in user_internal_types[user.id]
+            else 0
+            for type in types
+        ]
+        profitable_percentage = 100 + sum(internal_percentages)
+        external_percentage = (
+            100 * external_hours / total_hours_user if total_hours_user else Z0
+        )
+        invoiced_per_external_hour = (
+            row["margin"]
+            / row["hours_in_range"]
+            / (1 - internal_hours / total_hours_user)
+            if external_hours
+            else Z2
+        )
+        absence_days = absence_days_per_user[user]
+        expected_gross_margin = (
+            EXPECTED_AVERAGE_HOURLY_RATE
+            * WORKING_TIME_PER_DAY
+            * (working_days_estimation(date_range) - absence_days)
+            * Decimal(profitable_percentage)
+            / 100
+            * Decimal(employment_percentage)
+            / 100
+        )
+        delta = row["margin"] - expected_gross_margin
+
+        # internal_type_percentages: list of (InternalType, negative_percentage_or_0)
+        # where negative_percentage mirrors the internal_percentages list values
+        internal_type_percentages = list(zip(types, internal_percentages))
+
+        user_list.append({
+            "user": user,
+            "specialist_field": user.specialist_field.name
+            if user.specialist_field
+            else None,
+            "employment_percentage": employment_percentage,
+            "margin": row["margin"],
+            "hours_in_range": row["hours_in_range"],
+            "rate": row["margin"] / row["hours_in_range"]
+            if row["hours_in_range"]
+            else Z2,
+            "internal_hours": internal_hours,
+            "external_hours": external_hours,
+            "total_hours": total_hours_user,
+            "invoiced_per_external_hour": invoiced_per_external_hour,
+            "profitable_percentage": profitable_percentage,
+            "external_percentage": external_percentage,
+            "delta_external_percentage": external_percentage - profitable_percentage,
+            "expected_gross_margin": expected_gross_margin,
+            "delta": delta,
+            "absence_days": absence_days,
+            "internal_type_percentages": internal_type_percentages,
+            "by_project": dict(
+                sorted(
+                    row["by_project"].items(),
+                    key=lambda item: item[1]["hours"],
+                    reverse=True,
+                )
+            ),
+        })
+
+    user_list.sort(key=lambda r: r["delta"], reverse=True)
+
+    # Build specialist fields
+    fields_dict = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1, "names": []})
+    for ud in user_list:
+        field = ud["specialist_field"] or "<unbekannt>"
+        fields_dict[field]["margin"] += ud["margin"]
+        fields_dict[field]["hours_in_range"] += ud["hours_in_range"]
+        fields_dict[field]["names"].append(str(ud["user"]))
+
+    field_list = sorted(
+        [
+            {
+                "name": name,
+                "users": ", ".join(sorted(d["names"])),
+                "margin": d["margin"],
+                "hours_in_range": d["hours_in_range"],
+                "rate": d["margin"] / d["hours_in_range"]
+                if d["hours_in_range"]
+                else Z2,
+            }
+            for name, d in fields_dict.items()
+        ],
+        key=lambda r: r["rate"],
+        reverse=True,
+    )
+
+    # Build organizations
+    organizations = defaultdict(lambda: {"margin": Z2, "hours_in_range": Z1})
+    for p in project_list:
+        hours = p["hours"]
+        if hours:
+            org_name = str(p["project"].customer)
+            for u_data in p["by_user"].values():
+                organizations[org_name]["margin"] += u_data["margin"]
+                organizations[org_name]["hours_in_range"] += u_data["hours"]
+
+    org_list = sorted(
+        [
+            {
+                "name": name,
+                "margin": d["margin"],
+                "hours_in_range": d["hours_in_range"],
+                "rate": d["margin"] / d["hours_in_range"]
+                if d["hours_in_range"]
+                else Z2,
+            }
+            for name, d in organizations.items()
+        ],
+        key=lambda r: r["rate"],
+        reverse=True,
+    )
+
+    # Totals
+    all_users_margin = sum(ud["margin"] for ud in user_list)
+    all_users_hours_in_range = sum(ud["hours_in_range"] for ud in user_list)
+    total_employment_percentage = sum(average_percentage(u) for u in all_users)
+    total_internal = hpt["total"]["internal"]
+    total_external = hpt["total"]["external"]
+    total_total = hpt["total"]["total"]
+
+    totals = {
+        "employment_percentage": total_employment_percentage,
+        "margin": all_users_margin,
+        "hours_in_range": all_users_hours_in_range,
+        "rate": all_users_margin / all_users_hours_in_range
+        if all_users_hours_in_range
+        else Z2,
+        "internal_hours": total_internal,
+        "external_hours": total_external,
+        "total_hours": total_total,
+        "external_percentage": 100 * total_external / total_total
+        if total_total
+        else Z0,
+        "invoiced_per_external_hour": (
+            all_users_margin
+            / all_users_hours_in_range
+            / (1 - total_internal / total_total)
+            if total_external
+            else Z2
+        ),
+    }
+
+    return {
+        "date_range": date_range,
+        "projects": project_list,
+        "users": user_list,
+        "fields": field_list,
+        "organizations": org_list,
+        "totals": totals,
+        "all_users": all_users,
+        "types": types,
+    }
+
+
+def build_xlsx(data):
+    date_range = data["date_range"]
+    all_users = data["all_users"]
+    types = data["types"]
+    user_list = data["users"]
+    project_list = data["projects"]
+    field_list = data["fields"]
+    org_list = data["organizations"]
+    totals = data["totals"]
+
+    body = f"Squeeze {local_date_format(date_range[0])} - {local_date_format(date_range[1])}"
+    header = [[body]]
+
+    projects_table = [
+        [
+            _("project"),
+            _("offered (only open projects)"),
+            _("projected gross margin (only open projects)"),
+            _("invoiced without third party costs"),
+            _("relevant gross margin"),
+            _("offered hours (only open projects)"),
+            _("logged hours"),
+            _("relevant hours"),
+            _("rate"),
+            *list(chain.from_iterable((str(u), "") for u in all_users)),
+        ],
+        [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            *list(
+                chain.from_iterable((_("hours"), _("gross margin")) for _u in all_users)
+            ),
+        ],
+        *sorted(
+            (_project_xlsx_row(p, all_users) for p in project_list),
+            key=lambda row: row[4],
+            reverse=True,
+        ),
+    ]
+
+    users_table = [
+        [
+            _("user"),
+            _("specialist field"),
+            _("employment percentage YTD"),
+            _("relevant gross margin"),
+            _("relevant hours"),
+            _("rate"),
+            "",
+            _("internal hours"),
+            _("external hours"),
+            _("total hours"),
+            "",
+            _("invoiced per external hour"),
+            "",
+            _("starting point"),
+        ]
+        + [type.name for type in types]
+        + [
+            _("Target value: external percentage"),
+            _("external percentage"),
+            "",
+            _("Target value: gross margin"),
+            "",
+            _("included absence days"),
+        ],
+        [
+            _("Total"),
+            "",
+            totals["employment_percentage"],
+            totals["margin"],
+            totals["hours_in_range"],
+            totals["rate"],
+            "",
+            totals["internal_hours"],
+            totals["external_hours"],
+            totals["total_hours"],
+            "",
+            totals["invoiced_per_external_hour"],
+            "",
+            "",
+        ]
+        + ["" for _type in types]
+        + [
+            "",
+            totals["external_percentage"],
+            _("Delta"),
+            _("Target value w/ {}/h").format(EXPECTED_AVERAGE_HOURLY_RATE),
+            _("Delta"),
+            "",
+        ],
+        [],
+        *sorted(
+            (_user_xlsx_row(ud, types) for ud in user_list),
+            key=lambda row: row[-2],
+            reverse=True,
+        ),
+    ]
+
+    fields_table = [
+        [
+            _("specialist field"),
+            _("users"),
+            _("relevant gross margin"),
+            _("relevant hours"),
+            _("rate"),
+        ],
+        *[
+            [
+                f["name"],
+                f["users"],
+                f["margin"],
+                f["hours_in_range"],
+                f["rate"],
+            ]
+            for f in field_list
+        ],
+    ]
+
+    organizations_table = [
+        [
+            _("organization"),
+            _("relevant gross margin"),
+            _("relevant hours"),
+            _("rate"),
+        ],
+        *[
+            [
+                o["name"],
+                o["margin"],
+                o["hours_in_range"],
+                o["rate"],
+            ]
+            for o in org_list
+        ],
+    ]
+
+    xlsx = WorkbenchXLSXDocument()
+    xlsx.add_sheet(_("users").replace(":", "_"))
+    xlsx.table(None, header + users_table)
+    xlsx.add_sheet(_("specialist fields"))
+    xlsx.table(None, header + fields_table)
+    xlsx.add_sheet(_("organizations"))
+    xlsx.table(None, header + organizations_table)
+    xlsx.add_sheet(_("projects"))
+    xlsx.table(None, header + projects_table)
+
+    return xlsx
+
+
+def _project_xlsx_row(p, all_users):
+    hours = p["hours"]
+
+    def user_cells(u):
+        if by_user_data := p["by_user"].get(u):
+            return (by_user_data["hours"], by_user_data["margin"])
+        return ("", "")
+
+    return [
+        p["project"],
+        p["offered"],
+        p["projected"],
+        p["invoiced"],
+        p["margin"],
+        p["hours_offered"],
+        p["hours_logged"],
+        hours,
+        p["rate"],
+        *list(chain.from_iterable(user_cells(u) for u in all_users)),
+    ]
+
+
+def _user_xlsx_row(ud, types):
+    user = ud["user"]
+    # internal_type_percentages contains (type, negative_pct_or_0) pairs
+    # Convert 0 to None to match original behaviour: [p or None for p in internal_percentages]
+    internal_percentages_list = [
+        pct or None for _t, pct in ud["internal_type_percentages"]
+    ]
+    return [
+        user,
+        ud["specialist_field"] or _("<unknown>"),
+        ud["employment_percentage"],
+        ud["margin"],
+        ud["hours_in_range"],
+        ud["rate"],
+        "",
+        ud["internal_hours"],
+        ud["external_hours"],
+        ud["total_hours"],
+        "",
+        ud["invoiced_per_external_hour"],
+        "",
+        100,
+        *internal_percentages_list,
+        ud["profitable_percentage"],
+        ud["external_percentage"],
+        ud["external_percentage"] - ud["profitable_percentage"],
+        ud["expected_gross_margin"],
+        ud["delta"],
+        ud["absence_days"],
+    ]

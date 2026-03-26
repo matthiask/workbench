@@ -19,6 +19,7 @@ from workbench.reporting.views import (
     playing_bank_view,
     project_budget_statistics_view,
     projected_gross_margin,
+    squeeze_view,
     work_anniversaries_view,
 )
 
@@ -112,6 +113,7 @@ urlpatterns = [
         name="report_deal_history",
     ),
     path("labor-costs/", labor_costs_only(labor_costs_view), name="report_labor_costs"),
+    path("squeeze/", controlling_only(squeeze_view), name="report_squeeze"),
     path("logging/", controlling_only(logging), name="report_logging"),
     path(
         "work-anniversaries/",

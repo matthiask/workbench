@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% load fineforms i18n workbench %}
+{% block title %}
+  {% translate 'Squeeze' %} - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-sm-12">
+      <h1>
+        {% translate 'Squeeze' %}
+        {% if data.date_range %}
+          {{ data.date_range.0 }} – {{ data.date_range.1 }}
+        {% endif %}
+      </h1>
+
+      <form method="get" class="mb-3" data-autosubmit>
+        {% ff_fields form %}
+        <a href="{% querystring export='xlsx' %}" class="btn btn-sm btn-outline-secondary ms-2">
+          {% translate 'Export XLSX' %}
+        </a>
+      </form>
+
+      {% if data.users %}
+
+        {# Users table #}
+        <h2>{% translate 'Users' %}</h2>
+        <div class="table-responsive mb-4">
+          <table class="table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>{% translate 'User' %}</th>
+                <th>{% translate 'Specialist field' %}</th>
+                <th class="text-end">{% translate 'Employment %' %}</th>
+                <th class="text-end">{% translate 'Gross margin' %}</th>
+                <th class="text-end">{% translate 'Hours' %}</th>
+                <th class="text-end">{% translate 'Rate' %}</th>
+                <th class="text-end">{% translate 'External %' %}</th>
+                <th class="text-end">{% translate 'Target ext. %' %}</th>
+                <th class="text-end">{% translate 'Δ ext. %' %}</th>
+                <th class="text-end">{% translate 'Expected margin' %}</th>
+                <th class="text-end">{% translate 'Delta' %}</th>
+                <th class="text-end">{% translate 'Absence days' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ud in data.users %}
+                <tr>
+                  <td>{{ ud.user }}</td>
+                  <td>{{ ud.specialist_field|default:_("<unknown>") }}</td>
+                  <td class="text-end">{{ ud.employment_percentage|floatformat:1 }}%</td>
+                  <td class="text-end">{{ ud.margin|currency }}</td>
+                  <td class="text-end">
+                    {% if ud.by_project %}
+                      <a href="#"
+                         data-bs-toggle="modal"
+                         data-bs-target="#user-projects-{{ ud.user.pk }}"
+                         title="{% translate 'Project breakdown' %}">{{ ud.hours_in_range|hours }}</a>
+                    {% else %}
+                      {{ ud.hours_in_range|hours }}
+                    {% endif %}
+                  </td>
+                  <td class="text-end">{{ ud.rate|currency }}</td>
+                  <td class="text-end">{{ ud.external_percentage|floatformat:1 }}%</td>
+                  <td class="text-end">{{ ud.profitable_percentage }}%</td>
+                  <td class="text-end {% if ud.delta_external_percentage < 0 %}text-danger{% endif %}">
+                    {{ ud.delta_external_percentage|floatformat:1 }}%
+                  </td>
+                  <td class="text-end">{{ ud.expected_gross_margin|currency }}</td>
+                  <td class="text-end {% if ud.delta < 0 %}text-danger{% endif %}">
+                    {{ ud.delta|currency }}
+                  </td>
+                  <td class="text-end">{{ ud.absence_days|floatformat:1 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>{% translate 'Total' %}</th>
+                <th></th>
+                <th class="text-end">{{ data.totals.employment_percentage|floatformat:1 }}%</th>
+                <th class="text-end">{{ data.totals.margin|currency }}</th>
+                <th class="text-end">{{ data.totals.hours_in_range|hours }}</th>
+                <th class="text-end">{{ data.totals.rate|currency }}</th>
+                <th class="text-end">{{ data.totals.external_percentage|floatformat:1 }}%</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        {# Specialist fields table #}
+        <h2>{% translate 'Specialist fields' %}</h2>
+        <div class="table-responsive mb-4">
+          <table class="table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>{% translate 'Specialist field' %}</th>
+                <th>{% translate 'Users' %}</th>
+                <th class="text-end">{% translate 'Gross margin' %}</th>
+                <th class="text-end">{% translate 'Hours' %}</th>
+                <th class="text-end">{% translate 'Rate' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for f in data.fields %}
+                <tr>
+                  <td>{{ f.name }}</td>
+                  <td>{{ f.users }}</td>
+                  <td class="text-end">{{ f.margin|currency }}</td>
+                  <td class="text-end">{{ f.hours_in_range|hours }}</td>
+                  <td class="text-end">{{ f.rate|currency }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {# Organizations table #}
+        <h2>{% translate 'Organizations' %}</h2>
+        <div class="table-responsive mb-4">
+          <table class="table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>{% translate 'Organization' %}</th>
+                <th class="text-end">{% translate 'Gross margin' %}</th>
+                <th class="text-end">{% translate 'Hours' %}</th>
+                <th class="text-end">{% translate 'Rate' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for o in data.organizations %}
+                <tr>
+                  <td>{{ o.name }}</td>
+                  <td class="text-end">{{ o.margin|currency }}</td>
+                  <td class="text-end">{{ o.hours_in_range|hours }}</td>
+                  <td class="text-end">{{ o.rate|currency }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {# Per-user project breakdown modals #}
+        {% for ud in data.users %}
+          {% if ud.by_project %}
+            <div class="modal fade" id="user-projects-{{ ud.user.pk }}">
+              <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">{{ ud.user }}</h5>
+                  </div>
+                  <div class="modal-body">
+                    <p class="text-muted small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>{% translate 'Project' %}</th>
+                          <th class="text-end">{% translate 'Hours' %}</th>
+                          <th class="text-end">{% translate 'Gross margin' %}</th>
+                          <th class="text-end">{% translate 'Rate' %}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for project, contrib in ud.by_project.items %}
+                          <tr>
+                            <td>{% link_or_none project %}</td>
+                            <td class="text-end">{{ contrib.hours|hours }}</td>
+                            <td class="text-end">{{ contrib.margin|currency }}</td>
+                            <td class="text-end">{{ contrib.rate|currency }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th>{% translate 'Total' %}</th>
+                          <th class="text-end">{{ ud.hours_in_range|hours }}</th>
+                          <th class="text-end">{{ ud.margin|currency }}</th>
+                          <th class="text-end">{{ ud.rate|currency }}</th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {# Per-project user breakdown modals #}
+        {% for p in data.projects %}
+          {% if p.by_user %}
+            <div class="modal fade" id="project-users-{{ p.project.pk }}">
+              <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">{{ p.project }}</h5>
+                  </div>
+                  <div class="modal-body">
+                    <dl class="row small mb-3">
+                      <dt class="col-6">{% translate 'Gross margin' %}</dt>
+                      <dd class="col-6 text-end">{{ p.margin|currency }}</dd>
+                      <dt class="col-6">{% translate 'Hours' %}</dt>
+                      <dd class="col-6 text-end">{{ p.hours|hours }}</dd>
+                      <dt class="col-6">{% translate 'Rate' %}</dt>
+                      <dd class="col-6 text-end">{{ p.rate|currency }}</dd>
+                    </dl>
+                    <p class="text-muted small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>{% translate 'User' %}</th>
+                          <th class="text-end">{% translate 'Hours' %}</th>
+                          <th class="text-end">{% translate 'Gross margin' %}</th>
+                          <th class="text-end">{% translate 'Rate' %}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for user, contrib in p.by_user.items %}
+                          <tr>
+                            <td>{{ user }}</td>
+                            <td class="text-end">{{ contrib.hours|hours }}</td>
+                            <td class="text-end">{{ contrib.margin|currency }}</td>
+                            <td class="text-end">{{ contrib.rate|currency }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th>{% translate 'Total' %}</th>
+                          <th class="text-end">{{ p.hours_in_range|hours }}</th>
+                          <th class="text-end">{{ p.margin_in_range|currency }}</th>
+                          <th class="text-end">{{ p.rate|currency }}</th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {# Projects table #}
+        <h2>{% translate 'Projects' %}</h2>
+        <div class="table-responsive mb-4">
+          <table class="table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>{% translate 'Project' %}</th>
+                <th class="text-end">{% translate 'Offered' %}</th>
+                <th class="text-end">{% translate 'Projected' %}</th>
+                <th class="text-end">{% translate 'Invoiced' %}</th>
+                <th class="text-end">{% translate 'Gross margin' %}</th>
+                <th class="text-end">{% translate 'Hours offered' %}</th>
+                <th class="text-end">{% translate 'Hours logged' %}</th>
+                <th class="text-end">{% translate 'Hours' %}</th>
+                <th class="text-end">{% translate 'Rate' %}</th>
+                <th class="text-end">{% translate 'Period hours' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in data.projects %}
+                <tr>
+                  <td>{% link_or_none p.project %}</td>
+                  <td class="text-end">{{ p.offered|currency }}</td>
+                  <td class="text-end">{{ p.projected|currency }}</td>
+                  <td class="text-end">{{ p.invoiced|currency }}</td>
+                  <td class="text-end">{{ p.margin|currency }}</td>
+                  <td class="text-end">{{ p.hours_offered|hours }}</td>
+                  <td class="text-end">{{ p.hours_logged|hours }}</td>
+                  <td class="text-end">{{ p.hours|hours }}</td>
+                  <td class="text-end">{{ p.rate|currency }}</td>
+                  <td class="text-end">
+                    {% if p.by_user %}
+                      <a href="#"
+                         data-bs-toggle="modal"
+                         data-bs-target="#project-users-{{ p.project.pk }}"
+                         title="{% translate 'User breakdown' %}">{{ p.hours_in_range|hours }}</a>
+                    {% elif p.hours_in_range %}
+                      {{ p.hours_in_range|hours }}
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      {% else %}
+        <p class="text-muted">{% translate 'No data for the selected period.' %}</p>
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock content %}
