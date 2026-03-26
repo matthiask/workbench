@@ -11,7 +11,7 @@ const serialize = (data) => {
 const deserialize = (blob) => {
   const deserializeRaw = () => {
     const parsed = JSON.parse(blob)
-    if (!parsed || !parsed._v) return {}
+    if (!parsed?._v) return {}
     const { _v, ...data } = parsed
     if (_v === VERSION) {
       return data

@@ -11,16 +11,4 @@ fl.config.update(
 )
 
 
-@fl.task
-def dev(ctx):
-    backend = fl.random.randint(50000, 60000)
-    fl._concurrently(
-        ctx,
-        [
-            f"uv run manage.py runserver {backend}",
-            f"PORT=8000 yarn run rspack serve --mode=development --env backend={backend}",
-        ],
-    )
-
-
-ns = fl.Collection(*fl.GENERAL, dev)
+ns = fl.Collection(*fl.GENERAL)
