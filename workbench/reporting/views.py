@@ -5,6 +5,7 @@ from functools import reduce
 from itertools import groupby
 
 from django import forms
+from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render
 from django.utils.html import format_html, format_html_join
@@ -473,6 +474,15 @@ class DateRangeFilterForm(Form):
         )
 
 
+class LastMonthDateRangeFilterForm(DateRangeFilterForm):
+    def __init__(self, data, *args, **kwargs):
+        data = data.copy()
+        last_month_end = dt.date.today().replace(day=1) - dt.timedelta(days=1)
+        data.setdefault("date_from", last_month_end.replace(day=1).isoformat())
+        data.setdefault("date_until", last_month_end.isoformat())
+        super().__init__(data, *args, **kwargs)
+
+
 class DateRangeAndTeamFilterForm(DateRangeFilterForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -611,11 +621,23 @@ def birthdays_view(request):
     )
 
 
-@filter_form(DateRangeFilterForm)
+@filter_form(LastMonthDateRangeFilterForm)
 def squeeze_view(request, form):
     from workbench.reporting.squeeze import build_xlsx, squeeze_data
 
     date_range = [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
+
+    cutoff = (date_range[1].replace(day=1) + dt.timedelta(days=32)).replace(day=9)
+    if dt.date.today() < cutoff:
+        messages.warning(
+            request,
+            _(
+                "Invoices for the selected period may not be complete yet"
+                " (cutoff: %(cutoff)s)."
+            )
+            % {"cutoff": local_date_format(cutoff)},
+        )
+
     data = squeeze_data(date_range)
 
     if request.GET.get("export") == "xlsx":
