@@ -48,6 +48,7 @@ class FEATURES(StrEnum):
     LATE_LOGGING_NAG = "LATE_LOGGING_NAG"
     PLANNING = "PLANNING"
     PRIDE = "PRIDE"
+    PRODUCTIVITY = "PRODUCTIVITY"
     PROJECTED_GROSS_MARGIN = "PROJECTED_GROSS_MARGIN"
     WORKING_TIME_CORRECTION = "WORKING_TIME_CORRECTION"
 
@@ -119,6 +120,12 @@ LABELS = {
     FEATURES.PRIDE: {
         "label": capfirst(_("pride")),
     },
+    FEATURES.PRODUCTIVITY: {
+        "label": capfirst(_("productivity")),
+        "help_text": _(
+            "Access to per-user productivity reports including gross margin breakdown."
+        ),
+    },
     FEATURES.PROJECTED_GROSS_MARGIN: {
         "label": capfirst(_("projected gross margin")),
     },
@@ -141,3 +148,4 @@ bookkeeping_only = feature_required(FEATURES.BOOKKEEPING)
 controlling_only = feature_required(FEATURES.CONTROLLING)
 deals_only = feature_required(FEATURES.DEALS)
 labor_costs_only = feature_required(FEATURES.LABOR_COSTS)
+productivity_only = feature_required(FEATURES.PRODUCTIVITY)

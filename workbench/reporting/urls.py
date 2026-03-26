@@ -1,6 +1,11 @@
 from django.urls import path, re_path
 
-from workbench.accounts.features import controlling_only, deals_only, labor_costs_only
+from workbench.accounts.features import (
+    controlling_only,
+    deals_only,
+    labor_costs_only,
+    productivity_only,
+)
 from workbench.awt.views import absence_calendar, annual_working_time_view
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.planning.reporting import planning_vs_logbook
@@ -113,7 +118,7 @@ urlpatterns = [
         name="report_deal_history",
     ),
     path("labor-costs/", labor_costs_only(labor_costs_view), name="report_labor_costs"),
-    path("squeeze/", controlling_only(squeeze_view), name="report_squeeze"),
+    path("squeeze/", productivity_only(squeeze_view), name="report_squeeze"),
     path("logging/", controlling_only(logging), name="report_logging"),
     path(
         "work-anniversaries/",
