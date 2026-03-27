@@ -152,12 +152,14 @@
                             {{ pi.description }}
                           {% endif %}
                           <br>
+                        {% empty %}
+                          {% if not projected_warning %}&ndash;{% endif %}
                         {% endfor %}
-                        {% if not project.closed_on and not projected_invoices_total and gs.total_service_cost %}
+                        {% if projected_warning == "no_projected" %}
                           <div class="alert alert-warning py-1 mb-0 mt-1" role="alert">
                             {% translate "No projected invoices have been entered" %}
                           </div>
-                        {% elif projected_invoices_total > gs.total_service_cost %}
+                        {% elif projected_warning == "exceeds_service_cost" %}
                           <div class="alert alert-danger py-1 mb-0 mt-1" role="alert">
                             {% translate "Projected invoices exceed the planned service cost — please review" %}
                             <br>
@@ -166,7 +168,7 @@
                               {% translate "service cost" %}: {{ gs.total_service_cost|currency }}
                             </small>
                           </div>
-                        {% elif gs.accepted_offers_total_excl_tax and projected_invoices_total > gs.accepted_offers_total_excl_tax %}
+                        {% elif projected_warning == "exceeds_accepted_offer" %}
                           <div class="alert alert-info py-1 mb-0 mt-1" role="alert">
                             {% translate "Projected invoices exceed the accepted offer total" %}
                             <br>
@@ -175,7 +177,7 @@
                               {% translate "accepted offer total" %}: {{ gs.accepted_offers_total_excl_tax|currency }}
                             </small>
                           </div>
-                        {% elif projected_invoices_total and projected_invoices_total < gs.total_service_cost %}
+                        {% elif projected_warning == "incomplete" %}
                           <div class="alert alert-warning py-1 mb-0 mt-1" role="alert">
                             {% translate "Projected invoices appear to be incomplete" %}
                             <br>

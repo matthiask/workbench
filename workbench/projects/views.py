@@ -1,4 +1,5 @@
 from collections import defaultdict
+from decimal import Decimal
 
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
@@ -18,6 +19,9 @@ from workbench.templatetags.workbench import h
 from workbench.tools.formats import Z2, local_date_format
 
 
+PROJECTED_INVOICE_LEEWAY = Decimal(1000)
+
+
 class ProjectDetailView(generic.DetailView):
     model = Project
     queryset = Project.objects.select_related(
@@ -29,9 +33,33 @@ class ProjectDetailView(generic.DetailView):
             pi.gross_margin for pi in self.object.projected_invoices.all()
         )
         grouped_services = self.object.grouped_services
+
+        squeeze = project_gross_margin(self.object)
+
+        projected_warning = None
+        has_accepted_offers = bool(grouped_services["accepted_offers_total_excl_tax"])
+        if not self.object.closed_on and grouped_services["total_service_cost"]:
+            if not projected_invoices_total and not squeeze["invoiced"]:
+                projected_warning = "no_projected"
+            elif projected_invoices_total > grouped_services["total_service_cost"]:
+                projected_warning = "exceeds_service_cost"
+            elif has_accepted_offers and (
+                projected_invoices_total
+                - grouped_services["accepted_offers_total_excl_tax"]
+                > PROJECTED_INVOICE_LEEWAY
+            ):
+                projected_warning = "exceeds_accepted_offer"
+            elif (
+                grouped_services["total_service_cost"] - projected_invoices_total
+                > PROJECTED_INVOICE_LEEWAY
+                and grouped_services["total_service_cost"] > squeeze["invoiced"]
+            ):
+                projected_warning = "incomplete"
+
         return super().get_context_data(
-            squeeze=project_gross_margin(self.object),
+            squeeze=squeeze,
             projected_invoices_total=projected_invoices_total,
+            projected_warning=projected_warning,
             gs=grouped_services,
             **kwargs,
         )
