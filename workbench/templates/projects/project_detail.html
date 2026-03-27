@@ -4,7 +4,6 @@
 
 {% block content %}
 
-{% with gs=project.grouped_services %}
   {% if gs.warnings %}
     <div class="my-3">
       {% for warning in gs.warnings %}
@@ -158,14 +157,29 @@
                         {% if projected_invoices_total > gs.total_service_cost %}
                           <div class="alert alert-danger py-1 mb-0 mt-1" role="alert">
                             {% translate "Projected invoices exceed the planned service cost — please review" %}
+                            <br>
+                            <small>
+                              {% translate "Projected" %}: {{ projected_invoices_total|currency }},
+                              {% translate "service cost" %}: {{ gs.total_service_cost|currency }}
+                            </small>
                           </div>
                         {% elif gs.accepted_offers_total_excl_tax and projected_invoices_total > gs.accepted_offers_total_excl_tax %}
                           <div class="alert alert-info py-1 mb-0 mt-1" role="alert">
                             {% translate "Projected invoices exceed the accepted offer total" %}
+                            <br>
+                            <small>
+                              {% translate "Projected" %}: {{ projected_invoices_total|currency }},
+                              {% translate "accepted offer total" %}: {{ gs.accepted_offers_total_excl_tax|currency }}
+                            </small>
                           </div>
                         {% elif projected_invoices_total and projected_invoices_total < gs.total_service_cost %}
                           <div class="alert alert-warning py-1 mb-0 mt-1" role="alert">
                             {% translate "Projected invoices appear to be incomplete" %}
+                            <br>
+                            <small>
+                              {% translate "Projected" %}: {{ projected_invoices_total|currency }},
+                              {% translate "service cost" %}: {{ gs.total_service_cost|currency }}
+                            </small>
                           </div>
                         {% endif %}
                       </td>
@@ -704,7 +718,6 @@
     </a>
   </div>
 </div>
-{% endwith %}
 {% endblock content %}
 
 {% block fixed-add-button %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-27 12:14+0100\n"
+"POT-Creation-Date: 2026-03-27 12:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4025,6 +4025,13 @@ msgid "Projected invoices exceed the planned service cost — please review"
 msgstr "Geplante Rechnungen übersteigen die geplanten Servicekosten — bitte überprüfen"
 
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/projected_gross_margin.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Projected"
+msgstr "Geplant"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Projected invoices exceed the accepted offer total"
 msgstr "Geplante Rechnungen übersteigen das akzeptierte Offertentotal"
 
@@ -4227,12 +4234,6 @@ msgstr "Umsatz minus Fremdkosten minus Abgrenzungen"
 #: workbench/templates/reporting/key_data.html
 msgid "Revenue minus third party costs and accruals per FTE"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen pro FTE"
-
-#: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/projected_gross_margin.html
-#: workbench/templates/reporting/squeeze.html
-msgid "Projected"
-msgstr "Geplant"
 
 #: workbench/templates/reporting/key_data.html
 msgid "FTE"
