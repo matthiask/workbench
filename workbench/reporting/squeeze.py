@@ -40,6 +40,75 @@ def working_days_estimation(date_range):
     return days * WORKING_DAYS_PER_YEAR / DAYS_PER_YEAR
 
 
+def project_gross_margin(project):
+    """Compute the gross margin estimate and rate for a single project,
+    using the same logic as the squeeze report."""
+    invoiced_agg = (
+        Invoice.objects
+        .invoiced()
+        .filter(project=project)
+        .aggregate(Sum("total_excl_tax"), Sum("third_party_costs"))
+    )
+    invoiced = (invoiced_agg["total_excl_tax__sum"] or Z2) - (
+        invoiced_agg["third_party_costs__sum"] or Z2
+    )
+    invoiced -= (
+        LoggedCost.objects.filter(
+            service__project=project,
+            third_party_costs__isnull=False,
+            invoice_service__isnull=True,
+        ).aggregate(s=Sum("third_party_costs"))["s"]
+        or Z2
+    )
+
+    projected = Z2
+    offered = Z2
+    hours_offered = Z1
+    if project.closed_on is None:
+        projected = sum(
+            (
+                pi.gross_margin
+                for pi in ProjectedInvoice.objects.filter(project=project)
+            ),
+            Z2,
+        )
+        accepted_offers = list(Offer.objects.accepted().filter(project=project))
+        for offer in accepted_offers:
+            offered += offer.total_excl_tax
+        offered -= (
+            Service.objects.filter(
+                offer__in=accepted_offers, third_party_costs__isnull=False
+            ).aggregate(s=Sum("third_party_costs"))["s"]
+            or Z2
+        )
+        hours_offered = (
+            Service.objects
+            .budgeted()
+            .filter(project=project)
+            .aggregate(s=Sum("service_hours"))["s"]
+            or Z1
+        )
+
+    hours_logged = (
+        LoggedHours.objects.filter(service__project=project).aggregate(s=Sum("hours"))[
+            "s"
+        ]
+        or Z1
+    )
+    gross_margin = max(offered, projected, invoiced)
+    hours = max(hours_offered, hours_logged)
+    return {
+        "gross_margin": gross_margin,
+        "hours": hours,
+        "hours_offered": hours_offered,
+        "hours_logged": hours_logged,
+        "rate": gross_margin / hours if hours else Z2,
+        "offered": offered,
+        "projected": projected,
+        "invoiced": invoiced,
+    }
+
+
 def squeeze_data(date_range):  # noqa: C901
     projects = defaultdict(
         lambda: {

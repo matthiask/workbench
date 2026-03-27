@@ -12,9 +12,22 @@ from workbench.logbook.forms import LogbookBatchForm
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
+from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
 from workbench.templatetags.workbench import h
 from workbench.tools.formats import Z2, local_date_format
+
+
+class ProjectDetailView(generic.DetailView):
+    model = Project
+    queryset = Project.objects.select_related(
+        "owned_by", "customer", "contact__organization"
+    )
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            squeeze=project_gross_margin(self.object), **kwargs
+        )
 
 
 def select(request):

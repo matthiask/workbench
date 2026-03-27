@@ -35,6 +35,7 @@ from workbench.projects.forms import (
 from workbench.projects.models import Campaign, Project, Service
 from workbench.projects.views import (
     OffersRenumberView,
+    ProjectDetailView,
     assign_service_type,
     cost_by_month_and_service_xlsx,
     logbook_batch_update,
@@ -145,12 +146,7 @@ urlpatterns = [
     path("select/", select, name="projects_project_select"),
     path(
         "<int:pk>/",
-        generic.DetailView.as_view(
-            model=Project,
-            queryset=Project.objects.select_related(
-                "owned_by", "customer", "contact__organization"
-            ),
-        ),
+        ProjectDetailView.as_view(),
         name="projects_project_detail",
     ),
     path(

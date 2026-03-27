@@ -154,6 +154,27 @@
                       </td>
                     </tr>
                   {% endif %}
+                  <tr>
+                    <th class="text-end">{% translate 'Profitability estimation'|capfirst %}</th>
+                    <td>
+                      {% translate 'Gross margin' %}: {{ squeeze.gross_margin|currency }}
+                      <br>
+                      <small class="text-muted">
+                        {% translate 'offered' %}: {{ squeeze.offered|currency }},
+                        {% translate 'projected' %}: {{ squeeze.projected|currency }},
+                        {% translate 'invoiced' %}: {{ squeeze.invoiced|currency }}
+                      </small>
+                      <br>
+                      {% translate 'Relevant hours' %}: {{ squeeze.hours|hours }}
+                      <br>
+                      <small class="text-muted">
+                        {% translate 'offered' %}: {{ squeeze.hours_offered|hours }},
+                        {% translate 'logged' %}: {{ squeeze.hours_logged|hours }}
+                      </small>
+                      <br>
+                      {% translate 'Rate' %}: {{ squeeze.rate|currency }}/h
+                    </td>
+                  </tr>
                 </table>
               {% endif %} {# CONTROLLING #}
             </span>

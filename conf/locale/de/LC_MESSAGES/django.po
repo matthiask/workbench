@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-26 17:48+0100\n"
+"POT-Creation-Date: 2026-03-27 11:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1299,7 +1299,7 @@ msgstr "archivierter Werttyp"
 msgid "Total %(currency)s"
 msgstr "Total %(currency)s"
 
-#: workbench/deals/forms.py
+#: workbench/deals/forms.py workbench/templates/accounts/user_statistics.html
 msgid "Expected"
 msgstr "Erwartet"
 
@@ -3968,6 +3968,7 @@ msgid "sold"
 msgstr "verkauft"
 
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/playing_bank.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "invoiced"
@@ -4010,6 +4011,39 @@ msgstr "zurückbehalten"
 #: workbench/templates/projects/project_detail.html
 msgid "Total invoiced excl. tax"
 msgstr "Total verrechnet exkl. MwSt"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Profitability estimation"
+msgstr "Rentabilitätsschätzung"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Gross margin"
+msgstr "Umsatz bereinigt"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/playing_bank.html
+msgid "offered"
+msgstr "Offeriert"
+
+#: workbench/templates/projects/project_detail.html
+msgid "projected"
+msgstr "Geplant"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Relevant hours"
+msgstr "Relevante Stunden"
+
+#: workbench/templates/projects/project_detail.html
+msgid "logged"
+msgstr "Erfasst"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Rate"
+msgstr "Ansatz"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Project offers"
@@ -4171,11 +4205,6 @@ msgid "Revenue minus third party costs and accruals per FTE"
 msgstr "Umsatz minus Fremdkosten minus Abgrenzungen pro FTE"
 
 #: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/squeeze.html
-msgid "Gross margin"
-msgstr "Umsatz bereinigt"
-
-#: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/projected_gross_margin.html
 #: workbench/templates/reporting/squeeze.html
 msgid "Projected"
@@ -4293,10 +4322,6 @@ msgid "Allocation"
 msgstr "Zuteilung"
 
 #: workbench/templates/reporting/playing_bank.html
-msgid "offered"
-msgstr "Offeriert"
-
-#: workbench/templates/reporting/playing_bank.html
 msgid "logged (past)"
 msgstr "Erfasst (Vergangenheit)"
 
@@ -4317,10 +4342,6 @@ msgid "Export XLSX"
 msgstr "XLSX exportieren"
 
 #: workbench/templates/reporting/squeeze.html
-msgid "Rate"
-msgstr "Ansatz"
-
-#: workbench/templates/reporting/squeeze.html
 msgid "Without rate"
 msgstr "Ohne Stundensatz"
 
@@ -4336,10 +4357,6 @@ msgstr "Projekte"
 #: workbench/templates/reporting/squeeze.html
 msgid "estimated"
 msgstr "geschätzt"
-
-#: workbench/templates/reporting/squeeze.html
-msgid "Relevant hours"
-msgstr "Relevante Stunden"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Period hours"
