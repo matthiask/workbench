@@ -28,9 +28,11 @@ class ProjectDetailView(generic.DetailView):
         projected_invoices_total = sum(
             pi.gross_margin for pi in self.object.projected_invoices.all()
         )
+        grouped_services = self.object.grouped_services
         return super().get_context_data(
             squeeze=project_gross_margin(self.object),
             projected_invoices_total=projected_invoices_total,
+            gs=grouped_services,
             **kwargs,
         )
 

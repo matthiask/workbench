@@ -4026,7 +4026,7 @@ msgstr "Keine geplanten Rechnungen erfasst"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Projected invoices exceed the planned service cost — please review"
-msgstr "Geplante Rechnungen übersteigen die geplanten Servicekosten — bitte überprüfen"
+msgstr "Geplante Rechnungen übersteigen die geplanten Leistungskosten — bitte überprüfen"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/key_data.html
