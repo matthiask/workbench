@@ -37,7 +37,7 @@
       <div class="card my-3">
         <div class="card-body">
           <div class="row justify-content-between">
-            <span class="col-md-7">
+            <span class="col-md-7 col-lg-6">
               <p>
                 {{ object.description|linebreaksbr|urlize }}
               </p>
@@ -62,7 +62,7 @@
                 </div>
               </div>
             </span>
-            <span class="col-md-5">
+            <span class="col-md-5 col-lg-6">
               {% if request.user.features.CONTROLLING %}
                 <table class="table table-borderless table-sm">
 
