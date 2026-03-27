@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-27 12:03+0100\n"
+"POT-Creation-Date: 2026-03-27 12:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4066,6 +4066,10 @@ msgid "Rate"
 msgstr "Ansatz"
 
 #: workbench/templates/projects/project_detail.html
+msgid "rate based on accepted offers"
+msgstr "Ansatz basierend auf akzeptierten Offerten"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Project offers"
 msgstr "Projektofferten"
 
@@ -4745,6 +4749,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "offered rate"
+#~ msgstr "Offerierter Ansatz"
 
 #~ msgid "Hours offered"
 #~ msgstr "Offerierte Stunden"

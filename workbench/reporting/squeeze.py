@@ -61,9 +61,27 @@ def project_gross_margin(project):
         or Z2
     )
 
+    # Always compute offered/hours_offered — needed for offered_rate even on closed projects.
+    accepted_offers = list(Offer.objects.accepted().filter(project=project))
+    offered = sum((o.total_excl_tax for o in accepted_offers), Z2)
+    offered -= (
+        Service.objects.filter(
+            offer__in=accepted_offers, third_party_costs__isnull=False
+        ).aggregate(s=Sum("third_party_costs"))["s"]
+        or Z2
+    )
+    hours_offered = (
+        Service.objects
+        .budgeted()
+        .filter(project=project)
+        .aggregate(s=Sum("service_hours"))["s"]
+        or Z1
+    )
+
+    # Projected invoices and including offered in gross_margin only makes sense
+    # for open projects; for closed projects the invoiced amount is ground truth.
     projected = Z2
-    offered = Z2
-    hours_offered = Z1
+    offered_for_margin = Z2
     if project.closed_on is None:
         projected = sum(
             (
@@ -72,22 +90,7 @@ def project_gross_margin(project):
             ),
             Z2,
         )
-        accepted_offers = list(Offer.objects.accepted().filter(project=project))
-        for offer in accepted_offers:
-            offered += offer.total_excl_tax
-        offered -= (
-            Service.objects.filter(
-                offer__in=accepted_offers, third_party_costs__isnull=False
-            ).aggregate(s=Sum("third_party_costs"))["s"]
-            or Z2
-        )
-        hours_offered = (
-            Service.objects
-            .budgeted()
-            .filter(project=project)
-            .aggregate(s=Sum("service_hours"))["s"]
-            or Z1
-        )
+        offered_for_margin = offered
 
     hours_logged = (
         LoggedHours.objects.filter(service__project=project).aggregate(s=Sum("hours"))[
@@ -95,7 +98,7 @@ def project_gross_margin(project):
         ]
         or Z1
     )
-    gross_margin = max(offered, projected, invoiced)
+    gross_margin = max(offered_for_margin, projected, invoiced)
     hours = max(hours_offered, hours_logged)
     return {
         "gross_margin": gross_margin,
@@ -103,6 +106,7 @@ def project_gross_margin(project):
         "hours_offered": hours_offered,
         "hours_logged": hours_logged,
         "rate": gross_margin / hours if hours else Z2,
+        "offered_rate": offered / hours_offered if hours_offered else Z2,
         "offered": offered,
         "projected": projected,
         "invoiced": invoiced,

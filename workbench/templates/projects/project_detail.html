@@ -190,6 +190,12 @@
                       </small>
                       <br>
                       {% translate 'Rate' %}: {{ squeeze.rate|currency }}/h
+                      <br>
+                      {% if squeeze.offered %}
+                        <small class="text-muted">
+                          {% translate 'rate based on accepted offers' %}: {{ squeeze.offered_rate|currency }}/h
+                        </small>
+                      {% endif %}
                     </td>
                   </tr>
                 </table>
