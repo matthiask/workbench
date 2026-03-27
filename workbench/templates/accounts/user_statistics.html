@@ -42,6 +42,17 @@
               data: [{% for row in logged_hours.hours_per_week %}{{ row.by_type.internal|default:0|stringformat:'.1f' }},{% endfor %}],
               backgroundColor: '#9954bb',
             },
+            {
+              label: "{% translate 'Expected' %}",
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.expected_hours|stringformat:'.1f' }},{% endfor %}],
+              borderColor: 'rgba(220, 53, 69, 0.8)',
+              backgroundColor: 'transparent',
+              borderDash: [6, 4],
+              borderWidth: 2,
+              fill: false,
+              stack: 'expected',
+              pointRadius: 0,
+            },
           ],
         },
         options: {
@@ -86,6 +97,17 @@
               fill: true,
             },
             {% endfor %}
+            {
+              label: "{% translate 'Expected' %}",
+              data: [{% for row in logged_hours.hours_per_week %}{{ row.expected_hours|stringformat:'.1f' }},{% endfor %}],
+              borderColor: 'rgba(220, 53, 69, 0.8)',
+              backgroundColor: 'transparent',
+              borderDash: [6, 4],
+              borderWidth: 2,
+              fill: false,
+              stack: 'expected',
+              pointRadius: 0,
+            },
           ],
         },
         options: {

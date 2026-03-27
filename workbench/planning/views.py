@@ -41,7 +41,7 @@ def project_planning_external(request, pk):
 
 
 def user_planning(request, pk, *, retro=False):
-    instance = get_object_or_404(User.objects.active(), pk=pk)
+    instance = get_object_or_404(User, pk=pk)
     date_range = [in_days(-180), in_days(14)] if retro else [in_days(-14), in_days(400)]
 
     return render(

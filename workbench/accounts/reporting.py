@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
+from workbench.awt.models import Employment, Year
 from workbench.tools.forms import querystring
 from workbench.tools.reporting import query
 from workbench.tools.validation import in_days, monday
@@ -53,7 +54,34 @@ ORDER BY series.week
                 }),
             }
 
-    stats["hours_per_week"] = [row[1] for row in sorted(hours_per_week.items())]
+    employments = list(
+        Employment.objects
+        .filter(user=user)
+        .order_by("date_from")
+        .values("date_from", "date_until", "percentage")
+    )
+    working_time_per_day = {
+        y["year"]: float(y["working_time_per_day"])
+        for y in Year.objects.filter(working_time_model=user.working_time_model).values(
+            "year", "working_time_per_day"
+        )
+    }
+
+    def expected_hours_for_week(week_date):
+        active = None
+        for emp in employments:
+            if emp["date_from"] <= week_date <= emp["date_until"]:
+                active = emp
+        wtpd = working_time_per_day.get(week_date.year, 8.0)
+        if active is None:
+            return 0
+        return wtpd * 5 * active["percentage"] / 100
+
+    rows = [row[1] for row in sorted(hours_per_week.items())]
+    for row in rows:
+        week_date = row["week"].date() if hasattr(row["week"], "date") else row["week"]
+        row["expected_hours"] = expected_hours_for_week(week_date)
+    stats["hours_per_week"] = rows
 
     hours_per_customer = defaultdict(dict)
     total_hours_per_customer = defaultdict(int)
