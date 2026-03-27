@@ -152,9 +152,12 @@
                             {{ pi.description }}
                           {% endif %}
                           <br>
-                        {% empty %}&ndash;
                         {% endfor %}
-                        {% if projected_invoices_total > gs.total_service_cost %}
+                        {% if not project.closed_on and not projected_invoices_total and gs.total_service_cost %}
+                          <div class="alert alert-warning py-1 mb-0 mt-1" role="alert">
+                            {% translate "No projected invoices have been entered" %}
+                          </div>
+                        {% elif projected_invoices_total > gs.total_service_cost %}
                           <div class="alert alert-danger py-1 mb-0 mt-1" role="alert">
                             {% translate "Projected invoices exceed the planned service cost — please review" %}
                             <br>
