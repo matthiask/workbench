@@ -100,17 +100,21 @@
                           (+{{ gs.total_service_hours_rate_undefined|hours }})
                         </span>
                       {% endif %}
-                      <br>
-                      <small class="text-muted">
-                        {% translate "Accepted offers" %}: {{ gs.accepted_offers_service_cost|currency }},
-                        {% translate "Not offered yet" %}: {{ gs.not_offered_service_cost|currency }}
-                      </small>
+                      {% if gs.not_offered_service_cost %}
+                        <br>
+                        <small class="text-muted">{% translate "Not offered yet" %}: {{ gs.not_offered_service_cost|currency }}</small>
+                      {% endif %}
                     </td>
                   </tr>
-                  {% if not gs.has_budget_retainer_offers and gs.total_discount %}
+                  {% if not gs.has_budget_retainer_offers %}
                     <tr>
-                      <th class="text-end">{% translate 'discount'|capfirst %}</th>
-                      <td>{{ gs.total_discount|currency }}</td>
+                      <th class="text-end">{% translate 'accepted offer total'|capfirst %}</th>
+                      <td>
+                        {{ gs.accepted_offers_total_excl_tax|currency }}
+                        {% if gs.accepted_offers_discount %}
+                          ({% blocktranslate with discount=gs.accepted_offers_discount|currency %}includes discount of {{ discount }}{% endblocktranslate %})
+                        {% endif %}
+                      </td>
                     </tr>
                   {% endif %}
                   <tr>
@@ -151,6 +155,19 @@
                           <br>
                         {% empty %}&ndash;
                         {% endfor %}
+                        {% if projected_invoices_total > gs.total_service_cost %}
+                          <div class="alert alert-danger py-1 mb-0 mt-1" role="alert">
+                            {% translate "Projected invoices exceed the planned service cost — please review" %}
+                          </div>
+                        {% elif gs.accepted_offers_total_excl_tax and projected_invoices_total > gs.accepted_offers_total_excl_tax %}
+                          <div class="alert alert-info py-1 mb-0 mt-1" role="alert">
+                            {% translate "Projected invoices exceed the accepted offer total" %}
+                          </div>
+                        {% elif projected_invoices_total and projected_invoices_total < gs.total_service_cost %}
+                          <div class="alert alert-warning py-1 mb-0 mt-1" role="alert">
+                            {% translate "Projected invoices appear to be incomplete" %}
+                          </div>
+                        {% endif %}
                       </td>
                     </tr>
                   {% endif %}

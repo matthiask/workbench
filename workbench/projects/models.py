@@ -595,6 +595,12 @@ class Project(Model):
             "total_discount": sum(
                 (offer.discount for offer in offers if not offer.is_declined), Z2
             ),
+            "accepted_offers_discount": sum(
+                (offer.discount for offer in offers if offer.is_accepted), Z2
+            ),
+            "accepted_offers_total_excl_tax": sum(
+                (offer.total_excl_tax for offer in offers if offer.is_accepted), Z2
+            ),
             # Budget retainment
             "has_budget_retainer_offers": any(
                 offer.is_budget_retainer for offer in offers

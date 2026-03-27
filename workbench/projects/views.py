@@ -22,11 +22,16 @@ class ProjectDetailView(generic.DetailView):
     model = Project
     queryset = Project.objects.select_related(
         "owned_by", "customer", "contact__organization"
-    )
+    ).prefetch_related("projected_invoices")
 
     def get_context_data(self, **kwargs):
+        projected_invoices_total = sum(
+            pi.gross_margin for pi in self.object.projected_invoices.all()
+        )
         return super().get_context_data(
-            squeeze=project_gross_margin(self.object), **kwargs
+            squeeze=project_gross_margin(self.object),
+            projected_invoices_total=projected_invoices_total,
+            **kwargs,
         )
 
 

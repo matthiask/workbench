@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-27 11:34+0100\n"
+"POT-Creation-Date: 2026-03-27 12:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2809,7 +2809,7 @@ msgstr "Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgel�
 msgid "No invoices"
 msgstr "Keine Rechnungen"
 
-#: workbench/projects/forms.py workbench/templates/projects/project_detail.html
+#: workbench/projects/forms.py
 msgid "Accepted offers"
 msgstr "Akzeptierte Offerten"
 
@@ -3793,7 +3793,6 @@ msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/tools/models.py workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "discount"
@@ -4009,8 +4008,29 @@ msgid "retained"
 msgstr "zurückbehalten"
 
 #: workbench/templates/projects/project_detail.html
+msgid "accepted offer total"
+msgstr "Akzeptiertes Offertentotal"
+
+#: workbench/templates/projects/project_detail.html
+#, python-format
+msgid "includes discount of %(discount)s"
+msgstr "berücksichtigt Rabatt von %(discount)s"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Total invoiced excl. tax"
 msgstr "Total verrechnet exkl. MwSt"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Projected invoices exceed the planned service cost — please review"
+msgstr "Geplante Rechnungen übersteigen die geplanten Servicekosten — bitte überprüfen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Projected invoices exceed the accepted offer total"
+msgstr "Geplante Rechnungen übersteigen das akzeptierte Offertentotal"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Projected invoices appear to be incomplete"
+msgstr "Geplante Rechnungen scheinen unvollständig zu sein"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Profitability estimation"
@@ -4726,10 +4746,8 @@ msgstr "Suchanfrage fehlt."
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
 
-#, fuzzy
-#~| msgid "offered"
 #~ msgid "Hours offered"
-#~ msgstr "Offeriert"
+#~ msgstr "Offerierte Stunden"
 
 #~ msgid "Hours logged"
 #~ msgstr "Erfasste Stunden"
