@@ -275,7 +275,8 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th></th>
+                <th class="text-end">{{ data.totals.expected_gross_margin|currency }}</th>
+                <th class="text-end {% if data.totals.delta < 0 %}text-danger{% endif %}">{{ data.totals.delta|currency }}</th>
               </tr>
             </tfoot>
           </table>

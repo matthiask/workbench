@@ -533,6 +533,8 @@ def squeeze_data(date_range):  # noqa: C901
             if total_external
             else Z2
         ),
+        "expected_gross_margin": sum(ud["expected_gross_margin"] for ud in user_list),
+        "delta": sum(ud["delta"] for ud in user_list),
     }
 
     return {
