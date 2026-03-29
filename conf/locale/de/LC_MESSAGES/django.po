@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-27 12:25+0100\n"
+"POT-Creation-Date: 2026-03-29 10:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -345,6 +345,10 @@ msgstr "Kaffee-Paare"
 #: workbench/accounts/models.py workbench/deals/models.py
 msgid "value type"
 msgstr "Werttyp"
+
+#: workbench/accounts/models.py workbench/reporting/squeeze.py
+msgid "expected hourly rate"
+msgstr "erwarteter Stundensatz"
 
 #: workbench/accounts/models.py workbench/management/commands/workload.py
 #: workbench/reporting/squeeze.py
@@ -4430,6 +4434,10 @@ msgstr "Richtwert extern %%"
 #, python-format
 msgid "Δ ext. %%"
 msgstr "Δ ext. %%"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Expected rate"
+msgstr "Erwarteter Ansatz"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Expected margin"
