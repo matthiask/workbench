@@ -138,4 +138,5 @@ class TeamAdmin(admin.ModelAdmin):
 
 @admin.register(SpecialistField)
 class SpecialistFieldAdmin(admin.ModelAdmin):
-    list_display = ["name", "value_type"]
+    list_display = ["name", "value_type", "expected_hourly_rate"]
+    list_editable = ["value_type", "expected_hourly_rate"]

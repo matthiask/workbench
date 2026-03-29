@@ -383,8 +383,17 @@ def squeeze_data(date_range):  # noqa: C901
             else Z2
         )
         absence_days = absence_days_per_user[user]
+
+        if (
+            user.specialist_field
+            and user.specialist_field.expected_hourly_rate is not None
+        ):
+            expected_hourly_rate = user.specialist_field.expected_hourly_rate
+        else:
+            expected_hourly_rate = EXPECTED_AVERAGE_HOURLY_RATE
+
         expected_gross_margin = (
-            EXPECTED_AVERAGE_HOURLY_RATE
+            expected_hourly_rate
             * WORKING_TIME_PER_DAY
             * (working_days_estimation(date_range) - absence_days)
             * Decimal(profitable_percentage)
@@ -416,6 +425,7 @@ def squeeze_data(date_range):  # noqa: C901
             "profitable_percentage": profitable_percentage,
             "external_percentage": external_percentage,
             "delta_external_percentage": external_percentage - profitable_percentage,
+            "expected_hourly_rate": expected_hourly_rate,
             "expected_gross_margin": expected_gross_margin,
             "delta": delta,
             "absence_days": absence_days,
@@ -625,6 +635,7 @@ def build_xlsx(data):
             _("Target value: external percentage"),
             _("external percentage"),
             "",
+            _("expected hourly rate"),
             _("Target value: gross margin"),
             "",
             _("hours at default rate ({}/h)").format(EXPECTED_AVERAGE_HOURLY_RATE),
@@ -720,7 +731,12 @@ def _project_xlsx_row(p, all_users):
 
     def user_cells(u):
         if d := p["by_user"].get(u):
-            return (d["hours"], d["margin"], d["rate"], d["hours_rate_unknown"] or "")
+            return (
+                d["hours"],
+                d["gross_margin"],
+                d["rate"],
+                d["hours_rate_unknown"] or "",
+            )
         return ("", "", "", "")
 
     return [
@@ -728,14 +744,14 @@ def _project_xlsx_row(p, all_users):
         p["offered"],
         p["projected"],
         p["invoiced"],
-        p["margin"],
+        p["gross_margin"],
         p["hours_offered"],
         p["hours_logged"],
         hours,
         p["rate"],
         hours_in_range,
-        p["margin_in_range"],
-        p["margin_in_range"] / hours_in_range if hours_in_range else "",
+        p["gross_margin_in_range"],
+        p["gross_margin_in_range"] / hours_in_range if hours_in_range else "",
         p["hours_rate_unknown"] or "",
         *list(chain.from_iterable(user_cells(u) for u in all_users)),
     ]
@@ -755,7 +771,7 @@ def _user_xlsx_row(ud, types):
         ud["absence_days"],
         ud["hours_in_range"],
         ud["rate"],
-        ud["margin"],
+        ud["gross_margin"],
         "",
         ud["internal_hours"],
         ud["external_hours"],
@@ -768,6 +784,7 @@ def _user_xlsx_row(ud, types):
         ud["profitable_percentage"],
         ud["external_percentage"],
         ud["external_percentage"] - ud["profitable_percentage"],
+        ud["expected_hourly_rate"],
         ud["expected_gross_margin"],
         ud["delta"],
         ud["hours_rate_unknown"] or "",

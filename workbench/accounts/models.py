@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES, F
 from workbench.tools.formats import Z1
-from workbench.tools.models import Model
+from workbench.tools.models import Model, MoneyField
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, monday
 
@@ -436,6 +436,11 @@ class SpecialistField(models.Model):
         null=True,
         on_delete=models.PROTECT,
         verbose_name=_("value type"),
+    )
+    expected_hourly_rate = MoneyField(
+        _("expected hourly rate"),
+        blank=True,
+        null=True,
     )
 
     class Meta:

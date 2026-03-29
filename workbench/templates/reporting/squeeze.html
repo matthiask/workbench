@@ -225,6 +225,7 @@
                 <th class="text-end">{% translate 'External %' %}</th>
                 <th class="text-end">{% translate 'Target ext. %' %}</th>
                 <th class="text-end">{% translate 'Δ ext. %' %}</th>
+                <th class="text-end">{% translate 'Expected rate' %}</th>
                 <th class="text-end">{% translate 'Expected margin' %}</th>
                 <th class="text-end">{% translate 'Delta' %}</th>
               </tr>
@@ -253,6 +254,7 @@
                   <td class="text-end {% if ud.delta_external_percentage < 0 %}text-danger{% endif %}">
                     {{ ud.delta_external_percentage|stringformat:".1f" }}%
                   </td>
+                  <td class="text-end">{{ ud.expected_hourly_rate|currency }}</td>
                   <td class="text-end">{{ ud.expected_gross_margin|currency }}</td>
                   <td class="text-end {% if ud.delta < 0 %}text-danger{% endif %}">
                     {{ ud.delta|currency }}
