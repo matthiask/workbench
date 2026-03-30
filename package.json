@@ -3,7 +3,7 @@
     "@popperjs/core": "^2.11.8",
     "@rspack/cli": "^1.7.10",
     "@rspack/core": "^1.7.10",
-    "@swc/helpers": "^0.5.19",
+    "@swc/helpers": "^0.5.20",
     "autoprefixer": "^10.4.27",
     "bootstrap": "^5.3.8",
     "core-js": "^3.49.0",
