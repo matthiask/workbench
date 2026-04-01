@@ -290,9 +290,10 @@
               <tr>
                 <th>{% translate 'Specialist field' %}</th>
                 <th>{% translate 'Users' %}</th>
-                <th class="text-end">{% translate 'Gross margin' %}</th>
                 <th class="text-end">{% translate 'Hours' %}</th>
                 <th class="text-end">{% translate 'Rate' %}</th>
+                <th class="text-end">{% translate 'Gross margin' %}</th>
+                <th class="text-end">{% translate 'External %' %}</th>
               </tr>
             </thead>
             <tbody>
@@ -300,9 +301,10 @@
                 <tr>
                   <td>{{ f.name }}</td>
                   <td>{{ f.users }}</td>
-                  <td class="text-end">{{ f.gross_margin|currency }}</td>
                   <td class="text-end">{{ f.hours_in_range|hours }}</td>
                   <td class="text-end">{{ f.rate|currency }}</td>
+                  <td class="text-end">{{ f.gross_margin|currency }}</td>
+                  <td class="text-end">{{ f.external_percentage|stringformat:".1f" }}%</td>
                 </tr>
               {% endfor %}
             </tbody>

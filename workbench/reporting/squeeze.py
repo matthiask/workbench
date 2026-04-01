@@ -446,12 +446,20 @@ def squeeze_data(date_range):  # noqa: C901
 
     # Build specialist fields
     fields_dict = defaultdict(
-        lambda: {"gross_margin": Z2, "hours_in_range": Z1, "names": []}
+        lambda: {
+            "gross_margin": Z2,
+            "hours_in_range": Z1,
+            "external_hours": Z1,
+            "total_hours": Z1,
+            "names": [],
+        }
     )
     for ud in user_list:
         field = ud["specialist_field"] or "<unbekannt>"
         fields_dict[field]["gross_margin"] += ud["gross_margin"]
         fields_dict[field]["hours_in_range"] += ud["hours_in_range"]
+        fields_dict[field]["external_hours"] += ud["external_hours"]
+        fields_dict[field]["total_hours"] += ud["total_hours"]
         fields_dict[field]["names"].append(str(ud["user"]))
 
     field_list = sorted(
@@ -463,6 +471,9 @@ def squeeze_data(date_range):  # noqa: C901
                 "hours_in_range": d["hours_in_range"],
                 "rate": d["gross_margin"] / d["hours_in_range"]
                 if d["hours_in_range"]
+                else Z2,
+                "external_percentage": 100 * d["external_hours"] / d["total_hours"]
+                if d["total_hours"]
                 else Z2,
             }
             for name, d in fields_dict.items()
@@ -680,17 +691,19 @@ def build_xlsx(data):
         [
             _("specialist field"),
             _("users"),
-            _("relevant gross margin"),
             _("relevant hours"),
             _("rate"),
+            _("relevant gross margin"),
+            _("external percentage"),
         ],
         *[
             [
                 f["name"],
                 f["users"],
-                f["gross_margin"],
                 f["hours_in_range"],
                 f["rate"],
+                f["gross_margin"],
+                f["external_percentage"],
             ]
             for f in field_list
         ],
