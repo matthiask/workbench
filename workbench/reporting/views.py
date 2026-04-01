@@ -29,6 +29,7 @@ from workbench.reporting import (
     key_data,
     labor_costs,
     project_budget_statistics,
+    squeeze,
     third_party_costs,
 )
 from workbench.reporting.utils import date_ranges
@@ -623,8 +624,6 @@ def birthdays_view(request):
 
 @filter_form(LastMonthDateRangeFilterForm)
 def squeeze_view(request, form):
-    from workbench.reporting.squeeze import build_xlsx, squeeze_data
-
     date_range = [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
 
     cutoff = (date_range[1].replace(day=1) + dt.timedelta(days=32)).replace(day=9)
@@ -638,10 +637,18 @@ def squeeze_view(request, form):
             % {"cutoff": local_date_format(cutoff)},
         )
 
-    data = squeeze_data(date_range)
+    data = squeeze.squeeze_data(date_range)
 
     if request.GET.get("export") == "xlsx":
-        xlsx = build_xlsx(data)
+        xlsx = squeeze.build_xlsx(data)
         return xlsx.to_response(f"squeeze-{date_range[0]}-{date_range[1]}.xlsx")
 
-    return render(request, "reporting/squeeze.html", {"form": form, "data": data})
+    return render(
+        request,
+        "reporting/squeeze.html",
+        {
+            "form": form,
+            "data": data,
+            "EXPECTED_AVERAGE_HOURLY_RATE": squeeze.EXPECTED_AVERAGE_HOURLY_RATE,
+        },
+    )
