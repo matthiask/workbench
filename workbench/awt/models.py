@@ -248,7 +248,7 @@ class Holiday(Model):
         related_name="holidays",
     )
     date = models.DateField(_("date"))
-    name = models.CharField(_("name"), max_length=200)
+    name = models.CharField(_("name"), blank=True, max_length=200)
     fraction = models.DecimalField(
         _("fraction of day which is free"),
         default=1,
@@ -268,8 +268,12 @@ class Holiday(Model):
         verbose_name = _("holiday")
         verbose_name_plural = _("holidays")
 
+    @property
+    def display_name(self):
+        return self.name or self.get_kind_display()
+
     def __str__(self):
-        return f"{self.name} ({local_date_format(self.date, fmt='l, j.n.')})"
+        return f"{self.display_name} ({local_date_format(self.date, fmt='l, j.n.')})"
 
 
 class VacationDaysOverride(models.Model):

@@ -20,7 +20,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("date", models.DateField(verbose_name="date")),
-                ("name", models.CharField(max_length=200, verbose_name="name")),
+                (
+                    "name",
+                    models.CharField(blank=True, max_length=200, verbose_name="name"),
+                ),
                 (
                     "fraction",
                     models.DecimalField(

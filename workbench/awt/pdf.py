@@ -71,7 +71,7 @@ def annual_working_time_pdf(statistics):
                 xlsx.table(
                     [_("date"), _("name"), _("kind"), _("days")],
                     [
-                        [h.date, h.name, h.get_kind_display(), h.fraction]
+                        [h.date, h.display_name, h.get_kind_display(), h.fraction]
                         for h in all_holidays
                     ],
                 )
@@ -292,7 +292,7 @@ def user_stats_pdf(data):
                     *[
                         [
                             local_date_format(h.date),
-                            h.name,
+                            h.display_name,
                             h.get_kind_display(),
                             days(h.fraction),
                         ]
