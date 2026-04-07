@@ -10,17 +10,20 @@ def assign_holidays_to_wtms(apps, schema_editor):
     Holiday.objects.all().delete()
 
     wtms = list(WorkingTimeModel.objects.all())
-    Holiday.objects.bulk_create([
-        Holiday(
-            date=date,
-            name=name,
-            fraction=fraction,
-            kind=kind,
-            working_time_model=wtm,
-        )
-        for date, name, fraction, kind in existing
-        for wtm in wtms
-    ])
+    Holiday.objects.bulk_create(
+        [
+            Holiday(
+                date=date,
+                name=name,
+                fraction=fraction,
+                kind=kind,
+                working_time_model=wtm,
+            )
+            for date, name, fraction, kind in existing
+            for wtm in wtms
+        ],
+        ignore_conflicts=True,
+    )
 
 
 class Migration(migrations.Migration):
