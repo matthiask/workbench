@@ -595,7 +595,7 @@ on week=ph_week
             "absences": [
                 (str(user), lst) for user, lst in sorted(self._absences.items())
             ],
-            "capacity": self.capacity() if self.users else None,
+            "capacity": self.capacity() if (self.users or self._user_ids) else None,
             "service_types": [
                 {"id": type.id, "title": type.title, "color": type.color}
                 for type in ServiceType.objects.all()
