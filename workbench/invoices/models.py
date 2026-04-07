@@ -349,7 +349,11 @@ class Invoice(ModelWithTotal):
     @property
     def pretty_last_reminded_on(self):
         if self.last_reminded_on:
-            return f"{local_date_format(self.last_reminded_on)} ({timesince(self.last_reminded_on, depth=1)})"
+            if self.last_reminded_on == dt.date.today():
+                relative = gettext("today")
+            else:
+                relative = timesince(self.last_reminded_on, depth=1)
+            return f"{local_date_format(self.last_reminded_on)} ({relative})"
         return gettext("Not reminded yet")
 
     def payment_reminders_sent_at(self):
