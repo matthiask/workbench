@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.utils.formats import date_format
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from pdfdocument.document import PageBreak
 
 from workbench.tools.formats import days, hours, local_date_format
 from workbench.tools.pdf import PDFDocument, mm
@@ -285,7 +286,10 @@ def user_stats_pdf(data):
                 )
                 pdf.spacer()
 
+        pdf.p(_("Generated on %(day)s") % {"day": local_date_format(dt.date.today())})
+
         if holiday_list := data.get("holiday_list", []):
+            pdf.story.append(PageBreak())
             pdf.table(
                 [
                     [_("date"), _("name"), _("kind"), _("days")],
@@ -303,8 +307,6 @@ def user_stats_pdf(data):
                 (*awt_table_style, ("ALIGN", (0, 0), (-1, -1), "LEFT")),
             )
             pdf.spacer()
-
-        pdf.p(_("Generated on %(day)s") % {"day": local_date_format(dt.date.today())})
 
         pdf.generate()
         return buf.getvalue()
