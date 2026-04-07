@@ -163,6 +163,20 @@ def _nth_weekday(year, month, weekday, n):
     return first_occurrence + dt.timedelta(weeks=n - 1)
 
 
+def weekdays_per_month(year):
+    """Return a list of 12 weekday counts (Mon-Fri) for the given year."""
+    result = []
+    for month in range(1, 13):
+        count = 0
+        d = dt.date(year, month, 1)
+        while d.month == month:
+            if d.weekday() < 5:
+                count += 1
+            d += dt.timedelta(days=1)
+        result.append(D(count))
+    return result
+
+
 def get_zurich_holidays(year):
     """
     Return Sechseläuten and Knabenschiessen for the given year.

@@ -1,12 +1,17 @@
 import datetime as dt
+from decimal import Decimal
 
 from authlib.email import render_to_mail
 from django.conf import settings
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.awt.holidays import get_public_holidays, get_zurich_holidays
-from workbench.awt.models import Holiday, WorkingTimeModel
+from workbench.awt.holidays import (
+    get_public_holidays,
+    get_zurich_holidays,
+    weekdays_per_month,
+)
+from workbench.awt.models import Holiday, WorkingTimeModel, Year
 from workbench.awt.reporting import annual_working_time_warnings
 from workbench.tools.validation import logbook_lock
 
@@ -14,7 +19,24 @@ from workbench.tools.validation import logbook_lock
 def create_holidays():
     today = dt.date.today()
     for wtm in WorkingTimeModel.objects.all():
+        prev_year = (
+            Year.objects.filter(working_time_model=wtm).order_by("-year").first()
+        )
+        working_time_per_day = (
+            prev_year.working_time_per_day if prev_year else Decimal(0)
+        )
+
         for year in range(today.year, today.year + 3):
+            weekdays = weekdays_per_month(year)
+            Year.objects.get_or_create(
+                year=year,
+                working_time_model=wtm,
+                defaults={
+                    "working_time_per_day": working_time_per_day,
+                    **{month: weekdays[i] for i, month in enumerate(Year.MONTHS)},
+                },
+            )
+
             if Holiday.objects.filter(date__year=year, working_time_model=wtm).exists():
                 continue
             days = get_public_holidays(year)

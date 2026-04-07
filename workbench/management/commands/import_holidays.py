@@ -1,29 +1,18 @@
-import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
 
 from django.core.management import BaseCommand, CommandError
 
-from workbench.awt.holidays import get_public_holidays, get_zurich_holidays
+from workbench.awt.holidays import (
+    get_public_holidays,
+    get_zurich_holidays,
+    weekdays_per_month,
+)
 from workbench.awt.models import Holiday, WorkingTimeModel, Year
 
 
 TOLERANCE = Decimal("0.01")
 Z = Decimal(0)
-
-
-def _weekdays_per_month(year):
-    """Return a list of 12 weekday counts (Mon–Fri) for the given year."""
-    result = []
-    for month in range(1, 13):
-        count = 0
-        d = dt.date(year, month, 1)
-        while d.month == month:
-            if d.weekday() < 5:
-                count += 1
-            d += dt.timedelta(days=1)
-        result.append(Decimal(count))
-    return result
 
 
 def _compute_month_deltas(holidays):
@@ -65,7 +54,7 @@ def _adjust_year_months_smart(year, wtm_id, month_deltas):
 
     The operation is idempotent: a second run finds shortfall=0 and does nothing.
     """
-    weekdays = _weekdays_per_month(year)
+    weekdays = weekdays_per_month(year)
     for db_year in Year.objects.filter(year=year, working_time_model_id=wtm_id):
         stored = db_year.months
         updates = {}
@@ -97,7 +86,7 @@ class Command(BaseCommand):
     def _check(self, years_to_check, all_holidays, wtms):
         month_names = Year.MONTHS
         for year in years_to_check:
-            weekdays = _weekdays_per_month(year)
+            weekdays = weekdays_per_month(year)
             for wtm in wtms:
                 holiday_deltas = [Z] * 12
                 for date, (_name, fraction) in all_holidays[year].items():
@@ -156,7 +145,7 @@ class Command(BaseCommand):
             month_deltas = _compute_month_deltas(holidays)
             for wtm in wtms:
                 if options["dry_run"]:
-                    weekdays = _weekdays_per_month(year)
+                    weekdays = weekdays_per_month(year)
                     for db_year in Year.objects.filter(
                         year=year, working_time_model=wtm
                     ):
