@@ -86,10 +86,13 @@ class Command(BaseCommand):
                 hours_per_week_and_user[week][pw.user][type] += hours
 
         ep = employment_percentages(until_year=end.year)
+        holidays_by_wtm = defaultdict(list)
         for ph in Holiday.objects.filter(date__range=[start, end]):
-            week = monday(ph.date)
-            month = ph.date.replace(day=1)
-            for user in users:
+            holidays_by_wtm[ph.working_time_model_id].append(ph)
+        for user in users:
+            for ph in holidays_by_wtm.get(user.working_time_model_id, []):
+                week = monday(ph.date)
+                month = ph.date.replace(day=1)
                 hours_per_week_and_user[week][user]["absences"] += (
                     ph.fraction * ep[user][month] / 100 * user.planning_hours_per_day
                 )

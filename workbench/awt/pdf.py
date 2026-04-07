@@ -17,10 +17,7 @@ def annual_working_time_pdf(statistics):
 
     if len(statistics["statistics"]) == 1:
         response = HttpResponse(
-            user_stats_pdf(
-                statistics["statistics"][0],
-                holiday_list=statistics.get("holiday_list", []),
-            ),
+            user_stats_pdf(statistics["statistics"][0]),
             content_type="application/pdf",
         )
         user = statistics["statistics"][0]["user"]
@@ -37,7 +34,7 @@ def annual_working_time_pdf(statistics):
                         slugify(data["user"].get_full_name()),
                         data["months"]["year"].year,
                     ),
-                    user_stats_pdf(data, holiday_list=data.get("holiday_list", [])),
+                    user_stats_pdf(data),
                 )
             has_holidays = statistics.get("has_holidays", False)
             xlsx = WorkbenchXLSXDocument()
@@ -86,7 +83,7 @@ def annual_working_time_pdf(statistics):
         return response
 
 
-def user_stats_pdf(data, *, holiday_list=None):
+def user_stats_pdf(data):
     with io.BytesIO() as buf:
         pdf = PDFDocument(buf, font_size=7)
         pdf.init_report()
@@ -288,7 +285,7 @@ def user_stats_pdf(data, *, holiday_list=None):
                 )
                 pdf.spacer()
 
-        if holiday_list:
+        if holiday_list := data.get("holiday_list", []):
             pdf.table(
                 [
                     [_("date"), _("name"), _("kind"), _("days")],

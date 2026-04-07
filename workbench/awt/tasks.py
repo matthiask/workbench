@@ -37,8 +37,6 @@ def create_holidays():
                 },
             )
 
-            if Holiday.objects.filter(date__year=year, working_time_model=wtm).exists():
-                continue
             days = get_public_holidays(year)
             days.update(get_zurich_holidays(year))
             Holiday.objects.bulk_create(

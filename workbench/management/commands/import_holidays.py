@@ -2,6 +2,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from django.core.management import BaseCommand, CommandError
+from django.db import transaction
 
 from workbench.awt.holidays import (
     get_public_holidays,
@@ -141,10 +142,10 @@ class Command(BaseCommand):
             self._check(years_to_check, all_holidays, wtms)
             return
 
-        for year, holidays in all_holidays.items():
-            month_deltas = _compute_month_deltas(holidays)
-            for wtm in wtms:
-                if options["dry_run"]:
+        if options["dry_run"]:
+            for year, holidays in all_holidays.items():
+                month_deltas = _compute_month_deltas(holidays)
+                for wtm in wtms:
                     weekdays = weekdays_per_month(year)
                     for db_year in Year.objects.filter(
                         year=year, working_time_model=wtm
@@ -158,9 +159,11 @@ class Command(BaseCommand):
                                 self.stdout.write(
                                     f"  {year} {wtm} {Year.MONTHS[m]}: +{increment}"
                                 )
-                else:
-                    _insert_holidays(year, wtm, holidays)
-                    _adjust_year_months_smart(year, wtm.id, month_deltas)
-
-        if not options["dry_run"]:
+        else:
+            with transaction.atomic():
+                for year, holidays in all_holidays.items():
+                    month_deltas = _compute_month_deltas(holidays)
+                    for wtm in wtms:
+                        _insert_holidays(year, wtm, holidays)
+                        _adjust_year_months_smart(year, wtm.id, month_deltas)
             self.stdout.write(self.style.SUCCESS("Done."))

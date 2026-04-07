@@ -459,7 +459,8 @@ left outer join lateral (
         date_from,
         date_until,
         percentage,
-        planning_hours_per_day
+        planning_hours_per_day,
+        accounts_user.working_time_model_id
     from awt_employment
     left join accounts_user on awt_employment.user_id=accounts_user.id
     where user_id = any (%s)
@@ -529,6 +530,7 @@ left outer join lateral(
       sum(fraction) as ph_days
     from awt_holiday
     where extract(dow from date) between 1 and 6
+      and working_time_model_id = employment.working_time_model_id
     group by ph_week
 ) as public_holidays
 on week=ph_week

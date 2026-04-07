@@ -11,7 +11,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import User
-from workbench.awt.models import Absence, Employment
+from workbench.awt.models import Absence, Employment, Holiday
 from workbench.awt.reporting import (
     active_users,
     annual_working_time,
@@ -564,6 +564,50 @@ class AWTTest(TestCase):
                 "Annual working time warning - August 2021",
             ],
         )
+
+    def test_holiday_deduction(self):
+        """Holidays on weekdays reduce target; weekends and totals are correct"""
+        year = factories.YearFactory.create(year=2018)
+        user = factories.UserFactory.create(working_time_model=year.working_time_model)
+        Employment.objects.create(
+            user=user, date_from=dt.date(2018, 1, 1), percentage=100, vacation_weeks=5
+        )
+        wtm = year.working_time_model
+        # Tuesday — counts as 1 full public holiday day
+        Holiday.objects.create(
+            working_time_model=wtm,
+            date=dt.date(2018, 1, 2),
+            name="Public",
+            fraction=Decimal(1),
+            kind=Holiday.Kind.PUBLIC,
+        )
+        # Wednesday — counts as 0.5 company holiday day
+        Holiday.objects.create(
+            working_time_model=wtm,
+            date=dt.date(2018, 1, 3),
+            name="Company",
+            fraction=Decimal("0.5"),
+            kind=Holiday.Kind.COMPANY,
+        )
+        # Saturday — must not count
+        Holiday.objects.create(
+            working_time_model=wtm,
+            date=dt.date(2018, 1, 6),
+            name="Weekend",
+            fraction=Decimal(1),
+            kind=Holiday.Kind.PUBLIC,
+        )
+
+        awt = annual_working_time(2018, users=[user])["statistics"][0]
+
+        # target_days is the raw Year.months sum, unchanged by holidays
+        self.assertAlmostEqual(awt["totals"]["target_days"], Decimal(360))
+        # holiday totals only count weekday holidays
+        self.assertAlmostEqual(awt["totals"]["holiday_public"], Decimal(1))
+        self.assertAlmostEqual(awt["totals"]["holiday_company"], Decimal("0.5"))
+        # target hours: January reduced by 1.5 days, 11 months untouched
+        # (30 - 1.5) * 8 + 11 * 30 * 8 = 228 + 2640 = 2868
+        self.assertAlmostEqual(awt["totals"]["target"], Decimal(2868))
 
     def test_is_previous_month_locked_starting_today(self):
         """Examples of is_previous_month_locked_starting_today"""
