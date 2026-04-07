@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const RowContext = createContext()
 
-const FIRST_DATA_ROW = 3
 const FIRST_DATA_COLUMN = 6
 
 function months(weeks) {
@@ -53,8 +52,23 @@ function months(weeks) {
 
 function Planning({ data }) {
   const gridRef = useRef(null)
-  const rowCtx = {
-    __row: FIRST_DATA_ROW,
+
+  // Separate row contexts for the sticky header and the scrolling body.
+  // headerRowCtx starts at 3 so TotalByWeek/Capacity follow the 3 fixed
+  // week-header rows (month/week/period) inside the sticky header subgrid.
+  const headerRowCtx = {
+    __row: 3,
+    current() {
+      return this.__row
+    },
+    next() {
+      return ++this.__row
+    },
+  }
+  // bodyRowCtx drives rows in the outer grid; row 1 is the sticky header
+  // itself, so body content starts at row 2 (first next() returns 2).
+  const bodyRowCtx = {
+    __row: 1,
     current() {
       return this.__row
     },
@@ -79,22 +93,30 @@ function Planning({ data }) {
   }
 
   useLayoutEffect(() => {
-    gridRef.current.style.setProperty("--rows", rowCtx.current() - 2)
+    gridRef.current.style.setProperty("--rows", bodyRowCtx.current())
     gridRef.current.style.setProperty(
       "--first-project-row",
-      rowCtx.firstProjectRow,
+      bodyRowCtx.firstProjectRow,
     )
+
+    const navbar = document.querySelector(".navbar.sticky-top")
+    if (navbar) {
+      gridRef.current.style.setProperty(
+        "--navbar-height",
+        `${navbar.offsetHeight}px`,
+      )
+    }
 
     Array.from(document.querySelectorAll(".planning--title a")).forEach(
       (el) => {
         el.title = el.textContent
       },
     )
-    // biome-ignore lint/correctness/useExhaustiveDependencies: rowCtx is a plain object rebuilt on each render; effect must run every time
-  }, [rowCtx.current, rowCtx.firstProjectRow, rowCtx])
+    // biome-ignore lint/correctness/useExhaustiveDependencies: row contexts are plain objects rebuilt on each render; effect must run every time
+  }, [bodyRowCtx.current, bodyRowCtx.firstProjectRow, bodyRowCtx])
 
   return (
-    <RowContext.Provider value={rowCtx}>
+    <RowContext.Provider value={bodyRowCtx}>
       <div
         ref={gridRef}
         className={`planning${data.external_view ? " external" : ""}`}
@@ -102,11 +124,13 @@ function Planning({ data }) {
           "--weeks": data.weeks.length + 1,
         }}
       >
+        {/* Column stripe backgrounds — start at row 2 so they cover only the
+            body rows; the sticky header has its own solid background. */}
         {data.weeks.map((_, idx) => {
           return idx % 2 ? null : (
             <Cell
               key={idx}
-              row="1"
+              row="2"
               rowspan="-1"
               column={FIRST_DATA_COLUMN + idx}
               className="planning--stripe4"
@@ -116,56 +140,64 @@ function Planning({ data }) {
         {data.this_week_index === null ? null : (
           <Cell
             key="this_week_index"
-            row="1"
+            row="2"
             rowspan="-1"
             column={FIRST_DATA_COLUMN + data.this_week_index}
             className="planning--this-week"
           />
         )}
-        {months(data.weeks).map((month, idx) => (
-          <Cell
-            key={idx}
-            className="planning--scale text-center planning--small"
-            row={1}
-            column={FIRST_DATA_COLUMN + month.index}
-          >
-            <strong>{month.month}</strong>
-          </Cell>
-        ))}
-        {data.weeks.map((week, idx) => (
-          <Cell
-            key={idx}
-            className="planning--scale text-center planning--small"
-            row={2}
-            column={FIRST_DATA_COLUMN + idx}
-          >
-            {week.week}
-          </Cell>
-        ))}
-        {data.weeks.map((week, idx) => (
-          <Cell
-            key={idx}
-            className="planning--scale text-center planning--smaller"
-            row={3}
-            column={FIRST_DATA_COLUMN + idx}
-          >
-            {week.period}
-          </Cell>
-        ))}
 
-        {data.external_view || (
-          <>
-            <TotalByWeek
-              by_week={data.by_week}
-              title={gettext("Planned hours per week")}
-            />
-            <TotalByWeek
-              by_week={data.by_week_provisional}
-              title={gettext("Of which provisional")}
-            />
-            {data.capacity && <Capacity {...data.capacity} />}
-          </>
-        )}
+        {/* Sticky header — occupies outer grid row 1 and spans all columns.
+            Uses CSS subgrid so its children align with the outer columns.
+            A separate RowContext supplies row numbers relative to the header
+            subgrid instead of the outer grid. */}
+        <RowContext.Provider value={headerRowCtx}>
+          <div className="planning--sticky-header">
+            {months(data.weeks).map((month, idx) => (
+              <Cell
+                key={idx}
+                className="planning--scale text-center planning--small"
+                row={1}
+                column={FIRST_DATA_COLUMN + month.index}
+              >
+                <strong>{month.month}</strong>
+              </Cell>
+            ))}
+            {data.weeks.map((week, idx) => (
+              <Cell
+                key={idx}
+                className="planning--scale text-center planning--small"
+                row={2}
+                column={FIRST_DATA_COLUMN + idx}
+              >
+                {week.week}
+              </Cell>
+            ))}
+            {data.weeks.map((week, idx) => (
+              <Cell
+                key={idx}
+                className="planning--scale text-center planning--smaller"
+                row={3}
+                column={FIRST_DATA_COLUMN + idx}
+              >
+                {week.period}
+              </Cell>
+            ))}
+            {data.external_view || (
+              <>
+                <TotalByWeek
+                  by_week={data.by_week}
+                  title={gettext("Planned hours per week")}
+                />
+                <TotalByWeek
+                  by_week={data.by_week_provisional}
+                  title={gettext("Of which provisional")}
+                />
+                {data.capacity && <Capacity {...data.capacity} />}
+              </>
+            )}
+          </div>
+        </RowContext.Provider>
 
         {data.projects_offers.map((project) => (
           <Project
@@ -194,7 +226,7 @@ function TotalByWeek({ by_week, title }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-end pe-2"
+        className="planning--scale planning--row-label text-end pe-2"
       >
         <strong>{title}</strong>
       </Cell>
@@ -225,7 +257,7 @@ function Capacity({ total, by_user }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-end pe-2"
+        className="planning--scale planning--row-label text-end pe-2"
       >
         <strong>{gettext("Remaining capacity per week")}</strong>
       </Cell>
@@ -262,7 +294,7 @@ function UserCapacity({ user, capacity }) {
         row={row}
         column={1}
         colspan={`span ${FIRST_DATA_COLUMN - 1}`}
-        className="planning--scale text-end pe-2"
+        className="planning--scale planning--row-label text-end pe-2"
         tag="a"
         href={user.url}
       >

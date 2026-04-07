@@ -51,8 +51,30 @@
       var(--weeks),
       var(--week-width)
     );
-  grid-template-rows: 14px 16px 16px repeat(var(--rows), var(--default-height));
+  grid-template-rows: auto repeat(var(--rows), var(--default-height));
   font-size: 14px;
+}
+
+.planning--sticky-header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: subgrid;
+  // First three rows match the compact week-header sizes; remaining rows
+  // (summary rows) use the standard row height.
+  grid-template-rows: 14px 16px 16px;
+  grid-auto-rows: var(--default-height);
+  position: sticky;
+  top: var(--navbar-height, 0px);
+  z-index: 5;
+  background-color: var(--bs-body-bg);
+}
+
+.planning--row-label {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: var(--bs-body-bg);
 }
 
 .planning--title {
