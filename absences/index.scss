@@ -22,6 +22,7 @@ $popup-width: 12rem;
 
 $z-index: (
   "popup": 100,
+  "scale": 15,
   "person-column": 10,
 );
 
@@ -126,9 +127,23 @@ $z-index: (
     calc(var(--day-count) * ((var(--day-column-width) + var(--grid-gap)))) 100%;
 }
 
-.absences__scale-tick {
-  grid-row: scale / span 1;
+.absences__scale {
+  @include z-index("scale");
 
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+
+  position: sticky;
+  top: var(--navbar-height, 0px);
+  background-color: $white;
+}
+
+[data-bs-theme="dark"] .absences__scale {
+  background-color: #1a1a1a;
+}
+
+.absences__scale-tick {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;

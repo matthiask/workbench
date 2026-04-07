@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react"
 
 const { gettext, interpolate } = window
 
@@ -24,6 +24,18 @@ const MONTHS = [
 ].map((m) => gettext(m))
 
 export const Absences = ({ absencesByPerson, dateList, reasonList }) => {
+  const wrapperRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const navbar = document.querySelector(".navbar.sticky-top")
+    if (navbar && wrapperRef.current) {
+      wrapperRef.current.style.setProperty(
+        "--navbar-height",
+        `${navbar.offsetHeight}px`,
+      )
+    }
+  }, [])
+
   const scaleValues = useMemo(
     () =>
       dateList.reduce((acc, date) => {
@@ -75,7 +87,7 @@ export const Absences = ({ absencesByPerson, dateList, reasonList }) => {
         `}
       </style>
       <Legend reasons={reasonList} />
-      <div className="absences">
+      <div className="absences" ref={wrapperRef}>
         <Scale scaleValues={scaleValues} />
         <Now />
         {absencesByPerson.map((person) => (
@@ -161,7 +173,7 @@ const Popup = ({ absence }) => {
 
 const Scale = ({ scaleValues }) => {
   return (
-    <React.Fragment>
+    <div className="absences__scale" style={{ gridRow: "scale / span 1" }}>
       {scaleValues.map((entry) => {
         const style = {
           gridColumn: `${getColumnName(entry.date)} / span 1`,
@@ -180,7 +192,7 @@ const Scale = ({ scaleValues }) => {
           </div>
         )
       })}
-    </React.Fragment>
+    </div>
   )
 }
 
