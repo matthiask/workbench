@@ -5,8 +5,32 @@ from django.conf import settings
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.awt.holidays import get_public_holidays, get_zurich_holidays
+from workbench.awt.models import Holiday, WorkingTimeModel
 from workbench.awt.reporting import annual_working_time_warnings
 from workbench.tools.validation import logbook_lock
+
+
+def create_holidays():
+    today = dt.date.today()
+    for wtm in WorkingTimeModel.objects.all():
+        for year in range(today.year, today.year + 3):
+            if Holiday.objects.filter(date__year=year, working_time_model=wtm).exists():
+                continue
+            days = get_public_holidays(year)
+            days.update(get_zurich_holidays(year))
+            Holiday.objects.bulk_create(
+                [
+                    Holiday(
+                        date=date,
+                        name=name,
+                        fraction=fraction,
+                        working_time_model=wtm,
+                    )
+                    for date, (name, fraction) in days.items()
+                ],
+                ignore_conflicts=True,
+            )
 
 
 def is_previous_month_locked_starting_today():

@@ -21,23 +21,6 @@ from workbench.tools.validation import monday, raise_if_errors
 
 
 @model_urls
-class PublicHoliday(Model):
-    date = models.DateField(_("date"), unique=True)
-    name = models.CharField(_("name"), max_length=200)
-    fraction = models.DecimalField(
-        _("fraction of day which is free"), default=1, max_digits=5, decimal_places=2
-    )
-
-    class Meta:
-        ordering = ["-date"]
-        verbose_name = _("public holiday")
-        verbose_name_plural = _("public holidays")
-
-    def __str__(self):
-        return f"{self.name} ({local_date_format(self.date, fmt='l, j.n.')})"
-
-
-@model_urls
 class Milestone(Model):
     open_in_modal = True
 

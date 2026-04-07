@@ -2,13 +2,6 @@ from workbench.planning import models
 from workbench.tools import admin
 
 
-@admin.register(models.PublicHoliday)
-class PublicHolidayAdmin(admin.ReadWriteModelAdmin):
-    date_hierarchy = "date"
-    list_display = ["date", "name", "fraction"]
-    list_filter = ["name"]
-
-
 @admin.register(models.Milestone)
 class MilestoneAdmin(admin.ModelAdmin):
     list_display = ["project", "date", "title"]

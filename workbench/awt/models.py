@@ -235,6 +235,43 @@ class Absence(Model):
         return f"{local_date_format(self.starts_on)} - {local_date_format(self.ends_on or self.starts_on)}"
 
 
+@model_urls
+class Holiday(Model):
+    class Kind(models.TextChoices):
+        PUBLIC = "public", _("public holiday")
+        COMPANY = "company", _("company holiday")
+
+    working_time_model = models.ForeignKey(
+        WorkingTimeModel,
+        on_delete=models.CASCADE,
+        verbose_name=_("working time model"),
+        related_name="holidays",
+    )
+    date = models.DateField(_("date"))
+    name = models.CharField(_("name"), max_length=200)
+    fraction = models.DecimalField(
+        _("fraction of day which is free"),
+        default=1,
+        max_digits=5,
+        decimal_places=2,
+    )
+    kind = models.CharField(
+        _("kind"),
+        max_length=10,
+        choices=Kind.choices,
+        default=Kind.PUBLIC,
+    )
+
+    class Meta:
+        ordering = ["-date"]
+        unique_together = [("working_time_model", "date", "kind")]
+        verbose_name = _("holiday")
+        verbose_name_plural = _("holidays")
+
+    def __str__(self):
+        return f"{self.name} ({local_date_format(self.date, fmt='l, j.n.')})"
+
+
 class VacationDaysOverride(models.Model):
     class Type(models.TextChoices):
         ABSOLUTE = "absolute", _("absolute")

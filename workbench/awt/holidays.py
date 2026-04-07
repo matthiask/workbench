@@ -2,9 +2,6 @@
 
 import datetime as dt
 from decimal import Decimal as D
-from urllib.request import urlopen
-
-import bs4
 
 
 # ----------------------------------------------------------------------------#
@@ -159,42 +156,39 @@ def get_public_holidays(year):
     }
 
 
-def get_zurich_holidays():
-    sources = {
-        "Knabenschiessen": [
-            "https://www.feiertagskalender.ch/kalender.php?geo=3055&jahr=2026&klasse=4&ft_id=60&hl=de",
-            D("0.5"),
-        ],
-        "Sechseläuten": [
-            "https://www.feiertagskalender.ch/kalender.php?geo=3055&jahr=2026&klasse=4&ft_id=20&hl=de",
-            D("0.5"),
-        ],
+def _nth_weekday(year, month, weekday, n):
+    """Return the nth occurrence of weekday (0=Mon … 6=Sun) in the given month."""
+    first = dt.date(year, month, 1)
+    first_occurrence = first + dt.timedelta(days=(weekday - first.weekday()) % 7)
+    return first_occurrence + dt.timedelta(weeks=n - 1)
+
+
+def get_zurich_holidays(year):
+    """
+    Return Sechseläuten and Knabenschiessen for the given year.
+
+    - Sechseläuten: 3rd Monday of April, moved to the 4th Monday if it falls
+      on Easter Monday.
+    - Knabenschiessen: Monday after the 2nd Saturday of September
+      (the Saturday marks the start of the festival weekend)
+    """
+    easter_monday = EasterDay(year).get_date() + dt.timedelta(days=1)
+    sechselaeuten = _nth_weekday(year, 4, 0, 3)
+    if sechselaeuten == easter_monday:
+        sechselaeuten = _nth_weekday(year, 4, 0, 4)
+    knabenschiessen = _nth_weekday(year, 9, 5, 2) + dt.timedelta(days=2)
+    return {
+        sechselaeuten: ["Sechseläuten", D("0.5")],
+        knabenschiessen: ["Knabenschiessen", D("0.5")],
     }
-
-    days = {}
-
-    for name, (url, fraction) in sources.items():
-        with urlopen(url) as response:
-            html = response.read()
-            soup = bs4.BeautifulSoup(html, "lxml")
-
-            cells = soup.select("table.table-striped tr td:first-child")
-            for cell in cells:
-                try:
-                    day = dt.datetime.strptime(cell.text, "%d.%m.%Y").date()
-                except ValueError:
-                    continue
-
-                days[day] = [name, fraction]
-
-    return days
 
 
 if __name__ == "__main__":
     year = dt.date.today().year
 
-    days = get_zurich_holidays()
-    for i in range(year, year + 3):
+    days = {}
+    for i in range(year - 1, year + 3):
+        days |= get_zurich_holidays(i)
         days |= get_public_holidays(i)
     print(
         "\n".join(

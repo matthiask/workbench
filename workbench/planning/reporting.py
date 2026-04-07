@@ -260,7 +260,7 @@ select
     fraction,
     percentage
 
-from planning_publicholiday ph
+from awt_holiday ph
 left outer join lateral (
     select
         user_id,
@@ -301,7 +301,7 @@ order by ph.date
             self._absences[user][idx].append((
                 ph_hours,
                 f"{name} ({detail} = {hours(ph_hours)})",
-                reverse("planning_publicholiday_detail", kwargs={"pk": id}),
+                reverse("awt_holiday_detail", kwargs={"pk": id}),
             ))
             self._by_week[week] += ph_hours
 
@@ -527,7 +527,7 @@ left outer join lateral(
     select
       date_trunc('week', date) as ph_week,
       sum(fraction) as ph_days
-    from planning_publicholiday
+    from awt_holiday
     where extract(dow from date) between 1 and 6
     group by ph_week
 ) as public_holidays

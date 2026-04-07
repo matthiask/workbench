@@ -11,7 +11,13 @@ from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import SpecialistField, Team, User
-from workbench.awt.models import Absence, Employment, VacationDaysOverride, Year
+from workbench.awt.models import (
+    Absence,
+    Employment,
+    Holiday,
+    VacationDaysOverride,
+    Year,
+)
 from workbench.contacts.models import (
     EmailAddress,
     Organization,
@@ -34,7 +40,6 @@ from workbench.planning.models import (
     ExternalWork,
     Milestone,
     PlannedWork,
-    PublicHoliday,
 )
 from workbench.projects.models import (
     Campaign,
@@ -532,7 +537,7 @@ HISTORY = {
     Offer: _offers_offer_cfg,
     PlannedWork: {"fields": EVERYTHING},
     ExternalWork: {"fields": EVERYTHING},
-    PublicHoliday: {"fields": EVERYTHING},
+    Holiday: {"fields": EVERYTHING},
     Milestone: {"fields": EVERYTHING},
     Campaign: _projects_campaign_cfg,
     Project: _projects_project_cfg,

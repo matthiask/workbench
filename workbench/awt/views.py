@@ -46,12 +46,20 @@ def annual_working_time_view(request):
     if request.GET.get("export") == "pdf":
         return annual_working_time_pdf(statistics)
 
+    # Deduplicated holiday data per WTM for modal rendering.
+    wtm_holiday_data = {}
+    for s in statistics["statistics"]:
+        wtm_id = s["months"]["year"].working_time_model_id
+        if wtm_id not in wtm_holiday_data:
+            wtm_holiday_data[wtm_id] = s
+
     return render(
         request,
         "awt/year_detail.html",
         {
             "overall": statistics["overall"],
             "statistics": statistics["statistics"],
+            "wtm_holiday_data": wtm_holiday_data,
             "object": year,
             "year": year,
             "years": sorted(
@@ -65,6 +73,8 @@ def annual_working_time_view(request):
             "view": {"meta": Year._meta},
             "is_last_year": year == this_year - 1,
             "this_year": this_year,
+            "has_public_holidays": statistics["has_public_holidays"],
+            "has_company_holidays": statistics["has_company_holidays"],
         },
     )
 

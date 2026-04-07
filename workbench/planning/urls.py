@@ -14,7 +14,6 @@ from workbench.planning.models import (
     ExternalWork,
     Milestone,
     PlannedWork,
-    PublicHoliday,
 )
 from workbench.projects.models import Project
 
@@ -135,11 +134,5 @@ urlpatterns = [
             model=ExternalWork, template_name="modal_confirm_delete.html"
         ),
         name="planning_externalwork_delete",
-    ),
-    # Public holidays
-    path(
-        "ph/<int:pk>/",
-        generic.DetailView.as_view(model=PublicHoliday),
-        name="planning_publicholiday_detail",
     ),
 ]

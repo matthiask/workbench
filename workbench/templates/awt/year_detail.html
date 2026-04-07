@@ -75,6 +75,58 @@
           </tr>
         </table>
       {% endif %}
+      {% for wtm_id, data in wtm_holiday_data.items %}
+        {% if data.has_public_holidays %}
+          <div class="modal fade" id="holiday-public-modal-{{ wtm_id }}">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">{% translate 'public holiday days' %} {{ year }}</h5>
+                </div>
+                <div class="modal-body">
+                  <table class="table table-sm">
+                    {% for h in data.holiday_list %}{% if h.kind == "public" %}
+                      <tr>
+                        <td>{{ h.date|local_date_format }}</td>
+                        <td>{{ h.name }}</td>
+                        <td class="text-end">{{ h.fraction|days }}</td>
+                      </tr>
+                    {% endif %}{% endfor %}
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+        {% if data.has_company_holidays %}
+          <div class="modal fade" id="holiday-company-modal-{{ wtm_id }}">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">{% translate 'company holiday days' %} {{ year }}</h5>
+                </div>
+                <div class="modal-body">
+                  <table class="table table-sm">
+                    {% for h in data.holiday_list %}{% if h.kind == "company" %}
+                      <tr>
+                        <td>{{ h.date|local_date_format }}</td>
+                        <td>{{ h.name }}</td>
+                        <td class="text-end">{{ h.fraction|days }}</td>
+                      </tr>
+                    {% endif %}{% endfor %}
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
       {% for data in statistics %}
         {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
           <h2 class="mt-5">
@@ -102,6 +154,28 @@
                 {{ totals.target_days|days }}
               </th>
             </tr>
+            {% if data.has_public_holidays %}
+            <tr>
+              <th class="text-nowrap">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#holiday-public-modal-{{ stats.year.working_time_model_id }}">{% translate 'public holiday days' %}</a>
+              </th>
+              {% for value in stats.holiday_public %}
+                <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
+              {% endfor %}
+              <th class="text-end">{{ totals.holiday_public|days }}</th>
+            </tr>
+            {% endif %}
+            {% if data.has_company_holidays %}
+            <tr>
+              <th class="text-nowrap">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#holiday-company-modal-{{ stats.year.working_time_model_id }}">{% translate 'company holiday days' %}</a>
+              </th>
+              {% for value in stats.holiday_company %}
+                <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
+              {% endfor %}
+              <th class="text-end">{{ totals.holiday_company|days }}</th>
+            </tr>
+            {% endif %}
             <tr>
               <th class="text-nowrap">
                 {% translate 'pensum' %}

@@ -17,7 +17,11 @@ def annual_working_time_pdf(statistics):
 
     if len(statistics["statistics"]) == 1:
         response = HttpResponse(
-            user_stats_pdf(statistics["statistics"][0]), content_type="application/pdf"
+            user_stats_pdf(
+                statistics["statistics"][0],
+                holiday_list=statistics.get("holiday_list", []),
+            ),
+            content_type="application/pdf",
         )
         user = statistics["statistics"][0]["user"]
         response["Content-Disposition"] = (
@@ -33,21 +37,47 @@ def annual_working_time_pdf(statistics):
                         slugify(data["user"].get_full_name()),
                         data["months"]["year"].year,
                     ),
-                    user_stats_pdf(data),
+                    user_stats_pdf(data, holiday_list=data.get("holiday_list", [])),
                 )
+            has_holidays = statistics.get("has_holidays", False)
             xlsx = WorkbenchXLSXDocument()
             xlsx.add_sheet(_("running net work hours"))
             xlsx.table(
                 [""]
                 + [date_format(day, "M") for day in data["months"]["months"]]
+                + (
+                    [_("public holiday days"), _("company holiday days")]
+                    if has_holidays
+                    else []
+                )
                 + [_("vacation days credit")],
                 [
-                    [data["user"].get_full_name()]
-                    + data["running_sums"]
-                    + [data["totals"]["vacation_days_credit"]]
-                    for data in statistics["statistics"]
+                    [d["user"].get_full_name()]
+                    + d["running_sums"]
+                    + (
+                        [d["totals"]["holiday_public"], d["totals"]["holiday_company"]]
+                        if has_holidays
+                        else []
+                    )
+                    + [d["totals"]["vacation_days_credit"]]
+                    for d in statistics["statistics"]
                 ],
             )
+            # Collect all distinct holidays across WTMs (deduplicated by pk).
+            seen = {}
+            for d in statistics["statistics"]:
+                for h in d.get("holiday_list", []):
+                    seen.setdefault(h.pk, h)
+            all_holidays = sorted(seen.values(), key=lambda h: h.date)
+            if all_holidays:
+                xlsx.add_sheet(_("holidays"))
+                xlsx.table(
+                    [_("date"), _("name"), _("kind"), _("days")],
+                    [
+                        [h.date, h.name, h.get_kind_display(), h.fraction]
+                        for h in all_holidays
+                    ],
+                )
             with io.BytesIO() as x:
                 xlsx.workbook.save(x)
                 zf.writestr("statistics.xlsx", x.getvalue())
@@ -56,7 +86,7 @@ def annual_working_time_pdf(statistics):
         return response
 
 
-def user_stats_pdf(data):
+def user_stats_pdf(data, *, holiday_list=None):
     with io.BytesIO() as buf:
         pdf = PDFDocument(buf, font_size=7)
         pdf.init_report()
@@ -101,6 +131,24 @@ def user_stats_pdf(data):
                     f"{override.notes} ({override.pretty_days})",
                     days(data["totals"]["available_vacation_days"]),
                 ]
+            )
+        if data["totals"]["holiday_public"]:
+            table.append(
+                [_("public holiday days")]
+                + [
+                    days(value) if value else ""
+                    for value in data["months"]["holiday_public"]
+                ]
+                + [days(data["totals"]["holiday_public"])]
+            )
+        if data["totals"]["holiday_company"]:
+            table.append(
+                [_("company holiday days")]
+                + [
+                    days(value) if value else ""
+                    for value in data["months"]["holiday_company"]
+                ]
+                + [days(data["totals"]["holiday_company"])]
             )
         table.extend((
             [
@@ -239,6 +287,25 @@ def user_stats_pdf(data):
                     (*awt_table_style, ("ALIGN", (0, 0), (-1, -1), "LEFT")),
                 )
                 pdf.spacer()
+
+        if holiday_list:
+            pdf.table(
+                [
+                    [_("date"), _("name"), _("kind"), _("days")],
+                    *[
+                        [
+                            local_date_format(h.date),
+                            h.name,
+                            h.get_kind_display(),
+                            days(h.fraction),
+                        ]
+                        for h in holiday_list
+                    ],
+                ],
+                pdf.table_columns((25 * mm, None, 25 * mm, 15 * mm)),
+                (*awt_table_style, ("ALIGN", (0, 0), (-1, -1), "LEFT")),
+            )
+            pdf.spacer()
 
         pdf.p(_("Generated on %(day)s") % {"day": local_date_format(dt.date.today())})
 

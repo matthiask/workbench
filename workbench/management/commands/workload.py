@@ -8,10 +8,10 @@ from django.core.management import BaseCommand
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
-from workbench.awt.models import Absence
+from workbench.awt.models import Absence, Holiday
 from workbench.awt.reporting import employment_percentages
 from workbench.invoices.utils import recurring
-from workbench.planning.models import PlannedWork, PublicHoliday
+from workbench.planning.models import PlannedWork
 from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                 hours_per_week_and_user[week][pw.user][type] += hours
 
         ep = employment_percentages(until_year=end.year)
-        for ph in PublicHoliday.objects.filter(date__range=[start, end]):
+        for ph in Holiday.objects.filter(date__range=[start, end]):
             week = monday(ph.date)
             month = ph.date.replace(day=1)
             for user in users:
