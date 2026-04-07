@@ -84,20 +84,22 @@ class Command(BaseCommand):
             help="Compare stored Year.months values against computed weekday counts and exit",
         )
 
-    def _check(self, years_to_check, all_holidays, wtms):
+    def _check(self, years_to_check, wtms):
         month_names = Year.MONTHS
         for year in years_to_check:
             weekdays = weekdays_per_month(year)
             for wtm in wtms:
-                holiday_deltas = [Z] * 12
-                for date, (_name, fraction) in all_holidays[year].items():
-                    if date.weekday() < 5:
-                        holiday_deltas[date.month - 1] += fraction
-                expected = [weekdays[i] - holiday_deltas[i] for i in range(12)]
-
                 db_years = list(Year.objects.filter(year=year, working_time_model=wtm))
                 if not db_years:
                     continue
+
+                holiday_deltas = [Z] * 12
+                for h in Holiday.objects.filter(
+                    date__year=year, working_time_model=wtm
+                ):
+                    if h.date.weekday() < 5:
+                        holiday_deltas[h.date.month - 1] += h.fraction
+                expected = [weekdays[i] - holiday_deltas[i] for i in range(12)]
 
                 for db_year in db_years:
                     stored = db_year.months
@@ -139,7 +141,7 @@ class Command(BaseCommand):
         wtms = list(WorkingTimeModel.objects.filter(id__in=wtm_ids))
 
         if options["check"]:
-            self._check(years_to_check, all_holidays, wtms)
+            self._check(years_to_check, wtms)
             return
 
         if options["dry_run"]:
