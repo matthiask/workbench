@@ -21,7 +21,7 @@ cost discussions.
 
 | Field | Type | Notes |
 |---|---|---|
-| `Estimate` | Number | Hours estimate — synced to workbench `Service.effort_hours` |
+| `Estimate` | Number | Hours estimate — read from board; written by `github_create_offer_issues` |
 
 Other fields (`Status`, `Happy Date`, `Annotations`, etc.) are available but not currently
 used by the report.
@@ -39,7 +39,9 @@ individually via the Issues API using `_fetch_issues_batch`; their estimate is t
 
 ### Workbench
 
-- `Service` — linked to a GitHub issue URL via `description` (substring match)
+- `Service` — linked to a GitHub issue URL via `external_reference` (exact match) or
+  `description` (substring match, legacy fallback)
+- `Service.external_reference` — always-editable URL field; set by `github_create_offer_issues`
 - `Service.effort_hours` — synced from the GitHub `Estimate` field
 - `Service.offer` — FK to `Offer`; `None` if not yet in any offer
 - `Offer.status` — `ACCEPTED`, `DECLINED`, `REPLACED`, `SENT`, `IN_PREPARATION`
@@ -49,37 +51,53 @@ individually via the Issues API using `_fetch_issues_batch`; their estimate is t
 
 ## Classification: Offered vs. Additional
 
-### Why project board fields don't work
+### Primary mechanism: issue created from service
 
-- GitHub's audit log **does not expose project field change history** — confirmed:
-  `ProjectV2ItemFieldValueUpdatedAuditEntry` and `ProjectV2ItemFieldValueUpdatedEvent`
-  do not exist in the schema.
-- Offers are created early, often before GitHub issues exist; classification is decided later.
-- The customer has GitHub access but no workbench access — they need to participate in
-  classification, but a project field gives no attribution.
+When an offer is accepted, the PM runs `github_create_offer_issues` to create one GitHub
+issue per service. This issue is the anchor for that service on the board:
+- Created in the appropriate repository
+- Added to the project board automatically
+- "Estimate" field set from `Service.effort_hours`
+- Issue URL written back to `Service.external_reference` for matching
 
-### Labels as the solution
+Team members then create sub-issues under the service issue for detailed work. The
+**parent → child hierarchy expresses the billing structure**: an issue whose root ancestor
+is a service issue linked to an accepted offer is classified as `angeboten`. A top-level
+issue with no such ancestor is `zusätzlich`.
 
-**Issue labels are auditable.** The `LabeledEvent` in an issue's timeline records the actor
-login and timestamp. This gives us attribution for free: we can see who applied the label
-and when, whether that was a team member or the customer.
+### Why labels alone don't work
 
-**Labels in use:**
-- `angeboten` — covered by an existing offer
-- `zusätzlich` — additional work, to be billed separately
+- GitHub's audit log **does not expose project field change history.**
+- Service descriptions on accepted offers are **read-only** — the URL-in-description
+  matching strategy can't be applied retroactively.
+- Labels require manual upkeep; the hierarchy is structural and emerges naturally.
 
-### Integration with workbench
+### Labels as an override
 
-Labels are the input signal; workbench offer linkage is authoritative for billing.
+The labels `angeboten` and `zusätzlich` are still used, but only as an **explicit override**
+when the structural classification is wrong — e.g. an issue that grew beyond the scope of
+its parent service should be labeled `zusätzlich` to signal additional billing, even though
+it lives in the tree under a service issue.
 
-| GitHub label | `Service.offer` status | Display |
+| Structural classification | Label override | Final display |
 |---|---|---|
-| `angeboten` | `ACCEPTED` | `angeboten` |
-| `angeboten` | other / None | `angeboten (Angebot ausstehend)` |
-| (none) | `ACCEPTED` | `angeboten ⚠ label fehlt` |
-| `zusätzlich` | any | `zusätzlich` |
-| `zusätzlich` | `DECLINED` | `zusätzlich (Angebot abgelehnt)` |
-| (none) | None | `—` |
+| parent is accepted-offer service | — | `angeboten` |
+| parent is accepted-offer service | `zusätzlich` | `zusätzlich` (override) |
+| no service ancestor | — | `zusätzlich` |
+| no service ancestor | `angeboten` | `angeboten (Angebot ausstehend)` |
+
+### Service ↔ issue matching
+
+Two mechanisms are used, in priority order:
+
+1. **`Service.external_reference`** — exact URL match. Set by `github_create_offer_issues`
+   when creating issues from services. Always editable regardless of offer status, so it can
+   be updated even for services on accepted offers (where the description is read-only).
+2. **URL in `Service.description`** — substring match of the GitHub issue URL. Legacy
+   fallback for manually linked services and data predating `external_reference`.
+
+For archived issues (auto-archived after ~2 weeks on the board), the report batch-fetches
+them directly from the Issues API using URLs found in `external_reference` or descriptions.
 
 ---
 
@@ -144,17 +162,26 @@ links get no warning.
 - `workbench/projects/github_cost_allocation.py` — core module:
   - `fetch_project_items(project_url)` — paginates the project board, builds `IssueNode`
     list, fetches billing label attribution.
-  - `_fetch_issues_batch(refs, headers)` — batch-fetches issues not on the board (archived)
-    via a single aliased GraphQL query grouped by repo.
+  - `_fetch_archived(issues, github_services, ...)` — batch-fetches issues for unmatched
+    services; appends them to the issue list with estimates from `Service.effort_hours`.
+  - `_fetch_issues_batch(refs, headers)` — single aliased GraphQL query per repo for
+    bulk issue fetching.
   - `build_tree(issues, app_repos)` — resolves parent-child links, groups into `RepoGroup`
     list.
   - `join_with_workbench(issues)` — matches issues to workbench services, fetches archived
     issues for unmatched services, returns unmatched services grouped by project.
   - `billing_classification(issue)` — derives display string from label + offer state.
 
-- `workbench/management/commands/github_cost_allocation.py` — management command:
+- `workbench/management/commands/github_cost_allocation.py` — report command:
   - `--project-url` to override `settings.GITHUB_PROJECT_URLS[0]`
   - `--output FILE.xlsx` for XLSX output; defaults to stdout tree
+  - `--mailto EMAIL[,EMAIL]` to send the XLSX by email
+
+- `workbench/management/commands/github_create_offer_issues.py` — issue creation command:
+  - `<offer_pk> --repo REPO_NAME` required arguments
+  - Creates one GitHub issue per service, adds to project board, sets Workbench + Estimate fields
+  - Writes issue URL back to `Service.description` for fallback matching
+  - `--dry-run` to preview without API calls
 
 - `github-actions/.github/workflows/` — org-level GitHub Actions:
   - `add-to-project.yml` — adds issues/PRs to the project board

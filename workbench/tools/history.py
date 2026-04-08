@@ -455,6 +455,7 @@ def _projects_service_cfg(user):
         "created_at",
         "title",
         "description",
+        "external_reference",
         "service_hours",
         "project",
         "offer",

@@ -49,6 +49,7 @@ class IssueNode:
     # Workbench data (filled in by join_with_workbench)
     service: object = None  # projects.Service or None
     logged_hours: Decimal = Z1
+    monthly_hours: dict = field(default_factory=dict)  # {"YYYY-MM": Decimal}
     offer: object = None  # offers.Offer or None
 
 
@@ -86,6 +87,139 @@ def _get_project_id(org, number, headers):
         headers,
     )
     return data["organization"]["projectV2"]["id"]
+
+
+def _get_repo_id(owner, repo, headers):
+    data = _gql(
+        """
+        query($owner: String!, $repo: String!) {
+          repository(owner: $owner, name: $repo) { id }
+        }
+        """,
+        {"owner": owner, "repo": repo},
+        headers,
+    )
+    return data["repository"]["id"]
+
+
+def create_issue_on_project(
+    owner: str,
+    repo: str,
+    project_url: str,
+    title: str,
+    body: str,
+    estimate: float | None,
+    *,
+    dry_run: bool = False,
+) -> str | None:
+    """
+    Create a GitHub issue in the given repo, add it to the project board,
+    and set the Estimate field.
+
+    Returns the created issue URL, or None on failure.
+    """
+    from workbench.projects.github import extract_project_info
+
+    token = getattr(settings, "GITHUB_API_TOKEN", "")
+    if not token:
+        logger.error("GITHUB_API_TOKEN not set")
+        return None
+
+    headers = {"Authorization": f"token {token}"}
+    proj_org, _proj_repo, number_str = extract_project_info(project_url)
+    if not proj_org or not number_str:
+        logger.error("Could not parse project URL: %s", project_url)
+        return None
+
+    if dry_run:
+        logger.info("[dry-run] would create issue %r in %s/%s", title, owner, repo)
+        return None
+
+    repo_id = _get_repo_id(owner, repo, headers)
+    project_id = _get_project_id(proj_org, int(number_str), headers)
+
+    # Create issue
+    issue_data = _gql(
+        """
+        mutation($repoId: ID!, $title: String!, $body: String!) {
+          createIssue(input: {repositoryId: $repoId, title: $title, body: $body}) {
+            issue { id url }
+          }
+        }
+        """,
+        {"repoId": repo_id, "title": title, "body": body},
+        headers,
+    )
+    issue = issue_data.get("createIssue", {}).get("issue")
+    if not issue:
+        logger.error("Failed to create issue %r", title)
+        return None
+    issue_id = issue["id"]
+    issue_url = issue["url"]
+
+    # Add to project board
+    item_data = _gql(
+        """
+        mutation($projectId: ID!, $contentId: ID!) {
+          addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+            item { id }
+          }
+        }
+        """,
+        {"projectId": project_id, "contentId": issue_id},
+        headers,
+    )
+    item_id = item_data.get("addProjectV2ItemById", {}).get("item", {}).get("id")
+    if not item_id:
+        logger.error("Failed to add issue to project board: %s", issue_url)
+        return issue_url
+
+    # Set Estimate field
+    if estimate:
+        field_ids = _get_estimate_field_id(project_id, headers)
+        if field_ids:
+            _gql(
+                """
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: Float!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId, itemId: $itemId, fieldId: $fieldId,
+                    value: { number: $value }
+                  }) { projectV2Item { id } }
+                }
+                """,
+                {
+                    "projectId": project_id,
+                    "itemId": item_id,
+                    "fieldId": field_ids,
+                    "value": float(estimate),
+                },
+                headers,
+            )
+
+    return issue_url
+
+
+def _get_estimate_field_id(project_id, headers):
+    """Return the field ID of the Estimate (hours) field on the project board, or None."""
+    data = _gql(
+        """
+        query($projectId: ID!) {
+          node(id: $projectId) {
+            ... on ProjectV2 {
+              fields(first: 30) {
+                nodes { ... on ProjectV2FieldCommon { id name } }
+              }
+            }
+          }
+        }
+        """,
+        {"projectId": project_id},
+        headers,
+    )
+    for n in data["node"]["fields"]["nodes"]:
+        if n and any(t in n["name"].lower() for t in ["estimate", "hour"]):
+            return n["id"]
+    return None
 
 
 _ITEMS_QUERY = """
@@ -192,12 +326,11 @@ def fetch_project_items(project_url: str) -> list[IssueNode]:
         # Extract estimate from field values
         estimate = None
         for fv in item.get("fieldValues", {}).get("nodes", []):
+            if "number" not in fv:
+                continue
             fname = fv.get("field", {}).get("name", "").lower()
-            if "number" in fv and any(
-                t in fname for t in ["hour", "estimate", "time", "duration"]
-            ):
+            if any(t in fname for t in ["hour", "estimate", "time", "duration"]):
                 estimate = Decimal(str(fv["number"]))
-                break
 
         labels = [n["name"] for n in content.get("labels", {}).get("nodes", [])]
         billing_label = next((lb for lb in labels if lb in BILLING_LABELS), None)
@@ -412,18 +545,23 @@ def build_tree(
     return sorted(repo_groups.values(), key=lambda g: g.repo)
 
 
-def _fetch_archived(issues, github_services, matched_ids, logged, headers):
+def _fetch_archived(
+    issues, github_services, matched_ids, logged, monthly_by_service, headers
+):
     """Batch-fetch issues not on the project board (e.g. archived) and append to issues."""
     known_urls = {issue.url.lower() for issue in issues}
     ref_to_service = {}
     for service in github_services:
         if service.id in matched_ids:
             continue
-        m = _ISSUE_URL_RE.search(service.description)
+        # Prefer external_reference (primary), fall back to description (legacy)
+        candidate = service.external_reference or service.description or ""
+        m = _ISSUE_URL_RE.search(candidate)
         if not m:
             continue
         if m.group(0).lower() in known_urls:
-            continue  # URL known but not matched — skip
+            matched_ids.add(service.id)  # issue is on the board; exclude from unmatched
+            continue
         key = (m.group("owner"), m.group("repo"), int(m.group("number")))
         if key not in ref_to_service:  # first service wins; deduplicates refs
             ref_to_service[key] = service
@@ -439,6 +577,7 @@ def _fetch_archived(issues, github_services, matched_ids, logged, headers):
             node.estimate = service.effort_hours
             node.service = service
             node.logged_hours = logged.get(service.id, Z1)
+            node.monthly_hours = dict(monthly_by_service.get(service.id, {}))
             node.offer = service.offer
             matched_ids.add(service.id)
         issues.append(node)
@@ -460,38 +599,83 @@ def join_with_workbench(
     """
     from collections import defaultdict
 
+    from django.db.models.functions import TruncMonth
+
     from workbench.logbook.models import LoggedHours
     from workbench.projects.models import Service
 
     token = getattr(settings, "GITHUB_API_TOKEN", "")
     headers = {"Authorization": f"token {token}"} if token else {}
 
+    # Load all services that have a GitHub URL (via external_reference or description).
+    # These define the scope: other services from the same projects become "unmatched".
+    from django.db.models import Q
+
     github_services = list(
-        Service.objects.filter(description__icontains="github.com").select_related(
-            "offer", "project__owned_by"
-        )
+        Service.objects.filter(
+            Q(external_reference__icontains="github.com")
+            | Q(description__icontains="github.com")
+        ).select_related("offer", "project__owned_by")
     )
+    all_services_by_id = {
+        s.id: s
+        for s in Service.objects.select_related("offer", "project__owned_by").filter(
+            project__in={s.project_id for s in github_services}
+        )
+    }
+    svc_ids = list(all_services_by_id)
+
     logged = {
         row["service"]: row["hours__sum"]
         for row in LoggedHours.objects
-        .filter(service__in=[s.id for s in github_services])
+        .filter(service__in=svc_ids)
         .values("service")
         .annotate(hours__sum=Sum("hours"))
+    }
+    monthly_by_service: dict[int, dict[str, Decimal]] = defaultdict(dict)
+    for row in (
+        LoggedHours.objects
+        .filter(service__in=svc_ids)
+        .annotate(month=TruncMonth("rendered_on"))
+        .values("service", "month")
+        .annotate(total=Sum("hours"))
+    ):
+        monthly_by_service[row["service"]][row["month"].strftime("%Y-%m")] = row[
+            "total"
+        ]
+
+    def _attach(issue, service):
+        issue.service = service
+        issue.logged_hours = logged.get(service.id, Z1)
+        issue.monthly_hours = dict(monthly_by_service.get(service.id, {}))
+        issue.offer = service.offer
+        matched_ids.add(service.id)
+
+    # Build lookup by external_reference URL for fast matching
+    svc_by_external_ref = {
+        s.external_reference.lower(): s
+        for s in all_services_by_id.values()
+        if s.external_reference
     }
 
     matched_ids = set()
     for issue in issues:
+        # 1. external_reference field (exact URL match)
+        svc = svc_by_external_ref.get(issue.url.lower())
+        if svc and svc.id not in matched_ids:
+            _attach(issue, svc)
+            continue
+        # 2. Legacy: URL substring in service description
         for service in github_services:
             if issue.url.lower() in service.description.lower():
-                issue.service = service
-                issue.logged_hours = logged.get(service.id, Z1)
-                issue.offer = service.offer
-                matched_ids.add(service.id)
+                _attach(issue, service)
                 break
 
     # For services not yet matched, batch-fetch their issues directly (handles archived).
     if token:
-        _fetch_archived(issues, github_services, matched_ids, logged, headers)
+        _fetch_archived(
+            issues, github_services, matched_ids, logged, monthly_by_service, headers
+        )
 
     # Find projects that had at least one matched service, then collect
     # all other services from those same projects.
@@ -506,15 +690,26 @@ def join_with_workbench(
         .select_related("offer", "project__owned_by")
         .order_by("project", "position")
     )
+    unmatched_svc_ids = [s.id for s in all_project_services]
     unmatched_logged = {
         row["service"]: row["hours__sum"]
         for row in LoggedHours.objects
-        .filter(service__in=[s.id for s in all_project_services])
+        .filter(service__in=unmatched_svc_ids)
         .values("service")
         .annotate(hours__sum=Sum("hours"))
     }
+    unmatched_monthly: dict[int, dict[str, Decimal]] = defaultdict(dict)
+    for row in (
+        LoggedHours.objects
+        .filter(service__in=unmatched_svc_ids)
+        .annotate(month=TruncMonth("rendered_on"))
+        .values("service", "month")
+        .annotate(total=Sum("hours"))
+    ):
+        unmatched_monthly[row["service"]][row["month"].strftime("%Y-%m")] = row["total"]
     for service in all_project_services:
         service._logged_hours = unmatched_logged.get(service.id, Z1)
+        service._monthly_hours = dict(unmatched_monthly.get(service.id, {}))
 
     by_project = defaultdict(list)
     for service in all_project_services:

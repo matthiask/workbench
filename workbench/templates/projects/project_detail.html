@@ -571,7 +571,8 @@
                   {% history_link row.service %}
                 </h5>
                 <p>
-                  {{ row.service.description|linebreaksbr|default:'&nbsp;'|urlize }}
+                  {{ row.service.description|linebreaksbr|urlize }}
+                  {% if row.service.external_reference %}{% if row.service.description %}<br>{% endif %}<small><em>{{ row.service.external_reference|urlize }}</em></small>{% endif %}
                 </p>
                 <small class="row justify-content-between">
                   <span class="col-md-4">

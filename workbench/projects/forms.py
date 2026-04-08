@@ -446,6 +446,7 @@ class ServiceForm(ModelForm):
         fields = [
             "title",
             "description",
+            "external_reference",
             "allow_logging",
             "offer",
             "is_optional",

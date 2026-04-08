@@ -14,6 +14,7 @@ Usage:
 
 from __future__ import annotations
 
+import datetime
 import io
 from decimal import Decimal
 
@@ -215,7 +216,7 @@ def _group_totals(
 # Max depth observed in this project is ~3 (root → parent → child → grandchild).
 _TREE_DEPTH = 4
 
-_HEADERS = (
+_FIXED_HEADERS = (
     ["Repo", "Issue"]
     + [f"L{i}" for i in range(1, _TREE_DEPTH + 1)]
     + [
@@ -229,10 +230,65 @@ _HEADERS = (
         "Total logged (h)",
         "Delta (h)",
         "Offer",
+        "Service",
         "Cross-app parent",
     ]
 )
-_NUM_COLS = len(_HEADERS)
+_NUM_FIXED = len(_FIXED_HEADERS)
+
+
+def _month_columns(groups, unmatched):
+    """
+    Return (older_cutoff, recent_months) where:
+    - older_cutoff: "YYYY-MM" string; months strictly before this go into the Older bucket
+    - recent_months: sorted list of "YYYY-MM" strings to show as individual columns
+    """
+    today = datetime.date.today()
+    # Show the current month and the 11 preceding months individually (12 total).
+    cutoff_month = today.month - 11
+    cutoff_year = today.year
+    if cutoff_month <= 0:
+        cutoff_month += 12
+        cutoff_year -= 1
+    older_cutoff = f"{cutoff_year:04d}-{cutoff_month:02d}"
+
+    all_months: set[str] = set()
+
+    def collect(monthly: dict) -> None:
+        all_months.update(m for m in monthly if m >= older_cutoff)
+
+    def walk_node(node: IssueNode) -> None:
+        collect(node.monthly_hours)
+        for child in node.children:
+            walk_node(child)
+
+    for group in groups:
+        for node in group.roots + group.cross_app_children:
+            walk_node(node)
+    if unmatched:
+        for _project, services in unmatched:
+            for svc in services:
+                collect(getattr(svc, "_monthly_hours", {}))
+
+    return older_cutoff, sorted(all_months)
+
+
+def _aggregate_monthly(node: IssueNode) -> dict[str, Decimal]:
+    """Return monthly_hours summed over this node and all descendants."""
+    result: dict[str, Decimal] = dict(node.monthly_hours)
+    for child in node.children:
+        for month, hours in _aggregate_monthly(child).items():
+            result[month] = result.get(month, Z1) + hours
+    return result
+
+
+def _month_cells(monthly: dict, older_cutoff: str, recent_months: list, num):
+    """Return cells for the Older bucket + one cell per recent month."""
+    older = sum((v for k, v in monthly.items() if k < older_cutoff), Z1)
+    cells = [num(older if older else None)]
+    for m in recent_months:
+        cells.append(num(monthly.get(m)))
+    return cells
 
 
 def _build_xlsx(
@@ -240,6 +296,10 @@ def _build_xlsx(
 ) -> WorkbenchXLSXDocument:
     from openpyxl.cell import WriteOnlyCell
     from openpyxl.styles import Font
+
+    older_cutoff, recent_months = _month_columns(groups, unmatched or [])
+    month_headers = ["Older", *recent_months]
+    num_cols = _NUM_FIXED + len(month_headers)
 
     xlsx = WorkbenchXLSXDocument()
     xlsx.add_sheet("Cost Allocation")
@@ -266,13 +326,16 @@ def _build_xlsx(
         cols[min(depth, _TREE_DEPTH - 1)] = cell(title, bold=bold)
         return cols
 
-    ws.append([cell(h, bold=True) for h in _HEADERS])
+    def mc(monthly):
+        return _month_cells(monthly, older_cutoff, recent_months, num)
+
+    ws.append([cell(h, bold=True) for h in _FIXED_HEADERS + month_headers])
 
     for group in groups:
         ws.append(
             [cell(group.repo, bold=True), cell("")]
             + tree_cells(group.repo, 0, bold=True)
-            + [cell("")] * (_NUM_COLS - 2 - _TREE_DEPTH)
+            + [cell("")] * (num_cols - 2 - _TREE_DEPTH)
         )
 
         for node in sorted(group.roots, key=lambda n: n.number):
@@ -284,6 +347,7 @@ def _build_xlsx(
                 cell=cell,
                 num=num,
                 tree_cells=tree_cells,
+                mc=mc,
             )
 
         # Cross-app children — shown with warning, excluded from rollups
@@ -303,7 +367,9 @@ def _build_xlsx(
                 num(agg_logged),
                 num(agg_logged - agg_est if agg_est else None),
                 cell(str(node.offer) if node.offer else ""),
+                cell(node.service.title if node.service else ""),
                 cell(node.parent_repo or ""),
+                *mc(_aggregate_monthly(node)),
             ])
 
         # Repo-level rollup rows: Angeboten / Zusätzlich totals
@@ -325,25 +391,28 @@ def _build_xlsx(
                 num(est, bold=True),
                 num(act, bold=True),
                 num(act - est, bold=True),
-                cell(""),
-                cell(""),
+                cell(""),  # Offer
+                cell(""),  # Service
+                cell(""),  # Cross-app parent
+                *[cell("")] * len(month_headers),
             ])
 
-        ws.append([cell("")] * _NUM_COLS)  # blank separator
+        ws.append([cell("")] * num_cols)  # blank separator
 
     if unmatched:
         ws.append(
             [cell("Workbench services without GitHub issue", bold=True)]
-            + [cell("")] * (_NUM_COLS - 1)
+            + [cell("")] * (num_cols - 1)
         )
         for project, services in unmatched:
             ws.append(
                 [cell(str(project), bold=True), cell("")]
                 + tree_cells(str(project), 0, bold=True)
-                + [cell("")] * (_NUM_COLS - 2 - _TREE_DEPTH)
+                + [cell("")] * (num_cols - 2 - _TREE_DEPTH)
             )
             for svc in services:
                 logged = getattr(svc, "_logged_hours", None)
+                svc_monthly = getattr(svc, "_monthly_hours", {})
                 est = svc.effort_hours or None
                 ws.append([
                     cell(""),
@@ -359,9 +428,13 @@ def _build_xlsx(
                     num(logged),  # Total logged
                     num((logged or Z1) - (est or Z1) if est else None),
                     cell(str(svc.offer) if svc.offer else ""),
+                    cell(
+                        svc.title
+                    ),  # Service (it IS the service; repeat for column alignment)
                     cell(""),  # Cross-app parent
+                    *mc(svc_monthly),
                 ])
-        ws.append([cell("")] * _NUM_COLS)
+        ws.append([cell("")] * num_cols)
 
     return xlsx
 
@@ -377,7 +450,7 @@ def _aggregate(node: IssueNode) -> tuple[Decimal, Decimal]:
     return est, logged
 
 
-def _xlsx_node_rows(node, repo, depth, *, ws, cell, num, tree_cells) -> None:
+def _xlsx_node_rows(node, repo, depth, *, ws, cell, num, tree_cells, mc) -> None:
     is_parent = bool(node.children)
     agg_est, agg_logged = _aggregate(node)
     delta = agg_logged - agg_est if agg_est else None
@@ -396,12 +469,21 @@ def _xlsx_node_rows(node, repo, depth, *, ws, cell, num, tree_cells) -> None:
         num(agg_logged, bold=is_parent),  # total logged (own + children)
         num(delta, bold=is_parent),
         cell(str(node.offer) if node.offer else ""),
+        cell(node.service.title if node.service else ""),
         cell(""),
+        *mc(_aggregate_monthly(node)),
     ])
 
     for child in sorted(node.children, key=lambda n: n.number):
         _xlsx_node_rows(
-            child, repo, depth + 1, ws=ws, cell=cell, num=num, tree_cells=tree_cells
+            child,
+            repo,
+            depth + 1,
+            ws=ws,
+            cell=cell,
+            num=num,
+            tree_cells=tree_cells,
+            mc=mc,
         )
 
 

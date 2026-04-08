@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-07 15:20+0200\n"
+"POT-Creation-Date: 2026-04-08 16:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3028,6 +3028,10 @@ msgstr "Auf diesem Projekt wurden schon Rechnungen des Typs \"Fixbetrag\" gestel
 #: workbench/projects/models.py
 msgid "Pinned"
 msgstr "Angepinnt"
+
+#: workbench/projects/models.py
+msgid "external reference"
+msgstr "externe Referenz"
 
 #: workbench/projects/models.py
 msgid "allow logging"

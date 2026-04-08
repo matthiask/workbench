@@ -799,6 +799,11 @@ class Service(ServiceBase):
         blank=True,
         null=True,
     )
+    external_reference = models.CharField(
+        _("external reference"),
+        max_length=500,
+        blank=True,
+    )
     allow_logging = models.BooleanField(
         _("allow logging"),
         default=True,
