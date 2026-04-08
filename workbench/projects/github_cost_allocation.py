@@ -179,11 +179,15 @@ def fetch_project_items(project_url: str) -> list[IssueNode]:
             break
         after = items_data["pageInfo"]["endCursor"]
 
+    seen_urls: set[str] = set()
     issues = []
     for item in nodes:
         content = item.get("content") or {}
         if "number" not in content:
             continue  # draft or PR
+        if content["url"] in seen_urls:
+            continue  # deduplicate (same issue on multiple project board pages)
+        seen_urls.add(content["url"])
 
         # Extract estimate from field values
         estimate = None
@@ -408,6 +412,39 @@ def build_tree(
     return sorted(repo_groups.values(), key=lambda g: g.repo)
 
 
+def _fetch_archived(issues, github_services, matched_ids, logged, headers):
+    """Batch-fetch issues not on the project board (e.g. archived) and append to issues."""
+    known_urls = {issue.url.lower() for issue in issues}
+    ref_to_service = {}
+    for service in github_services:
+        if service.id in matched_ids:
+            continue
+        m = _ISSUE_URL_RE.search(service.description)
+        if not m:
+            continue
+        if m.group(0).lower() in known_urls:
+            continue  # URL known but not matched — skip
+        key = (m.group("owner"), m.group("repo"), int(m.group("number")))
+        if key not in ref_to_service:  # first service wins; deduplicates refs
+            ref_to_service[key] = service
+
+    for node in _fetch_issues_batch(list(ref_to_service), headers):
+        key = (
+            _ISSUE_URL_RE.search(node.url).group("owner"),
+            node.repo,
+            node.number,
+        )
+        service = ref_to_service.get(key)
+        if service:
+            node.estimate = service.effort_hours
+            node.service = service
+            node.logged_hours = logged.get(service.id, Z1)
+            node.offer = service.offer
+            matched_ids.add(service.id)
+        issues.append(node)
+        known_urls.add(node.url.lower())
+
+
 def join_with_workbench(
     issues: list[IssueNode],
 ) -> list:
@@ -454,38 +491,7 @@ def join_with_workbench(
 
     # For services not yet matched, batch-fetch their issues directly (handles archived).
     if token:
-        known_urls = {issue.url.lower() for issue in issues}
-        refs = []
-        ref_to_service = {}
-        for service in github_services:
-            if service.id in matched_ids:
-                continue
-            m = _ISSUE_URL_RE.search(service.description)
-            if not m:
-                continue
-            if m.group(0).lower() in known_urls:
-                continue  # URL known but didn't match text — skip
-            key = (m.group("owner"), m.group("repo"), int(m.group("number")))
-            refs.append(key)
-            ref_to_service[key] = service
-
-        if refs:
-            for node in _fetch_issues_batch(refs, headers):
-                key = (
-                    # owner isn't on IssueNode; derive from url
-                    _ISSUE_URL_RE.search(node.url).group("owner"),
-                    node.repo,
-                    node.number,
-                )
-                service = ref_to_service.get(key)
-                if service:
-                    node.estimate = service.effort_hours
-                    node.service = service
-                    node.logged_hours = logged.get(service.id, Z1)
-                    node.offer = service.offer
-                    matched_ids.add(service.id)
-                issues.append(node)
-                known_urls.add(node.url.lower())
+        _fetch_archived(issues, github_services, matched_ids, logged, headers)
 
     # Find projects that had at least one matched service, then collect
     # all other services from those same projects.
