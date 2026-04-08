@@ -3,19 +3,22 @@ Management command: github_cost_allocation
 
 Fetches all issues from the configured GitHub project board, joins them with
 workbench services and logged hours, and prints a tree-shaped cost breakdown
-grouped by repository (billing unit). Optionally writes to XLSX.
+grouped by repository (billing unit). Optionally writes to XLSX or sends by mail.
 
 Usage:
     uv run ./manage.py github_cost_allocation
     uv run ./manage.py github_cost_allocation --output report.xlsx
+    uv run ./manage.py github_cost_allocation --mailto user@example.com
     uv run ./manage.py github_cost_allocation --project-url https://github.com/orgs/MY-ORG/projects/3
 """
 
 from __future__ import annotations
 
+import io
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.core.management import BaseCommand
 from django.utils.translation import activate
 
@@ -48,8 +51,15 @@ class Command(BaseCommand):
             metavar="FILE.xlsx",
             help="Write report to an XLSX file instead of stdout.",
         )
+        parser.add_argument(
+            "--mailto",
+            type=str,
+            default=None,
+            metavar="EMAIL[,EMAIL]",
+            help="Send the XLSX report by email to these addresses (comma-separated).",
+        )
 
-    def handle(self, *, project_url, output, **options):
+    def handle(self, *, project_url, output, mailto, **options):
         activate("de")
 
         url = project_url or (
@@ -73,7 +83,26 @@ class Command(BaseCommand):
         app_repos = getattr(settings, "GITHUB_APP_REPOS", {})
         groups = build_tree(issues, app_repos)
 
-        if output:
+        if mailto:
+            recipients = mailto.split(",")
+            xlsx = _build_xlsx(groups, unmatched)
+            mail = EmailMultiAlternatives(
+                "GitHub Cost Allocation",
+                "",
+                to=recipients,
+                reply_to=recipients,
+            )
+            with io.BytesIO() as f:
+                xlsx.workbook.save(f)
+                f.seek(0)
+                mail.attach(
+                    "github-cost-allocation.xlsx",
+                    f.getvalue(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+            mail.send()
+            self.stdout.write(f"Sent to {mailto}")
+        elif output:
             xlsx = _build_xlsx(groups, unmatched)
             xlsx.workbook.save(output)
             self.stdout.write(f"Saved to {output}")
