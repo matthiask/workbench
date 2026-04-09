@@ -341,6 +341,9 @@ class LoggedHoursForm(ModelForm):
     service_description = forms.CharField(
         label=_("description"), required=False, widget=Textarea({"rows": 2})
     )
+    service_external_reference = forms.CharField(
+        label=capfirst(_("external reference")), required=False, max_length=500
+    )
     service_type = forms.ModelChoiceField(
         ServiceType.objects.all(), label=ServiceType._meta.verbose_name, required=False
     )
@@ -407,6 +410,7 @@ class LoggedHoursForm(ModelForm):
         if self.instance.pk:
             self.fields.pop("service_title")
             self.fields.pop("service_description")
+            self.fields.pop("service_external_reference")
             self.fields.pop("service_type")
             if (
                 not self.instance.rendered_by.features[FEATURES.LATE_LOGGING]
@@ -541,6 +545,7 @@ class LoggedHoursForm(ModelForm):
                 project=self.project,
                 title=self.cleaned_data["service_title"],
                 description=self.cleaned_data["service_description"],
+                external_reference=self.cleaned_data["service_external_reference"],
             )
             if self.project.flat_rate is not None:
                 with override(settings.WORKBENCH.PDF_LANGUAGE):

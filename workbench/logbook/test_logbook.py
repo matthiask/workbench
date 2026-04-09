@@ -182,6 +182,7 @@ class LogbookTest(TestCase):
                 "modal-description": "Test",
                 "modal-service_title": "service title",
                 "modal-service_description": "service description",
+                "modal-service_external_reference": "https://example.com/",
                 "modal-service_type": types.administration.pk,
             },
             headers={"x-requested-with": "XMLHttpRequest"},
@@ -190,6 +191,8 @@ class LogbookTest(TestCase):
 
         entry = LoggedHours.objects.get()
         self.assertEqual(entry.service.title, "service title")
+        self.assertEqual(entry.service.description, "service description")
+        self.assertEqual(entry.service.external_reference, "https://example.com/")
         self.assertEqual(entry.service.effort_rate, types.administration.hourly_rate)
 
         response = self.client.get(

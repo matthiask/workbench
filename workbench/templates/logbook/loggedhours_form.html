@@ -21,6 +21,7 @@
       <h5>{% translate 'new service' %}</h5>
       {% ff_field form.service_title %}
       {% ff_field form.service_description %}
+      {% ff_field form.service_external_reference %}
       {% if form.service_type %}
         {% ff_field form.service_type %}
       {% endif %}
