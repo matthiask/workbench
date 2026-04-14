@@ -41,13 +41,13 @@ repos:
       -   id: djade
           args: [--target-version, "6.0"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.8
+    rev: v0.15.10
     hooks:
       - id: ruff-check
         args: [--unsafe-fixes]
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.21.0
+    rev: v2.21.1
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
@@ -55,14 +55,14 @@ repos:
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.4.10
+    rev: v2.4.11
     hooks:
       - id: biome-check
         args: [--unsafe]
         types_or: [css, javascript, json]
         verbose: true
   - repo: https://github.com/boidolr/pre-commit-images
-    rev: v1.11.1
+    rev: v1.12.0
     hooks:
       - id: optimize-avif
       - id: optimize-jpg
