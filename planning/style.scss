@@ -1,6 +1,6 @@
 .planning-wrapper {
   --grid-gap: 0.125rem;
-  --title-column-width: max-content;
+  --title-column-width: 25rem;
   --action-width: 3.5rem;
   --range-width: 5rem;
   --hours-total-width: 4.5rem;
@@ -375,7 +375,6 @@
 }
 
 .planning.external {
-  --title-column-width: 25rem;
   --default-height: min-content;
 
   & .planning--title {
