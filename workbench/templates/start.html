@@ -7,7 +7,6 @@
 {% block content %}
   <div class="row gx-3 justify-content-center">
     <div class="col-lg-6">
-
       {% if needs_action %}{% include '_needs_action.html' %}{% endif %}
 
       <div class="card mb-3">
@@ -45,9 +44,12 @@
           </div>
           <div class="card-body">
             {% for birthday in birthdays %}
-              <a href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}"
-                 class="text-nowrap {% if birthday.is_active_user %}fw-bold{% endif %}">
-                {{ birthday.given_name }} {{ birthday.family_name }} ({{ birthday.date_of_birth|local_date_format }})</a>{% if not forloop.last %},{% endif %}
+              <a
+                href="{% url 'contacts_person_detail' pk=birthday.id as url %}{{ url }}"
+                class="text-nowrap {% if birthday.is_active_user %}fw-bold{% endif %}"
+              >
+                {{ birthday.given_name }} {{ birthday.family_name }}
+                ({{ birthday.date_of_birth|local_date_format }})</a>{% if not forloop.last %},{% endif %}
             {% endfor %}
           </div>
         </div>
@@ -57,12 +59,13 @@
       <div class="card mb-3">
         <div class="card-header">
           <h3 class="my-0">
-            <a class="d-block"
-               href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
+            <a class="d-block" href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
               {% translate "today's hours"|capfirst %}
             </a>
             <small>
-              <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}">
+              <a
+                href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}"
+              >
                 {{ request.user.hours.today|hours }} {% translate 'today' %}
               </a>
               /
@@ -77,12 +80,11 @@
         {% if todays_hours %}
           <div class="list-group list-group-flush">
             {% for hours in todays_hours %}
-              <a class="list-group-item list-group-item-action"
-                 href="{{ hours.get_absolute_url }}"
-                 data-ajaxmodal>
+              <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-ajaxmodal>
                 <small class="d-flex justify-content-between">
                   <span>{{ hours.service.project_service_title }}</span>
-                  <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+                  <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} /
+                    {{ hours.created_at|date:'H:i' }}</span>
                 </small>
                 <p class="card-text">
                   <strong>{{ hours.hours|hours }}</strong>
@@ -107,12 +109,11 @@
         {% if all_users_hours %}
           <div class="list-group list-group-flush">
             {% for hours in all_users_hours %}
-              <a class="list-group-item list-group-item-action"
-                 href="{{ hours.get_absolute_url }}"
-                 data-ajaxmodal>
+              <a class="list-group-item list-group-item-action" href="{{ hours.get_absolute_url }}" data-ajaxmodal>
                 <small class="d-flex justify-content-between">
                   <span>{{ hours.service.project_service_title }}</span>
-                  <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
+                  <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} /
+                    {{ hours.created_at|date:'H:i' }}</span>
                 </small>
                 <p class="card-text">
                   <strong>{{ hours.hours|hours }}</strong>

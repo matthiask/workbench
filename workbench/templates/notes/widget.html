@@ -5,9 +5,7 @@
     <div class="card mb-3">
       <div class="card-header d-flex justify-content-between">
         <h5 class="mb-1">{{ note.created_by }} at {{ note.created_at|local_date_format }}</h5>
-        <a href="{{ note.urls.update }}"
-           class="btn btn-primary btn-sm align-self-start"
-           data-ajaxmodal>
+        <a href="{{ note.urls.update }}" class="btn btn-primary btn-sm align-self-start" data-ajaxmodal>
           {% translate 'Update' %}
         </a>
       </div>
@@ -22,11 +20,13 @@
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-1">{% translate 'Add note' %}</h5>
-      <button type="button"
-              class="btn btn-primary btn-sm align-self-start"
-              data-bs-target="#note-add-form"
-              data-bs-toggle="collapse"
-              aria-expanded="false">
+      <button
+        type="button"
+        class="btn btn-primary btn-sm align-self-start"
+        data-bs-target="#note-add-form"
+        data-bs-toggle="collapse"
+        aria-expanded="false"
+      >
         {% translate 'Toggle form' %}
       </button>
     </div>
@@ -41,8 +41,10 @@
           <div class="col-sm-12">
             <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
             {% if object.get_absolute_url %}
-              <a href="{{ object.get_absolute_url }}"
-                 class="btn float-end btn-outline-danger">{% translate 'Cancel' %}</a>
+              <a
+                href="{{ object.get_absolute_url }}"
+                class="btn float-end btn-outline-danger"
+              >{% translate 'Cancel' %}</a>
             {% endif %}
           </div>
         </div>

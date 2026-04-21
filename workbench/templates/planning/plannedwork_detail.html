@@ -31,7 +31,7 @@
       <td>
         {% for range in object.ranges %}
           {{ range.pretty }}
-          <br />
+          <br>
         {% endfor %}
       </td>
     </tr>
@@ -39,15 +39,9 @@
 {% endblock body %}
 
 {% block footer %}
-  <a href="{{ object.urls.update }}"
-     data-ajaxmodal
-     class="btn btn-primary">{% translate 'Update' %}</a>
-  <a href="{{ object.project.urls.creatework }}?copy={{ object.pk }}"
-     data-ajaxmodal
-     class="btn btn-primary me-auto">
+  <a href="{{ object.urls.update }}" data-ajaxmodal class="btn btn-primary">{% translate 'Update' %}</a>
+  <a href="{{ object.project.urls.creatework }}?copy={{ object.pk }}" data-ajaxmodal class="btn btn-primary me-auto">
     {% translate 'Copy' %}
   </a>
-  <a href="{{ object.urls.delete }}"
-     data-ajaxmodal
-     class="btn btn-outline-danger">{% translate 'Delete' %}</a>
+  <a href="{{ object.urls.delete }}" data-ajaxmodal class="btn btn-outline-danger">{% translate 'Delete' %}</a>
 {% endblock footer %}

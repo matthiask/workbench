@@ -13,17 +13,25 @@
             {% translate "timestamps"|capfirst %}
             <small>
               {% if is_today %}
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}&amp;date_until={% now 'Y-m-d' %}">
+                <a
+                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}&amp;date_until={% now 'Y-m-d' %}"
+                >
                   {{ request.user.hours.today|hours }} {% translate 'today' %}
                 </a>
                 /
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}">
+                <a
+                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}"
+                >
                   {{ request.user.hours.week|hours }} {% translate 'this week' %}
                 </a>
               {% else %}
                 {{ day|local_date_format:'l d.m.Y' }} /
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ day.isoformat }}&amp;date_until={{ day.isoformat }}">{{ hours|hours }}</a> /
-                <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}">
+                <a
+                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ day.isoformat }}&amp;date_until={{ day.isoformat }}"
+                >{{ hours|hours }}</a> /
+                <a
+                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}"
+                >
                   {{ weekly_hours|hours }}
                   {% if is_this_week %}{% translate 'this week' %}
                   {% else %}{% translate 'during the week' %}
@@ -33,29 +41,43 @@
             </small>
           </h3>
           <div>
-            <a href="?day={{ previous.isoformat }}"
-               class="btn btn-primary btn-sm align-self-start
-                      {% if not previous %}
-                        disabled
-                      {% endif %}"
-               title="{% translate 'Previous day' %}"
-               {% if not previous %}aria-disabled="true"{% endif %}>
+            <a
+              href="?day={{ previous.isoformat }}"
+              class="
+                btn btn-primary btn-sm align-self-start
+                {% if not previous %}
+                disabled
+                {% endif %}
+              "
+              title="{% translate 'Previous day' %}"
+              {% if not previous %}
+                aria-disabled="true"
+              {% endif %}
+            >
               &laquo;
             </a>
-            <a href="?day={{ next.isoformat }}"
-               class="btn btn-primary btn-sm align-self-start
-                      {% if not next %}
-                        disabled
-                      {% endif %}"
-               title="{% translate 'Next day' %}"
-               {% if not next %}aria-disabled="true"{% endif %}>
+            <a
+              href="?day={{ next.isoformat }}"
+              class="
+                btn btn-primary btn-sm align-self-start
+                {% if not next %}
+                disabled
+                {% endif %}
+              "
+              title="{% translate 'Next day' %}"
+              {% if not next %}
+                aria-disabled="true"
+              {% endif %}
+            >
               &raquo;
             </a>
-            <a href="{% url 'timestamps-controller' %}?token={{ request.user.token }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
-               class="btn btn-primary btn-sm align-self-start"
-               target="_blank"
-               rel="noopener noreferrer"
-               onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false">
+            <a
+              href="{% url 'timestamps-controller' %}?token={{ request.user.token }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
+              class="btn btn-primary btn-sm align-self-start"
+              target="_blank"
+              rel="noopener noreferrer"
+              onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false"
+            >
               {% translate 'Controller' %}
             </a>
           </div>
@@ -65,7 +87,8 @@
             <div class="list-group-item">
               <div class="d-flex w-100">
                 <div>
-                  <strong>{{ slice.starts_at|date:'H:i'|default:'?' }} - {{ slice.ends_at|date:'H:i'|default:'?' }}</strong>
+                  <strong>{{ slice.starts_at|date:'H:i'|default:'?' }} -
+                    {{ slice.ends_at|date:'H:i'|default:'?' }}</strong>
                   {% if slice.elapsed_hours %}({{ slice.elapsed_hours|hours:True }}){% endif %}
                   {{ slice.description }}
                   {% if slice.comment %}<em>{{ slice.comment }}</em>{% endif %}
@@ -73,36 +96,46 @@
                 </div>
                 <div class="ms-auto">
                   {% if slice.hours_create_url %}
-                    <a href="{{ slice.hours_create_url }}"
-                       data-ajaxmodal
-                       class="btn btn-sm align-self-start btn-primary">
+                    <a
+                      href="{{ slice.hours_create_url }}"
+                      data-ajaxmodal
+                      class="btn btn-sm align-self-start btn-primary"
+                    >
                       {% translate 'hours'|capfirst %}
                     </a>
                   {% endif %}
                   {% if not forloop.first and slice.break_create_url %}
-                    <a href="{{ slice.break_create_url }}"
-                       data-ajaxmodal
-                       class="btn btn-sm align-self-start btn-primary">
+                    <a
+                      href="{{ slice.break_create_url }}"
+                      data-ajaxmodal
+                      class="btn btn-sm align-self-start btn-primary"
+                    >
                       {% translate 'break'|capfirst %}
                     </a>
                   {% endif %}
                   {% if slice.logged_hours %}
-                    <a href="{{ slice.logged_hours.get_absolute_url }}"
-                       data-ajaxmodal
-                       class="btn btn-sm btn-outline-primary">
+                    <a
+                      href="{{ slice.logged_hours.get_absolute_url }}"
+                      data-ajaxmodal
+                      class="btn btn-sm btn-outline-primary"
+                    >
                       {% translate 'hours'|capfirst %}
                     </a>
                   {% elif slice.logged_break %}
-                    <a href="{{ slice.logged_break.get_absolute_url }}"
-                       data-ajaxmodal
-                       class="btn btn-sm btn-outline-primary">
+                    <a
+                      href="{{ slice.logged_break.get_absolute_url }}"
+                      data-ajaxmodal
+                      class="btn btn-sm btn-outline-primary"
+                    >
                       {% translate 'break'|capfirst %}
                     </a>
                   {% elif slice.timestamp_id %}
-                    <form class="d-inline"
-                          method="post"
-                          action="{% url 'delete_timestamp' slice.timestamp_id %}"
-                          onsubmit="return confirm('{% translate 'Really delete?'|escapejs %}')">
+                    <form
+                      class="d-inline"
+                      method="post"
+                      action="{% url 'delete_timestamp' slice.timestamp_id %}"
+                      onsubmit="return confirm('{% translate 'Really delete?'|escapejs %}')"
+                    >
                       {% csrf_token %}
                       <input type="hidden" name="next" value="?{{ request.GET.urlencode }}">
                       <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>

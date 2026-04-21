@@ -29,9 +29,7 @@
         {{ address.postal_address|linebreaksbr }}
         {% if address.get_maps_url %}
           <br>
-          <a href="{{ address.get_maps_url }}"
-             target="_blank"
-             rel="noopener noreferrer">{% translate 'Maps' %}</a>
+          <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer">{% translate 'Maps' %}</a>
         {% endif %}
         <br>
       {% endfor %}
@@ -58,19 +56,16 @@
       {% endfor %}
     </div>
   </div>
-  <a href="{% url 'projects_project_create' %}?contact={{ object.pk }}"
-     class="btn btn-primary">
+  <a href="{% url 'projects_project_create' %}?contact={{ object.pk }}" class="btn btn-primary">
     {% include "svg/plus.svg" %}
     {% translate 'project'|capfirst %}
   </a>
-  <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}"
-     class="btn btn-primary">
+  <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-primary">
     {% include "svg/plus.svg" %}
     {% translate 'invoice'|capfirst %}
   </a>
   {% if request.user.features.DEALS %}
-    <a href="{% url 'deals_deal_create' %}?contact={{ object.pk }}"
-       class="btn btn-primary">
+    <a href="{% url 'deals_deal_create' %}?contact={{ object.pk }}" class="btn btn-primary">
       {% include "svg/plus.svg" %}
       {% translate 'deal'|capfirst %}
     </a>
@@ -80,6 +75,5 @@
     vCard
   </a>
   <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-  <a href="{{ object.urls.delete }}"
-     class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
+  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
 {% endblock content %}

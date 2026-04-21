@@ -41,7 +41,9 @@
           {{ object.grouped_services.logged_hours|hours }}
         </a>
       </th>
-      <th class="progress-cell">{% bar object.grouped_services.logged_hours object.grouped_services.service_hours %}</th>
+      <th class="progress-cell">
+        {% bar object.grouped_services.logged_hours object.grouped_services.service_hours %}
+      </th>
       {% for user, hours in object.grouped_services.logged_hours_per_user %}
         <th class="text-end">
           <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;rendered_by={{ user.pk }}">
@@ -60,10 +62,17 @@
       {% for row in offer_data.services %}
         {% if row.logged_hours or row.service.service_hours %}
           <tr>
-            <th style="padding-left:16px">{{ row.service.title }}</th>
-            <th class="text-end {% if not row.service.service_hours %}text-black-30{% endif %}">{{ row.service.service_hours|hours }}</th>
+            <th style="padding-left: 16px">{{ row.service.title }}</th>
+            <th class="text-end {% if not row.service.service_hours %}text-black-30{% endif %}">
+              {{ row.service.service_hours|hours }}
+            </th>
             <th class="text-end">
-              <a {% if not row.logged_hours %}class="text-black-30"{% endif %} href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}">{{ row.logged_hours|hours }}</a>
+              <a
+                {% if not row.logged_hours %}
+                  class="text-black-30"
+                {% endif %}
+                href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}"
+              >{{ row.logged_hours|hours }}</a>
             </th>
             <th class="progress-cell">
               {% if row.service.allow_logging or row.logged_hours %}
@@ -74,7 +83,9 @@
             {% for user, hours in user_row %}
               <td class="text-end">
                 {% if hours %}
-                  <a href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}">
+                  <a
+                    href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}&amp;rendered_by={{ user.pk }}"
+                  >
                     {{ hours|hours }}
                   </a>
                 {% endif %}
@@ -88,6 +99,9 @@
 {% endblock body %}
 
 {% block footer %}
-  <a class="btn btn-primary me-auto" href="{{ project.urls.cost_by_month_and_service_xlsx }}">{{ _("Cost by month and service") }} (XLSX)</a>
+  <a
+    class="btn btn-primary me-auto"
+    href="{{ project.urls.cost_by_month_and_service_xlsx }}"
+  >{{ _("Cost by month and service") }} (XLSX)</a>
   {{ block.super }}
 {% endblock footer %}

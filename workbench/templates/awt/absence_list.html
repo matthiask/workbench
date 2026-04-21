@@ -1,9 +1,7 @@
 {% extends "generic/object_list.html" %}
 {% load django_bootstrap5 i18n workbench %}
 {% block search-form-buttons %}
-  <a href="{{ view.model.urls.create }}"
-     class="btn btn-primary"
-     data-ajaxmodal>
+  <a href="{{ view.model.urls.create }}" class="btn btn-primary" data-ajaxmodal>
     {% include "svg/plus.svg" %}
     {{ view.meta.verbose_name }}
   </a>
@@ -21,9 +19,7 @@
       {% ifchanged object.starts_on.year object.starts_on.month %}
         <h5 class="mt-3 mb-3">{{ object.starts_on|date:'F Y' }}</h5>
       {% endifchanged %}
-      <a href="{{ object.get_absolute_url }}"
-         class="list-group-item list-group-item-action px-0"
-         data-ajaxmodal>
+      <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0" data-ajaxmodal>
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">{{ object|h }}</h5>
           {{ object.status_badge }}

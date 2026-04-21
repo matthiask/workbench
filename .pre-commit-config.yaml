@@ -40,6 +40,11 @@ repos:
       hooks:
       -   id: djade
           args: [--target-version, "6.0"]
+  - repo: https://github.com/UnknownPlatypus/djangofmt-pre-commit
+    rev: v0.2.7
+    hooks:
+      - id: djangofmt
+        types_or: [html]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.10
     hooks:

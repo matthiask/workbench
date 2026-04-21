@@ -8,11 +8,15 @@
         <ul class="nav nav-tabs my-3">
           {% for y in years %}
             <li class="nav-item">
-              <a class="nav-link
-                        {% if y == year %}
-                          active
-                        {% endif %}"
-                 href="{% querystring year=y %}">{{ y }}</a>
+              <a
+                class="
+                  nav-link
+                  {% if y == year %}
+                  active
+                  {% endif %}
+                "
+                href="{% querystring year=y %}"
+              >{{ y }}</a>
             </li>
           {% endfor %}
           {% if request.user.features.CONTROLLING %}
@@ -34,18 +38,20 @@
           </tr>
           <tr>
             <td class="text-end">{{ overall.absence_vacation|days }}</td>
-            <th>{% translate 'vacation days taken' %} ({% translate 'corrected' %})</th>
+            <th>
+              {% translate 'vacation days taken' %} ({% translate 'corrected' %})
+            </th>
           </tr>
           <tr>
             <td class="text-end">{{ overall.absence_sickness|days }}</td>
             <th>
               {% translate 'sickness days' %}
               {% if overall.sickness_by_fte %}
-              <span style="font-weight:normal">
-                ({% blocktranslate with sickness_by_fte=overall.sickness_by_fte|stringformat:'.1f' trimmed %}
-                Estimated {{ sickness_by_fte }} days per full time equivalent per year
-                {% endblocktranslate %})
-              </span>
+                <span style="font-weight: normal">
+                  ({% blocktranslate with sickness_by_fte=overall.sickness_by_fte|stringformat:'.1f' trimmed %}
+                    Estimated {{ sickness_by_fte }} days per full time equivalent per year
+                  {% endblocktranslate %})
+                </span>
               {% endif %}
             </th>
           </tr>
@@ -86,16 +92,18 @@
                 <div class="modal-body">
                   <table class="table table-sm">
                     {% for h in data.holiday_list %}{% if h.kind == "public" %}
-                      <tr>
-                        <td>{{ h.date|local_date_format }}</td>
-                        <td>{{ h.display_name }}</td>
-                        <td class="text-end">{{ h.fraction|days }}</td>
-                      </tr>
-                    {% endif %}{% endfor %}
+                        <tr>
+                          <td>{{ h.date|local_date_format }}</td>
+                          <td>{{ h.display_name }}</td>
+                          <td class="text-end">{{ h.fraction|days }}</td>
+                        </tr>
+                      {% endif %}{% endfor %}
                   </table>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {% translate 'Close' %}
+                  </button>
                 </div>
               </div>
             </div>
@@ -111,16 +119,18 @@
                 <div class="modal-body">
                   <table class="table table-sm">
                     {% for h in data.holiday_list %}{% if h.kind == "company" %}
-                      <tr>
-                        <td>{{ h.date|local_date_format }}</td>
-                        <td>{{ h.display_name }}</td>
-                        <td class="text-end">{{ h.fraction|days }}</td>
-                      </tr>
-                    {% endif %}{% endfor %}
+                        <tr>
+                          <td>{{ h.date|local_date_format }}</td>
+                          <td>{{ h.display_name }}</td>
+                          <td class="text-end">{{ h.fraction|days }}</td>
+                        </tr>
+                      {% endif %}{% endfor %}
                   </table>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {% translate 'Close' %}
+                  </button>
                 </div>
               </div>
             </div>
@@ -155,26 +165,34 @@
               </th>
             </tr>
             {% if data.has_public_holidays %}
-            <tr>
-              <th class="text-nowrap">
-                <a href="#" data-bs-toggle="modal" data-bs-target="#holiday-public-modal-{{ stats.year.working_time_model_id }}">{% translate 'public holiday days' %}</a>
-              </th>
-              {% for value in stats.holiday_public %}
-                <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
-              {% endfor %}
-              <th class="text-end">{{ totals.holiday_public|days }}</th>
-            </tr>
+              <tr>
+                <th class="text-nowrap">
+                  <a
+                    href="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#holiday-public-modal-{{ stats.year.working_time_model_id }}"
+                  >{% translate 'public holiday days' %}</a>
+                </th>
+                {% for value in stats.holiday_public %}
+                  <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
+                {% endfor %}
+                <th class="text-end">{{ totals.holiday_public|days }}</th>
+              </tr>
             {% endif %}
             {% if data.has_company_holidays %}
-            <tr>
-              <th class="text-nowrap">
-                <a href="#" data-bs-toggle="modal" data-bs-target="#holiday-company-modal-{{ stats.year.working_time_model_id }}">{% translate 'company holiday days' %}</a>
-              </th>
-              {% for value in stats.holiday_company %}
-                <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
-              {% endfor %}
-              <th class="text-end">{{ totals.holiday_company|days }}</th>
-            </tr>
+              <tr>
+                <th class="text-nowrap">
+                  <a
+                    href="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#holiday-company-modal-{{ stats.year.working_time_model_id }}"
+                  >{% translate 'company holiday days' %}</a>
+                </th>
+                {% for value in stats.holiday_company %}
+                  <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
+                {% endfor %}
+                <th class="text-end">{{ totals.holiday_company|days }}</th>
+              </tr>
             {% endif %}
             <tr>
               <th class="text-nowrap">
@@ -202,10 +220,14 @@
                   {% endif %}
                 </td>
               {% endfor %}
-              <th class="text-end
-                         {% if totals.vacation_days_override %}
-                           text-black-30
-                         {% endif %}">
+              <th
+                class="
+                  text-end
+                  {% if totals.vacation_days_override %}
+                  text-black-30
+                  {% endif %}
+                "
+              >
                 {{ totals.calculated_vacation_days|days }}
               </th>
             </tr>
@@ -377,8 +399,7 @@
                   {% if value is not None %}{{ value|hours }}{% endif %}
                 </td>
               {% endfor %}
-              <th>
-              </th>
+              <th></th>
             </tr>
             <tr>
               <th class="text-nowrap">
@@ -451,9 +472,10 @@
                   <th colspan="3">
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'vacation days' %}
-                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=vacation"
-                         data-ajaxmodal
-                       >
+                      <a
+                        href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=vacation"
+                        data-ajaxmodal
+                      >
                         &plus;
                       </a>
                     </div>
@@ -474,15 +496,15 @@
                 {% endfor %}
               </table>
               {% if not data.vacation_planning.fine %}
-              <div class="alert alert-warning" role="alert">
-                <h4 class="alert-heading">{% translate 'Vacation planning!' %}</h4>
-                {% if data.vacation_planning.ratio < 0.5 %}
-                  {% translate 'Less than half of all vacation days planned.' %}<br>
-                {% endif %}
-                {% if not data.vacation_planning.two_weeks %}
-                  {% translate 'Plan at least one vacation with a duration of two weeks, please.' %}<br>
-                {% endif %}
-              </div>
+                <div class="alert alert-warning" role="alert">
+                  <h4 class="alert-heading">{% translate 'Vacation planning!' %}</h4>
+                  {% if data.vacation_planning.ratio < 0.5 %}
+                    {% translate 'Less than half of all vacation days planned.' %}<br>
+                  {% endif %}
+                  {% if not data.vacation_planning.two_weeks %}
+                    {% translate 'Plan at least one vacation with a duration of two weeks, please.' %}<br>
+                  {% endif %}
+                </div>
               {% endif %}
             </div>
             <div class="col-md-4 col-12">
@@ -491,9 +513,10 @@
                   <th colspan="3">
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'sickness days' %}
-                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=sickness"
-                         data-ajaxmodal
-                       >
+                      <a
+                        href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=sickness"
+                        data-ajaxmodal
+                      >
                         &plus;
                       </a>
                     </div>
@@ -522,9 +545,7 @@
                   <th colspan="3">
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'Paid leave' %}
-                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=paid"
-                         data-ajaxmodal
-                       >
+                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=paid" data-ajaxmodal>
                         &plus;
                       </a>
                     </div>
@@ -549,9 +570,7 @@
                   <th colspan="3">
                     <div class="d-flex w-100 justify-content-between">
                       {% translate 'School attendance of apprentices' %}
-                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=school"
-                         data-ajaxmodal
-                       >
+                      <a href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=school" data-ajaxmodal>
                         &plus;
                       </a>
                     </div>

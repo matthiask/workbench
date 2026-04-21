@@ -27,8 +27,10 @@
             <tr>
               <td>{{ row.user }}</td>
               <td>
-                <span class="badge text-bg-{{ row.mean_logging_delay.classification.1 }}"
-                      title="{{ row.mean_logging_delay.classification.2 }}">
+                <span
+                  class="badge text-bg-{{ row.mean_logging_delay.classification.1 }}"
+                  title="{{ row.mean_logging_delay.classification.2 }}"
+                >
                   {{ row.mean_logging_delay.classification.0 }}
                 </span>
               </td>
@@ -48,7 +50,9 @@
                         <div class="modal-body text-start fw-normal">
                           {% if row.user == request.user %}
                             {% for day in row.insufficient_breaks.days %}
-                              <a href="{% url 'timestamps' %}?day={{ day.isoformat }}">{{ day|local_date_format:'D d.m.Y' }}</a><br>
+                              <a
+                                href="{% url 'timestamps' %}?day={{ day.isoformat }}"
+                              >{{ day|local_date_format:'D d.m.Y' }}</a><br>
                             {% endfor %}
                           {% else %}
                             {% for day in row.insufficient_breaks.days %}
@@ -57,21 +61,27 @@
                           {% endif %}
                         </div>
                         <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            {% translate 'Close' %}
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <a href="#" data-bs-toggle="modal" data-bs-target="#insufficient_breaks-{{ row.user.id }}" class="{% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}">
-                  {{ row.insufficient_breaks.days_count }} / {{ row.insufficient_breaks.of }}
-                  {% pie row.insufficient_breaks.days_count row.insufficient_breaks.of %}
+                  <a
+                    href="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#insufficient_breaks-{{ row.user.id }}"
+                    class="{% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}"
+                  >
+                    {{ row.insufficient_breaks.days_count }} / {{ row.insufficient_breaks.of }}
+                    {% pie row.insufficient_breaks.days_count row.insufficient_breaks.of %}
                   </a>
                 {% else %}
                   {{ row.insufficient_breaks.days_count }} / {{ row.insufficient_breaks.of }}
                   {% pie row.insufficient_breaks.days_count row.insufficient_breaks.of %}
                 {% endif %}
-
               </td>
             </tr>
           {% endfor %}

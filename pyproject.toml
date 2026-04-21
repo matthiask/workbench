@@ -157,3 +157,7 @@ run.omit = [
 ]
 report.show_missing = true
 report.skip_covered = true
+
+[tool.djangofmt]
+indent-width = 2
+profile = "django"

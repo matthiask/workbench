@@ -26,8 +26,8 @@
     <div class="col-lg-5">{% ff_fields form exclude='title,milestone,service_type,notes,provided_by' %}</div>
   </div>
   <style>
-#id_modal-weeks option[value="{{ form.this_monday.isoformat }}"] {
-  background: rgba(150, 150, 250, 0.2);
-}
+    #id_modal-weeks option[value='{{ form.this_monday.isoformat }}'] {
+      background: rgba(150, 150, 250, 0.2);
+    }
   </style>
 {% endblock body %}

@@ -44,9 +44,15 @@
           <th class="text-nowrap">{{ row.user }}</th>
           <th class="text-end"><a href="{{ row.url }}">{{ row.total|hours }}</a></th>
           {% for type in row.hours_per_type %}
-            <td class="text-end {% if not type.hours %}text-black-30{% endif %}"><a href="{{ type.url }}">{{ type.hours|hours }}</a></td>
-            <td class="text-end {% if not type.expected %}text-black-30{% endif %}">{{ type.expected|stringformat:".1f" }}%</td>
-            <td class="text-end {% if not type.reached %}text-black-30{% endif %} {{ type.highlight }}">{{ type.reached|stringformat:".1f" }}%</td>
+            <td class="text-end {% if not type.hours %}text-black-30{% endif %}">
+              <a href="{{ type.url }}">{{ type.hours|hours }}</a>
+            </td>
+            <td class="text-end {% if not type.expected %}text-black-30{% endif %}">
+              {{ type.expected|stringformat:".1f" }}%
+            </td>
+            <td class="text-end {% if not type.reached %}text-black-30{% endif %} {{ type.highlight }}">
+              {{ type.reached|stringformat:".1f" }}%
+            </td>
           {% endfor %}
           <th class="text-end"></th>
         </tr>
@@ -63,11 +69,11 @@
       </tr>
     </tfoot>
   </table>
-<style>
-.vertical-stripes tbody td:nth-child(6n+3),
-.vertical-stripes tbody td:nth-child(6n+4),
-.vertical-stripes tbody td:nth-child(6n+5) {
-  background: var(--bs-secondary-bg);
-}
-</style>
+  <style>
+    .vertical-stripes tbody td:nth-child(6n+3),
+    .vertical-stripes tbody td:nth-child(6n+4),
+    .vertical-stripes tbody td:nth-child(6n+5) {
+      background: var(--bs-secondary-bg);
+    }
+  </style>
 {% endblock content %}

@@ -9,54 +9,54 @@
   <h1>{% translate 'projected gross margin'|capfirst %}</h1>
   <table class="table table-sm bg-light vertical-stripes">
     <thead>
-    <tr>
-      <th class="w-100">{% translate 'project'|capfirst %}</th>
-      <th class="text-nowrap text-end">{% translate 'Projected' %}</th>
-      <th class="text-nowrap text-end">{% translate 'gross margin'|capfirst %}</th>
-      <th class="text-nowrap text-end">{% translate 'Delta' %}</th>
-      <th>&nbsp; &nbsp; &nbsp;</th>
-      {% for m in months %}<th class="text-nowrap text-end">{{ m|date:'M y' }}</th>{% endfor %}
-    </tr>
-    <tr>
-      <th class="w-100">{% translate 'Total' %}</th>
-      <th>&nbsp;</th>
-      <th>&nbsp;</th>
-      <th>&nbsp;</th>
-      <th>&nbsp;</th>
-      {% for mo in monthly_overall %}<th class="text-nowrap text-end">{{ mo|currency }}</th>{% endfor %}
-    </tr>
+      <tr>
+        <th class="w-100">{% translate 'project'|capfirst %}</th>
+        <th class="text-nowrap text-end">{% translate 'Projected' %}</th>
+        <th class="text-nowrap text-end">{% translate 'gross margin'|capfirst %}</th>
+        <th class="text-nowrap text-end">{% translate 'Delta' %}</th>
+        <th>&nbsp; &nbsp; &nbsp;</th>
+        {% for m in months %}<th class="text-nowrap text-end">{{ m|date:'M y' }}</th>{% endfor %}
+      </tr>
+      <tr>
+        <th class="w-100">{% translate 'Total' %}</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        {% for mo in monthly_overall %}<th class="text-nowrap text-end">{{ mo|currency }}</th>{% endfor %}
+      </tr>
     </thead>
     <tbody>
-    {% for project in projects %}
-      <tr>
-        <td>
-          <a href="{{ project.project.get_absolute_url }}">
-            {{ project.project|h }}
-            {{ project.project.status_badge }}
-          </a>
-        </td>
-        <td class="text-end">{{ project.projected_total|currency }}</td>
-        <td class="text-end">{{ project.gross_margin|currency }}</td>
-        <td class="text-end">{{ project.delta|currency }}</td>
-        <td>&nbsp;</td>
-        {% for mo in project.monthly %}
-          <td class="text-nowrap text-end">
-            {% if mo %}{{ mo|currency }}{% endif %}
+      {% for project in projects %}
+        <tr>
+          <td>
+            <a href="{{ project.project.get_absolute_url }}">
+              {{ project.project|h }}
+              {{ project.project.status_badge }}
+            </a>
           </td>
-        {% endfor %}
-      </tr>
-    {% endfor %}
+          <td class="text-end">{{ project.projected_total|currency }}</td>
+          <td class="text-end">{{ project.gross_margin|currency }}</td>
+          <td class="text-end">{{ project.delta|currency }}</td>
+          <td>&nbsp;</td>
+          {% for mo in project.monthly %}
+            <td class="text-nowrap text-end">
+              {% if mo %}{{ mo|currency }}{% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
     </tbody>
   </table>
-<style>
-.vertical-stripes thead {
-  position: sticky;
-  top: 0;
-  background: var(--bs-body-bg);
-}
-.vertical-stripes th:nth-child(2n+6),
-.vertical-stripes td:nth-child(2n+6) {
-  background: var(--bs-secondary-bg);
-}
-</style>
+  <style>
+    .vertical-stripes thead {
+      position: sticky;
+      top: 0;
+      background: var(--bs-body-bg);
+    }
+    .vertical-stripes th:nth-child(2n+6),
+    .vertical-stripes td:nth-child(2n+6) {
+      background: var(--bs-secondary-bg);
+    }
+  </style>
 {% endblock content %}

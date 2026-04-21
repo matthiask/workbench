@@ -31,12 +31,10 @@
         {% include 'svg/project.svg' %}
         {% translate 'Retrospective' %}
       </a>
-      <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}"
-         class="btn btn-primary">
+      <a href="{% url 'awt_absence_calendar' %}?team={{ object.pk }}" class="btn btn-primary">
         {% translate 'Absence calendar' %}
       </a>
-      <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
     </div>
   </div>
 {% endblock content %}

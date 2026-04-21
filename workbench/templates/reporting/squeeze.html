@@ -22,7 +22,6 @@
       </form>
 
       {% if data.users %}
-
         {# Per-project user breakdown modals #}
         {% for p in data.projects %}
           {% if p.by_user %}
@@ -39,7 +38,9 @@
                       <dt class="col-6">{% translate 'Hours' %}</dt>
                       <dd class="col-6 text-end">{{ p.hours|hours }}</dd>
                       <dt class="col-6">{% translate 'Rate' %}</dt>
-                      <dd class="col-6 text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">{{ p.rate|currency }}</dd>
+                      <dd class="col-6 text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                        {{ p.rate|currency }}
+                      </dd>
                     </dl>
                     <p class="text-muted small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
                     <table class="table table-sm">
@@ -57,9 +58,13 @@
                           <tr>
                             <td>{{ user }}</td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
-                            <td class="text-end">{% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}</td>
+                            <td class="text-end">
+                              {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
+                            </td>
                             <td class="text-end">{{ contrib.gross_margin|currency }}</td>
-                            <td class="text-end {% if contrib.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">{{ contrib.rate|currency }}</td>
+                            <td class="text-end {% if contrib.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                              {{ contrib.rate|currency }}
+                            </td>
                           </tr>
                         {% endfor %}
                       </tbody>
@@ -67,18 +72,27 @@
                         <tr>
                           <th>{% translate 'Total' %}</th>
                           <th class="text-end">{{ p.hours_in_range|hours }}</th>
-                          <th class="text-end">{% if p.hours_rate_unknown %}{{ p.hours_rate_unknown|hours }}{% endif %}</th>
+                          <th class="text-end">
+                            {% if p.hours_rate_unknown %}{{ p.hours_rate_unknown|hours }}{% endif %}
+                          </th>
                           <th class="text-end">{{ p.gross_margin_in_range|currency }}</th>
-                          <th class="text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">{{ p.rate|currency }}</th>
+                          <th class="text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                            {{ p.rate|currency }}
+                          </th>
                         </tr>
                       </tfoot>
                     </table>
                     {% if p.hours_rate_unknown %}
-                      <p class="text-muted small mt-2">{% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of {{ rate }}/h applied{% endblocktranslate %}</p>
+                      <p class="text-muted small mt-2">
+                        {% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of
+                          {{ rate }}/h applied{% endblocktranslate %}
+                      </p>
                     {% endif %}
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      {% translate 'Close' %}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -94,9 +108,13 @@
               <tr>
                 <th>{% translate 'Project' %}</th>
                 <th class="text-end">{% translate 'Offered' %}</th>
-                <th class="text-end">{% translate 'Projected' %} <small class="text-muted">{% translate 'open' %}</small></th>
+                <th class="text-end">
+                  {% translate 'Projected' %} <small class="text-muted">{% translate 'open' %}</small>
+                </th>
                 <th class="text-end">{% translate 'Invoiced' %}</th>
-                <th class="text-end">{% translate 'Gross margin' %} <small class="text-muted">{% translate 'estimated' %}</small></th>
+                <th class="text-end">
+                  {% translate 'Gross margin' %} <small class="text-muted">{% translate 'estimated' %}</small>
+                </th>
                 <th class="text-end">{% translate 'Relevant hours' %}</th>
                 <th class="text-end">{% translate 'Rate' %}</th>
                 <th class="text-end">{% translate 'Period hours' %}</th>
@@ -123,14 +141,18 @@
                   <td class="text-end">{{ p.invoiced|currency }}</td>
                   <td class="text-end">{{ p.gross_margin|currency }}</td>
                   <td class="text-end">{{ p.hours|hours }}</td>
-                  <td class="text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">{{ p.rate|currency }}</td>
+                  <td class="text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                    {{ p.rate|currency }}
+                  </td>
                   <td class="text-end">{{ p.hours_in_range|hours }}</td>
                   <td class="text-end">
                     {% if p.by_user %}
-                      <a href="#"
-                         data-bs-toggle="modal"
-                         data-bs-target="#project-users-{{ p.project.pk }}"
-                         title="{% translate 'User breakdown' %}">{{ p.gross_margin_in_range|currency }}</a>
+                      <a
+                        href="#"
+                        data-bs-toggle="modal"
+                        data-bs-target="#project-users-{{ p.project.pk }}"
+                        title="{% translate 'User breakdown' %}"
+                      >{{ p.gross_margin_in_range|currency }}</a>
                     {% else %}
                       {{ p.gross_margin_in_range|currency }}
                     {% endif %}
@@ -180,9 +202,13 @@
                           <tr>
                             <td>{% link_or_none project with_badge=True %}</td>
                             <td class="text-end">{{ contrib.hours|hours }}</td>
-                            <td class="text-end">{% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}</td>
+                            <td class="text-end">
+                              {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
+                            </td>
                             <td class="text-end">{{ contrib.gross_margin|currency }}</td>
-                            <td class="text-end {% if contrib.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">{{ contrib.rate|currency }}</td>
+                            <td class="text-end {% if contrib.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                              {{ contrib.rate|currency }}
+                            </td>
                           </tr>
                         {% endfor %}
                       </tbody>
@@ -190,18 +216,25 @@
                         <tr>
                           <th>{% translate 'Total' %}</th>
                           <th class="text-end">{{ ud.hours_in_range|hours }}</th>
-                          <th class="text-end">{% if ud.hours_rate_unknown %}{{ ud.hours_rate_unknown|hours }}{% endif %}</th>
+                          <th class="text-end">
+                            {% if ud.hours_rate_unknown %}{{ ud.hours_rate_unknown|hours }}{% endif %}
+                          </th>
                           <th class="text-end">{{ ud.gross_margin|currency }}</th>
                           <th class="text-end">{{ ud.rate|currency }}</th>
                         </tr>
                       </tfoot>
                     </table>
                     {% if ud.hours_rate_unknown %}
-                      <p class="text-muted small mt-2">{% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of {{ rate }}/h applied{% endblocktranslate %}</p>
+                      <p class="text-muted small mt-2">
+                        {% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of
+                          {{ rate }}/h applied{% endblocktranslate %}
+                      </p>
                     {% endif %}
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      {% translate 'Close' %}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -241,10 +274,12 @@
                   <td class="text-end">{{ ud.rate|currency }}</td>
                   <td class="text-end">
                     {% if ud.by_project %}
-                      <a href="#"
-                         data-bs-toggle="modal"
-                         data-bs-target="#user-projects-{{ ud.user.pk }}"
-                         title="{% translate 'Project breakdown' %}">{{ ud.gross_margin|currency }}</a>
+                      <a
+                        href="#"
+                        data-bs-toggle="modal"
+                        data-bs-target="#user-projects-{{ ud.user.pk }}"
+                        title="{% translate 'Project breakdown' %}"
+                      >{{ ud.gross_margin|currency }}</a>
                     {% else %}
                       {{ ud.gross_margin|currency }}
                     {% endif %}
@@ -276,7 +311,9 @@
                 <th></th>
                 <th></th>
                 <th class="text-end">{{ data.totals.expected_gross_margin|currency }}</th>
-                <th class="text-end {% if data.totals.delta < 0 %}text-danger{% endif %}">{{ data.totals.delta|currency }}</th>
+                <th class="text-end {% if data.totals.delta < 0 %}text-danger{% endif %}">
+                  {{ data.totals.delta|currency }}
+                </th>
               </tr>
             </tfoot>
           </table>
@@ -335,11 +372,9 @@
             </tbody>
           </table>
         </div>
-
       {% else %}
         <p class="text-muted">{% translate 'No data for the selected period.' %}</p>
       {% endif %}
-
     </div>
   </div>
 {% endblock content %}

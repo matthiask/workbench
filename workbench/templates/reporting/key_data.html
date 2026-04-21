@@ -34,134 +34,138 @@
           <th>{% translate 'Open offers total excl. tax' %}</th>
         </tr>
         <tr>
-          <td class="text-end">{{ average_employment_duration.current_users|stringformat:'.2f' }} {% translate 'years' %}</td>
+          <td class="text-end">
+            {{ average_employment_duration.current_users|stringformat:'.2f' }} {% translate 'years' %}
+          </td>
           <th>{% translate 'Average employment duration of current users' %}</th>
         </tr>
         <tr>
-          <td class="text-end">{{ average_employment_duration.all_users|stringformat:'.2f' }} {% translate 'years' %}</td>
+          <td class="text-end">
+            {{ average_employment_duration.all_users|stringformat:'.2f' }} {% translate 'years' %}
+          </td>
           <th>{% translate 'Average employment duration of all users' %}</th>
         </tr>
       </table>
       <script src="{% static 'workbench/lib/chart.js' %}"></script>
 
       <script>
-    // Helper function to adjust colors based on theme
-    function getChartColor(lightColor, darkColor) {
-      const theme = document.documentElement.getAttribute('data-bs-theme');
-      return theme === 'dark' ? darkColor : lightColor;
-    }
+        // Helper function to adjust colors based on theme
+        function getChartColor(lightColor, darkColor) {
+          const theme = document.documentElement.getAttribute('data-bs-theme');
+          return theme === 'dark' ? darkColor : lightColor;
+        }
 
-    // Define color sets for light and dark modes
-    const chartColors = {
-      set1: {
-        bg: getChartColor('rgba(30, 0, 100, 0.3)', 'rgba(120, 100, 200, 0.5)'),
-        border: getChartColor('rgba(30, 0, 100, 0.3)', 'rgba(120, 100, 200, 0.6)')
-      },
-      set2: {
-        bg: getChartColor('rgba(100, 30, 50, 0.3)', 'rgba(220, 120, 150, 0.5)'),
-        border: getChartColor('rgba(100, 30, 50, 0.4)', 'rgba(220, 120, 150, 0.6)')
-      },
-      set3: {
-        bg: getChartColor('rgba(0, 150, 0, 0.3)', 'rgba(100, 220, 100, 0.5)'),
-        border: getChartColor('rgba(0, 150, 0, 0.4)', 'rgba(100, 220, 100, 0.6)')
-      },
-      set4: {
-        bg: getChartColor('rgba(0, 0, 150, 0.3)', 'rgba(100, 150, 255, 0.5)'),
-        border: getChartColor('rgba(0, 0, 150, 0.4)', 'rgba(100, 150, 255, 0.6)')
-      },
-      projected: {
-        bg: getChartColor('rgba(100, 180, 180, 0.4)', 'rgba(150, 220, 220, 0.5)'),
-        border: getChartColor('rgba(100, 180, 180, 0.6)', 'rgba(150, 220, 220, 0.7)')
-      },
-      green: getChartColor('rgba(0, 150, 0, 0.4)', 'rgba(100, 220, 100, 0.5)'),
-      brown: getChartColor('rgba(50, 40, 30, 0.4)', 'rgba(180, 160, 140, 0.5)'),
-      orange: getChartColor('rgba(150, 50, 30, 0.4)', 'rgba(255, 150, 120, 0.5)'),
-      blue: getChartColor('rgba(0, 0, 150, 0.4)', 'rgba(100, 150, 255, 0.5)')
-    };
+        // Define color sets for light and dark modes
+        const chartColors = {
+          set1: {
+            bg: getChartColor('rgba(30, 0, 100, 0.3)', 'rgba(120, 100, 200, 0.5)'),
+            border: getChartColor('rgba(30, 0, 100, 0.3)', 'rgba(120, 100, 200, 0.6)')
+          },
+          set2: {
+            bg: getChartColor('rgba(100, 30, 50, 0.3)', 'rgba(220, 120, 150, 0.5)'),
+            border: getChartColor('rgba(100, 30, 50, 0.4)', 'rgba(220, 120, 150, 0.6)')
+          },
+          set3: {
+            bg: getChartColor('rgba(0, 150, 0, 0.3)', 'rgba(100, 220, 100, 0.5)'),
+            border: getChartColor('rgba(0, 150, 0, 0.4)', 'rgba(100, 220, 100, 0.6)')
+          },
+          set4: {
+            bg: getChartColor('rgba(0, 0, 150, 0.3)', 'rgba(100, 150, 255, 0.5)'),
+            border: getChartColor('rgba(0, 0, 150, 0.4)', 'rgba(100, 150, 255, 0.6)')
+          },
+          projected: {
+            bg: getChartColor('rgba(100, 180, 180, 0.4)', 'rgba(150, 220, 220, 0.5)'),
+            border: getChartColor('rgba(100, 180, 180, 0.6)', 'rgba(150, 220, 220, 0.7)')
+          },
+          green: getChartColor('rgba(0, 150, 0, 0.4)', 'rgba(100, 220, 100, 0.5)'),
+          brown: getChartColor('rgba(50, 40, 30, 0.4)', 'rgba(180, 160, 140, 0.5)'),
+          orange: getChartColor('rgba(150, 50, 30, 0.4)', 'rgba(255, 150, 120, 0.5)'),
+          blue: getChartColor('rgba(0, 0, 150, 0.4)', 'rgba(100, 150, 255, 0.5)')
+        };
       </script>
 
       <h2 class="mt-5">{% translate 'Revenue minus third party costs and accruals' %}</h2>
       <canvas id="invoiced-corrected" width="1200" height="450"></canvas>
       <script>
-    new Chart("invoiced-corrected", {
-      type: "bar",
-      data: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
-        datasets: [
-          {% for year, month_data in invoiced_corrected %}
-          {
-            label: "{{ year }}",
-            data: [{% for value in month_data %}{{ value|stringformat:"d" }},{% endfor %}],
-            backgroundColor: {% cycle 'chartColors.set1.bg' 'chartColors.set2.bg' 'chartColors.set3.bg' 'chartColors.set4.bg' %},
-            borderColor: {% cycle 'chartColors.set1.border' 'chartColors.set2.border' 'chartColors.set3.border' 'chartColors.set4.border' %},
-            type: "{% cycle 'line' 'line' 'line' 'bar' %}",
-            stack: "{% cycle '' '' '' 'this' %}",
+        new Chart("invoiced-corrected", {
+          type: "bar",
+          data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+            datasets: [
+              {% for year, month_data in invoiced_corrected %}
+              {
+                label: "{{ year }}",
+                data: [{% for value in month_data %}{{ value|stringformat:"d" }},{% endfor %}],
+                backgroundColor: {% cycle 'chartColors.set1.bg' 'chartColors.set2.bg' 'chartColors.set3.bg' 'chartColors.set4.bg' %},
+                borderColor: {% cycle 'chartColors.set1.border' 'chartColors.set2.border' 'chartColors.set3.border' 'chartColors.set4.border' %},
+                type: "{% cycle 'line' 'line' 'line' 'bar' %}",
+                stack: "{% cycle '' '' '' 'this' %}",
+              },
+              {% endfor %}
+              {
+                label: "{% translate 'projected gross margin'|capfirst %}",
+                data: [{% for pi in projected_gross_margin %}{{ pi|stringformat:'d' }},{% endfor %}],
+                backgroundColor: chartColors.projected.bg,
+                borderColor: chartColors.projected.border,
+                type: "bar",
+                stack: "this",
+              },
+            ],
           },
-          {% endfor %}
-          {
-            label: "{% translate 'projected gross margin'|capfirst %}",
-            data: [{% for pi in projected_gross_margin %}{{ pi|stringformat:'d' }},{% endfor %}],
-            backgroundColor: chartColors.projected.bg,
-            borderColor: chartColors.projected.border,
-            type: "bar",
-            stack: "this",
-          },
-        ],
-      },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }]
-        },
-        elements: {
-          line: {
-            tension: 0,
-            fill: "none",
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                }
+              }]
+            },
+            elements: {
+              line: {
+                tension: 0,
+                fill: "none",
+              }
+            },
           }
-        },
-      }
-    });
+        });
       </script>
 
       <h2 class="mt-5">{% translate 'Revenue minus third party costs and accruals per FTE' %}</h2>
       <canvas id="invoiced-corrected-per-fte" width="1200" height="250"></canvas>
       <script>
-    new Chart("invoiced-corrected-per-fte", {
-      type: "bar",
-      data: {
-        labels: ["Q1", "Q2", "Q3", "Q4"],
-        datasets: [
-          {% for year, quarters in invoiced_corrected_per_fte %}
-          {
-            label: "{{ year }}",
-            data: [{% for quarter in quarters %}{{ quarter|stringformat:"d" }},{% endfor %}],
-            backgroundColor: {% cycle 'chartColors.set1.bg' 'chartColors.set2.bg' 'chartColors.set3.bg' 'chartColors.set4.bg' %},
-            borderColor: {% cycle 'chartColors.set1.border' 'chartColors.set2.border' 'chartColors.set3.border' 'chartColors.set4.border' %},
-            type: "{% cycle 'line' 'line' 'line' 'bar' %}",
-            stack: "{% cycle '' '' '' 'this' %}",
+        new Chart("invoiced-corrected-per-fte", {
+          type: "bar",
+          data: {
+            labels: ["Q1", "Q2", "Q3", "Q4"],
+            datasets: [
+              {% for year, quarters in invoiced_corrected_per_fte %}
+              {
+                label: "{{ year }}",
+                data: [{% for quarter in quarters %}{{ quarter|stringformat:"d" }},{% endfor %}],
+                backgroundColor: {% cycle 'chartColors.set1.bg' 'chartColors.set2.bg' 'chartColors.set3.bg' 'chartColors.set4.bg' %},
+                borderColor: {% cycle 'chartColors.set1.border' 'chartColors.set2.border' 'chartColors.set3.border' 'chartColors.set4.border' %},
+                type: "{% cycle 'line' 'line' 'line' 'bar' %}",
+                stack: "{% cycle '' '' '' 'this' %}",
+              },
+              {% endfor %}
+            ],
           },
-          {% endfor %}
-        ],
-      },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }]
-        },
-        elements: {
-          line: {
-            tension: 0,
-            fill: "none",
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                }
+              }]
+            },
+            elements: {
+              line: {
+                tension: 0,
+                fill: "none",
+              }
+            },
           }
-        },
-      }
-    });
+        });
       </script>
 
       <table class="table table-hover">
@@ -181,7 +185,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr style="font-style:italic">
+          <tr style="font-style: italic">
             <th>{% translate 'projection'|capfirst %}</th>
             <th class="text-end">
               {{ gross_margin_projection.gross_profit|currency }}
@@ -209,8 +213,7 @@
               <th class="text-end">
                 {{ year.third_party_costs|currency }}
               </th>
-              <th>
-              </th>
+              <th></th>
               <th class="text-end">
                 {{ year.accruals|currency }}
               </th>
@@ -235,14 +238,12 @@
                   {{ month.date|date:'F' }}
                 </td>
                 <td class="text-end">
-                  <a href="gross-profit/{{ month.date|date:'Y.m' }}/"
-                     data-ajaxmodal>
+                  <a href="gross-profit/{{ month.date|date:'Y.m' }}/" data-ajaxmodal>
                     {{ month.gross_profit|currency }}
                   </a>
                 </td>
                 <td class="text-end">
-                  <a href="third-party-costs/{{ month.date|date:'Y.m' }}/"
-                     data-ajaxmodal>
+                  <a href="third-party-costs/{{ month.date|date:'Y.m' }}/" data-ajaxmodal>
                     {{ month.third_party_costs|currency:1 }}
                   </a>
                 </td>
@@ -278,36 +279,36 @@
       </h2>
       <canvas id="hours-distribution" width="1200" height="450"></canvas>
       <script>
-    new Chart("hours-distribution", {
-      type: "line",
-      data: {
-        labels: [{% for label in hours_distribution.labels %}"{{ label }}",{% endfor %}],
-        datasets: [
-          {% for dataset in hours_distribution.datasets %}
-          {
-            label: "{{ dataset.label }}",
-            data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }},{% endfor %}],
-            backgroundColor: {% cycle 'chartColors.green' 'chartColors.brown' 'chartColors.orange' 'chartColors.blue' %},
-            fill: true,
+        new Chart("hours-distribution", {
+          type: "line",
+          data: {
+            labels: [{% for label in hours_distribution.labels %}"{{ label }}",{% endfor %}],
+            datasets: [
+              {% for dataset in hours_distribution.datasets %}
+              {
+                label: "{{ dataset.label }}",
+                data: [{% for value in dataset.data %}{{ value|stringformat:".2f" }},{% endfor %}],
+                backgroundColor: {% cycle 'chartColors.green' 'chartColors.brown' 'chartColors.orange' 'chartColors.blue' %},
+                fill: true,
+              },
+              {% endfor %}
+            ],
           },
-          {% endfor %}
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            stacked: true,
-            min: 0,
-            max: 100,
+          options: {
+            scales: {
+              y: {
+                stacked: true,
+                min: 0,
+                max: 100,
+              },
+            },
+            elements: {
+              line: {
+                tension: 0,
+              },
+            },
           },
-        },
-        elements: {
-          line: {
-            tension: 0,
-          },
-        },
-      },
-    });
+        });
       </script>
       <table class="table table-hover">
         <thead class="sticky">
@@ -318,23 +319,19 @@
             <th class="text-end">
               {% translate 'profitable' %}
             </th>
-            <th>
-            </th>
+            <th></th>
             <th class="text-end">
               {% translate 'overdrawn' %}
             </th>
-            <th>
-            </th>
+            <th></th>
             <th class="text-end">
               {% translate 'maintenance' %}
             </th>
-            <th>
-            </th>
+            <th></th>
             <th class="text-end">
               {% translate 'internal' %}
             </th>
-            <th>
-            </th>
+            <th></th>
             <th class="text-end">
               {% translate 'green' %}
             </th>

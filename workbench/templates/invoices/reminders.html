@@ -20,34 +20,37 @@
         </thead>
         <tbody>
           {% for customer, contact_invoices in nested.items %}
-          {% for contact, invoices in contact_invoices.items %}
-          <tr>
-            <th colspan="3" class="inline-links">{% link_or_none customer %} / {% link_or_none contact %}</th>
-            <td class="text-end"></td>
-            <td colspan="1" class="text-nowrap text-end">
-              {% if contact.id %}
-                <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'Generate' %}</a>
-                <a data-ajaxmodal href="{% url 'invoices_send_reminder' contact_id=contact.id %}">{% translate 'Select recipient' %}</a>
-
-              {% else %}
-                {% translate 'Contact missing' %}
-              {% endif %}
-            </td>
-          </tr>
-          {% for invoice in invoices %}
-          <tr>
-            <td>{% link_or_none invoice %}</td>
-            <td class="text-nowrap text-end">{{ invoice.total_excl_tax|currency }}</td>
-            <td class="text-nowrap text-end">{{ invoice.invoiced_on|local_date_format }}</td>
-            <td class="text-nowrap text-end">{{ invoice.pretty_last_reminded_on }}</td>
-            <td class="text-end"><a href="{{ invoice.urls.pdf }}?disposition=attachment">PDF</a></td>
-          </tr>
-          {% endfor %}
-          {% endfor %}
+            {% for contact, invoices in contact_invoices.items %}
+              <tr>
+                <th colspan="3" class="inline-links">
+                  {% link_or_none customer %} / {% link_or_none contact %}
+                </th>
+                <td class="text-end"></td>
+                <td colspan="1" class="text-nowrap text-end">
+                  {% if contact.id %}
+                    <a href="{% url 'invoices_dunning_letter' contact_id=contact.id %}">{% translate 'Generate' %}</a>
+                    <a
+                      data-ajaxmodal
+                      href="{% url 'invoices_send_reminder' contact_id=contact.id %}"
+                    >{% translate 'Select recipient' %}</a>
+                  {% else %}
+                    {% translate 'Contact missing' %}
+                  {% endif %}
+                </td>
+              </tr>
+              {% for invoice in invoices %}
+                <tr>
+                  <td>{% link_or_none invoice %}</td>
+                  <td class="text-nowrap text-end">{{ invoice.total_excl_tax|currency }}</td>
+                  <td class="text-nowrap text-end">{{ invoice.invoiced_on|local_date_format }}</td>
+                  <td class="text-nowrap text-end">{{ invoice.pretty_last_reminded_on }}</td>
+                  <td class="text-end"><a href="{{ invoice.urls.pdf }}?disposition=attachment">PDF</a></td>
+                </tr>
+              {% endfor %}
+            {% endfor %}
           {% endfor %}
         </tbody>
       </table>
-
     </div>
   </div>
 {% endblock content %}

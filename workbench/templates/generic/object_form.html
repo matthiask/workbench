@@ -22,9 +22,13 @@
           <button type="submit" class="btn btn-primary">{% translate 'continue' %}</button>
         </form>
       {% else %}
-        <form method="POST"
-              action="{{ request.get_full_path }}"
-              {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+        <form
+          method="POST"
+          action="{{ request.get_full_path }}"
+          {% if form.is_multipart %}
+            enctype="multipart/form-data"
+          {% endif %}
+        >
           {% csrf_token %}
           {% include 'fineforms/warnings.html' %}
           {% ff_errors form %}
@@ -34,8 +38,10 @@
             <div class="col-sm-12">
               <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
               {% if object.get_absolute_url %}
-                <a href="{{ object.get_absolute_url }}"
-                   class="btn float-end btn-outline-danger">{% translate 'Cancel' %}</a>
+                <a
+                  href="{{ object.get_absolute_url }}"
+                  class="btn float-end btn-outline-danger"
+                >{% translate 'Cancel' %}</a>
               {% endif %}
             </div>
           </div>

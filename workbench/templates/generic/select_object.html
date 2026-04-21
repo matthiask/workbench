@@ -5,8 +5,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">{{ title }}</h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body clearfix">
           {% bootstrap_messages %}
@@ -19,11 +18,15 @@
           {% if links %}
             <div class="list-group">
               {% for link in links %}
-                <a href="{{ link.url }}"
+                <a
+                  href="{{ link.url }}"
                   class="list-group-item list-group-item-action"
                   {{ link.attrs|safe }}
-                  data-number-shortcut="{{ link.shortcut }}">
-                  {% if link.shortcut is not None %}<span class="badge text-bg-secondary float-end mt-1">{{ link.shortcut }}</span>{% endif %}
+                  data-number-shortcut="{{ link.shortcut }}"
+                >
+                  {% if link.shortcut is not None %}<span
+                      class="badge text-bg-secondary float-end mt-1"
+                    >{{ link.shortcut }}</span>{% endif %}
                   {% if link.is_pinned %}<small>&#128204;</small>{% endif %}
                   {{ link.title }}
                 </a>

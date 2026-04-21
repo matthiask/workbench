@@ -1,164 +1,158 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon"
-          href="{% static 'workbench/lib/timestamps.png' %}">
-    <link rel="apple-touch-icon"
-          sizes="128x128"
-          href="{% static 'workbench/lib/timestamps.png' %}">
-    <link rel="icon"
-          sizes="192x192"
-          href="{% static 'workbench/lib/timestamps.png' %}">
+    <link rel="shortcut icon" href="{% static 'workbench/lib/timestamps.png' %}">
+    <link rel="apple-touch-icon" sizes="128x128" href="{% static 'workbench/lib/timestamps.png' %}">
+    <link rel="icon" sizes="192x192" href="{% static 'workbench/lib/timestamps.png' %}">
     <title>Timestamps</title>
     <style>
-body {
-  font-family: sans-serif;
-  min-height: 90vh;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  background: #212529;
-  color: #f8f9fa;
-  box-sizing: border-box;
-}
+      body {
+        box-sizing: border-box;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        min-height: 90vh;
+        background: #212529;
+        color: #f8f9fa;
+        font-family: sans-serif;
+      }
 
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-}
+      *,
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
 
-main {
-  max-width: 30rem;
-}
+      main {
+        max-width: 30rem;
+      }
 
-main > * + * {
-  margin-top: 1rem;
-}
+      main > * + * {
+        margin-top: 1rem;
+      }
 
-input {
-  border: 1px solid grey;
-  padding: 0.25rem;
-  font-size: 2rem;
-  padding: 0.25rem 0.5rem;
-  background: inherit;
-  color: inherit;
-}
+      input {
+        padding: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid grey;
+        background: inherit;
+        color: inherit;
+        font-size: 2rem;
+      }
 
-input::placeholder {
-  color: #999;
-}
+      input::placeholder {
+        color: #999;
+      }
 
-.notes input {
-  width: 100%;
-}
+      .notes input {
+        width: 100%;
+      }
 
-input + input {
-  margin-top: 1rem;
-}
+      input + input {
+        margin-top: 1rem;
+      }
 
-.buttons {
-  display: grid;
-  grid-gap: 0.5rem;
-}
+      .buttons {
+        display: grid;
+        grid-gap: 0.5rem;
+      }
 
-button {
-  border: none;
-  font-size: 2rem;
-  padding: 1.5rem;
-  color: #fff;
-  cursor: pointer;
-}
+      button {
+        padding: 1.5rem;
+        border: none;
+        color: #fff;
+        font-size: 2rem;
+        cursor: pointer;
+      }
 
-button:active {
-  opacity: 0.8;
-}
+      button:active {
+        opacity: 0.8;
+      }
 
-[data-type="start"] {
-  background: #9954bb;
-  grid-column: 1;
-  grid-row: 1;
-}
-[data-type="stop"] {
-  background: #cc1e6e;
-  grid-column: 2;
-  grid-row: 1;
-}
+      [data-type='start'] {
+        grid-row: 1;
+        grid-column: 1;
+        background: #9954bb;
+      }
+      [data-type='stop'] {
+        grid-row: 1;
+        grid-column: 2;
+        background: #cc1e6e;
+      }
 
-#status {
-  min-height: 1.5rem;
-  text-align: center;
-}
+      #status {
+        min-height: 1.5rem;
+        text-align: center;
+      }
 
-.success {
-  color: #9954bb;
-}
+      .success {
+        color: #9954bb;
+      }
     </style>
     <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const $ = (sel, base=document) => base.querySelector(sel)
+      document.addEventListener("DOMContentLoaded", () => {
+        const $ = (sel, base=document) => base.querySelector(sel)
 
-  const notes = $("[name=notes]")
-  const time = $("[name=time]")
+        const notes = $("[name=notes]")
+        const time = $("[name=time]")
 
-  let statusTimeout = null
-  const setStatus = (success, message = "") => {
-    clearTimeout(statusTimeout)
+        let statusTimeout = null
+        const setStatus = (success, message = "") => {
+          clearTimeout(statusTimeout)
 
-    const f = $("#status")
-    f.textContent = message
-    f.classList.toggle("success", success)
+          const f = $("#status")
+          f.textContent = message
+          f.classList.toggle("success", success)
 
-    statusTimeout = setTimeout(() => {
-      f.textContent = ""
-      f.classList.remove("success")
-    }, 2000)
-  }
+          statusTimeout = setTimeout(() => {
+            f.textContent = ""
+            f.classList.remove("success")
+          }, 2000)
+        }
 
-  const params = new URLSearchParams(window.location.search)
-  const url = params.get("url")
-  const token = params.get("token")
-  const title = params.get("title")
+        const params = new URLSearchParams(window.location.search)
+        const url = params.get("url")
+        const token = params.get("token")
+        const title = params.get("title")
 
-  if (!token || !url) {
-    alert("Necessary configuration parameters missing.")
-  }
+        if (!token || !url) {
+          alert("Necessary configuration parameters missing.")
+        }
 
-  if (title) {
-    document.title += `: ${title}`
-    $("h1").textContent += `: ${title}`
-  }
+        if (title) {
+          document.title += `: ${title}`
+          $("h1").textContent += `: ${title}`
+        }
 
-  document.body.addEventListener("click", async e => {
-    const button = e.target.closest("button[data-type]")
+        document.body.addEventListener("click", async e => {
+          const button = e.target.closest("button[data-type]")
 
-    if (button) {
-      const fd = new FormData()
-      fd.append("type", button.dataset.type)
-      fd.append("notes", notes.value)
-      fd.append("time", time.value)
-      fd.append("token", token)
-      try {
-        const response = await fetch(`${url}`, {
-          method: "POST",
-          body: fd,
+          if (button) {
+            const fd = new FormData()
+            fd.append("type", button.dataset.type)
+            fd.append("notes", notes.value)
+            fd.append("time", time.value)
+            fd.append("token", token)
+            try {
+              const response = await fetch(`${url}`, {
+                method: "POST",
+                body: fd,
+              })
+              if (!response.ok) throw Error()
+              const _data = await response.json()
+
+              notes.value = ""
+              time.value = ""
+              setStatus(true, "Saved!")
+            } catch(err) {
+              setStatus(false, `Error: ${err}`)
+            }
+          }
         })
-        if (!response.ok) throw Error()
-        const _data = await response.json()
-
-        notes.value = ""
-        time.value = ""
-        setStatus(true, "Saved!")
-      } catch(err) {
-        setStatus(false, `Error: ${err}`)
-      }
-    }
-  })
-})
-
+      })
     </script>
   </head>
   <body>

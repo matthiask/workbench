@@ -2,8 +2,7 @@
 {% load django_bootstrap5 fineforms formset i18n %}
 {% block uplink %}
   {% if view.object %}
-    <a href="{{ view.object.get_absolute_url }}"
-       class="btn btn-primary btn-sm uplink">
+    <a href="{{ view.object.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
       {% include 'svg/chevron-left.svg' %}
       {% translate 'offer' %}
     </a>
@@ -34,13 +33,13 @@
           <h4>{% translate 'services' %}</h4>
           <table class="table table-sm table-offer-pricing">
             <colgroup>
-              <col />
-              <col width="50%"/>
-              <col />
-              <col />
-              <col />
-              <col />
-              <col />
+              <col>
+              <col width="50%">
+              <col>
+              <col>
+              <col>
+              <col>
+              <col>
             </colgroup>
             <thead>
               <tr>
@@ -55,20 +54,20 @@
             </thead>
             <tbody>
               {% formset form.formsets.services "services" %}
-                <tr id="{{ form_id }}" data-service>
-                  <td>
-                    {% ff_errors form %}
-                    {% ff_fields form exclude='title,effort_type,effort_rate,effort_hours,cost' %}
-                  </td>
-                  <td>{% ff_field form.title %}</td>
-                  <td>{% ff_field form.effort_type %}</td>
-                  <td data-effort-rate>{% ff_field form.effort_rate %}</td>
-                  <td data-effort-hours>{% ff_field form.effort_hours %}</td>
-                  <td data-cost>{% ff_field form.cost %}</td>
-                  <td>
-                    <input type="text" class="form-control" disabled data-service-cost>
-                  </td>
-                </tr>
+              <tr id="{{ form_id }}" data-service>
+                <td>
+                  {% ff_errors form %}
+                  {% ff_fields form exclude='title,effort_type,effort_rate,effort_hours,cost' %}
+                </td>
+                <td>{% ff_field form.title %}</td>
+                <td>{% ff_field form.effort_type %}</td>
+                <td data-effort-rate>{% ff_field form.effort_rate %}</td>
+                <td data-effort-hours>{% ff_field form.effort_hours %}</td>
+                <td data-cost>{% ff_field form.cost %}</td>
+                <td>
+                  <input type="text" class="form-control" disabled data-service-cost>
+                </td>
+              </tr>
               {% endformset %}
             </tbody>
           </table>
@@ -79,8 +78,10 @@
           <div class="col-sm-12">
             <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
             {% if object.get_absolute_url %}
-              <a href="{{ object.get_absolute_url }}"
-                 class="btn float-end btn-outline-danger">{% translate 'cancel' %}</a>
+              <a
+                href="{{ object.get_absolute_url }}"
+                class="btn float-end btn-outline-danger"
+              >{% translate 'cancel' %}</a>
             {% endif %}
           </div>
         </div>

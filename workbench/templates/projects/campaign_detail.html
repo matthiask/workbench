@@ -22,7 +22,9 @@
                   <thead class="sticky">
                     <tr>
                       <th>{% translate 'project'|capfirst %}</th>
-                      <th class="text-end" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</th>
+                      <th class="text-end" title="{% translate 'Offered and accepted' %}">
+                        {% translate 'sold'|capfirst %}
+                      </th>
                       <th class="text-end">{% translate 'logbook'|capfirst %}</th>
                       <th class="text-end">{% translate 'third party costs'|capfirst %}</th>
                       <th class="text-end">{% translate 'invoiced'|capfirst %}</th>
@@ -53,14 +55,24 @@
                     {% for project in statistics.statistics %}
                       <tr>
                         <td>{% link_or_none project.project with_badge=True %}</td>
-                        <td class="text-end
-                                   {% if not project.sold %}
-                                     text-black-30
-                                   {% endif %}">{{ project.sold|currency }}</td>
-                        <td class="text-end text-nowrap
-                                   {% if not project.logbook and not project.effort_hours_with_rate_undefined %}
-                                     text-black-30
-                                   {% endif %}">
+                        <td
+                          class="
+                            text-end
+                            {% if not project.sold %}
+                            text-black-30
+                            {% endif %}
+                          "
+                        >
+                          {{ project.sold|currency }}
+                        </td>
+                        <td
+                          class="
+                            text-end text-nowrap
+                            {% if not project.logbook and not project.effort_hours_with_rate_undefined %}
+                            text-black-30
+                            {% endif %}
+                          "
+                        >
                           {{ project.logbook|currency }}
                           {% if project.effort_hours_with_rate_undefined %}
                             <span class="text-warning" title="{% translate 'undefined rate' %}">
@@ -69,22 +81,34 @@
                           {% endif %}
                           {% bar project.logbook project.sold %}
                         </td>
-                        <td class="text-end
-                                   {% if not project.third_party_costs %}
-                                     text-black-30
-                                   {% endif %}">
+                        <td
+                          class="
+                            text-end
+                            {% if not project.third_party_costs %}
+                            text-black-30
+                            {% endif %}
+                          "
+                        >
                           {{ project.third_party_costs|currency }}
                         </td>
-                        <td class="text-end
-                                   {% if not project.invoiced %}
-                                     text-black-30
-                                   {% endif %}">{{ project.invoiced|currency }}</td>
+                        <td
+                          class="
+                            text-end
+                            {% if not project.invoiced %}
+                            text-black-30
+                            {% endif %}
+                          "
+                        >
+                          {{ project.invoiced|currency }}
+                        </td>
                         <td class="text-end text-nowrap">
                           {{ project.hours|hours }} /
                           {{ project.service_hours|hours }}
                           {% bar project.hours project.service_hours %}
                         </td>
-                        <td class="text-end {% if not project.delta %}text-black-30{% endif %}">{{ project.delta|currency:True }}</td>
+                        <td class="text-end {% if not project.delta %}text-black-30{% endif %}">
+                          {{ project.delta|currency:True }}
+                        </td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -100,23 +124,17 @@
           </td>
         </tr>
       </table>
-      <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}"
-         class="btn btn-primary">
+      <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}" class="btn btn-primary">
         {% include "svg/plus.svg" %}
         {% translate 'project'|capfirst %}
       </a>
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.create }}?copy={{ object.pk }}"
-         class="btn btn-primary">{% translate 'Copy' %}</a>
-        <a href="{{ object.urls.statistics }}"
-           class="btn btn-primary"
-           data-ajaxmodal>{% translate 'Statistics' %}</a>
-      <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}"
-         class="btn btn-primary">
+      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">{% translate 'Copy' %}</a>
+      <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-ajaxmodal>{% translate 'Statistics' %}</a>
+      <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
         {% translate 'logged hours'|capfirst %}
       </a>
-      <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}"
-         class="btn btn-primary">
+      <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
         {% translate 'logged cost'|capfirst %}
       </a>
       {% if request.user.features.PLANNING %}
@@ -125,8 +143,7 @@
           {% translate 'planning'|capfirst %}
         </a>
       {% endif %}
-      <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-end">
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">
         {% translate 'Delete' %}
       </a>
     </div>

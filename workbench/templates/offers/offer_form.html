@@ -2,8 +2,7 @@
 {% load i18n %}
 {% block uplink %}
   {% if view.project %}
-    <a href="{{ view.project.get_absolute_url }}"
-       class="btn btn-primary btn-sm uplink">
+    <a href="{{ view.project.get_absolute_url }}" class="btn btn-primary btn-sm uplink">
       {% include 'svg/chevron-left.svg' %}
       {% translate 'project' %}
     </a>
@@ -15,13 +14,13 @@
 {% block js %}
   {{ block.super }}
   <script>
-jQuery(function($) {
-  $(document.body).on("change", "[data-toggle-following]", function() {
-    var self = $(this),
-      siblings = self.closest(".form-text").nextUntil(".form-text");
+    jQuery(function($) {
+      $(document.body).on("change", "[data-toggle-following]", function() {
+        var self = $(this),
+          siblings = self.closest(".form-text").nextUntil(".form-text");
 
-    siblings.find("input").prop("checked", this.checked);
-  });
-});
+        siblings.find("input").prop("checked", this.checked);
+      });
+    });
   </script>
 {% endblock js %}

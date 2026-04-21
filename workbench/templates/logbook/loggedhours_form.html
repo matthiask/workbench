@@ -14,10 +14,14 @@
   {% include 'fineforms/warnings.html' %}
   {% ff_errors form %}
   {% if form.service_title %}
-    <div class="{% if form.hide_new_service %}
-                  d-none
-                {% endif %}"
-         id="new-service">
+    <div
+      class="
+        {% if form.hide_new_service %}
+        d-none
+        {% endif %}
+      "
+      id="new-service"
+    >
       <h5>{% translate 'new service' %}</h5>
       {% ff_field form.service_title %}
       {% ff_field form.service_description %}
@@ -40,7 +44,7 @@
         <div class="progress-bar bg-caveat" role="progressbar"></div>
         <div class="progress-bar bg-danger" role="progressbar"></div>
       </div>
-      <small data-numbers class="d-inline-block text-end" style="width:15ch"></small>
+      <small data-numbers class="d-inline-block text-end" style="width: 15ch"></small>
     </div>
     {{ form.progress_on_selectable_services|json_script }}
   </div>
@@ -51,9 +55,7 @@
 
 {% block footer %}
   {% if form.service_title and form.hide_new_service %}
-    <button type="button"
-            class="btn btn-primary me-auto"
-            data-new-service>
+    <button type="button" class="btn btn-primary me-auto" data-new-service>
       {% translate 'new service' %}
     </button>
   {% endif %}

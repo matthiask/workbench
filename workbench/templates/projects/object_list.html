@@ -4,8 +4,7 @@
   <h1>
     {% translate 'projects'|capfirst %}
     <small>
-      <a {% if request.path == "/projects/" %}class="active"{% endif %}
-         href="{% url 'projects_project_list' %}">
+      <a {% if request.path == "/projects/" %}class="active"{% endif %} href="{% url 'projects_project_list' %}">
         {% translate 'projects'|capfirst %}
       </a>
       {% mark_current request.path %}
@@ -15,7 +14,7 @@
       {% if request.user.features.CAMPAIGNS %}
         <a href="{% url 'projects_campaign_list' %}">{% translate 'campaigns'|capfirst %}</a>
       {% endif %}
-    {% endmark_current %}
-  </small>
-</h1>
+      {% endmark_current %}
+    </small>
+  </h1>
 {% endblock content-title %}

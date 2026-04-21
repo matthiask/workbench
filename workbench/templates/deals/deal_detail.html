@@ -35,19 +35,25 @@
                 {% endif %}
               </div>
               <div class="col-auto">
-                <a data-ajaxmodal
-                   href="{{ object.urls.set_status }}?status={{ object.OPEN }}"
-                   class="btn btn-sm btn-info">
+                <a
+                  data-ajaxmodal
+                  href="{{ object.urls.set_status }}?status={{ object.OPEN }}"
+                  class="btn btn-sm btn-info"
+                >
                   {% translate 'open'|capfirst %}
                 </a>
-                <a data-ajaxmodal
-                   href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}"
-                   class="btn btn-sm btn-success">
+                <a
+                  data-ajaxmodal
+                  href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}"
+                  class="btn btn-sm btn-success"
+                >
                   {% translate 'accepted'|capfirst %}
                 </a>
-                <a data-ajaxmodal
-                   href="{{ object.urls.set_status }}?status={{ object.DECLINED }}"
-                   class="btn btn-sm btn-danger">
+                <a
+                  data-ajaxmodal
+                  href="{{ object.urls.set_status }}?status={{ object.DECLINED }}"
+                  class="btn btn-sm btn-danger"
+                >
                   {% translate 'declined'|capfirst %}
                 </a>
               </div>
@@ -93,14 +99,12 @@
           <td>
             {% for offer in object.get_related_offers %}
               <div class="clearfix mb-2">
-                <form method="post"
-                      action="{{ object.urls.remove_offer }}"
-                      class="float-end">
+                <form method="post" action="{{ object.urls.remove_offer }}" class="float-end">
                   {% csrf_token %}
                   <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
-                  <button type="submit"
-                          title="{% translate 'Unlink offer' %}"
-                          class="btn btn-outline-danger btn-sm">&times;</button>
+                  <button type="submit" title="{% translate 'Unlink offer' %}" class="btn btn-outline-danger btn-sm">
+                    &times;
+                  </button>
                 </form>
                 {% link_or_none offer with_badge=True %}
               </div>
@@ -111,11 +115,8 @@
         </tr>
       </table>
       <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.add_offer }}"
-         class="btn btn-primary"
-         data-ajaxmodal>{% translate 'Link offer' %}</a>
-      <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-end">
+      <a href="{{ object.urls.add_offer }}" class="btn btn-primary" data-ajaxmodal>{% translate 'Link offer' %}</a>
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">
         {% translate 'Delete' %}
       </a>
       {% notes object %}

@@ -1,7 +1,8 @@
 <div class="form-group mb-3 {{ css_classes }}">
   {% if widget_then_label %}
     <div class="form-check">
-      {{ field }} {{ label_tag }}
+      {{ field }}
+      {{ label_tag }}
       {% if field.errors %}
         <div class="invalid-feedback">
           {% for error in field.errors %}

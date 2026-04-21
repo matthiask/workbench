@@ -14,8 +14,9 @@
           <td>
             {% link_or_none object.customer %}
             {% if object.customer.notes %}
-              <div style="margin-top:1rem;padding:0.75rem 1rem;border:1px solid #ccc">
-                <strong>{% translate 'notes of the organization' %}:</strong><br>{{ object.customer.notes|linebreaksbr }}
+              <div style="margin-top: 1rem; padding: 0.75rem 1rem; border: 1px solid #ccc">
+                <strong
+                >{% translate 'notes of the organization' %}:</strong><br>{{ object.customer.notes|linebreaksbr }}
               </div>
             {% endif %}
           </td>
@@ -74,8 +75,16 @@
                     </td>
                     <td class="text-end">{{ service.service_cost|currency }}</td>
                     <td>
-                      <a class="inline" href="{{ service.urls.update }}" data-ajaxmodal>{% include 'svg/pencil.svg' %}</a>
-                      <a class="inline" href="{{ service.urls.delete }}" data-ajaxmodal>{% include 'svg/trashcan.svg' %}</a>
+                      <a
+                        class="inline"
+                        href="{{ service.urls.update }}"
+                        data-ajaxmodal
+                      >{% include 'svg/pencil.svg' %}</a>
+                      <a
+                        class="inline"
+                        href="{{ service.urls.delete }}"
+                        data-ajaxmodal
+                      >{% include 'svg/trashcan.svg' %}</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -133,24 +142,22 @@
         </tr>
       </table>
       <span class="btn-group">
-        <a href="{{ object.urls.pdf }}"
-           class="btn btn-primary"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
           PDF
         </a>
-        <button type="button"
-                class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                data-bs-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
+        <button
+          type="button"
+          class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           <span class="visually-hidden">
             Toggle Dropdown
           </span>
         </button>
         <div class="dropdown-menu dropdown-menu-end">
-          <a class="dropdown-item"
-             href="{{ object.urls.pdf }}?disposition=attachment">
+          <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
             {% translate 'Download' %}
           </a>
         </div>
@@ -163,8 +170,7 @@
       <a href="{{ object.urls.update }}" class="btn btn-primary">
         {% translate 'Update' %}
       </a>
-      <a href="{{ object.urls.delete }}"
-         class="btn btn-outline-danger float-end">
+      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">
         {% translate 'Delete' %}
       </a>
       {% notes object %}

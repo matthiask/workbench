@@ -98,7 +98,7 @@ class ContactsTest(TestCase):
 
         self.client.force_login(person.primary_contact)
         response = self.client.get(person.urls["list"])
-        self.assertContains(response, "1 &ndash; 2 of 2")
+        self.assertContains(response, "1 &ndash; 2 of 2", html=True)
         self.assertContains(response, "Vorname Nachname", 2)
 
         response = self.client.get("/contacts/people/?g=" + str(group1.pk))

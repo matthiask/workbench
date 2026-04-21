@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 {% load django_bootstrap5 i18n static webpack_assets %}
 <html lang="{{ LANGUAGE_CODE }}">
   <head>
@@ -28,25 +28,28 @@
 
     {% if not TESTING %}{% webpack_assets 'main' %}{% endif %}
     <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="robots" content="noindex">
     {% if request.user.features.PRIDE and JUN or request.user.features.PRIDE and MAR08 %}
       <style>
-      body::before {
-        content: "";
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(to right, red,orange,yellow,green,blue,indigo,violet);
-      }
+        body::before {
+          width: 100%;
+          height: 3px;
+          background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+          content: '';
+        }
       </style>
     {% endif %}
   </head>
-  <body class="d-flex flex-column
-               {% if DEBUG %}
-                 debug-is-active
-               {% endif %}"
-        role="document">
+  <body
+    class="
+      d-flex flex-column
+      {% if DEBUG %}
+      debug-is-active
+      {% endif %}
+    "
+    role="document"
+  >
     {% block body %}
     {% endblock body %}
     {% block js %}{% endblock %}
