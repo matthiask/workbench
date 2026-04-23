@@ -1,7 +1,7 @@
 import fh_fablib as fl
 
 
-fl.require("1.0.20260320")
+fl.require("1.0.20260423")
 fl.config.update(
     app="workbench",
     domain="workbench.feinheit.ch",
