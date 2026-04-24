@@ -4,7 +4,7 @@ WORKDIR /src
 ENV PYTHONUNBUFFERED 1
 ENV UV_PYTHON_INSTALL_DIR=/opt/uv
 ADD pyproject.toml uv.lock .
-RUN --mount=type=cache,target=/root/.cache/uv uv sync
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv uv sync --no-dev
 ADD . /src
 COPY conf/_env .env
 RUN uv run python manage.py collectstatic --noinput && rm .env
