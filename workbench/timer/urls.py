@@ -10,6 +10,11 @@ urlpatterns = [
     path("create-timestamp/", views.create_timestamp, name="create_timestamp"),
     path("list-timestamps/", views.list_timestamps, name="list_timestamps"),
     re_path(
+        r"^split-timestamp/([0-9]+)/$",
+        views.split_timestamp,
+        name="split_timestamp",
+    ),
+    re_path(
         r"^delete-timestamp/([0-9]+)/$", views.delete_timestamp, name="delete_timestamp"
     ),
     path(

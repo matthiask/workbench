@@ -155,6 +155,65 @@ class TimestampsTest(TestCase):
             ],
         )
 
+    def test_split_timestamp(self):
+        """Unassigned timestamp slices can be split into decimal hour parts"""
+        today = localtime(timezone.now()).replace(
+            hour=9, minute=0, second=0, microsecond=0
+        )
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        user.timestamp_set.create(type=Timestamp.START, created_at=today)
+        stop = user.timestamp_set.create(
+            type=Timestamp.STOP,
+            created_at=today + dt.timedelta(minutes=40),
+            notes="Work",
+        )
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(slices[0].elapsed_hours, Decimal("0.7"))
+        self.assertEqual(
+            slices[0].split_url, reverse("split_timestamp", args=(stop.pk,))
+        )
+
+        response = self.client.post(
+            reverse("split_timestamp", args=(stop.pk,)),
+            {"parts": 3},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 201)
+
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(
+            [slice.elapsed_hours for slice in slices],
+            [
+                Decimal("0.2"),
+                Decimal("0.2"),
+                Decimal("0.3"),
+            ],
+        )
+        self.assertEqual(
+            [local_date_format(slice.get("ends_at"), fmt="H:i") for slice in slices],
+            ["09:12", "09:24", "09:40"],
+        )
+
+    def test_split_timestamp_rejects_associated_log(self):
+        """Timestamps which are already linked to hours cannot be split"""
+        hours = factories.LoggedHoursFactory.create()
+        user = hours.rendered_by
+        self.client.force_login(user)
+        timestamp = user.timestamp_set.create(
+            type=Timestamp.STOP,
+            logged_hours=hours,
+        )
+
+        response = self.client.post(
+            reverse("split_timestamp", args=(timestamp.pk,)),
+            {"parts": 2},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 404)
+
     def test_latest_logbook_entry(self):
         """Timestamps are automatically created for logged hours"""
         now = timezone.now()

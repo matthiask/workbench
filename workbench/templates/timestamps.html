@@ -141,6 +141,17 @@
                       <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
                     </form>
                   {% endif %}
+                  {% if slice.split_url %}
+                    <a
+                      href="{{ slice.split_url }}"
+                      data-ajaxmodal
+                      class="btn btn-sm align-self-start btn-primary"
+                      title="{% translate 'Split' %}"
+                    >
+                      <span aria-hidden="true">{% include 'svg/repo-forked.svg' %}</span>
+                      <span class="visually-hidden">{% translate 'Split' %}</span>
+                    </a>
+                  {% endif %}
                 </div>
               </div>
             </div>

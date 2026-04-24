@@ -1,14 +1,15 @@
 import datetime as dt
+from decimal import Decimal
 
 from corsheaders.middleware import CorsMiddleware
 from django import forms
 from django.contrib import messages
 from django.db.models import Sum
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.decorators import decorator_from_middleware
-from django.utils.timezone import make_aware
+from django.utils.timezone import localdate, make_aware
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
@@ -91,6 +92,30 @@ class TokenUserForm(TokenUserMixin, Form):
     pass
 
 
+class SplitTimestampForm(Form):
+    parts = forms.IntegerField(label=_("Number of parts"), min_value=2)
+
+    def __init__(self, *args, slice, **kwargs):
+        self.slice = slice
+        super().__init__(*args, **kwargs)
+
+    def clean_parts(self):
+        parts = self.cleaned_data["parts"]
+        total_tenths = int(self.slice.elapsed_hours * Decimal(10))
+        if parts > total_tenths:
+            raise forms.ValidationError(
+                _("This timestamp can be split into at most %(parts)s parts."),
+                params={"parts": total_tenths},
+            )
+        return parts
+
+    def split_hours(self):
+        total_tenths = int(self.slice.elapsed_hours * Decimal(10))
+        parts = self.cleaned_data["parts"]
+        base, remainder = divmod(total_tenths, parts)
+        return [base] * (parts - 1) + [base + remainder]
+
+
 @decorator_from_middleware(CorsMiddleware)
 @require_GET
 def list_timestamps(request):
@@ -139,6 +164,67 @@ def delete_timestamp(request, pk):
         % {"class": timestamp._meta.verbose_name, "object": timestamp},
     )
     return HttpResponseRedirect(reverse("timestamps") + request.POST.get("next", ""))
+
+
+def _timestamp_slice(timestamp):
+    day = localdate(timestamp.created_at)
+    for slice in Timestamp.objects.slices(timestamp.user, day=day):
+        if slice.get("timestamp_id") == timestamp.id:
+            return slice
+    return None
+
+
+def split_timestamp(request, pk):
+    timestamp = get_object_or_404(
+        Timestamp.objects.filter(
+            user=request.user,
+            logged_hours__isnull=True,
+            logged_break__isnull=True,
+        ),
+        pk=pk,
+    )
+    slice = _timestamp_slice(timestamp)
+    if not slice or not slice.split_url:
+        messages.error(request, _("This timestamp cannot be split."))
+        return (
+            render(request, "modal.html")
+            if request.is_ajax()
+            else HttpResponseRedirect(reverse("timestamps"))
+        )
+
+    form = SplitTimestampForm(
+        request.POST if request.method == "POST" else None,
+        request=request,
+        slice=slice,
+    )
+    if request.method == "POST" and form.is_valid():
+        accumulated_tenths = 0
+        new_timestamps = []
+        for part_tenths in form.split_hours()[:-1]:
+            accumulated_tenths += part_tenths
+            new_timestamps.append(
+                Timestamp(
+                    user=request.user,
+                    type=Timestamp.STOP,
+                    notes=timestamp.notes,
+                    created_at=slice["starts_at"]
+                    + dt.timedelta(seconds=accumulated_tenths * 360),
+                )
+            )
+        Timestamp.objects.bulk_create(new_timestamps)
+        messages.success(request, _("The timestamp has been split successfully."))
+        if request.is_ajax():
+            return HttpResponse("Thanks", status=201)
+        return HttpResponseRedirect(reverse("timestamps"))
+
+    return render(
+        request,
+        "modalform.html",
+        {
+            "form": form,
+            "title": _("Split timestamp"),
+        },
+    )
 
 
 class DayForm(Form):

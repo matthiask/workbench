@@ -85,6 +85,18 @@ class Slice(dict):
             urlencode([pair for pair in params if pair[1]]),
         )
 
+    @property
+    def split_url(self):
+        if (
+            self.has_associated_log
+            or not self.get("timestamp_id")
+            or not self.get("starts_at")
+            or not self.get("ends_at")
+            or not self.elapsed_hours
+        ):
+            return None
+        return reverse("split_timestamp", args=(self["timestamp_id"],))
+
 
 class TimestampQuerySet(models.QuerySet):
     def slices(self, user, *, day=None):

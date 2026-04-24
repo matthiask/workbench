@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-08 16:27+0200\n"
+"POT-Creation-Date: 2026-04-24 15:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2259,6 +2259,10 @@ msgstr "Nicht archiviert"
 msgid "External"
 msgstr "Extern"
 
+#: workbench/logbook/forms.py workbench/projects/models.py
+msgid "external reference"
+msgstr "externe Referenz"
+
 #: workbench/logbook/forms.py
 msgid "This field is required unless you create a new service."
 msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
@@ -3028,10 +3032,6 @@ msgstr "Auf diesem Projekt wurden schon Rechnungen des Typs \"Fixbetrag\" gestel
 #: workbench/projects/models.py
 msgid "Pinned"
 msgstr "Angepinnt"
-
-#: workbench/projects/models.py
-msgid "external reference"
-msgstr "externe Referenz"
 
 #: workbench/projects/models.py
 msgid "allow logging"
@@ -4350,14 +4350,22 @@ msgid "week"
 msgstr "Woche"
 
 #: workbench/templates/reporting/planning_vs_logbook.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "          <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.\n"
+#| "          100%% means the client received exactly their proportional slice of your time.\n"
+#| "          Below 100%% means under-served; above 100%% means over-served.\n"
+#| "          ∞ means time was logged with no planned allocation.\n"
+#| "          The overall logged/planned ratio for this period is <strong>%(ratio)s%%</strong> (%(logged)s logged / %(planned)s planned), which is the baseline these allocations are normalised against.\n"
+#| "        "
 msgid ""
 "\n"
 "          <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.\n"
-"          100%% means the client received exactly their proportional slice of your time.\n"
-"          Below 100%% means under-served; above 100%% means over-served.\n"
-"          ∞ means time was logged with no planned allocation.\n"
-"          The overall logged/planned ratio for this period is <strong>%(ratio)s%%</strong> (%(logged)s logged / %(planned)s planned), which is the baseline these allocations are normalised against.\n"
+"          100%% means the client received exactly their proportional slice of your time. Below 100%% means under-served;\n"
+"          above 100%% means over-served. ∞ means time was logged with no planned allocation. The overall logged/planned\n"
+"          ratio for this period is <strong>%(ratio)s%%</strong> (%(logged)s logged / %(planned)s planned), which is\n"
+"          the baseline these allocations are normalised against.\n"
 "        "
 msgstr ""
 "\n"
@@ -4590,6 +4598,10 @@ msgid "Controller"
 msgstr "Controller"
 
 #: workbench/templates/timestamps.html
+msgid "Split"
+msgstr "Aufteilen"
+
+#: workbench/templates/timestamps.html
 msgid "Really delete?"
 msgstr "Wirklich löschen?"
 
@@ -4628,6 +4640,27 @@ msgstr "Wahrscheinlichkeit unbekannt"
 #: workbench/timer/models.py
 msgid "Stop"
 msgstr "Stop"
+
+#: workbench/timer/views.py
+msgid "Number of parts"
+msgstr "Anzahl Teile"
+
+#: workbench/timer/views.py
+#, python-format
+msgid "This timestamp can be split into at most %(parts)s parts."
+msgstr "Diese Zeitmarke kann in höchstens %(parts)s Teile geteilt werden."
+
+#: workbench/timer/views.py
+msgid "This timestamp cannot be split."
+msgstr "Diese Zeitmarke kann nicht geteilt werden."
+
+#: workbench/timer/views.py
+msgid "The timestamp has been split successfully."
+msgstr "Die Zeitmarke wurde erfolgreich geteilt."
+
+#: workbench/timer/views.py
+msgid "Split timestamp"
+msgstr "Zeitmarke teilen"
 
 #: workbench/tools/csv.py
 msgid "Export selected items as CSV"
