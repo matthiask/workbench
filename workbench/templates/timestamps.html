@@ -7,10 +7,14 @@
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-8">
+      <h2>{% translate "timestamps"|capfirst %}</h2>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
       <div class="card mb-3">
         <div class="card-header d-flex w-100 justify-content-between">
           <h3 class="my-0">
-            {% translate "timestamps"|capfirst %}
             <small>
               {% if is_today %}
                 <a
@@ -23,6 +27,7 @@
                   href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}"
                 >
                   {{ request.user.hours.week|hours }} {% translate 'this week' %}
+                  (KW{{ week_range.0|date:'W' }})
                 </a>
               {% else %}
                 {{ day|local_date_format:'l d.m.Y' }} /
@@ -36,11 +41,21 @@
                   {% if is_this_week %}{% translate 'this week' %}
                   {% else %}{% translate 'during the week' %}
                   {% endif %}
+                  (KW{{ week_range.0|date:'W' }})
                 </a>
               {% endif %}
             </small>
           </h3>
           <div>
+            {% if not is_today %}
+              <a
+                href="{% url 'timestamps' %}"
+                class="btn btn-primary btn-sm align-self-start"
+                data-today-link
+              >
+                {% translate 'today'|capfirst %}
+              </a>
+            {% endif %}
             <a
               href="?day={{ previous.isoformat }}"
               class="

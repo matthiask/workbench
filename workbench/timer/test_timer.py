@@ -200,6 +200,18 @@ class TimestampsTest(TestCase):
         response = self.client.get("/timestamps/")
         self.assertContains(response, "timestamps")
 
+    @travel("2020-02-20T03:00:00+00:00")
+    def test_today_link_on_past_timestamps_view(self):
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.get("/timestamps/", {"day": "2020-02-19"})
+        self.assertContains(response, "data-today-link")
+        self.assertContains(response, "Today")
+
+        response = self.client.get("/timestamps/")
+        self.assertNotContains(response, "data-today-link")
+
     def test_controller(self):
         """The timestamps controller does not crash"""
         response = self.client.get("/timestamps-controller/")
