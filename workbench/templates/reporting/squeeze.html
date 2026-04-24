@@ -84,7 +84,8 @@
                     </table>
                     {% if p.hours_rate_unknown %}
                       <p class="text-muted small mt-2">
-                        {% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of
+                        {% blocktranslate with rate=data.default_hourly_rate|currency trimmed %}Hours without rate:
+                          default of
                           {{ rate }}/h applied{% endblocktranslate %}
                       </p>
                     {% endif %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-24 15:28+0200\n"
+"POT-Creation-Date: 2026-04-24 16:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4350,31 +4350,14 @@ msgid "week"
 msgstr "Woche"
 
 #: workbench/templates/reporting/planning_vs_logbook.html
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "          <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.\n"
-#| "          100%% means the client received exactly their proportional slice of your time.\n"
-#| "          Below 100%% means under-served; above 100%% means over-served.\n"
-#| "          ∞ means time was logged with no planned allocation.\n"
-#| "          The overall logged/planned ratio for this period is <strong>%(ratio)s%%</strong> (%(logged)s logged / %(planned)s planned), which is the baseline these allocations are normalised against.\n"
-#| "        "
-msgid ""
-"\n"
-"          <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.\n"
-"          100%% means the client received exactly their proportional slice of your time. Below 100%% means under-served;\n"
-"          above 100%% means over-served. ∞ means time was logged with no planned allocation. The overall logged/planned\n"
-"          ratio for this period is <strong>%(ratio)s%%</strong> (%(logged)s logged / %(planned)s planned), which is\n"
-"          the baseline these allocations are normalised against.\n"
-"        "
+#, python-format
+msgid "<strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours. 100%% means the client received exactly their proportional slice of your time. Below 100%% means under-served; above 100%% means over-served. ∞ means time was logged with no planned allocation. The overall logged/planned ratio for this period is <strong>%(ratio)s%%</strong> (%(logged)s logged / %(planned)s planned), which is the baseline these allocations are normalised against."
 msgstr ""
-"\n"
-"          <strong>Zuteilung</strong> zeigt den Anteil der erfassten Stunden jeder Kundschaft geteilt durch ihren Anteil an den geplanten Stunden.\n"
+"<strong>Zuteilung</strong> zeigt den Anteil der erfassten Stunden jeder Kundschaft geteilt durch ihren Anteil an den geplanten Stunden.\n"
 "          100%% bedeutet, dass die Kundschaft genau ihren proportionalen Anteil der Zeit erhalten hat.\n"
 "          Unter 100%% bedeutet unterversorgt; über 100%% bedeutet überversorgt.\n"
 "          ∞ bedeutet, dass Stunden ohne geplante Zuteilung erfasst wurden.\n"
-"          Das gesamte Erfasst/Geplant-Verhältnis für diesen Zeitraum beträgt <strong>%(ratio)s%%</strong> (%(logged)s erfasst / %(planned)s geplant), was die Grundlage für die Normalisierung dieser Zuteilungen ist.\n"
-"        "
+"          Das gesamte Erfasst/Geplant-Verhältnis für diesen Zeitraum beträgt <strong>%(ratio)s%%</strong> (%(logged)s erfasst / %(planned)s geplant), was die Grundlage für die Normalisierung dieser Zuteilungen ist."
 
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Customer"
@@ -4440,6 +4423,13 @@ msgstr "Deckungsbeitrag im Zeitraum"
 #: workbench/templates/reporting/squeeze.html
 msgid "User breakdown"
 msgstr "Aufschlüsselung nach Person"
+
+#: workbench/templates/reporting/squeeze.html
+#, python-format
+msgid ""
+"Hours without rate: default of\n"
+"                          %(rate)s/h applied"
+msgstr "Stunden ohne Stundensatz: Standard von %(rate)s/h angewendet"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Users"
@@ -4598,12 +4588,12 @@ msgid "Controller"
 msgstr "Controller"
 
 #: workbench/templates/timestamps.html
-msgid "Split"
-msgstr "Aufteilen"
-
-#: workbench/templates/timestamps.html
 msgid "Really delete?"
 msgstr "Wirklich löschen?"
+
+#: workbench/templates/timestamps.html
+msgid "Split"
+msgstr "Aufteilen"
 
 #: workbench/templatetags/workbench.py workbench/tools/history.py
 msgid "yes"
