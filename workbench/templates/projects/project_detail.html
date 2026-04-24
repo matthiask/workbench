@@ -727,6 +727,12 @@
 {% endblock content %}
 
 {% block fixed-add-button %}
+  <a href="{% url 'projects_project_select' %}"
+     data-ajaxmodal
+     class="btn btn-primary fixed-btn project"
+     title="{% translate 'Jump to project' %}">
+    {% include "svg/project.svg" %}
+  </a>
   <a href="{{ project.urls.createhours }}"
      data-createhours
      data-ajaxmodal
