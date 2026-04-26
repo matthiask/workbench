@@ -306,6 +306,20 @@ tbody th > a {
   background-image: url("lib/break.svg");
 }
 
+.fixed-btn.project {
+  left: 7.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-image: none;
+}
+
+.fixed-btn.project svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+}
+
 .widget--checkboxselectmultiple .my-2 {
   /* column-width: 15rem; */
 }

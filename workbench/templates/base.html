@@ -288,6 +288,14 @@
   <!-- /container -->
   {% block fixed-add-button %}
     <a
+      href="{% url 'projects_project_select' %}"
+      data-ajaxmodal
+      class="btn btn-primary fixed-btn project"
+      title="{% translate 'Jump to project' %}"
+    >
+      {% include "svg/project.svg" %}
+    </a>
+    <a
       href="{% url 'logbook_loggedhours_create' %}"
       data-createhours
       data-ajaxmodal
