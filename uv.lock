@@ -469,11 +469,11 @@ wheels = [
 
 [[package]]
 name = "phonenumbers"
-version = "9.0.28"
+version = "9.0.29"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/db/72/97fd1961e3d6f8323b1396669c346557a8581874e2c2a478a83dc5d616e7/phonenumbers-9.0.28.tar.gz", hash = "sha256:f1d810aaa43fbf3a5cb1ee54733218f8333a2a92c85c4d579a810403d6260a8c", size = 2298779, upload-time = "2026-04-13T14:19:50.741Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/c3/5b544d133241d649317c0ef456df4705cddb3968d31b5f64ec34e98925aa/phonenumbers-9.0.29.tar.gz", hash = "sha256:66455e5c5ca4197aca5a4217d0dc82717a22038292cfa322d5d5e7c46934a214", size = 2300063, upload-time = "2026-04-25T05:35:37.574Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/68/bd/5e55cea252bf21402a2d5f2479edd7e24a4c9ebbe59f197080d0d4cd9093/phonenumbers-9.0.28-py2.py3-none-any.whl", hash = "sha256:ee8caabab4fd554efb6119e7b95cb69da40e0f04050611730eed839d93f39920", size = 2585077, upload-time = "2026-04-13T14:16:09.853Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/65/d932a84540a2d188c5d0dc3a80d7063820588bbc310cc59b4fe48619be9e/phonenumbers-9.0.29-py2.py3-none-any.whl", hash = "sha256:0eb26e0c578aa2d56428330d5b4a0a07dac9a452c4387bf76a76a88b1e839ab7", size = 2586805, upload-time = "2026-04-25T05:35:34.081Z" },
 ]
 
 [[package]]
@@ -765,11 +765,11 @@ wheels = [
 
 [[package]]
 name = "tzdata"
-version = "2026.1"
+version = "2026.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/19/f5/cd531b2d15a671a40c0f66cf06bc3570a12cd56eef98960068ebbad1bf5a/tzdata-2026.1.tar.gz", hash = "sha256:67658a1903c75917309e753fdc349ac0efd8c27db7a0cb406a25be4840f87f98", size = 197639, upload-time = "2026-04-03T11:25:22.002Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/19/1b9b0e29f30c6d35cb345486df41110984ea67ae69dddbc0e8a100999493/tzdata-2026.2.tar.gz", hash = "sha256:9173fde7d80d9018e02a662e168e5a2d04f87c41ea174b139fbef642eda62d10", size = 198254, upload-time = "2026-04-24T15:22:08.651Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b0/70/d460bd685a170790ec89317e9bd33047988e4bce507b831f5db771e142de/tzdata-2026.1-py2.py3-none-any.whl", hash = "sha256:4b1d2be7ac37ceafd7327b961aa3a54e467efbdb563a23655fbfe0d39cfc42a9", size = 348952, upload-time = "2026-04-03T11:25:20.313Z" },
+    { url = "https://files.pythonhosted.org/packages/ce/e4/dccd7f47c4b64213ac01ef921a1337ee6e30e8c6466046018326977efd95/tzdata-2026.2-py2.py3-none-any.whl", hash = "sha256:bbe9af844f658da81a5f95019480da3a89415801f6cc966806612cc7169bffe7", size = 349321, upload-time = "2026-04-24T15:22:05.876Z" },
 ]
 
 [[package]]
