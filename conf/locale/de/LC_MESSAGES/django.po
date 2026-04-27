@@ -828,6 +828,10 @@ msgid "balance"
 msgstr "Bilanz"
 
 #: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+msgid "Monthly sums may not be exact: holidays spanning month boundaries are split slightly inaccurately for part-time employees. The annual total is correct."
+msgstr "Monatssummen können leicht ungenau sein: Feiertage über Monatsgrenzen werden für Teilzeitbeschäftigte leicht ungenau verteilt. Die Jahressumme ist korrekt."
+
+#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
 msgid "vacation days"
 msgstr "Ferientage"
 

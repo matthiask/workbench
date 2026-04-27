@@ -245,6 +245,12 @@ def user_stats_pdf(data):
             awt_columns,
             (*awt_table_style, ("FONT", (0, 0), (-1, 0), "Rep", pdf.style.fontSize)),
         )
+        pdf.spacer(2 * mm)
+        pdf.smaller(
+            _(
+                "Monthly sums may not be exact: holidays spanning month boundaries are split slightly inaccurately for part-time employees. The annual total is correct."
+            )
+        )
         pdf.spacer()
 
         table = []
