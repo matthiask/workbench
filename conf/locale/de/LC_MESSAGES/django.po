@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-24 16:03+0200\n"
+"POT-Creation-Date: 2026-04-27 09:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3062,7 +3062,9 @@ msgstr "Die Offerte muss zum gleichen Projekt gehören wie die Leistung."
 msgid "Reassign logbook entries of %(instance)s"
 msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 
-#: workbench/projects/views.py workbench/templates/shortcuts.html
+#: workbench/projects/views.py workbench/templates/base.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/shortcuts.html
 msgid "Jump to project"
 msgstr "Zu Projekt springen"
 

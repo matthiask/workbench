@@ -12,7 +12,7 @@
         {% ff_fields form %}
       </form>
       <p>
-        {% blocktranslate atio=stats.overall_ratio logged=stats.logged|hours planned=stats.planned|hours trimmed %}
+        {% blocktranslate with ratio=stats.overall_ratio logged=stats.logged|hours planned=stats.planned|hours trimmed %}
           <strong>Allocation</strong> shows each client's share of logged hours divided by their share of planned hours.
           100% means the client received exactly their proportional slice of your time. Below 100% means under-served;
           above 100% means over-served. ∞ means time was logged with no planned allocation. The overall logged/planned
