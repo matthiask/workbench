@@ -1,5 +1,5 @@
 /*
-Somewhat reusable webpack configuration chunks
+Somewhat reusable rspack configuration chunks
 
 A basic rspack file may looks as follows:
 
@@ -44,7 +44,6 @@ TO FH-FABLIB AT https://github.com/feinheit/fh-fablib
 
 const path = require("node:path")
 const fs = require("node:fs")
-const HtmlWebpackPlugin = require("html-webpack-plugin")
 const rspack = require("@rspack/core")
 
 const truthy = (...list) => list.filter((el) => !!el)
@@ -70,7 +69,7 @@ module.exports = (PRODUCTION) => {
     return {
       test: /\.(j|t)sx?$/,
       loader: "builtin:swc-loader",
-      exclude: [/[\\/]node_modules[\\/]|foundation/],
+      exclude: /node_modules/,
       options: {
         jsc: {
           parser: {
@@ -98,7 +97,7 @@ module.exports = (PRODUCTION) => {
     return {
       test: /\.(j|t)sx?$/,
       loader: "builtin:swc-loader",
-      exclude: [/[\\/]node_modules[\\/]|foundation/],
+      exclude: /node_modules/,
       options: {
         jsc: {
           parser: {
@@ -123,11 +122,8 @@ module.exports = (PRODUCTION) => {
   }
 
   function htmlPlugin(name = "", config = {}) {
-    return new HtmlWebpackPlugin({
+    return new rspack.HtmlRspackPlugin({
       filename: name ? `${name}.html` : "[name].html",
-      inject: false,
-      templateContent: ({ htmlWebpackPlugin }) =>
-        `${htmlWebpackPlugin.tags.headTags}`,
       ...config,
     })
   }
@@ -223,7 +219,11 @@ module.exports = (PRODUCTION) => {
           ...cssLoaders,
           {
             loader: "sass-loader",
-            options: { sassOptions: { includePaths, silenceDeprecations } },
+            options: {
+              api: "modern-compiler",
+              implementation: "sass-embedded",
+              sassOptions: { includePaths, silenceDeprecations },
+            },
           },
         ],
         type: "javascript/auto",
