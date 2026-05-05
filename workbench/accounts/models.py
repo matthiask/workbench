@@ -328,14 +328,11 @@ select max(created_at) from sq
 
     @cached_property
     def hours_since_latest(self):
-        return (
-            (
-                Decimal(int((timezone.now() - self.latest_created_at).total_seconds()))
-                / 3600
-            ).quantize(Z1, rounding=ROUND_UP)
-            if self.latest_created_at
-            else Z1
-        )
+        if not self.latest_created_at:
+            return Z1
+        elapsed = timezone.now() - self.latest_created_at
+        seconds = max(0, int(elapsed.total_seconds()))
+        return (Decimal(seconds) / 3600).quantize(Z1, rounding=ROUND_UP)
 
     def take_a_break_warning(self, *, add=0, day=None, request=None):
         if not self.features[FEATURES.BREAKS_NAG]:

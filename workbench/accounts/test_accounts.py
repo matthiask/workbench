@@ -1,4 +1,6 @@
 import datetime as dt
+from decimal import Decimal
+from unittest.mock import PropertyMock, patch
 
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
@@ -249,3 +251,30 @@ class AccountsTest(TestCase):
 
         user.refresh_from_db()
         self.assertEqual(user._features, [FEATURES.BOOKKEEPING])
+
+
+class HoursSinceLatestTest(TestCase):
+    def _make_user(self, latest_created_at):
+        user = factories.UserFactory.create()
+        with patch.object(
+            type(user),
+            "latest_created_at",
+            new_callable=PropertyMock,
+            return_value=latest_created_at,
+        ):
+            return user.hours_since_latest
+
+    def test_future_timestamp_returns_zero(self):
+        from django.utils import timezone
+
+        future = timezone.now() + dt.timedelta(hours=2)
+        self.assertEqual(self._make_user(future), Decimal("0.0"))
+
+    def test_no_timestamp_returns_zero(self):
+        self.assertEqual(self._make_user(None), Decimal("0.0"))
+
+    def test_past_timestamp_returns_positive(self):
+        from django.utils import timezone
+
+        past = timezone.now() - dt.timedelta(hours=3)
+        self.assertGreater(self._make_user(past), Decimal("0.0"))
