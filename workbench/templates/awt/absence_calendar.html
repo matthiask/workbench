@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load fineforms i18n webpack_assets workbench %}
+{% load fineforms i18n rspack_assets workbench %}
 
 {% block title %}
   {% translate 'Absence calendar' %} - {{ block.super }}
@@ -24,6 +24,6 @@
   {{ absences_data|json_script:'absences-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
-    {% webpack_assets 'absences' %}
+    {% rspack_assets 'absences' %}
   {% endif %}
 {% endblock content %}

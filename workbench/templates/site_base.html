@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load django_bootstrap5 i18n static webpack_assets %}
+{% load django_bootstrap5 i18n rspack_assets static %}
 <html lang="{{ LANGUAGE_CODE }}">
   <head>
     <title>
@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
     <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
 
-    {% if not TESTING %}{% webpack_assets 'main' %}{% endif %}
+    {% if not TESTING %}{% rspack_assets 'main' %}{% endif %}
     <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="robots" content="noindex">

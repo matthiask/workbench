@@ -1,6 +1,6 @@
 {% extends "generic/object_detail.html" %}
 
-{% load i18n webpack_assets workbench %}
+{% load i18n rspack_assets workbench %}
 
 {% block title %}
   {% translate 'planning'|capfirst %} - {{ block.super }}
@@ -23,7 +23,7 @@
   {{ planning_data|json_script:'planning-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
   {% if not TESTING %}
-    {% webpack_assets "planning" %}
+    {% rspack_assets "planning" %}
   {% endif %}
   <div class="row mt-5">
     <div class="col-12">
