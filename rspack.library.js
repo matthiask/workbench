@@ -219,11 +219,7 @@ module.exports = (PRODUCTION) => {
           ...cssLoaders,
           {
             loader: "sass-loader",
-            options: {
-              api: "modern-compiler",
-              implementation: "sass-embedded",
-              sassOptions: { includePaths, silenceDeprecations },
-            },
+            options: { sassOptions: { includePaths, silenceDeprecations } },
           },
         ],
         type: "javascript/auto",
