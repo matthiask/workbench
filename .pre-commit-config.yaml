@@ -41,18 +41,18 @@ repos:
       -   id: djade
           args: [--target-version, "6.0"]
   - repo: https://github.com/UnknownPlatypus/djangofmt-pre-commit
-    rev: v0.2.7
+    rev: v0.2.10
     hooks:
       - id: djangofmt
         types_or: [html]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.12
+    rev: v0.15.16
     hooks:
       - id: ruff-check
         args: [--unsafe-fixes]
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.21.1
+    rev: v2.23.0
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/abravalheri/validate-pyproject
@@ -60,7 +60,7 @@ repos:
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.4.13
+    rev: v2.4.16
     hooks:
       - id: biome-check
         args: [--unsafe]

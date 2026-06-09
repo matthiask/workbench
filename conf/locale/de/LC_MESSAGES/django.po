@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 09:51+0200\n"
+"POT-Creation-Date: 2026-06-09 08:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2390,6 +2390,7 @@ msgstr "Originalbetrag"
 
 #: workbench/logbook/models.py
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 msgid "logged cost"
 msgstr "Erfasste Kosten"
@@ -4084,6 +4085,10 @@ msgid "Projected invoices appear to be incomplete"
 msgstr "Geplante Rechnungen scheinen unvollständig zu sein"
 
 #: workbench/templates/projects/project_detail.html
+msgid "Projected invoice total isn't large enough to cover logged work"
+msgstr "Das Total der geplanten Rechnungen ist nicht hoch genug, um die erfassten Leistungen abzudecken"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Profitability estimation"
 msgstr "Rentabilitätsschätzung"
 
@@ -4821,6 +4826,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Logbook contains work for which no projected invoice exists"
+#~ msgstr "Logbuch enthält Leistungen, für welche es keine geplanten Rechnungen gibt"
 
 #~ msgid "offered rate"
 #~ msgstr "Offerierter Ansatz"

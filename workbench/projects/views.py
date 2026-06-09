@@ -55,6 +55,15 @@ class ProjectDetailView(generic.DetailView):
                 and grouped_services["total_service_cost"] > squeeze["invoiced"]
             ):
                 projected_warning = "incomplete"
+        elif (
+            not self.object.closed_on
+            and not grouped_services["total_service_cost"]
+            and self.object.type != Project.INTERNAL
+            and grouped_services["total_logged_cost"]
+            - max(squeeze["invoiced"], projected_invoices_total)
+            > PROJECTED_INVOICE_LEEWAY
+        ):
+            projected_warning = "no_projected_unbudgeted"
 
         return super().get_context_data(
             squeeze=squeeze,

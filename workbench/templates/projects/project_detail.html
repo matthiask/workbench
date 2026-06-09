@@ -186,6 +186,15 @@
                               {% translate "service cost" %}: {{ gs.total_service_cost|currency }}
                             </small>
                           </div>
+                        {% elif projected_warning == "no_projected_unbudgeted" %}
+                          <div class="alert alert-warning py-1 mb-0 mt-1" role="alert">
+                            {% translate "Projected invoice total isn't large enough to cover logged work" %}
+                            <br>
+                            <small>
+                              {% translate "logged cost"|capfirst %}: {{ gs.total_logged_cost|currency }},
+                              {% translate "invoiced"|capfirst %}: {{ squeeze.invoiced|currency }}
+                            </small>
+                          </div>
                         {% endif %}
                       </td>
                     </tr>
