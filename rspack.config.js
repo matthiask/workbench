@@ -1,4 +1,5 @@
 const path = require("node:path")
+const rspack = require("@rspack/core")
 
 module.exports = (env, argv) => {
   const {
@@ -32,6 +33,9 @@ module.exports = (env, argv) => {
       htmlSingleChunkPlugin("timer"),
       htmlSingleChunkPlugin("absences"),
       htmlSingleChunkPlugin("planning"),
+      new rspack.DefinePlugin({
+        "process.env.DRAGGABLE_DEBUG": JSON.stringify(false),
+      }),
     ),
   }
 }
