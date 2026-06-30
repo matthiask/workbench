@@ -189,10 +189,7 @@ WORKBENCH = {
         PDF_ADDRESS="Feinheit AG · Fabrikstrasse 54, 8005 Zürich · Effingerstrasse 2, 3011 Bern · www.feinheit.ch",
         PDF_VAT_NO="CHE-113.948.417 MWST",
         PDF_OFFER_TERMS=(
-            "Bestandteil dieser Offerte sind die zum Zeitpunkt"
-            " des Vertragsabschlusses aktuellen Allgemeinen"
-            " Geschäftsbedingungen der Feinheit AG."
-            " Die jeweils aktuelle Version finden Sie auf www.feinheit.ch/agb/."
+            "Die Abrechnung erfolgt auf Basis des tatsächlich geleisteten Aufwandes bzw. der effektiv erbrachten Leistungen. Der in der Offerte genannte Kostenansatz versteht sich als unverbindlich auf Grundlage der uns bekannten Informationen. Abweichungen vom Kostenansatz im Umfang von ±10 % gelten als vom Auftraggeber mit Annahme der Offerte als genehmigt und bedürfen keiner gesonderten Bestätigung. Im Übrigen gelten unsere Allgemeinen Geschäftsbedingungen, die Bestandteil dieser Offerte sind. Die jeweils aktuelle Version finden Sie auf feinheit.ch/agb/"
         ),
         PDF_OFFER_AGREEMENT=[
             "Die Kundschaft - %s",
