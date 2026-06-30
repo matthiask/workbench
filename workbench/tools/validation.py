@@ -46,7 +46,12 @@ def in_days(days):
 
 UNSPECIFIC_TITLE = re.compile(r"(general|allg|unspec)", re.IGNORECASE)
 WHITESPACE = re.compile(r"\s+")
+URL_ONLY = re.compile(r"^\s*https?://\S+\s*$", re.IGNORECASE)
 
 
 def is_title_specific(title):
     return not UNSPECIFIC_TITLE.search(title) or len(WHITESPACE.split(title)) >= 5
+
+
+def is_only_url(text):
+    return bool(URL_ONLY.match(text))

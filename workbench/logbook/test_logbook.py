@@ -204,6 +204,27 @@ class LogbookTest(TestCase):
             "</a>",
         )
 
+    def test_log_and_create_service_description_only_url(self):
+        """A service description containing only a URL raises a warning"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        types = factories.service_types()
+
+        response = self.client.post(
+            project.urls["createhours"],
+            {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "specific service title",
+                "modal-service_description": "https://example.com/some/reference",
+                "modal-service_type": types.administration.pk,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "description-only-url")
+
     def test_log_and_create_service_with_flat_rate(self):
         """Creating services through the logged hours form on projects with
         flat rates assigns the flat rate"""

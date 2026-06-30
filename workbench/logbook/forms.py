@@ -31,6 +31,7 @@ from workbench.tools.forms import (
 )
 from workbench.tools.validation import (
     in_days,
+    is_only_url,
     is_title_specific,
     logbook_lock,
     raise_if_errors,
@@ -465,6 +466,14 @@ class LoggedHoursForm(ModelForm):
                     " Please use specific titles for services."
                 ),
                 code="unspecific-service",
+            )
+        if data.get("service_description") and is_only_url(data["service_description"]):
+            self.add_warning(
+                _(
+                    "The description should not only contain a URL."
+                    " Please use the external reference field for this."
+                ),
+                code="description-only-url",
             )
 
         if all(

@@ -688,6 +688,24 @@ class ProjectsTest(TestCase):
         )
         self.assertContains(response, "unspecific-service")
 
+    def test_service_description_only_url(self):
+        """A description containing only a URL raises a warning"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["createservice"],
+            {
+                "title": "Specific service title",
+                "description": "https://example.com/some/reference",
+                "effort_type": "Consulting",
+                "effort_rate": "180",
+                "allow_logging": True,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "description-only-url")
+
     def test_offer_project_mismatch(self):
         """Services with offers must not have differing projects"""
         project = factories.ProjectFactory.create()

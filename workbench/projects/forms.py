@@ -22,7 +22,7 @@ from workbench.tools.forms import (
     Textarea,
     add_prefix,
 )
-from workbench.tools.validation import in_days, is_title_specific
+from workbench.tools.validation import in_days, is_only_url, is_title_specific
 
 
 class CampaignSearchForm(Form):
@@ -504,6 +504,14 @@ class ServiceForm(ModelForm):
                     " Please use specific titles for services."
                 ),
                 code="unspecific-service",
+            )
+        if data.get("description") and is_only_url(data["description"]):
+            self.add_warning(
+                _(
+                    "The description should not only contain a URL."
+                    " Please use the external reference field for this."
+                ),
+                code="description-only-url",
             )
         return data
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-09 08:59+0200\n"
+"POT-Creation-Date: 2026-06-30 16:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2290,6 +2290,12 @@ msgstr "Dieser Eintrag ist schon Teil einer Rechnung."
 #: workbench/logbook/forms.py workbench/projects/forms.py
 msgid "This title seems awfully unspecific. Please use specific titles for services."
 msgstr "Mir scheint, dass der Titel furchtbar unspezifisch ist. Bitte verwende spezifische Titel für Leistungen."
+
+#: workbench/logbook/forms.py workbench/projects/forms.py
+msgid "The description should not only contain a URL. Please use the external reference field for this."
+msgstr ""
+"Die Beschreibung sollte nicht nur eine URL enthalten. Bitte verwende dafür "
+"das Feld für die externe Referenz."
 
 #: workbench/logbook/forms.py
 msgid "Hours have to be logged in the same week."
