@@ -64,7 +64,7 @@ class OfferQuerySet(SearchQuerySet):
             | Q(status=Offer.OFFERED, project__closed_on__isnull=True),
             Q(owned_by=user) | Q(owned_by__is_active=False),
             Q(work_completed_on__isnull=True)
-            | Q(work_completed_on__lt=dt.date.today()),
+            | Q(work_completed_on__gt=dt.date.today()),
         ).select_related("project", "owned_by")
 
     def offered(self):
