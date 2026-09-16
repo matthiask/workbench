@@ -101,6 +101,10 @@ def change_obj(
     raise NotImplementedError
 
 
+def _date(value):
+    return local_date_format(parse_date(value)) if value else _("<no value>")
+
+
 def pretty_changes_milestone():
     def prettifier(changes):
         def _row(row):
@@ -110,6 +114,11 @@ def pretty_changes_milestone():
                 pass
             else:
                 row["pretty_field"] = field.verbose_name
+
+            if row["field"] in {"date", "phase_starts_on"}:
+                row["old"] = _date(row["old"])
+                row["new"] = _date(row["new"])
+
             return row
 
         return [_row(row) for row in changes]
@@ -239,7 +248,9 @@ def changes(*, since):
                     actions,
                     aux={"object": milestones_by_id.get(key[1]), "by": by},
                     pretty_changes=pretty_changes_milestone(),
-                    pretty_deleted_object=lambda x: f"{x['title']} ({x['date']})",
+                    pretty_deleted_object=lambda x: (
+                        f"{x['title']} ({_date(x['date'])})"
+                    ),
                 )
             )
 
@@ -299,10 +310,6 @@ def changes(*, since):
             )
 
     return dict(changes)
-
-
-def _date(value):
-    return local_date_format(parse_date(value)) if value else _("<no value>")
 
 
 def pretty_changes_absence(*, users):

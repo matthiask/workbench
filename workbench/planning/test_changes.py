@@ -70,7 +70,13 @@ class ChangesTest(TestCase):
         self.assertEqual(changed["milestone_id"], ("<no value>", m))
 
         # The owner is affected by the milestone change as well
-        self.assertEqual(c[pw.user][pw.project]["objects"][1]["object"], m)
+        [_work, milestone] = c[pw.user][pw.project]["objects"]
+        self.assertEqual(milestone["type"], updates.UPDATE)
+        self.assertEqual(milestone["object"], m)
+        changed = {
+            row["field"]: (row["old"], row["new"]) for row in milestone["changes"]
+        }
+        self.assertEqual(changed["date"], ("18.10.2021", "19.10.2021"))
 
         updates.changes_mails()
         self.assertEqual(len(mail.outbox), 2)
@@ -268,3 +274,22 @@ class ChangesTest(TestCase):
         self.assertEqual(
             updates.absence_changes(since=timezone.now() - dt.timedelta(days=1)), {}
         )
+
+    @travel("2021-10-18")
+    def test_deleted_milestone(self):
+        """Deleted milestones are reported with a readable date"""
+        self.set_current_user()
+
+        pw = factories.PlannedWorkFactory.create(weeks=[in_days(d) for d in (0, 7)])
+        m = factories.MilestoneFactory.create(
+            project=pw.project, date=in_days(14), title="Launch"
+        )
+        LoggedAction.objects.all().update(
+            created_at=timezone.now() - dt.timedelta(days=14)
+        )
+        m.delete()
+
+        c = updates.changes(since=timezone.now() - dt.timedelta(days=1))
+        [milestone] = c[pw.user][pw.project]["objects"]
+        self.assertEqual(milestone["type"], updates.DELETE)
+        self.assertEqual(milestone["object"], "Launch (01.11.2021)")
