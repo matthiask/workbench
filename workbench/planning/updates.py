@@ -369,7 +369,8 @@ def project_involvement(*, today):
     Return projects and the users involved in them
 
     Involved means either being planned on the project now or in the future, or
-    having worked on the project recently.
+    having worked on the project recently. Project owners are involved in their
+    own projects as soon as anyone else is.
     """
     projects = {
         project.id: project
@@ -400,6 +401,10 @@ def project_involvement(*, today):
     involved = defaultdict(set)
     for project_id, user_id in chain(planned, worked):
         involved[project_id].add(user_id)
+    # Owners are only involved in projects where something is happening --
+    # otherwise long-forgotten open projects would pad everyone's mail.
+    for project_id, user_ids in involved.items():
+        user_ids.add(projects[project_id].owned_by_id)
     return projects, involved
 
 
@@ -409,7 +414,7 @@ def absence_changes(*, since):
 
     Everyone involved in a project (see :func:`project_involvement`) hears about
     the absences of everyone else involved in the same project, the project
-    owner included.
+    owner included -- in both directions.
     """
     today = dt.date.today()
     users = {user.id: user for user in User.objects.all()}
@@ -463,7 +468,7 @@ def absence_changes(*, since):
         recipients = defaultdict(set)
         for user_id in absent:
             for project in projects_of_user[user_id]:
-                for recipient_id in involved[project.id] | {project.owned_by_id}:
+                for recipient_id in involved[project.id]:
                     if recipient := users.get(recipient_id):
                         recipients[recipient].add(project)
 

@@ -151,8 +151,11 @@ class ChangesTest(TestCase):
         self.set_current_user()
 
         pw = factories.PlannedWorkFactory.create(weeks=[in_days(d) for d in (7, 14)])
+        # The audit trigger stamps created_at from the database clock which
+        # time_machine does not freeze, so move the planning changes out of the
+        # mail's window by setting an absolute timestamp.
         LoggedAction.objects.all().update(
-            created_at=F("created_at") - dt.timedelta(days=14)
+            created_at=timezone.now() - dt.timedelta(days=14)
         )
         factories.AbsenceFactory.create(
             user=pw.user,
@@ -162,10 +165,15 @@ class ChangesTest(TestCase):
             description="Herbstferien",
         )
 
+        since = updates.start_of_monday() - dt.timedelta(days=7)
+        self.assertEqual(updates.changes(since=since), {})
+        self.assertTrue(updates.absence_changes(since=since))
+
         updates.changes_mails()
         self.assertEqual(len(mail.outbox), 2)
-        self.assertIn("Absenzen von Personen", mail.outbox[0].body)
-        self.assertIn("Herbstferien", mail.outbox[0].body)
+        for message in mail.outbox:
+            self.assertIn("Absenzen von Personen", message.body)
+            self.assertIn("Herbstferien", message.body)
 
     @travel("2021-10-18")
     def test_absence_updates_and_deletions(self):
@@ -214,3 +222,31 @@ class ChangesTest(TestCase):
         self.assertEqual(changed["days"], ("1.00", "3.00"))
         # Derived from the reason, not worth reporting
         self.assertNotIn("is_vacation", changed)
+
+    @travel("2021-10-18")
+    def test_absences_of_project_owners(self):
+        """Owners are part of their projects' audience in both directions"""
+        self.set_current_user()
+
+        pw = factories.PlannedWorkFactory.create(weeks=[in_days(d) for d in (7, 14)])
+        factories.AbsenceFactory.create(
+            user=pw.project.owned_by, starts_on=in_days(7), ends_on=in_days(11), days=5
+        )
+
+        c = updates.absence_changes(since=timezone.now() - dt.timedelta(days=1))
+        self.assertEqual(set(c), {pw.user, pw.project.owned_by})
+        self.assertEqual(c[pw.user][0]["projects"], [pw.project])
+
+    @travel("2021-10-18")
+    def test_absences_of_owners_of_dormant_projects(self):
+        """Owning a project nobody works on doesn't put anyone in the audience"""
+        self.set_current_user()
+
+        project = factories.ProjectFactory.create()
+        factories.AbsenceFactory.create(
+            user=project.owned_by, starts_on=in_days(7), ends_on=in_days(11), days=5
+        )
+
+        self.assertEqual(
+            updates.absence_changes(since=timezone.now() - dt.timedelta(days=1)), {}
+        )
