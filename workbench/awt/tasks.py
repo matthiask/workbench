@@ -22,9 +22,11 @@ def create_holidays():
         prev_year = (
             Year.objects.filter(working_time_model=wtm).order_by("-year").first()
         )
+        # Zero hours per day isn't a usable configuration (the annual working
+        # time report skips such years) -- default to 8 hours instead.
         working_time_per_day = (
-            prev_year.working_time_per_day if prev_year else Decimal(0)
-        )
+            prev_year.working_time_per_day if prev_year else None
+        ) or Decimal(8)
 
         for year in range(today.year, today.year + 3):
             weekdays = weekdays_per_month(year)

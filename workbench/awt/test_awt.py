@@ -11,7 +11,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import User
-from workbench.awt.models import Absence, Employment, Holiday
+from workbench.awt.models import Absence, Employment, Holiday, Year
 from workbench.awt.reporting import (
     active_users,
     annual_working_time,
@@ -19,6 +19,7 @@ from workbench.awt.reporting import (
 )
 from workbench.awt.tasks import (
     annual_working_time_warnings_mails,
+    create_holidays,
     is_previous_month_locked_starting_today,
 )
 from workbench.awt.utils import monthly_days
@@ -348,6 +349,32 @@ class AWTTest(TestCase):
                     " The working time per day is zero."
                 )
             ],
+        )
+
+    def test_create_holidays_working_time_per_day(self):
+        """Years are created with 8 hours per day unless a previous year exists"""
+        wtm = factories.WorkingTimeModelFactory.create()
+        create_holidays()
+        self.assertEqual(
+            {
+                year.working_time_per_day
+                for year in Year.objects.filter(working_time_model=wtm)
+            },
+            {Decimal("8.00")},
+        )
+
+        Year.objects.filter(working_time_model=wtm).update(
+            working_time_per_day=Decimal("8.40")
+        )
+        Year.objects.filter(
+            working_time_model=wtm, year=dt.date.today().year + 2
+        ).delete()
+        create_holidays()
+        self.assertEqual(
+            Year.objects.get(
+                working_time_model=wtm, year=dt.date.today().year + 2
+            ).working_time_per_day,
+            Decimal("8.40"),
         )
 
     def test_non_ajax_redirect(self):
