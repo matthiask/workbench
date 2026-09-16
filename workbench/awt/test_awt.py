@@ -328,6 +328,28 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
 
+    def test_year_without_working_time_per_day(self):
+        """A year without working time per day produces an error, not a crash"""
+        year = factories.YearFactory.create(working_time_per_day=0)
+        user = factories.UserFactory.create(
+            _full_name="Fritz", working_time_model=year.working_time_model
+        )
+        Employment.objects.create(user=user, percentage=100, vacation_weeks=5)
+        self.client.force_login(user)
+
+        response = self.client.get(f"/report/annual-working-time/?year={year.year}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            messages(response),
+            [
+                (
+                    f"The annual working time {year.year} of the working time model"
+                    " Test is not configured correctly:"
+                    " The working time per day is zero."
+                )
+            ],
+        )
+
     def test_non_ajax_redirect(self):
         """The absence URL redirects when encountering a non-AJAX request"""
         absence = factories.AbsenceFactory.create()

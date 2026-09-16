@@ -33,6 +33,19 @@ def annual_working_time_view(request):
     if not users:
         users = [request.user]
     statistics = annual_working_time(year, users=users)
+    for misconfigured in statistics["months"].misconfigured_years:
+        messages.error(
+            request,
+            _(
+                "The annual working time %(year)s of the working time model"
+                " %(working_time_model)s is not configured correctly:"
+                " The working time per day is zero."
+            )
+            % {
+                "year": misconfigured.year,
+                "working_time_model": misconfigured.working_time_model,
+            },
+        )
     for user in statistics["months"].users_without_wtm:
         messages.warning(
             request,

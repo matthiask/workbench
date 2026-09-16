@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-03 12:05+0200\n"
+"POT-Creation-Date: 2026-09-16 11:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -840,6 +840,11 @@ msgstr "Ferientage"
 #, python-format
 msgid "Generated on %(day)s"
 msgstr "Generiert am %(day)s"
+
+#: workbench/awt/views.py
+#, python-format
+msgid "The annual working time %(year)s of the working time model %(working_time_model)s is not configured correctly: The working time per day is zero."
+msgstr "Die Jahresarbeitszeit %(year)s des Arbeitszeitmodells %(working_time_model)s ist nicht korrekt konfiguriert: Die Arbeitszeit pro Tag ist null."
 
 #: workbench/awt/views.py
 #, python-format
@@ -3566,6 +3571,7 @@ msgstr "Abwesenheitskalender"
 #: workbench/templates/planning/externalwork_detail.html
 #: workbench/templates/planning/milestone_detail.html
 #: workbench/templates/planning/plannedwork_detail.html
+#: workbench/templates/projects/budgettransfer_form.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 msgid "Delete"
@@ -3846,6 +3852,7 @@ msgstr "%(class)s erstellen"
 #: workbench/templates/modalform.html workbench/templates/notes/note_form.html
 #: workbench/templates/notes/widget.html
 #: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/projects/budgettransfer_form.html
 #: workbench/templates/projects/project_projected_invoices_form.html
 msgid "Save"
 msgstr "Sichern"

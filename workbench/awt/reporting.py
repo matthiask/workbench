@@ -27,16 +27,35 @@ class Months(UserDict):
         # UserDict.__init__ has run.
         super().__init__()
         self.year = year
+        years = list(
+            Year.objects.filter(year=year).select_related("working_time_model")
+        )
+        # Years without a working time per day cannot be used for any
+        # calculation (everything would be zero, and dividing by it crashes).
         self.year_by_wtm = {
-            year.working_time_model_id: year for year in Year.objects.filter(year=year)
+            y.working_time_model_id: y for y in years if y.working_time_per_day > 0
+        }
+        misconfigured_by_wtm = {
+            y.working_time_model_id: y for y in years if y.working_time_per_day <= 0
         }
         self.users = users
         self.users_to_wtm = {user.id: user.working_time_model_id for user in users}
         self.users_with_wtm = [
             user for user in users if self.year_by_wtm.get(self.users_to_wtm[user.id])
         ]
+        self.users_with_misconfigured_wtm = [
+            user for user in users if self.users_to_wtm[user.id] in misconfigured_by_wtm
+        ]
+        self.misconfigured_years = [
+            y
+            for wtm_id, y in misconfigured_by_wtm.items()
+            if wtm_id in set(self.users_to_wtm.values())
+        ]
         self.users_without_wtm = [
-            user for user in users if user not in self.users_with_wtm
+            user
+            for user in users
+            if user not in self.users_with_wtm
+            and user not in self.users_with_misconfigured_wtm
         ]
 
     def __getitem__(self, key):
