@@ -1,7 +1,6 @@
 import datetime as dt
 
 from django.core import mail
-from django.db.models import F
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.translation import deactivate_all
@@ -42,12 +41,15 @@ class ChangesTest(TestCase):
         original_pw_user = pw.user
         m = factories.MilestoneFactory.create(project=pw.project, date=dt.date.today())
 
+        # The audit trigger stamps created_at from the database clock which
+        # time_machine does not freeze, so move the creations out of the window
+        # by setting an absolute timestamp. Only the updates below remain.
         LoggedAction.objects.all().update(
-            created_at=F("created_at") - dt.timedelta(days=14)
+            created_at=timezone.now() - dt.timedelta(days=14)
         )
 
         pw.user = pw.project.owned_by
-        pw.hours = 50
+        pw.planned_hours = 50
         pw.weeks = [in_days(d) for d in (7, 14, 21)]
         pw.milestone = m
         pw.save()
@@ -57,8 +59,24 @@ class ChangesTest(TestCase):
         c = updates.changes(since=timezone.now() - dt.timedelta(days=1))
         self.assertEqual(set(c), {original_pw_user, pw.user})
 
+        [work] = c[original_pw_user][pw.project]["objects"]
+        self.assertEqual(work["type"], updates.UPDATE)
+        changed = {row["field"]: (row["old"], row["new"]) for row in work["changes"]}
+        self.assertEqual(changed["user_id"], (original_pw_user, pw.user))
+        self.assertEqual(changed["planned_hours"], ("20.0", "50.0"))
+        self.assertEqual(
+            changed["weeks"], ("18.10.2021 - 07.11.2021", "25.10.2021 - 14.11.2021")
+        )
+        self.assertEqual(changed["milestone_id"], ("<no value>", m))
+
+        # The owner is affected by the milestone change as well
+        self.assertEqual(c[pw.user][pw.project]["objects"][1]["object"], m)
+
         updates.changes_mails()
         self.assertEqual(len(mail.outbox), 2)
+        for message in mail.outbox:
+            self.assertIn("Updated: ", message.body)
+            self.assertNotIn("Created: ", message.body)
 
     @travel("2021-10-18")
     def test_absence_changes(self):
