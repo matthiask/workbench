@@ -23,6 +23,7 @@ from workbench.awt.tasks import (
     is_previous_month_locked_starting_today,
 )
 from workbench.awt.utils import monthly_days
+from workbench.tools.formats import Z1
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -657,6 +658,88 @@ class AWTTest(TestCase):
         # target hours: January reduced by 1.5 days, 11 months untouched
         # (30 - 1.5) * 8 + 11 * 30 * 8 = 228 + 2640 = 2868
         self.assertAlmostEqual(awt["totals"]["target"], Decimal(2868))
+
+    def test_holidays_outside_employment(self):
+        """Holidays only count inside employments, across gaps and partial months"""
+        year = factories.YearFactory.create(year=2018)
+        user = factories.UserFactory.create(working_time_model=year.working_time_model)
+        # Two consecutive employments, a gap in July, and a final employment
+        # ending in the middle of September.
+        Employment.objects.create(
+            user=user,
+            date_from=dt.date(2018, 1, 1),
+            date_until=dt.date(2018, 3, 31),
+            percentage=100,
+            vacation_weeks=5,
+        )
+        Employment.objects.create(
+            user=user,
+            date_from=dt.date(2018, 4, 1),
+            date_until=dt.date(2018, 6, 30),
+            percentage=80,
+            vacation_weeks=5,
+        )
+        Employment.objects.create(
+            user=user,
+            date_from=dt.date(2018, 8, 1),
+            date_until=dt.date(2018, 9, 15),
+            percentage=50,
+            vacation_weeks=5,
+        )
+        wtm = year.working_time_model
+        for date, name, kind in [
+            # Inside the first employment
+            (dt.date(2018, 1, 2), "Tuesday", Holiday.Kind.PUBLIC),
+            # Inside the second employment, the day after the first ended
+            (dt.date(2018, 4, 2), "Monday", Holiday.Kind.PUBLIC),
+            # Inside the gap between the second and the third employment
+            (dt.date(2018, 7, 2), "Monday", Holiday.Kind.PUBLIC),
+            # Inside the third employment, on its first day
+            (dt.date(2018, 8, 1), "Wednesday", Holiday.Kind.PUBLIC),
+            # Same month as the end of the third employment, but after it
+            (dt.date(2018, 9, 20), "Thursday", Holiday.Kind.PUBLIC),
+        ]:
+            Holiday.objects.create(
+                working_time_model=wtm,
+                date=date,
+                name=name,
+                fraction=Decimal(1),
+                kind=kind,
+            )
+        # Half a company holiday inside the second employment, one inside the gap
+        Holiday.objects.create(
+            working_time_model=wtm,
+            date=dt.date(2018, 5, 2),
+            name="Company",
+            fraction=Decimal("0.5"),
+            kind=Holiday.Kind.COMPANY,
+        )
+        Holiday.objects.create(
+            working_time_model=wtm,
+            date=dt.date(2018, 7, 3),
+            name="Company in the gap",
+            fraction=Decimal(1),
+            kind=Holiday.Kind.COMPANY,
+        )
+
+        awt = annual_working_time(2018, users=[user])["statistics"][0]
+
+        self.assertEqual(
+            awt["months"]["holiday_public"],
+            [Decimal(1), Z1, Z1, Decimal(1), Z1, Z1, Z1, Decimal(1), Z1, Z1, Z1, Z1],
+        )
+        self.assertEqual(
+            awt["months"]["holiday_company"],
+            [Z1, Z1, Z1, Z1, Decimal("0.5"), Z1, Z1, Z1, Z1, Z1, Z1, Z1],
+        )
+        self.assertAlmostEqual(awt["totals"]["holiday_public"], Decimal(3))
+        self.assertAlmostEqual(awt["totals"]["holiday_company"], Decimal("0.5"))
+
+        # target hours, with 30 target days per month and 8 hours per day:
+        # 100%: (30 - 1) * 8 + 2 * 30 * 8 = 712
+        #  80%: ((30 - 1) + (30 - 0.5) + 30) * 0.8 * 8 = 566.4
+        #  50%: ((30 - 1) + 30 * 15/30) * 0.5 * 8 = 176
+        self.assertAlmostEqual(awt["totals"]["target"], Decimal("1454.4"))
 
     def test_is_previous_month_locked_starting_today(self):
         """Examples of is_previous_month_locked_starting_today"""

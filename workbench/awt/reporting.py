@@ -125,18 +125,28 @@ def full_time_equivalents_by_month():
     return months
 
 
-def holiday_days_by_month(year, working_time_model_id):
-    result = {Holiday.Kind.PUBLIC: [Z1] * 12, Holiday.Kind.COMPANY: [Z1] * 12}
-    objects = list(
+def holidays_of_year(year, working_time_model_id):
+    """The holiday calendar of a working time model, weekends included."""
+    return list(
         Holiday.objects.filter(
             date__year=year, working_time_model_id=working_time_model_id
         ).order_by("date")
     )
-    for h in objects:
-        if h.date.weekday() >= 5:
+
+
+def holiday_days_by_month(holidays, date_from, date_until):
+    """
+    Holiday days per kind and month, restricted to an employment period.
+
+    Holidays outside the employment aren't free days anyone is entitled to, so
+    they neither reduce the target time nor show up in the report.
+    """
+    result = {Holiday.Kind.PUBLIC: [Z1] * 12, Holiday.Kind.COMPANY: [Z1] * 12}
+    for h in holidays:
+        if h.date.weekday() >= 5 or not (date_from <= h.date <= date_until):
             continue
         result[h.kind][h.date.month - 1] += h.fraction
-    return result, objects
+    return result
 
 
 def annual_working_time(year, *, users):  # noqa: C901
@@ -158,14 +168,11 @@ def annual_working_time(year, *, users):  # noqa: C901
         for override in VacationDaysOverride.objects.filter(year=year, user__in=users)
     }
 
-    # Compute holidays once per working time model.
-    _empty_holidays = {Holiday.Kind.PUBLIC: [Z1] * 12, Holiday.Kind.COMPANY: [Z1] * 12}
-    holidays_by_wtm = {}
-    holiday_list_by_wtm = {}
-    for wtm_id in {y.working_time_model_id for y in months.year_by_wtm.values()}:
-        h, hl = holiday_days_by_month(year, wtm_id)
-        holidays_by_wtm[wtm_id] = h
-        holiday_list_by_wtm[wtm_id] = hl
+    # The holiday calendar is shared by all users of a working time model.
+    holiday_list_by_wtm = {
+        wtm_id: holidays_of_year(year, wtm_id)
+        for wtm_id in {months.users_to_wtm[user.id] for user in months.users_with_wtm}
+    }
 
     for employment in Employment.objects.filter(
         user__in=months.users_with_wtm
@@ -176,7 +183,11 @@ def annual_working_time(year, *, users):  # noqa: C901
         )
         month_data = months[employment.user_id]
         wtm_id = month_data["year"].working_time_model_id
-        holidays = holidays_by_wtm.get(wtm_id, _empty_holidays)
+        holidays = holiday_days_by_month(
+            holiday_list_by_wtm.get(wtm_id, []),
+            employment.date_from,
+            employment.date_until,
+        )
         total_holiday_days = [
             holidays[Holiday.Kind.PUBLIC][i] + holidays[Holiday.Kind.COMPANY][i]
             for i in range(12)
@@ -189,10 +200,14 @@ def annual_working_time(year, *, users):  # noqa: C901
                 break
             m = month.month - 1
             partial_month_factor = Decimal(days) / dpm[m]
+            # Holidays are already restricted to the employment period, so they
+            # must not be scaled by the partial month factor again.
             month_data["target"][m] += (
-                (month_data["year"].months[m] - total_holiday_days[m])
+                (
+                    month_data["year"].months[m] * partial_month_factor
+                    - total_holiday_days[m]
+                )
                 * percentage_factor
-                * partial_month_factor
                 * month_data["year"].working_time_per_day
             )
             month_data["percentage"][m] += (
@@ -201,6 +216,9 @@ def annual_working_time(year, *, users):  # noqa: C901
             month_data["available_vacation_days"][m] += (
                 available_vacation_days_per_month * partial_month_factor
             )
+            # Holiday day counts are per WTM — not scaled by employment %.
+            month_data["holiday_public"][m] += holidays[Holiday.Kind.PUBLIC][m]
+            month_data["holiday_company"][m] += holidays[Holiday.Kind.COMPANY][m]
             month_data["employments"].add(employment)
 
     for row in (
@@ -287,15 +305,6 @@ def annual_working_time(year, *, users):  # noqa: C901
     ):
         other_absences[absence.user_id].append(absence)
 
-    # Holiday day counts are per WTM — not scaled by employment %.
-    for user in months.users_with_wtm:
-        month_data = months[user.id]
-        wtm_id = month_data["year"].working_time_model_id
-        holidays = holidays_by_wtm.get(wtm_id, _empty_holidays)
-        for m in range(12):
-            month_data["holiday_public"][m] = holidays[Holiday.Kind.PUBLIC][m]
-            month_data["holiday_company"][m] = holidays[Holiday.Kind.COMPANY][m]
-
     def absences_time(data):
         return [
             sum(
@@ -328,7 +337,6 @@ def annual_working_time(year, *, users):  # noqa: C901
     for user in months.users_with_wtm:
         month_data = months[user.id]
         wtm_id = month_data["year"].working_time_model_id
-        holidays = holidays_by_wtm.get(wtm_id, _empty_holidays)
         sums = monthly_sums(month_data)
         at = absences_time(month_data)
         wt = working_time(month_data)
@@ -348,8 +356,8 @@ def annual_working_time(year, *, users):  # noqa: C901
                 "monthly_sums": sums,
                 "running_sums": [sum(sums[:i], Z1) for i in range(1, 13)],
                 "holiday_list": holiday_list_by_wtm.get(wtm_id, []),
-                "has_public_holidays": any(holidays[Holiday.Kind.PUBLIC]),
-                "has_company_holidays": any(holidays[Holiday.Kind.COMPANY]),
+                "has_public_holidays": any(month_data["holiday_public"]),
+                "has_company_holidays": any(month_data["holiday_company"]),
                 "totals": {
                     "target_days": sum(month_data["target_days"]),
                     "percentage": sum(month_data["percentage"]) / 12,
@@ -411,12 +419,24 @@ def annual_working_time(year, *, users):  # noqa: C901
         else None
     )
 
+    # Modals and the holiday list are per working time model, not per user:
+    # a user whose employment misses all holidays still links to the calendar.
+    holidays_by_wtm = {}
+    for wtm_id, holiday_list in holiday_list_by_wtm.items():
+        counted = holiday_days_by_month(holiday_list, dt.date.min, dt.date.max)
+        holidays_by_wtm[wtm_id] = {
+            "holiday_list": holiday_list,
+            "has_public_holidays": any(counted[Holiday.Kind.PUBLIC]),
+            "has_company_holidays": any(counted[Holiday.Kind.COMPANY]),
+        }
+
     has_public_holidays = any(s["has_public_holidays"] for s in statistics)
     has_company_holidays = any(s["has_company_holidays"] for s in statistics)
     return {
         "months": months,
         "overall": overall,
         "statistics": statistics,
+        "holidays_by_wtm": holidays_by_wtm,
         "has_holidays": has_public_holidays or has_company_holidays,
         "has_public_holidays": has_public_holidays,
         "has_company_holidays": has_company_holidays,
