@@ -248,7 +248,7 @@ def user_stats_pdf(data):
         pdf.spacer(2 * mm)
         pdf.smaller(
             _(
-                "Monthly sums may not be exact: holidays spanning month boundaries are split slightly inaccurately for part-time employees. The annual total is correct."
+                "Monthly sums may not be exact: absences spanning month boundaries are split by calendar days, not by working days. The annual total is correct."
             )
         )
         pdf.spacer()
