@@ -435,11 +435,11 @@ def absence_changes(*, since):
     if not actions_by_object:
         return {}
 
-    projects, involved = project_involvement(today=today)
-    projects_of_user = defaultdict(list)
+    _, involved = project_involvement(today=today)
+    project_ids_of_user = defaultdict(list)
     for project_id, user_ids in involved.items():
         for user_id in user_ids:
-            projects_of_user[user_id].append(projects[project_id])
+            project_ids_of_user[user_id].append(project_id)
 
     changes = defaultdict(list)
 
@@ -472,15 +472,15 @@ def absence_changes(*, since):
             for action in actions
             for data in (action.row_data, action.new_row_data)
         }
-        recipients = defaultdict(set)
+        recipients = set()
         for user_id in absent:
-            for project in projects_of_user[user_id]:
-                for recipient_id in involved[project.id]:
+            for project_id in project_ids_of_user[user_id]:
+                for recipient_id in involved[project_id]:
                     if recipient := users.get(recipient_id):
-                        recipients[recipient].add(project)
+                        recipients.add(recipient)
 
-        for recipient, recipient_projects in recipients.items():
-            changes[recipient].append(obj | {"projects": sorted(recipient_projects)})
+        for recipient in recipients:
+            changes[recipient].append(obj)
 
     return {
         user: sorted(user_changes, key=lambda obj: obj["object"])

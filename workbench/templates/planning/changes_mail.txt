@@ -26,8 +26,7 @@ Geändert von {% for user in planning_changes.by %}{{ user }}{% if not forloop.l
 Absenzen von Personen in Deinen Projekten
 
 {% for obj in absences %}- {{ obj.pretty_type }}: {{ obj.object }}{% if obj.changes %}
-  ({% for change in obj.changes %}{{ change.pretty_field|default:change.field }}: {{ change.old }} ==> {{ change.new }}{% if not forloop.last %} / {% endif %}{% endfor %}){% endif %}
-  Projekte: {% for project in obj.projects %}{{ project }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if obj.by %}
+  ({% for change in obj.changes %}{{ change.pretty_field|default:change.field }}: {{ change.old }} ==> {{ change.new }}{% if not forloop.last %} / {% endif %}{% endfor %}){% endif %}{% if obj.by %}
   Geändert von {% for user in obj.by %}{{ user }}{% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}
 {% endfor %}
 {% endif %}

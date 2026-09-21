@@ -108,7 +108,6 @@ class ChangesTest(TestCase):
             change["object"],
             f"{pw.user.get_short_name()}: vacation, 25.10.2021 - 29.10.2021 (5.00d) Herbstferien",
         )
-        self.assertEqual(change["projects"], [pw.project])
 
         absence.ends_on = in_days(18)
         absence.days = 10
@@ -132,7 +131,6 @@ class ChangesTest(TestCase):
 
         c = updates.absence_changes(since=timezone.now() - dt.timedelta(days=1))
         self.assertEqual(set(c), {hours.rendered_by, project.owned_by})
-        self.assertEqual(c[project.owned_by][0]["projects"], [project])
 
     @travel("2021-10-18")
     def test_uninteresting_absences(self):
@@ -259,7 +257,6 @@ class ChangesTest(TestCase):
 
         c = updates.absence_changes(since=timezone.now() - dt.timedelta(days=1))
         self.assertEqual(set(c), {pw.user, pw.project.owned_by})
-        self.assertEqual(c[pw.user][0]["projects"], [pw.project])
 
     @travel("2021-10-18")
     def test_absences_of_owners_of_dormant_projects(self):
