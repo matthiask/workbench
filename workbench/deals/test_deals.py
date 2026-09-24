@@ -505,6 +505,75 @@ class DealsTest(TestCase):
         )
         self.assertRedirects(response, deal.urls["detail"])
 
+    def test_decline_related_offer_with_planned_work(self):
+        """Declining a related offer through a deal forces a decision about
+        its planning entries"""
+        closing_type = factories.ClosingTypeFactory.create(represents_a_win=False)
+        self.client.force_login(factories.UserFactory.create())
+
+        def declined_offer_with_planned_work():
+            deal = factories.DealFactory.create()
+            offer = factories.OfferFactory.create(
+                title="Test",
+                postal_address="Test\nTest street\nTest",
+                offered_on=in_days(0),
+                valid_until=in_days(60),
+            )
+            factories.PlannedWorkFactory.create(
+                project=offer.project, offer=offer, weeks=[in_days(7)]
+            )
+            self.client.post(deal.urls["add_offer"], {"modal-offer": offer.pk})
+            self.assertEqual(deal.related_offers.get(), offer)
+            return deal, offer
+
+        # No decision about the linked planning entries yet -- rejected
+        deal, offer = declined_offer_with_planned_work()
+        response = self.client.post(
+            deal.urls["set_status"] + "?status=30",
+            {
+                "closed_on": dt.date.today().isoformat(),
+                "closing_type": closing_type.pk,
+                "related_offers": [offer.pk],
+            },
+        )
+        self.assertContains(
+            response,
+            "Please decide whether the linked planning entries should be deleted.",
+        )
+        self.assertEqual(offer.planned_work.count(), 1)
+
+        # Deciding to keep the planning entries succeeds and leaves them be
+        deal, offer = declined_offer_with_planned_work()
+        response = self.client.post(
+            deal.urls["set_status"] + "?status=30",
+            {
+                "closed_on": dt.date.today().isoformat(),
+                "closing_type": closing_type.pk,
+                "related_offers": [offer.pk],
+                "delete_planned_work": "0",
+            },
+        )
+        self.assertRedirects(response, deal.urls["detail"])
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, offer.DECLINED)
+        self.assertEqual(offer.planned_work.count(), 1)
+
+        # Deciding to delete the planning entries removes them
+        deal, offer = declined_offer_with_planned_work()
+        response = self.client.post(
+            deal.urls["set_status"] + "?status=30",
+            {
+                "closed_on": dt.date.today().isoformat(),
+                "closing_type": closing_type.pk,
+                "related_offers": [offer.pk],
+                "delete_planned_work": "1",
+            },
+        )
+        self.assertRedirects(response, deal.urls["detail"])
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, offer.DECLINED)
+        self.assertEqual(offer.planned_work.count(), 0)
+
     def test_all_contributions(self):
         """The contributions calculation works as expected"""
         deal = factories.DealFactory.create()

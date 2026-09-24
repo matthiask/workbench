@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:56+0200\n"
+"POT-Creation-Date: 2026-09-24 08:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1409,6 +1409,18 @@ msgid "Decline offers"
 msgstr "Offerten ablehnen"
 
 #: workbench/deals/forms.py
+msgid "Some of these offers have planning entries linked to them. Delete them now that the offers are being declined?"
+msgstr "Einige dieser Offerten haben Planungseinträge. Sollen diese jetzt, wo die Offerten abgelehnt werden, gelöscht werden?"
+
+#: workbench/deals/forms.py workbench/offers/forms.py
+msgid "Yes, delete the planning entries"
+msgstr "Ja, die Planungseinträge löschen"
+
+#: workbench/deals/forms.py workbench/offers/forms.py
+msgid "No, keep them"
+msgstr "Nein, behalten"
+
+#: workbench/deals/forms.py
 msgid "This field is required when closing a deal."
 msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
 
@@ -1416,6 +1428,10 @@ msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
 #, python-format
 msgid "Setting the status of offer \"%(offer)s\" to \"%(status)s\" is not possible because of the following errors: %(error)s"
 msgstr "Wegen folgenden Fehlern ist es nicht möglich, den Status der Offerte \"%(offer)s\" auf \"%(status)s\" zu setzen: %(error)s"
+
+#: workbench/deals/forms.py workbench/offers/forms.py
+msgid "Please decide whether the linked planning entries should be deleted."
+msgstr "Bitte entscheide, ob die verknüpften Planungseinträge gelöscht werden sollen."
 
 #: workbench/deals/forms.py
 msgid "Attention! The closed on date is more than tree months in the future!"
@@ -2546,6 +2562,10 @@ msgstr "Offerten"
 #: workbench/offers/forms.py
 msgid "This offer is not in preparation anymore. I assume you know what you're doing and wont stand in the way."
 msgstr "Diese Offerte befindet sich nicht mehr in Vorbereitung. Ich gehe davon aus, dass Du weisst was Du tust und werde nicht im Weg stehen."
+
+#: workbench/offers/forms.py
+msgid "This offer has planning entries linked to it. Delete them now that the offer is being declined?"
+msgstr "Diese Offerte hat Planungseinträge. Sollen diese jetzt, wo die Offerte abgelehnt wird, gelöscht werden?"
 
 #: workbench/offers/forms.py
 #, python-format

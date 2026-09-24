@@ -188,6 +188,31 @@ class OfferForm(PostalAddressSelectionForm):
         )
         self.fields["subtotal"].disabled = True
 
+        if self.instance.pk and self.instance.planned_work.exists():
+            posted_status = (
+                self.data.get(self.add_prefix("status")) if self.is_bound else None
+            )
+            if str(Offer.DECLINED) in (posted_status, str(self.instance.status)):
+                self.fields["delete_planned_work"] = forms.TypedChoiceField(
+                    label=_(
+                        "This offer has planning entries linked to it."
+                        " Delete them now that the offer is being declined?"
+                    ),
+                    choices=[
+                        (1, _("Yes, delete the planning entries")),
+                        (0, _("No, keep them")),
+                    ],
+                    coerce=int,
+                    widget=forms.RadioSelect,
+                    required=True,
+                    error_messages={
+                        "required": _(
+                            "Please decide whether the linked planning"
+                            " entries should be deleted."
+                        )
+                    },
+                )
+
     def clean(self):
         data = super().clean()
         s_dict = dict(Offer.STATUS_CHOICES)
@@ -228,6 +253,10 @@ class OfferForm(PostalAddressSelectionForm):
             offer=None
         )
         instance.save()
+        if instance.status == Offer.DECLINED and self.cleaned_data.get(
+            "delete_planned_work"
+        ):
+            instance.planned_work.all().delete()
         instance.project.solely_declined_offers_warning(request=self.request)
         return instance
 

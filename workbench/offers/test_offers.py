@@ -560,6 +560,54 @@ class OffersTest(TestCase):
         offer.project.closed_on = dt.date.today()
         self.assertIsNone(offer.project.solely_declined_offers_warning(request=None))
 
+    def test_decline_offer_with_planned_work(self):
+        """Declining an offer with linked planning entries forces a decision"""
+        offer = factories.OfferFactory.create()
+        factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, weeks=[in_days(7)]
+        )
+        self.client.force_login(offer.owned_by)
+
+        data = {
+            "title": "Stuff",
+            "owned_by": offer.owned_by_id,
+            "discount": "10",
+            "liable_to_vat": "1",
+            "tax_rate": "7.70",
+            "postal_address": "Anything\nStreet\nCity",
+            "offered_on": in_days(0).isoformat(),
+            "valid_until": in_days(60).isoformat(),
+            "status": Offer.DECLINED,
+            WarningsForm.ignore_warnings_id: "yes-please-decline",
+        }
+
+        # Neither warning acknowledgement nor a decision about the planning
+        # entries have been given yet -- the form is rejected.
+        response = self.client.post(offer.urls["update"], data)
+        self.assertContains(
+            response,
+            "Please decide whether the linked planning entries should be deleted.",
+        )
+        self.assertEqual(offer.planned_work.count(), 1)
+
+        # Deciding to keep the planning entries succeeds and leaves them be.
+        response = self.client.post(
+            offer.urls["update"], {**data, "delete_planned_work": "0"}
+        )
+        self.assertRedirects(
+            response, offer.get_absolute_url(), fetch_redirect_response=False
+        )
+        self.assertEqual(offer.planned_work.count(), 1)
+
+        # Deciding to delete the planning entries removes them.
+        response = self.client.post(
+            offer.urls["update"], {**data, "delete_planned_work": "1"}
+        )
+        self.assertRedirects(
+            response, offer.get_absolute_url(), fetch_redirect_response=False
+        )
+        self.assertEqual(offer.planned_work.count(), 0)
+
     @travel("2020-04-21 12:00")
     def test_offer_with_closed_project(self):
         """Sent offers on closed projects have a warning badge"""

@@ -405,6 +405,30 @@ class SetStatusForm(ModelForm):
                     for offer in related_offers
                 ]
 
+                if instance.status == Deal.DECLINED and any(
+                    offer.planned_work.exists() for offer in related_offers
+                ):
+                    self.fields["delete_planned_work"] = forms.TypedChoiceField(
+                        label=_(
+                            "Some of these offers have planning entries linked"
+                            " to them. Delete them now that the offers are"
+                            " being declined?"
+                        ),
+                        choices=[
+                            (1, _("Yes, delete the planning entries")),
+                            (0, _("No, keep them")),
+                        ],
+                        coerce=int,
+                        widget=forms.RadioSelect,
+                        required=True,
+                        error_messages={
+                            "required": _(
+                                "Please decide whether the linked planning"
+                                " entries should be deleted."
+                            )
+                        },
+                    )
+
     def clean(self):
         data = super().clean()
         if data["status"] != Deal.OPEN and not data.get("closing_type"):
@@ -453,6 +477,10 @@ class SetStatusForm(ModelForm):
             for offer in self.offers_to_update:
                 offer.save()
                 projects.add(offer.project)
+                if instance.status == Deal.DECLINED and self.cleaned_data.get(
+                    "delete_planned_work"
+                ):
+                    offer.planned_work.all().delete()
 
             for project in projects:
                 project.solely_declined_offers_warning(request=self.request)
