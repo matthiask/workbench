@@ -259,7 +259,7 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
             ),
         )
         if request.is_ajax():
-            return HttpResponse("Thanks", status=204)  # No content
+            return HttpResponse(status=204)  # No content
         return redirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
