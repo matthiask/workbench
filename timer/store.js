@@ -33,7 +33,8 @@ const deserialize = (blob) => {
     return {}
   }
 
-  const data = deserializeRaw()
+  // No modal is open after a page load; a persisted modalActivity is stale.
+  const { modalActivity: _modalActivity, ...data } = deserializeRaw()
   return {
     ...data,
     activities: Object.fromEntries(

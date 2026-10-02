@@ -26,6 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 function addModalActivityListener(store) {
+  // Forget the activity when its modal is closed without saving, otherwise
+  // the next successful modal form submission (for something else entirely)
+  // would reset the activity without its time ever having been logged.
+  document.addEventListener("hide.bs.modal", () => {
+    if (store.getState().modalActivity) {
+      store.dispatch({ type: "MODAL_ACTIVITY", id: null })
+    }
+  })
+
   window.jQuery(document).on("modalform", () => {
     const { activities, modalActivity } = store.getState()
     if (modalActivity) {
