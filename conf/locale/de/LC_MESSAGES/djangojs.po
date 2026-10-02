@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 11:01+0200\n"
+"POT-Creation-Date: 2026-10-02 14:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -92,10 +92,6 @@ msgstr "Geplante Arbeit hinzufügen"
 #: conf/strings.js timer/breakActivity.js timer/createActivity.js
 msgid "Break"
 msgstr ""
-
-#: conf/strings.js
-msgid "Concurrent absences"
-msgstr "Parallele Absenzen"
 
 #: conf/strings.js planning/index.js
 msgid "Efforts"
@@ -209,12 +205,9 @@ msgstr "Konnte Formular nicht öffnen"
 msgid "Unable to submit the logbook entry"
 msgstr "Konnte Logbucheintrag nicht abschicken"
 
-msgid ""
-"Unable to submit the logbook entry. Your session may have expired, please "
-"reload the page."
-msgstr ""
-"Konnte Logbucheintrag nicht abschicken. Möglicherweise ist deine Sitzung "
-"abgelaufen, bitte lade die Seite neu."
+#: conf/strings.js timer/actions.js
+msgid "Unable to submit the logbook entry. Your session may have expired, please reload the page."
+msgstr "Konnte Logbucheintrag nicht abschicken. Möglicherweise ist deine Sitzung abgelaufen, bitte lade die Seite neu."
 
 #: conf/strings.js timer/i18n.js
 msgid "What outcome do you seek?"
@@ -224,6 +217,9 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
+
+#~ msgid "Concurrent absences"
+#~ msgstr "Parallele Absenzen"
 
 #~ msgid "Overwrite seconds"
 #~ msgstr "Sekunden überschreiben"

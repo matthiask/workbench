@@ -83,6 +83,49 @@ class LogbookTest(TestCase):
         response = send()
         self.assertContains(response, "This project has been closed too long ago.")
 
+    def test_logging_not_allowed_on_service(self):
+        """Hours cannot be logged on services which do not allow logging"""
+        service = factories.ServiceFactory.create(allow_logging=False)
+        project = service.project
+        self.client.force_login(project.owned_by)
+
+        data = {
+            "modal-rendered_by": project.owned_by_id,
+            "modal-rendered_on": dt.date.today().isoformat(),
+            "modal-service": service.id,
+            "modal-hours": "0.5",
+            "modal-description": "Test",
+        }
+        response = self.client.post(
+            project.urls["createhours"],
+            data,
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "Logging is not allowed on this service anymore.")
+        self.assertEqual(LoggedHours.objects.count(), 0)
+
+        service.allow_logging = True
+        service.save()
+        response = self.client.post(
+            project.urls["createhours"],
+            data,
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 201)
+
+        # Existing entries can still be edited after logging has been disabled
+        service.allow_logging = False
+        service.save()
+        hours = LoggedHours.objects.get()
+        response = self.client.post(
+            hours.urls["update"],
+            {**data, "modal-description": "Updated"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        hours.refresh_from_db()
+        self.assertEqual(hours.description, "Updated")
+
     def test_move_to_past_week_forbidden(self):
         """Moving hours into the past week is not allowed"""
         hours = factories.LoggedHoursFactory.create()

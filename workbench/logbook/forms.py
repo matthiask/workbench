@@ -449,6 +449,14 @@ class LoggedHoursForm(ModelForm):
             errors["service"] = _(
                 "Deselect the existing service if you want to create a new service."
             )
+        elif (
+            data.get("service")
+            and "service" in self.changed_data
+            and not data["service"].is_logging_allowed()
+        ):
+            # The choices only contain services which allow logging, but the
+            # field's queryset doesn't, so validate this explicitly.
+            errors["service"] = _("Logging is not allowed on this service anymore.")
         if self.project.closed_on:
             if self.project.is_logbook_locked:
                 errors["__all__"] = _("This project has been closed too long ago.")

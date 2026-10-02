@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 14:34+0200\n"
+"POT-Creation-Date: 2026-10-02 14:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2332,6 +2332,10 @@ msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 #: workbench/logbook/forms.py
 msgid "Deselect the existing service if you want to create a new service."
 msgstr "Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende Leistung wählen."
+
+#: workbench/logbook/forms.py
+msgid "Logging is not allowed on this service anymore."
+msgstr "Auf dieser Leistung kann nicht mehr erfasst werden."
 
 #: workbench/logbook/forms.py
 msgid "This project has been closed too long ago."
