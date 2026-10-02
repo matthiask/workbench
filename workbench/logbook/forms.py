@@ -15,6 +15,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
+from workbench.logbook.celebrations import celebrate
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Campaign, InternalType, Project, Service
@@ -535,8 +536,9 @@ class LoggedHoursForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
+        is_new = not instance.pk
         timestamp = None
-        if not instance.pk:
+        if is_new:
             instance.created_by = self.request.user
             if pk := self.request.GET.get("timestamp"):
                 timestamp = Timestamp.objects.filter(
@@ -569,6 +571,8 @@ class LoggedHoursForm(ModelForm):
         if timestamp:
             timestamp.logged_hours = instance
             timestamp.save()
+        if is_new and instance.rendered_by == self.request.user:
+            celebrate(self.request, instance)
 
         return instance
 

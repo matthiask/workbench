@@ -13,6 +13,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.deals.models import Deal
+from workbench.logbook.celebrations import SESSION_KEY
 from workbench.logbook.models import LoggedHours
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
@@ -335,3 +336,10 @@ def pin(object, user):
             pinned = object.id in getattr(user, name)
 
     return {"object": object, "pinned": pinned}
+
+
+@register.inclusion_tag("logbook/celebration.html", takes_context=True)
+def logbook_celebration(context):
+    request = context.get("request")
+    session = getattr(request, "session", None)
+    return {"celebration": session.pop(SESSION_KEY, None) if session else None}
