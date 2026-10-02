@@ -66,10 +66,12 @@
               <a
                 href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}"
               >
+                {% hours_ring request.user.hours.today request.user.hours.today_target 'today' %}
                 {{ request.user.hours.today|hours }} {% translate 'today' %}
               </a>
               /
               <a href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
+                {% hours_ring request.user.hours.week request.user.hours.week_target 'week' %}
                 {{ request.user.hours.week|hours }} {% translate 'this week' %}
               </a>
               /

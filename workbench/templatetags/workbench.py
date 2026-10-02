@@ -343,3 +343,20 @@ def logbook_celebration(context):
     request = context.get("request")
     session = getattr(request, "session", None)
     return {"celebration": session.pop(SESSION_KEY, None) if session else None}
+
+
+@register.simple_tag
+def hours_ring(value, target, name):
+    if not target:
+        return ""
+    ratio = min(1, float(value / target))
+    return format_html(
+        """\
+<svg class="hours-ring{complete}" viewBox="0 0 20 20" aria-hidden="true" data-hours-ring="{name}">
+  <circle class="hours-ring-track" cx="10" cy="10" r="8" pathLength="100" />
+  <circle class="hours-ring-fill" cx="10" cy="10" r="8" pathLength="100" style="stroke-dasharray: {percentage} 100" />
+</svg>""",
+        complete=" complete" if ratio >= 1 else "",
+        name=name,
+        percentage=round(100 * ratio, 1),
+    )

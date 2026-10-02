@@ -234,10 +234,32 @@ class User(Model, AbstractBaseUser):
             .annotate(Sum("hours"))
         }
 
+        target = self.daily_hours_target
         return {
             "today": per_day.get(dt.date.today(), Decimal("0.0")),
             "week": sum(per_day.values(), Decimal("0.0")),
+            "today_target": target,
+            "week_target": 5 * target if target else None,
         }
+
+    @cached_property
+    def daily_hours_target(self):
+        """Hours per day according to the working time model and the current
+        employment percentage. Absences and holidays are ignored."""
+        from workbench.awt.models import Year
+
+        today = dt.date.today()
+        employment = self.employments.filter(
+            date_from__lte=today, date_until__gte=today
+        ).first()
+        year = Year.objects.filter(
+            working_time_model=self.working_time_model_id, year=today.year
+        ).first()
+        if not employment or not year or year.working_time_per_day <= 0:
+            return None
+        return (year.working_time_per_day * employment.percentage / 100).quantize(
+            Decimal("0.0")
+        )
 
     @cached_property
     def active_projects(self):

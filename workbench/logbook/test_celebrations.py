@@ -1,8 +1,10 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.test import TestCase
 
 from workbench import factories
+from workbench.accounts.models import User
 from workbench.logbook.celebrations import SESSION_KEY, project_emoji
 from workbench.projects.models import InternalType, Project
 
@@ -76,3 +78,25 @@ class CelebrationsTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         self.assertNotIn(SESSION_KEY, self.client.session)
+
+    def test_hours_targets(self):
+        """Daily and weekly targets follow the working time model and employment"""
+        user = factories.UserFactory.create()
+        self.assertIsNone(user.daily_hours_target)
+        self.assertIsNone(user.hours["today_target"])
+        self.assertIsNone(user.hours["week_target"])
+
+        factories.YearFactory.create(
+            working_time_model=user.working_time_model, working_time_per_day=8.4
+        )
+        factories.EmploymentFactory.create(user=user, percentage=80)
+
+        user = User.objects.get(pk=user.pk)
+        self.assertEqual(user.hours["today_target"], Decimal("6.7"))
+        self.assertEqual(user.hours["week_target"], Decimal("33.5"))
+
+        factories.LoggedHoursFactory.create(rendered_by=user, hours=7)
+        self.client.force_login(user)
+        response = self.client.get("/")
+        self.assertContains(response, 'class="hours-ring complete"')
+        self.assertContains(response, "stroke-dasharray: 20.9 100")

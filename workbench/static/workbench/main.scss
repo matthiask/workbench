@@ -457,3 +457,38 @@ a:hover {
     }
   }
 }
+
+.hours-rings {
+  white-space: nowrap;
+}
+
+.hours-ring {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.15em;
+}
+
+.hours-rings .hours-ring:not(:first-child) {
+  margin-left: 0.4em;
+}
+
+.hours-ring circle {
+  fill: none;
+  stroke-width: 4;
+}
+
+.hours-ring-track {
+  stroke: rgba(127, 127, 127, 0.35);
+}
+
+.hours-ring-fill {
+  stroke: #f47c3c;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dasharray 0.8s ease-out;
+}
+
+.hours-ring.complete .hours-ring-fill {
+  stroke: var(--bs-success);
+}

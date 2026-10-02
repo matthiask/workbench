@@ -191,6 +191,20 @@
           {% endmark_current %}
 
           <li class="nav-item ms-lg-auto">
+            {% with user_hours=request.user.hours %}
+              <a
+                class="nav-link hours-rings"
+                href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}"
+                title="{% translate 'today' %}: {{ user_hours.today|hours }}{% if user_hours.today_target %} / {{ user_hours.today_target|hours }}{% endif %}, {% translate 'this week' %}: {{ user_hours.week|hours }}{% if user_hours.week_target %} / {{ user_hours.week_target|hours }}{% endif %}"
+              >
+                {% hours_ring user_hours.today user_hours.today_target "today" %}
+                {{ user_hours.today|hours }}
+                {% hours_ring user_hours.week user_hours.week_target "week" %}
+                {{ user_hours.week|hours }}
+              </a>
+            {% endwith %}
+          </li>
+          <li class="nav-item">
             <button class="btn nav-link" type="button" data-theme-toggle aria-label="Cycle theme" title="Theme: Auto">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z" />
