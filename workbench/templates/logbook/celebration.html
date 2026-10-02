@@ -1,5 +1,18 @@
 {% if celebration %}
-  <div class="celebration" aria-hidden="true">
+  <div
+    class="celebration"
+    aria-hidden="true"
+    {% if celebration.rings_from.today is not None %}
+      data-ring-from-today="{{ celebration.rings_from.today|stringformat:'s' }}"
+    {% endif %}
+    {% if celebration.rings_from.week is not None %}
+      data-ring-from-week="{{ celebration.rings_from.week|stringformat:'s' }}"
+    {% endif %}
+    {% if celebration.confetti %}data-confetti{% endif %}
+  >
     <span class="celebration-emoji">{{ celebration.emoji }}</span>
+    {% if celebration.message %}
+      <span class="celebration-message">{{ celebration.message }}</span>
+    {% endif %}
   </div>
 {% endif %}

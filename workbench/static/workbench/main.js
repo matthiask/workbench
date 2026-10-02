@@ -404,6 +404,7 @@ $(() => {
   // Widgets
   initWidgets()
   initSortableTables()
+  initCelebration()
 
   // Some special cases...
   $(document.body).on("click", "[data-hours-button]", function () {
@@ -774,4 +775,47 @@ function initSortableTables() {
 
     if (initialTh) initialTh.click()
   }
+}
+
+function initCelebration() {
+  const el = _sel(".celebration")
+  if (!el) return
+
+  // Let the hours rings grow from their value before logging
+  for (const name of ["today", "week"]) {
+    const from = el.dataset[`ringFrom${name[0].toUpperCase()}${name.slice(1)}`]
+    if (from === undefined) continue
+    for (const fill of document.querySelectorAll(
+      `[data-hours-ring="${name}"] .hours-ring-fill`,
+    )) {
+      const to = fill.style.strokeDasharray
+      fill.style.transition = "none"
+      fill.style.strokeDasharray = `${from} 100`
+      window.getComputedStyle(fill).strokeDasharray // Force a style flush
+      fill.style.transition = ""
+      requestAnimationFrame(() => {
+        fill.style.strokeDasharray = to
+      })
+    }
+  }
+
+  if (
+    el.hasAttribute("data-confetti") &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    const colors = ["#f47c3c", "#325d88", "#93c54b", "#f1e53b", "#d9534f"]
+    for (let i = 0; i < 40; ++i) {
+      const piece = document.createElement("span")
+      const angle = Math.random() * 2 * Math.PI
+      const distance = 6 + Math.random() * 14
+      piece.className = "confetti"
+      piece.style.setProperty("--x", `${Math.cos(angle) * distance}rem`)
+      piece.style.setProperty("--y", `${Math.sin(angle) * distance}rem`)
+      piece.style.setProperty("--r", `${Math.random() * 720 - 360}deg`)
+      piece.style.background = colors[i % colors.length]
+      el.appendChild(piece)
+    }
+  }
+
+  setTimeout(() => el.remove(), 3000)
 }

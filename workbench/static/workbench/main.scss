@@ -412,6 +412,8 @@ a:hover {
   inset: 0;
   z-index: 1090;
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   align-items: center;
   justify-content: center;
   pointer-events: none;
@@ -491,4 +493,62 @@ a:hover {
 
 .hours-ring.complete .hours-ring-fill {
   stroke: var(--bs-success);
+}
+
+.celebration-message {
+  padding: 0.5rem 1rem;
+  border-radius: var(--bs-border-radius-pill);
+  background: var(--bs-body-bg);
+  box-shadow: var(--bs-box-shadow);
+  font-size: 1.25rem;
+  font-weight: 600;
+  opacity: 0;
+  animation: celebration-message 2.2s ease-out 0.2s forwards;
+}
+
+@keyframes celebration-message {
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  15%,
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+.celebration .confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.8rem;
+  border-radius: 1px;
+  animation: confetti-burst 1.4s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), calc(var(--y) + 4rem)) rotate(var(--r));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebration-message {
+    animation: celebration-fade 2.2s ease-out forwards;
+  }
+
+  .hours-ring-fill {
+    transition: none;
+  }
 }

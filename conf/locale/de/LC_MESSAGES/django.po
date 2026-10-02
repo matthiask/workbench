@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-24 08:51+0200\n"
+"POT-Creation-Date: 2026-10-02 14:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1420,6 +1420,10 @@ msgstr "Ja, die Planungseinträge löschen"
 msgid "No, keep them"
 msgstr "Nein, behalten"
 
+#: workbench/deals/forms.py workbench/offers/forms.py
+msgid "Please decide whether the linked planning entries should be deleted."
+msgstr "Bitte entscheide, ob die verknüpften Planungseinträge gelöscht werden sollen."
+
 #: workbench/deals/forms.py
 msgid "This field is required when closing a deal."
 msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
@@ -1428,10 +1432,6 @@ msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
 #, python-format
 msgid "Setting the status of offer \"%(offer)s\" to \"%(status)s\" is not possible because of the following errors: %(error)s"
 msgstr "Wegen folgenden Fehlern ist es nicht möglich, den Status der Offerte \"%(offer)s\" auf \"%(status)s\" zu setzen: %(error)s"
-
-#: workbench/deals/forms.py workbench/offers/forms.py
-msgid "Please decide whether the linked planning entries should be deleted."
-msgstr "Bitte entscheide, ob die verknüpften Planungseinträge gelöscht werden sollen."
 
 #: workbench/deals/forms.py
 msgid "Attention! The closed on date is more than tree months in the future!"
@@ -2067,8 +2067,8 @@ msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
 #: workbench/invoices/models.py workbench/projects/forms.py
-#: workbench/reporting/views.py workbench/templates/start.html
-#: workbench/templates/timestamps.html
+#: workbench/reporting/views.py workbench/templates/base.html
+#: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
 
@@ -2290,6 +2290,18 @@ msgstr "Keine überfälligen Rechnungen für diese Kontaktperson."
 #: workbench/invoices/views.py
 msgid "Send reminder"
 msgstr "Zahlungserinnerung verschicken"
+
+#: workbench/logbook/celebrations.py
+msgid "Week complete 🏁"
+msgstr "Wochensoll erreicht 🏁"
+
+#: workbench/logbook/celebrations.py
+msgid "Day complete 🎉"
+msgstr "Tagessoll erreicht 🎉"
+
+#: workbench/logbook/celebrations.py
+msgid "Halfway there 💪"
+msgstr "Halbzeit 💪"
 
 #: workbench/logbook/forms.py workbench/timer/models.py
 msgid "<detected>"
@@ -3378,8 +3390,8 @@ msgstr "relevanter Umsatz"
 msgid "<unknown>"
 msgstr "<unbekannt>"
 
-#: workbench/reporting/utils.py workbench/templates/start.html
-#: workbench/templates/timestamps.html
+#: workbench/reporting/utils.py workbench/templates/base.html
+#: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "this week"
 msgstr "diese Woche"
 

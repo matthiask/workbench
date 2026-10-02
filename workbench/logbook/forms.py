@@ -537,6 +537,8 @@ class LoggedHoursForm(ModelForm):
     def save(self):
         instance = super().save(commit=False)
         is_new = not instance.pk
+        celebrate_hours = is_new and instance.rendered_by == self.request.user
+        hours_before = self.request.user.hours if celebrate_hours else None
         timestamp = None
         if is_new:
             instance.created_by = self.request.user
@@ -571,8 +573,8 @@ class LoggedHoursForm(ModelForm):
         if timestamp:
             timestamp.logged_hours = instance
             timestamp.save()
-        if is_new and instance.rendered_by == self.request.user:
-            celebrate(self.request, instance)
+        if celebrate_hours:
+            celebrate(self.request, instance, hours_before=hours_before)
 
         return instance
 
