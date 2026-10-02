@@ -76,6 +76,10 @@ class ProjectDetailView(generic.DetailView):
             projected_invoices_total=projected_invoices_total,
             projected_warning=projected_warning,
             services_gross_margin=services_gross_margin,
+            accepted_offers_third_party_costs=grouped_services[
+                "accepted_offers_total_excl_tax"
+            ]
+            - squeeze["offered"],
             gs=grouped_services,
             **kwargs,
         )

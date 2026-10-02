@@ -69,6 +69,9 @@ class ProjectedInvoicesTest(TestCase):
         pi.gross_margin = Decimal(2000)
         pi.save()
         self.assertEqual(projected_warning(), "incomplete")
+        response = self.client.get(project.get_absolute_url())
+        self.assertContains(response, "(10’000.00 &minus;")
+        self.assertContains(response, "5’000.00 third party costs)")
 
         pi.gross_margin = Decimal(6000)
         pi.save()
