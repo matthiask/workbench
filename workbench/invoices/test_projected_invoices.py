@@ -48,3 +48,28 @@ class ProjectedInvoicesTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         # print(mail.outbox[0].__dict__)
+
+    def test_projected_warning_third_party_costs(self):
+        """Projected invoices are compared to the gross margin of services"""
+        service = factories.ServiceFactory.create(
+            cost=Decimal(10000), third_party_costs=Decimal(5000)
+        )
+        project = service.project
+        pi = factories.ProjectedInvoiceFactory.create(
+            project=project, gross_margin=Decimal(5000)
+        )
+        self.client.force_login(project.owned_by)
+
+        def projected_warning():
+            response = self.client.get(project.get_absolute_url())
+            return response.context["projected_warning"]
+
+        self.assertIsNone(projected_warning())
+
+        pi.gross_margin = Decimal(2000)
+        pi.save()
+        self.assertEqual(projected_warning(), "incomplete")
+
+        pi.gross_margin = Decimal(6000)
+        pi.save()
+        self.assertEqual(projected_warning(), "exceeds_service_cost")

@@ -190,7 +190,7 @@
                             <br>
                             <small>
                               {% translate "Projected" %}: {{ projected_invoices_total|currency }},
-                              {% translate "service cost" %}: {{ gs.total_service_cost|currency }}
+                              {% translate "services gross margin" %}: {{ services_gross_margin|currency }}
                             </small>
                           </div>
                         {% elif projected_warning == "exceeds_accepted_offer" %}
@@ -199,7 +199,7 @@
                             <br>
                             <small>
                               {% translate "Projected" %}: {{ projected_invoices_total|currency }},
-                              {% translate "accepted offer total" %}: {{ gs.accepted_offers_total_excl_tax|currency }}
+                              {% translate "accepted offers gross margin" %}: {{ squeeze.offered|currency }}
                             </small>
                           </div>
                         {% elif projected_warning == "incomplete" %}
@@ -208,7 +208,7 @@
                             <br>
                             <small>
                               {% translate "Projected" %}: {{ projected_invoices_total|currency }},
-                              {% translate "service cost" %}: {{ gs.total_service_cost|currency }}
+                              {% translate "services gross margin" %}: {{ services_gross_margin|currency }}
                             </small>
                           </div>
                         {% elif projected_warning == "no_projected_unbudgeted" %}

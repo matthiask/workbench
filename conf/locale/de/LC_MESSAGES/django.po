@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 14:37+0200\n"
+"POT-Creation-Date: 2026-10-02 14:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4241,8 +4241,16 @@ msgid "Projected"
 msgstr "Geplant"
 
 #: workbench/templates/projects/project_detail.html
+msgid "services gross margin"
+msgstr "Umsatz bereinigt der Leistungen"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Projected invoices exceed the accepted offer total"
 msgstr "Geplante Rechnungen übersteigen das akzeptierte Offertentotal"
+
+#: workbench/templates/projects/project_detail.html
+msgid "accepted offers gross margin"
+msgstr "Umsatz bereinigt der akzeptierten Offerten"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Projected invoices appear to be incomplete"

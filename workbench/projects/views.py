@@ -36,25 +36,31 @@ class ProjectDetailView(generic.DetailView):
 
         squeeze = project_gross_margin(self.object)
 
+        # Projected invoices are entered as gross margin, that is, without
+        # third party costs. Compare them to the gross margin of services and
+        # accepted offers, not to their totals.
+        services_gross_margin = (
+            grouped_services["total_service_cost"]
+            - grouped_services["total_service_third_party_costs"]
+        )
         projected_warning = None
-        has_accepted_offers = bool(grouped_services["accepted_offers_total_excl_tax"])
         if not self.object.closed_on and grouped_services["total_service_cost"]:
             if not projected_invoices_total and not squeeze["invoiced"]:
                 projected_warning = "no_projected"
-            elif projected_invoices_total > grouped_services["total_service_cost"]:
+            elif projected_invoices_total > services_gross_margin:
                 projected_warning = "exceeds_service_cost"
-            elif has_accepted_offers and (
-                projected_invoices_total
-                - grouped_services["accepted_offers_total_excl_tax"]
+            elif (
+                services_gross_margin - projected_invoices_total
+                > PROJECTED_INVOICE_LEEWAY
+                and services_gross_margin > squeeze["invoiced"]
+            ):
+                projected_warning = "incomplete"
+            elif (
+                grouped_services["accepted_offers_total_excl_tax"]
+                and projected_invoices_total - squeeze["offered"]
                 > PROJECTED_INVOICE_LEEWAY
             ):
                 projected_warning = "exceeds_accepted_offer"
-            elif (
-                grouped_services["total_service_cost"] - projected_invoices_total
-                > PROJECTED_INVOICE_LEEWAY
-                and grouped_services["total_service_cost"] > squeeze["invoiced"]
-            ):
-                projected_warning = "incomplete"
         elif (
             not self.object.closed_on
             and not grouped_services["total_service_cost"]
@@ -69,6 +75,7 @@ class ProjectDetailView(generic.DetailView):
             squeeze=squeeze,
             projected_invoices_total=projected_invoices_total,
             projected_warning=projected_warning,
+            services_gross_margin=services_gross_margin,
             gs=grouped_services,
             **kwargs,
         )

@@ -461,6 +461,7 @@ class Project(Model):
         logged_cost = defaultdict(lambda: Z2)
         # Project logbook vs. project service cost (hours and cost)
         total_service_cost = Z2
+        total_service_third_party_costs = Z2
         accepted_offers_service_cost = Z2
         total_logged_cost = Z2
         total_service_hours_rate_undefined = Z1
@@ -565,6 +566,7 @@ class Project(Model):
                 service_hours[service.project] += service.service_hours
                 service_cost[service.project] += service.cost or Z2
                 total_service_cost += service.service_cost
+                total_service_third_party_costs += service.third_party_costs or Z2
                 if service.offer and service.offer.is_accepted:
                     accepted_offers_service_cost += service.service_cost
 
@@ -608,6 +610,7 @@ class Project(Model):
             "service_hours": service_hours[self],
             "service_cost": service_cost[self],
             "total_service_cost": total_service_cost,
+            "total_service_third_party_costs": total_service_third_party_costs,
             "accepted_offers_service_cost": accepted_offers_service_cost,
             "not_offered_service_cost": total_service_cost
             - accepted_offers_service_cost,
