@@ -866,7 +866,10 @@ class ProjectedInvoice(models.Model):
         verbose_name=_("project"),
     )
     invoiced_on = models.DateField(_("invoiced on"))
-    gross_margin = MoneyField(_("gross margin"))
+    gross_margin = MoneyField(
+        _("gross margin"),
+        help_text=_("Invoice total excl. tax minus third party costs incl. tax."),
+    )
     description = models.CharField(_("description"), max_length=200, blank=True)
 
     class Meta:

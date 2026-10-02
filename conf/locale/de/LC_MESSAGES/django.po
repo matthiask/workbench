@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 14:49+0200\n"
+"POT-Creation-Date: 2026-10-02 14:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2197,6 +2197,10 @@ msgstr "Nächste Periode beginnt am %(start)s, Rechnung wird am %(create)s erste
 #: workbench/templates/reporting/projected_gross_margin.html
 msgid "gross margin"
 msgstr "Umsatz bereinigt"
+
+#: workbench/invoices/models.py
+msgid "Invoice total excl. tax minus third party costs incl. tax."
+msgstr "Rechnungstotal exkl. MwSt. abzüglich Fremdkosten inkl. MwSt."
 
 #: workbench/invoices/tasks.py
 msgid "Unsent projected invoices"
