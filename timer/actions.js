@@ -29,6 +29,54 @@ const formatDate = (d) =>
   `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 const formatTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`
 
+// POST a form and return the response, or alert and return null if the
+// request failed or got redirected (e.g. to the login page because the
+// session expired). fetch follows redirects, so those would otherwise look
+// like a regular 200 response.
+async function postForm(url, body) {
+  const headers = new Headers()
+  headers.append("X-Requested-With", "XMLHttpRequest")
+  headers.append("X-CSRFToken", document.cookie.match(/\bcsrftoken=(.+?)\b/)[1])
+
+  let response
+  try {
+    response = await fetch(url, {
+      credentials: "include",
+      method: "POST",
+      body,
+      headers,
+    })
+  } catch (e) {
+    console.error(e)
+    alert(gettext("Unable to submit the logbook entry"))
+    return null
+  }
+  if (response.redirected) {
+    alert(
+      gettext(
+        "Unable to submit the logbook entry. Your session may have expired, please reload the page.",
+      ),
+    )
+    return null
+  }
+  return response
+}
+
+// Show the form with errors or warnings returned by the server. Returns false
+// (after alerting) if the response does not contain a modal at all, since
+// nothing would be shown otherwise.
+async function showFormResponse(response) {
+  const html = await response.text()
+  const template = document.createElement("template")
+  template.innerHTML = html
+  if (response.status !== 200 || !template.content.querySelector(".modal")) {
+    alert(gettext("Unable to submit the logbook entry"))
+    return false
+  }
+  window.initModal(html)
+  return true
+}
+
 export async function saveBreak(dispatch, activity, { reload = true } = {}) {
   const startedAt = new Date(activity.startedAt * 1000)
   const endedAt = new Date()
@@ -40,16 +88,8 @@ export async function saveBreak(dispatch, activity, { reload = true } = {}) {
   if (activity.description)
     body.append("modal-description", activity.description)
 
-  const headers = new Headers()
-  headers.append("X-Requested-With", "XMLHttpRequest")
-  headers.append("X-CSRFToken", document.cookie.match(/\bcsrftoken=(.+?)\b/)[1])
-
-  const response = await fetch(BREAK_URL, {
-    credentials: "include",
-    method: "POST",
-    body,
-    headers,
-  })
+  const response = await postForm(BREAK_URL, body)
+  if (!response) return
   if (response.status === 201) {
     dispatch({
       type: "UPDATE_ACTIVITY",
@@ -57,11 +97,10 @@ export async function saveBreak(dispatch, activity, { reload = true } = {}) {
       fields: { startedAt: null, description: "" },
     })
     if (reload) window.location.reload()
-  } else {
+  } else if (await showFormResponse(response)) {
     // The form came back with errors or warnings. Remember the activity so
     // that submitting the modal successfully still resets it.
     dispatch({ type: "MODAL_ACTIVITY", id: activity.id })
-    window.initModal(await response.text())
   }
 }
 
@@ -163,34 +202,20 @@ export async function sendLogbook(dispatch, { activity, current }) {
   )
   body.append("modal-rendered_on", new Date().toISOString().replace(/T.*/, ""))
 
-  const headers = new Headers()
-  headers.append("X-Requested-With", "XMLHttpRequest")
-  headers.append("X-CSRFToken", document.cookie.match(/\bcsrftoken=(.+?)\b/)[1])
-
-  const response = await fetch(url, {
-    credentials: "include",
-    method: "POST",
-    body,
-    headers,
-  })
-  if (response.status === 200) {
-    // The form came back with errors or warnings. Stop the timer and remember
-    // the activity so that submitting the modal successfully still resets it.
-    if (current && current.id === activity.id)
-      dispatch({ type: "STOP", current })
-    dispatch({ type: "MODAL_ACTIVITY", id: activity.id })
-    window.initModal(await response.text())
-  } else if (response.status === 201) {
-    if (current && current.id === activity.id)
-      dispatch({ type: "STOP", current })
+  const response = await postForm(url, body)
+  if (!response) return
+  if (current && current.id === activity.id) dispatch({ type: "STOP", current })
+  if (response.status === 201) {
     dispatch({
       type: "UPDATE_ACTIVITY",
       id: activity.id,
       fields: { description: "", seconds: 0 },
     })
     window.location.reload()
-  } else {
-    alert(gettext("Unable to submit the logbook entry"))
+  } else if (await showFormResponse(response)) {
+    // The form came back with errors or warnings. Remember the activity so
+    // that submitting the modal successfully still resets it.
+    dispatch({ type: "MODAL_ACTIVITY", id: activity.id })
   }
 }
 

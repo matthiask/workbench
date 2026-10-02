@@ -209,6 +209,13 @@ msgstr "Konnte Formular nicht öffnen"
 msgid "Unable to submit the logbook entry"
 msgstr "Konnte Logbucheintrag nicht abschicken"
 
+msgid ""
+"Unable to submit the logbook entry. Your session may have expired, please "
+"reload the page."
+msgstr ""
+"Konnte Logbucheintrag nicht abschicken. Möglicherweise ist deine Sitzung "
+"abgelaufen, bitte lade die Seite neu."
+
 #: conf/strings.js timer/i18n.js
 msgid "What outcome do you seek?"
 msgstr "Welches Ergebnis strebst Du an?"

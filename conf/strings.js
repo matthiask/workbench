@@ -36,6 +36,9 @@ gettext("Timer")
 gettext("Today")
 gettext("Unable to open the form")
 gettext("Unable to submit the logbook entry")
+gettext(
+  "Unable to submit the logbook entry. Your session may have expired, please reload the page.",
+)
 gettext("Week %s")
 gettext("What outcome do you seek?")
 gettext(m)
