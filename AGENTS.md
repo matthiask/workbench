@@ -7,6 +7,16 @@ Use `./runtests.sh` to run the full test suite. Accepts an optional module argum
 ./runtests.sh workbench.projects.test_projects
 ```
 
+The tests need the local PostgreSQL container: `podman start local_postgres_1`.
+
+# Fixing bugs
+
+1. Write a test which reproduces the bug.
+2. Run it and make sure it fails, and fails for the right reason.
+3. Simplify the test down to the essential behaviour.
+4. Run it again and make sure it still fails.
+5. Only then implement the fix and confirm the test passes.
+
 # Translations
 
 Update and compile the translation catalog with:
