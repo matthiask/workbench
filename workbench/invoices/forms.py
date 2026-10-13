@@ -284,6 +284,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                     "third_party_costs",
                     "status",
                     "payment_notice",
+                    "postpone_reminders_until",
                 }:
                     self.fields[field].disabled = True
 

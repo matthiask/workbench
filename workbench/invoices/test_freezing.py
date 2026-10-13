@@ -196,3 +196,22 @@ class FreezingTest(TestCase):
         self.assertEqual(invoice.status, Invoice.PAID)
         self.assertEqual(invoice.closed_on, in_days(0))
         self.assertEqual(invoice.payment_notice, "Whatevs")
+
+    def test_freezed_invoice_postpone_reminders(self):
+        """Reminders of frozen invoices can still be postponed"""
+        FreezeDate.objects.create(up_to=dt.date(2024, 12, 31))
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=dt.date(2024, 12, 15),
+            due_on=dt.date(2025, 1, 1),
+            status=Invoice.SENT,
+            postal_address="A\nB\nC",
+        )
+
+        self.client.force_login(invoice.owned_by)
+        self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, postpone_reminders_until=in_days(14)),
+        )
+
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.postpone_reminders_until, in_days(14))
