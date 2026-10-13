@@ -7,7 +7,7 @@ fl.config.update(
     domain="workbench.feinheit.ch",
     branch="main",
     remote="production",
-    python="3.14",
+    python="3.15",
 )
 
 

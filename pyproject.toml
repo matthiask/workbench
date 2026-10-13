@@ -1,10 +1,8 @@
 [project]
 name = "workbench"
 version = "0.0.1"
-requires-python = ">=3.14"
+requires-python = ">=3.15"
 classifiers = [
-  "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
   "beautifulsoup4>=4.14.3",
@@ -40,7 +38,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-target-version = "py314"
+target-version = "py315"
 preview = true
 fix = true
 show-fixes = true
