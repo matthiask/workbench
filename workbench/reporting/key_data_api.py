@@ -93,15 +93,21 @@ def key_data_for_month(first_of_month):
         ),
         Z2,
     )
-    green_hours = next(
-        (row for row in green_hours_by_month() if row["month"] == first_of_month),
-        None,
-    )
+    green_hours = {row["month"]: row["percentage"] for row in green_hours_by_month()}
+    previous_months = []
+    day = first_of_month
+    for _i in range(3):
+        day = (day - dt.timedelta(days=1)).replace(day=1)
+        previous_months.append({
+            "month": f"{day:%Y-%m}",
+            "green_hours_percentage": green_hours.get(day),
+        })
 
     return {
         "month": f"{first_of_month:%Y-%m}",
         "generated_at": dt.datetime.now().isoformat(timespec="seconds"),
-        "green_hours_percentage": green_hours["percentage"] if green_hours else None,
+        "green_hours_percentage": green_hours.get(first_of_month),
+        "previous_months": previous_months,
         "gross_margin": gross_margin,
         "open_invoices_total_excl_tax": open_invoices_total(last_of_month),
         "accruals": accruals(last_of_month),

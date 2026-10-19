@@ -85,6 +85,14 @@ class KeyDataAPITest(TestCase):
             data["accepted_deals"][0]["closed_on"],
             (month + dt.timedelta(days=3)).isoformat(),
         )
+        self.assertEqual(
+            [row["month"] for row in data["previous_months"]],
+            [
+                f"{(month - dt.timedelta(days=1)):%Y-%m}",
+                f"{(month - dt.timedelta(days=32)).replace(day=1):%Y-%m}",
+                f"{(month - dt.timedelta(days=63)).replace(day=1):%Y-%m}",
+            ],
+        )
         for key in [
             "green_hours_percentage",
             "accruals",
