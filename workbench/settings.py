@@ -24,6 +24,7 @@ RECURRING_INVOICES_CC = env("RECURRING_INVOICES_CC", default=[])
 GITHUB_API_TOKEN = env("GITHUB_API_TOKEN", default="")
 GITHUB_PROJECT_URLS = env("GITHUB_PROJECT_URLS", default=[])
 GITHUB_APP_REPOS = env("GITHUB_APP_REPOS", default={})
+KEY_DATA_API_TOKEN = env("KEY_DATA_API_TOKEN", default="")
 
 DEBUG_TOOLBAR = DEBUG and not TESTING
 
@@ -78,6 +79,7 @@ LOGIN_REQUIRED_EXEMPT = (
     "/create-timestamp",
     "/list-timestamps",
     "/timestamps-controller",
+    "/api/",
 )
 
 MIDDLEWARE = [
