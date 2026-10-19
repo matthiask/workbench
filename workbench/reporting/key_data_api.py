@@ -31,6 +31,16 @@ def open_invoices_total(cutoff_date):
     )
 
 
+def canceled_invoices_total(date_range):
+    return (
+        Invoice.objects
+        .filter(status=Invoice.CANCELED, closed_on__range=date_range)
+        .order_by()
+        .aggregate(t=Sum("total_excl_tax"))["t"]
+        or Z2
+    )
+
+
 def accruals(cutoff_date):
     if obj := Accruals.objects.filter(cutoff_date=cutoff_date).first():
         return obj.accruals
@@ -110,6 +120,7 @@ def key_data_for_month(first_of_month):
         "previous_months": previous_months,
         "gross_margin": gross_margin,
         "open_invoices_total_excl_tax": open_invoices_total(last_of_month),
+        "canceled_invoices_total_excl_tax": canceled_invoices_total(date_range),
         "accruals": accruals(last_of_month),
         "full_time_equivalents": full_time_equivalents_by_month().get(
             first_of_month, Z1

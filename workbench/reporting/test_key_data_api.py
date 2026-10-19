@@ -93,6 +93,7 @@ class KeyDataAPITest(TestCase):
                 f"{(month - dt.timedelta(days=63)).replace(day=1):%Y-%m}",
             ],
         )
+        self.assertEqual(data["canceled_invoices_total_excl_tax"], 0.0)
         for key in [
             "green_hours_percentage",
             "accruals",
@@ -100,3 +101,28 @@ class KeyDataAPITest(TestCase):
             "squeeze_gross_margin",
         ]:
             self.assertIn(key, data)
+
+    @override_settings(KEY_DATA_API_TOKEN="secret")
+    def test_canceled_invoices(self):
+        """Invoices canceled last month are reported separately"""
+        month = previous_month()
+
+        factories.InvoiceFactory.create(
+            invoiced_on=month - dt.timedelta(days=40),
+            closed_on=month + dt.timedelta(days=5),
+            subtotal=300,
+            status=Invoice.CANCELED,
+            payment_notice="Wrong customer",
+        )
+        factories.InvoiceFactory.create(
+            invoiced_on=month - dt.timedelta(days=40),
+            closed_on=month - dt.timedelta(days=5),
+            subtotal=700,
+            status=Invoice.CANCELED,
+            payment_notice="Canceled before last month",
+        )
+
+        response = self.client.get(
+            "/api/key-data/", headers={"Authorization": "Bearer secret"}
+        )
+        self.assertEqual(response.json()["canceled_invoices_total_excl_tax"], 300.0)
