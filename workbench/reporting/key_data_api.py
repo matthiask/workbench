@@ -107,10 +107,12 @@ def key_data_for_month(first_of_month):
     previous_months = []
     day = first_of_month
     for _i in range(3):
-        day = (day - dt.timedelta(days=1)).replace(day=1)
+        end = day - dt.timedelta(days=1)
+        day = end.replace(day=1)
         previous_months.append({
             "month": f"{day:%Y-%m}",
             "green_hours_percentage": green_hours.get(day),
+            "canceled_invoices_total_excl_tax": canceled_invoices_total([day, end]),
         })
 
     return {

@@ -125,4 +125,12 @@ class KeyDataAPITest(TestCase):
         response = self.client.get(
             "/api/key-data/", headers={"Authorization": "Bearer secret"}
         )
-        self.assertEqual(response.json()["canceled_invoices_total_excl_tax"], 300.0)
+        data = response.json()
+        self.assertEqual(data["canceled_invoices_total_excl_tax"], 300.0)
+        self.assertEqual(
+            [
+                row["canceled_invoices_total_excl_tax"]
+                for row in data["previous_months"]
+            ],
+            [700.0, 0.0, 0.0],
+        )
