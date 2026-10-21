@@ -46,6 +46,15 @@ def working_days_estimation(date_range):
     return days * WORKING_DAYS_PER_YEAR / DAYS_PER_YEAR
 
 
+def relevant_hours(hours_offered, hours_logged, hours_logged_budgeted):
+    """Hours logged on services which aren't budgeted (optional, declined,
+    budget retainers) are added on top instead of disappearing in the max() so
+    that we rather underestimate than overestimate the rate."""
+    return (
+        max(hours_offered, hours_logged_budgeted) + hours_logged - hours_logged_budgeted
+    )
+
+
 def project_gross_margin(project):
     """Compute the gross margin estimate and rate for a single project,
     using the same logic as the squeeze report."""
@@ -106,14 +115,13 @@ def project_gross_margin(project):
         )
         offered_for_margin = offered
 
-    hours_logged = (
-        LoggedHours.objects.filter(service__project=project).aggregate(s=Sum("hours"))[
-            "s"
-        ]
-        or Z1
+    logged = LoggedHours.objects.filter(service__project=project).aggregate(
+        total=Sum("hours"),
+        budgeted=Sum("hours", filter=Q(service__in=Service.objects.budgeted())),
     )
+    hours_logged = logged["total"] or Z1
     gross_margin = max(offered_for_margin, projected, invoiced)
-    hours = max(hours_offered, hours_logged)
+    hours = relevant_hours(hours_offered, hours_logged, logged["budgeted"] or Z1)
 
     # Budget which was invoiced here but is worked off elsewhere (or reserved
     # for that) has to follow the hours it paid for.
@@ -143,6 +151,7 @@ def squeeze_data(date_range):  # noqa: C901
             "projected": Z2,
             "offered": Z2,
             "hours_logged": Z1,
+            "hours_logged_budgeted": Z1,
             "hours_offered": Z1,
             "hours_in_range_by_user": {},
         }
@@ -198,10 +207,18 @@ def squeeze_data(date_range):  # noqa: C901
         .order_by()
         .filter(service__project__in=projects.keys())
         .values("service__project")
-        .annotate(hours__sum=Sum("hours"))
+        .annotate(
+            hours__sum=Sum("hours"),
+            budgeted_hours__sum=Sum(
+                "hours", filter=Q(service__in=Service.objects.budgeted())
+            ),
+        )
     )
     for row in total_hours:
         projects[row["service__project"]]["hours_logged"] = row["hours__sum"]
+        projects[row["service__project"]]["hours_logged_budgeted"] = (
+            row["budgeted_hours__sum"] or Z1
+        )
 
     offered_hours = (
         Service.objects
@@ -278,7 +295,7 @@ def squeeze_data(date_range):  # noqa: C901
         margin = max((offered, projected, invoiced))
         hours_offered = p["hours_offered"]
         hours_logged = p["hours_logged"]
-        hours = max((hours_offered, hours_logged))
+        hours = relevant_hours(hours_offered, hours_logged, p["hours_logged_budgeted"])
 
         # Budget which was invoiced here but is worked off elsewhere (or
         # reserved for that) has to follow the hours it paid for, otherwise the
