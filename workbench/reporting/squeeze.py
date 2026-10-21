@@ -83,6 +83,14 @@ def project_gross_margin(project):
         .aggregate(s=Sum("service_hours"))["s"]
         or Z1
     )
+    # Only the hours of accepted offers match the offered amount.
+    hours_accepted = (
+        Service.objects
+        .budgeted()
+        .filter(offer__in=accepted_offers)
+        .aggregate(s=Sum("service_hours"))["s"]
+        or Z1
+    )
 
     # Projected invoices and including offered in gross_margin only makes sense
     # for open projects; for closed projects the invoiced amount is ground truth.
@@ -121,7 +129,7 @@ def project_gross_margin(project):
         "hours_offered": hours_offered,
         "hours_logged": hours_logged,
         "rate": gross_margin / hours if hours else Z2,
-        "offered_rate": offered / hours_offered if hours_offered else Z2,
+        "offered_rate": offered / hours_accepted if hours_accepted else Z2,
         "offered": offered,
         "projected": projected,
         "invoiced": invoiced,
