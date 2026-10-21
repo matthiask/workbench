@@ -92,7 +92,8 @@ def project_gross_margin(project):
         .aggregate(s=Sum("service_hours"))["s"]
         or Z1
     )
-    # Only the hours of accepted offers match the offered amount.
+    # Only the hours of accepted offers match the offered amount (logged hours
+    # are taken into account below).
     hours_accepted = (
         Service.objects
         .budgeted()
@@ -115,13 +116,20 @@ def project_gross_margin(project):
         )
         offered_for_margin = offered
 
+    budgeted = Q(service__in=Service.objects.budgeted())
+    accepted = Q(service__offer__in=accepted_offers)
     logged = LoggedHours.objects.filter(service__project=project).aggregate(
         total=Sum("hours"),
-        budgeted=Sum("hours", filter=Q(service__in=Service.objects.budgeted())),
+        budgeted=Sum("hours", filter=budgeted),
+        accepted=Sum("hours", filter=accepted),
+        accepted_budgeted=Sum("hours", filter=accepted & budgeted),
     )
     hours_logged = logged["total"] or Z1
     gross_margin = max(offered_for_margin, projected, invoiced)
     hours = relevant_hours(hours_offered, hours_logged, logged["budgeted"] or Z1)
+    hours_accepted = relevant_hours(
+        hours_accepted, logged["accepted"] or Z1, logged["accepted_budgeted"] or Z1
+    )
 
     # Budget which was invoiced here but is worked off elsewhere (or reserved
     # for that) has to follow the hours it paid for.

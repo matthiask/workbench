@@ -48,3 +48,11 @@ class SqueezeTest(TestCase):
         data = squeeze_data((in_days(-1), in_days(1)))
         row = next(p for p in data["projects"] if p["project"] == project)
         self.assertEqual(row["hours"], 15)
+
+    def test_offered_rate_uses_logged_hours(self):
+        """Hours logged beyond the accepted offers' hours lower their rate"""
+        project = factories.ProjectFactory.create()
+        service = self.offer(project, status=Offer.ACCEPTED, hours=10)
+        factories.LoggedHoursFactory.create(service=service, hours=20)
+
+        self.assertEqual(project_gross_margin(project)["offered_rate"], 100)

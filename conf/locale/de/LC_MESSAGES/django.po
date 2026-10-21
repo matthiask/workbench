@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 14:51+0200\n"
+"POT-Creation-Date: 2026-10-21 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1137,6 +1137,7 @@ msgstr "NOCH KEIN DATUM"
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/templates/reporting/labor_costs.html
@@ -4298,8 +4299,8 @@ msgid "Rate"
 msgstr "Ansatz"
 
 #: workbench/templates/projects/project_detail.html
-msgid "rate based on accepted offers"
-msgstr "Ansatz basierend auf akzeptierten Offerten"
+msgid "rate based on accepted offers (offered or logged hours)"
+msgstr "Ansatz basierend auf akzeptierten Offerten (offerierte bzw. erfasste Stunden)"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Project offers"

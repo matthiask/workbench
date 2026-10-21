@@ -258,7 +258,8 @@
                       <br>
                       {% if squeeze.offered %}
                         <small class="text-muted">
-                          {% translate 'rate based on accepted offers' %}: {{ squeeze.offered_rate|currency }}/h
+                          {% translate 'rate based on accepted offers (offered or logged hours)' %}:
+                          {{ squeeze.offered_rate|currency }}/h
                         </small>
                       {% endif %}
                     </td>

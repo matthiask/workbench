@@ -37,7 +37,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - Profitability estimates (rates, gross margins) should rather underestimate
   than overestimate. When in doubt, count hours and leave out money.
   The overall rate counts all budgeted hours (also from offers not accepted
-  yet); the rate based on accepted offers only their hours. Hours logged on
+  yet); the rate based on accepted offers only their hours (offered or
+  logged, whichever is higher). Hours logged on
   services which aren't budgeted (optional, declined) are added on top.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
