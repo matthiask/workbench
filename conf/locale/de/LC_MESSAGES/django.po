@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 11:42+0200\n"
+"POT-Creation-Date: 2026-10-21 11:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2850,6 +2850,7 @@ msgid "Service Type"
 msgstr "Leistungstyp"
 
 #: workbench/planning/xlsx.py workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_profitability.html
 #: workbench/templates/reporting/hours_per_type.html
 #: workbench/templates/reporting/squeeze.html
 msgid "Hours"
@@ -2936,6 +2937,7 @@ msgid "No invoices"
 msgstr "Keine Rechnungen"
 
 #: workbench/projects/forms.py
+#: workbench/templates/projects/project_profitability.html
 msgid "Accepted offers"
 msgstr "Akzeptierte Offerten"
 
@@ -3243,8 +3245,9 @@ msgstr "Kosten nach Monat und Leistung"
 msgid "Budgeted"
 msgstr "Budgetiert"
 
-#: workbench/projects/views.py workbench/templates/reporting/squeeze.html
-#: workbench/tools/xlsx.py
+#: workbench/projects/views.py
+#: workbench/templates/projects/project_profitability.html
+#: workbench/templates/reporting/squeeze.html workbench/tools/xlsx.py
 msgid "Invoiced"
 msgstr "Verrechnet"
 
@@ -4266,41 +4269,9 @@ msgid "Projected invoice total isn't large enough to cover logged work"
 msgstr "Das Total der geplanten Rechnungen ist nicht hoch genug, um die erfassten Leistungen abzudecken"
 
 #: workbench/templates/projects/project_detail.html
-msgid "Profitability estimation"
-msgstr "Rentabilitätsschätzung"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/key_data.html
-#: workbench/templates/reporting/squeeze.html
-msgid "Gross margin"
-msgstr "Umsatz bereinigt"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/playing_bank.html
-msgid "offered"
-msgstr "Offeriert"
-
-#: workbench/templates/projects/project_detail.html
-msgid "projected"
-msgstr "Geplant"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/squeeze.html
-msgid "Relevant hours"
-msgstr "Relevante Stunden"
-
-#: workbench/templates/projects/project_detail.html
-msgid "logged"
-msgstr "Erfasst"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/reporting/squeeze.html
-msgid "Rate"
-msgstr "Ansatz"
-
-#: workbench/templates/projects/project_detail.html
-msgid "rate based on accepted offers (offered or logged hours)"
-msgstr "Ansatz basierend auf akzeptierten Offerten (offerierte bzw. erfasste Stunden)"
+#: workbench/templates/projects/project_profitability.html
+msgid "Profitability"
+msgstr "Rentabilität"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Project offers"
@@ -4381,6 +4352,86 @@ msgstr "Leistungen aus dem Logbuch"
 #: workbench/templates/projects/project_detail.html
 msgid "Services from offer"
 msgstr "Leistungen aus Offerte"
+
+#: workbench/templates/projects/project_profitability.html
+#: workbench/templates/reporting/key_data.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Gross margin"
+msgstr "Umsatz bereinigt"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "not used for closed projects"
+msgstr "bei geschlossenen Projekten nicht verwendet"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Projected invoices"
+msgstr "Geplante Rechnungen"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Budget transfers"
+msgstr "Budgetverschiebungen"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Service hours"
+msgstr "Leistungsstunden"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Hours logged on these services"
+msgstr "Erfasste Stunden auf diesen Leistungen"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Hours logged on other services"
+msgstr "Erfasste Stunden auf anderen Leistungen"
+
+#: workbench/templates/projects/project_profitability.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Relevant hours"
+msgstr "Relevante Stunden"
+
+#: workbench/templates/projects/project_profitability.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Rate"
+msgstr "Ansatz"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Accepted offers only"
+msgstr "Nur akzeptierte Offerten"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Offered hours"
+msgstr "Offerierte Stunden"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Logged hours"
+msgstr "Erfasste Stunden"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Assumptions"
+msgstr "Annahmen"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "All figures are estimates. They should rather underestimate than overestimate the profitability. When in doubt, hours are counted and money is left out."
+msgstr "Alle Zahlen sind Schätzungen. Sie sollen die Rentabilität eher unter- als überschätzen. Im Zweifelsfall werden Stunden mitgezählt und Beträge weggelassen."
+
+#: workbench/templates/projects/project_profitability.html
+msgid "The gross margin is the largest of the accepted offers' total, the projected invoices and the invoiced total. Closed projects only use the invoiced total. Third party costs are always deducted, also those which have been logged but not invoiced yet."
+msgstr "Der bereinigte Umsatz ist der grösste Wert aus dem Total der akzeptierten Offerten, den geplanten Rechnungen und dem verrechneten Total. Bei geschlossenen Projekten zählt nur das verrechnete Total. Fremdkosten werden immer abgezogen, auch solche, die erfasst, aber noch nicht verrechnet wurden."
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Budget transferred to other projects is deducted, budget transferred from other projects is added."
+msgstr "Budget, das auf andere Projekte verschoben wurde, wird abgezogen; Budget, das von anderen Projekten hierher verschoben wurde, wird dazugezählt."
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Service hours are the hours entered in the services, except for optional services and services of declined offers or budget retainers. Hours of offers which haven't been accepted yet are included even though their amount isn't."
+msgstr "Leistungsstunden sind die in den Leistungen erfassten Stunden, ausser bei optionalen Leistungen und Leistungen von abgelehnten Offerten oder von Offerten, die Budget zurückbehalten. Stunden von noch nicht akzeptierten Offerten zählen mit, auch wenn ihr Betrag noch nicht mitzählt."
+
+#: workbench/templates/projects/project_profitability.html
+msgid "The relevant hours are the service hours or the hours logged on these services, whichever is larger. Hours logged on other services (for example optional services) are always added on top."
+msgstr "Massgebend ist der grössere Wert aus Leistungsstunden und auf diesen Leistungen erfassten Stunden. Stunden, die auf anderen Leistungen (z.B. optionalen Leistungen) erfasst wurden, werden immer dazugezählt."
+
+#: workbench/templates/projects/project_profitability.html
+msgid "The rate for accepted offers only uses their amount and their hours. It shows how profitable the project is if no further offers are accepted and no work happens outside of the accepted offers."
+msgstr "Der Ansatz für akzeptierte Offerten verwendet nur deren Betrag und deren Stunden. Er zeigt, wie rentabel das Projekt ist, wenn keine weiteren Offerten akzeptiert werden und keine Arbeit ausserhalb der akzeptierten Offerten anfällt."
 
 #: workbench/templates/projects/project_projected_invoices_form.html
 msgid "Update projected gross margin"
@@ -4574,6 +4625,10 @@ msgstr "Differenz"
 #: workbench/templates/reporting/planning_vs_logbook.html
 msgid "Allocation"
 msgstr "Zuteilung"
+
+#: workbench/templates/reporting/playing_bank.html
+msgid "offered"
+msgstr "Offeriert"
 
 #: workbench/templates/reporting/playing_bank.html
 msgid "logged (past)"
@@ -5011,6 +5066,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "projected"
+#~ msgstr "Geplant"
+
+#~ msgid "logged"
+#~ msgstr "Erfasst"
+
+#~ msgid "rate based on accepted offers (offered or logged hours)"
+#~ msgstr "Ansatz basierend auf akzeptierten Offerten (offerierte bzw. erfasste Stunden)"
 
 #~ msgid "Logbook contains work for which no projected invoice exists"
 #~ msgstr "Logbuch enthält Leistungen, für welche es keine geplanten Rechnungen gibt"

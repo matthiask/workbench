@@ -85,6 +85,16 @@ class ProjectDetailView(generic.DetailView):
         )
 
 
+class ProjectProfitabilityView(generic.DetailView):
+    model = Project
+    template_name_suffix = "_profitability"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            squeeze=project_gross_margin(self.object), **kwargs
+        )
+
+
 def select(request):
     if not request.is_ajax():
         return redirect("/")

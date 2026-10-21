@@ -1,0 +1,139 @@
+{% extends 'modal.html' %}
+{% load i18n workbench %}
+{% block size %}modal-lg{% endblock %}
+
+{% block title %}
+  {% translate 'Profitability' %}
+{% endblock title %}
+
+{% block body %}
+  <table class="table table-sm">
+    <tr>
+      <th colspan="2">{% translate 'Gross margin' %}</th>
+    </tr>
+    <tr>
+      <td>
+        {% translate 'Accepted offers' %}
+        {% if object.closed_on %}
+          <small class="text-muted">({% translate 'not used for closed projects' %})</small>
+        {% endif %}
+      </td>
+      <td class="text-end">{{ squeeze.offered|currency }}</td>
+    </tr>
+    <tr>
+      <td>
+        {% translate 'Projected invoices' %}
+        {% if object.closed_on %}
+          <small class="text-muted">({% translate 'not used for closed projects' %})</small>
+        {% endif %}
+      </td>
+      <td class="text-end">{{ squeeze.projected|currency }}</td>
+    </tr>
+    <tr>
+      <td>{% translate 'Invoiced' %}</td>
+      <td class="text-end">{{ squeeze.invoiced|currency }}</td>
+    </tr>
+    {% if squeeze.budget_adjustment %}
+      <tr>
+        <td>{% translate 'Budget transfers' %}</td>
+        <td class="text-end">{{ squeeze.budget_adjustment|currency }}</td>
+      </tr>
+    {% endif %}
+    <tr>
+      <th>{% translate 'Gross margin' %}</th>
+      <th class="text-end">{{ squeeze.gross_margin|currency }}</th>
+    </tr>
+
+    <tr>
+      <th colspan="2" class="pt-4">{% translate 'Hours' %}</th>
+    </tr>
+    <tr>
+      <td>{% translate 'Service hours' %}</td>
+      <td class="text-end">{{ squeeze.hours_offered|hours }}</td>
+    </tr>
+    <tr>
+      <td>{% translate 'Hours logged on these services' %}</td>
+      <td class="text-end">{{ squeeze.hours_logged_budgeted|hours }}</td>
+    </tr>
+    <tr>
+      <td>{% translate 'Hours logged on other services' %}</td>
+      <td class="text-end">{{ squeeze.hours_logged_unbudgeted|hours }}</td>
+    </tr>
+    <tr>
+      <th>{% translate 'Relevant hours' %}</th>
+      <th class="text-end">{{ squeeze.hours|hours }}</th>
+    </tr>
+
+    <tr class="table-primary">
+      <th>{% translate 'Rate' %}</th>
+      <th class="text-end">{{ squeeze.rate|currency }}/h</th>
+    </tr>
+
+    {% if squeeze.offered %}
+      <tr>
+        <th colspan="2" class="pt-4">{% translate 'Accepted offers only' %}</th>
+      </tr>
+      <tr>
+        <td>{% translate 'Gross margin' %}</td>
+        <td class="text-end">{{ squeeze.offered|currency }}</td>
+      </tr>
+      <tr>
+        <td>{% translate 'Offered hours' %}</td>
+        <td class="text-end">{{ squeeze.hours_accepted_offered|hours }}</td>
+      </tr>
+      <tr>
+        <td>{% translate 'Logged hours' %}</td>
+        <td class="text-end">{{ squeeze.hours_accepted_logged|hours }}</td>
+      </tr>
+      <tr>
+        <th>{% translate 'Relevant hours' %}</th>
+        <th class="text-end">{{ squeeze.hours_accepted|hours }}</th>
+      </tr>
+      <tr class="table-primary">
+        <th>{% translate 'Rate' %}</th>
+        <th class="text-end">{{ squeeze.offered_rate|currency }}/h</th>
+      </tr>
+    {% endif %}
+  </table>
+
+  <h5>{% translate 'Assumptions' %}</h5>
+  <p>
+    {% blocktranslate trimmed %}
+      All figures are estimates. They should rather underestimate than overestimate the profitability. When in doubt,
+      hours are counted and money is left out.
+    {% endblocktranslate %}
+  </p>
+  <ul>
+    <li>
+      {% blocktranslate trimmed %}
+        The gross margin is the largest of the accepted offers' total, the projected invoices and the invoiced total.
+        Closed projects only use the invoiced total. Third party costs are always deducted, also those which have been
+        logged but not invoiced yet.
+      {% endblocktranslate %}
+    </li>
+    <li>
+      {% blocktranslate trimmed %}
+        Budget transferred to other projects is deducted, budget transferred from other projects is added.
+      {% endblocktranslate %}
+    </li>
+    <li>
+      {% blocktranslate trimmed %}
+        Service hours are the hours entered in the services, except for optional services and services of declined
+        offers or budget retainers. Hours of offers which haven't been accepted yet are included even though their
+        amount isn't.
+      {% endblocktranslate %}
+    </li>
+    <li>
+      {% blocktranslate trimmed %}
+        The relevant hours are the service hours or the hours logged on these services, whichever is larger. Hours
+        logged on other services (for example optional services) are always added on top.
+      {% endblocktranslate %}
+    </li>
+    <li>
+      {% blocktranslate trimmed %}
+        The rate for accepted offers only uses their amount and their hours. It shows how profitable the project is if
+        no further offers are accepted and no work happens outside of the accepted offers.
+      {% endblocktranslate %}
+    </li>
+  </ul>
+{% endblock body %}

@@ -56,3 +56,14 @@ class SqueezeTest(TestCase):
         factories.LoggedHoursFactory.create(service=service, hours=20)
 
         self.assertEqual(project_gross_margin(project)["offered_rate"], 100)
+
+    def test_profitability_modal(self):
+        """The profitability modal shows both rates"""
+        project = factories.ProjectFactory.create()
+        self.offer(project, status=Offer.ACCEPTED, hours=10)
+        self.offer(project, status=Offer.IN_PREPARATION, hours=10)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["profitability"])
+        self.assertContains(response, "100.00/h")
+        self.assertContains(response, "200.00/h")

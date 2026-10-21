@@ -94,7 +94,7 @@ def project_gross_margin(project):
     )
     # Only the hours of accepted offers match the offered amount (logged hours
     # are taken into account below).
-    hours_accepted = (
+    hours_accepted_offered = (
         Service.objects
         .budgeted()
         .filter(offer__in=accepted_offers)
@@ -125,25 +125,34 @@ def project_gross_margin(project):
         accepted_budgeted=Sum("hours", filter=accepted & budgeted),
     )
     hours_logged = logged["total"] or Z1
+    hours_logged_budgeted = logged["budgeted"] or Z1
+    hours_accepted_logged = logged["accepted"] or Z1
     gross_margin = max(offered_for_margin, projected, invoiced)
-    hours = relevant_hours(hours_offered, hours_logged, logged["budgeted"] or Z1)
+    hours = relevant_hours(hours_offered, hours_logged, hours_logged_budgeted)
     hours_accepted = relevant_hours(
-        hours_accepted, logged["accepted"] or Z1, logged["accepted_budgeted"] or Z1
+        hours_accepted_offered,
+        hours_accepted_logged,
+        logged["accepted_budgeted"] or Z1,
     )
 
     # Budget which was invoiced here but is worked off elsewhere (or reserved
     # for that) has to follow the hours it paid for.
-    gross_margin = max(
-        gross_margin
-        + BudgetTransfer.objects.adjustments(projects=[project])[project.id],
-        Z2,
-    )
+    budget_adjustment = BudgetTransfer.objects.adjustments(projects=[project])[
+        project.id
+    ]
+    gross_margin = max(gross_margin + budget_adjustment, Z2)
 
     return {
         "gross_margin": gross_margin,
         "hours": hours,
         "hours_offered": hours_offered,
         "hours_logged": hours_logged,
+        "hours_logged_budgeted": hours_logged_budgeted,
+        "hours_logged_unbudgeted": hours_logged - hours_logged_budgeted,
+        "hours_accepted": hours_accepted,
+        "hours_accepted_offered": hours_accepted_offered,
+        "hours_accepted_logged": hours_accepted_logged,
+        "budget_adjustment": budget_adjustment,
         "rate": gross_margin / hours if hours else Z2,
         "offered_rate": offered / hours_accepted if hours_accepted else Z2,
         "offered": offered,

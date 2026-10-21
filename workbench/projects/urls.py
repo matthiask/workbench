@@ -37,6 +37,7 @@ from workbench.projects.models import BudgetTransfer, Campaign, Project, Service
 from workbench.projects.views import (
     OffersRenumberView,
     ProjectDetailView,
+    ProjectProfitabilityView,
     assign_service_type,
     cost_by_month_and_service_xlsx,
     logbook_batch_update,
@@ -160,6 +161,11 @@ urlpatterns = [
         "<int:pk>/statistics/",
         generic.DetailView.as_view(model=Project, template_name_suffix="_statistics"),
         name="projects_project_statistics",
+    ),
+    path(
+        "<int:pk>/profitability/",
+        controlling_only(ProjectProfitabilityView.as_view()),
+        name="projects_project_profitability",
     ),
     path(
         "<int:pk>/cost-by-month-and-service-xlsx/",
