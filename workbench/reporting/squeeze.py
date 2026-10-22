@@ -55,26 +55,52 @@ def relevant_hours(hours_offered, hours_logged, hours_logged_budgeted):
     )
 
 
+def third_party_costs(projects):
+    """Third party costs per project as ``{project_id: amount}``.
+
+    Logged costs are the actual costs, invoices know what has been passed on
+    to the customer. Logged costs can't be linked to fixed amount invoices, and
+    may be logged after a services invoice has been created from the offer, so
+    adding up both would count many costs twice. Using the larger of the two
+    still subtracts logged costs which haven't been invoiced yet."""
+    invoiced = defaultdict(
+        lambda: Z2,
+        Invoice.objects
+        .invoiced()
+        .filter(project__in=projects)
+        .order_by()
+        .values("project")
+        .annotate(s=Sum("third_party_costs"))
+        .values_list("project", "s"),
+    )
+    logged = defaultdict(
+        lambda: Z2,
+        LoggedCost.objects
+        .filter(service__project__in=projects, third_party_costs__isnull=False)
+        .order_by()
+        .values("service__project")
+        .annotate(s=Sum("third_party_costs"))
+        .values_list("service__project", "s"),
+    )
+    return defaultdict(
+        lambda: Z2,
+        {
+            project: max(invoiced[project], logged[project])
+            for project in {*invoiced, *logged}
+        },
+    )
+
+
 def project_gross_margin(project):
     """Compute the gross margin estimate and rate for a single project,
     using the same logic as the squeeze report."""
-    invoiced_agg = (
+    invoiced = (
         Invoice.objects
         .invoiced()
         .filter(project=project)
-        .aggregate(Sum("total_excl_tax"), Sum("third_party_costs"))
-    )
-    invoiced = (invoiced_agg["total_excl_tax__sum"] or Z2) - (
-        invoiced_agg["third_party_costs__sum"] or Z2
-    )
-    invoiced -= (
-        LoggedCost.objects.filter(
-            service__project=project,
-            third_party_costs__isnull=False,
-            invoice_service__isnull=True,
-        ).aggregate(s=Sum("third_party_costs"))["s"]
+        .aggregate(s=Sum("total_excl_tax"))["s"]
         or Z2
-    )
+    ) - third_party_costs([project.id])[project.id]
 
     # Always compute offered/hours_offered — needed for offered_rate even on closed projects.
     accepted_offers = list(Offer.objects.accepted().filter(project=project))
@@ -261,28 +287,13 @@ def squeeze_data(date_range):  # noqa: C901
         .filter(project__in=projects.keys())
         .order_by()
         .values("project")
-        .annotate(Sum("total_excl_tax"), Sum("third_party_costs"))
+        .annotate(Sum("total_excl_tax"))
     )
     for row in invoiced_per_project:
-        projects[row["project"]]["invoiced"] = (
-            row["total_excl_tax__sum"] - row["third_party_costs__sum"]
-        )
+        projects[row["project"]]["invoiced"] = row["total_excl_tax__sum"]
 
-    # Subtract third party costs from logged costs which have not been
-    # invoiced yet. Maybe we're double counting here but I'd rather have a
-    # pessimistic outlook here.
-    for row in (
-        LoggedCost.objects
-        .filter(
-            service__project__in=projects.keys(),
-            third_party_costs__isnull=False,
-            invoice_service__isnull=True,
-        )
-        .order_by()
-        .values("service__project")
-        .annotate(Sum("third_party_costs"))
-    ):
-        projects[row["service__project"]]["invoiced"] -= row["third_party_costs__sum"]
+    for project_id, costs in third_party_costs(projects.keys()).items():
+        projects[project_id]["invoiced"] -= costs
 
     for pi in ProjectedInvoice.objects.filter(
         project__in=projects.keys(), project__closed_on__isnull=True

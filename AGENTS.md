@@ -44,6 +44,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   with the service's hourly rate. Services without a rate or with a rate of
   0.00 (work paid elsewhere, e.g. by a package price) are weighted with
   `BASE_HOURLY_RATE`.
+- Third party costs are deducted once: the larger of those on invoices and
+  the logged ones (`third_party_costs()` in `workbench/reporting/squeeze.py`).
+  Logged costs can't be linked to fixed amount invoices, so adding up both
+  would count them twice.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Pre-commit hooks run ruff and auto-fix formatting. If a commit fails due to formatting, re-stage the auto-fixed files and commit again.

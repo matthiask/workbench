@@ -107,8 +107,9 @@
     <li>
       {% blocktranslate trimmed %}
         The gross margin is the largest of the accepted offers' total, the projected invoices and the invoiced total.
-        Closed projects only use the invoiced total. Third party costs are always deducted, also those which have been
-        logged but not invoiced yet.
+        Closed projects only use the invoiced total. Third party costs are always deducted: the larger of the third
+        party costs on invoices and the logged third party costs, so that logged costs which haven't been invoiced yet
+        are deducted too.
       {% endblocktranslate %}
     </li>
     <li>

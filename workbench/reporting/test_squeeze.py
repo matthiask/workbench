@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.reporting.squeeze import (
     BASE_HOURLY_RATE,
@@ -89,3 +90,32 @@ class SqueezeTest(TestCase):
             BASE_HOURLY_RATE / 200,
         )
         self.assertEqual(unrated_contrib["hours_rate_unknown"], 10)
+
+    def test_third_party_costs_are_not_subtracted_twice(self):
+        """Logged third party costs invoiced with a fixed amount invoice count once"""
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(project=project)
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1000,
+            third_party_costs=600,
+            status=Invoice.SENT,
+            due_on=in_days(15),
+        )
+        cost = factories.LoggedCostFactory.create(
+            service=service, cost=600, third_party_costs=600
+        )
+        factories.LoggedHoursFactory.create(service=service)
+
+        self.assertEqual(project_gross_margin(project)["invoiced"], 400)
+        data = squeeze_data((in_days(-1), in_days(1)))
+        row = next(p for p in data["projects"] if p["project"] == project)
+        self.assertEqual(row["invoiced"], 400)
+
+        # Logged third party costs exceeding those on invoices are subtracted
+        cost.third_party_costs = 800
+        cost.save()
+        self.assertEqual(project_gross_margin(project)["invoiced"], 200)

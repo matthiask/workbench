@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 11:46+0200\n"
+"POT-Creation-Date: 2026-10-22 15:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4414,8 +4414,8 @@ msgid "All figures are estimates. They should rather underestimate than overesti
 msgstr "Alle Zahlen sind Schätzungen. Sie sollen die Rentabilität eher unter- als überschätzen. Im Zweifelsfall werden Stunden mitgezählt und Beträge weggelassen."
 
 #: workbench/templates/projects/project_profitability.html
-msgid "The gross margin is the largest of the accepted offers' total, the projected invoices and the invoiced total. Closed projects only use the invoiced total. Third party costs are always deducted, also those which have been logged but not invoiced yet."
-msgstr "Der bereinigte Umsatz ist der grösste Wert aus dem Total der akzeptierten Offerten, den geplanten Rechnungen und dem verrechneten Total. Bei geschlossenen Projekten zählt nur das verrechnete Total. Fremdkosten werden immer abgezogen, auch solche, die erfasst, aber noch nicht verrechnet wurden."
+msgid "The gross margin is the largest of the accepted offers' total, the projected invoices and the invoiced total. Closed projects only use the invoiced total. Third party costs are always deducted: the larger of the third party costs on invoices and the logged third party costs, so that logged costs which haven't been invoiced yet are deducted too."
+msgstr "Der bereinigte Umsatz ist der grösste Wert aus dem Total der akzeptierten Offerten, den geplanten Rechnungen und dem verrechneten Total. Bei geschlossenen Projekten zählt nur das verrechnete Total. Fremdkosten werden immer abgezogen, und zwar der grössere Wert aus den Fremdkosten auf den Rechnungen und den erfassten Fremdkosten. So werden auch erfasste, aber noch nicht verrechnete Fremdkosten abgezogen."
 
 #: workbench/templates/projects/project_profitability.html
 msgid "Budget transferred to other projects is deducted, budget transferred from other projects is added."
