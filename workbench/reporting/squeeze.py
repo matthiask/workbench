@@ -35,7 +35,7 @@ from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
-EXPECTED_AVERAGE_HOURLY_RATE = Decimal(150)
+BASE_HOURLY_RATE = Decimal(150)
 WORKING_TIME_PER_DAY = Decimal(8)
 WORKING_DAYS_PER_YEAR = Decimal(250)
 DAYS_PER_YEAR = Decimal("365.24")
@@ -184,8 +184,7 @@ def squeeze_data(date_range):  # noqa: C901
 
     # hours × COALESCE(effort_rate, default) gives a rate-weighted hours value
     _weighted_hours_expr = ExpressionWrapper(
-        F("hours")
-        * Coalesce(F("service__effort_rate"), Value(EXPECTED_AVERAGE_HOURLY_RATE)),
+        F("hours") * Coalesce(F("service__effort_rate"), Value(BASE_HOURLY_RATE)),
         output_field=DecimalField(max_digits=14, decimal_places=4),
     )
     # Hours where no effort_rate was set (default rate was applied)
@@ -454,7 +453,7 @@ def squeeze_data(date_range):  # noqa: C901
         ):
             expected_hourly_rate = user.specialist_field.expected_hourly_rate
         else:
-            expected_hourly_rate = EXPECTED_AVERAGE_HOURLY_RATE
+            expected_hourly_rate = BASE_HOURLY_RATE
 
         expected_gross_margin = (
             expected_hourly_rate
@@ -622,7 +621,7 @@ def squeeze_data(date_range):  # noqa: C901
         "totals": totals,
         "all_users": all_users,
         "types": types,
-        "default_hourly_rate": EXPECTED_AVERAGE_HOURLY_RATE,
+        "default_hourly_rate": BASE_HOURLY_RATE,
     }
 
 
@@ -653,7 +652,7 @@ def build_xlsx(data):
             _("period hours"),
             _("period gross margin"),
             _("period rate"),
-            _("hours at default rate ({}/h)").format(EXPECTED_AVERAGE_HOURLY_RATE),
+            _("hours at default rate ({}/h)").format(BASE_HOURLY_RATE),
             *list(chain.from_iterable((str(u), "", "", "") for u in all_users)),
         ],
         [
@@ -715,7 +714,7 @@ def build_xlsx(data):
             _("expected hourly rate"),
             _("Target value: gross margin"),
             "",
-            _("hours at default rate ({}/h)").format(EXPECTED_AVERAGE_HOURLY_RATE),
+            _("hours at default rate ({}/h)").format(BASE_HOURLY_RATE),
         ],
         [
             _("Total"),
@@ -739,7 +738,7 @@ def build_xlsx(data):
             "",
             totals["external_percentage"],
             _("Delta"),
-            _("Target value w/ {}/h").format(EXPECTED_AVERAGE_HOURLY_RATE),
+            _("Target value w/ {}/h").format(BASE_HOURLY_RATE),
             _("Delta"),
             "",
         ],

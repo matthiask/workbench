@@ -649,6 +649,6 @@ def squeeze_view(request, form):
         {
             "form": form,
             "data": data,
-            "EXPECTED_AVERAGE_HOURLY_RATE": squeeze.EXPECTED_AVERAGE_HOURLY_RATE,
+            "BASE_HOURLY_RATE": squeeze.BASE_HOURLY_RATE,
         },
     )

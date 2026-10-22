@@ -38,7 +38,7 @@
                       <dt class="col-6">{% translate 'Hours' %}</dt>
                       <dd class="col-6 text-end">{{ p.hours|hours }}</dd>
                       <dt class="col-6">{% translate 'Rate' %}</dt>
-                      <dd class="col-6 text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                      <dd class="col-6 text-end {% if p.rate < BASE_HOURLY_RATE %}text-danger{% endif %}">
                         {{ p.rate|currency }}
                       </dd>
                     </dl>
@@ -62,7 +62,7 @@
                               {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
                             </td>
                             <td class="text-end">{{ contrib.gross_margin|currency }}</td>
-                            <td class="text-end {% if contrib.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                            <td class="text-end {% if contrib.rate < BASE_HOURLY_RATE %}text-danger{% endif %}">
                               {{ contrib.rate|currency }}
                             </td>
                           </tr>
@@ -76,7 +76,7 @@
                             {% if p.hours_rate_unknown %}{{ p.hours_rate_unknown|hours }}{% endif %}
                           </th>
                           <th class="text-end">{{ p.gross_margin_in_range|currency }}</th>
-                          <th class="text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                          <th class="text-end {% if p.rate < BASE_HOURLY_RATE %}text-danger{% endif %}">
                             {{ p.rate|currency }}
                           </th>
                         </tr>
@@ -142,7 +142,7 @@
                   <td class="text-end">{{ p.invoiced|currency }}</td>
                   <td class="text-end">{{ p.gross_margin|currency }}</td>
                   <td class="text-end">{{ p.hours|hours }}</td>
-                  <td class="text-end {% if p.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                  <td class="text-end {% if p.rate < BASE_HOURLY_RATE %}text-danger{% endif %}">
                     {{ p.rate|currency }}
                   </td>
                   <td class="text-end">{{ p.hours_in_range|hours }}</td>
@@ -207,7 +207,7 @@
                               {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
                             </td>
                             <td class="text-end">{{ contrib.gross_margin|currency }}</td>
-                            <td class="text-end {% if contrib.rate < EXPECTED_AVERAGE_HOURLY_RATE %}text-danger{% endif %}">
+                            <td class="text-end {% if contrib.rate < BASE_HOURLY_RATE %}text-danger{% endif %}">
                               {{ contrib.rate|currency }}
                             </td>
                           </tr>
