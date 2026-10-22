@@ -12,7 +12,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, NullIf
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
@@ -182,15 +182,23 @@ def squeeze_data(date_range):  # noqa: C901
     )
     user_dict = {u.id: u for u in User.objects.all()}
 
-    # hours × COALESCE(effort_rate, default) gives a rate-weighted hours value
+    # hours × COALESCE(effort_rate, default) gives a rate-weighted hours value.
+    # A rate of 0.00 means the work is paid elsewhere (e.g. a package price),
+    # not that it is worth nothing, so it gets the default rate too.
     _weighted_hours_expr = ExpressionWrapper(
-        F("hours") * Coalesce(F("service__effort_rate"), Value(BASE_HOURLY_RATE)),
+        F("hours")
+        * Coalesce(
+            NullIf(F("service__effort_rate"), Value(Z2)), Value(BASE_HOURLY_RATE)
+        ),
         output_field=DecimalField(max_digits=14, decimal_places=4),
     )
-    # Hours where no effort_rate was set (default rate was applied)
+    # Hours where no or a zero effort_rate was set (default rate was applied)
     _hours_rate_unknown_expr = Sum(
         Case(
-            When(service__effort_rate__isnull=True, then=F("hours")),
+            When(
+                Q(service__effort_rate__isnull=True) | Q(service__effort_rate=0),
+                then=F("hours"),
+            ),
             default=Value(Decimal(0)),
             output_field=DecimalField(max_digits=10, decimal_places=1),
         )

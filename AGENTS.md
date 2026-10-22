@@ -40,6 +40,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   yet); the rate based on accepted offers only their hours (offered or
   logged, whichever is higher). Hours logged on
   services which aren't budgeted (optional, declined) are added on top.
+- Squeeze splits a project's gross margin between people by hours weighted
+  with the service's hourly rate. Services without a rate or with a rate of
+  0.00 (work paid elsewhere, e.g. by a package price) are weighted with
+  `BASE_HOURLY_RATE`.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Pre-commit hooks run ruff and auto-fix formatting. If a commit fails due to formatting, re-stage the auto-fixed files and commit again.
