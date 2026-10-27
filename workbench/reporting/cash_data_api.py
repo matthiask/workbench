@@ -133,6 +133,7 @@ def cash_data(date):
         "planned_invoicing_by_month": None,
         "planned_invoicing_overdue_excl_tax": None,
         "accepted_offers_not_invoiced": None,
+        "work_not_invoiced": None,
     }
     if is_current:
         pgm = projected_gross_margin(Project.objects.open().external())
@@ -141,6 +142,15 @@ def cash_data(date):
             date, pgm
         )
         data["accepted_offers_not_invoiced"] = accepted_offers_not_invoiced(pgm)
+        # Logged work valued at the effort rates which hasn't been invoiced
+        # yet. The split into planned invoicing is an approximation (rates vs.
+        # gross margin) and like the offers only available for the current week.
+        overall = statistics["overall"]
+        data["work_not_invoiced"] = {
+            "total_excl_tax": overall["delta_positive"],
+            "beyond_offers_excl_tax": overall["delta_beyond_offer"],
+            "in_planned_invoicing_excl_tax": overall["delta_planned"],
+        }
     return data
 
 

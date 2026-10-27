@@ -171,6 +171,48 @@ class CashDataAPITest(TestCase):
         self.assertEqual(data["accruals"], 0.0)
 
     @travel("2026-10-28 08:00")
+    def test_work_not_invoiced(self):
+        """Work not invoiced yet, beyond the offers and covered by planned invoicing"""
+        project = factories.ProjectFactory.create()
+        accepted = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        service = factories.ServiceFactory.create(
+            project=project,
+            offer=accepted,
+            effort_type="Any",
+            effort_rate=100,
+            effort_hours=10,
+        )
+        accepted.save()
+        factories.LoggedHoursFactory.create(service=service, hours=15)
+        factories.ProjectedInvoiceFactory.create(
+            project=project,
+            invoiced_on=dt.date(2026, 12, 15),
+            gross_margin=Decimal(400),
+        )
+        # Internal projects are never invoiced
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(
+                project=factories.ProjectFactory.create(type=Project.INTERNAL),
+                effort_type="Any",
+                effort_rate=100,
+            ),
+            hours=5,
+        )
+
+        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        self.assertEqual(
+            data["work_not_invoiced"],
+            {
+                "total_excl_tax": 1500.0,
+                "beyond_offers_excl_tax": 500.0,
+                "in_planned_invoicing_excl_tax": 400.0,
+            },
+        )
+
+        data = self.client.get("/api/cash-data/?date=2026-10-19", headers=AUTH).json()
+        self.assertIsNone(data["work_not_invoiced"])
+
+    @travel("2026-10-28 08:00")
     def test_offers_not_in_planned_invoicing_are_gross_margin(self):
         """Third party costs in offers are not compared with planned gross margin"""
         project = factories.ProjectFactory.create()
