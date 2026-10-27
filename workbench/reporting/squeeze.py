@@ -83,26 +83,49 @@ def third_party_costs(projects):
     )
 
 
+def gross_margin_components(projects):
+    """Offered, projected and invoiced gross margin per project as
+    ``{project_id: {"offered": ..., "projected": ..., "invoiced": ...}}``.
+
+    Projections are only taken into account for open projects. Third party
+    costs are deducted from offers and invoices."""
+    offers = Offer.objects.accepted().filter(project__in=projects)
+    offered = sum_by_project(offers)
+    offered_costs = sum_by_project(
+        Service.objects.filter(offer__in=offers, third_party_costs__isnull=False),
+        "third_party_costs",
+    )
+    projected = sum_by_project(
+        ProjectedInvoice.objects.filter(
+            project__in=projects, project__closed_on__isnull=True
+        ),
+        "gross_margin",
+    )
+    invoiced = sum_by_project(Invoice.objects.invoiced().filter(project__in=projects))
+    invoiced_costs = third_party_costs(projects)
+    return defaultdict(
+        lambda: {"offered": Z2, "projected": Z2, "invoiced": Z2},
+        {
+            project: {
+                "offered": offered[project] - offered_costs[project],
+                "projected": projected[project],
+                "invoiced": invoiced[project] - invoiced_costs[project],
+            }
+            for project in {*offered, *projected, *invoiced, *invoiced_costs}
+        },
+    )
+
+
 def project_gross_margin(project):
     """Compute the gross margin estimate and rate for a single project,
     using the same logic as the squeeze report."""
-    invoiced = (
-        Invoice.objects
-        .invoiced()
-        .filter(project=project)
-        .aggregate(s=Sum("total_excl_tax"))["s"]
-        or Z2
-    ) - third_party_costs([project.id])[project.id]
-
-    # Always compute offered/hours_offered — needed for offered_rate even on closed projects.
+    # offered and hours_offered are needed for offered_rate even on closed
+    # projects, projections are only available for open projects.
+    gross_margins = gross_margin_components([project.id])[project.id]
+    offered = gross_margins["offered"]
+    projected = gross_margins["projected"]
+    invoiced = gross_margins["invoiced"]
     accepted_offers = list(Offer.objects.accepted().filter(project=project))
-    offered = sum((o.total_excl_tax for o in accepted_offers), Z2)
-    offered -= (
-        Service.objects.filter(
-            offer__in=accepted_offers, third_party_costs__isnull=False
-        ).aggregate(s=Sum("third_party_costs"))["s"]
-        or Z2
-    )
     hours_offered = (
         Service.objects
         .budgeted()
@@ -120,19 +143,9 @@ def project_gross_margin(project):
         or Z1
     )
 
-    # Projected invoices and including offered in gross_margin only makes sense
-    # for open projects; for closed projects the invoiced amount is ground truth.
-    projected = Z2
-    offered_for_margin = Z2
-    if project.closed_on is None:
-        projected = sum(
-            (
-                pi.gross_margin
-                for pi in ProjectedInvoice.objects.filter(project=project)
-            ),
-            Z2,
-        )
-        offered_for_margin = offered
+    # Including offered in gross_margin only makes sense for open projects; for
+    # closed projects the invoiced amount is ground truth.
+    offered_for_margin = offered if project.closed_on is None else Z2
 
     budgeted = Q(service__in=Service.objects.budgeted())
     accepted = Q(service__offer__in=accepted_offers)
@@ -273,38 +286,12 @@ def squeeze_data(date_range):  # noqa: C901
     for row in offered_hours:
         projects[row["project"]]["hours_offered"] = row["service_hours__sum"]
 
-    for project_id, invoiced in sum_by_project(
-        Invoice.objects.invoiced().filter(project__in=projects.keys())
-    ).items():
-        projects[project_id]["invoiced"] = invoiced
-
-    for project_id, costs in third_party_costs(projects.keys()).items():
-        projects[project_id]["invoiced"] -= costs
-
-    for project_id, projected in sum_by_project(
-        ProjectedInvoice.objects.filter(
-            project__in=projects.keys(), project__closed_on__isnull=True
-        ),
-        "gross_margin",
-    ).items():
-        projects[project_id]["projected"] = projected
-
-    offers = Offer.objects.accepted().filter(
-        project__in=projects.keys(), project__closed_on__isnull=True
-    )
-    for project_id, offered in sum_by_project(offers).items():
-        projects[project_id]["offered"] = offered
-    for row in (
-        Service.objects
-        .filter(offer__in=offers, third_party_costs__isnull=False)
-        .order_by()
-        .values("project")
-        .annotate(Sum("third_party_costs"))
-    ):
-        projects[row["project"]]["offered"] -= row["third_party_costs__sum"]
-
+    gross_margins = gross_margin_components(projects.keys())
     for project_id, project in Project.objects.in_bulk(projects.keys()).items():
         projects[project_id]["project"] = project
+        projects[project_id] |= gross_margins[project_id]
+        if project.closed_on is not None:
+            projects[project_id]["offered"] = Z2
 
     budget_adjustments = BudgetTransfer.objects.adjustments(projects=projects.keys())
 
