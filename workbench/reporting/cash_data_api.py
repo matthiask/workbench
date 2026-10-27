@@ -11,6 +11,7 @@ from workbench.projects.models import Project
 from workbench.reporting.api import has_valid_token, jsonable
 from workbench.reporting.key_data import projected_gross_margin
 from workbench.reporting.key_data_api import accruals
+from workbench.reporting.squeeze import gross_margin_components
 from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z2
 
@@ -80,9 +81,9 @@ def planned_invoicing_overdue(cutoff_date, pgm):
 def accepted_offers_not_invoiced(pgm):
     """
     Accepted offers of open projects minus everything invoiced on those
-    projects already. The part not in planned invoicing is what remains after
-    deducting the project's projected gross margin which hasn't been invoiced
-    yet.
+    projects already. The part not in planned invoicing is gross margin like
+    planned invoicing: the offered gross margin minus the invoiced gross margin
+    minus the projected gross margin which hasn't been invoiced yet.
     """
     projects = Project.objects.open()
     offered = sum_by(
@@ -91,14 +92,16 @@ def accepted_offers_not_invoiced(pgm):
     invoiced = sum_by(
         Invoice.objects.invoiced().filter(project__in=offered.keys()), key="project"
     )
+    gross_margins = gross_margin_components(list(offered))
     planned = {row["project"].id: row["delta"] for row in pgm["projects"]}
 
     totals = {"total_excl_tax": Z2, "not_in_planned_invoicing_excl_tax": Z2}
     for project, total in offered.items():
-        remaining = max(total - invoiced[project], Z2)
-        totals["total_excl_tax"] += remaining
+        totals["total_excl_tax"] += max(total - invoiced[project], Z2)
+        gm = gross_margins[project]
+        remaining_gross_margin = max(gm["offered"] - gm["invoiced"], Z2)
         totals["not_in_planned_invoicing_excl_tax"] += max(
-            remaining - planned.get(project, Z2), Z2
+            remaining_gross_margin - planned.get(project, Z2), Z2
         )
     return totals
 

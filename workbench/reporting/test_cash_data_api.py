@@ -161,6 +161,27 @@ class CashDataAPITest(TestCase):
         )
 
     @travel("2026-10-28 08:00")
+    def test_offers_not_in_planned_invoicing_are_gross_margin(self):
+        """Third party costs in offers are not compared with planned gross margin"""
+        project = factories.ProjectFactory.create()
+        factories.ProjectedInvoiceFactory.create(
+            project=project,
+            invoiced_on=dt.date(2026, 12, 15),
+            gross_margin=Decimal(6000),
+        )
+        accepted = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        factories.ServiceFactory.create(
+            project=project, offer=accepted, cost=10000, third_party_costs=4000
+        )
+        accepted.save()
+
+        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        self.assertEqual(
+            data["accepted_offers_not_invoiced"],
+            {"total_excl_tax": 10000.0, "not_in_planned_invoicing_excl_tax": 0.0},
+        )
+
+    @travel("2026-10-28 08:00")
     def test_missed_planned_invoicing(self):
         """Planned invoicing from past months which hasn't happened is overdue"""
         project = factories.ProjectFactory.create()
