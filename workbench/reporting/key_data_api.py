@@ -147,12 +147,16 @@ def _jsonable(value):
     return float(value)
 
 
+def has_valid_token(request):
+    token = settings.KEY_DATA_API_TOKEN
+    return bool(token) and secrets.compare_digest(
+        request.headers.get("Authorization", ""), f"Bearer {token}"
+    )
+
+
 @require_GET
 def key_data_api(request):
-    token = settings.KEY_DATA_API_TOKEN
-    if not token or not secrets.compare_digest(
-        request.headers.get("Authorization", ""), f"Bearer {token}"
-    ):
+    if not has_valid_token(request):
         return HttpResponseForbidden()
 
     previous_month = (dt.date.today().replace(day=1) - dt.timedelta(days=1)).replace(
