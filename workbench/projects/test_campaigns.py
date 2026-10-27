@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from workbench import factories
+from workbench.invoices.models import Invoice
 from workbench.projects.models import Campaign, Project
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code
@@ -71,6 +72,26 @@ class CampaignsTest(TestCase):
         self.client.force_login(campaign.owned_by)
         response = self.client.get(campaign.urls["statistics"])
         self.assertEqual(response.status_code, 200)
+
+    def test_gross_margin_per_hour(self):
+        """Third party costs on invoices are deducted from the gross margin"""
+        campaign = factories.CampaignFactory.create()
+        project = factories.ProjectFactory.create(campaign=campaign)
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1000,
+            third_party_costs=600,
+            status=Invoice.SENT,
+        )
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project), hours=4
+        )
+
+        self.assertEqual(campaign.statistics["overall"]["gross_margin_per_hour"], 100)
+        self.assertEqual(project.customer.statistics["gross_margin_per_hour"], 100)
 
     def test_lists(self):
         """Filter form smoke test"""

@@ -95,8 +95,16 @@ class Organization(Model):
         from workbench.reporting.project_budget_statistics import (
             project_budget_statistics,
         )
+        from workbench.reporting.squeeze import gross_margin_components
 
         pbs = project_budget_statistics(self.project_set.all())["overall"]
+        gross_margin = sum(
+            (
+                row["invoiced"]
+                for row in gross_margin_components(self.project_set.all()).values()
+            ),
+            Z2,
+        )
 
         invoices = (
             self.invoice_set
@@ -108,11 +116,12 @@ class Organization(Model):
 
         pbs["invoiced"] += invoices["total_excl_tax__sum"] or Z2
         pbs["third_party_costs"] += invoices["third_party_costs__sum"] or Z2
+        gross_margin += (invoices["total_excl_tax__sum"] or Z2) - (
+            invoices["third_party_costs__sum"] or Z2
+        )
 
         pbs["gross_margin_per_hour"] = (
-            (pbs["invoiced"] - pbs["third_party_costs"]) / pbs["hours"]
-            if pbs["hours"]
-            else None
+            gross_margin / pbs["hours"] if pbs["hours"] else None
         )
         return pbs
 

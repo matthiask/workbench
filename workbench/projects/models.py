@@ -132,13 +132,19 @@ class Campaign(Model):
         from workbench.reporting.project_budget_statistics import (
             project_budget_statistics,
         )
+        from workbench.reporting.squeeze import gross_margin_components
 
         pbs = project_budget_statistics(self.projects.all())
         overall = pbs["overall"]
+        gross_margin = sum(
+            (
+                row["invoiced"]
+                for row in gross_margin_components(self.projects.all()).values()
+            ),
+            Z2,
+        )
         overall["gross_margin_per_hour"] = (
-            (overall["invoiced"] - overall["third_party_costs"]) / overall["hours"]
-            if overall["hours"]
-            else None
+            gross_margin / overall["hours"] if overall["hours"] else None
         )
         pbs["statistics"] = sorted(pbs["statistics"], key=lambda s: s["project"])
         return pbs
