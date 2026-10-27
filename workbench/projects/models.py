@@ -458,6 +458,7 @@ class Project(Model):
         # Avoid circular imports
         from workbench.deals.models import Deal
         from workbench.logbook.models import LoggedCost, LoggedHours
+        from workbench.reporting.utils import sum_by
 
         # Logged vs. service hours
         service_hours = defaultdict(lambda: Z1)
@@ -497,35 +498,26 @@ class Project(Model):
                 "hours__sum"
             ]
 
-        logged_cost_per_service = {
-            row["service"]: row["cost__sum"]
-            for row in LoggedCost.objects
-            .order_by()
-            .filter(service__project=self)
-            .values("service")
-            .annotate(Sum("cost"))
-        }
-
-        not_archived_logged_hours_per_service = {
-            row["service"]: row["hours__sum"]
-            for row in LoggedHours.objects
-            .order_by()
-            .filter(
+        logged_cost_per_service = sum_by(
+            LoggedCost.objects.filter(service__project=self),
+            key="service",
+            field="cost",
+        )
+        not_archived_logged_hours_per_service = sum_by(
+            LoggedHours.objects.filter(
                 service__project=self,
                 archived_at__isnull=True,
                 service__effort_rate__isnull=False,
-            )
-            .values("service")
-            .annotate(Sum("hours"))
-        }
-        not_archived_logged_cost_per_service = {
-            row["service"]: row["cost__sum"]
-            for row in LoggedCost.objects
-            .order_by()
-            .filter(service__project=self, archived_at__isnull=True)
-            .values("service")
-            .annotate(Sum("cost"))
-        }
+            ),
+            key="service",
+            field="hours",
+            default=Z1,
+        )
+        not_archived_logged_cost_per_service = sum_by(
+            LoggedCost.objects.filter(service__project=self, archived_at__isnull=True),
+            key="service",
+            field="cost",
+        )
 
         users = {
             user.id: user
@@ -543,13 +535,13 @@ class Project(Model):
                     key=lambda row: row[1],
                     reverse=True,
                 ),
-                "logged_cost": logged_cost_per_service.get(service.id, Z2),
-                "not_archived_logged_hours": not_archived_logged_hours_per_service.get(
-                    service.id, Z1
-                ),
-                "not_archived_logged_cost": not_archived_logged_cost_per_service.get(
-                    service.id, Z1
-                ),
+                "logged_cost": logged_cost_per_service[service.id],
+                "not_archived_logged_hours": not_archived_logged_hours_per_service[
+                    service.id
+                ],
+                "not_archived_logged_cost": not_archived_logged_cost_per_service[
+                    service.id
+                ],
             }
             row["not_archived"] = (service.effort_rate or Z2) * row[
                 "not_archived_logged_hours"
