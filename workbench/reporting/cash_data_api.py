@@ -58,24 +58,34 @@ def receivables_by_due_week(invoices):
 def planned_invoicing(cutoff_date, pgm):
     """
     Projected gross margin not yet invoiced per month, starting with the month
-    of the cutoff date. Projections from earlier months which haven't been
-    invoiced yet are still expected and are therefore added to the first month.
+    of the cutoff date. Same values as in the key data report.
     """
     this = (cutoff_date.year, cutoff_date.month)
-    amounts = defaultdict(lambda: Z2)
-    for month, amount in pgm["monthly_overall"].items():
-        amounts[max(month, this)] += amount
-
     months = [this]
     while len(months) < PLANNED_INVOICING_MONTHS or months[-1] < max(
-        amounts, default=this
+        pgm["monthly_overall"], default=this
     ):
         year, month = months[-1]
         months.append((year + 1, 1) if month == 12 else (year, month + 1))
     return [
-        {"month": "{}-{:02}".format(*month), "amount_excl_tax": amounts[month]}
+        {
+            "month": "{}-{:02}".format(*month),
+            "amount_excl_tax": pgm["monthly_overall"].get(month, Z2),
+        }
         for month in months
     ]
+
+
+def planned_invoicing_overdue(cutoff_date, pgm):
+    """
+    Projected gross margin of months before the cutoff date which hasn't been
+    invoiced yet. The key data report shows it in the original month.
+    """
+    this = (cutoff_date.year, cutoff_date.month)
+    return sum(
+        (amount for month, amount in pgm["monthly_overall"].items() if month < this),
+        Z2,
+    )
 
 
 def accepted_offers_not_invoiced(pgm):
@@ -135,11 +145,15 @@ def cash_data(date):
         "receivables_by_due_week": receivables_by_due_week(invoices),
         "accruals": accruals(cutoff_date),
         "planned_invoicing_by_month": None,
+        "planned_invoicing_overdue_excl_tax": None,
         "accepted_offers_not_invoiced": None,
     }
     if is_current:
         pgm = projected_gross_margin()
         data["planned_invoicing_by_month"] = planned_invoicing(date, pgm)
+        data["planned_invoicing_overdue_excl_tax"] = planned_invoicing_overdue(
+            date, pgm
+        )
         data["accepted_offers_not_invoiced"] = accepted_offers_not_invoiced(pgm)
     return data
 

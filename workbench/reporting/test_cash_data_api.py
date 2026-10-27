@@ -105,6 +105,7 @@ class CashDataAPITest(TestCase):
         data = self.client.get("/api/cash-data/?date=2026-10-19", headers=AUTH).json()
         self.assertEqual(data["open_invoices"]["total_excl_tax"], 6500.0)
         self.assertIsNone(data["planned_invoicing_by_month"])
+        self.assertIsNone(data["planned_invoicing_overdue_excl_tax"])
         self.assertIsNone(data["accepted_offers_not_invoiced"])
 
     @travel("2026-10-28 08:00")
@@ -161,7 +162,7 @@ class CashDataAPITest(TestCase):
 
     @travel("2026-10-28 08:00")
     def test_missed_planned_invoicing(self):
-        """Planned invoicing from past months which hasn't happened is still due"""
+        """Planned invoicing from past months which hasn't happened is overdue"""
         project = factories.ProjectFactory.create()
         for invoiced_on, gross_margin in [
             (dt.date(2026, 6, 15), 1000),
@@ -178,10 +179,11 @@ class CashDataAPITest(TestCase):
         self.assertEqual(
             data["planned_invoicing_by_month"][:2],
             [
-                {"month": "2026-10", "amount_excl_tax": 3000.0},
+                {"month": "2026-10", "amount_excl_tax": 0.0},
                 {"month": "2026-11", "amount_excl_tax": 4000.0},
             ],
         )
+        self.assertEqual(data["planned_invoicing_overdue_excl_tax"], 3000.0)
 
         # Invoicing 2500 consumes the oldest projections first
         invoice(project=project, subtotal=2500, due_on=dt.date(2026, 11, 1))
@@ -189,7 +191,8 @@ class CashDataAPITest(TestCase):
         self.assertEqual(
             data["planned_invoicing_by_month"][:2],
             [
-                {"month": "2026-10", "amount_excl_tax": 500.0},
+                {"month": "2026-10", "amount_excl_tax": 0.0},
                 {"month": "2026-11", "amount_excl_tax": 4000.0},
             ],
         )
+        self.assertEqual(data["planned_invoicing_overdue_excl_tax"], 500.0)

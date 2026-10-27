@@ -50,10 +50,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   would count them twice.
 - Projected invoices (`ProjectedInvoice.gross_margin`) are gross margin, third
   party costs are not included. Invoiced gross margin uses up a project's
-  oldest projections first. The key data report shows projections which
-  haven't been invoiced in time in their original month; the cash data API
-  (`planned_invoicing()` in `workbench/reporting/cash_data_api.py`) carries
-  them over to the current month.
+  oldest projections first. Projections which haven't been invoiced in time
+  stay in their original month (key data report and cash data API alike); the
+  cash data API reports their sum separately as
+  `planned_invoicing_overdue_excl_tax` since its months start at the cutoff
+  date.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Pre-commit hooks run ruff and auto-fix formatting. If a commit fails due to formatting, re-stage the auto-fixed files and commit again.
