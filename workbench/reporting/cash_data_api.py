@@ -8,8 +8,9 @@ from django.views.decorators.http import require_GET
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
+from workbench.reporting.api import has_valid_token, jsonable
 from workbench.reporting.key_data import projected_gross_margin
-from workbench.reporting.key_data_api import _jsonable, accruals, has_valid_token
+from workbench.reporting.key_data_api import accruals
 from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z2
 
@@ -143,4 +144,4 @@ def cash_data_api(request):
         )
     except ValueError:
         return HttpResponseBadRequest("Invalid date")
-    return JsonResponse(_jsonable(cash_data(cutoff_date)))
+    return JsonResponse(jsonable(cash_data(cutoff_date)))

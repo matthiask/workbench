@@ -1,8 +1,6 @@
 import datetime as dt
-import secrets
 from collections import defaultdict
 
-from django.conf import settings
 from django.http import HttpResponseForbidden, JsonResponse
 from django.views.decorators.http import require_GET
 
@@ -10,6 +8,7 @@ from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.reporting import key_data, squeeze
+from workbench.reporting.api import has_valid_token, jsonable
 from workbench.reporting.green_hours import green_hours_by_month
 from workbench.reporting.models import Accruals
 from workbench.reporting.utils import sum_of
@@ -121,25 +120,6 @@ def key_data_for_month(first_of_month):
     }
 
 
-def _jsonable(value):
-    if isinstance(value, dict):
-        return {k: _jsonable(v) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_jsonable(v) for v in value]
-    if isinstance(value, dt.date):
-        return value.isoformat()
-    if value is None or isinstance(value, (str, int)):
-        return value
-    return float(value)
-
-
-def has_valid_token(request):
-    token = settings.KEY_DATA_API_TOKEN
-    return bool(token) and secrets.compare_digest(
-        request.headers.get("Authorization", ""), f"Bearer {token}"
-    )
-
-
 @require_GET
 def key_data_api(request):
     if not has_valid_token(request):
@@ -148,4 +128,4 @@ def key_data_api(request):
     previous_month = (dt.date.today().replace(day=1) - dt.timedelta(days=1)).replace(
         day=1
     )
-    return JsonResponse(_jsonable(key_data_for_month(previous_month)))
+    return JsonResponse(jsonable(key_data_for_month(previous_month)))
