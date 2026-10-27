@@ -2,11 +2,11 @@ from collections import defaultdict
 from itertools import chain, groupby
 
 from django.db import connections
-from django.db.models import Sum
 
 from workbench.accounts.models import User
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project
+from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z1, Z2
 
 
@@ -123,16 +123,17 @@ def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
         for project_id, revenue in cursor:
             projects[project_id]["revenue"] += revenue
 
-    for row in (
-        logged_costs
-        .filter(third_party_costs__isnull=False)
-        .values("service__project")
-        .annotate(cost=Sum("third_party_costs"))
-    ):
-        projects[row["service__project"]]["third_party_costs"] += row["cost"]
+    for project_id, cost in sum_by_project(
+        logged_costs.filter(third_party_costs__isnull=False),
+        "third_party_costs",
+        project="service__project",
+    ).items():
+        projects[project_id]["third_party_costs"] += cost
 
-    for row in logged_costs.values("service__project").annotate(cost=Sum("cost")):
-        projects[row["service__project"]]["revenue"] += row["cost"]
+    for project_id, cost in sum_by_project(
+        logged_costs, "cost", project="service__project"
+    ).items():
+        projects[project_id]["revenue"] += cost
 
     return projects
 

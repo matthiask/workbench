@@ -6,6 +6,7 @@ from django.db.models import Sum
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project, Service
+from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z2
 
 
@@ -24,25 +25,19 @@ def playing_bank(projects):
             row["third_party_costs__sum"]
         )
 
-    invoiced = {
-        row["project"]: row["third_party_costs__sum"]
-        for row in Invoice.objects
+    invoiced = sum_by_project(
+        Invoice.objects
         .invoiced()
-        .order_by()
         .filter(project__isnull=False)
-        .exclude(third_party_costs=0)
-        .values("project")
-        .annotate(Sum("third_party_costs"))
-    }
-    offered = {
-        row["project"]: row["third_party_costs__sum"]
-        for row in Service.objects
-        .order_by()
-        .filter(third_party_costs__isnull=False)
-        .exclude(third_party_costs=0)
-        .values("project")
-        .annotate(Sum("third_party_costs"))
-    }
+        .exclude(third_party_costs=0),
+        "third_party_costs",
+    )
+    offered = sum_by_project(
+        Service.objects.filter(third_party_costs__isnull=False).exclude(
+            third_party_costs=0
+        ),
+        "third_party_costs",
+    )
 
     sums = {True: Z2, False: Z2}
 
@@ -54,9 +49,9 @@ def playing_bank(projects):
     projects = [
         _statsify({
             "project": project,
-            "offered": offered.get(project.id, Z2),
+            "offered": offered[project.id],
             "logged": logged[project.id],
-            "invoiced": invoiced.get(project.id, Z2),
+            "invoiced": invoiced[project.id],
         })
         for project in projects.filter(
             id__in=offered.keys() | logged.keys() | invoiced.keys()

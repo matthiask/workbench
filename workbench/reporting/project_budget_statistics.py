@@ -17,22 +17,15 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     cutoff_date = cutoff_date or dt.date.today()
     cutoff_dttm = timezone.make_aware(dt.datetime.combine(cutoff_date, dt.time.max))
 
-    costs = (
-        LoggedCost.objects
-        .filter(service__project__in=projects, rendered_on__lte=cutoff_dttm)
-        .order_by()
-        .values("service__project")
+    costs = LoggedCost.objects.filter(
+        service__project__in=projects, rendered_on__lte=cutoff_dttm
     )
-
-    cost_per_project = {
-        row["service__project"]: row["cost__sum"] for row in costs.annotate(Sum("cost"))
-    }
-    third_party_costs_per_project = {
-        row["service__project"]: row["third_party_costs__sum"]
-        for row in costs.filter(
-            third_party_costs__isnull=False, invoice_service__isnull=True
-        ).annotate(Sum("third_party_costs"))
-    }
+    cost_per_project = sum_by_project(costs, "cost", project="service__project")
+    third_party_costs_per_project = sum_by_project(
+        costs.filter(third_party_costs__isnull=False, invoice_service__isnull=True),
+        "third_party_costs",
+        project="service__project",
+    )
 
     hours = (
         LoggedHours.objects
@@ -56,15 +49,11 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             )
         hours_per_project[row["service__project"]] += row["hours__sum"]
 
-    service_hours = {
-        row["project"]: row["service_hours__sum"]
-        for row in Service.objects
-        .budgeted()
-        .filter(project__in=projects)
-        .order_by()
-        .values("project")
-        .annotate(Sum("service_hours"))
-    }
+    service_hours = sum_by_project(
+        Service.objects.budgeted().filter(project__in=projects),
+        "service_hours",
+        default=Z1,
+    )
 
     sold_per_project = sum_by_project(
         Offer.objects.accepted().filter(project__in=projects, is_budget_retainer=False)
@@ -109,23 +98,22 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     statistics = [
         {
             "project": project,
-            "logbook": cost_per_project.get(project.id, Z2)
+            "logbook": cost_per_project[project.id]
             + effort_cost_per_project[project.id],
-            "cost": cost_per_project.get(project.id, Z2),
+            "cost": cost_per_project[project.id],
             "effort_cost": effort_cost_per_project[project.id],
             "effort_hours_with_rate_undefined": effort_hours_with_rate_undefined_per_project[
                 project.id
             ],
-            "third_party_costs": third_party_costs_per_project.get(project.id, Z2),
-            "sold": sold_per_project.get(project.id, Z2)
-            + budget_adjustments[project.id],
+            "third_party_costs": third_party_costs_per_project[project.id],
+            "sold": sold_per_project[project.id] + budget_adjustments[project.id],
             "discount": Z2 - discount_per_project[project.id],
-            "invoiced": invoiced_per_project.get(project.id, Z2),
+            "invoiced": invoiced_per_project[project.id],
             "hours": hours_per_project[project.id],
-            "service_hours": service_hours.get(project.id, Z1),
-            "delta": cost_per_project.get(project.id, Z2)
+            "service_hours": service_hours[project.id],
+            "delta": cost_per_project[project.id]
             + effort_cost_per_project[project.id]
-            - invoiced_per_project.get(project.id, Z2),
+            - invoiced_per_project[project.id],
             "projected_gross_margin": projected_gross_margin[project.id],
             "projected_gross_margin_on_cutoff_date": projected_gross_margin_on_cutoff_date.get(
                 project.id, Z2

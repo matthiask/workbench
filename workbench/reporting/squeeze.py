@@ -121,7 +121,9 @@ def hours_components(projects):
     ``{project_id: {"hours_offered": ..., "hours_logged": ...,
     "hours_logged_budgeted": ...}}``."""
     offered = sum_by_project(
-        Service.objects.budgeted().filter(project__in=projects), "service_hours"
+        Service.objects.budgeted().filter(project__in=projects),
+        "service_hours",
+        default=Z1,
     )
     logged = {
         row["service__project"]: row
@@ -138,7 +140,7 @@ def hours_components(projects):
         lambda: {"hours_offered": Z1, "hours_logged": Z1, "hours_logged_budgeted": Z1},
         {
             project: {
-                "hours_offered": offered.get(project, Z1),
+                "hours_offered": offered[project],
                 "hours_logged": logged[project]["total"] if project in logged else Z1,
                 "hours_logged_budgeted": (
                     logged[project]["budgeted"] or Z1 if project in logged else Z1

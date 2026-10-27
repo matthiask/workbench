@@ -8,10 +8,10 @@ from workbench.tools.formats import Z2
 from workbench.tools.validation import monday
 
 
-def sum_by_project(queryset, field="total_excl_tax", *, project="project"):
-    """``{project_id: sum of field}``, zero for projects without rows"""
+def sum_by_project(queryset, field="total_excl_tax", *, project="project", default=Z2):
+    """``{project_id: sum of field}``, ``default`` for projects without rows"""
     return defaultdict(
-        lambda: Z2,
+        lambda: default,
         queryset
         .order_by()
         .values(project)

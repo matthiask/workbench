@@ -5,7 +5,6 @@ from itertools import groupby
 
 from django import template
 from django.db import models
-from django.db.models import Sum
 from django.template.defaultfilters import linebreaksbr
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join, mark_safe
@@ -18,6 +17,7 @@ from workbench.logbook.models import LoggedHours
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
 from workbench.projects.models import Project, Service
+from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
 from workbench.tools.forms import querystring as _qs
 from workbench.tools.history import EVERYTHING
@@ -290,28 +290,22 @@ def notes(context, instance):
 @register.filter
 def analyze_projects(object_list):
     pks = [object.pk for object in object_list]
-    service_hours = {
-        row["project"]: row["service_hours__sum"]
-        for row in Service.objects
-        .budgeted()
-        .filter(project__in=pks)
-        .order_by()
-        .values("project")
-        .annotate(Sum("service_hours"))
-    }
-    logged_hours = {
-        row["service__project"]: row["hours__sum"]
-        for row in LoggedHours.objects
-        .filter(service__project__in=pks)
-        .order_by()
-        .values("service__project")
-        .annotate(Sum("hours"))
-    }
+    service_hours = sum_by_project(
+        Service.objects.budgeted().filter(project__in=pks),
+        "service_hours",
+        default=Z1,
+    )
+    logged_hours = sum_by_project(
+        LoggedHours.objects.filter(service__project__in=pks),
+        "hours",
+        project="service__project",
+        default=Z1,
+    )
 
     for object in object_list:
         object.analyzed = {
-            "service_hours": service_hours.get(object.pk, 0),
-            "logged_hours": logged_hours.get(object.pk, 0),
+            "service_hours": service_hours[object.pk],
+            "logged_hours": logged_hours[object.pk],
         }
     return object_list
 
