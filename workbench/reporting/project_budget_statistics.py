@@ -9,7 +9,7 @@ from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import BudgetTransfer, Service
-from workbench.reporting.utils import sum_by_project
+from workbench.reporting.utils import effort_cost_by_project, sum_by_project
 from workbench.tools.formats import Z1, Z2
 
 
@@ -27,27 +27,11 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         project="service__project",
     )
 
-    hours = (
-        LoggedHours.objects
-        .filter(service__project__in=projects, rendered_on__lte=cutoff_dttm)
-        .order_by()
-        .values("service__project", "service__effort_rate")
-        .annotate(Sum("hours"))
+    effort = effort_cost_by_project(
+        LoggedHours.objects.filter(
+            service__project__in=projects, rendered_on__lte=cutoff_dttm
+        )
     )
-    effort_cost_per_project = defaultdict(lambda: Z2)
-    effort_hours_with_rate_undefined_per_project = defaultdict(lambda: Z1)
-    hours_per_project = defaultdict(lambda: Z1)
-
-    for row in hours:
-        if row["service__effort_rate"] is None:
-            effort_hours_with_rate_undefined_per_project[row["service__project"]] += (
-                row["hours__sum"]
-            )
-        else:
-            effort_cost_per_project[row["service__project"]] += (
-                row["service__effort_rate"] * row["hours__sum"]
-            )
-        hours_per_project[row["service__project"]] += row["hours__sum"]
 
     service_hours = sum_by_project(
         Service.objects.budgeted().filter(project__in=projects),
@@ -98,21 +82,20 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     statistics = [
         {
             "project": project,
-            "logbook": cost_per_project[project.id]
-            + effort_cost_per_project[project.id],
+            "logbook": cost_per_project[project.id] + effort[project.id]["cost"],
             "cost": cost_per_project[project.id],
-            "effort_cost": effort_cost_per_project[project.id],
-            "effort_hours_with_rate_undefined": effort_hours_with_rate_undefined_per_project[
-                project.id
+            "effort_cost": effort[project.id]["cost"],
+            "effort_hours_with_rate_undefined": effort[project.id][
+                "hours_rate_undefined"
             ],
             "third_party_costs": third_party_costs_per_project[project.id],
             "sold": sold_per_project[project.id] + budget_adjustments[project.id],
             "discount": Z2 - discount_per_project[project.id],
             "invoiced": invoiced_per_project[project.id],
-            "hours": hours_per_project[project.id],
+            "hours": effort[project.id]["hours"],
             "service_hours": service_hours[project.id],
             "delta": cost_per_project[project.id]
-            + effort_cost_per_project[project.id]
+            + effort[project.id]["cost"]
             - invoiced_per_project[project.id],
             "projected_gross_margin": projected_gross_margin[project.id],
             "projected_gross_margin_on_cutoff_date": projected_gross_margin_on_cutoff_date.get(

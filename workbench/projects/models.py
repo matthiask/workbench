@@ -689,30 +689,19 @@ class Project(Model):
     def not_archived_total(self):
         # Avoid circular imports
         from workbench.logbook.models import LoggedCost, LoggedHours
+        from workbench.reporting.utils import effort_cost_by_project, sum_of
 
-        total = Z2
-        hours_rate_undefined = Z1
-
-        for row in (
-            LoggedHours.objects
-            .order_by()
-            .filter(service__project=self, archived_at__isnull=True)
-            .values("service__effort_rate")
-            .annotate(Sum("hours"))
-        ):
-            if row["service__effort_rate"] is None:
-                hours_rate_undefined += row["hours__sum"]
-            else:
-                total += row["hours__sum"] * row["service__effort_rate"]
-
-        total += (
-            LoggedCost.objects
-            .order_by()
-            .filter(service__project=self, archived_at__isnull=True)
-            .aggregate(Sum("cost"))["cost__sum"]
-            or Z2
+        effort = effort_cost_by_project(
+            LoggedHours.objects.filter(service__project=self, archived_at__isnull=True)
+        )[self.id]
+        costs = sum_of(
+            LoggedCost.objects.filter(service__project=self, archived_at__isnull=True),
+            "cost",
         )
-        return {"total": total, "hours_rate_undefined": hours_rate_undefined}
+        return {
+            "total": effort["cost"] + costs,
+            "hours_rate_undefined": effort["hours_rate_undefined"],
+        }
 
     def solely_declined_offers_warning(self, *, request):
         from workbench.offers.models import Offer

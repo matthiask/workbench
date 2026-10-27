@@ -4,7 +4,7 @@ from collections import defaultdict
 from django.db.models import Sum
 from django.utils.translation import gettext as _
 
-from workbench.tools.formats import Z2
+from workbench.tools.formats import Z1, Z2
 from workbench.tools.validation import monday
 
 
@@ -76,3 +76,27 @@ def date_ranges():
             _("last year"),
         ),
     ]
+
+
+def effort_cost_by_project(logged_hours):
+    """Hours times the service's effort rate per project as
+    ``{project_id: {"cost": ..., "hours_rate_undefined": ..., "hours": ...}}``.
+
+    Hours on services without an effort rate aren't valued, they are only
+    reported in ``hours_rate_undefined``."""
+    projects = defaultdict(
+        lambda: {"cost": Z2, "hours_rate_undefined": Z1, "hours": Z1}
+    )
+    for project, rate, hours in (
+        logged_hours
+        .order_by()
+        .values("service__project", "service__effort_rate")
+        .annotate(s=Sum("hours"))
+        .values_list("service__project", "service__effort_rate", "s")
+    ):
+        if rate is None:
+            projects[project]["hours_rate_undefined"] += hours
+        else:
+            projects[project]["cost"] += rate * hours
+        projects[project]["hours"] += hours
+    return projects
