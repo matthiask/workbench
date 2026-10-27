@@ -10,7 +10,7 @@ from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.reporting.api import has_valid_token, jsonable
 from workbench.reporting.key_data import projected_gross_margin
-from workbench.reporting.key_data_api import accruals
+from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import gross_margin_components
 from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z2
@@ -85,7 +85,7 @@ def accepted_offers_not_invoiced(pgm):
     planned invoicing: the offered gross margin minus the invoiced gross margin
     minus the projected gross margin which hasn't been invoiced yet.
     """
-    projects = Project.objects.open()
+    projects = Project.objects.open().external()
     offered = sum_by(
         Offer.objects.accepted().filter(project__in=projects), key="project"
     )
@@ -111,25 +111,31 @@ def cash_data(date):
     Dates in the current week are evaluated at the time of the request so that
     invoices paid since monday do not show up as open anymore. Projections and
     offers aren't versioned; they are only available for the current week.
+    Figures based on projects leave out internal projects; open invoices are
+    money owed regardless of the project.
     """
     today = dt.date.today()
     is_current = date >= today - dt.timedelta(days=today.weekday())
     cutoff_date = max(date, today) if is_current else date
 
     invoices = list(Invoice.objects.outstanding(on=cutoff_date).order_by("due_on"))
+    # Internal projects are never invoiced
+    statistics = project_budget_statistics(
+        Project.objects.open(on=cutoff_date).external(), cutoff_date=cutoff_date
+    )
     data = {
         "date": date,
         "generated_at": timezone.localtime().isoformat(timespec="seconds"),
         "currency": "CHF",
         "open_invoices": open_invoices_totals(invoices, cutoff_date),
         "receivables_by_due_week": receivables_by_due_week(invoices),
-        "accruals": accruals(cutoff_date),
+        "accruals": statistics["overall"]["delta_negative"],
         "planned_invoicing_by_month": None,
         "planned_invoicing_overdue_excl_tax": None,
         "accepted_offers_not_invoiced": None,
     }
     if is_current:
-        pgm = projected_gross_margin()
+        pgm = projected_gross_margin(Project.objects.open().external())
         data["planned_invoicing_by_month"] = planned_invoicing(date, pgm)
         data["planned_invoicing_overdue_excl_tax"] = planned_invoicing_overdue(
             date, pgm

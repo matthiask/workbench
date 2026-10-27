@@ -8,6 +8,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
+from workbench.projects.models import Project
 
 
 AUTH = {"Authorization": "Bearer secret"}
@@ -159,6 +160,15 @@ class CashDataAPITest(TestCase):
                 "not_in_planned_invoicing_excl_tax": 6000.0,
             },
         )
+
+    @travel("2026-10-28 08:00")
+    def test_internal_projects_are_ignored(self):
+        """Internal projects don't count towards accruals"""
+        internal = factories.ProjectFactory.create(type=Project.INTERNAL)
+        invoice(project=internal, subtotal=1000, status=Invoice.PAID)
+
+        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        self.assertEqual(data["accruals"], 0.0)
 
     @travel("2026-10-28 08:00")
     def test_offers_not_in_planned_invoicing_are_gross_margin(self):

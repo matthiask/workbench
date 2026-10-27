@@ -129,8 +129,10 @@ def service_hours_in_open_orders():
     )
 
 
-def projected_gross_margin():
-    open_projects = Project.objects.open().select_related("owned_by")
+def projected_gross_margin(projects=None):
+    if projects is None:
+        projects = Project.objects.open()
+    open_projects = projects.select_related("owned_by")
 
     projected = ProjectedInvoice.objects.filter(
         project__in=open_projects

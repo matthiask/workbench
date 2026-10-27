@@ -75,6 +75,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - In the cash data API, `accepted_offers_not_invoiced.total_excl_tax` is
   revenue, but `not_in_planned_invoicing_excl_tax` is gross margin because it
   complements planned invoicing. Never subtract gross margin from revenue.
+  Figures based on projects (accruals, planned invoicing, offers) leave out
+  internal projects; open invoices include all invoices.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Pre-commit hooks run ruff and auto-fix formatting. If a commit fails due to formatting, re-stage the auto-fixed files and commit again.
