@@ -31,7 +31,7 @@ from workbench.projects.models import (
     Service,
 )
 from workbench.projects.reporting import hours_per_type
-from workbench.reporting.utils import sum_by_project
+from workbench.reporting.utils import sum_by_project, sum_of
 from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -167,12 +167,10 @@ def project_gross_margin(project):
     hours_logged_budgeted = project_hours["hours_logged_budgeted"]
     # Only the hours of accepted offers match the offered amount (logged hours
     # are taken into account below).
-    hours_accepted_offered = (
-        Service.objects
-        .budgeted()
-        .filter(offer__in=accepted_offers)
-        .aggregate(s=Sum("service_hours"))["s"]
-        or Z1
+    hours_accepted_offered = sum_of(
+        Service.objects.budgeted().filter(offer__in=accepted_offers),
+        "service_hours",
+        default=Z1,
     )
 
     # Including offered amounts and hours only makes sense for open projects;

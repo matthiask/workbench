@@ -13,6 +13,7 @@ from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.reporting.models import Accruals
 from workbench.reporting.squeeze import gross_margin_components
+from workbench.reporting.utils import sum_of
 from workbench.tools.formats import Z1, Z2
 
 
@@ -135,13 +136,12 @@ def gross_margin_by_month(date_range):
 
 
 def service_hours_in_open_orders():
-    return (
-        Service.objects
-        .budgeted()
-        .filter(project__type=Project.ORDER, project__closed_on__isnull=True)
-        .order_by()
-        .aggregate(h=Sum("service_hours"))["h"]
-        or Z1
+    return sum_of(
+        Service.objects.budgeted().filter(
+            project__type=Project.ORDER, project__closed_on__isnull=True
+        ),
+        "service_hours",
+        default=Z1,
     )
 
 
@@ -214,39 +214,25 @@ def unsent_projected_invoices(cutoff_date):
 
 
 def logged_hours_in_open_orders():
-    return (
-        LoggedHours.objects
-        .filter(
+    return sum_of(
+        LoggedHours.objects.filter(
             service__project__type=Project.ORDER,
             service__project__closed_on__isnull=True,
-        )
-        .order_by()
-        .aggregate(h=Sum("hours"))["h"]
-        or Z1
+        ),
+        "hours",
+        default=Z1,
     )
 
 
 def sent_invoices_total():
-    return (
-        Invoice.objects
-        .filter(status=Invoice.SENT)
-        .order_by()
-        .aggregate(t=Sum("total_excl_tax"))["t"]
-        or Z2
-    )
+    return sum_of(Invoice.objects.filter(status=Invoice.SENT))
 
 
 def due_invoices_total():
-    return (
-        Invoice.objects
-        .filter(status=Invoice.SENT, due_on__lte=dt.date.today())
-        .order_by()
-        .aggregate(t=Sum("total_excl_tax"))["t"]
-        or Z2
+    return sum_of(
+        Invoice.objects.filter(status=Invoice.SENT, due_on__lte=dt.date.today())
     )
 
 
 def open_offers_total():
-    return (
-        Offer.objects.offered().order_by().aggregate(t=Sum("total_excl_tax"))["t"] or Z2
-    )
+    return sum_of(Offer.objects.offered())

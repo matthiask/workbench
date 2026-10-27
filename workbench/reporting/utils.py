@@ -8,6 +8,11 @@ from workbench.tools.formats import Z2
 from workbench.tools.validation import monday
 
 
+def sum_of(queryset, field="total_excl_tax", *, default=Z2):
+    """Sum of ``field`` over ``queryset``, ``default`` if there are no rows"""
+    return queryset.order_by().aggregate(s=Sum(field))["s"] or default
+
+
 def sum_by_project(queryset, field="total_excl_tax", *, project="project", default=Z2):
     """``{project_id: sum of field}``, ``default`` for projects without rows"""
     return defaultdict(

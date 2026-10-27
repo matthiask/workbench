@@ -3,7 +3,6 @@ import secrets
 from collections import defaultdict
 
 from django.conf import settings
-from django.db.models import Sum
 from django.http import HttpResponseForbidden, JsonResponse
 from django.views.decorators.http import require_GET
 
@@ -13,27 +12,18 @@ from workbench.invoices.models import Invoice
 from workbench.reporting import key_data, squeeze
 from workbench.reporting.green_hours import green_hours_by_month
 from workbench.reporting.models import Accruals
+from workbench.reporting.utils import sum_of
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import Z1, Z2
 
 
 def open_invoices_total(cutoff_date):
-    return (
-        Invoice.objects
-        .outstanding(on=cutoff_date)
-        .order_by()
-        .aggregate(t=Sum("total_excl_tax"))["t"]
-        or Z2
-    )
+    return sum_of(Invoice.objects.outstanding(on=cutoff_date))
 
 
 def canceled_invoices_total(date_range):
-    return (
-        Invoice.objects
-        .filter(status=Invoice.CANCELED, closed_on__range=date_range)
-        .order_by()
-        .aggregate(t=Sum("total_excl_tax"))["t"]
-        or Z2
+    return sum_of(
+        Invoice.objects.filter(status=Invoice.CANCELED, closed_on__range=date_range)
     )
 
 
