@@ -33,6 +33,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - `grouped_services` (on `Project`) returns a **dict**, not an object — use `gs["key"]` not `gs.key`. Template access works with dot notation automatically.
 - `Decimal` zero constants: `Z1 = Decimal("0.0")` for hours, `Z2 = Decimal("0.00")` for money (imported from `workbench.tools.formats`).
 - `Offer.is_accepted` checks `status == ACCEPTED`. Use this (not `not is_declined`) when computing accepted-offer totals.
+- Shared helpers for reports: `Invoice.objects.outstanding(on=date)` for
+  invoices open on a cutoff date, `sum_by_project(queryset, field)` in
+  `workbench/reporting/utils.py` for per-project totals, and
+  `gross_margin_components(projects)` in `workbench/reporting/squeeze.py` for
+  offered/projected/invoiced gross margin. Prefer calling utilities over
+  adding mixins or base classes.
 - `project_gross_margin(project)` in `workbench/reporting/squeeze.py` computes single-project profitability (gross margin, rate, offered/projected/invoiced breakdown). Use this instead of duplicating squeeze logic.
 - Profitability estimates (rates, gross margins) should rather underestimate
   than overestimate. When in doubt, count hours and leave out money.
