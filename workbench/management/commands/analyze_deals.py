@@ -8,12 +8,19 @@ from django.core.management import BaseCommand
 from django.db.models import Sum
 
 from workbench.deals.models import Deal, ValueType
-from workbench.invoices.models import Invoice, ProjectedInvoice
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import LoggedHours
 from workbench.projects.models import Project
-from workbench.reporting.utils import sum_by_project
+from workbench.reporting.squeeze import gross_margin_components
 from workbench.tools.formats import Z1, Z2
 from workbench.tools.xlsx import WorkbenchXLSXDocument
+
+
+def gross_margin_projection(projects):
+    """Projected or invoiced gross margin per project, whichever is higher"""
+    return {
+        project: max(row["projected"], row["invoiced"])
+        for project, row in gross_margin_components(projects).items()
+    }
 
 
 class Command(BaseCommand):
@@ -58,46 +65,7 @@ class Command(BaseCommand):
         projects = Project.objects.filter(created_at__date__range=date_range).filter(
             customer__in=per_customer_and_value_type.keys()
         )
-        projected = sum_by_project(
-            ProjectedInvoice.objects.filter(
-                project__in=projects, project__closed_on__isnull=True
-            ),
-            "gross_margin",
-        )
-
-        invoiced = defaultdict(lambda: Z2)
-        invoiced_per_project = (
-            Invoice.objects
-            .invoiced()
-            .filter(project__in=projects)
-            .order_by()
-            .values("project")
-            .annotate(Sum("total_excl_tax"), Sum("third_party_costs"))
-        )
-        for row in invoiced_per_project:
-            invoiced[row["project"]] = (
-                row["total_excl_tax__sum"] - row["third_party_costs__sum"]
-            )
-
-        # Subtract third party costs from logged costs which have not been
-        # invoiced yet. Maybe we're double counting here but I'd rather have a
-        # pessimistic outlook here.
-        for row in (
-            LoggedCost.objects
-            .filter(
-                service__project__in=projects,
-                third_party_costs__isnull=False,
-                invoice_service__isnull=True,
-            )
-            .order_by()
-            .values("service__project")
-            .annotate(Sum("third_party_costs"))
-        ):
-            invoiced[row["service__project"]] -= row["third_party_costs__sum"]
-        gross_margin_projection = {
-            id: max(projected.get(id, Z2), invoiced.get(id, Z2))
-            for id in projected.keys() | invoiced.keys()
-        }
+        projection = gross_margin_projection(projects)
 
         hours = (
             LoggedHours.objects
@@ -127,7 +95,7 @@ class Command(BaseCommand):
                 },
             )
 
-            gmp = gross_margin_projection.get(project.id, Z2)
+            gmp = projection.get(project.id, Z2)
 
             c["gross_margin_projection"] += gmp
 
@@ -137,10 +105,8 @@ class Command(BaseCommand):
                     c["rendered_by_value_type"][field] += h / sum(hours.values()) * gmp
 
         # pprint(accepted)
-        # pprint(gross_margin_projection)
+        # pprint(projection)
         # pprint(project_hours)
-        # pprint(projected)
-        # pprint(invoiced)
 
         def discrepancy_value(c):
             accepted_sum = sum(c["accepted_by_value_type"].values())

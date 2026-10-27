@@ -11,6 +11,8 @@ from workbench import factories
 from workbench.audit.models import LoggedAction
 from workbench.deals.models import Deal
 from workbench.deals.reporting import accepted_deals
+from workbench.invoices.models import Invoice
+from workbench.management.commands.analyze_deals import gross_margin_projection
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
@@ -594,3 +596,22 @@ class DealsTest(TestCase):
 
         self.assertEqual(str(c1), f"{deal.owned_by}: 75")
         self.assertEqual(str(c2), f"{other}: 25")
+
+    def test_gross_margin_projection_third_party_costs(self):
+        """Third party costs on invoices and logged ones are deducted once"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1000,
+            third_party_costs=600,
+            status=Invoice.SENT,
+        )
+        factories.LoggedCostFactory.create(
+            service=service, cost=600, third_party_costs=600
+        )
+
+        self.assertEqual(gross_margin_projection([project.id])[project.id], 400)
