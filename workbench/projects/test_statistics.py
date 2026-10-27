@@ -5,6 +5,7 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.invoices.models import Invoice
+from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.projects.reporting import hours_per_customer
 from workbench.reporting import green_hours, project_budget_statistics
@@ -153,6 +154,37 @@ class StatisticsTest(TestCase):
         )
         self.assertEqual(stats["overall"]["delta_positive"], Decimal("1800.00"))
         self.assertEqual(stats["overall"]["delta_negative"], Decimal("0.00"))
+
+    def test_project_budget_statistics_delta_splits(self):
+        """Work not invoiced yet beyond the offer and in planned invoicing"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        service = factories.ServiceFactory.create(
+            project=project,
+            offer=offer,
+            effort_type="Any",
+            effort_rate=100,
+            effort_hours=10,
+        )
+        offer.save()
+        factories.LoggedHoursFactory.create(service=service, hours=15)
+        factories.ProjectedInvoiceFactory.create(
+            project=project, gross_margin=Decimal(400)
+        )
+
+        # Not invoiced third party costs without any planned invoicing
+        unplanned = factories.ServiceFactory.create()
+        factories.LoggedCostFactory.create(
+            service=unplanned, cost=100, third_party_costs=100
+        )
+
+        overall = project_budget_statistics.project_budget_statistics([
+            project,
+            unplanned.project,
+        ])["overall"]
+        self.assertEqual(overall["delta_positive"], 1600)
+        self.assertEqual(overall["delta_beyond_offer"], 500)
+        self.assertEqual(overall["delta_planned"], 400)
 
     def create_projects(self):
         p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)

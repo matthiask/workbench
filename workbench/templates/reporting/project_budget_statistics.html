@@ -48,6 +48,20 @@
             <th class="text-end">
               {{ statistics.overall.delta_positive|currency:True }}
               <br>
+              <small
+                class="fw-normal text-nowrap"
+                title="{% translate 'Logged beyond the accepted offers and the invoiced total, e.g. hours over the offer and discounts' %}"
+              >
+                {% translate 'thereof beyond offers' %} {{ statistics.overall.delta_beyond_offer|currency }}
+              </small>
+              <br>
+              <small
+                class="fw-normal text-nowrap"
+                title="{% translate 'Covered by projected gross margin which has not been invoiced yet (approximation)' %}"
+              >
+                {% translate 'thereof planned' %} {{ statistics.overall.delta_planned|currency }}
+              </small>
+              <br>
               {{ statistics.overall.delta_negative|currency:True }}
             </th>
             <th class="text-end {% if not statistics.overall.projected_gross_margin %}text-black-30{% endif %}">

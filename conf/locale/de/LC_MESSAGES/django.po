@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 15:14+0200\n"
+"POT-Creation-Date: 2026-10-27 10:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4641,6 +4641,22 @@ msgstr "Erfasst (Zukunft)"
 #: workbench/templates/reporting/playing_bank.html
 msgid "delta"
 msgstr "Delta"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "Logged beyond the accepted offers and the invoiced total, e.g. hours over the offer and discounts"
+msgstr "Mehr erfasst als offeriert und verrechnet, z.B. Stunden über der Offerte und Rabatte"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "thereof beyond offers"
+msgstr "davon über Offerte"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "Covered by projected gross margin which has not been invoiced yet (approximation)"
+msgstr "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)"
+
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "thereof planned"
+msgstr "davon geplant"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Squeeze"

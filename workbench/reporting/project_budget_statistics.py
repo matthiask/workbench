@@ -9,6 +9,7 @@ from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import BudgetTransfer, Service
+from workbench.reporting.squeeze import gross_margin_components
 from workbench.reporting.utils import effort_cost_by_project, sum_by
 from workbench.tools.formats import Z1, Z2
 
@@ -127,6 +128,31 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     }
     overall["delta_positive"] = sum(s["delta"] for s in statistics if s["delta"] > 0)
     overall["delta_negative"] = sum(s["delta"] for s in statistics if s["delta"] < 0)
+
+    # Splits of the work which hasn't been invoiced yet: Logged beyond what has
+    # been offered (hours over the offer, discounts), and covered by projected
+    # gross margin which hasn't been invoiced yet (at most the projections
+    # themselves, as in the planned invoicing per month). The latter mixes
+    # logbook values with gross margin and is only an approximation.
+    gross_margins = gross_margin_components(projects)
+
+    def planned(s):
+        projected = s["projected_gross_margin"]
+        invoiced = gross_margins[s["project"].id]["invoiced"]
+        return min(projected, max(projected - invoiced, Z2))
+
+    overall["delta_beyond_offer"] = sum(
+        (
+            max(s["logbook"] - max(s["sold"], s["invoiced"]), Z2)
+            for s in statistics
+            if s["delta"] > 0 and s["sold"]
+        ),
+        Z2,
+    )
+    overall["delta_planned"] = sum(
+        (min(s["delta"], planned(s)) for s in statistics if s["delta"] > 0),
+        Z2,
+    )
 
     return {
         "statistics": sorted(statistics, key=lambda s: s["delta"], reverse=True),
