@@ -14,6 +14,7 @@ from workbench.reporting.models import Accruals
 from workbench.reporting.utils import sum_of
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import Z1, Z2
+from workbench.tools.validation import last_month_range, month_range
 
 
 def open_invoices_total(cutoff_date):
@@ -74,10 +75,8 @@ def accepted_deals(date_range):
 
 
 def key_data_for_month(first_of_month):
-    last_of_month = (first_of_month + dt.timedelta(days=31)).replace(
-        day=1
-    ) - dt.timedelta(days=1)
-    date_range = [first_of_month, last_of_month]
+    date_range = month_range(first_of_month)
+    last_of_month = date_range[1]
     month = (first_of_month.year, first_of_month.month)
 
     gross_margin = next(
@@ -92,8 +91,7 @@ def key_data_for_month(first_of_month):
     previous_months = []
     day = first_of_month
     for _i in range(3):
-        end = day - dt.timedelta(days=1)
-        day = end.replace(day=1)
+        day, end = month_range(day - dt.timedelta(days=1))
         previous_months.append({
             "month": f"{day:%Y-%m}",
             "green_hours_percentage": green_hours.get(day),
@@ -125,7 +123,4 @@ def key_data_api(request):
     if not has_valid_token(request):
         return HttpResponseForbidden()
 
-    previous_month = (dt.date.today().replace(day=1) - dt.timedelta(days=1)).replace(
-        day=1
-    )
-    return JsonResponse(jsonable(key_data_for_month(previous_month)))
+    return JsonResponse(jsonable(key_data_for_month(last_month_range()[0])))

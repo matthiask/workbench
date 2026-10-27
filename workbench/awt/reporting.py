@@ -16,9 +16,9 @@ from workbench.awt.models import (
     Year,
 )
 from workbench.awt.utils import days_per_month, monthly_days
-from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedHours
 from workbench.tools.formats import Z1, Z2
+from workbench.tools.validation import last_month_range, month_range
 
 
 class Months(UserDict):
@@ -263,7 +263,6 @@ def annual_working_time(year, *, users):  # noqa: C901
             days = [(absence.starts_on.month, absence.days)]
         else:
             total = Decimal((ends_on - starts_on).days + 1)
-            one_day = dt.timedelta(days=1)
 
             calendar_days_per_month = [
                 (
@@ -271,7 +270,7 @@ def annual_working_time(year, *, users):  # noqa: C901
                     Decimal(
                         (
                             # end of absence or last day of this month
-                            min(ends_on, next_valid_day(ends_on.year, m, 99) - one_day)
+                            min(ends_on, month_range(dt.date(ends_on.year, m, 1))[1])
                             # start of absence or first day of this month
                             - max(starts_on, dt.date(starts_on.year, m, 1))
                         ).days
@@ -444,7 +443,7 @@ def annual_working_time(year, *, users):  # noqa: C901
 
 
 def annual_working_time_warnings():
-    month = dt.date.today().replace(day=1) - dt.timedelta(days=1)
+    month = last_month_range()[1]
 
     awt = annual_working_time(month.year, users=active_users(month.year))
     warnings = [

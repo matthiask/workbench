@@ -20,7 +20,6 @@ from workbench.accounts.reporting import (
     work_anniversaries,
 )
 from workbench.invoices.models import Invoice
-from workbench.invoices.utils import next_valid_day
 from workbench.logbook.models import LoggedCost
 from workbench.logbook.reporting import logbook_stats
 from workbench.projects.models import Project
@@ -35,7 +34,13 @@ from workbench.reporting import (
 from workbench.reporting.utils import date_ranges
 from workbench.tools.formats import Z0, Z2, local_date_format
 from workbench.tools.forms import DateInput, Form
-from workbench.tools.validation import filter_form, in_days, monday
+from workbench.tools.validation import (
+    filter_form,
+    in_days,
+    last_month_range,
+    monday,
+    month_range,
+)
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -93,11 +98,7 @@ def open_items_list(request, form):
 
 def key_data_details(fn):
     def view(request, year, month):
-        year = int(year)
-        month = int(month)
-        date_range = [dt.date(year, month, 1)]
-        date_range.append(next_valid_day(year, month + 1, 1) - dt.timedelta(days=1))
-        return fn(request, date_range)
+        return fn(request, month_range(dt.date(int(year), int(month), 1)))
 
     return view
 
@@ -473,9 +474,9 @@ class DateRangeFilterForm(Form):
 class LastMonthDateRangeFilterForm(DateRangeFilterForm):
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
-        last_month_end = dt.date.today().replace(day=1) - dt.timedelta(days=1)
-        data.setdefault("date_from", last_month_end.replace(day=1).isoformat())
-        data.setdefault("date_until", last_month_end.isoformat())
+        date_from, date_until = last_month_range()
+        data.setdefault("date_from", date_from.isoformat())
+        data.setdefault("date_until", date_until.isoformat())
         super().__init__(data, *args, **kwargs)
 
 

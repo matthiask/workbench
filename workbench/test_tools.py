@@ -1,8 +1,10 @@
+import datetime as dt
 from decimal import Decimal
 
 from django import forms
 from django.db.models import ProtectedError
 from django.test import TestCase
+from time_machine import travel
 
 from workbench import factories
 from workbench.awt.models import Year  # any tools.Model()
@@ -12,7 +14,7 @@ from workbench.tools import formats
 from workbench.tools.forms import Autocomplete
 from workbench.tools.models import CalculationModel
 from workbench.tools.testing import messages
-from workbench.tools.validation import is_title_specific
+from workbench.tools.validation import is_title_specific, last_month_range, month_range
 
 
 class ToolsTest(TestCase):
@@ -90,6 +92,26 @@ class ToolsTest(TestCase):
         ]:
             with self.subTest(value=value, result=result):
                 self.assertEqual(formats.hours(value), result)
+
+    @travel("2024-03-15")
+    def test_month_range(self):
+        """Month ranges include the first and last day of the month"""
+        self.assertEqual(month_range(), [dt.date(2024, 3, 1), dt.date(2024, 3, 31)])
+        self.assertEqual(
+            month_range(dt.date(2024, 2, 29)),
+            [dt.date(2024, 2, 1), dt.date(2024, 2, 29)],
+        )
+        self.assertEqual(
+            month_range(dt.date(2023, 12, 31)),
+            [dt.date(2023, 12, 1), dt.date(2023, 12, 31)],
+        )
+        self.assertEqual(
+            last_month_range(), [dt.date(2024, 2, 1), dt.date(2024, 2, 29)]
+        )
+        with travel("2024-01-31"):
+            self.assertEqual(
+                last_month_range(), [dt.date(2023, 12, 1), dt.date(2023, 12, 31)]
+            )
 
     def test_is_title_specific(self):
         """is_title_specific tests"""

@@ -44,6 +44,18 @@ def in_days(days):
     return dt.date.today() + dt.timedelta(days=days)
 
 
+def month_range(day=None):
+    """First and last day of the month of ``day`` (default: today)"""
+    first = (day or dt.date.today()).replace(day=1)
+    last = (first + dt.timedelta(days=31)).replace(day=1) - dt.timedelta(days=1)
+    return [first, last]
+
+
+def last_month_range():
+    """First and last day of the previous month"""
+    return month_range(dt.date.today().replace(day=1) - dt.timedelta(days=1))
+
+
 UNSPECIFIC_TITLE = re.compile(r"(general|allg|unspec)", re.IGNORECASE)
 WHITESPACE = re.compile(r"\s+")
 URL_ONLY = re.compile(r"^\s*https?://\S+\s*$", re.IGNORECASE)

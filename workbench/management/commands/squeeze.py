@@ -9,6 +9,7 @@ from django.utils.translation import activate
 
 from workbench.reporting.squeeze import build_xlsx, squeeze_data
 from workbench.tools.formats import local_date_format
+from workbench.tools.validation import last_month_range
 
 
 def range_type(arg_value):
@@ -42,7 +43,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         activate("de")
 
-        last_month_end = dt.date.today().replace(day=1) - dt.timedelta(days=1)
+        last_month_end = last_month_range()[1]
         date_range = options["range"] or (
             [
                 dt.date(options["year"], 1, 1),
