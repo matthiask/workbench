@@ -12,6 +12,7 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.reporting.models import Accruals
+from workbench.reporting.squeeze import gross_margin_components
 from workbench.tools.formats import Z1, Z2
 
 
@@ -150,25 +151,15 @@ def projected_gross_margin():
     projected = ProjectedInvoice.objects.filter(
         project__in=open_projects
     ).select_related("project__owned_by")
-    invoices = (
-        Invoice.objects
-        .invoiced()
-        .filter(project__in=open_projects)
-        .select_related("project__owned_by")
-    )
 
-    projects = defaultdict(lambda: {"projected": [], "invoiced": []})
-
+    projects = defaultdict(lambda: {"projected": []})
     for pi in projected:
         projects[pi.project]["projected"].append(pi)
-    for pi in invoices:
-        projects[pi.project]["invoiced"].append(pi)
 
-    for data in projects.values():
-        data["projected_total"] = sum((pi.gross_margin for pi in data["projected"]), Z2)
-        data["gross_margin"] = sum(
-            (i.total_excl_tax - i.third_party_costs for i in data["invoiced"]), Z2
-        )
+    gross_margins = gross_margin_components([project.id for project in projects])
+    for project, data in projects.items():
+        data["projected_total"] = gross_margins[project.id]["projected"]
+        data["gross_margin"] = gross_margins[project.id]["invoiced"]
 
     monthly_overall = defaultdict(lambda: Z2)
 

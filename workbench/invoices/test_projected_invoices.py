@@ -6,6 +6,7 @@ from django.utils.translation import deactivate_all
 from time_machine import travel
 
 from workbench import factories
+from workbench.invoices.models import Invoice
 from workbench.invoices.tasks import send_unsent_projected_invoices_reminders
 from workbench.reporting.key_data import projected_gross_margin
 
@@ -27,7 +28,6 @@ class ProjectedInvoicesTest(TestCase):
                 {
                     "delta": Decimal("1000.00"),
                     "gross_margin": Decimal("0.00"),
-                    "invoiced": [],
                     "monthly": {(2021, 11): Decimal("1000.00")},
                     "project": obj.project,
                     "projected": [obj],
@@ -48,6 +48,29 @@ class ProjectedInvoicesTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         # print(mail.outbox[0].__dict__)
+
+    def test_logged_third_party_costs_reduce_invoiced_gross_margin(self):
+        """Logged third party costs exceeding those on invoices are deducted"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        factories.ProjectedInvoiceFactory.create(
+            project=project, gross_margin=Decimal(1000)
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1000,
+            status=Invoice.SENT,
+        )
+        factories.LoggedCostFactory.create(
+            service=service, cost=300, third_party_costs=300
+        )
+
+        [row] = projected_gross_margin()["projects"]
+        self.assertEqual(row["gross_margin"], 700)
+        self.assertEqual(row["delta"], 300)
 
     def test_projected_warning_third_party_costs(self):
         """Projected invoices are compared to the gross margin of services"""
