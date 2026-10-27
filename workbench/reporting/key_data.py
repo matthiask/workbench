@@ -2,8 +2,7 @@ import datetime as dt
 from collections import defaultdict
 from itertools import pairwise, takewhile
 
-from django.db.models import Q, Sum
-from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models import Q
 
 from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.invoices.models import Invoice, ProjectedInvoice
@@ -13,54 +12,39 @@ from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.reporting.models import Accruals
 from workbench.reporting.squeeze import gross_margin_components
-from workbench.reporting.utils import sum_of
+from workbench.reporting.utils import sum_by_month, sum_of
 from workbench.tools.formats import Z1, Z2
 
 
 def gross_profit_by_month(date_range):
-    profit = defaultdict(lambda: Z2)
-    for result in (
-        Invoice.objects
-        .invoiced()
-        .order_by()
-        .filter(invoiced_on__range=date_range)
-        .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
-        .values("year", "month")
-        .annotate(Sum("total_excl_tax"))
-    ):
-        profit[(result["year"], result["month"])] += result["total_excl_tax__sum"]
-    return profit
+    return sum_by_month(
+        Invoice.objects.invoiced().filter(invoiced_on__range=date_range),
+        "invoiced_on",
+    )
 
 
 def third_party_costs_by_month(date_range):
-    costs = defaultdict(lambda: Z2)
-
-    for result in (
-        LoggedCost.objects
-        .filter(
+    """Third party costs as negative amounts per month"""
+    logged = sum_by_month(
+        LoggedCost.objects.filter(
             rendered_on__range=date_range,
             third_party_costs__isnull=False,
             invoice_service__isnull=True,
-        )
-        .order_by()
-        .annotate(year=ExtractYear("rendered_on"), month=ExtractMonth("rendered_on"))
-        .values("year", "month")
-        .annotate(Sum("third_party_costs"))
-    ):
-        costs[(result["year"], result["month"])] -= result["third_party_costs__sum"]
-
-    for result in (
+        ),
+        "rendered_on",
+        "third_party_costs",
+    )
+    invoiced = sum_by_month(
         Invoice.objects
         .invoiced()
         .filter(~Q(type=Invoice.DOWN_PAYMENT))
-        .order_by()
-        .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
-        .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
-        .values("year", "month")
-        .annotate(Sum("third_party_costs"))
-    ):
-        costs[(result["year"], result["month"])] -= result["third_party_costs__sum"]
-
+        .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2)),
+        "invoiced_on",
+        "third_party_costs",
+    )
+    costs = defaultdict(lambda: Z2)
+    for month in {*logged, *invoiced}:
+        costs[month] -= logged[month] + invoiced[month]
     return costs
 
 

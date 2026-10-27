@@ -2,6 +2,7 @@ import datetime as dt
 from collections import defaultdict
 
 from django.db.models import Sum
+from django.db.models.functions import ExtractMonth, ExtractYear
 from django.utils.translation import gettext as _
 
 from workbench.tools.formats import Z1, Z2
@@ -76,6 +77,22 @@ def date_ranges():
             _("last year"),
         ),
     ]
+
+
+def sum_by_month(queryset, date_field, field="total_excl_tax"):
+    """``{(year, month): sum of field}`` grouped by the month of ``date_field``"""
+    return defaultdict(
+        lambda: Z2,
+        {
+            (year, month): total
+            for year, month, total in queryset
+            .order_by()
+            .annotate(year=ExtractYear(date_field), month=ExtractMonth(date_field))
+            .values("year", "month")
+            .annotate(s=Sum(field))
+            .values_list("year", "month", "s")
+        },
+    )
 
 
 def effort_cost_by_project(logged_hours):
