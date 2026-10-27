@@ -32,6 +32,12 @@ class InvoiceQuerySet(SearchQuerySet):
     def invoiced(self):
         return self.filter(status__in=Invoice.INVOICED_STATUSES)
 
+    def outstanding(self, *, on):
+        """Invoices which have been sent but not paid yet on the given date"""
+        return self.invoiced().filter(
+            Q(invoiced_on__lte=on), Q(closed_on__gt=on) | Q(closed_on__isnull=True)
+        )
+
     def due(self):
         return self.filter(
             status=Invoice.SENT, due_on__isnull=False, due_on__lte=dt.date.today()

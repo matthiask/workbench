@@ -1,7 +1,7 @@
 import datetime as dt
 from collections import defaultdict
 
-from django.db.models import Q, Sum
+from django.db.models import Sum
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_GET
@@ -15,18 +15,6 @@ from workbench.tools.formats import Z2
 
 
 PLANNED_INVOICING_MONTHS = 7
-
-
-def open_invoices(cutoff_date):
-    return (
-        Invoice.objects
-        .invoiced()
-        .filter(
-            Q(invoiced_on__lte=cutoff_date),
-            Q(closed_on__gt=cutoff_date) | Q(closed_on__isnull=True),
-        )
-        .order_by("due_on")
-    )
 
 
 def open_invoices_totals(invoices, cutoff_date):
@@ -136,7 +124,7 @@ def cash_data(date):
     is_current = date >= today - dt.timedelta(days=today.weekday())
     cutoff_date = max(date, today) if is_current else date
 
-    invoices = list(open_invoices(cutoff_date))
+    invoices = list(Invoice.objects.outstanding(on=cutoff_date).order_by("due_on"))
     data = {
         "date": date,
         "generated_at": timezone.localtime().isoformat(timespec="seconds"),

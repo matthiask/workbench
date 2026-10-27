@@ -3,7 +3,7 @@ import secrets
 from collections import defaultdict
 
 from django.conf import settings
-from django.db.models import Q, Sum
+from django.db.models import Sum
 from django.http import HttpResponseForbidden, JsonResponse
 from django.views.decorators.http import require_GET
 
@@ -20,11 +20,7 @@ from workbench.tools.formats import Z1, Z2
 def open_invoices_total(cutoff_date):
     return (
         Invoice.objects
-        .invoiced()
-        .filter(
-            Q(invoiced_on__lte=cutoff_date),
-            Q(closed_on__gt=cutoff_date) | Q(closed_on__isnull=True),
-        )
+        .outstanding(on=cutoff_date)
         .order_by()
         .aggregate(t=Sum("total_excl_tax"))["t"]
         or Z2
