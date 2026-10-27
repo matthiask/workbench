@@ -80,6 +80,17 @@ def get_project_cards(
     return _get_classic_project_cards(owner, repo, project_number, headers)
 
 
+def _find_classic_project_id(
+    projects_url: str, project_number: str, headers: dict[str, str]
+) -> Any:
+    response = requests.get(projects_url, headers=headers)
+    if response.status_code == 200:
+        for project in response.json():
+            if str(project.get("number")) == project_number:
+                return project.get("id")
+    return None
+
+
 def _get_classic_project_cards(  # noqa: C901
     owner: str, repo: str, project_number: str, headers: dict[str, str]
 ) -> list[dict[str, Any]]:
@@ -91,33 +102,17 @@ def _get_classic_project_cards(  # noqa: C901
         "Accept": "application/vnd.github.inertia-preview+json",
     }
 
-    # Try a few different API routes to find the project
+    # Organization or repository projects
+    projects_url = (
+        f"https://api.github.com/orgs/{owner}/projects"
+        if repo is None
+        else f"https://api.github.com/repos/{owner}/{repo}/projects"
+    )
     project_id = None
-
-    # First try to get the project directly by number
     try:
-        # For organization projects
-        if repo is None:
-            org_url = f"https://api.github.com/orgs/{owner}/projects"
-            response = requests.get(org_url, headers=preview_headers)
-
-            if response.status_code == 200:
-                projects = response.json()
-                for project in projects:
-                    if str(project.get("number")) == project_number:
-                        project_id = project.get("id")
-                        break
-        else:
-            # For repository projects
-            repo_url = f"https://api.github.com/repos/{owner}/{repo}/projects"
-            response = requests.get(repo_url, headers=preview_headers)
-
-            if response.status_code == 200:
-                projects = response.json()
-                for project in projects:
-                    if str(project.get("number")) == project_number:
-                        project_id = project.get("id")
-                        break
+        project_id = _find_classic_project_id(
+            projects_url, project_number, preview_headers
+        )
     except Exception:
         logger.exception("Error finding project %s", project_number)
 
