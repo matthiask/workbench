@@ -9,7 +9,7 @@ from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import BudgetTransfer, Service
-from workbench.reporting.utils import effort_cost_by_project, sum_by_project
+from workbench.reporting.utils import effort_cost_by_project, sum_by
 from workbench.tools.formats import Z1, Z2
 
 
@@ -20,11 +20,11 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     costs = LoggedCost.objects.filter(
         service__project__in=projects, rendered_on__lte=cutoff_dttm
     )
-    cost_per_project = sum_by_project(costs, "cost", project="service__project")
-    third_party_costs_per_project = sum_by_project(
+    cost_per_project = sum_by(costs, key="service__project", field="cost")
+    third_party_costs_per_project = sum_by(
         costs.filter(third_party_costs__isnull=False, invoice_service__isnull=True),
-        "third_party_costs",
-        project="service__project",
+        key="service__project",
+        field="third_party_costs",
     )
 
     effort = effort_cost_by_project(
@@ -33,25 +33,29 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         )
     )
 
-    service_hours = sum_by_project(
+    service_hours = sum_by(
         Service.objects.budgeted().filter(project__in=projects),
-        "service_hours",
+        key="project",
+        field="service_hours",
         default=Z1,
     )
 
-    sold_per_project = sum_by_project(
-        Offer.objects.accepted().filter(project__in=projects, is_budget_retainer=False)
+    sold_per_project = sum_by(
+        Offer.objects.accepted().filter(project__in=projects, is_budget_retainer=False),
+        key="project",
     )
-    discount_per_project = sum_by_project(
+    discount_per_project = sum_by(
         Offer.objects.not_declined().filter(
             project__in=projects, is_budget_retainer=False
         ),
-        "discount",
+        key="project",
+        field="discount",
     )
-    invoiced_per_project = sum_by_project(
+    invoiced_per_project = sum_by(
         Invoice.objects.invoiced().filter(
             project__in=projects, invoiced_on__lte=cutoff_date
-        )
+        ),
+        key="project",
     )
 
     projected_gross_margin_on_cutoff_date = {}

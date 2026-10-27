@@ -17,7 +17,7 @@ from workbench.logbook.models import LoggedHours
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
 from workbench.projects.models import Project, Service
-from workbench.reporting.utils import sum_by_project
+from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
 from workbench.tools.forms import querystring as _qs
 from workbench.tools.history import EVERYTHING
@@ -290,15 +290,16 @@ def notes(context, instance):
 @register.filter
 def analyze_projects(object_list):
     pks = [object.pk for object in object_list]
-    service_hours = sum_by_project(
+    service_hours = sum_by(
         Service.objects.budgeted().filter(project__in=pks),
-        "service_hours",
+        key="project",
+        field="service_hours",
         default=Z1,
     )
-    logged_hours = sum_by_project(
+    logged_hours = sum_by(
         LoggedHours.objects.filter(service__project__in=pks),
-        "hours",
-        project="service__project",
+        key="service__project",
+        field="hours",
         default=Z1,
     )
 

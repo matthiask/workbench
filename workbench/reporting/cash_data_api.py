@@ -11,7 +11,7 @@ from workbench.projects.models import Project
 from workbench.reporting.api import has_valid_token, jsonable
 from workbench.reporting.key_data import projected_gross_margin
 from workbench.reporting.key_data_api import accruals
-from workbench.reporting.utils import sum_by_project
+from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z2
 
 
@@ -85,9 +85,11 @@ def accepted_offers_not_invoiced(pgm):
     yet.
     """
     projects = Project.objects.open()
-    offered = sum_by_project(Offer.objects.accepted().filter(project__in=projects))
-    invoiced = sum_by_project(
-        Invoice.objects.invoiced().filter(project__in=offered.keys())
+    offered = sum_by(
+        Offer.objects.accepted().filter(project__in=projects), key="project"
+    )
+    invoiced = sum_by(
+        Invoice.objects.invoiced().filter(project__in=offered.keys()), key="project"
     )
     planned = {row["project"].id: row["delta"] for row in pgm["projects"]}
 

@@ -34,10 +34,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - `Decimal` zero constants: `Z1 = Decimal("0.0")` for hours, `Z2 = Decimal("0.00")` for money (imported from `workbench.tools.formats`).
 - `Offer.is_accepted` checks `status == ACCEPTED`. Use this (not `not is_declined`) when computing accepted-offer totals.
 - Shared helpers for reports: `Invoice.objects.outstanding(on=date)` for
-  invoices open on a cutoff date; `sum_of(queryset, field)`,
-  `sum_by_project(queryset, field)`, `sum_by_month(queryset, date_field,
-  field)` and `effort_cost_by_project(logged_hours)` in
-  `workbench/reporting/utils.py` for totals (pass `default=Z1` for hours);
+  invoices open on a cutoff date; `sum_of(queryset, field=...)`,
+  `sum_by(queryset, key=..., field=...)` (e.g. `key="service__project"`),
+  `sum_by_month(queryset, date_field=..., field=...)` and
+  `effort_cost_by_project(logged_hours)` in `workbench/reporting/utils.py`
+  for totals (pass `default=Z1` for hours; everything after the queryset is
+  keyword-only);
   `month_range(day)` and `last_month_range()` in
   `workbench/tools/validation.py`; `gross_margin_components(projects)`
   and `hours_components(projects)` in `workbench/reporting/squeeze.py` for

@@ -9,20 +9,16 @@ from workbench.tools.formats import Z1, Z2
 from workbench.tools.validation import monday
 
 
-def sum_of(queryset, field="total_excl_tax", *, default=Z2):
+def sum_of(queryset, *, field="total_excl_tax", default=Z2):
     """Sum of ``field`` over ``queryset``, ``default`` if there are no rows"""
     return queryset.order_by().aggregate(s=Sum(field))["s"] or default
 
 
-def sum_by_project(queryset, field="total_excl_tax", *, project="project", default=Z2):
-    """``{project_id: sum of field}``, ``default`` for projects without rows"""
+def sum_by(queryset, *, key, field="total_excl_tax", default=Z2):
+    """``{value of key: sum of field}``, ``default`` for keys without rows"""
     return defaultdict(
         lambda: default,
-        queryset
-        .order_by()
-        .values(project)
-        .annotate(s=Sum(field))
-        .values_list(project, "s"),
+        queryset.order_by().values(key).annotate(s=Sum(field)).values_list(key, "s"),
     )
 
 
@@ -79,7 +75,7 @@ def date_ranges():
     ]
 
 
-def sum_by_month(queryset, date_field, field="total_excl_tax"):
+def sum_by_month(queryset, *, date_field, field="total_excl_tax"):
     """``{(year, month): sum of field}`` grouped by the month of ``date_field``"""
     return defaultdict(
         lambda: Z2,

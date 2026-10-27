@@ -6,7 +6,7 @@ from django.db.models import BooleanField, ExpressionWrapper, Q, Sum
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project, Service
-from workbench.reporting.utils import sum_by_project
+from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z2
 
 
@@ -29,18 +29,20 @@ def playing_bank(projects):
             row["third_party_costs__sum"]
         )
 
-    invoiced = sum_by_project(
+    invoiced = sum_by(
         Invoice.objects
         .invoiced()
         .filter(project__isnull=False)
         .exclude(third_party_costs=0),
-        "third_party_costs",
+        key="project",
+        field="third_party_costs",
     )
-    offered = sum_by_project(
+    offered = sum_by(
         Service.objects.filter(third_party_costs__isnull=False).exclude(
             third_party_costs=0
         ),
-        "third_party_costs",
+        key="project",
+        field="third_party_costs",
     )
 
     sums = {True: Z2, False: Z2}

@@ -31,7 +31,7 @@ from workbench.projects.models import (
     Service,
 )
 from workbench.projects.reporting import hours_per_type
-from workbench.reporting.utils import sum_by_project, sum_of
+from workbench.reporting.utils import sum_by, sum_of
 from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -64,15 +64,17 @@ def third_party_costs(projects):
     may be logged after a services invoice has been created from the offer, so
     adding up both would count many costs twice. Using the larger of the two
     still subtracts logged costs which haven't been invoiced yet."""
-    invoiced = sum_by_project(
-        Invoice.objects.invoiced().filter(project__in=projects), "third_party_costs"
+    invoiced = sum_by(
+        Invoice.objects.invoiced().filter(project__in=projects),
+        key="project",
+        field="third_party_costs",
     )
-    logged = sum_by_project(
+    logged = sum_by(
         LoggedCost.objects.filter(
             service__project__in=projects, third_party_costs__isnull=False
         ),
-        "third_party_costs",
-        project="service__project",
+        key="service__project",
+        field="third_party_costs",
     )
     return defaultdict(
         lambda: Z2,
@@ -90,18 +92,22 @@ def gross_margin_components(projects):
     Projections are only taken into account for open projects. Third party
     costs are deducted from offers and invoices."""
     offers = Offer.objects.accepted().filter(project__in=projects)
-    offered = sum_by_project(offers)
-    offered_costs = sum_by_project(
+    offered = sum_by(offers, key="project")
+    offered_costs = sum_by(
         Service.objects.filter(offer__in=offers, third_party_costs__isnull=False),
-        "third_party_costs",
+        key="project",
+        field="third_party_costs",
     )
-    projected = sum_by_project(
+    projected = sum_by(
         ProjectedInvoice.objects.filter(
             project__in=projects, project__closed_on__isnull=True
         ),
-        "gross_margin",
+        key="project",
+        field="gross_margin",
     )
-    invoiced = sum_by_project(Invoice.objects.invoiced().filter(project__in=projects))
+    invoiced = sum_by(
+        Invoice.objects.invoiced().filter(project__in=projects), key="project"
+    )
     invoiced_costs = third_party_costs(projects)
     return defaultdict(
         lambda: {"offered": Z2, "projected": Z2, "invoiced": Z2},
@@ -120,9 +126,10 @@ def hours_components(projects):
     """Offered (budgeted) and logged hours per project as
     ``{project_id: {"hours_offered": ..., "hours_logged": ...,
     "hours_logged_budgeted": ...}}``."""
-    offered = sum_by_project(
+    offered = sum_by(
         Service.objects.budgeted().filter(project__in=projects),
-        "service_hours",
+        key="project",
+        field="service_hours",
         default=Z1,
     )
     logged = {
@@ -169,7 +176,7 @@ def project_gross_margin(project):
     # are taken into account below).
     hours_accepted_offered = sum_of(
         Service.objects.budgeted().filter(offer__in=accepted_offers),
-        "service_hours",
+        field="service_hours",
         default=Z1,
     )
 

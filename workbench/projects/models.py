@@ -696,7 +696,7 @@ class Project(Model):
         )[self.id]
         costs = sum_of(
             LoggedCost.objects.filter(service__project=self, archived_at__isnull=True),
-            "cost",
+            field="cost",
         )
         return {
             "total": effort["cost"] + costs,

@@ -19,7 +19,7 @@ from workbench.tools.formats import Z1, Z2
 def gross_profit_by_month(date_range):
     return sum_by_month(
         Invoice.objects.invoiced().filter(invoiced_on__range=date_range),
-        "invoiced_on",
+        date_field="invoiced_on",
     )
 
 
@@ -31,16 +31,16 @@ def third_party_costs_by_month(date_range):
             third_party_costs__isnull=False,
             invoice_service__isnull=True,
         ),
-        "rendered_on",
-        "third_party_costs",
+        date_field="rendered_on",
+        field="third_party_costs",
     )
     invoiced = sum_by_month(
         Invoice.objects
         .invoiced()
         .filter(~Q(type=Invoice.DOWN_PAYMENT))
         .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2)),
-        "invoiced_on",
-        "third_party_costs",
+        date_field="invoiced_on",
+        field="third_party_costs",
     )
     costs = defaultdict(lambda: Z2)
     for month in {*logged, *invoiced}:
@@ -124,7 +124,7 @@ def service_hours_in_open_orders():
         Service.objects.budgeted().filter(
             project__type=Project.ORDER, project__closed_on__isnull=True
         ),
-        "service_hours",
+        field="service_hours",
         default=Z1,
     )
 
@@ -203,7 +203,7 @@ def logged_hours_in_open_orders():
             service__project__type=Project.ORDER,
             service__project__closed_on__isnull=True,
         ),
-        "hours",
+        field="hours",
         default=Z1,
     )
 

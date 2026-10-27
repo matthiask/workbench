@@ -6,7 +6,7 @@ from django.db import connections
 from workbench.accounts.models import User
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project
-from workbench.reporting.utils import sum_by_project
+from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z1, Z2
 
 
@@ -123,15 +123,15 @@ def _labor_costs_by_project_id(date_range, *, project=None, cost_center=None):
         for project_id, revenue in cursor:
             projects[project_id]["revenue"] += revenue
 
-    for project_id, cost in sum_by_project(
+    for project_id, cost in sum_by(
         logged_costs.filter(third_party_costs__isnull=False),
-        "third_party_costs",
-        project="service__project",
+        key="service__project",
+        field="third_party_costs",
     ).items():
         projects[project_id]["third_party_costs"] += cost
 
-    for project_id, cost in sum_by_project(
-        logged_costs, "cost", project="service__project"
+    for project_id, cost in sum_by(
+        logged_costs, key="service__project", field="cost"
     ).items():
         projects[project_id]["revenue"] += cost
 
