@@ -48,6 +48,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   the logged ones (`third_party_costs()` in `workbench/reporting/squeeze.py`).
   Logged costs can't be linked to fixed amount invoices, so adding up both
   would count them twice.
+- Projected invoices (`ProjectedInvoice.gross_margin`) are gross margin, third
+  party costs are not included. Invoiced gross margin uses up a project's
+  oldest projections first. The key data report shows projections which
+  haven't been invoiced in time in their original month; the cash data API
+  (`planned_invoicing()` in `workbench/reporting/cash_data_api.py`) carries
+  them over to the current month.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Pre-commit hooks run ruff and auto-fix formatting. If a commit fails due to formatting, re-stage the auto-fixed files and commit again.
