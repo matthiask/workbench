@@ -1,7 +1,7 @@
 import datetime as dt
 from collections import defaultdict
 
-from django.db.models import Sum
+from django.db.models import BooleanField, ExpressionWrapper, Q, Sum
 
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost
@@ -15,13 +15,17 @@ def playing_bank(projects):
     for row in (
         LoggedCost.objects
         .order_by()
-        .extra(select={"_is_future": f"rendered_on > '{dt.date.today().isoformat()}'"})
         .filter(third_party_costs__isnull=False)
         .exclude(third_party_costs=0)
-        .values("service__project", "_is_future")
+        .annotate(
+            is_future=ExpressionWrapper(
+                Q(rendered_on__gt=dt.date.today()), output_field=BooleanField()
+            )
+        )
+        .values("service__project", "is_future")
         .annotate(Sum("third_party_costs"))
     ):
-        logged[row["service__project"]]["future" if row["_is_future"] else "past"] += (
+        logged[row["service__project"]]["future" if row["is_future"] else "past"] += (
             row["third_party_costs__sum"]
         )
 
