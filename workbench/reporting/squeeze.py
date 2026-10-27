@@ -31,6 +31,7 @@ from workbench.projects.models import (
     Service,
 )
 from workbench.projects.reporting import hours_per_type
+from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -63,24 +64,15 @@ def third_party_costs(projects):
     may be logged after a services invoice has been created from the offer, so
     adding up both would count many costs twice. Using the larger of the two
     still subtracts logged costs which haven't been invoiced yet."""
-    invoiced = defaultdict(
-        lambda: Z2,
-        Invoice.objects
-        .invoiced()
-        .filter(project__in=projects)
-        .order_by()
-        .values("project")
-        .annotate(s=Sum("third_party_costs"))
-        .values_list("project", "s"),
+    invoiced = sum_by_project(
+        Invoice.objects.invoiced().filter(project__in=projects), "third_party_costs"
     )
-    logged = defaultdict(
-        lambda: Z2,
-        LoggedCost.objects
-        .filter(service__project__in=projects, third_party_costs__isnull=False)
-        .order_by()
-        .values("service__project")
-        .annotate(s=Sum("third_party_costs"))
-        .values_list("service__project", "s"),
+    logged = sum_by_project(
+        LoggedCost.objects.filter(
+            service__project__in=projects, third_party_costs__isnull=False
+        ),
+        "third_party_costs",
+        project="service__project",
     )
     return defaultdict(
         lambda: Z2,
@@ -281,30 +273,27 @@ def squeeze_data(date_range):  # noqa: C901
     for row in offered_hours:
         projects[row["project"]]["hours_offered"] = row["service_hours__sum"]
 
-    invoiced_per_project = (
-        Invoice.objects
-        .invoiced()
-        .filter(project__in=projects.keys())
-        .order_by()
-        .values("project")
-        .annotate(Sum("total_excl_tax"))
-    )
-    for row in invoiced_per_project:
-        projects[row["project"]]["invoiced"] = row["total_excl_tax__sum"]
+    for project_id, invoiced in sum_by_project(
+        Invoice.objects.invoiced().filter(project__in=projects.keys())
+    ).items():
+        projects[project_id]["invoiced"] = invoiced
 
     for project_id, costs in third_party_costs(projects.keys()).items():
         projects[project_id]["invoiced"] -= costs
 
-    for pi in ProjectedInvoice.objects.filter(
-        project__in=projects.keys(), project__closed_on__isnull=True
-    ):
-        projects[pi.project_id]["projected"] += pi.gross_margin
+    for project_id, projected in sum_by_project(
+        ProjectedInvoice.objects.filter(
+            project__in=projects.keys(), project__closed_on__isnull=True
+        ),
+        "gross_margin",
+    ).items():
+        projects[project_id]["projected"] = projected
 
     offers = Offer.objects.accepted().filter(
         project__in=projects.keys(), project__closed_on__isnull=True
     )
-    for offer in offers:
-        projects[offer.project_id]["offered"] += offer.total_excl_tax
+    for project_id, offered in sum_by_project(offers).items():
+        projects[project_id]["offered"] = offered
     for row in (
         Service.objects
         .filter(offer__in=offers, third_party_costs__isnull=False)

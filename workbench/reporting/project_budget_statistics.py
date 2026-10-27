@@ -9,6 +9,7 @@ from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import BudgetTransfer, Service
+from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z1, Z2
 
 
@@ -65,33 +66,20 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         .annotate(Sum("service_hours"))
     }
 
-    sold_per_project = {
-        row["project"]: row["total_excl_tax__sum"]
-        for row in Offer.objects
-        .accepted()
-        .filter(project__in=projects, is_budget_retainer=False)
-        .order_by()
-        .values("project")
-        .annotate(Sum("total_excl_tax"))
-    }
-    discount_per_project = {
-        row["project"]: -row["discount__sum"]
-        for row in Offer.objects
-        .not_declined()
-        .filter(project__in=projects, is_budget_retainer=False)
-        .order_by()
-        .values("project")
-        .annotate(Sum("discount"))
-    }
-    invoiced_per_project = {
-        row["project"]: row["total_excl_tax__sum"]
-        for row in Invoice.objects
-        .invoiced()
-        .filter(project__in=projects, invoiced_on__lte=cutoff_date)
-        .order_by()
-        .values("project")
-        .annotate(Sum("total_excl_tax"))
-    }
+    sold_per_project = sum_by_project(
+        Offer.objects.accepted().filter(project__in=projects, is_budget_retainer=False)
+    )
+    discount_per_project = sum_by_project(
+        Offer.objects.not_declined().filter(
+            project__in=projects, is_budget_retainer=False
+        ),
+        "discount",
+    )
+    invoiced_per_project = sum_by_project(
+        Invoice.objects.invoiced().filter(
+            project__in=projects, invoiced_on__lte=cutoff_date
+        )
+    )
 
     projected_gross_margin_on_cutoff_date = {}
     projected_gross_margin = defaultdict(lambda: Z2)
@@ -131,7 +119,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             "third_party_costs": third_party_costs_per_project.get(project.id, Z2),
             "sold": sold_per_project.get(project.id, Z2)
             + budget_adjustments[project.id],
-            "discount": discount_per_project.get(project.id, Z2),
+            "discount": Z2 - discount_per_project[project.id],
             "invoiced": invoiced_per_project.get(project.id, Z2),
             "hours": hours_per_project[project.id],
             "service_hours": service_hours.get(project.id, Z1),

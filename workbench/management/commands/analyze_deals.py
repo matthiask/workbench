@@ -11,6 +11,7 @@ from workbench.deals.models import Deal, ValueType
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
+from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z1, Z2
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -57,13 +58,11 @@ class Command(BaseCommand):
         projects = Project.objects.filter(created_at__date__range=date_range).filter(
             customer__in=per_customer_and_value_type.keys()
         )
-        projected = dict(
-            ProjectedInvoice.objects
-            .filter(project__in=projects, project__closed_on__isnull=True)
-            .order_by()
-            .values("project")
-            .annotate(gross_margin=Sum("gross_margin"))
-            .values_list("project", "gross_margin")
+        projected = sum_by_project(
+            ProjectedInvoice.objects.filter(
+                project__in=projects, project__closed_on__isnull=True
+            ),
+            "gross_margin",
         )
 
         invoiced = defaultdict(lambda: Z2)

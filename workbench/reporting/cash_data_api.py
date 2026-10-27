@@ -1,7 +1,6 @@
 import datetime as dt
 from collections import defaultdict
 
-from django.db.models import Sum
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_GET
@@ -11,6 +10,7 @@ from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.reporting.key_data import projected_gross_margin
 from workbench.reporting.key_data_api import _jsonable, accruals, has_valid_token
+from workbench.reporting.utils import sum_by_project
 from workbench.tools.formats import Z2
 
 
@@ -84,29 +84,15 @@ def accepted_offers_not_invoiced(pgm):
     yet.
     """
     projects = Project.objects.open()
-    offered = {
-        row["project"]: row["total"]
-        for row in Offer.objects
-        .accepted()
-        .filter(project__in=projects)
-        .order_by()
-        .values("project")
-        .annotate(total=Sum("total_excl_tax"))
-    }
-    invoiced = {
-        row["project"]: row["total"]
-        for row in Invoice.objects
-        .invoiced()
-        .filter(project__in=offered.keys())
-        .order_by()
-        .values("project")
-        .annotate(total=Sum("total_excl_tax"))
-    }
+    offered = sum_by_project(Offer.objects.accepted().filter(project__in=projects))
+    invoiced = sum_by_project(
+        Invoice.objects.invoiced().filter(project__in=offered.keys())
+    )
     planned = {row["project"].id: row["delta"] for row in pgm["projects"]}
 
     totals = {"total_excl_tax": Z2, "not_in_planned_invoicing_excl_tax": Z2}
     for project, total in offered.items():
-        remaining = max(total - invoiced.get(project, Z2), Z2)
+        remaining = max(total - invoiced[project], Z2)
         totals["total_excl_tax"] += remaining
         totals["not_in_planned_invoicing_excl_tax"] += max(
             remaining - planned.get(project, Z2), Z2

@@ -1,8 +1,23 @@
 import datetime as dt
+from collections import defaultdict
 
+from django.db.models import Sum
 from django.utils.translation import gettext as _
 
+from workbench.tools.formats import Z2
 from workbench.tools.validation import monday
+
+
+def sum_by_project(queryset, field="total_excl_tax", *, project="project"):
+    """``{project_id: sum of field}``, zero for projects without rows"""
+    return defaultdict(
+        lambda: Z2,
+        queryset
+        .order_by()
+        .values(project)
+        .annotate(s=Sum(field))
+        .values_list(project, "s"),
+    )
 
 
 def date_ranges():
