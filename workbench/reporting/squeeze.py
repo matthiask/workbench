@@ -116,6 +116,39 @@ def gross_margin_components(projects):
     )
 
 
+def hours_components(projects):
+    """Offered (budgeted) and logged hours per project as
+    ``{project_id: {"hours_offered": ..., "hours_logged": ...,
+    "hours_logged_budgeted": ...}}``."""
+    offered = sum_by_project(
+        Service.objects.budgeted().filter(project__in=projects), "service_hours"
+    )
+    logged = {
+        row["service__project"]: row
+        for row in LoggedHours.objects
+        .filter(service__project__in=projects)
+        .order_by()
+        .values("service__project")
+        .annotate(
+            total=Sum("hours"),
+            budgeted=Sum("hours", filter=Q(service__in=Service.objects.budgeted())),
+        )
+    }
+    return defaultdict(
+        lambda: {"hours_offered": Z1, "hours_logged": Z1, "hours_logged_budgeted": Z1},
+        {
+            project: {
+                "hours_offered": offered.get(project, Z1),
+                "hours_logged": logged[project]["total"] if project in logged else Z1,
+                "hours_logged_budgeted": (
+                    logged[project]["budgeted"] or Z1 if project in logged else Z1
+                ),
+            }
+            for project in {*offered, *logged}
+        },
+    )
+
+
 def project_gross_margin(project):
     """Compute the gross margin estimate and rate for a single project,
     using the same logic as the squeeze report."""
@@ -126,13 +159,10 @@ def project_gross_margin(project):
     projected = gross_margins["projected"]
     invoiced = gross_margins["invoiced"]
     accepted_offers = list(Offer.objects.accepted().filter(project=project))
-    hours_offered = (
-        Service.objects
-        .budgeted()
-        .filter(project=project)
-        .aggregate(s=Sum("service_hours"))["s"]
-        or Z1
-    )
+    project_hours = hours_components([project.id])[project.id]
+    hours_offered = project_hours["hours_offered"]
+    hours_logged = project_hours["hours_logged"]
+    hours_logged_budgeted = project_hours["hours_logged_budgeted"]
     # Only the hours of accepted offers match the offered amount (logged hours
     # are taken into account below).
     hours_accepted_offered = (
@@ -143,23 +173,22 @@ def project_gross_margin(project):
         or Z1
     )
 
-    # Including offered in gross_margin only makes sense for open projects; for
-    # closed projects the invoiced amount is ground truth.
-    offered_for_margin = offered if project.closed_on is None else Z2
+    # Including offered amounts and hours only makes sense for open projects;
+    # for closed projects the invoiced amount and the logged hours are ground
+    # truth.
+    is_open = project.closed_on is None
+    offered_for_margin = offered if is_open else Z2
+    hours_offered_for_rate = hours_offered if is_open else Z1
 
     budgeted = Q(service__in=Service.objects.budgeted())
     accepted = Q(service__offer__in=accepted_offers)
     logged = LoggedHours.objects.filter(service__project=project).aggregate(
-        total=Sum("hours"),
-        budgeted=Sum("hours", filter=budgeted),
         accepted=Sum("hours", filter=accepted),
         accepted_budgeted=Sum("hours", filter=accepted & budgeted),
     )
-    hours_logged = logged["total"] or Z1
-    hours_logged_budgeted = logged["budgeted"] or Z1
     hours_accepted_logged = logged["accepted"] or Z1
     gross_margin = max(offered_for_margin, projected, invoiced)
-    hours = relevant_hours(hours_offered, hours_logged, hours_logged_budgeted)
+    hours = relevant_hours(hours_offered_for_rate, hours_logged, hours_logged_budgeted)
     hours_accepted = relevant_hours(
         hours_accepted_offered,
         hours_accepted_logged,
@@ -256,42 +285,16 @@ def squeeze_data(date_range):  # noqa: C901
         }
         users[u]["hours_in_range"] += row["hours_sum"]
 
-    # Total all-time logged hours per project (used as attribution denominator)
-    total_hours = (
-        LoggedHours.objects
-        .order_by()
-        .filter(service__project__in=projects.keys())
-        .values("service__project")
-        .annotate(
-            hours__sum=Sum("hours"),
-            budgeted_hours__sum=Sum(
-                "hours", filter=Q(service__in=Service.objects.budgeted())
-            ),
-        )
-    )
-    for row in total_hours:
-        projects[row["service__project"]]["hours_logged"] = row["hours__sum"]
-        projects[row["service__project"]]["hours_logged_budgeted"] = (
-            row["budgeted_hours__sum"] or Z1
-        )
-
-    offered_hours = (
-        Service.objects
-        .order_by()
-        .budgeted()
-        .filter(project__in=projects.keys(), project__closed_on__isnull=True)
-        .values("project")
-        .annotate(Sum("service_hours"))
-    )
-    for row in offered_hours:
-        projects[row["project"]]["hours_offered"] = row["service_hours__sum"]
-
+    # All-time hours (logged hours are the attribution denominator) and gross
+    # margin. Offered amounts and hours only count for open projects.
     gross_margins = gross_margin_components(projects.keys())
+    hours = hours_components(projects.keys())
     for project_id, project in Project.objects.in_bulk(projects.keys()).items():
         projects[project_id]["project"] = project
-        projects[project_id] |= gross_margins[project_id]
+        projects[project_id] |= gross_margins[project_id] | hours[project_id]
         if project.closed_on is not None:
             projects[project_id]["offered"] = Z2
+            projects[project_id]["hours_offered"] = Z1
 
     budget_adjustments = BudgetTransfer.objects.adjustments(projects=projects.keys())
 

@@ -54,6 +54,20 @@ class SqueezeTest(TestCase):
         row = next(p for p in data["projects"] if p["project"] == project)
         self.assertEqual(row["hours"], 15)
 
+    def test_closed_projects_only_count_logged_hours(self):
+        """Squeeze and the project use logged hours only for closed projects"""
+        project = factories.ProjectFactory.create()
+        service = self.offer(project, status=Offer.ACCEPTED, hours=20)
+        factories.LoggedHoursFactory.create(service=service, hours=10)
+        project.closed_on = in_days(0)
+        project.save()
+
+        self.assertEqual(project_gross_margin(project)["hours"], 10)
+
+        data = squeeze_data((in_days(-1), in_days(1)))
+        row = next(p for p in data["projects"] if p["project"] == project)
+        self.assertEqual(row["hours"], 10)
+
     def test_offered_rate_uses_logged_hours(self):
         """Hours logged beyond the accepted offers' hours lower their rate"""
         project = factories.ProjectFactory.create()
