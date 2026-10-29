@@ -707,6 +707,31 @@ def context(project_id):
     _echo_json(_request("GET", f"projects/{project_id}/offers/context/"))
 
 
+@offers.command("search")
+@click.argument("query", nargs=-1)
+@click.option(
+    "--status",
+    type=click.Choice([
+        "in_preparation",
+        "service_group",
+        "offered",
+        "accepted",
+        "declined",
+    ]),
+)
+@click.option("--owned-by", help="Short name.")
+@click.option("--json", "as_json", is_flag=True)
+def search_offers(query, status, owned_by, as_json):
+    """Search offers, newest first"""
+    params = {"q": " ".join(query)}
+    if status:
+        params["status"] = status
+    if owned_by:
+        params["owned_by"] = owned_by
+    data = _request("GET", "offers/", params=params)
+    _echo_json(data) if as_json else _echo_offer_list(data)
+
+
 @offers.command("list")
 @click.argument("project_id", type=int)
 @click.option("--json", "as_json", is_flag=True)

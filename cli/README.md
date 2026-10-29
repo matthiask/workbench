@@ -90,6 +90,7 @@ Offers in preparation can be replaced as long as no hours or costs have been
 logged on their services:
 
     wb offers list 1234
+    wb offers search relaunch --status offered
     wb offers show 5678
     wb offers replace 5678 offer.yaml --dry-run
     wb offers replace 5678 offer.yaml

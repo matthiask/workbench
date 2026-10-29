@@ -159,6 +159,9 @@ services:
         result = self.wb("offers", "list", project.pk)
         self.assertIn(created.code, result.output)
 
+        result = self.wb("offers", "search", "relaunch", "--status", "in_preparation")
+        self.assertIn(created.code, result.output)
+
         self.file("title: Smaller\nservices:\n  - title: Concept\n    hours: 1\n")
         result = self.wb("offers", "replace", created.pk, offer)
         self.assertEqual(result.exit_code, 1)
