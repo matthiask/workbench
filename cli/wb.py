@@ -238,6 +238,32 @@ def _echo_stats_csv(projects):
             ])
 
 
+def _echo_invoice_list(invoices):
+    table = _table(
+        "ID>",
+        "Code",
+        "Title",
+        "Customer",
+        "Status",
+        "Invoiced on",
+        "Due on",
+        "Total excl. tax>",
+        title="Invoices",
+    )
+    for invoice in invoices:
+        table.add_row(
+            _link(invoice["id"], invoice["url"]),
+            _link(invoice["code"], invoice["url"]),
+            invoice["title"],
+            invoice["customer"],
+            invoice["status"],
+            invoice["invoiced_on"] or "",
+            invoice["due_on"] or "",
+            invoice["total_excl_tax"],
+        )
+    console.print(table)
+
+
 @click.group()
 @click.version_option(package_name="workbench-cli")
 def cli():
@@ -417,6 +443,25 @@ def create_project(
         console.print("Dry run, nothing has been saved.")
 
 
+@projects.command()
+@click.argument("project_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def invoicing(project_id, as_json):
+    """Show the planned invoicing and the invoices of a project"""
+    projected = _request("GET", f"projects/{project_id}/projected-invoices/")
+    invoices = _request("GET", "invoices/", params={"project": project_id})
+    if as_json:
+        _echo_json({"projected_invoices": projected, "invoices": invoices})
+        return
+    table = _table(
+        "Invoiced on", "Gross margin>", "Description", title="Planned invoicing"
+    )
+    for row in projected:
+        table.add_row(row["invoiced_on"], row["gross_margin"], row["description"])
+    console.print(table)
+    _echo_invoice_list(invoices)
+
+
 @cli.group()
 def contacts():
     """Find organizations and people"""
@@ -583,3 +628,73 @@ def planning_import(project_id, file, dry_run, as_json):
         click.secho(f"Warning: {_error(warning)}", fg="yellow", err=True)
     if dry_run:
         console.print("Dry run, nothing has been saved.")
+
+
+@cli.group()
+def invoices():
+    """Look at invoices"""
+
+
+@invoices.command("list")
+@click.option("--project", type=int, help="Project ID.")
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option(
+    "--status", type=click.Choice(["in_preparation", "sent", "paid", "canceled"])
+)
+@click.option("--open", "open_", is_flag=True, help="In preparation or sent.")
+@click.option("--overdue", is_flag=True, help="Due for more than 15 days.")
+@click.option(
+    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced since."
+)
+@click.option("--json", "as_json", is_flag=True)
+def list_invoices(project, customer, status, open_, overdue, since, as_json):
+    """List invoices, newest first"""
+    params = {"open": _bool(open_), "overdue": _bool(overdue)}
+    if project:
+        params["project"] = project
+    if customer:
+        params["customer"] = customer
+    if status:
+        params["status"] = status
+    if since:
+        params["invoiced_since"] = since.date().isoformat()
+    data = _request("GET", "invoices/", params=params)
+    _echo_json(data) if as_json else _echo_invoice_list(data)
+
+
+@invoices.command("show")
+@click.argument("invoice_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_invoice(invoice_id, as_json):
+    """Show an invoice"""
+    data = _request("GET", f"invoices/{invoice_id}/")
+    if as_json:
+        _echo_json(data)
+        return
+    period = (
+        f"{data['service_period_from']} – {data['service_period_until']}"
+        if data["service_period_from"]
+        else None
+    )
+    _echo_fields(
+        f"{data['code']} {data['title']}",
+        [
+            ("ID", data["id"]),
+            ("Type", data["type"]),
+            ("Status", data["status"]),
+            ("Customer", data["customer"]),
+            ("Owned by", data["owned_by"]),
+            ("Invoiced on", data["invoiced_on"]),
+            ("Due on", data["due_on"]),
+            ("Closed on", data["closed_on"]),
+            ("Service period", period),
+            ("Total excl. tax", data["total_excl_tax"]),
+            ("Third party costs", data["third_party_costs"]),
+            ("Total", data["total"]),
+            ("URL", data["url"]),
+        ],
+        url=data["url"],
+    )
+    if data["description"]:
+        console.print()
+        console.print(data["description"])

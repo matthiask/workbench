@@ -82,6 +82,16 @@ logged on their services:
 
 All commands which output data accept `--json`.
 
+## Invoices
+
+Invoices are read-only in the CLI:
+
+    wb invoices list --open
+    wb invoices list --overdue
+    wb invoices list --project 1234 --since 2026-01-01
+    wb invoices show 5678
+    wb projects invoicing 1234   # Planned invoicing and invoices of a project
+
 ## Planning
 
 Like offers: Fetch the context (offers, people, absences, existing milestones
