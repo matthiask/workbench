@@ -49,7 +49,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - The JSON APIs use django-ninja (`workbench/api.py`, mounted at `/api/`) with
   one router per app. Endpoints authenticate with the user's session by
   default, or with personal API tokens (`APIToken`, sent as bearer token,
-  checked before the session because session auth requires a CSRF token); the
+  checked before the session because session auth requires a CSRF token, see
+  `user_auth()` in `workbench/accounts/api_auth.py`). Endpoints require the
+  same features as the web interface: `user_auth(feature=FEATURES.CONTROLLING)`
+  on the router or the endpoint, checked before the request is validated. The
   reporting router uses the static bearer token (`ReportingToken` in
   `workbench/reporting/api.py`). Routes end with a slash. The Django test
   client skips CSRF checks, use `Client(enforce_csrf_checks=True)` to test

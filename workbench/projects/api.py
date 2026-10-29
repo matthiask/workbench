@@ -10,6 +10,8 @@ from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import HttpError, ValidationError
 
+from workbench.accounts.api_auth import user_auth
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedHours
@@ -221,7 +223,11 @@ class ProjectStats(Schema):
     invoices: list[InvoiceStats]
 
 
-@router.get("/projects/stats/", response=list[ProjectStats])
+@router.get(
+    "/projects/stats/",
+    response=list[ProjectStats],
+    auth=user_auth(feature=FEATURES.CONTROLLING),
+)
 def project_stats(request, filters: Query[StatsFilter]):
     """Hours, amounts and gross margins of the selected projects
 

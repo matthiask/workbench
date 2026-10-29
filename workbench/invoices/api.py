@@ -5,11 +5,14 @@ from typing import Literal
 from django.shortcuts import get_object_or_404
 from ninja import Query, Router, Schema
 
+from workbench.accounts.api_auth import user_auth
+from workbench.accounts.features import FEATURES
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.projects.models import Project
 
 
-router = Router(tags=["invoices"])
+# Same as in the web interface
+router = Router(auth=user_auth(feature=FEATURES.CONTROLLING), tags=["invoices"])
 
 STATUSES = {
     "in_preparation": Invoice.IN_PREPARATION,

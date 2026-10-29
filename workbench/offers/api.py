@@ -8,6 +8,8 @@ from django.utils.translation import gettext as _, override
 from ninja import Field, Router, Schema
 from ninja.errors import HttpError, ValidationError
 
+from workbench.accounts.api_auth import user_auth
+from workbench.accounts.features import FEATURES
 from workbench.contacts.models import postal_address_choices
 from workbench.offers.models import Offer
 from workbench.projects.api import ProjectOut, project_out
@@ -15,7 +17,8 @@ from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 
 
-router = Router(tags=["offers"])
+# Same as in the web interface
+router = Router(auth=user_auth(feature=FEATURES.CONTROLLING), tags=["offers"])
 
 
 class ServiceIn(Schema):
