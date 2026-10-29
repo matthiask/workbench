@@ -10,8 +10,8 @@ always **in preparation**. People review, adjust and send them in Workbench, so
 the CLI never sends anything to a customer.
 
 If `wb` isn't installed or configured, tell the user to run
-`uv tool install --editable path/to/workbench/cli` and `wb login URL` with a
-personal API token from Workbench ("API tokens" in the user menu).
+`uv tool install "git+https://github.com/matthiask/workbench#subdirectory=cli"`
+and `wb login URL`, which authorizes `wb` in the browser.
 
 ## 1. Find the project
 

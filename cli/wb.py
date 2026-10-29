@@ -1,12 +1,18 @@
 import csv
 import json
 import os
+import secrets
+import socket
 import sys
+import threading
+import time
 import tomllib
+import webbrowser
 from functools import cache
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from importlib.metadata import version
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import parse_qs, urlencode, urljoin
 
 import click
 import requests
@@ -29,14 +35,84 @@ def _terminate(msg):
     sys.exit(1)
 
 
+def _read_config():
+    return tomllib.loads(CONFIG.read_text()) if CONFIG.exists() else {}
+
+
+def _save_config(url, token):
+    CONFIG.parent.mkdir(parents=True, exist_ok=True)
+    CONFIG.write_text(f"url = {json.dumps(url)}\ntoken = {json.dumps(token)}\n")
+    CONFIG.chmod(0o600)
+
+
 def _config():
     """URL and token from the environment or from the configuration file"""
-    config = tomllib.loads(CONFIG.read_text()) if CONFIG.exists() else {}
+    config = _read_config()
     url = os.environ.get("WORKBENCH_URL") or config.get("url")
     token = os.environ.get("WORKBENCH_TOKEN") or config.get("token")
     if not url or not token:
-        _terminate("Not configured yet. Run `wb login` first.")
+        _terminate("Not configured yet. Run `wb login URL` first.")
     return url, token
+
+
+def _can_login_again():
+    """Expired tokens are replaced through the browser, but only for people
+    sitting in front of a terminal, and only if the token is stored by wb"""
+    return sys.stdin.isatty() and not os.environ.get("WORKBENCH_TOKEN")
+
+
+LOGIN_TIMEOUT = 300
+
+
+def _browser_login(url):
+    """Authorize wb in the browser and store the token
+
+    Workbench posts the token to a server listening on a local port, the
+    state protects against tokens posted by others."""
+    state = secrets.token_urlsafe(24)
+    result = {}
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            length = int(self.headers.get("content-length", 0))
+            data = parse_qs(self.rfile.read(length).decode())
+            if data.get("state") != [state] or not data.get("token"):
+                self.send_error(400)
+                return
+            result["token"] = data["token"][0]
+            body = b"wb is authorized. You can close this window."
+            self.send_response(200)
+            self.send_header("content-type", "text/plain; charset=utf-8")
+            self.send_header("content-length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    server.timeout = 1
+    login_url = (
+        urljoin(url, "/cli-login/")
+        + "?"
+        + urlencode({
+            "port": server.server_address[1],
+            "state": state,
+            "name": socket.gethostname(),
+        })
+    )
+    click.echo(f"Authorize wb in your browser: {login_url}", err=True)
+    # webbrowser waits for some browser commands to exit, serve meanwhile
+    threading.Thread(target=webbrowser.open, args=[login_url], daemon=True).start()
+    deadline = time.monotonic() + LOGIN_TIMEOUT
+    with server:
+        while "token" not in result and time.monotonic() < deadline:
+            server.handle_request()
+    if "token" not in result:
+        _terminate("Timed out waiting for the browser.")
+    _save_config(url, result["token"])
+    click.echo(f"Saved {CONFIG}", err=True)
+    return result["token"]
 
 
 def _parse_version(version):
@@ -65,14 +141,9 @@ def _error(error):
     return error["msg"]
 
 
-def _request(method, path, *, optional=False, **kwargs):
-    """Request the API, terminate on errors
-
-    ``optional`` requests return ``None`` if access is denied, e.g. because
-    a feature is missing."""
-    url, token = _config()
+def _send(method, url, path, token, **kwargs):
     try:
-        response = requests.request(
+        return requests.request(
             method,
             urljoin(url, f"/api/{path}"),
             headers={"authorization": f"Bearer {token}", "x-workbench-cli": VERSION},
@@ -81,7 +152,23 @@ def _request(method, path, *, optional=False, **kwargs):
         )
     except requests.RequestException as exc:
         _terminate(str(exc))
+
+
+def _request(method, path, *, optional=False, **kwargs):
+    """Request the API, terminate on errors
+
+    ``optional`` requests return ``None`` if access is denied, e.g. because
+    a feature is missing. Expired tokens are replaced and the request is
+    sent again."""
+    url, token = _config()
+    response = _send(method, url, path, token, **kwargs)
+    if response.status_code == 401 and _can_login_again():
+        click.secho("Your access has expired.", fg="yellow", err=True)
+        token = _browser_login(url)
+        response = _send(method, url, path, token, **kwargs)
     _check_version(response.headers.get("x-workbench-cli-latest"))
+    if response.status_code == 401:
+        _terminate("Not authorized (anymore). Run `wb login` to log in again.")
     if response.status_code == 403 and optional:
         return None
     if response.status_code == 422:
@@ -300,16 +387,25 @@ def cli():
 
 
 @cli.command()
-@click.argument("url")
-def login(url):
-    """Store the Workbench URL and a personal API token
+@click.argument("url", required=False)
+@click.option(
+    "--token",
+    "paste_token",
+    is_flag=True,
+    help="Paste a token from the API tokens page instead of using the browser.",
+)
+def login(url, paste_token):
+    """Authorize wb to access Workbench in your name
 
-    Create the token in Workbench under "API tokens" in the user menu."""
-    token = click.prompt("API token", hide_input=True).strip()
-    CONFIG.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG.write_text(f"url = {json.dumps(url)}\ntoken = {json.dumps(token)}\n")
-    CONFIG.chmod(0o600)
-    click.echo(f"Saved {CONFIG}")
+    Opens the browser; the URL defaults to the one used last time. Use
+    --token on computers without a browser."""
+    if not (url := url or _read_config().get("url")):
+        _terminate("Which Workbench? Run `wb login URL`.")
+    if paste_token:
+        _save_config(url, click.prompt("API token", hide_input=True).strip())
+        click.echo(f"Saved {CONFIG}")
+    else:
+        _browser_login(url)
 
 
 @cli.command()

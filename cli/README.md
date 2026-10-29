@@ -12,14 +12,17 @@ Upgrade it when `wb` tells you to:
 
     uv tool upgrade workbench-cli
 
-Create a personal API token in Workbench ("API tokens" in the user menu) and
-log in:
+Log in, which opens the browser to authorize `wb`:
 
     wb login https://workbench.feinheit.ch
 
-Check it with `wb whoami`. The URL and the token are stored in
-`~/.config/workbench.toml`. The `WORKBENCH_URL` and `WORKBENCH_TOKEN`
-environment variables take precedence.
+Check it with `wb whoami`. Access expires after 30 days; `wb` then opens the
+browser again by itself. On computers without a browser, create a token in
+Workbench ("API tokens" in the user menu) and use `wb login URL --token`.
+
+The URL and the token are stored in `~/.config/workbench.toml`. The
+`WORKBENCH_URL` and `WORKBENCH_TOKEN` environment variables take precedence;
+`wb` doesn't log in again by itself when they are used.
 
 ## Creating projects
 
