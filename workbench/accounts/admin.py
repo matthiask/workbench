@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES, LABELS, F
-from workbench.accounts.models import SpecialistField, Team, User
+from workbench.accounts.models import APIToken, SpecialistField, Team, User
 from workbench.awt.models import Employment, VacationDaysOverride
 from workbench.projects.models import InternalTypeUser
 
@@ -140,3 +140,22 @@ class TeamAdmin(admin.ModelAdmin):
 class SpecialistFieldAdmin(admin.ModelAdmin):
     list_display = ["name", "value_type", "expected_hourly_rate"]
     list_editable = ["value_type", "expected_hourly_rate"]
+
+
+@admin.register(APIToken)
+class APITokenAdmin(admin.ModelAdmin):
+    """Tokens can be revoked by deleting them, but not created: Users create
+    their own and only see the secret once."""
+
+    list_display = ["title", "user", "created_at", "last_used_at"]
+    list_filter = ["user__is_active"]
+    list_select_related = ["user"]
+    search_fields = ["title", "user__email", "user___short_name", "user___full_name"]
+    readonly_fields = ["user", "title", "created_at", "last_used_at"]
+    fields = readonly_fields
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

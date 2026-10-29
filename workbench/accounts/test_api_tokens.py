@@ -102,3 +102,32 @@ class APITokenTest(TestCase):
 
         self.client.post("/accounts/api-tokens/", {"delete": token.pk})
         self.assertFalse(user.api_tokens.exists())
+
+    def test_admin(self):
+        """Admins can revoke tokens, but not create or change them"""
+        token, _secret = APIToken.create_for(
+            user=factories.UserFactory.create(), title="Laptop"
+        )
+        self.client.force_login(factories.UserFactory.create(is_admin=True))
+
+        response = self.client.get("/admin/accounts/apitoken/")
+        self.assertContains(response, "Laptop")
+        self.assertEqual(
+            self.client.get("/admin/accounts/apitoken/add/").status_code, 403
+        )
+
+        response = self.client.post(
+            f"/admin/accounts/apitoken/{token.pk}/delete/", {"post": "yes"}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(APIToken.objects.exists())
+
+    def test_inactive_session(self):
+        """Sessions of deactivated users do not work anymore"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        self.assertEqual(self.client.get("/api/me/").status_code, 200)
+
+        user.is_active = False
+        user.save()
+        self.assertEqual(self.client.get("/api/me/").status_code, 401)
