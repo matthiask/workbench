@@ -56,7 +56,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   them.
 - The `wb` command line interface lives in `cli/` (separate package, installed
   with `uv tool install`). It is a thin client of the JSON API, keep the logic
-  on the server. The offers API (`workbench/offers/api.py`) only creates and
+  on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`. The offers API (`workbench/offers/api.py`) only creates and
   replaces offers in preparation. Service types only suggest the effort type
   and the hourly rate, both can be set freely.
 - The planning import prompt is pasted into external LLMs. Keep personal data

@@ -119,11 +119,16 @@ def login(url):
     click.echo(f"Saved {CONFIG}")
 
 
-@cli.command()
+@cli.group()
+def projects():
+    """Find projects"""
+
+
+@projects.command()
 @click.argument("query", nargs=-1)
 @click.option("--all", "include_closed", is_flag=True, help="Include closed projects.")
 @click.option("--json", "as_json", is_flag=True)
-def projects(query, include_closed, as_json):
+def search(query, include_closed, as_json):
     """Search projects"""
     data = _request(
         "GET",

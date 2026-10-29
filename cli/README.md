@@ -21,7 +21,7 @@ The URL and the token are stored in `~/.config/workbench.toml`. The
 
 Find the project:
 
-    wb projects relaunch
+    wb projects search relaunch
 
 Print everything needed to write the offer: the project, its existing offers,
 the service types with their hourly rates and the JSON schema of an offer.
