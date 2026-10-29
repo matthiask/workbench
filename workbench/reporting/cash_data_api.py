@@ -1,14 +1,11 @@
 import datetime as dt
 from collections import defaultdict
 
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.utils import timezone
-from django.views.decorators.http import require_GET
 
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
-from workbench.reporting.api import has_valid_token, jsonable
 from workbench.reporting.key_data import projected_gross_margin
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import gross_margin_components
@@ -152,17 +149,3 @@ def cash_data(date):
             "in_planned_invoicing_excl_tax": overall["delta_planned"],
         }
     return data
-
-
-@require_GET
-def cash_data_api(request):
-    if not has_valid_token(request):
-        return HttpResponseForbidden()
-
-    try:
-        cutoff_date = dt.date.fromisoformat(
-            request.GET.get("date") or dt.date.today().isoformat()
-        )
-    except ValueError:
-        return HttpResponseBadRequest("Invalid date")
-    return JsonResponse(jsonable(cash_data(cutoff_date)))

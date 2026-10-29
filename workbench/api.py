@@ -3,6 +3,7 @@ from ninja import NinjaAPI
 from ninja.security import django_auth
 
 from workbench.planning.api import router as planning_router
+from workbench.reporting.api import router as reporting_router
 
 
 api = NinjaAPI(
@@ -12,3 +13,4 @@ api = NinjaAPI(
     urls_namespace="api",
 )
 api.add_router("/", planning_router)
+api.add_router("/", reporting_router)

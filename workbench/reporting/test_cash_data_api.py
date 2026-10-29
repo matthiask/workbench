@@ -34,12 +34,12 @@ class CashDataAPITest(TestCase):
     def test_authentication(self):
         """The cash data API requires the key data API token"""
         url = "/api/cash-data/"
-        self.assertEqual(self.client.get(url).status_code, 403)
+        self.assertEqual(self.client.get(url).status_code, 401)
         response = self.client.get(url, headers={"Authorization": "Bearer nope"})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertEqual(self.client.post(url, headers=AUTH).status_code, 405)
         response = self.client.get(url + "?date=2026-13-01", headers=AUTH)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
 
     @travel("2026-10-28 08:00")
     def test_open_invoices(self):

@@ -2,6 +2,12 @@ import datetime as dt
 import secrets
 
 from django.conf import settings
+from ninja import Router
+from ninja.security import HttpBearer
+
+from workbench.reporting.cash_data_api import cash_data
+from workbench.reporting.key_data_api import key_data_for_month
+from workbench.tools.validation import last_month_range
 
 
 def jsonable(value):
@@ -17,9 +23,26 @@ def jsonable(value):
     return float(value)
 
 
-def has_valid_token(request):
+class ReportingToken(HttpBearer):
     """The reporting APIs authenticate with a static bearer token"""
-    token = settings.KEY_DATA_API_TOKEN
-    return bool(token) and secrets.compare_digest(
-        request.headers.get("Authorization", ""), f"Bearer {token}"
-    )
+
+    def authenticate(self, request, token):
+        expected = settings.KEY_DATA_API_TOKEN
+        return bool(expected) and secrets.compare_digest(
+            token.encode(), expected.encode()
+        )
+
+
+router = Router(auth=ReportingToken(), tags=["reporting"])
+
+
+@router.get("/key-data/")
+def key_data(request):
+    """Key data of the last month"""
+    return jsonable(key_data_for_month(last_month_range()[0]))
+
+
+@router.get("/cash-data/")
+def cash_data_api(request, date: dt.date | None = None):
+    """Cash data as of the given date, today by default"""
+    return jsonable(cash_data(date or dt.date.today()))

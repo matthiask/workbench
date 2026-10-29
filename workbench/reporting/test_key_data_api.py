@@ -25,14 +25,16 @@ class KeyDataAPITest(TestCase):
         url = "/api/key-data/"
 
         with override_settings(KEY_DATA_API_TOKEN=""):
-            self.assertEqual(self.client.get(url).status_code, 403)
+            self.assertEqual(self.client.get(url).status_code, 401)
             response = self.client.get(url, headers={"Authorization": "Bearer "})
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 401)
 
         with override_settings(KEY_DATA_API_TOKEN="secret"):
-            self.assertEqual(self.client.get(url).status_code, 403)
+            self.assertEqual(self.client.get(url).status_code, 401)
             response = self.client.get(url, headers={"Authorization": "Bearer nope"})
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 401)
+            response = self.client.get(url, headers={"Authorization": "Bearer nöpe"})
+            self.assertEqual(response.status_code, 401)
             response = self.client.post(url, headers={"Authorization": "Bearer secret"})
             self.assertEqual(response.status_code, 405)
 

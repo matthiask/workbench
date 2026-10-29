@@ -1,20 +1,16 @@
 import datetime as dt
 from collections import defaultdict
 
-from django.http import HttpResponseForbidden, JsonResponse
-from django.views.decorators.http import require_GET
-
 from workbench.awt.reporting import full_time_equivalents_by_month
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.reporting import key_data, squeeze
-from workbench.reporting.api import has_valid_token, jsonable
 from workbench.reporting.green_hours import green_hours_by_month
 from workbench.reporting.models import Accruals
 from workbench.reporting.utils import sum_of
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import Z1, Z2
-from workbench.tools.validation import last_month_range, month_range
+from workbench.tools.validation import month_range
 
 
 def open_invoices_total(cutoff_date):
@@ -116,11 +112,3 @@ def key_data_for_month(first_of_month):
         "deals_funnel": deals_funnel(),
         "accepted_deals": accepted_deals(date_range),
     }
-
-
-@require_GET
-def key_data_api(request):
-    if not has_valid_token(request):
-        return HttpResponseForbidden()
-
-    return JsonResponse(jsonable(key_data_for_month(last_month_range()[0])))
