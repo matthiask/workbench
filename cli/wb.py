@@ -36,6 +36,13 @@ def _config():
     return url, token
 
 
+def _error(error):
+    """A validation error, prefixed with the field if there is one"""
+    if loc := ".".join(str(part) for part in error["loc"][2:]):
+        return f"{loc}: {error['msg']}"
+    return error["msg"]
+
+
 def _request(method, path, **kwargs):
     url, token = _config()
     try:
@@ -49,13 +56,7 @@ def _request(method, path, **kwargs):
     except requests.RequestException as exc:
         _terminate(str(exc))
     if response.status_code == 422:
-        errors = response.json()["detail"]
-        _terminate(
-            "\n".join(
-                f"{'.'.join(str(part) for part in error['loc'][2:])}: {error['msg']}"
-                for error in errors
-            )
-        )
+        _terminate("\n".join(_error(error) for error in response.json()["detail"]))
     if not response.ok:
         try:
             detail = response.json()["detail"]
@@ -365,6 +366,94 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
         _echo_stats(data)
 
 
+@projects.command("create")
+@click.option("--title", required=True)
+@click.option("--customer", type=int, required=True, help="Organization ID.")
+@click.option("--contact", type=int, help="Person ID.")
+@click.option(
+    "--type",
+    "type_",
+    type=click.Choice(["order", "maintenance", "internal"]),
+    default="order",
+    show_default=True,
+)
+@click.option("--owned-by", help="Short name, defaults to you.")
+@click.option("--description", default="")
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_project(
+    title, customer, contact, type_, owned_by, description, dry_run, as_json
+):
+    """Create a project
+
+    Find the customer and the contact with `wb contacts search`."""
+    data = _request(
+        "POST",
+        "projects/",
+        params={"dry_run": _bool(dry_run)},
+        json={
+            "title": title,
+            "description": description,
+            "customer": customer,
+            "contact": contact,
+            "type": type_,
+            "owned_by": owned_by,
+        },
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_fields(
+        f"{data['code']} {data['title']}",
+        [
+            ("ID", data["id"]),
+            ("Customer", data["customer"]),
+            ("Owned by", data["owned_by"]),
+            ("URL", data["url"]),
+        ],
+        url=data["url"],
+    )
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
+
+
+@cli.group()
+def contacts():
+    """Find organizations and people"""
+
+
+@contacts.command("search")
+@click.argument("query", nargs=-1, required=True)
+@click.option("--all", "include_archived", is_flag=True, help="Include archived.")
+@click.option("--json", "as_json", is_flag=True)
+def search_contacts(query, include_archived, as_json):
+    """Search organizations and people"""
+    params = {"q": " ".join(query), "include_archived": _bool(include_archived)}
+    organizations = _request("GET", "contacts/organizations/", params=params)
+    people = _request("GET", "contacts/people/", params=params)
+    if as_json:
+        _echo_json({"organizations": organizations, "people": people})
+        return
+    table = _table("ID>", "Organization", title="Organizations")
+    for organization in organizations:
+        table.add_row(
+            str(organization["id"]),
+            organization["name"]
+            + (" (archived)" if organization["is_archived"] else ""),
+        )
+    console.print(table)
+    table = _table("ID>", "Name", "Organization ID>", "Organization", title="People")
+    for person in people:
+        organization = person["organization"] or {}
+        table.add_row(
+            str(person["id"]),
+            person["full_name"] + (" (archived)" if person["is_archived"] else ""),
+            str(organization.get("id", "")),
+            organization.get("name", ""),
+        )
+    console.print(table)
+
+
 @cli.group()
 def offers():
     """Create and update offers"""
@@ -491,7 +580,6 @@ def planning_import(project_id, file, dry_run, as_json):
         )
     console.print(table)
     for warning in data["warnings"]:
-        loc = ".".join(str(part) for part in warning["loc"][2:])
-        click.secho(f"Warning: {loc}: {warning['msg']}", fg="yellow", err=True)
+        click.secho(f"Warning: {_error(warning)}", fg="yellow", err=True)
     if dry_run:
         console.print("Dry run, nothing has been saved.")

@@ -17,6 +17,19 @@ log in:
 Check it with `wb whoami`. The URL and the token are stored in `~/.config/workbench.toml`. The
 `WORKBENCH_URL` and `WORKBENCH_TOKEN` environment variables take precedence.
 
+## Creating projects
+
+Find the customer and the contact, then create the project. Projects are
+validated like in the web interface; where the web interface would show a
+warning, the CLI fails and you have to use the web interface.
+
+    wb contacts search espoir
+    wb projects create --title "Online Marketing 2027" --customer 12 --contact 345 --dry-run
+    wb projects create --title "Online Marketing 2027" --customer 12 --contact 345
+
+`--type` is `order` (default), `maintenance` or `internal`, `--owned-by` takes a
+short name and defaults to you.
+
 ## Creating offers
 
 Find the project:
