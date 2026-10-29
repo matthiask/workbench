@@ -65,10 +65,20 @@ def _request(method, path, **kwargs):
     return response.json()
 
 
+class _Loader(yaml.SafeLoader):
+    """Keeps dates as strings, the server parses them"""
+
+
+_Loader.yaml_implicit_resolvers = {
+    key: [r for r in resolvers if r[0] != "tag:yaml.org,2002:timestamp"]
+    for key, resolvers in yaml.SafeLoader.yaml_implicit_resolvers.items()
+}
+
+
 def _load(file):
-    """Load an offer from a YAML or JSON file"""
+    """Load data from a YAML or JSON file"""
     try:
-        return yaml.safe_load(file)
+        return yaml.load(file, Loader=_Loader)
     except yaml.YAMLError as exc:
         _terminate(f"Invalid YAML or JSON: {exc}")
 
