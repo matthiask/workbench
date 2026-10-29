@@ -103,6 +103,13 @@ Deals are read-only in the CLI and require the deals feature:
     wb deals list --status accepted relaunch
     wb deals show 1234
 
+## Reports
+
+Key figures as JSON, for users with the controlling feature:
+
+    wb reports key-data
+    wb reports cash-data --date 2026-09-30
+
 ## Planning
 
 Like offers: Fetch the context (offers, people, absences, existing milestones

@@ -789,3 +789,26 @@ def show_deal(deal_id, as_json):
     for text in (data["description"], data["closing_notice"]):
         if text:
             console.print(text)
+
+
+@cli.group()
+def reports():
+    """Key figures, require the controlling feature (JSON output)"""
+
+
+@reports.command("key-data")
+def key_data():
+    """Key data of the last month"""
+    _echo_json(_request("GET", "key-data/"))
+
+
+@reports.command("cash-data")
+@click.option(
+    "--date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Cutoff date, defaults to today.",
+)
+def cash_data(date):
+    """Cash data: Open invoices, planned invoicing, accruals etc."""
+    params = {"date": date.date().isoformat()} if date else {}
+    _echo_json(_request("GET", "cash-data/", params=params))
