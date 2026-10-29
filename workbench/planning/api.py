@@ -1,4 +1,5 @@
 import datetime as dt
+from collections import defaultdict
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -27,7 +28,7 @@ class ProjectOut(Schema):
     title: str
     description: str
     customer: str
-    owned_by: str
+    owned_by: str | None
 
 
 class ServiceOut(Schema):
@@ -47,8 +48,7 @@ class OfferOut(Schema):
 
 
 class UserOut(Schema):
-    email: str
-    name: str
+    short_name: str
     planning_hours_per_day: Decimal
 
 
@@ -62,7 +62,7 @@ class MilestoneOut(Schema):
 
 class PlannedWorkOut(Schema):
     title: str
-    user: str
+    user: str | None
     service_type: str | None
     offer: str | None
     milestone: int | None
@@ -76,7 +76,6 @@ class AbsenceOut(Schema):
     starts_on: dt.date
     ends_on: dt.date | None
     days: Decimal
-    reason: str
 
 
 class PlanningContext(Schema):
@@ -90,6 +89,21 @@ class PlanningContext(Schema):
     import_schema: dict
 
 
+def plannable_users():
+    """Active users by short name, leaving out those without a unique short name
+
+    The planning context is sent to LLMs, so it identifies people only by
+    their short name, not by their email address or full name."""
+    users = defaultdict(list)
+    for user in User.objects.filter(is_active=True).exclude(_short_name=""):
+        users[user._short_name].append(user)
+    return {
+        short_name: matches[0]
+        for short_name, matches in sorted(users.items())
+        if len(matches) == 1
+    }
+
+
 def project_planning_context(project):
     """Everything needed to plan the project, and the schema of the import"""
     offers = (
@@ -98,18 +112,19 @@ def project_planning_context(project):
         .select_related("project")
         .prefetch_related("services")
     )
-    users = User.objects.filter(is_active=True).order_by("_full_name", "email")
+    users = plannable_users()
+    short_names = {user.pk: short_name for short_name, user in users.items()}
     service_types = list(ServiceType.objects.values_list("title", flat=True))
     today = dt.date.today()
     absences = (
         Absence.objects
         .filter(
-            user__is_active=True,
+            user__in=users.values(),
             starts_on__lte=today + dt.timedelta(days=366),
         )
+        .exclude(reason=Absence.CORRECTION)
         .exclude(ends_on__lt=monday(today))
         .exclude(ends_on__isnull=True, starts_on__lt=monday(today))
-        .select_related("user")
         .order_by("starts_on")
     )
 
@@ -120,7 +135,7 @@ def project_planning_context(project):
             "title": project.title,
             "description": project.description,
             "customer": project.customer.name,
-            "owned_by": project.owned_by.email,
+            "owned_by": short_names.get(project.owned_by_id),
         },
         "offers": [
             {
@@ -134,18 +149,17 @@ def project_planning_context(project):
         ],
         "users": [
             {
-                "email": user.email,
-                "name": user.get_full_name(),
+                "short_name": short_name,
                 "planning_hours_per_day": user.planning_hours_per_day,
             }
-            for user in users
+            for short_name, user in users.items()
         ],
         "service_types": service_types,
         "milestones": list(project.milestones.all()),
         "planned_work": [
             {
                 "title": pw.title,
-                "user": pw.user.email,
+                "user": short_names.get(pw.user_id),
                 "service_type": pw.service_type.title if pw.service_type else None,
                 "offer": pw.offer.code if pw.offer else None,
                 "milestone": pw.milestone_id,
@@ -154,21 +168,20 @@ def project_planning_context(project):
                 "is_provisional": pw.is_provisional,
             }
             for pw in project.planned_work.select_related(
-                "user", "service_type", "offer__project"
+                "service_type", "offer__project"
             )
         ],
         "absences": [
             {
-                "user": absence.user.email,
+                "user": short_names[absence.user_id],
                 "starts_on": absence.starts_on,
                 "ends_on": absence.ends_on,
                 "days": absence.days,
-                "reason": absence.get_reason_display(),
             }
             for absence in absences
         ],
         "import_schema": planning_import_schema(
-            users=[user.email for user in users],
+            users=list(users),
             service_types=service_types,
             offers=[offer.code for offer in offers],
         ),
@@ -238,7 +251,7 @@ def planning_import(
 
     Nothing is saved if anything is invalid or with ``dry_run``."""
     project = get_object_or_404(Project, pk=project_id)
-    users = {user.email: user for user in User.objects.filter(is_active=True)}
+    users = plannable_users()
     service_types = {st.title: st for st in ServiceType.objects.all()}
     offers = {
         offer.code: offer

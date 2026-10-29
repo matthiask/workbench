@@ -24,9 +24,12 @@ class PlanningAPITest(TestCase):
         factories.PlannedWorkFactory.create(
             project=project, milestone=milestone, weeks=[monday()]
         )
-        factories.AbsenceFactory.create(user=project.owned_by)
+        factories.AbsenceFactory.create(user=project.owned_by, reason="sickness")
         factories.AbsenceFactory.create(starts_on=in_days(-30), ends_on=in_days(-20))
+        factories.AbsenceFactory.create(reason="correction")
         inactive = factories.UserFactory.create(is_active=False)
+        twin = factories.UserFactory.create(_short_name="twin", email="t1@example.com")
+        factories.UserFactory.create(_short_name="twin", email="t2@example.com")
         service_type = factories.service_types().consulting
 
         url = f"/api/projects/{project.pk}/planning/context/"
@@ -42,15 +45,27 @@ class PlanningAPITest(TestCase):
         self.assertEqual(data["planned_work"][0]["milestone"], milestone.pk)
         self.assertEqual(data["planned_work"][0]["weeks"], [monday().isoformat()])
         self.assertEqual(
-            [a["user"] for a in data["absences"]], [project.owned_by.email]
+            data["absences"],
+            [
+                {
+                    "user": project.owned_by._short_name,
+                    "starts_on": dt.date.today().isoformat(),
+                    "ends_on": None,
+                    "days": "1.00",
+                }
+            ],
         )
 
-        emails = [user["email"] for user in data["users"]]
-        self.assertIn(project.owned_by.email, emails)
-        self.assertNotIn(inactive.email, emails)
+        # Only short names which identify a single active user
+        short_names = [user["short_name"] for user in data["users"]]
+        self.assertIn(project.owned_by._short_name, short_names)
+        self.assertNotIn(inactive._short_name, short_names)
+        self.assertNotIn(twin._short_name, short_names)
+        self.assertEqual(data["project"]["owned_by"], project.owned_by._short_name)
+        self.assertNotIn("@", str(data))
 
         work = data["import_schema"]["$defs"]["PlannedWorkIn"]["properties"]
-        self.assertEqual(sorted(work["user"]["enum"]), sorted(emails))
+        self.assertEqual(work["user"]["enum"], short_names)
         self.assertIn(service_type.title, work["service_type"]["enum"])
         self.assertEqual(work["offer"]["anyOf"][0]["enum"], [offer.code])
 
@@ -77,7 +92,7 @@ class PlanningAPITest(TestCase):
             "planned_work": [
                 {
                     "title": "Concept",
-                    "user": user.email,
+                    "user": user._short_name,
                     "service_type": "consulting",
                     "offer": offer.code,
                     "milestone": "golive",
@@ -90,7 +105,7 @@ class PlanningAPITest(TestCase):
                 },
                 {
                     "title": "Production",
-                    "user": user.email,
+                    "user": user._short_name,
                     "service_type": "production",
                     "milestone": existing.pk,
                     "weeks": [start.isoformat()],
@@ -126,7 +141,7 @@ class PlanningAPITest(TestCase):
         # Invalid references are reported per entry, and nothing is saved
         data["milestones"].append(data["milestones"][0])
         data["planned_work"][0] |= {
-            "user": "nobody@example.com",
+            "user": "nobody",
             "service_type": "unknown",
             "offer": declined.code,
             "milestone": "missing",
@@ -181,6 +196,7 @@ class PlanningAPITest(TestCase):
         self.assertContains(response, offer.code)
         self.assertContains(response, "PlannedWorkIn")
         self.assertContains(response, f"/api/projects/{project.pk}/planning/import/")
+        self.assertNotContains(response, project.owned_by.email)
 
     def test_import_csrf(self):
         """Session authenticated requests need a CSRF token"""

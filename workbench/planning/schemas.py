@@ -17,7 +17,7 @@ class MilestoneIn(Schema):
 
 class PlannedWorkIn(Schema):
     title: str = Field(min_length=1, max_length=200)
-    user: str = Field(description="Email address of the person doing the work.")
+    user: str = Field(description="Short name of the person doing the work.")
     service_type: str = Field(description="Title of the primary service type.")
     offer: str | None = Field(
         default=None, description="Code of the offer this work belongs to."
