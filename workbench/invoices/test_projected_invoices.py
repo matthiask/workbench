@@ -72,6 +72,47 @@ class ProjectedInvoicesTest(TestCase):
         self.assertEqual(row["gross_margin"], 700)
         self.assertEqual(row["delta"], 300)
 
+    @travel("2021-11-28")
+    def test_reminder_explains_delta(self):
+        """The reminder mail explains how the delta comes about"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        factories.ProjectedInvoiceFactory.create(
+            project=project,
+            gross_margin=Decimal(1000),
+            invoiced_on="2021-11-15",
+        )
+        factories.ProjectedInvoiceFactory.create(
+            project=project,
+            gross_margin=Decimal(500),
+            invoiced_on="2022-01-15",
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1000,
+            third_party_costs=100,
+            status=Invoice.SENT,
+        )
+        factories.LoggedCostFactory.create(
+            service=service, cost=300, third_party_costs=300
+        )
+
+        send_unsent_projected_invoices_reminders()
+        [message] = mail.outbox
+        self.assertIn(
+            "Geplanter bereinigter Umsatz bis 30.11.2021: 1’000.00", message.body
+        )
+        self.assertIn("Verrechnet exkl. MwSt.: 1’000.00", message.body)
+        self.assertIn(
+            "Fremdkosten: 300.00 (auf Rechnungen: 100.00, erfasst: 300.00)",
+            message.body,
+        )
+        self.assertIn("Verrechneter bereinigter Umsatz: 700.00", message.body)
+        self.assertIn("Delta: 300.00", message.body)
+
     def test_projected_warning_third_party_costs(self):
         """Projected invoices are compared to the gross margin of services"""
         service = factories.ServiceFactory.create(

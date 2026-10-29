@@ -56,14 +56,9 @@ def relevant_hours(hours_offered, hours_logged, hours_logged_budgeted):
     )
 
 
-def third_party_costs(projects):
-    """Third party costs per project as ``{project_id: amount}``.
-
-    Logged costs are the actual costs, invoices know what has been passed on
-    to the customer. Logged costs can't be linked to fixed amount invoices, and
-    may be logged after a services invoice has been created from the offer, so
-    adding up both would count many costs twice. Using the larger of the two
-    still subtracts logged costs which haven't been invoiced yet."""
+def third_party_costs_components(projects):
+    """Third party costs on invoices and logged third party costs per project
+    as two ``{project_id: amount}`` dicts."""
     invoiced = sum_by(
         Invoice.objects.invoiced().filter(project__in=projects),
         key="project",
@@ -76,6 +71,18 @@ def third_party_costs(projects):
         key="service__project",
         field="third_party_costs",
     )
+    return invoiced, logged
+
+
+def third_party_costs(projects):
+    """Third party costs per project as ``{project_id: amount}``.
+
+    Logged costs are the actual costs, invoices know what has been passed on
+    to the customer. Logged costs can't be linked to fixed amount invoices, and
+    may be logged after a services invoice has been created from the offer, so
+    adding up both would count many costs twice. Using the larger of the two
+    still subtracts logged costs which haven't been invoiced yet."""
+    invoiced, logged = third_party_costs_components(projects)
     return defaultdict(
         lambda: Z2,
         {

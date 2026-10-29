@@ -11,7 +11,9 @@ from workbench.credit_control.models import CreditEntry
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.utils import next_valid_day
 from workbench.reporting.key_data import unsent_projected_invoices
-from workbench.tools.formats import currency, local_date_format
+from workbench.reporting.squeeze import third_party_costs_components
+from workbench.reporting.utils import sum_by
+from workbench.tools.formats import Z2, currency, local_date_format
 
 
 TEMPLATE = """\
@@ -59,6 +61,10 @@ def create_recurring_invoices_and_notify():
 PROJECTED_GROSS_MARGIN_TEMPLATE = """\
 {project}
 {base_url}{project_url}
+Geplanter bereinigter Umsatz bis {eom}: {projected}
+Verrechnet exkl. MwSt.: {invoiced}
+Fremdkosten: {costs} (auf Rechnungen: {invoiced_costs}, erfasst: {logged_costs})
+Verrechneter bereinigter Umsatz: {gross_margin}
 Delta: {unsent}
 """
 
@@ -69,7 +75,13 @@ def send_unsent_projected_invoices_reminders():
     if (next_month - today).days != 3:  # third-last day of month
         return
 
-    upi = unsent_projected_invoices(next_month)
+    upi = list(unsent_projected_invoices(next_month))
+    project_ids = [project["project"].id for project in upi]
+    invoiced = sum_by(
+        Invoice.objects.invoiced().filter(project__in=project_ids), key="project"
+    )
+    invoiced_costs, logged_costs = third_party_costs_components(project_ids)
+    eom = local_date_format(next_month - dt.timedelta(days=1))
     by_user = defaultdict(list)
 
     for project in upi:
@@ -81,20 +93,43 @@ def send_unsent_projected_invoices_reminders():
                 project=project["project"],
                 base_url=settings.WORKBENCH.URL,
                 project_url=project["project"].get_absolute_url(),
+                eom=eom,
+                projected=currency(
+                    sum(
+                        (
+                            pi.gross_margin
+                            for pi in project["projected"]
+                            if pi.invoiced_on < next_month
+                        ),
+                        Z2,
+                    )
+                ),
+                invoiced=currency(invoiced[project["project"].id]),
+                costs=currency(
+                    invoiced[project["project"].id] - project["gross_margin"]
+                ),
+                invoiced_costs=currency(invoiced_costs[project["project"].id]),
+                logged_costs=currency(logged_costs[project["project"].id]),
+                gross_margin=currency(project["gross_margin"]),
                 unsent=currency(project["unsent"]),
             )
             for project in projects
         )
-        eom = local_date_format(next_month - dt.timedelta(days=1))
         EmailMultiAlternatives(
             "{} ({})".format(_("Unsent projected invoices"), eom),
             f"""\
 Hallo {user}
 
-Das geplante Rechnungstotal per {eom} wurde bei
+Der geplante bereinigte Umsatz per {eom} wurde bei
 folgenden Projekten noch nicht erreicht:
 
 {body}
+
+Der bereinigte Umsatz ist das Rechnungstotal exkl. MwSt. abzüglich der
+Fremdkosten. Als Fremdkosten zählt der grössere Betrag: die Fremdkosten
+auf den Rechnungen oder die erfassten Fremdkosten. Erfasste Fremdkosten,
+welche noch nicht weiterverrechnet wurden, verringern deshalb den
+verrechneten bereinigten Umsatz.
 
 Wenn Du die Rechnungen nicht stellen kannst, aktualisiere bitte
 die geplanten Rechnungen oder schliesse das Projekt.
