@@ -63,15 +63,6 @@ class OffersAPITest(TestCase):
             ["consulting", "production", "administration"],
         )
 
-    def test_project_list(self):
-        """Projects can be searched"""
-        project = factories.ProjectFactory.create(title="Relaunch")
-        factories.ProjectFactory.create(title="Other")
-        self.client.force_login(project.owned_by)
-
-        data = self.client.get("/api/projects/?q=relaunch").json()
-        self.assertEqual([p["id"] for p in data], [project.pk])
-
     def test_project_and_offers(self):
         """Projects and their offers can be shown"""
         project = factories.ProjectFactory.create()

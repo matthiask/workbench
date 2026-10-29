@@ -10,6 +10,7 @@ from ninja.errors import HttpError, ValidationError
 
 from workbench.contacts.models import postal_address_choices
 from workbench.offers.models import Offer
+from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 
@@ -105,18 +106,6 @@ class OfferOut(Schema):
     services: list[ServiceOut]
 
 
-class ProjectOut(Schema):
-    id: int
-    code: str
-    url: str
-    title: str
-    description: str
-    customer: str
-    owned_by: str
-    flat_rate: Decimal | None
-    closed_on: str | None
-
-
 class ServiceTypeOut(Schema):
     title: str
     hourly_rate: Decimal
@@ -127,21 +116,6 @@ class OfferContext(Schema):
     offers: list[OfferOut]
     service_types: list[ServiceTypeOut]
     import_schema: dict
-
-
-def _project_out(project):
-    # Only the short name: The context is pasted into LLMs.
-    return {
-        "id": project.id,
-        "code": project.code,
-        "url": f"{settings.WORKBENCH.URL}{project.get_absolute_url()}",
-        "title": project.title,
-        "description": project.description,
-        "customer": project.customer.name,
-        "owned_by": project.owned_by.get_short_name(),
-        "flat_rate": project.flat_rate,
-        "closed_on": project.closed_on.isoformat() if project.closed_on else None,
-    }
 
 
 def _offer_out(offer, services):
@@ -164,17 +138,6 @@ def _offer_out(offer, services):
     }
 
 
-@router.get("/projects/", response=list[ProjectOut])
-def project_list(request, q: str = "", *, include_closed: bool = False):
-    """Search projects, open projects only by default"""
-    projects = Project.objects.select_related("customer", "owned_by")
-    if not include_closed:
-        projects = projects.open()
-    if q:
-        projects = projects.search(q)
-    return [_project_out(project) for project in projects[:50]]
-
-
 def _project_offers(project):
     return [
         _offer_out(offer, list(offer.services.all()))
@@ -182,15 +145,6 @@ def _project_offers(project):
             "services"
         )
     ]
-
-
-@router.get("/projects/{project_id}/", response=ProjectOut)
-def project_detail(request, project_id: int):
-    return _project_out(
-        get_object_or_404(
-            Project.objects.select_related("customer", "owned_by"), pk=project_id
-        )
-    )
 
 
 @router.get("/projects/{project_id}/offers/", response=list[OfferOut])
@@ -209,7 +163,7 @@ def offer_context(request, project_id: int):
     )
     service_types = list(ServiceType.objects.all())
     return {
-        "project": _project_out(project),
+        "project": project_out(project),
         "offers": _project_offers(project),
         "service_types": service_types,
         "import_schema": offer_import_schema(
