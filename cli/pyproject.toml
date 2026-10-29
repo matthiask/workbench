@@ -26,3 +26,8 @@ dependencies = [
   "rich",
 ]
 scripts.wb = "wb:cli"
+
+[tool.setuptools]
+py-modules = [
+  "wb",
+]
