@@ -231,3 +231,22 @@ class OffersAPITest(TestCase):
         offer.save()
         response = self.client.put(url, replacement, content_type="application/json")
         self.assertEqual(response.status_code, 409)
+
+    def test_search(self):
+        """Offers can be searched and filtered"""
+        user = factories.UserFactory.create(_short_name="ab")
+        relaunch = factories.OfferFactory.create(
+            title="Website relaunch", owned_by=user
+        )
+        other = factories.OfferFactory.create(title="Hosting", status=Offer.DECLINED)
+        self.client.force_login(user)
+
+        def ids(query=""):
+            return [o["id"] for o in self.client.get(f"/api/offers/{query}").json()]
+
+        self.assertEqual(ids(), [other.pk, relaunch.pk])
+        self.assertEqual(ids("?q=relaunch"), [relaunch.pk])
+        self.assertEqual(ids(f"?q={other.project.code}"), [other.pk])
+        self.assertEqual(ids("?status=declined"), [other.pk])
+        self.assertEqual(ids("?owned_by=AB"), [relaunch.pk])
+        self.assertEqual(self.client.get("/api/offers/?status=nope").status_code, 422)

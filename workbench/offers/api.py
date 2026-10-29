@@ -1,11 +1,12 @@
 from decimal import Decimal
+from typing import Literal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _, override
-from ninja import Field, Router, Schema
+from ninja import Field, Query, Router, Schema
 from ninja.errors import HttpError, ValidationError
 
 from workbench.accounts.api_auth import user_auth
@@ -174,6 +175,39 @@ def offer_context(request, project_id: int):
             service_types=[st.title for st in service_types]
         ),
     }
+
+
+OFFER_STATUSES = {
+    "in_preparation": Offer.IN_PREPARATION,
+    "service_group": Offer.SERVICE_GROUP,
+    "offered": Offer.OFFERED,
+    "accepted": Offer.ACCEPTED,
+    "declined": Offer.DECLINED,
+}
+
+
+class OfferFilter(Schema):
+    q: str = ""
+    status: (
+        Literal["in_preparation", "service_group", "offered", "accepted", "declined"]
+        | None
+    ) = None
+    owned_by: str | None = None
+
+
+@router.get("/offers/", response=list[OfferOut])
+def offer_list_search(request, filters: Query[OfferFilter]):
+    """Search offers, newest first, at most 50"""
+    offers = Offer.objects.select_related("project").prefetch_related("services")
+    if filters.status:
+        offers = offers.filter(status=OFFER_STATUSES[filters.status])
+    if filters.owned_by:
+        offers = offers.filter(owned_by___short_name__iexact=filters.owned_by)
+    if filters.q:
+        offers = offers.search(filters.q)
+    return [
+        offer_out(offer, list(offer.services.all()), request) for offer in offers[:50]
+    ]
 
 
 @router.get("/offers/{offer_id}/", response=OfferOut)
