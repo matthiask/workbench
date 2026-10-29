@@ -35,7 +35,14 @@ dependencies = [
   "svglib<1.6",
   "time-machine>=3.2",
   "vobject>=0.9.9",
+  "workbench-cli",
   "xlsxdocument>=1.3.10",
+]
+
+[tool.uv]
+sources.workbench-cli = { workspace = true, editable = true }
+workspace.members = [
+  "cli",
 ]
 
 [tool.ruff]
