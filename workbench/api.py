@@ -20,7 +20,8 @@ class UserToken(HttpBearer):
 
 api = NinjaAPI(
     title="Workbench",
-    auth=[django_auth, UserToken()],
+    # Tokens first, the session authentication fails without a CSRF token
+    auth=[UserToken(), django_auth],
     docs_decorator=login_required,
     urls_namespace="api",
 )

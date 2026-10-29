@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
@@ -46,6 +46,20 @@ class APITokenTest(TestCase):
             ).status_code,
             401,
         )
+
+    def test_bearer_auth_without_csrf(self):
+        """Token authenticated requests do not need a CSRF token"""
+        project = factories.ProjectFactory.create()
+        _token, secret = APIToken.create_for(user=project.owned_by, title="CLI")
+
+        client = Client(enforce_csrf_checks=True)
+        response = client.post(
+            f"/api/projects/{project.pk}/planning/import/?dry_run=true",
+            {},
+            content_type="application/json",
+            headers={"authorization": f"Bearer {secret}"},
+        )
+        self.assertEqual(response.status_code, 200)
 
     def test_token_page(self):
         """Users create and delete their own tokens"""
