@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 15:02+0100\n"
+"POT-Creation-Date: 2026-10-29 15:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -277,6 +277,10 @@ msgstr "Gepinnte Projekte"
 #: workbench/accounts/models.py
 msgid "pinned services"
 msgstr "Gepinnte Leistungen"
+
+#: workbench/accounts/models.py
+msgid "This short name is already taken."
+msgstr "Dieses Kürzel ist schon vergeben."
 
 #: workbench/accounts/models.py workbench/audit/admin.py
 #: workbench/awt/models.py workbench/deals/models.py
@@ -3005,6 +3009,10 @@ msgstr "Mitarbeiter:in"
 #: workbench/planning/xlsx.py
 msgid "Total Capacity"
 msgstr "Gesamtkapazität"
+
+#: workbench/projects/api.py
+msgid "Select projects using ids, open or closed_since."
+msgstr "Wähle Projekte mit ids, open oder closed_since aus."
 
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/reporting/squeeze.py workbench/templates/base.html
