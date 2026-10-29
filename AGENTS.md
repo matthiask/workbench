@@ -114,3 +114,5 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - No attribution trailers in commit messages (no `Co-Authored-By:`, no
   "Generated with ..." footers).
 - Commit messages are written in English.
+- Work on `main` directly, no feature branches. Fast-forward instead of
+  creating merge commits whenever possible.
