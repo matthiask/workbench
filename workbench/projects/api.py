@@ -100,7 +100,7 @@ def project_create(request, data: ProjectIn, *, dry_run: bool = False):
     owned_by = request.user
     if data.owned_by is not None:
         owned_by = User.objects.filter(
-            is_active=True, _short_name=data.owned_by
+            is_active=True, _short_name__iexact=data.owned_by
         ).first()
         if not owned_by:
             raise ValidationError([

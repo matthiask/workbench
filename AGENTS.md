@@ -61,8 +61,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only creates and
   replaces offers in preparation. Service types only suggest the effort type
   and the hourly rate, both can be set freely.
-- Short names (`User._short_name`) are unique unless blank. APIs identify
-  people by their short name.
+- Short names (`User._short_name`) are unique when case folding, unless blank.
+  APIs identify people by their short name and match it case-insensitively.
 - The planning import prompt is pasted into external LLMs. Keep personal data
   out of it: people are identified by their short name only (no email
   addresses or full names, see `plannable_users()` in

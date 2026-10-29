@@ -11,6 +11,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.postgres.fields import ArrayField
 from django.db import connections, models
 from django.db.models import Count, Q, Sum
+from django.db.models.functions import Lower
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
@@ -176,9 +177,9 @@ class User(Model, AbstractBaseUser):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["_short_name"],
+                Lower("_short_name"),
                 condition=~Q(_short_name=""),
-                name="accounts_user_unique_short_name",
+                name="accounts_user_unique_short_name_ci",
                 violation_error_message=_("This short name is already taken."),
             ),
         ]

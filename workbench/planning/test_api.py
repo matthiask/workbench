@@ -102,7 +102,8 @@ class PlanningAPITest(TestCase):
                 },
                 {
                     "title": "Production",
-                    "user": user._short_name,
+                    # Short names are matched case-insensitively
+                    "user": user._short_name.upper(),
                     "service_type": "production",
                     "milestone": existing.pk,
                     "weeks": [start.isoformat()],

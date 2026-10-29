@@ -131,7 +131,7 @@ class ProjectsAPITest(TestCase):
 
         response = self.client.post(
             "/api/projects/",
-            data | {"owned_by": "ot", "type": "maintenance"},
+            data | {"owned_by": "OT", "type": "maintenance"},
             content_type="application/json",
         )
         project = Project.objects.get(pk=response.json()["id"])

@@ -249,7 +249,9 @@ def planning_import(
 
     Nothing is saved if anything is invalid or with ``dry_run``."""
     project = get_object_or_404(Project, pk=project_id)
-    users = plannable_users()
+    users_casefolded = {
+        short_name.casefold(): user for short_name, user in plannable_users().items()
+    }
     service_types = {st.title: st for st in ServiceType.objects.all()}
     offers = {
         offer.code: offer
@@ -292,7 +294,7 @@ def planning_import(
             is_provisional=item.is_provisional,
         )
 
-        if user := users.get(item.user):
+        if user := users_casefolded.get(item.user.casefold()):
             pw.user = user
         else:
             errors.append({

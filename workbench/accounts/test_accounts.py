@@ -295,8 +295,28 @@ class ShortNameTest(TestCase):
         other._short_name = "ab"
         with self.assertRaises(ValidationError):
             other.validate_constraints()
+        other._short_name = "AB"
+        with self.assertRaises(ValidationError):
+            other.validate_constraints()
 
         user.validate_constraints()
+
+    def test_rename_case_insensitive_duplicates(self):
+        """Short names which only differ in case are renamed too"""
+        migration = importlib.import_module(
+            "workbench.accounts.migrations.0029_unique_short_name_case_insensitive"
+        )
+        with connection.cursor() as cursor:
+            cursor.execute("DROP INDEX accounts_user_unique_short_name_ci")
+        active = factories.UserFactory.create(_short_name="ab")
+        inactive = factories.UserFactory.create(_short_name="AB", is_active=False)
+
+        migration.rename_duplicate_short_names(apps, None)
+
+        inactive.refresh_from_db()
+        active.refresh_from_db()
+        self.assertEqual(active._short_name, "ab")
+        self.assertEqual(inactive._short_name, "AB-2")
 
     def test_rename_duplicate_short_names(self):
         """Duplicates are renamed, inactive users first"""
@@ -304,7 +324,7 @@ class ShortNameTest(TestCase):
             "workbench.accounts.migrations.0028_unique_short_name"
         )
         with connection.cursor() as cursor:
-            cursor.execute("DROP INDEX accounts_user_unique_short_name")
+            cursor.execute("DROP INDEX accounts_user_unique_short_name_ci")
         inactive = factories.UserFactory.create(_short_name="ab", is_active=False)
         active = factories.UserFactory.create(_short_name="ab")
         newer = factories.UserFactory.create(_short_name="ab")
