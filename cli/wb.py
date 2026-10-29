@@ -427,6 +427,71 @@ def whoami(as_json):
     )
 
 
+@cli.command()
+@click.option("--json", "as_json", is_flag=True)
+def me(as_json):
+    """What's on your plate: projects, this week's planning, offers, invoices
+    and deals which may need action"""
+    data = _request("GET", "me/overview/")
+    if as_json:
+        _echo_json(data)
+        return
+
+    table = _table("ID>", "Code", "Title", "Customer", title="Your open projects")
+    for project in data["projects"]:
+        table.add_row(
+            _link(project["id"], project["url"]),
+            _link(project["code"], project["url"]),
+            project["title"],
+            project["customer"],
+        )
+    console.print(table)
+
+    table = _table(
+        "Project",
+        "Planned work",
+        "Hours>",
+        "Provisional",
+        title=f"Week of {data['week']}",
+    )
+    for pw in data["planned_work"]:
+        project = pw["project"]
+        table.add_row(
+            _link(f"{project['code']} {project['title']}", project["url"]),
+            pw["title"],
+            pw["hours"],
+            "yes" if pw["is_provisional"] else "",
+        )
+    console.print(table)
+
+    if data["offers"] is not None:
+        table = _table("ID>", "Code", "Title", "Status", "Total>", title="Offers")
+        for offer in data["offers"]:
+            table.add_row(
+                _link(offer["id"], offer["url"]),
+                _link(offer["code"], offer["url"]),
+                offer["title"],
+                offer["status"],
+                offer["total"],
+            )
+        console.print(table)
+    if data["invoices"] is not None:
+        _echo_invoice_list(data["invoices"])
+    if data["deals"] is not None:
+        table = _table(
+            "ID>", "Title", "Customer", "Decision expected on", "Value>", title="Deals"
+        )
+        for deal in data["deals"]:
+            table.add_row(
+                _link(deal["id"], deal["url"]),
+                deal["title"],
+                deal["customer"],
+                deal["decision_expected_on"] or "",
+                deal["value"],
+            )
+        console.print(table)
+
+
 @cli.group()
 def projects():
     """Find projects"""

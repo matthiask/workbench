@@ -24,6 +24,12 @@ The URL and the token are stored in `~/.config/workbench.toml`. The
 `WORKBENCH_URL` and `WORKBENCH_TOKEN` environment variables take precedence;
 `wb` doesn't log in again by itself when they are used.
 
+## What's on your plate
+
+`wb me` shows your open projects, this week's planned work, and the offers,
+invoices and deals which may need action (the latter depending on your
+features).
+
 ## Creating projects
 
 Find the customer and the contact, then create the project. Projects are
