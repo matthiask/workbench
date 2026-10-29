@@ -82,3 +82,13 @@ name.
     wb projects stats --closed-since 2026-01-01 --csv > hours.csv
 
 `--csv` writes one row per project, service and person with the logged hours.
+
+## Claude Code skill
+
+`skills/workbench-offer/` contains a [Claude Code](https://claude.com/claude-code)
+skill which turns a specification into an offer using `wb`: it finds the
+project, fetches the context, drafts the offer, reviews it with you, validates
+it with `--dry-run` and only creates it after your approval. Link it into your
+personal skills to use it in any directory:
+
+    ln -s "$PWD/cli/skills/workbench-offer" ~/.claude/skills/workbench-offer
