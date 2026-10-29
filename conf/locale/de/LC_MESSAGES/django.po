@@ -4193,8 +4193,8 @@ msgid "Prompt"
 msgstr "Prompt"
 
 #: workbench/templates/planning/planning_import.html
-msgid "Copy the prompt, add your own requirements, for example fixed dates and who should do what, and let Claude or ChatGPT create a plan. The prompt contains the offers, people, absences and the existing planning of the project."
-msgstr "Kopiere den Prompt, ergänze deine eigenen Anforderungen, zum Beispiel fixe Termine und wer was machen soll, und lass Claude oder ChatGPT eine Planung erstellen. Der Prompt enthält die Offerten, Personen, Abwesenheiten und die bestehende Planung des Projekts."
+msgid "Copy the prompt, add your own requirements, for example fixed dates and who should do what, and let an AI tool create a plan. The prompt contains the offers, people, absences and the existing planning of the project."
+msgstr "Kopiere den Prompt, ergänze deine eigenen Anforderungen, zum Beispiel fixe Termine und wer was machen soll, und lass ein KI-Tool eine Planung erstellen. Der Prompt enthält die Offerten, Personen, Abwesenheiten und die bestehende Planung des Projekts."
 
 #: workbench/templates/planning/planning_import.html
 msgid "Copy prompt"
