@@ -706,3 +706,86 @@ def show_invoice(invoice_id, as_json):
     if data["description"]:
         console.print()
         console.print(data["description"])
+
+
+@cli.group()
+def deals():
+    """Look at the sales pipeline"""
+
+
+@deals.command("list")
+@click.argument("query", nargs=-1)
+@click.option(
+    "--status", type=click.Choice(["open", "accepted", "declined"]), default="open"
+)
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option("--owned-by", help="Short name.")
+@click.option("--json", "as_json", is_flag=True)
+def list_deals(query, status, customer, owned_by, as_json):
+    """List deals, open deals by default"""
+    params = {"q": " ".join(query), "status": status}
+    if customer:
+        params["customer"] = customer
+    if owned_by:
+        params["owned_by"] = owned_by
+    data = _request("GET", "deals/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table(
+        "ID>",
+        "Title",
+        "Customer",
+        "Owned by",
+        "Probability",
+        "Decision expected on",
+        "Value>",
+    )
+    for deal in data:
+        table.add_row(
+            _link(deal["id"], deal["url"]),
+            deal["title"],
+            deal["customer"],
+            deal["owned_by"],
+            deal["probability"],
+            deal["decision_expected_on"] or "",
+            deal["value"],
+        )
+    console.print(table)
+
+
+@deals.command("show")
+@click.argument("deal_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_deal(deal_id, as_json):
+    """Show a deal"""
+    data = _request("GET", f"deals/{deal_id}/")
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_fields(
+        f"{data['code']} {data['title']}",
+        [
+            ("ID", data["id"]),
+            ("Customer", data["customer"]),
+            ("Owned by", data["owned_by"]),
+            ("Contributors", ", ".join(data["contributors"])),
+            ("Status", data["status"]),
+            ("Probability", data["probability"]),
+            ("Decision expected on", data["decision_expected_on"]),
+            ("Closed on", data["closed_on"]),
+            ("Closing type", data["closing_type"]),
+            ("Related offers", ", ".join(data["related_offers"])),
+            ("URL", data["url"]),
+        ],
+        url=data["url"],
+    )
+    table = _table("Value type", "Value>", show_footer=True)
+    for value in data["values"]:
+        table.add_row(value["type"], value["value"])
+    table.columns[0].footer = "Total"
+    table.columns[1].footer = data["value"]
+    console.print(table)
+    for text in (data["description"], data["closing_notice"]):
+        if text:
+            console.print(text)

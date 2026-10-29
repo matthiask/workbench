@@ -95,6 +95,14 @@ Invoices are read-only in the CLI:
     wb invoices show 5678
     wb projects invoicing 1234   # Planned invoicing and invoices of a project
 
+## Deals
+
+Deals are read-only in the CLI and require the deals feature:
+
+    wb deals list                     # Open deals
+    wb deals list --status accepted relaunch
+    wb deals show 1234
+
 ## Planning
 
 Like offers: Fetch the context (offers, people, absences, existing milestones
