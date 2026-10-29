@@ -17,6 +17,7 @@ dependencies = [
   "django-debug-toolbar>=6.2",
   "django-fast-export>=0.1.1",
   "django-fineforms>=0.7",
+  "django-ninja>=1.7.2",
   "django-vanilla-views>=3",
   "factory-boy>=3.3.3",
   "granian>=2.7",

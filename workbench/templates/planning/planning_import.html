@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% translate 'Import planning' %} - {{ object }} - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-12">
+      <a href="{% url 'projects_project_planning' object.pk %}" class="btn btn-primary btn-sm">
+        {% include 'svg/chevron-left.svg' %}
+        {% translate 'planning'|capfirst %}
+      </a>
+      <h1>{% translate 'Import planning' %}: {{ object }}</h1>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-lg-6">
+      <h2 class="h4">1. {% translate 'Prompt' %}</h2>
+      <p>
+        {% blocktranslate trimmed %}
+          Copy the prompt, add your own requirements, for example fixed dates and who should do what, and let an AI tool
+          create a plan. The prompt contains the offers, people, absences and the existing planning of the project.
+        {% endblocktranslate %}
+      </p>
+      <textarea id="planning-prompt" class="form-control font-monospace" rows="16" readonly>{{ prompt }}</textarea>
+      <button type="button" id="planning-copy" class="btn btn-primary btn-sm mt-2">
+        {% translate 'Copy prompt' %}
+      </button>
+    </div>
+    <div class="col-lg-6">
+      <h2 class="h4">2. {% translate 'Plan' %}</h2>
+      <p>
+        {% blocktranslate trimmed %}
+          Paste the JSON answer here and check it. Nothing is saved before you import it. The import only adds
+          milestones and planned work.
+        {% endblocktranslate %}
+      </p>
+      {% csrf_token %}
+      <textarea id="planning-json" class="form-control font-monospace" rows="16"></textarea>
+      <button type="button" id="planning-check" class="btn btn-primary btn-sm mt-2">
+        {% translate 'Check' %}
+      </button>
+      <button type="button" id="planning-import" class="btn btn-success btn-sm mt-2" disabled>
+        {% translate 'Import' %}
+      </button>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-12">
+      <div id="planning-errors" class="alert alert-danger" hidden>
+        <ul class="mb-0"></ul>
+      </div>
+      <div id="planning-warnings" class="alert alert-warning" hidden>
+        <ul class="mb-0"></ul>
+      </div>
+      <div id="planning-preview" hidden>
+        <h2 class="h4">{% translate 'milestones'|capfirst %}</h2>
+        <table class="table table-sm table-striped" id="planning-preview-milestones">
+          <thead>
+            <tr>
+              <th>{% translate 'title'|capfirst %}</th>
+              <th>{% translate 'phase starts on'|capfirst %}</th>
+              <th>{% translate 'date'|capfirst %}</th>
+              <th class="text-end">{% translate 'planned hours'|capfirst %}</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <h2 class="h4">{% translate 'planned work'|capfirst %}</h2>
+        <table class="table table-sm table-striped" id="planning-preview-work">
+          <thead>
+            <tr>
+              <th>{% translate 'title'|capfirst %}</th>
+              <th>{% translate 'user'|capfirst %}</th>
+              <th>{% translate 'primary service type'|capfirst %}</th>
+              <th>{% translate 'offer'|capfirst %}</th>
+              <th>{% translate 'milestone'|capfirst %}</th>
+              <th>{% translate 'weeks'|capfirst %}</th>
+              <th class="text-end">{% translate 'planned hours'|capfirst %}</th>
+              <th>{% translate 'is provisional'|capfirst %}</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{ api_urls|json_script:'planning-import-urls' }}
+{% endblock content %}
+
+{% block js %}
+  {{ block.super }}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urls = JSON.parse(document.getElementById("planning-import-urls").textContent)
+      const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value
+      const json = document.getElementById("planning-json")
+      const importButton = document.getElementById("planning-import")
+      let checked = null
+
+      const cell = (text, className = "") => {
+        const td = document.createElement("td")
+        td.textContent = text ?? "–"
+        td.className = className
+        return td
+      }
+
+      const fillList = (id, items) => {
+        const box = document.getElementById(id)
+        const ul = box.querySelector("ul")
+        ul.replaceChildren(
+          ...items.map((item) => {
+            const li = document.createElement("li")
+            const loc = Array.isArray(item.loc) ? item.loc.slice(2).join(" › ") : ""
+            li.textContent = loc ? `${loc}: ${item.msg}` : item.msg
+            return li
+          }),
+        )
+        box.hidden = !items.length
+      }
+
+      const fillTable = (id, rows) => {
+        document
+          .querySelector(`#${id} tbody`)
+          .replaceChildren(
+            ...rows.map((cells) => {
+              const tr = document.createElement("tr")
+              tr.append(...cells)
+              return tr
+            }),
+          )
+      }
+
+      const showResult = (result) => {
+        fillList("planning-warnings", result.warnings)
+        fillTable(
+          "planning-preview-milestones",
+          result.milestones.map((m) => [
+            cell(m.title),
+            cell(m.phase_starts_on),
+            cell(m.date),
+            cell(m.estimated_total_hours, "text-end"),
+          ]),
+        )
+        fillTable(
+          "planning-preview-work",
+          result.planned_work.map((pw) => [
+            cell(pw.title),
+            cell(pw.user),
+            cell(pw.service_type),
+            cell(pw.offer),
+            cell(pw.milestone),
+            cell(pw.weeks.join(", ")),
+            cell(pw.planned_hours, "text-end"),
+            cell(pw.is_provisional ? "✓" : ""),
+          ]),
+        )
+        document.getElementById("planning-preview").hidden = false
+      }
+
+      const post = async (url) => {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrf },
+          body: json.value,
+        })
+        let data
+        try {
+          data = await response.json()
+        } catch {
+          data = { detail: response.statusText }
+        }
+        if (!response.ok) {
+          fillList(
+            "planning-errors",
+            Array.isArray(data.detail) ? data.detail : [{ msg: String(data.detail) }],
+          )
+          fillList("planning-warnings", [])
+          document.getElementById("planning-preview").hidden = true
+          return null
+        }
+        fillList("planning-errors", [])
+        return data
+      }
+
+      document.getElementById("planning-copy").addEventListener("click", async (e) => {
+        await navigator.clipboard.writeText(document.getElementById("planning-prompt").value)
+        e.target.blur()
+      })
+
+      json.addEventListener("input", () => {
+        importButton.disabled = json.value !== checked
+      })
+
+      document.getElementById("planning-check").addEventListener("click", async () => {
+        const result = await post(`${urls.import}?dry_run=true`)
+        checked = result ? json.value : null
+        importButton.disabled = !result
+        if (result) showResult(result)
+      })
+
+      importButton.addEventListener("click", async () => {
+        importButton.disabled = true
+        if (await post(urls.import)) window.location.href = urls.planning
+      })
+    })
+  </script>
+{% endblock js %}

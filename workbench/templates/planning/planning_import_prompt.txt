@@ -1,0 +1,25 @@
+{% autoescape off %}You are helping to plan the project "{{ project.code }} {{ project.title }}" in Workbench, our project management tool. Today is {{ today|date:"Y-m-d" }}.
+
+Create a plan of milestones and planned work and answer with a single JSON document which validates against the JSON schema at the end. Answer with the JSON document only.
+
+Rules:
+- Weeks are given by their Monday as ISO date (YYYY-MM-DD). Weeks of a planned work entry do not have to be consecutive.
+- planned_hours is the total of hours over all weeks of an entry, not the hours per week.
+- Respect each person's planning_hours_per_day and their absences. People also work on other projects, so do not plan anyone fully.
+- Only use the listed people (by short name), service types and offers (by code).
+- Planned work references new milestones by their key and existing milestones by their ID.
+- The import adds to the existing milestones and planned work, so do not repeat them.
+- Use the offers and their services to estimate the hours. Hours should add up to the offered hours.
+- Mark work as provisional (is_provisional: true) unless told otherwise.
+
+Additional requirements (replace this line with your own instructions, for example fixed dates and who should do what):
+
+
+Project, offers, people, existing milestones, existing planned work and absences:
+
+{{ context_json }}
+
+JSON schema of the answer:
+
+{{ schema_json }}
+{% endautoescape %}

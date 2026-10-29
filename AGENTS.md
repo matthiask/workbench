@@ -44,9 +44,16 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `workbench/tools/validation.py`; `gross_margin_components(projects)`
   and `hours_components(projects)` in `workbench/reporting/squeeze.py` for
   offered/projected/invoiced gross margin and offered/logged hours;
-  `jsonable()` and `has_valid_token()` in `workbench/reporting/api.py` for
-  the token-authenticated JSON APIs. Prefer calling utilities over adding
-  mixins or base classes.
+  `jsonable()` in `workbench/reporting/api.py` for the token-authenticated
+  JSON APIs. Prefer calling utilities over adding mixins or base classes.
+- The JSON APIs use django-ninja (`workbench/api.py`, mounted at `/api/`) with
+  one router per app. Endpoints authenticate with the user's session by
+  default; the reporting router uses the static bearer token
+  (`ReportingToken` in `workbench/reporting/api.py`). Routes end with a slash.
+- The planning import prompt is pasted into external LLMs. Keep personal data
+  out of it: people are identified by their short name only (no email
+  addresses or full names, see `plannable_users()` in
+  `workbench/planning/api.py`), and absences have no reason.
 - Offered amounts and offered hours only count for open projects; for closed
   projects the invoiced amount and the logged hours are ground truth.
 - `project_gross_margin(project)` in `workbench/reporting/squeeze.py` computes single-project profitability (gross margin, rate, offered/projected/invoiced breakdown). Use this instead of duplicating squeeze logic.

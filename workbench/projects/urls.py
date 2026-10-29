@@ -20,6 +20,7 @@ from workbench.planning.views import (
     project_planning,
     project_planning_external,
     project_planning_gantt_xlsx,
+    project_planning_import,
 )
 from workbench.projects.forms import (
     BudgetTransferForm,
@@ -181,6 +182,11 @@ urlpatterns = [
         "<int:pk>/planning/gantt-xlsx/",
         project_planning_gantt_xlsx,
         name="projects_project_planning_gantt_xlsx",
+    ),
+    path(
+        "<int:pk>/planning/import/",
+        project_planning_import,
+        name="projects_project_planning_import",
     ),
     path(
         "<int:pk>/planning/batch-update/",

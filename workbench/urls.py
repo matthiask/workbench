@@ -6,8 +6,7 @@ from django.urls import include, path, re_path
 from django.views.i18n import JavaScriptCatalog
 
 from workbench import views
-from workbench.reporting.cash_data_api import cash_data_api
-from workbench.reporting.key_data_api import key_data_api
+from workbench.api import api
 
 
 admin.site.enable_nav_sidebar = False
@@ -33,8 +32,7 @@ urlpatterns = [
     path("search/", views.search, name="search"),
     re_path(r"^history/(\w+)/(\w+)/([0-9]+)/$", views.history, name="history"),
     path("report/", include("workbench.reporting.urls")),
-    path("api/key-data/", key_data_api, name="api_key_data"),
-    path("api/cash-data/", cash_data_api, name="api_cash_data"),
+    path("api/", api.urls),
     path("", include("workbench.timer.urls")),
     path("notes/", include("workbench.notes.urls")),
     # Legacy URL redirects

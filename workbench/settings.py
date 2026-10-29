@@ -46,6 +46,7 @@ INSTALLED_APPS = [
         "authlib",
         "corsheaders",
         "fineforms",
+        "ninja",
         "django.forms",
         "workbench.accounts",
         "workbench.audit",
