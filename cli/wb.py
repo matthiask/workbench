@@ -586,7 +586,9 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
 
 @projects.command("create")
 @click.option("--title", required=True)
-@click.option("--customer", type=int, required=True, help="Organization ID.")
+@click.option(
+    "--customer", type=int, help="Organization ID, defaults to the contact's."
+)
 @click.option("--contact", type=int, help="Person ID.")
 @click.option(
     "--type",

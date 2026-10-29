@@ -116,8 +116,6 @@ class CLITest(TestCase):
             "create",
             "--title",
             "Second",
-            "--customer",
-            project.customer_id,
             "--contact",
             project.contact_id,
             "--dry-run",

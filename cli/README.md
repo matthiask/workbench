@@ -37,9 +37,10 @@ validated like in the web interface; where the web interface would show a
 warning, the CLI fails and you have to use the web interface.
 
     wb contacts search espoir
-    wb projects create --title "Online Marketing 2027" --customer 12 --contact 345 --dry-run
-    wb projects create --title "Online Marketing 2027" --customer 12 --contact 345
+    wb projects create --title "Online Marketing 2027" --contact 345 --dry-run
+    wb projects create --title "Online Marketing 2027" --contact 345
 
+The customer is the contact's organization unless you pass `--customer`.
 `--type` is `order` (default), `maintenance` or `internal`, `--owned-by` takes a
 short name and defaults to you.
 

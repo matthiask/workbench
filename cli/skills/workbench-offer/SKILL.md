@@ -27,8 +27,11 @@ If the project doesn't exist yet, find the customer and the contact and create
 the project, after confirming title, customer and contact with the user:
 
     wb contacts search <terms>
-    wb projects create --title "<title>" --customer <organization_id> --contact <person_id> --dry-run
-    wb projects create --title "<title>" --customer <organization_id> --contact <person_id>
+    wb projects create --title "<title>" --contact <person_id> --dry-run
+    wb projects create --title "<title>" --contact <person_id>
+
+The customer is the contact's organization; pass `--customer` only for
+people without one.
 
 If Workbench rejects the project with a message which isn't about a specific
 field, it's a warning of the web interface: ask the user to create the project
