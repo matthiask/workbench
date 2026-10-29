@@ -72,6 +72,24 @@ class OffersAPITest(TestCase):
         data = self.client.get("/api/projects/?q=relaunch").json()
         self.assertEqual([p["id"] for p in data], [project.pk])
 
+    def test_project_and_offers(self):
+        """Projects and their offers can be shown"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        factories.ServiceFactory.create(project=project, offer=offer, title="Design")
+        self.client.force_login(project.owned_by)
+
+        data = self.client.get(f"/api/projects/{project.pk}/").json()
+        self.assertEqual(data["code"], project.code)
+        self.assertTrue(data["url"].endswith(project.get_absolute_url()))
+
+        data = self.client.get(f"/api/projects/{project.pk}/offers/").json()
+        self.assertEqual([o["code"] for o in data], [offer.code])
+        self.assertEqual(data[0]["services"][0]["title"], "Design")
+
+        self.assertEqual(self.client.get("/api/projects/0/").status_code, 404)
+        self.assertEqual(self.client.get("/api/projects/0/offers/").status_code, 404)
+
     def test_create(self):
         """Creating adds an offer in preparation with its services"""
         factories.service_types()

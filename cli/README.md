@@ -22,6 +22,7 @@ The URL and the token are stored in `~/.config/workbench.toml`. The
 Find the project:
 
     wb projects search relaunch
+    wb projects show 1234
 
 Print everything needed to write the offer: the project, its existing offers,
 the service types with their hourly rates and the JSON schema of an offer.
@@ -61,6 +62,7 @@ created in preparation; review and send them in Workbench.
 Offers in preparation can be replaced as long as no hours or costs have been
 logged on their services:
 
+    wb offers list 1234
     wb offers show 5678
     wb offers replace 5678 offer.yaml --dry-run
     wb offers replace 5678 offer.yaml

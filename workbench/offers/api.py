@@ -108,6 +108,7 @@ class OfferOut(Schema):
 class ProjectOut(Schema):
     id: int
     code: str
+    url: str
     title: str
     description: str
     customer: str
@@ -133,6 +134,7 @@ def _project_out(project):
     return {
         "id": project.id,
         "code": project.code,
+        "url": f"{settings.WORKBENCH.URL}{project.get_absolute_url()}",
         "title": project.title,
         "description": project.description,
         "customer": project.customer.name,
@@ -173,6 +175,32 @@ def project_list(request, q: str = "", *, include_closed: bool = False):
     return [_project_out(project) for project in projects[:50]]
 
 
+def _project_offers(project):
+    return [
+        _offer_out(offer, list(offer.services.all()))
+        for offer in project.offers.select_related("project").prefetch_related(
+            "services"
+        )
+    ]
+
+
+@router.get("/projects/{project_id}/", response=ProjectOut)
+def project_detail(request, project_id: int):
+    return _project_out(
+        get_object_or_404(
+            Project.objects.select_related("customer", "owned_by"), pk=project_id
+        )
+    )
+
+
+@router.get("/projects/{project_id}/offers/", response=list[OfferOut])
+def offer_list(request, project_id: int):
+    """All offers of the project with their services"""
+    return _project_offers(
+        get_object_or_404(Project.objects.select_related("customer"), pk=project_id)
+    )
+
+
 @router.get("/projects/{project_id}/offers/context/", response=OfferContext)
 def offer_context(request, project_id: int):
     """Everything needed to write an offer, and the schema of the offer"""
@@ -182,12 +210,7 @@ def offer_context(request, project_id: int):
     service_types = list(ServiceType.objects.all())
     return {
         "project": _project_out(project),
-        "offers": [
-            _offer_out(offer, list(offer.services.all()))
-            for offer in project.offers.select_related("project").prefetch_related(
-                "services"
-            )
-        ],
+        "offers": _project_offers(project),
         "service_types": service_types,
         "import_schema": offer_import_schema(
             service_types=[st.title for st in service_types]

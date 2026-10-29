@@ -100,6 +100,16 @@ def _echo_offer(offer):
     click.echo(f"{offer['total']:>12}  Total")
 
 
+def _echo_offer_list(offers):
+    if not offers:
+        click.echo("No offers yet.")
+    for offer in offers:
+        click.echo(
+            f"{offer['id']:>6}  {offer['code']}  {offer['total']:>12}"
+            f"  {offer['title']} ({offer['status']})"
+        )
+
+
 @click.group()
 @click.version_option(package_name="workbench-cli")
 def cli():
@@ -146,6 +156,32 @@ def search(query, include_closed, as_json):
         )
 
 
+@projects.command("show")
+@click.argument("project_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_project(project_id, as_json):
+    """Show a project and its offers"""
+    project = _request("GET", f"projects/{project_id}/")
+    offers = _request("GET", f"projects/{project_id}/offers/")
+    if as_json:
+        _echo_json(project | {"offers": offers})
+        return
+    click.secho(f"{project['code']} {project['title']}", bold=True)
+    click.echo(f"ID: {project['id']}")
+    click.echo(f"Customer: {project['customer']}")
+    click.echo(f"Owned by: {project['owned_by']}")
+    if project["flat_rate"]:
+        click.echo(f"Flat rate: {project['flat_rate']}")
+    if project["closed_on"]:
+        click.echo(f"Closed on: {project['closed_on']}")
+    click.echo(project["url"])
+    if project["description"]:
+        click.echo()
+        click.echo(project["description"])
+    click.echo()
+    _echo_offer_list(offers)
+
+
 @cli.group()
 def offers():
     """Create and update offers"""
@@ -158,6 +194,15 @@ def context(project_id):
 
     Feed this to an LLM together with the specification of the offer."""
     _echo_json(_request("GET", f"projects/{project_id}/offers/context/"))
+
+
+@offers.command("list")
+@click.argument("project_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def list_offers(project_id, as_json):
+    """List the offers of a project"""
+    data = _request("GET", f"projects/{project_id}/offers/")
+    _echo_json(data) if as_json else _echo_offer_list(data)
 
 
 @offers.command()
