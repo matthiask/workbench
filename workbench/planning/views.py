@@ -1,10 +1,16 @@
+import datetime as dt
+import json
+
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import Team, User
 from workbench.planning import reporting
+from workbench.planning.api import project_planning_context
 from workbench.planning.forms import PlannedWorkBatchForm
 from workbench.planning.models import PlannedWork
 from workbench.planning.xlsx import PlanningXLSXDocument
@@ -21,6 +27,35 @@ def project_planning(request, pk):
             "object": instance,
             "project": instance,
             "planning_data": reporting.project_planning(instance),
+        },
+    )
+
+
+def project_planning_import(request, pk):
+    instance = get_object_or_404(
+        Project.objects.select_related("customer", "owned_by"), pk=pk
+    )
+    context = project_planning_context(instance).model_dump(mode="json")
+    schema = context.pop("import_schema")
+    return render(
+        request,
+        "planning/planning_import.html",
+        {
+            "object": instance,
+            "project": instance,
+            "api_urls": {
+                "import": reverse("api:planning_import", args=[instance.pk]),
+                "planning": instance.urls["planning"],
+            },
+            "prompt": render_to_string(
+                "planning/planning_import_prompt.txt",
+                {
+                    "project": instance,
+                    "today": dt.date.today(),
+                    "context_json": json.dumps(context, indent=1, ensure_ascii=False),
+                    "schema_json": json.dumps(schema, indent=1, ensure_ascii=False),
+                },
+            ),
         },
     )
 

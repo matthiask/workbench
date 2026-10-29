@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 11:18+0100\n"
+"POT-Creation-Date: 2026-10-29 11:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,6 +140,7 @@ msgstr "Nutzer:innen nerven wenn sie ihre Stunden spät eintragen."
 #: workbench/templates/accounts/team_detail.html
 #: workbench/templates/planning/campaign_planning.html
 #: workbench/templates/planning/campaign_planning_external.html
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/project_planning_external.html
 #: workbench/templates/planning/team_planning.html
@@ -283,6 +284,7 @@ msgstr "Gepinnte Leistungen"
 #: workbench/planning/models.py workbench/projects/models.py
 #: workbench/reporting/squeeze.py workbench/templates/accounts/user_base.html
 #: workbench/templates/awt/absence_detail.html
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/birthdays.html
 #: workbench/templates/reporting/green_hours.html
@@ -694,6 +696,7 @@ msgid "company holiday"
 msgstr "Betriebsferien"
 
 #: workbench/awt/models.py workbench/awt/pdf.py workbench/planning/models.py
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
 #: workbench/tools/pdf.py
 msgid "date"
@@ -921,6 +924,7 @@ msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
 #: workbench/offers/models.py workbench/planning/models.py
 #: workbench/projects/models.py workbench/reporting/models.py
 #: workbench/services/models.py workbench/templates/offers/offer_pricing.html
+#: workbench/templates/planning/planning_import.html
 msgid "title"
 msgstr "Titel"
 
@@ -2645,6 +2649,7 @@ msgstr "Diese Offerte wird nur zur Zurückbehaltung von Budget verwendet; wenn s
 
 #: workbench/offers/models.py workbench/planning/models.py
 #: workbench/projects/models.py workbench/templates/offers/offer_pricing.html
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/service_form.html workbench/tools/pdf.py
 msgid "offer"
@@ -2736,6 +2741,7 @@ msgid "The following work is planned after the new milestone date: %(work)s."
 msgstr "Die folgenden Arbeiten sind geplant nach dem neuen Meilenstein-Datum: %(work)s."
 
 #: workbench/planning/forms.py workbench/planning/models.py
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/reporting/accepted_deals.html
 msgid "weeks"
 msgstr "Wochen"
@@ -2752,6 +2758,7 @@ msgstr "Die ausgewählte Offerte ist abgelehnt."
 #: workbench/planning/forms.py workbench/planning/models.py
 #: workbench/templates/base.html
 #: workbench/templates/planning/campaign_planning.html
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
@@ -2779,6 +2786,7 @@ msgid "Delete planned work entries?"
 msgstr "Geplante Arbeit löschen?"
 
 #: workbench/planning/models.py
+#: workbench/templates/planning/planning_import.html
 msgid "phase starts on"
 msgstr "Phase startet am"
 
@@ -2791,11 +2799,13 @@ msgid "Planned work belonging to this milestone is shown in this color instead o
 msgstr "Geplante Arbeit, die zu diesem Meilenstein gehört, wird in dieser Farbe dargestellt statt in der Farbe ihrer Leistungsart."
 
 #: workbench/planning/models.py
+#: workbench/templates/planning/planning_import.html
 msgid "planned hours"
 msgstr "geplante Stunden"
 
 #: workbench/planning/models.py
 #: workbench/templates/planning/campaign_planning.html
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/team_planning.html
 #: workbench/templates/planning/user_planning.html
@@ -2803,10 +2813,12 @@ msgid "milestone"
 msgstr "Meilenstein"
 
 #: workbench/planning/models.py
+#: workbench/templates/planning/planning_import.html
 msgid "milestones"
 msgstr "Meilensteine"
 
 #: workbench/planning/models.py
+#: workbench/templates/planning/planning_import.html
 msgid "primary service type"
 msgstr "Primärer Leistungstyp"
 
@@ -2830,6 +2842,7 @@ msgid "external work"
 msgstr "Kundenarbeit"
 
 #: workbench/planning/models.py
+#: workbench/templates/planning/planning_import.html
 msgid "is provisional"
 msgstr "ist provisorisch"
 
@@ -4169,6 +4182,39 @@ msgstr "Zurück zur Kampagnenplanung"
 #: workbench/templates/planning/plannedwork_detail.html
 msgid "Periods"
 msgstr "Zeiträume"
+
+#: workbench/templates/planning/planning_import.html
+#: workbench/templates/planning/project_planning.html
+msgid "Import planning"
+msgstr "Planung importieren"
+
+#: workbench/templates/planning/planning_import.html
+msgid "Prompt"
+msgstr "Prompt"
+
+#: workbench/templates/planning/planning_import.html
+msgid "Copy the prompt, add your own requirements, for example fixed dates and who should do what, and let Claude or ChatGPT create a plan. The prompt contains the offers, people, absences and the existing planning of the project."
+msgstr "Kopiere den Prompt, ergänze deine eigenen Anforderungen, zum Beispiel fixe Termine und wer was machen soll, und lass Claude oder ChatGPT eine Planung erstellen. Der Prompt enthält die Offerten, Personen, Abwesenheiten und die bestehende Planung des Projekts."
+
+#: workbench/templates/planning/planning_import.html
+msgid "Copy prompt"
+msgstr "Prompt kopieren"
+
+#: workbench/templates/planning/planning_import.html
+msgid "Plan"
+msgstr "Planung"
+
+#: workbench/templates/planning/planning_import.html
+msgid "Paste the JSON answer here and check it. Nothing is saved before you import it. The import only adds milestones and planned work."
+msgstr "Füge die JSON-Antwort hier ein und prüfe sie. Gespeichert wird erst beim Importieren. Der Import fügt nur Meilensteine und geplante Arbeit hinzu."
+
+#: workbench/templates/planning/planning_import.html
+msgid "Check"
+msgstr "Prüfen"
+
+#: workbench/templates/planning/planning_import.html
+msgid "Import"
+msgstr "Importieren"
 
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/user_planning.html

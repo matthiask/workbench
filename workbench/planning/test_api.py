@@ -1,6 +1,6 @@
 import datetime as dt
 
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
@@ -166,3 +166,37 @@ class PlanningAPITest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 422)
+
+    def test_import_page(self):
+        """The import page contains the prompt and is linked from the planning"""
+        project = factories.ProjectFactory.create(title="Relaunch für Kunde")
+        offer = factories.OfferFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["planning"])
+        self.assertContains(response, project.urls["planning_import"])
+
+        response = self.client.get(project.urls["planning_import"])
+        self.assertContains(response, "Relaunch für Kunde")
+        self.assertContains(response, offer.code)
+        self.assertContains(response, "PlannedWorkIn")
+        self.assertContains(response, f"/api/projects/{project.pk}/planning/import/")
+
+    def test_import_csrf(self):
+        """Session authenticated requests need a CSRF token"""
+        project = factories.ProjectFactory.create()
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/planning/import/?dry_run=true"
+
+        response = client.post(url, {}, content_type="application/json")
+        self.assertEqual(response.status_code, 403)
+
+        client.get(project.urls["planning_import"])  # Sets the CSRF cookie
+        response = client.post(
+            url,
+            {},
+            content_type="application/json",
+            headers={"X-CSRFToken": client.cookies["csrftoken"].value},
+        )
+        self.assertEqual(response.status_code, 200)

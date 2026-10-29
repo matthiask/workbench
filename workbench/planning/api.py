@@ -90,12 +90,8 @@ class PlanningContext(Schema):
     import_schema: dict
 
 
-@router.get("/projects/{project_id}/planning/context/", response=PlanningContext)
-def planning_context(request, project_id: int):
+def project_planning_context(project):
     """Everything needed to plan the project, and the schema of the import"""
-    project = get_object_or_404(
-        Project.objects.select_related("customer", "owned_by"), pk=project_id
-    )
     offers = (
         project.offers
         .exclude(status=Offer.DECLINED)
@@ -117,7 +113,7 @@ def planning_context(request, project_id: int):
         .order_by("starts_on")
     )
 
-    return {
+    return PlanningContext.model_validate({
         "project": {
             "id": project.id,
             "code": project.code,
@@ -132,7 +128,7 @@ def planning_context(request, project_id: int):
                 "title": offer.title,
                 "description": offer.description,
                 "status": offer.get_status_display(),
-                "services": offer.services.all(),
+                "services": list(offer.services.all()),
             }
             for offer in offers
         ],
@@ -145,7 +141,7 @@ def planning_context(request, project_id: int):
             for user in users
         ],
         "service_types": service_types,
-        "milestones": project.milestones.all(),
+        "milestones": list(project.milestones.all()),
         "planned_work": [
             {
                 "title": pw.title,
@@ -176,7 +172,16 @@ def planning_context(request, project_id: int):
             service_types=service_types,
             offers=[offer.code for offer in offers],
         ),
-    }
+    })
+
+
+@router.get("/projects/{project_id}/planning/context/", response=PlanningContext)
+def planning_context(request, project_id: int):
+    return project_planning_context(
+        get_object_or_404(
+            Project.objects.select_related("customer", "owned_by"), pk=project_id
+        )
+    )
 
 
 class ImportedMilestone(Schema):
