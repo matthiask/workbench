@@ -91,4 +91,4 @@ project, fetches the context, drafts the offer, reviews it with you, validates
 it with `--dry-run` and only creates it after your approval. Link it into your
 personal skills to use it in any directory:
 
-    ln -s "$PWD/cli/skills/workbench-offer" ~/.claude/skills/workbench-offer
+    ln -sfn "$PWD/cli/skills/workbench-offer" ~/.claude/skills/workbench-offer
