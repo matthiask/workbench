@@ -30,12 +30,12 @@ class APITokenTest(TestCase):
         token.refresh_from_db()
         self.assertIsNotNone(token.last_used_at)
 
-        # The reporting API uses its own token
+        # The reporting API accepts tokens of users with the controlling feature
         self.assertEqual(
             self.client.get(
-                "/api/key-data/", headers={"authorization": f"Bearer {secret}"}
+                "/api/cash-data/", headers={"authorization": f"Bearer {secret}"}
             ).status_code,
-            401,
+            200,
         )
 
         user.is_active = False

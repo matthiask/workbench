@@ -28,6 +28,8 @@ class APIFeaturesTest(TestCase):
             ("get", f"/api/projects/{project.pk}/projected-invoices/"),
             ("get", "/api/invoices/"),
             ("get", f"/api/invoices/{invoice.pk}/"),
+            ("get", "/api/key-data/"),
+            ("get", "/api/cash-data/"),
         ]:
             with self.subTest(method=method, url=url):
                 response = getattr(self.client, method)(

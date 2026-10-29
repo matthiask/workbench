@@ -5,6 +5,8 @@ from django.conf import settings
 from ninja import Router
 from ninja.security import HttpBearer
 
+from workbench.accounts.api_auth import user_auth
+from workbench.accounts.features import FEATURES
 from workbench.reporting.cash_data_api import cash_data
 from workbench.reporting.key_data_api import key_data_for_month
 from workbench.tools.validation import last_month_range
@@ -33,7 +35,12 @@ class ReportingToken(HttpBearer):
         )
 
 
-router = Router(auth=ReportingToken(), tags=["reporting"])
+# The static token for integrations, or users with the controlling feature
+# like in the web interface
+router = Router(
+    auth=[ReportingToken(), *user_auth(feature=FEATURES.CONTROLLING)],
+    tags=["reporting"],
+)
 
 
 @router.get("/key-data/")
