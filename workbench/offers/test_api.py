@@ -72,11 +72,12 @@ class OffersAPITest(TestCase):
 
         data = self.client.get(f"/api/projects/{project.pk}/").json()
         self.assertEqual(data["code"], project.code)
-        self.assertTrue(data["url"].endswith(project.get_absolute_url()))
+        self.assertEqual(data["url"], f"http://testserver{project.get_absolute_url()}")
 
         data = self.client.get(f"/api/projects/{project.pk}/offers/").json()
         self.assertEqual([o["code"] for o in data], [offer.code])
         self.assertEqual(data[0]["services"][0]["title"], "Design")
+        self.assertEqual(data[0]["url"], f"http://testserver{offer.get_absolute_url()}")
 
         self.assertEqual(self.client.get("/api/projects/0/").status_code, 404)
         self.assertEqual(self.client.get("/api/projects/0/offers/").status_code, 404)

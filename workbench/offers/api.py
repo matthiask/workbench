@@ -118,11 +118,11 @@ class OfferContext(Schema):
     import_schema: dict
 
 
-def _offer_out(offer, services):
+def _offer_out(offer, services, request):
     return {
         "id": offer.pk,
         "code": offer.code if offer.pk else None,
-        "url": f"{settings.WORKBENCH.URL}{offer.get_absolute_url()}"
+        "url": request.build_absolute_uri(offer.get_absolute_url())
         if offer.pk
         else None,
         "title": offer.title,
@@ -138,9 +138,9 @@ def _offer_out(offer, services):
     }
 
 
-def _project_offers(project):
+def _project_offers(project, request):
     return [
-        _offer_out(offer, list(offer.services.all()))
+        _offer_out(offer, list(offer.services.all()), request)
         for offer in project.offers.select_related("project").prefetch_related(
             "services"
         )
@@ -151,7 +151,8 @@ def _project_offers(project):
 def offer_list(request, project_id: int):
     """All offers of the project with their services"""
     return _project_offers(
-        get_object_or_404(Project.objects.select_related("customer"), pk=project_id)
+        get_object_or_404(Project.objects.select_related("customer"), pk=project_id),
+        request,
     )
 
 
@@ -163,8 +164,8 @@ def offer_context(request, project_id: int):
     )
     service_types = list(ServiceType.objects.all())
     return {
-        "project": project_out(project),
-        "offers": _project_offers(project),
+        "project": project_out(project, request),
+        "offers": _project_offers(project, request),
         "service_types": service_types,
         "import_schema": offer_import_schema(
             service_types=[st.title for st in service_types]
@@ -175,7 +176,7 @@ def offer_context(request, project_id: int):
 @router.get("/offers/{offer_id}/", response=OfferOut)
 def offer_detail(request, offer_id: int):
     offer = get_object_or_404(Offer.objects.select_related("project"), pk=offer_id)
-    return _offer_out(offer, list(offer.services.all()))
+    return _offer_out(offer, list(offer.services.all()), request)
 
 
 def _decimal(value, exp):
@@ -251,7 +252,7 @@ def _build_services(project, data, errors):
     return services
 
 
-def _save(offer, services, *, dry_run, delete=()):
+def _save(offer, services, request, *, dry_run, delete=()):
     """Save everything and return the offer, roll back with ``dry_run``"""
     with transaction.atomic():
         for service in delete:
@@ -261,7 +262,7 @@ def _save(offer, services, *, dry_run, delete=()):
             service.offer = offer
             service.save(skip_related_model=True)
         offer.save()  # Recalculate the total
-        result = _offer_out(offer, list(offer.services.all()))
+        result = _offer_out(offer, list(offer.services.all()), request)
         if dry_run:
             transaction.set_rollback(True)
             result |= {"id": None, "url": None}
@@ -308,7 +309,7 @@ def offer_create(request, project_id: int, data: OfferIn, *, dry_run: bool = Fal
     if errors:
         raise ValidationError(errors)
 
-    return _save(offer, services, dry_run=dry_run)
+    return _save(offer, services, request, dry_run=dry_run)
 
 
 @router.put("/offers/{offer_id}/", response=OfferOut)
@@ -347,4 +348,4 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = Fals
     if errors:
         raise ValidationError(errors)
 
-    return _save(offer, services, dry_run=dry_run, delete=existing)
+    return _save(offer, services, request, dry_run=dry_run, delete=existing)

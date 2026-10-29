@@ -2,7 +2,6 @@ import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
 
-from django.conf import settings
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
@@ -34,11 +33,11 @@ class ProjectOut(Schema):
     closed_on: dt.date | None
 
 
-def project_out(project):
+def project_out(project, request):
     return {
         "id": project.id,
         "code": project.code,
-        "url": f"{settings.WORKBENCH.URL}{project.get_absolute_url()}",
+        "url": request.build_absolute_uri(project.get_absolute_url()),
         "title": project.title,
         "description": project.description,
         "customer": project.customer.name,
@@ -56,7 +55,7 @@ def project_list(request, q: str = "", *, include_closed: bool = False):
         projects = projects.open()
     if q:
         projects = projects.search(q)
-    return [project_out(project) for project in projects[:50]]
+    return [project_out(project, request) for project in projects[:50]]
 
 
 @router.get("/projects/{int:project_id}/", response=ProjectOut)
@@ -64,7 +63,8 @@ def project_detail(request, project_id: int):
     return project_out(
         get_object_or_404(
             Project.objects.select_related("customer", "owned_by"), pk=project_id
-        )
+        ),
+        request,
     )
 
 
@@ -214,7 +214,7 @@ def project_stats(request, filters: Query[StatsFilter]):
         b = budget[project.id]
         gm = project_gross_margin(project)
         return {
-            "project": project_out(project),
+            "project": project_out(project, request),
             "hours": {
                 "offered": b["service_hours"],
                 "logged": b["hours"],
