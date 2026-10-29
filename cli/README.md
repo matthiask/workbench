@@ -68,3 +68,17 @@ logged on their services:
     wb offers replace 5678 offer.yaml
 
 All commands which output data accept `--json`.
+
+## Project statistics
+
+Hours (offered, logged, planned), amounts (sold, invoiced, logged work which
+hasn't been invoiced yet), gross margins, services, logged and planned hours
+per person and invoices of projects. People are identified by their short
+name.
+
+    wb projects stats 1234 5678
+    wb projects stats --open --closed-since 2026-01-01
+    wb projects stats --open --json > stats.json
+    wb projects stats --closed-since 2026-01-01 --csv > hours.csv
+
+`--csv` writes one row per project, service and person with the logged hours.

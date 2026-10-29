@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import sys
@@ -147,6 +148,77 @@ def _echo_offer_list(offers):
     console.print(table)
 
 
+def _echo_stats(projects):
+    table = _table(
+        "Code",
+        "Title",
+        "Closed on",
+        "Offered h>",
+        "Logged h>",
+        "Planned h>",
+        "Sold>",
+        "Invoiced>",
+        "Not invoiced>",
+        "Gross margin>",
+        "Rate>",
+    )
+    for stats in projects:
+        project = stats["project"]
+        table.add_row(
+            project["code"],
+            project["title"],
+            project["closed_on"] or "",
+            stats["hours"]["offered"],
+            stats["hours"]["logged"],
+            stats["hours"]["planned"],
+            stats["amounts"]["sold"],
+            stats["amounts"]["invoiced"],
+            stats["amounts"]["not_invoiced"],
+            stats["gross_margin"]["gross_margin"],
+            stats["gross_margin"]["rate"],
+        )
+    console.print(table)
+
+
+def _echo_stats_csv(projects):
+    writer = csv.writer(sys.stdout)
+    writer.writerow([
+        "project_id",
+        "project",
+        "project_title",
+        "closed_on",
+        "service_id",
+        "service",
+        "offer",
+        "offer_status",
+        "effort_type",
+        "effort_rate",
+        "is_optional",
+        "user",
+        "hours",
+    ])
+    for stats in projects:
+        project = stats["project"]
+        services = {service["id"]: service for service in stats["services"]}
+        for row in stats["logged_hours"]:
+            service = services[row["service"]]
+            writer.writerow([
+                project["id"],
+                project["code"],
+                project["title"],
+                project["closed_on"] or "",
+                service["id"],
+                service["title"],
+                service["offer"] or "",
+                service["offer_status"] or "",
+                service["effort_type"],
+                service["effort_rate"] or "",
+                service["is_optional"],
+                row["user"],
+                row["hours"],
+            ])
+
+
 @click.group()
 @click.version_option(package_name="workbench-cli")
 def cli():
@@ -224,6 +296,35 @@ def show_project(project_id, as_json):
         console.print(project["description"])
     console.print()
     _echo_offer_list(offers)
+
+
+@projects.command()
+@click.argument("project_ids", nargs=-1, type=int)
+@click.option("--open", "open_", is_flag=True, help="All open projects.")
+@click.option(
+    "--closed-since",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Projects closed on or after this date.",
+)
+@click.option("--json", "as_json", is_flag=True, help="Everything as JSON.")
+@click.option(
+    "--csv",
+    "as_csv",
+    is_flag=True,
+    help="Logged hours per project, service and person as CSV.",
+)
+def stats(project_ids, open_, closed_since, as_json, as_csv):
+    """Hours, amounts and gross margins of projects"""
+    params = {"ids": project_ids, "open": _bool(open_)}
+    if closed_since:
+        params["closed_since"] = closed_since.date().isoformat()
+    data = _request("GET", "projects/stats/", params=params)
+    if as_json:
+        _echo_json(data)
+    elif as_csv:
+        _echo_stats_csv(data)
+    else:
+        _echo_stats(data)
 
 
 @cli.group()
