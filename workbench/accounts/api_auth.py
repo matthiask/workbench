@@ -1,4 +1,4 @@
-from django.utils.translation import gettext as _
+from django.utils.translation import activate, gettext as _
 from ninja.errors import HttpError
 from ninja.security import HttpBearer, SessionAuth
 
@@ -27,6 +27,8 @@ class UserToken(HttpBearer):
     def authenticate(self, request, token):
         if user := APIToken.objects.user_for(token):
             request.user = user
+            # The user middleware only does this for sessions
+            activate(user.language)
             return _check_feature(user, self.feature)
         return None
 

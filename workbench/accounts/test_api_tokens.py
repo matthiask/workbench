@@ -177,3 +177,18 @@ class APITokenTest(TestCase):
             response.content.decode().split('name="token" value="')[1].split('"')[0]
         )
         self.assertEqual(APIToken.objects.user_for(secret), user)
+
+    def test_language(self):
+        """Token authenticated requests use the user's language"""
+        user = factories.UserFactory.create(language="en")
+        _token, secret = APIToken.create_for(user=user, title="CLI")
+        response = self.client.post(
+            "/api/projects/",
+            {"title": "X", "customer": 0},
+            content_type="application/json",
+            headers={"authorization": f"Bearer {secret}", "accept-language": "de"},
+        )
+        self.assertEqual(
+            response.json()["detail"][0]["msg"],
+            "Select a valid choice. That choice is not one of the available choices.",
+        )
