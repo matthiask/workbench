@@ -1,7 +1,11 @@
 import datetime as dt
+import importlib
 from decimal import Decimal
 from unittest.mock import PropertyMock, patch
 
+from django.apps import apps
+from django.core.exceptions import ValidationError
+from django.db import connection
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -278,3 +282,42 @@ class HoursSinceLatestTest(TestCase):
 
         past = timezone.now() - dt.timedelta(hours=3)
         self.assertGreater(self._make_user(past), Decimal("0.0"))
+
+
+class ShortNameTest(TestCase):
+    def test_unique_short_names(self):
+        """Short names are unique, blank short names are allowed"""
+        user = factories.UserFactory.create(_short_name="ab")
+        factories.UserFactory.create(_short_name="")
+        factories.UserFactory.create(_short_name="")
+
+        other = factories.UserFactory.create()
+        other._short_name = "ab"
+        with self.assertRaises(ValidationError):
+            other.validate_constraints()
+
+        user.validate_constraints()
+
+    def test_rename_duplicate_short_names(self):
+        """Duplicates are renamed, inactive users first"""
+        migration = importlib.import_module(
+            "workbench.accounts.migrations.0028_unique_short_name"
+        )
+        with connection.cursor() as cursor:
+            cursor.execute("DROP INDEX accounts_user_unique_short_name")
+        inactive = factories.UserFactory.create(_short_name="ab", is_active=False)
+        active = factories.UserFactory.create(_short_name="ab")
+        newer = factories.UserFactory.create(_short_name="ab")
+        taken = factories.UserFactory.create(_short_name="ab-2")
+
+        migration.rename_duplicate_short_names(apps, None)
+
+        names = dict(
+            User.objects.filter(
+                pk__in=[inactive.pk, active.pk, newer.pk, taken.pk]
+            ).values_list("pk", "_short_name")
+        )
+        self.assertEqual(names[active.pk], "ab")
+        self.assertEqual(names[newer.pk], "ab-3")
+        self.assertEqual(names[inactive.pk], "ab-4")
+        self.assertEqual(names[taken.pk], "ab-2")

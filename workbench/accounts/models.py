@@ -174,6 +174,14 @@ class User(Model, AbstractBaseUser):
     objects = UserManager()
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["_short_name"],
+                condition=~Q(_short_name=""),
+                name="accounts_user_unique_short_name",
+                violation_error_message=_("This short name is already taken."),
+            ),
+        ]
         ordering = ("_full_name",)
         verbose_name = _("user")
         verbose_name_plural = _("users")

@@ -59,6 +59,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`. The offers API (`workbench/offers/api.py`) only creates and
   replaces offers in preparation. Service types only suggest the effort type
   and the hourly rate, both can be set freely.
+- Short names (`User._short_name`) are unique unless blank. APIs identify
+  people by their short name.
 - The planning import prompt is pasted into external LLMs. Keep personal data
   out of it: people are identified by their short name only (no email
   addresses or full names, see `plannable_users()` in
