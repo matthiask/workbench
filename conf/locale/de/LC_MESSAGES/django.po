@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-27 10:17+0100\n"
+"POT-Creation-Date: 2026-10-29 11:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2576,7 +2576,7 @@ msgstr "Bemerkung"
 
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
-#: workbench/templates/shortcuts.html
+#: workbench/templates/shortcuts.html workbench/tools/pdf.py
 msgid "offers"
 msgstr "Offerten"
 
@@ -2699,6 +2699,36 @@ msgstr "Keine Offerten im Projekt."
 #, python-format
 msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
+
+#: workbench/planning/api.py
+#, python-format
+msgid "Duplicate milestone key %r."
+msgstr "Doppelter Meilenstein-Schlüssel %r."
+
+#: workbench/planning/api.py
+#, python-format
+msgid "Unknown or inactive user %r."
+msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
+
+#: workbench/planning/api.py
+#, python-format
+msgid "Unknown service type %r."
+msgstr "Unbekannter Leistungstyp %r."
+
+#: workbench/planning/api.py
+#, python-format
+msgid "Unknown or declined offer %r."
+msgstr "Unbekannte oder abgelehnte Offerte %r."
+
+#: workbench/planning/api.py
+#, python-format
+msgid "Work is planned in or after the week of the milestone %(milestone)r: %(weeks)s"
+msgstr "Arbeit ist in oder nach der Woche des Meilensteins %(milestone)r geplant: %(weeks)s"
+
+#: workbench/planning/api.py
+#, python-format
+msgid "Unknown milestone %r."
+msgstr "Unbekannter Meilenstein %r."
 
 #: workbench/planning/forms.py
 #, python-format
