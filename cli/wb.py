@@ -3,6 +3,8 @@ import json
 import os
 import sys
 import tomllib
+from functools import cache
+from importlib.metadata import version
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -17,6 +19,7 @@ from rich.text import Text
 
 
 CONFIG = Path.home() / ".config" / "workbench.toml"
+VERSION = version("workbench-cli")
 
 console = Console(markup=False, highlight=False)
 
@@ -36,6 +39,25 @@ def _config():
     return url, token
 
 
+def _parse_version(version):
+    try:
+        return tuple(int(part) for part in version.split("."))
+    except ValueError:
+        return ()
+
+
+@cache
+def _check_version(latest):
+    """Tell the user about a newer version, once"""
+    if latest and _parse_version(latest) > _parse_version(VERSION):
+        click.secho(
+            f"wb {latest} is available (you have {VERSION}):"
+            " uv tool upgrade workbench-cli",
+            fg="yellow",
+            err=True,
+        )
+
+
 def _error(error):
     """A validation error, prefixed with the field if there is one"""
     if loc := ".".join(str(part) for part in error["loc"][2:]):
@@ -53,12 +75,13 @@ def _request(method, path, *, optional=False, **kwargs):
         response = requests.request(
             method,
             urljoin(url, f"/api/{path}"),
-            headers={"authorization": f"Bearer {token}"},
+            headers={"authorization": f"Bearer {token}", "x-workbench-cli": VERSION},
             timeout=30,
             **kwargs,
         )
     except requests.RequestException as exc:
         _terminate(str(exc))
+    _check_version(response.headers.get("x-workbench-cli-latest"))
     if response.status_code == 403 and optional:
         return None
     if response.status_code == 422:

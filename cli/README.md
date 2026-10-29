@@ -6,19 +6,20 @@ Commands follow the pattern `wb <noun> <verb>`, e.g. `wb projects search` or
 The `wb` program talks to the Workbench JSON API. Install it with
 [uv](https://docs.astral.sh/uv/):
 
-    uv tool install "git+ssh://git@github.com/matthiask/workbench.git#subdirectory=cli"
+    uv tool install "git+https://github.com/matthiask/workbench#subdirectory=cli"
 
-or, from a local checkout:
+Upgrade it when `wb` tells you to:
 
-    uv tool install --editable ./cli
+    uv tool upgrade workbench-cli
 
 Create a personal API token in Workbench ("API tokens" in the user menu) and
 log in:
 
     wb login https://workbench.feinheit.ch
 
-Check it with `wb whoami`. The URL and the token are stored in `~/.config/workbench.toml`. The
-`WORKBENCH_URL` and `WORKBENCH_TOKEN` environment variables take precedence.
+Check it with `wb whoami`. The URL and the token are stored in
+`~/.config/workbench.toml`. The `WORKBENCH_URL` and `WORKBENCH_TOKEN`
+environment variables take precedence.
 
 ## Creating projects
 
