@@ -7,6 +7,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
+from workbench.projects.models import Project
 from workbench.tools.validation import monday
 
 
@@ -99,3 +100,73 @@ class ProjectsAPITest(TestCase):
         ).json()
         self.assertEqual(len(data), 2)
         self.assertEqual(Decimal(data[1]["hours"]["logged"]), 0)
+
+    def test_create(self):
+        """Projects are validated like in the web interface"""
+        user = factories.UserFactory.create()
+        other = factories.UserFactory.create(_short_name="ot")
+        customer = factories.OrganizationFactory.create()
+        contact = factories.PersonFactory.create(organization=customer)
+        self.client.force_login(user)
+
+        data = {
+            "title": "Relaunch",
+            "customer": customer.pk,
+            "contact": contact.pk,
+        }
+        response = self.client.post(
+            "/api/projects/?dry_run=true", data, content_type="application/json"
+        )
+        self.assertEqual(response.json()["id"], None)
+        self.assertFalse(Project.objects.exists())
+
+        response = self.client.post(
+            "/api/projects/", data, content_type="application/json"
+        )
+        project = Project.objects.get()
+        self.assertEqual(response.json()["id"], project.pk)
+        self.assertEqual(project.owned_by, user)
+        self.assertEqual(project.contact, contact)
+        self.assertEqual(project.type, Project.ORDER)
+
+        response = self.client.post(
+            "/api/projects/",
+            data | {"owned_by": "ot", "type": "maintenance"},
+            content_type="application/json",
+        )
+        project = Project.objects.get(pk=response.json()["id"])
+        self.assertEqual(project.owned_by, other)
+        self.assertEqual(project.type, Project.MAINTENANCE)
+
+        # Warnings of the web interface are errors
+        response = self.client.post(
+            "/api/projects/",
+            data | {"contact": None},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [{"loc": ["body", "data"], "msg": "No contact selected."}],
+        )
+
+        response = self.client.post(
+            "/api/projects/",
+            data | {"customer": 0, "owned_by": "nobody"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["body", "data", "owned_by"]],
+        )
+
+        response = self.client.post(
+            "/api/projects/",
+            data | {"customer": 0},
+            content_type="application/json",
+        )
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["body", "data", "customer"]],
+        )

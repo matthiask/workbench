@@ -1,17 +1,20 @@
 import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
+from typing import Literal
 
+from django.db import transaction
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from ninja import Query, Router, Schema
-from ninja.errors import HttpError
+from ninja import Field, Query, Router, Schema
+from ninja.errors import HttpError, ValidationError
 
 from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedHours
 from workbench.planning.models import PlannedWork
+from workbench.projects.forms import ProjectForm
 from workbench.projects.models import Project
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
@@ -66,6 +69,81 @@ def project_detail(request, project_id: int):
         ),
         request,
     )
+
+
+class ProjectIn(Schema):
+    title: str = Field(min_length=1, max_length=200)
+    description: str = ""
+    customer: int = Field(description="ID of the customer organization.")
+    contact: int | None = Field(
+        default=None, description="ID of the contact person at the customer."
+    )
+    type: Literal["order", "maintenance", "internal"] = "order"
+    owned_by: str | None = Field(
+        default=None,
+        description="Short name of the person responsible, defaults to the"
+        " authenticated user.",
+    )
+
+
+class ProjectCreated(ProjectOut):
+    id: int | None
+    url: str | None
+
+
+@router.post("/projects/", response=ProjectCreated)
+def project_create(request, data: ProjectIn, *, dry_run: bool = False):
+    """Create a project, validated like in the web interface
+
+    Warnings of the web interface are errors here; nothing is saved if anything
+    is invalid or with ``dry_run``."""
+    owned_by = request.user
+    if data.owned_by is not None:
+        owned_by = User.objects.filter(
+            is_active=True, _short_name=data.owned_by
+        ).first()
+        if not owned_by:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "owned_by"],
+                    "msg": _("Unknown or inactive user %r.") % data.owned_by,
+                }
+            ])
+
+    form = ProjectForm(
+        {
+            "title": data.title,
+            "description": data.description,
+            "customer": data.customer,
+            "contact": data.contact or "",
+            "type": data.type,
+            "owned_by": owned_by.pk,
+        },
+        request=request,
+    )
+    if not form.is_valid():
+        raise ValidationError(
+            [
+                {
+                    "loc": ["body", "data"] + ([field] if field != "__all__" else []),
+                    "msg": message,
+                }
+                for field, messages in form.errors.items()
+                for message in messages
+            ]
+            + [
+                {"loc": ["body", "data"], "msg": str(warning)}
+                for warning in form.warnings.values()
+            ]
+        )
+
+    with transaction.atomic():
+        project = form.save()
+        result = project_out(project, request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "url": None}
+    return result
 
 
 class StatsFilter(Schema):
