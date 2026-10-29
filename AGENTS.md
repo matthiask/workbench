@@ -50,7 +50,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   one router per app. Endpoints authenticate with the user's session by
   default, or with personal API tokens (`APIToken`, sent as bearer token,
   checked before the session because session auth requires a CSRF token, see
-  `user_auth()` in `workbench/accounts/api_auth.py`). Endpoints require the
+  `user_auth()` in `workbench/accounts/api_auth.py`). Tokens expire after
+  `API_TOKEN_LIFETIME`; `wb login` gets a new one through `/cli-login/` in the
+  browser, which posts it to a server the CLI runs on a local port. Endpoints require the
   same features as the web interface: `user_auth(feature=FEATURES.CONTROLLING)`
   on the router or the endpoint, checked before the request is validated. The
   reporting router uses the static bearer token (`ReportingToken` in

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 15:42+0100\n"
+"POT-Creation-Date: 2026-10-29 15:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -380,6 +380,10 @@ msgstr "Schlüssel-Hash"
 #: workbench/accounts/models.py workbench/templates/accounts/api_tokens.html
 msgid "last used at"
 msgstr "zuletzt verwendet am"
+
+#: workbench/accounts/models.py workbench/templates/accounts/api_tokens.html
+msgid "expires at"
+msgstr "läuft ab am"
 
 #: workbench/accounts/models.py
 msgid "API token"
@@ -3633,8 +3637,9 @@ msgid "Possibly requiring action"
 msgstr "Benötigen evtl. eine Aktion"
 
 #: workbench/templates/accounts/api_tokens.html
-msgid "API tokens give command line tools like <code>wb</code> access to Workbench in your name."
-msgstr "Mit API-Tokens erhalten Kommandozeilenwerkzeuge wie <code>wb</code> in deinem Namen Zugriff auf Workbench."
+#, python-format
+msgid "API tokens give command line tools like <code>wb</code> access to Workbench in your name. They expire after %(days)s days. <code>wb login</code> creates tokens through the browser; create them here for computers without a browser."
+msgstr "Mit API-Tokens erhalten Kommandozeilenwerkzeuge wie <code>wb</code> in deinem Namen Zugriff auf Workbench. Sie laufen nach %(days)s Tagen ab. <code>wb login</code> erstellt Tokens über den Browser; erstelle sie hier für Computer ohne Browser."
 
 #: workbench/templates/accounts/api_tokens.html
 msgid "Copy the token now, it will not be shown again:"
@@ -3670,6 +3675,41 @@ msgstr "Noch keine API-Tokens."
 #: workbench/templates/accounts/api_tokens.html
 msgid "Create token"
 msgstr "Token erstellen"
+
+#: workbench/templates/accounts/cli_login.html
+#: workbench/templates/accounts/cli_login_redirect.html
+msgid "Authorize wb"
+msgstr "wb autorisieren"
+
+#: workbench/templates/accounts/cli_login.html
+#, python-format
+msgid "The <code>wb</code> command line interface on <strong>%(name)s</strong> wants to access Workbench in your name."
+msgstr "Die Kommandozeile <code>wb</code> auf <strong>%(name)s</strong> möchte in deinem Namen auf Workbench zugreifen."
+
+#: workbench/templates/accounts/cli_login.html
+msgid "The <code>wb</code> command line interface wants to access Workbench in your name."
+msgstr "Die Kommandozeile <code>wb</code> möchte in deinem Namen auf Workbench zugreifen."
+
+#: workbench/templates/accounts/cli_login.html
+#, python-format
+msgid "The access expires after %(days)s days, <code>wb</code> will ask you to authorize it again."
+msgstr "Der Zugriff läuft nach %(days)s Tagen ab, <code>wb</code> wird dich dann erneut um Autorisierung bitten."
+
+#: workbench/templates/accounts/cli_login.html
+msgid "Only continue if you just started wb yourself."
+msgstr "Fahre nur fort, wenn du wb gerade selbst gestartet hast."
+
+#: workbench/templates/accounts/cli_login.html
+msgid "Authorize"
+msgstr "Autorisieren"
+
+#: workbench/templates/accounts/cli_login_redirect.html
+msgid "Handing the access over to wb…"
+msgstr "Zugriff wird an wb übergeben…"
+
+#: workbench/templates/accounts/cli_login_redirect.html
+msgid "Continue"
+msgstr "Weiter"
 
 #: workbench/templates/accounts/coffee_mail.txt
 msgid "Coffee and donut break"

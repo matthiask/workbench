@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate 'Authorize wb' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h1>{% translate 'Authorize wb' %}</h1>
+      <p>
+        {% if name %}
+          {% blocktranslate trimmed %}
+            The <code>wb</code> command line interface on <strong>{{ name }}</strong> wants to access Workbench in your
+            name.
+          {% endblocktranslate %}
+        {% else %}
+          {% blocktranslate trimmed %}
+            The <code>wb</code> command line interface wants to access Workbench in your name.
+          {% endblocktranslate %}
+        {% endif %}
+        {% blocktranslate trimmed %}
+          The access expires after {{ days }} days, <code>wb</code> will ask you to authorize it again.
+        {% endblocktranslate %}
+      </p>
+      <p>{% translate 'Only continue if you just started wb yourself.' %}</p>
+      <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">{% translate 'Authorize' %}</button>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

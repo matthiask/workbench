@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate 'Authorize wb' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h1>{% translate 'Authorize wb' %}</h1>
+      {# Posted, not redirected: The token does not end up in the browser history #}
+      <form method="POST" action="{{ action }}" id="cli-login">
+        <input type="hidden" name="token" value="{{ token }}">
+        <input type="hidden" name="state" value="{{ state }}">
+        <p>{% translate 'Handing the access over to wb…' %}</p>
+        <button type="submit" class="btn btn-primary">{% translate 'Continue' %}</button>
+      </form>
+      <script>
+        document.getElementById("cli-login").submit()
+      </script>
+    </div>
+  </div>
+{% endblock content %}

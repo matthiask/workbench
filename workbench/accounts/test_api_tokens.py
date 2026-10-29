@@ -1,4 +1,5 @@
 from django.test import Client, TestCase
+from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
@@ -131,3 +132,48 @@ class APITokenTest(TestCase):
         user.is_active = False
         user.save()
         self.assertEqual(self.client.get("/api/me/").status_code, 401)
+
+    def test_expiry(self):
+        """Tokens expire, creating a token removes the user's expired tokens"""
+        user = factories.UserFactory.create()
+        token, secret = APIToken.create_for(user=user, title="CLI")
+        headers = {"authorization": f"Bearer {secret}"}
+        self.assertEqual(self.client.get("/api/me/", headers=headers).status_code, 200)
+
+        token.expires_at = timezone.now()
+        token.save()
+        self.assertEqual(self.client.get("/api/me/", headers=headers).status_code, 401)
+
+        APIToken.create_for(user=user, title="New")
+        self.assertEqual(list(user.api_tokens.values_list("title", flat=True)), ["New"])
+
+    def test_cli_login(self):
+        """The CLI is authorized through the browser"""
+        url = "/cli-login/?port=8123&state=abcdefghijklmnop&name=laptop"
+
+        response = self.client.get(url)
+        self.assertRedirects(
+            response, "/accounts/login/", fetch_redirect_response=False
+        )
+
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        self.assertContains(self.client.get(url), "laptop")
+        for invalid in [
+            "/cli-login/",
+            "/cli-login/?port=80&state=abcdefghijklmnop",
+            "/cli-login/?port=8123&state=short",
+            "/cli-login/?port=8123&state=abcdefghijklmnop%22",
+        ]:
+            with self.subTest(url=invalid):
+                self.assertEqual(self.client.get(invalid).status_code, 400)
+
+        response = self.client.post(url)
+        token = user.api_tokens.get()
+        self.assertEqual(token.title, "wb (laptop)")
+        self.assertContains(response, 'action="http://127.0.0.1:8123/"')
+        self.assertContains(response, 'value="abcdefghijklmnop"')
+        secret = (
+            response.content.decode().split('name="token" value="')[1].split('"')[0]
+        )
+        self.assertEqual(APIToken.objects.user_for(secret), user)

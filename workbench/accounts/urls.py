@@ -11,6 +11,8 @@ urlpatterns = [
     path("accounts/", views.accounts, name="accounts"),
     path("accounts/update/", views.UserUpdateView.as_view(), name="accounts_update"),
     path("accounts/api-tokens/", views.api_tokens, name="accounts_api_tokens"),
+    # Not below accounts/ so that the login middleware redirects back here
+    path("cli-login/", views.cli_login, name="accounts_cli_login"),
     path("accounts/login/", views.login, name="login"),
     path("accounts/oauth2/", views.oauth2, name="accounts_oauth2"),
     path("accounts/logout/", views.logout, name="logout"),

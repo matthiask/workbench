@@ -485,6 +485,14 @@ class SpecialistField(models.Model):
         return self.name < other.name if isinstance(other, SpecialistField) else 1
 
 
+# Short lived: The CLI logs in again through the browser when its token expires
+API_TOKEN_LIFETIME = dt.timedelta(days=30)
+
+
+def _api_token_expiry():
+    return timezone.now() + API_TOKEN_LIFETIME
+
+
 def _hash_api_token(secret):
     return hashlib.sha256(secret.encode()).hexdigest()
 
@@ -494,7 +502,11 @@ class APITokenQuerySet(models.QuerySet):
         """The active user the token belongs to, or None"""
         token = (
             self
-            .filter(key_hash=_hash_api_token(secret), user__is_active=True)
+            .filter(
+                key_hash=_hash_api_token(secret),
+                expires_at__gt=timezone.now(),
+                user__is_active=True,
+            )
             .select_related("user")
             .first()
         )
@@ -517,6 +529,7 @@ class APIToken(models.Model):
     )
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     last_used_at = models.DateTimeField(_("last used at"), blank=True, null=True)
+    expires_at = models.DateTimeField(_("expires at"), default=_api_token_expiry)
 
     objects = APITokenQuerySet.as_manager()
 
@@ -532,7 +545,9 @@ class APIToken(models.Model):
     def create_for(cls, *, user, title):
         """Create a token and return it with its secret
 
-        Only the hash of the secret is stored, it cannot be shown again."""
+        Only the hash of the secret is stored, it cannot be shown again. Expired
+        tokens of the user are removed."""
+        cls.objects.filter(user=user, expires_at__lte=timezone.now()).delete()
         secret = f"wb_{secrets.token_urlsafe(32)}"
         token = cls.objects.create(
             user=user, title=title, key_hash=_hash_api_token(secret)

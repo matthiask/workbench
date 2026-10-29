@@ -1,15 +1,22 @@
+import re
+
 from authlib.google import GoogleOAuth2Client
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.http import (
+    Http404,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
 
 from workbench.accounts.forms import UserForm
-from workbench.accounts.models import APIToken, User
+from workbench.accounts.models import API_TOKEN_LIFETIME, APIToken, User
 from workbench.accounts.reporting import logged_hours
 from workbench.generic import DetailView, UpdateView
 
@@ -158,5 +165,41 @@ def api_tokens(request):
     return render(
         request,
         "accounts/api_tokens.html",
-        {"tokens": request.user.api_tokens.all(), "secret": secret},
+        {
+            "tokens": request.user.api_tokens.all(),
+            "secret": secret,
+            "days": API_TOKEN_LIFETIME.days,
+        },
+    )
+
+
+@never_cache
+def cli_login(request):
+    """Authorize the wb CLI on this computer
+
+    The CLI waits on a local port for the token. The login middleware makes
+    sure that the user is authenticated."""
+    try:
+        port = int(request.GET["port"])
+    except KeyError, ValueError:
+        port = 0
+    state = request.GET.get("state", "")
+    if not 1024 <= port <= 65535 or not re.fullmatch(r"[\w-]{16,100}", state):
+        return HttpResponseBadRequest("Invalid port or state.")
+    name = request.GET.get("name", "")[:50]
+
+    if request.method == "POST":
+        _token, secret = APIToken.create_for(
+            user=request.user, title=f"wb ({name})" if name else "wb"
+        )
+        return render(
+            request,
+            "accounts/cli_login_redirect.html",
+            {"action": f"http://127.0.0.1:{port}/", "token": secret, "state": state},
+        )
+
+    return render(
+        request,
+        "accounts/cli_login.html",
+        {"name": name, "days": API_TOKEN_LIFETIME.days},
     )

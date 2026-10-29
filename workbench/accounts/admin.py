@@ -147,11 +147,11 @@ class APITokenAdmin(admin.ModelAdmin):
     """Tokens can be revoked by deleting them, but not created: Users create
     their own and only see the secret once."""
 
-    list_display = ["title", "user", "created_at", "last_used_at"]
+    list_display = ["title", "user", "created_at", "last_used_at", "expires_at"]
     list_filter = ["user__is_active"]
     list_select_related = ["user"]
     search_fields = ["title", "user__email", "user___short_name", "user___full_name"]
-    readonly_fields = ["user", "title", "created_at", "last_used_at"]
+    readonly_fields = ["user", "title", "created_at", "last_used_at", "expires_at"]
     fields = readonly_fields
 
     def has_add_permission(self, request):
