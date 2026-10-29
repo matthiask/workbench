@@ -356,3 +356,44 @@ class PostalAddress(PersonDetail):
                 urlencode({"q": " ".join(parts)})
             )
         return None
+
+
+def postal_address_choices(*, organization=None, person=None, for_billing=False):
+    """Postal addresses of the person, or of the organization's people
+
+    Returns a list of ``(type, postal_address)`` tuples."""
+    postal_addresses = []
+
+    if person:
+        if (
+            for_billing
+            and person.organization
+            and person.organization.default_billing_address
+        ):
+            postal_addresses.append((
+                _("default billing address"),
+                person.organization.default_billing_address,
+            ))
+        postal_addresses.extend(
+            (pa.type, pa.postal_address)
+            for pa in PostalAddress.objects.filter(person=person).select_related(
+                "person__organization"
+            )
+        )
+
+    if organization and (not person or not postal_addresses):
+        if for_billing and organization.default_billing_address:
+            postal_addresses.append((
+                _("default billing address"),
+                organization.default_billing_address,
+            ))
+        postal_addresses.extend(
+            (pa.type, pa.postal_address)
+            for pa in PostalAddress.objects
+            .filter(person__organization=organization)
+            .exclude(person=person)
+            .exclude(person__is_archived=True)
+            .select_related("person__organization")
+        )
+
+    return postal_addresses

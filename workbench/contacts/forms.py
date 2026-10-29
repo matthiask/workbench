@@ -19,6 +19,7 @@ from workbench.contacts.models import (
     Person,
     PhoneNumber,
     PostalAddress,
+    postal_address_choices,
 )
 from workbench.tools.forms import (
     Autocomplete,
@@ -392,39 +393,9 @@ class PostalAddressSelectionForm(ModelForm):
     def add_postal_address_selection_if_empty(
         self, *, organization=None, person=None, for_billing=False
     ):
-        postal_addresses = []
-
-        if person:
-            if (
-                for_billing
-                and person.organization
-                and person.organization.default_billing_address
-            ):
-                postal_addresses.append((
-                    _("default billing address"),
-                    person.organization.default_billing_address,
-                ))
-            postal_addresses.extend(
-                (pa.type, pa.postal_address)
-                for pa in PostalAddress.objects.filter(person=person).select_related(
-                    "person__organization"
-                )
-            )
-
-        if organization and (not person or not postal_addresses):
-            if for_billing and organization.default_billing_address:
-                postal_addresses.append((
-                    _("default billing address"),
-                    organization.default_billing_address,
-                ))
-            postal_addresses.extend(
-                (pa.type, pa.postal_address)
-                for pa in PostalAddress.objects
-                .filter(person__organization=organization)
-                .exclude(person=person)
-                .exclude(person__is_archived=True)
-                .select_related("person__organization")
-            )
+        postal_addresses = postal_address_choices(
+            organization=organization, person=person, for_billing=for_billing
+        )
 
         if postal_addresses:
             self.fields["postal_address"].help_text = format_html(

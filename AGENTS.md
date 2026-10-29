@@ -48,8 +48,19 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   JSON APIs. Prefer calling utilities over adding mixins or base classes.
 - The JSON APIs use django-ninja (`workbench/api.py`, mounted at `/api/`) with
   one router per app. Endpoints authenticate with the user's session by
-  default; the reporting router uses the static bearer token
-  (`ReportingToken` in `workbench/reporting/api.py`). Routes end with a slash.
+  default, or with personal API tokens (`APIToken`, sent as bearer token,
+  checked before the session because session auth requires a CSRF token); the
+  reporting router uses the static bearer token (`ReportingToken` in
+  `workbench/reporting/api.py`). Routes end with a slash. The Django test
+  client skips CSRF checks, use `Client(enforce_csrf_checks=True)` to test
+  them.
+- The `wb` command line interface lives in `cli/` (separate package, installed
+  with `uv tool install`). It is a thin client of the JSON API, keep the logic
+  on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`. The offers API (`workbench/offers/api.py`) only creates and
+  replaces offers in preparation. Service types only suggest the effort type
+  and the hourly rate, both can be set freely.
+- Short names (`User._short_name`) are unique unless blank. APIs identify
+  people by their short name.
 - The planning import prompt is pasted into external LLMs. Keep personal data
   out of it: people are identified by their short name only (no email
   addresses or full names, see `plannable_users()` in

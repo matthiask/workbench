@@ -28,8 +28,6 @@ class PlanningAPITest(TestCase):
         factories.AbsenceFactory.create(starts_on=in_days(-30), ends_on=in_days(-20))
         factories.AbsenceFactory.create(reason="correction")
         inactive = factories.UserFactory.create(is_active=False)
-        twin = factories.UserFactory.create(_short_name="twin", email="t1@example.com")
-        factories.UserFactory.create(_short_name="twin", email="t2@example.com")
         service_type = factories.service_types().consulting
 
         url = f"/api/projects/{project.pk}/planning/context/"
@@ -56,11 +54,10 @@ class PlanningAPITest(TestCase):
             ],
         )
 
-        # Only short names which identify a single active user
+        # Only active users
         short_names = [user["short_name"] for user in data["users"]]
         self.assertIn(project.owned_by._short_name, short_names)
         self.assertNotIn(inactive._short_name, short_names)
-        self.assertNotIn(twin._short_name, short_names)
         self.assertEqual(data["project"]["owned_by"], project.owned_by._short_name)
         self.assertNotIn("@", str(data))
 

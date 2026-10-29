@@ -1,6 +1,7 @@
 from authlib.google import GoogleOAuth2Client
 from django.conf import settings
 from django.contrib import auth, messages
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -8,7 +9,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
 
 from workbench.accounts.forms import UserForm
-from workbench.accounts.models import User
+from workbench.accounts.models import APIToken, User
 from workbench.accounts.reporting import logged_hours
 from workbench.generic import DetailView, UpdateView
 
@@ -140,3 +141,22 @@ def pin(request, pk, *, model, attribute):
         return JsonResponse({"pinned": True})
     manager.remove(instance)
     return JsonResponse({"pinned": False})
+
+
+@never_cache
+@login_required
+def api_tokens(request):
+    secret = None
+    if request.method == "POST":
+        if pk := request.POST.get("delete"):
+            request.user.api_tokens.filter(pk=pk).delete()
+            messages.success(request, _("The API token has been deleted."))
+            return redirect("accounts_api_tokens")
+        if title := request.POST.get("title", "").strip():
+            _token, secret = APIToken.create_for(user=request.user, title=title[:100])
+
+    return render(
+        request,
+        "accounts/api_tokens.html",
+        {"tokens": request.user.api_tokens.all(), "secret": secret},
+    )

@@ -230,6 +230,9 @@
               <a class="dropdown-item" href="{% url 'accounts_update' %}">
                 {% translate 'Settings' %}
               </a>
+              <a class="dropdown-item" href="{% url 'accounts_api_tokens' %}">
+                {% translate 'API tokens' %}
+              </a>
               {% if request.user.features.PLANNING %}
                 <a class="dropdown-item" href="{{ request.user.urls.planning }}">
                   {% translate 'planned work'|capfirst %}

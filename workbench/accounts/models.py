@@ -1,4 +1,6 @@
 import datetime as dt
+import hashlib
+import secrets
 from decimal import ROUND_UP, Decimal
 from functools import total_ordering
 from itertools import chain
@@ -172,6 +174,14 @@ class User(Model, AbstractBaseUser):
     objects = UserManager()
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["_short_name"],
+                condition=~Q(_short_name=""),
+                name="accounts_user_unique_short_name",
+                violation_error_message=_("This short name is already taken."),
+            ),
+        ]
         ordering = ("_full_name",)
         verbose_name = _("user")
         verbose_name_plural = _("users")
@@ -472,3 +482,58 @@ class SpecialistField(models.Model):
 
     def __lt__(self, other):
         return self.name < other.name if isinstance(other, SpecialistField) else 1
+
+
+def _hash_api_token(secret):
+    return hashlib.sha256(secret.encode()).hexdigest()
+
+
+class APITokenQuerySet(models.QuerySet):
+    def user_for(self, secret):
+        """The active user the token belongs to, or None"""
+        token = (
+            self
+            .filter(key_hash=_hash_api_token(secret), user__is_active=True)
+            .select_related("user")
+            .first()
+        )
+        if not token:
+            return None
+        self.filter(pk=token.pk).update(last_used_at=timezone.now())
+        return token.user
+
+
+class APIToken(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="api_tokens",
+        verbose_name=_("user"),
+    )
+    title = models.CharField(_("title"), max_length=100)
+    key_hash = models.CharField(
+        _("key hash"), max_length=64, unique=True, editable=False
+    )
+    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    last_used_at = models.DateTimeField(_("last used at"), blank=True, null=True)
+
+    objects = APITokenQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = _("API token")
+        verbose_name_plural = _("API tokens")
+
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def create_for(cls, *, user, title):
+        """Create a token and return it with its secret
+
+        Only the hash of the secret is stored, it cannot be shown again."""
+        secret = f"wb_{secrets.token_urlsafe(32)}"
+        token = cls.objects.create(
+            user=user, title=title, key_hash=_hash_api_token(secret)
+        )
+        return token, secret

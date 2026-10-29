@@ -1,5 +1,4 @@
 import datetime as dt
-from collections import defaultdict
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -90,17 +89,16 @@ class PlanningContext(Schema):
 
 
 def plannable_users():
-    """Active users by short name, leaving out those without a unique short name
+    """Active users by short name
 
     The planning context is sent to LLMs, so it identifies people only by
     their short name, not by their email address or full name."""
-    users = defaultdict(list)
-    for user in User.objects.filter(is_active=True).exclude(_short_name=""):
-        users[user._short_name].append(user)
     return {
-        short_name: matches[0]
-        for short_name, matches in sorted(users.items())
-        if len(matches) == 1
+        user._short_name: user
+        for user in User.objects
+        .filter(is_active=True)
+        .exclude(_short_name="")
+        .order_by("_short_name")
     }
 
 
