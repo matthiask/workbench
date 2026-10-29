@@ -20,3 +20,4 @@ tmp
 /*.xlsx
 
 **/.claude/settings.local.json
+/cli/uv.lock
