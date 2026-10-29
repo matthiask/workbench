@@ -246,6 +246,25 @@ def login(url):
     click.echo(f"Saved {CONFIG}")
 
 
+@cli.command()
+@click.option("--json", "as_json", is_flag=True)
+def whoami(as_json):
+    """Show the user and the Workbench installation the token belongs to"""
+    data = _request("GET", "me/")
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_fields(
+        data["full_name"],
+        [
+            ("Short name", data["short_name"]),
+            ("Email", data["email"]),
+            ("Workbench", data["url"]),
+        ],
+        url=data["url"],
+    )
+
+
 @cli.group()
 def projects():
     """Find projects"""

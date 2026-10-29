@@ -14,7 +14,7 @@ log in:
 
     wb login https://workbench.feinheit.ch
 
-The URL and the token are stored in `~/.config/workbench.toml`. The
+Check it with `wb whoami`. The URL and the token are stored in `~/.config/workbench.toml`. The
 `WORKBENCH_URL` and `WORKBENCH_TOKEN` environment variables take precedence.
 
 ## Creating offers

@@ -61,6 +61,25 @@ class APITokenTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_me(self):
+        """The authenticated user"""
+        user = factories.UserFactory.create(_short_name="ab", _full_name="A B")
+        _token, secret = APIToken.create_for(user=user, title="CLI")
+
+        self.assertEqual(self.client.get("/api/me/").status_code, 401)
+        self.assertEqual(
+            self.client.get(
+                "/api/me/", headers={"authorization": f"Bearer {secret}"}
+            ).json(),
+            {
+                "id": user.pk,
+                "short_name": "ab",
+                "full_name": "A B",
+                "email": user.email,
+                "url": "http://testserver/",
+            },
+        )
+
     def test_token_page(self):
         """Users create and delete their own tokens"""
         user = factories.UserFactory.create()
