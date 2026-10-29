@@ -60,6 +60,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - The `wb` command line interface lives in `cli/` (separate package, installed
   with `uv tool install`). It is a thin client of the JSON API, keep the logic
   on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`.
+  Bump the version in `cli/pyproject.toml` when changing the CLI: the server
+  reads it and tells users of older versions to upgrade. Raise `MINIMUM` in
+  `workbench/cli_version.py` when older versions don't work anymore.
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only creates and
   replaces offers in preparation. Service types only suggest the effort type

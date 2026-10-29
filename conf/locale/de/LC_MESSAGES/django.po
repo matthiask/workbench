@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 15:19+0100\n"
+"POT-Creation-Date: 2026-10-29 15:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,14 +21,14 @@ msgstr ""
 msgid "feature"
 msgstr "Feature"
 
-#: workbench/accounts/apps.py workbench/templates/base.html
-msgid "accounts"
-msgstr "Konten"
-
-#: workbench/accounts/features.py
+#: workbench/accounts/api_auth.py workbench/accounts/features.py
 #, python-brace-format
 msgid "You do not have access to the required feature '{feature}'."
 msgstr "Du hast keinen Zugriff auf das notwendige Feature '{feature}'."
+
+#: workbench/accounts/apps.py workbench/templates/base.html
+msgid "accounts"
+msgstr "Konten"
 
 #: workbench/accounts/features.py workbench/invoices/tasks.py
 msgid "Auto dunning"
@@ -894,6 +894,10 @@ msgstr "Keine Jahresarbeitszeit definiert für Nutzer:in %(user)s mit Arbeitszei
 #: workbench/awt/views.py
 msgid "Filter invalid, no absences available."
 msgstr "Filter ungültig, keine Abwesenheiten verfügbar."
+
+#: workbench/cli_version.py
+msgid "Your wb is too old for this Workbench, please upgrade it: uv tool upgrade workbench-cli"
+msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: uv tool upgrade workbench-cli"
 
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
@@ -2762,7 +2766,7 @@ msgstr "%s zu Projekt kopieren"
 msgid "Duplicate milestone key %r."
 msgstr "Doppelter Meilenstein-Schlüssel %r."
 
-#: workbench/planning/api.py
+#: workbench/planning/api.py workbench/projects/api.py
 #, python-format
 msgid "Unknown or inactive user %r."
 msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
