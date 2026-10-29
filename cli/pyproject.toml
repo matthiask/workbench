@@ -23,5 +23,6 @@ dependencies = [
   "click",
   "pyyaml",
   "requests",
+  "rich",
 ]
 scripts.wb = "wb:cli"

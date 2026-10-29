@@ -8,9 +8,14 @@ from urllib.parse import urljoin
 import click
 import requests
 import yaml
+from rich import box
+from rich.console import Console
+from rich.table import Table
 
 
 CONFIG = Path.home() / ".config" / "workbench.toml"
+
+console = Console(markup=False, highlight=False)
 
 
 def _terminate(msg):
@@ -73,41 +78,73 @@ def _echo_json(data):
     click.echo(json.dumps(data, indent=2, ensure_ascii=False))
 
 
+def _table(*columns, **kwargs):
+    """A table with headings, columns ending in ">" are right-aligned"""
+    table = Table(box=box.SIMPLE_HEAD, **kwargs)
+    for column in columns:
+        if column.endswith(">"):
+            table.add_column(column[:-1], justify="right")
+        else:
+            table.add_column(column)
+    return table
+
+
+def _echo_fields(title, fields):
+    """A bold title followed by the non-empty fields"""
+    console.print(title, style="bold")
+    grid = Table.grid(padding=(0, 2))
+    grid.add_column(style="dim")
+    grid.add_column()
+    for label, value in fields:
+        if value:
+            grid.add_row(label, str(value))
+    console.print(grid)
+
+
 def _echo_offer(offer):
-    click.secho(f"{offer['code'] or '(new offer)'} {offer['title']}", bold=True)
-    if offer["id"]:
-        click.echo(f"ID: {offer['id']}")
-    click.echo(f"Status: {offer['status']}")
-    if offer["url"]:
-        click.echo(offer["url"])
-    click.echo()
+    _echo_fields(
+        f"{offer['code'] or '(new offer)'} {offer['title']}",
+        [("ID", offer["id"]), ("Status", offer["status"]), ("URL", offer["url"])],
+    )
+    table = _table(
+        "Service", "Effort type", "Hours>", "Rate>", "Cost>", show_footer=True
+    )
     for service in offer["services"]:
-        effort = (
-            f"{service['effort_hours']}h {service['effort_type']}"
-            f" à {service['effort_rate']}"
-            if service["effort_hours"]
-            else ""
+        table.add_row(
+            service["title"] + (" (optional)" if service["is_optional"] else ""),
+            service["effort_type"],
+            service["effort_hours"] or "",
+            service["effort_rate"] or "",
+            service["service_cost"],
+            style="dim" if service["is_optional"] else None,
         )
-        optional = " (optional)" if service["is_optional"] else ""
-        click.echo(
-            f"{service['service_cost']:>12}  {service['title']}{optional}"
-            + (f"  [{effort}]" if effort else "")
-        )
-    click.echo()
-    click.echo(f"{offer['subtotal']:>12}  Subtotal")
+    table.columns[0].footer = "Subtotal"
+    table.columns[-1].footer = offer["subtotal"]
+    console.print(table)
+    totals = Table.grid(padding=(0, 2))
+    totals.add_column()
+    totals.add_column(justify="right")
     if float(offer["discount"]):
-        click.echo(f"{offer['discount']:>12}  Discount")
-    click.echo(f"{offer['total']:>12}  Total")
+        totals.add_row("Discount", offer["discount"])
+    totals.add_row("Total excl. tax", offer["total_excl_tax"])
+    totals.add_row("Total", offer["total"], style="bold")
+    console.print(totals)
 
 
 def _echo_offer_list(offers):
     if not offers:
-        click.echo("No offers yet.")
+        console.print("No offers yet.")
+        return
+    table = _table("ID>", "Code", "Title", "Status", "Total>")
     for offer in offers:
-        click.echo(
-            f"{offer['id']:>6}  {offer['code']}  {offer['total']:>12}"
-            f"  {offer['title']} ({offer['status']})"
+        table.add_row(
+            str(offer["id"]),
+            offer["code"],
+            offer["title"],
+            offer["status"],
+            offer["total"],
         )
+    console.print(table)
 
 
 @click.group()
@@ -148,12 +185,17 @@ def search(query, include_closed, as_json):
     if as_json:
         _echo_json(data)
         return
+    table = _table("ID>", "Code", "Title", "Customer", "Owned by", "Closed on")
     for project in data:
-        closed = f" (closed {project['closed_on']})" if project["closed_on"] else ""
-        click.echo(
-            f"{project['id']:>6}  {project['code']}  {project['title']}"
-            f" - {project['customer']}{closed}"
+        table.add_row(
+            str(project["id"]),
+            project["code"],
+            project["title"],
+            project["customer"],
+            project["owned_by"],
+            project["closed_on"] or "",
         )
+    console.print(table)
 
 
 @projects.command("show")
@@ -166,19 +208,21 @@ def show_project(project_id, as_json):
     if as_json:
         _echo_json(project | {"offers": offers})
         return
-    click.secho(f"{project['code']} {project['title']}", bold=True)
-    click.echo(f"ID: {project['id']}")
-    click.echo(f"Customer: {project['customer']}")
-    click.echo(f"Owned by: {project['owned_by']}")
-    if project["flat_rate"]:
-        click.echo(f"Flat rate: {project['flat_rate']}")
-    if project["closed_on"]:
-        click.echo(f"Closed on: {project['closed_on']}")
-    click.echo(project["url"])
+    _echo_fields(
+        f"{project['code']} {project['title']}",
+        [
+            ("ID", project["id"]),
+            ("Customer", project["customer"]),
+            ("Owned by", project["owned_by"]),
+            ("Flat rate", project["flat_rate"]),
+            ("Closed on", project["closed_on"]),
+            ("URL", project["url"]),
+        ],
+    )
     if project["description"]:
-        click.echo()
-        click.echo(project["description"])
-    click.echo()
+        console.print()
+        console.print(project["description"])
+    console.print()
     _echo_offer_list(offers)
 
 
