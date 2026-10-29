@@ -102,6 +102,7 @@ class ProjectedInvoicesTest(TestCase):
 
         send_unsent_projected_invoices_reminders()
         [message] = mail.outbox
+        self.assertIn("Geplanter bereinigter Umsatz gesamt: 1’500.00", message.body)
         self.assertIn(
             "Geplanter bereinigter Umsatz bis 30.11.2021: 1’000.00", message.body
         )

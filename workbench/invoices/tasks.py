@@ -61,6 +61,7 @@ def create_recurring_invoices_and_notify():
 PROJECTED_GROSS_MARGIN_TEMPLATE = """\
 {project}
 {base_url}{project_url}
+Geplanter bereinigter Umsatz gesamt: {projected_total}
 Geplanter bereinigter Umsatz bis {eom}: {projected}
 Verrechnet exkl. MwSt.: {invoiced}
 Fremdkosten: {costs} (auf Rechnungen: {invoiced_costs}, erfasst: {logged_costs})
@@ -94,6 +95,7 @@ def send_unsent_projected_invoices_reminders():
                 base_url=settings.WORKBENCH.URL,
                 project_url=project["project"].get_absolute_url(),
                 eom=eom,
+                projected_total=currency(project["projected_total"]),
                 projected=currency(
                     sum(
                         (
