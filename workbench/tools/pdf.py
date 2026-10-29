@@ -1,10 +1,12 @@
 import datetime as dt
+import re
 from copy import deepcopy
 from decimal import Decimal as D
 
 from django.conf import settings
+from django.utils.http import content_disposition_header
 from django.utils.text import Truncator, capfirst
-from django.utils.translation import activate, gettext as _
+from django.utils.translation import activate, gettext as _, override
 from pdfdocument.document import (
     TA_RIGHT,
     Frame,
@@ -534,11 +536,7 @@ class PDFDocument(_PDFDocument):
             self.end_keeptogether()
 
     def process_invoice(self, invoice, *, qr=True):
-        title = _("invoice")
-        if invoice.type == invoice.DOWN_PAYMENT:
-            title = _("down payment invoice")
-        elif invoice.type == invoice.CREDIT:
-            title = _("credit")
+        title = invoice_title(invoice)
 
         self.watermark(
             ""
@@ -755,10 +753,55 @@ als gegenstandslos zu betrachten.</p>
         return [calculated if col is None else col for col in columns]
 
 
-def pdf_response(*args, **kwargs):
+def invoice_title(invoice):
+    if invoice.type == invoice.DOWN_PAYMENT:
+        return _("down payment invoice")
+    if invoice.type == invoice.CREDIT:
+        return _("credit")
+    return _("invoice")
+
+
+def document_filename(*parts):
+    """Join the parts with underscores, replacing anything which isn't a
+    letter or a digit inside the parts with dashes"""
+    return "_".join(
+        slug for part in parts if (slug := re.sub(r"[\W_]+", "-", str(part)).strip("-"))
+    )
+
+
+@override(settings.WORKBENCH.PDF_LANGUAGE)
+def offer_filename(offer):
+    return document_filename(
+        offer.code, offer.project.customer.name, offer.project.title, _("offer")
+    )
+
+
+@override(settings.WORKBENCH.PDF_LANGUAGE)
+def offers_filename(project):
+    return document_filename(
+        project.code, project.customer.name, project.title, _("offers")
+    )
+
+
+@override(settings.WORKBENCH.PDF_LANGUAGE)
+def invoice_filename(invoice):
+    return document_filename(
+        invoice.code,
+        invoice.customer.name,
+        invoice.project.title if invoice.project else invoice.title,
+        invoice_title(invoice),
+    )
+
+
+def pdf_response(filename, *, as_attachment=True, **kwargs):
     activate(settings.WORKBENCH.PDF_LANGUAGE)
     kwargs["pdfdocument"] = PDFDocument
-    return _pdf_response(*args, **kwargs)
+    pdf, response = _pdf_response(filename, as_attachment=as_attachment, **kwargs)
+    # pdfdocument replaces underscores and non-ASCII characters with dashes
+    response["Content-Disposition"] = content_disposition_header(
+        as_attachment, f"{filename}.pdf"
+    )
+    return pdf, response
 
 
 def get_debtor_address(postal_address):

@@ -7,7 +7,7 @@ from workbench import generic
 from workbench.offers.forms import OfferCopyForm, OfferDeleteForm
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
-from workbench.tools.pdf import pdf_response
+from workbench.tools.pdf import offer_filename, offers_filename, pdf_response
 
 
 class OfferPDFView(generic.DetailView):
@@ -17,7 +17,7 @@ class OfferPDFView(generic.DetailView):
         self.object = self.get_object()
 
         pdf, response = pdf_response(
-            self.object.code,
+            offer_filename(self.object),
             as_attachment=request.GET.get("disposition") == "attachment",
         )
 
@@ -48,7 +48,7 @@ class ProjectOfferPDFView(generic.DetailView):
             return redirect(self.object)
 
         pdf, response = pdf_response(
-            self.object.code,
+            offers_filename(self.object),
             as_attachment=request.GET.get("disposition") == "attachment",
         )
         pdf.offers_pdf(

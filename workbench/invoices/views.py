@@ -13,7 +13,7 @@ from workbench.contacts.models import Person
 from workbench.invoices.forms import SendReminderForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
-from workbench.tools.pdf import pdf_response
+from workbench.tools.pdf import invoice_filename, pdf_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
@@ -24,7 +24,7 @@ class InvoicePDFView(generic.DetailView):
         self.object = self.get_object()
 
         pdf, response = pdf_response(
-            self.object.code,
+            invoice_filename(self.object),
             as_attachment=request.GET.get("disposition") == "attachment",
         )
 

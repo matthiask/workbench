@@ -946,6 +946,32 @@ class InvoicesTest(TestCase):
             " preparation anymore.",
         )
 
+    def test_pdf_filenames(self):
+        """PDF filenames contain the project number, customer, title and type"""
+        project = factories.ProjectFactory.create(title="Relaunch")
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.DOWN_PAYMENT,
+        )
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.get(invoice.urls["pdf"] + "?disposition=attachment")
+        self.assertEqual(
+            response["content-disposition"],
+            f'attachment; filename="{invoice.code}_The-Organization-Ltd_Relaunch'
+            '_Anzahlungsrechnung.pdf"',
+        )
+
+        invoice = factories.InvoiceFactory.create(title="Hosting 2027")
+        response = self.client.get(invoice.urls["pdf"])
+        self.assertEqual(
+            response["content-disposition"],
+            f'inline; filename="{invoice.code}_The-Organization-Ltd_Hosting-2027'
+            '_Rechnung.pdf"',
+        )
+
     def test_person_invoice_without_vat(self):
         """Test another branch in workbench/tools/pdf.py"""
 

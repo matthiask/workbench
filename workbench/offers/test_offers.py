@@ -695,3 +695,27 @@ class OffersTest(TestCase):
         """Offer property testing"""
         self.assertTrue(Offer(status=Offer.ACCEPTED).is_accepted)
         self.assertTrue(Offer(status=Offer.DECLINED).is_declined)
+
+    def test_pdf_filenames(self):
+        """PDF filenames contain the project number, customer and project title"""
+        project = factories.ProjectFactory.create(
+            customer__name="Müller & Söhne AG", title="Website/Relaunch 2027"
+        )
+        offer = factories.OfferFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(offer.urls["pdf"])
+        self.assertEqual(
+            response["content-disposition"],
+            "inline; filename*=utf-8''"
+            f"{offer.code}_M%C3%BCller-S%C3%B6hne-AG_Website-Relaunch-2027_Offerte.pdf",
+        )
+
+        response = self.client.get(
+            project.urls["offers_pdf"] + "?disposition=attachment"
+        )
+        self.assertEqual(
+            response["content-disposition"],
+            "attachment; filename*=utf-8''"
+            f"{project.code}_M%C3%BCller-S%C3%B6hne-AG_Website-Relaunch-2027_Offerten.pdf",
+        )
