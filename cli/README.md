@@ -1,5 +1,8 @@
 # Workbench CLI
 
+Commands follow the pattern `wb <noun> <verb>`, e.g. `wb projects search` or
+`wb offers create`. `wb --help` and `wb <noun> --help` list them all.
+
 The `wb` program talks to the Workbench JSON API. Install it with
 [uv](https://docs.astral.sh/uv/):
 

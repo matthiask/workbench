@@ -43,7 +43,11 @@ def _error(error):
     return error["msg"]
 
 
-def _request(method, path, **kwargs):
+def _request(method, path, *, optional=False, **kwargs):
+    """Request the API, terminate on errors
+
+    ``optional`` requests return ``None`` if access is denied, e.g. because
+    a feature is missing."""
     url, token = _config()
     try:
         response = requests.request(
@@ -55,6 +59,8 @@ def _request(method, path, **kwargs):
         )
     except requests.RequestException as exc:
         _terminate(str(exc))
+    if response.status_code == 403 and optional:
+        return None
     if response.status_code == 422:
         _terminate("\n".join(_error(error) for error in response.json()["detail"]))
     if not response.ok:
@@ -340,7 +346,8 @@ def search(query, include_closed, as_json):
 def show_project(project_id, as_json):
     """Show a project and its offers"""
     project = _request("GET", f"projects/{project_id}/")
-    offers = _request("GET", f"projects/{project_id}/offers/")
+    # Offers require the controlling feature
+    offers = _request("GET", f"projects/{project_id}/offers/", optional=True)
     if as_json:
         _echo_json(project | {"offers": offers})
         return
@@ -359,8 +366,9 @@ def show_project(project_id, as_json):
     if project["description"]:
         console.print()
         console.print(project["description"])
-    console.print()
-    _echo_offer_list(offers)
+    if offers is not None:
+        console.print()
+        _echo_offer_list(offers)
 
 
 @projects.command()
