@@ -170,3 +170,33 @@ class ProjectsAPITest(TestCase):
             [e["loc"] for e in response.json()["detail"]],
             [["body", "data", "customer"]],
         )
+
+    def test_create_customer_from_contact(self):
+        """The customer defaults to the contact's organization"""
+        user = factories.UserFactory.create()
+        contact = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        self.client.force_login(user)
+
+        response = self.client.post(
+            "/api/projects/",
+            {"title": "Relaunch", "contact": contact.pk},
+            content_type="application/json",
+        )
+        project = Project.objects.get(pk=response.json()["id"])
+        self.assertEqual(project.customer, contact.organization)
+
+        loner = factories.PersonFactory.create(organization=None)
+        for data in [{"contact": loner.pk}, {}]:
+            with self.subTest(data=data):
+                response = self.client.post(
+                    "/api/projects/",
+                    {"title": "Relaunch"} | data,
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(
+                    [e["loc"] for e in response.json()["detail"]],
+                    [["body", "data", "customer"]],
+                )

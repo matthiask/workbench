@@ -76,7 +76,11 @@ def project_detail(request, project_id: int):
 class ProjectIn(Schema):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
-    customer: int = Field(description="ID of the customer organization.")
+    customer: int | None = Field(
+        default=None,
+        description="ID of the customer organization, defaults to the contact's"
+        " organization.",
+    )
     contact: int | None = Field(
         default=None, description="ID of the contact person at the customer."
     )
@@ -116,7 +120,8 @@ def project_create(request, data: ProjectIn, *, dry_run: bool = False):
         {
             "title": data.title,
             "description": data.description,
-            "customer": data.customer,
+            # The form uses the contact's organization if empty
+            "customer": "" if data.customer is None else data.customer,
             "contact": data.contact or "",
             "type": data.type,
             "owned_by": owned_by.pk,
