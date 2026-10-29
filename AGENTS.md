@@ -56,7 +56,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   them.
 - The `wb` command line interface lives in `cli/` (separate package, installed
   with `uv tool install`). It is a thin client of the JSON API, keep the logic
-  on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`. The offers API (`workbench/offers/api.py`) only creates and
+  on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`.
+  Hours are not logged through the CLI on purpose: the warnings of the web
+  interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only creates and
   replaces offers in preparation. Service types only suggest the effort type
   and the hourly rate, both can be set freely.
 - Short names (`User._short_name`) are unique unless blank. APIs identify

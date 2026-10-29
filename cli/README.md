@@ -69,6 +69,19 @@ logged on their services:
 
 All commands which output data accept `--json`.
 
+## Planning
+
+Like offers: Fetch the context (offers, people, absences, existing milestones
+and planned work, and the JSON schema of the import), let an LLM write the
+plan, validate it and import it:
+
+    wb planning context 1234 > context.json
+    wb planning import 1234 plan.yaml --dry-run
+    wb planning import 1234 plan.yaml
+
+Importing only adds milestones and planned work, it never changes or removes
+existing entries.
+
 ## Project statistics
 
 Hours (offered, logged, planned), amounts (sold, invoiced, logged work which

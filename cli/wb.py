@@ -427,3 +427,71 @@ def replace(offer_id, file, dry_run, as_json):
         json=_load(file),
     )
     _echo_json(data) if as_json else _echo_offer(data)
+
+
+@cli.group()
+def planning():
+    """Plan projects: milestones and planned work"""
+
+
+@planning.command("context")
+@click.argument("project_id", type=int)
+def planning_context(project_id):
+    """Print everything needed to plan a project and the import schema
+
+    Feed this to an LLM together with the plan, e.g. the offer and a timeline."""
+    _echo_json(_request("GET", f"projects/{project_id}/planning/context/"))
+
+
+@planning.command("import")
+@click.argument("project_id", type=int)
+@click.argument("file", type=click.File("r"))
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def planning_import(project_id, file, dry_run, as_json):
+    """Add milestones and planned work from a YAML or JSON file"""
+    data = _request(
+        "POST",
+        f"projects/{project_id}/planning/import/",
+        params={"dry_run": _bool(dry_run)},
+        json=_load(file),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    if data["milestones"]:
+        table = _table("Milestone", "Date", "Phase starts on", "Estimated hours>")
+        for milestone in data["milestones"]:
+            table.add_row(
+                milestone["title"],
+                milestone["date"],
+                milestone["phase_starts_on"] or "",
+                milestone["estimated_total_hours"],
+            )
+        console.print(table)
+    table = _table(
+        "Planned work",
+        "User",
+        "Service type",
+        "Offer",
+        "Weeks",
+        "Hours>",
+        "Provisional",
+    )
+    for pw in data["planned_work"]:
+        weeks = pw["weeks"]
+        table.add_row(
+            pw["title"],
+            pw["user"],
+            pw["service_type"],
+            pw["offer"] or "",
+            f"{weeks[0]} – {weeks[-1]} ({len(weeks)})" if len(weeks) > 1 else weeks[0],
+            pw["planned_hours"],
+            "yes" if pw["is_provisional"] else "",
+        )
+    console.print(table)
+    for warning in data["warnings"]:
+        loc = ".".join(str(part) for part in warning["loc"][2:])
+        click.secho(f"Warning: {loc}: {warning['msg']}", fg="yellow", err=True)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
