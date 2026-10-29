@@ -11,7 +11,9 @@ import requests
 import yaml
 from rich import box
 from rich.console import Console
+from rich.style import Style
 from rich.table import Table
+from rich.text import Text
 
 
 CONFIG = Path.home() / ".config" / "workbench.toml"
@@ -79,6 +81,11 @@ def _echo_json(data):
     click.echo(json.dumps(data, indent=2, ensure_ascii=False))
 
 
+def _link(text, url):
+    """Text which links to the URL in terminals supporting hyperlinks"""
+    return Text(str(text), style=Style(link=url)) if url else str(text)
+
+
 def _table(*columns, **kwargs):
     """A table with headings, columns ending in ">" are right-aligned"""
     table = Table(box=box.SIMPLE_HEAD, **kwargs)
@@ -90,9 +97,9 @@ def _table(*columns, **kwargs):
     return table
 
 
-def _echo_fields(title, fields):
+def _echo_fields(title, fields, *, url=None):
     """A bold title followed by the non-empty fields"""
-    console.print(title, style="bold")
+    console.print(_link(title, url), style="bold")
     grid = Table.grid(padding=(0, 2))
     grid.add_column(style="dim")
     grid.add_column()
@@ -106,6 +113,7 @@ def _echo_offer(offer):
     _echo_fields(
         f"{offer['code'] or '(new offer)'} {offer['title']}",
         [("ID", offer["id"]), ("Status", offer["status"]), ("URL", offer["url"])],
+        url=offer["url"],
     )
     table = _table(
         "Service", "Effort type", "Hours>", "Rate>", "Cost>", show_footer=True
@@ -139,8 +147,8 @@ def _echo_offer_list(offers):
     table = _table("ID>", "Code", "Title", "Status", "Total>")
     for offer in offers:
         table.add_row(
-            str(offer["id"]),
-            offer["code"],
+            _link(offer["id"], offer["url"]),
+            _link(offer["code"], offer["url"]),
             offer["title"],
             offer["status"],
             offer["total"],
@@ -165,7 +173,7 @@ def _echo_stats(projects):
     for stats in projects:
         project = stats["project"]
         table.add_row(
-            project["code"],
+            _link(project["code"], project["url"]),
             project["title"],
             project["closed_on"] or "",
             stats["hours"]["offered"],
@@ -260,8 +268,8 @@ def search(query, include_closed, as_json):
     table = _table("ID>", "Code", "Title", "Customer", "Owned by", "Closed on")
     for project in data:
         table.add_row(
-            str(project["id"]),
-            project["code"],
+            _link(project["id"], project["url"]),
+            _link(project["code"], project["url"]),
             project["title"],
             project["customer"],
             project["owned_by"],
@@ -290,6 +298,7 @@ def show_project(project_id, as_json):
             ("Closed on", project["closed_on"]),
             ("URL", project["url"]),
         ],
+        url=project["url"],
     )
     if project["description"]:
         console.print()
