@@ -67,7 +67,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `workbench/cli_version.py` when older versions don't work anymore.
   `workbench/test_cli.py` runs the real CLI commands against the API (requests
   go through Django's test client); add a test there for new commands. The CLI
-  is a uv workspace member of the project.
+  is installed with the project's dev dependencies, not in the container.
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only creates and
   replaces offers in preparation. Service types only suggest the effort type
