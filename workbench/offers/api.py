@@ -121,7 +121,7 @@ class OfferContext(Schema):
     import_schema: dict
 
 
-def _offer_out(offer, services, request):
+def offer_out(offer, services, request):
     return {
         "id": offer.pk,
         "code": offer.code if offer.pk else None,
@@ -143,7 +143,7 @@ def _offer_out(offer, services, request):
 
 def _project_offers(project, request):
     return [
-        _offer_out(offer, list(offer.services.all()), request)
+        offer_out(offer, list(offer.services.all()), request)
         for offer in project.offers.select_related("project").prefetch_related(
             "services"
         )
@@ -179,7 +179,7 @@ def offer_context(request, project_id: int):
 @router.get("/offers/{offer_id}/", response=OfferOut)
 def offer_detail(request, offer_id: int):
     offer = get_object_or_404(Offer.objects.select_related("project"), pk=offer_id)
-    return _offer_out(offer, list(offer.services.all()), request)
+    return offer_out(offer, list(offer.services.all()), request)
 
 
 def _decimal(value, exp):
@@ -265,7 +265,7 @@ def _save(offer, services, request, *, dry_run, delete=()):
             service.offer = offer
             service.save(skip_related_model=True)
         offer.save()  # Recalculate the total
-        result = _offer_out(offer, list(offer.services.all()), request)
+        result = offer_out(offer, list(offer.services.all()), request)
         if dry_run:
             transaction.set_rollback(True)
             result |= {"id": None, "url": None}

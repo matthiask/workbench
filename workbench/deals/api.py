@@ -41,7 +41,7 @@ class DealOut(Schema):
     related_offers: list[str]
 
 
-def _deal_out(deal, request):
+def deal_out(deal, request):
     return {
         "id": deal.id,
         "code": deal.code,
@@ -88,12 +88,12 @@ def deal_list(request, filters: Query[DealFilter]):
     if filters.q:
         deals = deals.search(filters.q)
     deals = deals.order_by("status", "decision_expected_on", "-pk")
-    return [_deal_out(deal, request) for deal in deals[:200]]
+    return [deal_out(deal, request) for deal in deals[:200]]
 
 
 @router.get("/deals/{deal_id}/", response=DealOut)
 def deal_detail(request, deal_id: int):
-    return _deal_out(
+    return deal_out(
         get_object_or_404(
             Deal.objects.select_related("customer", "owned_by", "closing_type"),
             pk=deal_id,

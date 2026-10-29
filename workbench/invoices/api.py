@@ -43,7 +43,7 @@ class InvoiceOut(Schema):
     third_party_costs: Decimal | None
 
 
-def _invoice_out(invoice, request):
+def invoice_out(invoice, request):
     return {
         "id": invoice.id,
         "code": invoice.code,
@@ -95,14 +95,14 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
     if filters.invoiced_since:
         invoices = invoices.filter(invoiced_on__gte=filters.invoiced_since)
     return [
-        _invoice_out(invoice, request)
+        invoice_out(invoice, request)
         for invoice in invoices.order_by("-invoiced_on", "-pk")[:200]
     ]
 
 
 @router.get("/invoices/{invoice_id}/", response=InvoiceOut)
 def invoice_detail(request, invoice_id: int):
-    return _invoice_out(
+    return invoice_out(
         get_object_or_404(
             Invoice.objects.select_related("project", "customer", "owned_by"),
             pk=invoice_id,
