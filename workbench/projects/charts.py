@@ -3,21 +3,12 @@ from decimal import Decimal
 from itertools import accumulate
 
 from workbench.invoices.models import Invoice
+from workbench.tools.charts import nice_step
 from workbench.tools.formats import Z2, currency, local_date_format
 
 
 WIDTH, HEIGHT = 720, 260
 LEFT, RIGHT, TOP, BOTTOM = 72, 96, 16, 28
-
-
-def _nice_step(maximum, ticks=4):
-    raw = maximum / ticks
-    magnitude = Decimal(10) ** (len(str(int(raw))) - 1)
-    return next(
-        step * magnitude
-        for step in map(Decimal, ("1", "2", "2.5", "5", "10"))
-        if step * magnitude >= raw
-    )
 
 
 def _months_between(first, last):
@@ -63,7 +54,7 @@ def projected_vs_invoiced_chart(project, *, today=None):
         for key, entries in series.items()
     }
     maximum = max(total for values in totals.values() for total in values)
-    step = _nice_step(max(maximum, Decimal(1)))
+    step = nice_step(max(maximum, Decimal(1)))
     top = step * (int(maximum / step) + 1)
 
     def x(day):

@@ -1072,9 +1072,18 @@ a:hover {
 }
 
 // Charts are plain SVG, the colours are validated for both themes
+// Categorical chart colors, validated for color vision deficiencies
 .wb-chart {
-  --wb-chart-projected: #2a78d6;
-  --wb-chart-invoiced: #eb6834;
+  --wb-series-1: #2a78d6;
+  --wb-series-2: #eb6834;
+  --wb-series-3: #1baf7a;
+  --wb-series-4: #eda100;
+  --wb-series-5: #e87ba4;
+  --wb-series-6: #008300;
+  --wb-series-7: #6250d6;
+  --wb-series-8: #e34948;
+  --wb-chart-projected: var(--wb-series-1);
+  --wb-chart-invoiced: var(--wb-series-2);
   margin: 0 0 1rem;
 
   svg {
@@ -1086,13 +1095,78 @@ a:hover {
 }
 
 [data-bs-theme="dark"] .wb-chart {
-  --wb-chart-projected: #3987e5;
-  --wb-chart-invoiced: #d95926;
+  --wb-series-1: #3987e5;
+  --wb-series-2: #d95926;
+  --wb-series-3: #199e70;
+  --wb-series-4: #c98500;
+  --wb-series-5: #d55181;
+  --wb-series-6: #008300;
+  --wb-series-7: #9085e9;
+  --wb-series-8: #e66767;
+}
+
+@for $i from 1 through 8 {
+  .wb-series-#{$i} {
+    --wb-series: var(--wb-series-#{$i});
+  }
+}
+
+.wb-series-muted {
+  --wb-series: var(--bs-secondary-color);
+}
+
+.wb-series-neutral {
+  --wb-series: color-mix(in srgb, var(--bs-secondary-color) 45%, transparent);
+}
+
+.wb-series-projected {
+  --wb-series: color-mix(in srgb, var(--wb-series-1) 40%, transparent);
+}
+
+.wb-chart-bar {
+  fill: var(--wb-series);
+  stroke: var(--bs-body-bg);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.card .wb-chart-bar {
+  stroke: var(--bs-card-bg);
+}
+
+.wb-chart-column {
+  fill: transparent;
+
+  &:hover {
+    fill: var(--bs-tertiary-bg);
+  }
+}
+
+.wb-chart-baseline {
+  stroke: var(--bs-secondary-color);
+  stroke-width: 1;
+}
+
+.wb-chart-key.wb-chart-key-bar {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  background: var(--wb-series);
+}
+
+.wb-chart-key.wb-chart-key-line,
+.wb-chart-key.wb-chart-key-dashed {
+  border-top: 2px solid var(--wb-series);
+}
+
+.wb-chart-key.wb-chart-key-dashed {
+  border-top-style: dashed;
 }
 
 .wb-chart-legend {
   display: flex;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
   margin-bottom: 0.5rem;
   font-size: 0.8rem;
 }
@@ -1138,8 +1212,14 @@ a:hover {
 
 .wb-chart-line {
   fill: none;
+  stroke: var(--wb-series);
   stroke-width: 2;
   stroke-linejoin: round;
+  pointer-events: none;
+
+  &.wb-chart-dashed {
+    stroke-dasharray: 5 4;
+  }
 
   &.wb-chart-projected {
     stroke: var(--wb-chart-projected);

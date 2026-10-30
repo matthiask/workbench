@@ -11,6 +11,7 @@ from workbench.awt.models import Year  # any tools.Model()
 from workbench.contacts.models import Organization
 from workbench.projects.models import Project
 from workbench.tools import formats
+from workbench.tools.charts import bar_chart, nice_step
 from workbench.tools.forms import Autocomplete
 from workbench.tools.models import CalculationModel
 from workbench.tools.testing import messages
@@ -131,3 +132,35 @@ class ToolsTest(TestCase):
         ]:
             with self.subTest(value=value, result=result):
                 self.assertEqual(formats.hours_and_minutes(value), result)
+
+    def test_nice_step(self):
+        """Axis steps are round numbers"""
+        for maximum, step in [(1, "0.25"), (7, "2"), (100, "25"), (93_000, "25000")]:
+            with self.subTest(maximum=maximum):
+                self.assertEqual(nice_step(maximum), Decimal(step))
+
+    def test_bar_chart(self):
+        """Bars stack positive and negative values separately, lines skip
+        missing values and every column gets a tooltip"""
+        chart = bar_chart(
+            ["A", "B", "C"],
+            bars=[
+                {"label": "One", "values": [1, -1, 0], "color": "wb-series-1"},
+                {"label": "Two", "values": [2, -2, 3], "color": "wb-series-2"},
+            ],
+            lines=[{"label": "Goal", "values": [4, None, 4], "color": "x"}],
+            fmt=formats.hours,
+        )
+        self.assertEqual(
+            [tick["label"] for tick in chart["y_ticks"]],
+            ["-2.0h", "0.0h", "2.0h", "4.0h"],
+        )
+        # Two bars of the first series, the zero is left out
+        self.assertEqual(chart["bars"][0]["path"].count("M"), 2)
+        self.assertEqual(chart["lines"][0]["path"].count("L"), 1)
+        self.assertEqual(chart["columns"][1]["title"], "B\nOne: -1.0h\nTwo: -2.0h")
+        self.assertEqual(
+            [item["kind"] for item in chart["legend"]], ["bar", "bar", "line"]
+        )
+
+        self.assertEqual(bar_chart([])["y_ticks"][-1]["label"], "0.25")

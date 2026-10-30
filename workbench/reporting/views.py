@@ -32,7 +32,8 @@ from workbench.reporting import (
     third_party_costs,
 )
 from workbench.reporting.utils import date_ranges
-from workbench.tools.formats import Z0, Z2, local_date_format
+from workbench.tools.charts import bar_chart
+from workbench.tools.formats import Z0, Z2, currency, local_date_format
 from workbench.tools.forms import DateInput, Form
 from workbench.tools.validation import (
     filter_form,
@@ -169,6 +170,42 @@ def projected_gross_margin(request):
     )
 
 
+def _amount(value):
+    return f"{value:,.0f}".replace(",", "’")
+
+
+def _years_chart(labels, years, *, projected=None, height=280):
+    """The last year as bars (with the projection on top), the years before
+    as lines"""
+    if not years:
+        return None
+    *previous, (year, values) = years
+    return bar_chart(
+        labels,
+        bars=[
+            {"label": str(year), "values": values, "color": "wb-series-1"},
+            *(
+                [
+                    {
+                        "label": capfirst(_("projected gross margin")),
+                        "values": projected,
+                        "color": "wb-series-projected",
+                    }
+                ]
+                if projected
+                else []
+            ),
+        ],
+        lines=[
+            {"label": str(year), "values": values, "color": f"wb-series-{index}"}
+            for index, (year, values) in enumerate(reversed(previous), 2)
+        ],
+        fmt=currency,
+        axis_fmt=_amount,
+        height=height,
+    )
+
+
 def key_data_view(request):
     today = dt.date.today()
     date_range = [dt.date(today.year - 3, 1, 1), dt.date(today.year, 12, 31)]
@@ -265,40 +302,53 @@ def key_data_view(request):
             "gross_margin_by_years": gross_margin_by_years,
             "gross_margin_projection": gross_margin_projection,
             "gross_margin_by_month": gross_margin_by_month,
-            "invoiced_corrected": [
-                (year, [gross_margin_months.get((year, i), Z2) for i in range(1, 13)])
-                for year in range(date_range[0].year, date_range[1].year + 1)
-            ],
-            "projected_gross_margin": [
-                projected_gross_margin["monthly_overall"].get((today.year, i), Z2)
-                for i in range(1, 13)
-            ],
-            "invoiced_corrected_per_fte": [
-                (
-                    year["year"],
-                    [
-                        sum(month["margin_per_fte"] or 0 for month in quarter)
-                        for quarter in chunked(year["months"], 3)
-                    ],
-                )
-                for year in gross_margin_by_years
-            ],
+            "invoiced_corrected_chart": _years_chart(
+                [local_date_format(dt.date(2000, i, 1), fmt="M") for i in range(1, 13)],
+                [
+                    (
+                        year,
+                        [gross_margin_months.get((year, i), Z2) for i in range(1, 13)],
+                    )
+                    for year in range(date_range[0].year, date_range[1].year + 1)
+                ],
+                projected=[
+                    projected_gross_margin["monthly_overall"].get((today.year, i), Z2)
+                    for i in range(1, 13)
+                ],
+            ),
+            "invoiced_corrected_per_fte_chart": _years_chart(
+                ["Q1", "Q2", "Q3", "Q4"],
+                [
+                    (
+                        year["year"],
+                        [
+                            sum(month["margin_per_fte"] or 0 for month in quarter)
+                            for quarter in chunked(year["months"], 3)
+                        ],
+                    )
+                    for year in gross_margin_by_years
+                ],
+                height=200,
+            ),
             "green_hours": yearly_headline(gh),
-            "hours_distribution": {
-                "labels": [local_date_format(row["month"], fmt="F Y") for row in gh],
-                "datasets": [
+            "hours_distribution_chart": bar_chart(
+                [local_date_format(row["month"], fmt="M Y") for row in gh],
+                bars=[
                     {
                         "label": label,
-                        "data": [100 * row[attribute] / row["total"] for row in gh],
+                        "values": [100 * row[attribute] / row["total"] for row in gh],
+                        "color": color,
                     }
-                    for label, attribute in [
-                        (_("profitable"), "profitable"),
-                        (_("maintenance"), "maintenance"),
-                        (_("overdrawn"), "overdrawn"),
-                        (_("internal"), "internal"),
+                    for label, attribute, color in [
+                        (_("profitable"), "profitable", "wb-series-3"),
+                        (_("maintenance"), "maintenance", "wb-series-1"),
+                        (_("overdrawn"), "overdrawn", "wb-series-2"),
+                        (_("internal"), "internal", "wb-series-neutral"),
                     ]
                 ],
-            },
+                fmt=lambda value: f"{value:.0f}%",
+                maximum=100,
+            ),
             "service_hours_in_open_orders": key_data.service_hours_in_open_orders(),
             "logged_hours_in_open_orders": key_data.logged_hours_in_open_orders(),
             "sent_invoices_total": key_data.sent_invoices_total(),

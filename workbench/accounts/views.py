@@ -19,6 +19,9 @@ from workbench.accounts.forms import UserForm
 from workbench.accounts.models import API_TOKEN_LIFETIME, APIToken, User
 from workbench.accounts.reporting import logged_hours
 from workbench.generic import DetailView, UpdateView
+from workbench.projects.models import Project
+from workbench.tools.charts import bar_chart
+from workbench.tools.formats import hours
 
 
 def accounts(request):
@@ -135,8 +138,47 @@ class ProfileView(DetailView):
     template_name_suffix = "_statistics"
 
     def get_context_data(self, **kwargs):
+        stats = logged_hours(self.object)
+        weeks = stats["hours_per_week"]
+        labels = [f"KW{row['week']:%V}" for row in weeks]
+        expected = {
+            "label": _("Expected"),
+            "values": [row["expected_hours"] for row in weeks],
+            "color": "wb-series-muted",
+            "dashed": True,
+        }
         return super().get_context_data(
-            logged_hours=logged_hours(self.object), **kwargs
+            logged_hours=stats,
+            hours_per_week_chart=bar_chart(
+                labels,
+                bars=[
+                    {
+                        "label": label,
+                        "values": [row["by_type"].get(type, 0) for row in weeks],
+                        "color": f"wb-series-{index}",
+                    }
+                    for index, (type, label) in enumerate(Project.TYPE_CHOICES, 1)
+                ],
+                lines=[expected],
+                fmt=hours,
+            ),
+            hours_per_customer_chart=bar_chart(
+                labels,
+                bars=[
+                    {
+                        "label": row["name"],
+                        "values": row["hours"],
+                        "color": f"wb-series-{index}",
+                    }
+                    for index, row in enumerate(
+                        stats["hours_per_customer"]["by_customer"], 1
+                    )
+                ],
+                lines=[expected],
+                fmt=hours,
+                height=360,
+            ),
+            **kwargs,
         )
 
 

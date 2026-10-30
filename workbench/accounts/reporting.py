@@ -116,7 +116,7 @@ ORDER BY series.week
         for row in sorted(
             total_hours_per_customer.items(), key=lambda row: row[1], reverse=True
         )
-    ][:10]
+    ][:7]
 
     weeks = sorted(hours_per_customer.keys())
     stats["hours_per_customer"] = {
