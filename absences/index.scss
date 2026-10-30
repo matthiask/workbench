@@ -34,12 +34,19 @@ $z-index: (
   margin-bottom: 2rem;
 }
 
+// The calendar lies on a card surface, it may be wider than the page
 .absences-wrapper {
   --grid-gap: 0.125rem;
   --scale-row-height: 4.75rem;
   --name-column-width: 10rem;
 
-  min-width: min-content;
+  width: max-content;
+  min-width: 100%;
+  padding: 0.75rem 1rem;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: var(--wb-surface);
+  box-shadow: var(--wb-shadow);
 }
 
 .absences {
@@ -256,6 +263,9 @@ $z-index: (
 
 .absences-legend {
   display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+  max-width: calc(100vw - var(--name-column-width) - 4rem);
   padding: 0;
   margin-left: calc(var(--name-column-width) + var(--grid-gap));
   list-style: none;
