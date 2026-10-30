@@ -259,3 +259,44 @@ class ProjectsAPITest(TestCase):
         self.assertEqual([s["id"] for s in data], [design.pk])
         data = self.client.get("/api/services/?q=hosting").json()["items"]
         self.assertEqual([s["id"] for s in data], [hosting.pk])
+
+    def test_update(self):
+        """Projects are changed field by field and closed like in the web
+        interface"""
+        project = factories.ProjectFactory.create(title="Relaunch")
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch({"title": "Website"}, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "Website")
+        project.refresh_from_db()
+        self.assertEqual(project.title, "Relaunch")
+
+        response = patch({"closed_on": dt.date.today().isoformat()})
+        self.assertEqual(response.json()["closed_on"], dt.date.today().isoformat())
+        project.refresh_from_db()
+        self.assertEqual(
+            (project.title, project.closed_on), ("Relaunch", dt.date.today())
+        )
+
+        response = patch({"closed_on": None})
+        project.refresh_from_db()
+        self.assertIsNone(project.closed_on)
+
+        # Warnings of the web interface are errors
+        factories.InvoiceFactory.create(project=project, customer=project.customer)
+        response = patch({
+            "customer": factories.OrganizationFactory.create().pk,
+            "contact": None,
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("already has invoices", response.content.decode())
+
+        response = patch({"owned_by": "nobody"})
+        self.assertEqual(response.status_code, 422)

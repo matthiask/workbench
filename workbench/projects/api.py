@@ -22,7 +22,7 @@ from workbench.projects.forms import ProjectForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
-from workbench.tools.api import Serialized, raise_form_errors
+from workbench.tools.api import Serialized, form_data, raise_form_errors
 from workbench.tools.formats import Z1, Z2
 
 
@@ -168,6 +168,61 @@ def project_create(request, data: ProjectIn, *, dry_run: bool = False):
         if dry_run:
             transaction.set_rollback(True)
             result |= {"id": None, "url": None}
+    return result
+
+
+class ProjectPatch(Schema):
+    """Fields which aren't given are left alone"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    customer: int | None = Field(default=None, description="Organization ID.")
+    contact: int | None = Field(
+        default=None, description="ID of the contact person, null removes it."
+    )
+    type: Literal["order", "maintenance", "internal"] | None = None
+    owned_by: str | None = Field(default=None, description="Short name.")
+    closed_on: dt.date | None = Field(
+        default=None, description="Closes the project, null reopens it."
+    )
+
+
+@router.patch("/projects/{int:project_id}/", response=ProjectOut)
+def project_update(
+    request, project_id: int, data: ProjectPatch, *, dry_run: bool = False
+):
+    """Change or close a project, validated like in the web interface
+
+    Warnings of the web interface are errors here; nothing is saved if anything
+    is invalid or with ``dry_run``."""
+    project = get_object_or_404(Project, pk=project_id)
+    values = form_data(ProjectForm(instance=project, request=request))
+    patch = data.model_dump(exclude_unset=True)
+    for field in ["title", "description", "customer", "contact", "type", "closed_on"]:
+        if field in patch:
+            values[field] = "" if patch[field] is None else patch[field]
+    if patch.get("owned_by"):
+        owned_by = User.objects.filter(
+            is_active=True, _short_name__iexact=patch["owned_by"]
+        ).first()
+        if not owned_by:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "owned_by"],
+                    "msg": _("Unknown or inactive user %r.") % patch["owned_by"],
+                }
+            ])
+        values["owned_by"] = owned_by.pk
+
+    form = ProjectForm(values, instance=project, request=request)
+    if not form.is_valid():
+        raise_form_errors(form)
+
+    with transaction.atomic():
+        project = form.save()
+        result = project_out(project, request)
+        if dry_run:
+            transaction.set_rollback(True)
     return result
 
 

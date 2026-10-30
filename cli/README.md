@@ -82,6 +82,12 @@ warning, the CLI fails and you have to use the web interface.
     wb projects create --title "Online Marketing 2027" --contact 345 --dry-run
     wb projects create --title "Online Marketing 2027" --contact 345
 
+Projects are changed field by field, closed and reopened the same way:
+
+    wb projects update 1234 --title "Online Marketing 2028" --owned-by mk
+    wb projects update 1234 --close --dry-run
+    wb projects update 1234 --reopen
+
 `wb organizations show 123` and `wb people show 345` show the details of the
 search results, e.g. the people of an organization or the email addresses of a
 person.

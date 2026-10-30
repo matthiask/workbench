@@ -1014,6 +1014,10 @@ def create_project(
             "owned_by": owned_by,
         },
     )
+    _echo_saved_project(data, dry_run=dry_run, as_json=as_json)
+
+
+def _echo_saved_project(data, *, dry_run, as_json):
     if as_json:
         _echo_json(data)
         return
@@ -1023,12 +1027,78 @@ def create_project(
             ("ID", data["id"]),
             ("Customer", _link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
+            ("Closed on", data["closed_on"]),
             ("URL", data["url"]),
         ],
         url=data["url"],
     )
     if dry_run:
         console.print("Dry run, nothing has been saved.")
+
+
+@projects.command("update")
+@click.argument("project_id", type=int)
+@click.option("--title")
+@click.option("--description", help="The text, or - to read it from stdin.")
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option("--contact", type=int, help="Person ID.")
+@click.option(
+    "--type", "type_", type=click.Choice(["order", "maintenance", "internal"])
+)
+@click.option("--owned-by", help="Short name.")
+@click.option("--close", is_flag=True, help="Close the project today.")
+@click.option(
+    "--closed-on",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Close the project on this date.",
+)
+@click.option("--reopen", is_flag=True, help="Open a closed project again.")
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_project(
+    project_id,
+    title,
+    description,
+    customer,
+    contact,
+    type_,
+    owned_by,
+    close,
+    closed_on,
+    reopen,
+    dry_run,
+    as_json,
+):
+    """Change, close or reopen a project, only the given fields"""
+    if sum(map(bool, [close, closed_on, reopen])) > 1:
+        _terminate("Use only one of --close, --closed-on and --reopen.")
+    data = {
+        key: value
+        for key, value in [
+            ("title", title),
+            ("description", _text(description)),
+            ("customer", customer),
+            ("contact", contact),
+            ("type", type_),
+            ("owned_by", owned_by),
+        ]
+        if value is not None
+    }
+    if close:
+        data["closed_on"] = dt.date.today().isoformat()
+    elif closed_on:
+        data["closed_on"] = closed_on.date().isoformat()
+    elif reopen:
+        data["closed_on"] = None
+    if not data:
+        _terminate("Nothing to change.")
+    data = _request(
+        "PATCH",
+        f"projects/{project_id}/",
+        params={"dry_run": _bool(dry_run)},
+        json=data,
+    )
+    _echo_saved_project(data, dry_run=dry_run, as_json=as_json)
 
 
 @cli.group()

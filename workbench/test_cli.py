@@ -167,6 +167,20 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 1)
         self.assertIn("No contact selected.\n", result.output)
 
+        result = self.wb("projects", "update", project.pk, "--title", "Relaunch 2027")
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb("projects", "update", project.pk, "--close")
+        self.assertIn(f"Closed on  {dt.date.today()}", result.output)
+        project.refresh_from_db()
+        self.assertEqual(
+            (project.title, project.closed_on), ("Relaunch 2027", dt.date.today())
+        )
+        self.wb("projects", "update", project.pk, "--reopen")
+        project.refresh_from_db()
+        self.assertIsNone(project.closed_on)
+        result = self.wb("projects", "update", project.pk, "--close", "--reopen")
+        self.assertEqual(result.exit_code, 1)
+
     def test_people(self):
         """People are created from YAML files"""
         person = self.file(
