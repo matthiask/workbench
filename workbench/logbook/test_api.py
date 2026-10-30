@@ -28,15 +28,25 @@ class LogbookAPITest(TestCase):
 
         def ids(query=""):
             data = self.client.get(f"/api/logbook/hours/{query}").json()
-            return [row["id"] for row in data["hours"]]
+            return [row["id"] for row in data["items"]]
 
         data = self.client.get("/api/logbook/hours/").json()
         self.assertEqual(data["total_hours"], "3.5")
         self.assertEqual(data["count"], 2)
-        self.assertEqual([row["id"] for row in data["hours"]], [mine.pk, other.pk])
-        self.assertEqual(data["hours"][0]["project"]["code"], service.project.code)
-        self.assertEqual(data["hours"][0]["service"], "Design")
-        self.assertEqual(data["hours"][0]["rendered_by"], "ab")
+        self.assertEqual([row["id"] for row in data["items"]], [mine.pk, other.pk])
+        self.assertEqual(data["items"][0]["project"]["code"], service.project.code)
+        self.assertEqual(data["items"][0]["service"], "Design")
+        self.assertEqual(data["items"][0]["rendered_by"], "ab")
+
+        # Pages of matches, the total and the count include all of them
+        data = self.client.get("/api/logbook/hours/?limit=1&offset=1").json()
+        self.assertEqual([row["id"] for row in data["items"]], [other.pk])
+        self.assertEqual(data["count"], 2)
+        self.assertEqual(data["total_hours"], "3.5")
+        response = self.client.get("/api/logbook/hours/?limit=1001")
+        self.assertEqual(response.status_code, 422)
+        response = self.client.get("/api/logbook/hours/?offset=-1")
+        self.assertEqual(response.status_code, 422)
 
         self.assertEqual(ids("?q=wireframes"), [mine.pk])
         self.assertEqual(ids(f"?project={service.project_id}"), [mine.pk])
@@ -68,7 +78,7 @@ class LogbookAPITest(TestCase):
 
         def ids(query=""):
             data = self.client.get(f"/api/logbook/costs/{query}").json()
-            return {row["id"] for row in data["costs"]}
+            return {row["id"] for row in data["items"]}
 
         data = self.client.get("/api/logbook/costs/").json()
         self.assertEqual(data["total_cost"], "150.00")

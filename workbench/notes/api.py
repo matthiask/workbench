@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
+from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import check_feature
 from workbench.accounts.features import FEATURES
@@ -12,7 +13,7 @@ from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
-from workbench.tools.api import form_errors
+from workbench.tools.api import Serialized, form_errors
 
 
 router = Router(tags=["notes"])
@@ -88,8 +89,9 @@ class NoteFilter(Schema):
 
 
 @router.get("/notes/", response=list[NoteOut])
+@paginate
 def note_list(request, filters: Query[NoteFilter]):
-    """Notes on deals and invoices, newest first, at most 200
+    """Notes on deals and invoices, newest first
 
     Notes on objects which require features the user hasn't got and notes of
     deleted objects are left out."""
@@ -111,8 +113,10 @@ def note_list(request, filters: Query[NoteFilter]):
         notes = notes.filter(created_by___short_name__iexact=filters.created_by)
     if filters.q:
         notes = notes.search(filters.q)
-    notes = notes.prefetch_related("content_object")[:200]
-    return [note_out(note, request, types=types) for note in notes]
+    return Serialized(
+        notes.prefetch_related("content_object").order_by("-created_at", "-pk"),
+        lambda note: note_out(note, request, types=types),
+    )
 
 
 class NoteIn(Schema):

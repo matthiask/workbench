@@ -40,7 +40,10 @@ class InvoicesAPITest(TestCase):
         self.client.force_login(project.owned_by)
 
         def ids(query=""):
-            return {i["id"] for i in self.client.get(f"/api/invoices/{query}").json()}
+            return {
+                i["id"]
+                for i in self.client.get(f"/api/invoices/{query}").json()["items"]
+            }
 
         self.assertEqual(ids(), {sent.pk, draft.pk, paid.pk})
         self.assertEqual(ids(f"?project={project.pk}"), {sent.pk, draft.pk})
@@ -102,7 +105,9 @@ class InvoicesAPITest(TestCase):
         def rows(query=""):
             return [
                 (row["project"]["code"], row["gross_margin"])
-                for row in self.client.get(f"/api/projected-invoices/{query}").json()
+                for row in self.client.get(f"/api/projected-invoices/{query}").json()[
+                    "items"
+                ]
             ]
 
         self.assertEqual(

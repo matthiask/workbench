@@ -1,11 +1,14 @@
 import datetime as dt
 from decimal import Decimal
+from typing import Any
 
-from django.db.models import Count, Sum
+from django.db.models import Sum
 from ninja import Query, Router, Schema
+from ninja.pagination import paginate
 
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
+from workbench.tools.api import Serialized, TotalsPagination
 from workbench.tools.formats import Z1, Z2
 
 
@@ -25,10 +28,11 @@ class LoggedHoursOut(Schema):
     service: str
 
 
-class LoggedHoursList(Schema):
-    total_hours: Decimal
-    count: int
-    hours: list[LoggedHoursOut]
+class LoggedHoursPagination(TotalsPagination):
+    class Output(Schema):
+        items: list[Any]
+        count: int
+        total_hours: Decimal
 
 
 class LoggedHoursFilter(Schema):
@@ -75,20 +79,20 @@ def _entry_out(entry, request):
     }
 
 
-@router.get("/logbook/hours/", response=LoggedHoursList)
+@router.get("/logbook/hours/", response=list[LoggedHoursOut])
+@paginate(LoggedHoursPagination)
 def logged_hours_list(request, filters: Query[LoggedHoursFilter]):
-    """Logged hours, newest first, at most 500; the total and the count
-    include all matching entries"""
+    """Logged hours, newest first; the total includes all matching entries"""
     hours = _filter(LoggedHours.objects.all(), filters)
-    totals = hours.order_by().aggregate(hours=Sum("hours"), count=Count("id"))
-    return {
-        "total_hours": totals["hours"] or Z1,
-        "count": totals["count"],
-        "hours": [
-            _entry_out(row, request) | {"hours": row.hours}
-            for row in hours.select_related("rendered_by", "service__project")[:500]
-        ],
-    }
+    return Serialized(
+        hours.select_related("rendered_by", "service__project").order_by(
+            "-rendered_on", "-created_at", "-pk"
+        ),
+        lambda row: _entry_out(row, request) | {"hours": row.hours},
+        totals={
+            "total_hours": hours.order_by().aggregate(Sum("hours"))["hours__sum"] or Z1
+        },
+    )
 
 
 class LoggedCostOut(Schema):
@@ -105,42 +109,44 @@ class LoggedCostOut(Schema):
     service: str
 
 
-class LoggedCostList(Schema):
-    total_cost: Decimal
-    total_third_party_costs: Decimal
-    count: int
-    costs: list[LoggedCostOut]
+class LoggedCostPagination(TotalsPagination):
+    class Output(Schema):
+        items: list[Any]
+        count: int
+        total_cost: Decimal
+        total_third_party_costs: Decimal
 
 
 class LoggedCostFilter(LoggedHoursFilter):
     expenses: bool = False
 
 
-@router.get("/logbook/costs/", response=LoggedCostList)
+@router.get("/logbook/costs/", response=list[LoggedCostOut])
+@paginate(LoggedCostPagination)
 def logged_cost_list(request, filters: Query[LoggedCostFilter]):
-    """Logged costs, newest first, at most 500; the totals and the count
-    include all matching entries
+    """Logged costs, newest first; the totals include all matching entries
 
     ``expenses`` are costs paid from someone's own pocket."""
     costs = _filter(LoggedCost.objects.all(), filters)
     if filters.expenses:
         costs = costs.filter(are_expenses=True)
     totals = costs.order_by().aggregate(
-        cost=Sum("cost"),
-        third_party_costs=Sum("third_party_costs"),
-        count=Count("id"),
+        cost=Sum("cost"), third_party_costs=Sum("third_party_costs")
     )
-    return {
-        "total_cost": totals["cost"] or Z2,
-        "total_third_party_costs": totals["third_party_costs"] or Z2,
-        "count": totals["count"],
-        "costs": [
+    return Serialized(
+        costs.select_related("rendered_by", "service__project").order_by(
+            "-rendered_on", "-created_at", "-pk"
+        ),
+        lambda row: (
             _entry_out(row, request)
             | {
                 "cost": row.cost,
                 "third_party_costs": row.third_party_costs,
                 "are_expenses": row.are_expenses,
             }
-            for row in costs.select_related("rendered_by", "service__project")[:500]
-        ],
-    }
+        ),
+        totals={
+            "total_cost": totals["cost"] or Z2,
+            "total_third_party_costs": totals["third_party_costs"] or Z2,
+        },
+    )

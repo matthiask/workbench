@@ -25,7 +25,10 @@ class ProjectsAPITest(TestCase):
         self.client.force_login(project.owned_by)
 
         def ids(query=""):
-            return {p["id"] for p in self.client.get(f"/api/projects/{query}").json()}
+            return {
+                p["id"]
+                for p in self.client.get(f"/api/projects/{query}").json()["items"]
+            }
 
         self.assertEqual(ids("?q=relaunch"), {project.pk})
         self.assertEqual(ids(f"?customer={other.customer_id}"), {other.pk})
@@ -240,7 +243,7 @@ class ProjectsAPITest(TestCase):
         factories.ServiceFactory.create(title="Other project")
         self.client.force_login(project.owned_by)
 
-        data = self.client.get(f"/api/services/?project={project.pk}").json()
+        data = self.client.get(f"/api/services/?project={project.pk}").json()["items"]
         self.assertEqual(
             [
                 (s["title"], s["offer"], s["service_hours"], s["logged_hours"])
@@ -252,7 +255,7 @@ class ProjectsAPITest(TestCase):
         self.assertEqual(data[1]["logged_cost"], "100.00")
         self.assertNotIn("effort_rate", data[0])
 
-        data = self.client.get(f"/api/services/?offer={offer.pk}").json()
+        data = self.client.get(f"/api/services/?offer={offer.pk}").json()["items"]
         self.assertEqual([s["id"] for s in data], [design.pk])
-        data = self.client.get("/api/services/?q=hosting").json()
+        data = self.client.get("/api/services/?q=hosting").json()["items"]
         self.assertEqual([s["id"] for s in data], [hosting.pk])

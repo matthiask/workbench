@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import HttpError, ValidationError
+from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
@@ -21,7 +22,7 @@ from workbench.projects.forms import ProjectForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
-from workbench.tools.api import raise_form_errors
+from workbench.tools.api import Serialized, raise_form_errors
 from workbench.tools.formats import Z1, Z2
 
 
@@ -78,9 +79,10 @@ class ProjectFilter(Schema):
 
 
 @router.get("/projects/", response=list[ProjectOut])
+@paginate
 def project_list(request, filters: Query[ProjectFilter]):
-    """Search projects, open projects only by default"""
-    projects = Project.objects.select_related("customer", "owned_by")
+    """Search projects, open projects only by default, newest first"""
+    projects = Project.objects.select_related("customer", "owned_by").order_by("-pk")
     if not filters.include_closed:
         projects = projects.open()
     if filters.customer:
@@ -89,7 +91,7 @@ def project_list(request, filters: Query[ProjectFilter]):
         projects = projects.filter(owned_by___short_name__iexact=filters.owned_by)
     if q := filters.q:
         projects = projects.search(q)
-    return [project_out(project, request) for project in projects[:50]]
+    return Serialized(projects, lambda project: project_out(project, request))
 
 
 @router.get("/projects/{int:project_id}/", response=ProjectOut)
@@ -432,8 +434,9 @@ def _sum_of(model, field):
 
 
 @router.get("/services/", response=list[ServiceOut])
+@paginate
 def service_list(request, filters: Query[ServiceFilter]):
-    """Services with their logged hours and costs, at most 200
+    """Services with their logged hours and costs
 
     Same as on the project page: rates and amounts other than costs require
     the controlling feature (see the offers and the project statistics)."""
@@ -452,8 +455,9 @@ def service_list(request, filters: Query[ServiceFilter]):
         services = services.filter(offer=filters.offer)
     if filters.q:
         services = services.search(filters.q)
-    return [
-        {
+    return Serialized(
+        services,
+        lambda service: {
             "id": service.id,
             "url": request.build_absolute_uri(
                 f"{service.project.get_absolute_url()}#service{service.pk}"
@@ -474,6 +478,5 @@ def service_list(request, filters: Query[ServiceFilter]):
             "logged_cost": service.logged_cost or Z2,
             "is_optional": service.is_optional,
             "is_logging_allowed": service.is_logging_allowed(),
-        }
-        for service in services[:200]
-    ]
+        },
+    )

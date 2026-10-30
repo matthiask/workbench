@@ -1,8 +1,9 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from ninja import Field, Router, Schema
+from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
+from ninja.pagination import paginate
 
 from workbench.contacts.forms import PersonForm
 from workbench.contacts.models import (
@@ -12,7 +13,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.tools.api import form_errors, full_clean
+from workbench.tools.api import Serialized, form_errors, full_clean
 
 
 router = Router(tags=["contacts"])
@@ -62,36 +63,43 @@ def person_list_out(person, request):
     }
 
 
+class OrganizationFilter(Schema):
+    q: str = ""
+    include_archived: bool = False
+
+
 @router.get("/contacts/organizations/", response=list[OrganizationOut])
-def organization_list(request, q: str = "", *, include_archived: bool = False):
+@paginate
+def organization_list(request, filters: Query[OrganizationFilter]):
     """Search organizations, e.g. the customer of a new project"""
-    organizations = Organization.objects.all()
-    if not include_archived:
+    organizations = Organization.objects.order_by("name", "pk")
+    if not filters.include_archived:
         organizations = organizations.active()
-    if q:
-        organizations = organizations.search(q)
-    return [
-        organization_out(organization, request) for organization in organizations[:50]
-    ]
+    if filters.q:
+        organizations = organizations.search(filters.q)
+    return Serialized(
+        organizations, lambda organization: organization_out(organization, request)
+    )
+
+
+class PersonFilter(OrganizationFilter):
+    organization: int | None = None
 
 
 @router.get("/contacts/people/", response=list[PersonOut])
-def person_list(
-    request,
-    q: str = "",
-    organization: int | None = None,
-    *,
-    include_archived: bool = False,
-):
+@paginate
+def person_list(request, filters: Query[PersonFilter]):
     """Search people, e.g. the contact of a new project"""
-    people = Person.objects.select_related("organization")
-    if not include_archived:
+    people = Person.objects.select_related("organization").order_by(
+        "given_name", "family_name", "pk"
+    )
+    if not filters.include_archived:
         people = people.active()
-    if organization:
-        people = people.filter(organization=organization)
-    if q:
-        people = people.search(q)
-    return [person_list_out(person, request) for person in people[:50]]
+    if filters.organization:
+        people = people.filter(organization=filters.organization)
+    if filters.q:
+        people = people.search(filters.q)
+    return Serialized(people, lambda person: person_list_out(person, request))
 
 
 class OrganizationDetail(OrganizationOut):

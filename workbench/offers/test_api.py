@@ -242,7 +242,9 @@ class OffersAPITest(TestCase):
         self.client.force_login(user)
 
         def ids(query=""):
-            return [o["id"] for o in self.client.get(f"/api/offers/{query}").json()]
+            return [
+                o["id"] for o in self.client.get(f"/api/offers/{query}").json()["items"]
+            ]
 
         self.assertEqual(ids(), [other.pk, relaunch.pk])
         self.assertEqual(ids("?q=relaunch"), [relaunch.pk])

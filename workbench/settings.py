@@ -136,6 +136,10 @@ DATABASES["default"] |= {
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 ATOMIC_REQUESTS = True
 
+# Search APIs return pages of 100 results, at most 1000 (limit and offset)
+NINJA_PAGINATION_PER_PAGE = 100
+NINJA_PAGINATION_MAX_LIMIT = 1000
+
 LANGUAGE_CODE = "de"
 LANGUAGES = [("en", _("english")), ("de", _("german"))]
 TIME_ZONE = "Europe/Zurich"

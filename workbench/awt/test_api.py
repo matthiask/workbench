@@ -30,7 +30,10 @@ class AbsencesAPITest(TestCase):
         self.client.force_login(user)
 
         def ids(query=""):
-            return [a["id"] for a in self.client.get(f"/api/absences/{query}").json()]
+            return [
+                a["id"]
+                for a in self.client.get(f"/api/absences/{query}").json()["items"]
+            ]
 
         self.assertEqual(ids(), [sick.pk, vacation.pk])
         self.assertEqual(ids("?since=2026-11-01"), [vacation.pk])
@@ -38,7 +41,7 @@ class AbsencesAPITest(TestCase):
         self.assertEqual(ids("?user=AB"), [vacation.pk])
         self.assertEqual(ids("?reason=sickness"), [sick.pk])
 
-        data = self.client.get("/api/absences/?user=ab").json()[0]
+        data = self.client.get("/api/absences/?user=ab").json()["items"][0]
         self.assertEqual(data["user"], "ab")
         self.assertEqual(data["days"], "10.00")
         self.assertEqual(data["description"], "Holidays")

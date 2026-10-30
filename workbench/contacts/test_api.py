@@ -18,17 +18,19 @@ class ContactsAPITest(TestCase):
         )
         self.client.force_login(factories.UserFactory.create())
 
-        data = self.client.get("/api/contacts/organizations/?q=beispiel").json()
+        data = self.client.get("/api/contacts/organizations/?q=beispiel").json()[
+            "items"
+        ]
         self.assertEqual([o["id"] for o in data], [organization.pk])
         self.assertEqual(
             data[0]["url"], f"http://testserver{organization.get_absolute_url()}"
         )
         data = self.client.get(
             "/api/contacts/organizations/?q=beispiel&include_archived=true"
-        ).json()
+        ).json()["items"]
         self.assertEqual(len(data), 2)
 
-        data = self.client.get("/api/contacts/people/?q=muster").json()
+        data = self.client.get("/api/contacts/people/?q=muster").json()["items"]
         self.assertEqual(data[0]["id"], person.pk)
         self.assertEqual(data[0]["full_name"], "Hans Muster")
         self.assertEqual(
@@ -41,7 +43,7 @@ class ContactsAPITest(TestCase):
         )
         data = self.client.get(
             f"/api/contacts/people/?organization={organization.pk}"
-        ).json()
+        ).json()["items"]
         self.assertEqual([p["id"] for p in data], [person.pk])
 
     def test_detail(self):

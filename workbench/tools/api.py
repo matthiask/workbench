@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Schema
 from ninja.errors import ValidationError as NinjaValidationError
+from ninja.pagination import LimitOffsetPagination
 
 from workbench.accounts.models import Team, User
 from workbench.tools.validation import monday
@@ -165,3 +166,33 @@ def filter_users(filters):
                 }
             ])
     return users
+
+
+class Serialized:
+    """A queryset for ninja's ``@paginate`` whose objects are serialized when
+    the page is sliced, e.g. by functions which need the request"""
+
+    def __init__(self, queryset, out, *, totals=None):
+        self.queryset = queryset
+        self.out = out
+        self.totals = totals or {}
+
+    def all(self):
+        return self
+
+    def count(self):
+        return self.queryset.count()
+
+    def __getitem__(self, key):
+        return [self.out(obj) for obj in self.queryset[key]]
+
+
+class TotalsPagination(LimitOffsetPagination):
+    """Adds the totals of a ``Serialized`` queryset to the page, subclasses
+    declare them in their ``Output``"""
+
+    def paginate_queryset(self, queryset, pagination, request, **params):
+        return (
+            super().paginate_queryset(queryset, pagination, request, **params)
+            | queryset.totals
+        )

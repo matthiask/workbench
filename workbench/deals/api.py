@@ -10,6 +10,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
+from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
@@ -22,6 +23,7 @@ from workbench.deals.reporting import accepted_deals, deal_history, declined_dea
 from workbench.reporting.api import jsonable
 from workbench.tools.api import (
     DateRangeFilter,
+    Serialized,
     UsersFilter,
     date_range,
     filter_users,
@@ -101,8 +103,9 @@ class DealFilter(Schema):
 
 
 @router.get("/deals/", response=list[DealOut])
+@paginate
 def deal_list(request, filters: Query[DealFilter]):
-    """Deals, open deals with the earliest expected decision first, at most 200"""
+    """Deals, open deals with the earliest expected decision first"""
     deals = Deal.objects.select_related(
         "customer", "owned_by", "closing_type"
     ).prefetch_related("values__type", "contributors", "related_offers__project")
@@ -115,7 +118,7 @@ def deal_list(request, filters: Query[DealFilter]):
     if filters.q:
         deals = deals.search(filters.q)
     deals = deals.order_by("status", "decision_expected_on", "-pk")
-    return [deal_out(deal, request) for deal in deals[:200]]
+    return Serialized(deals, lambda deal: deal_out(deal, request))
 
 
 class StatsFilter(DateRangeFilter, UsersFilter):

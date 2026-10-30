@@ -32,7 +32,9 @@ class NotesAPITest(TestCase):
         self.client.force_login(user)
 
         def ids(query=""):
-            return [n["id"] for n in self.client.get(f"/api/notes/{query}").json()]
+            return [
+                n["id"] for n in self.client.get(f"/api/notes/{query}").json()["items"]
+            ]
 
         self.assertEqual(ids(), [on_invoice.pk, on_deal.pk])
         self.assertEqual(ids("?q=budget"), [on_deal.pk])
@@ -43,7 +45,7 @@ class NotesAPITest(TestCase):
         )
         self.assertEqual(ids("?created_by=AB"), [on_deal.pk])
 
-        data = self.client.get(f"/api/notes/?deal={deal.pk}").json()[0]
+        data = self.client.get(f"/api/notes/?deal={deal.pk}").json()["items"][0]
         self.assertEqual(data["created_by"], "ab")
         self.assertEqual(data["object"]["type"], "deal")
         self.assertEqual(data["object"]["id"], deal.pk)
@@ -69,7 +71,7 @@ class NotesAPITest(TestCase):
 
         response = self.client.get("/api/notes/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), [])
+        self.assertEqual(response.json()["items"], [])
 
     def test_create(self):
         """Notes are added to exactly one object, its owner is notified"""

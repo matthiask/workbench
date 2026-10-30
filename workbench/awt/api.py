@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Schema
 from ninja.errors import ValidationError
+from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import check_feature
 from workbench.accounts.features import FEATURES
@@ -17,6 +18,7 @@ from workbench.awt.reporting import (
     working_time_by_week,
 )
 from workbench.reporting.api import jsonable
+from workbench.tools.api import Serialized
 
 
 router = Router(tags=["absences"])
@@ -43,9 +45,10 @@ class AbsenceFilter(Schema):
 
 
 @router.get("/absences/", response=list[AbsenceOut])
+@paginate
 def absence_list(request, filters: Query[AbsenceFilter]):
     """Absences overlapping the period from ``since`` until ``until``, oldest
-    first, at most 500"""
+    first"""
     absences = Absence.objects.select_related("user")
     if filters.user:
         absences = absences.filter(user___short_name__iexact=filters.user)
@@ -58,8 +61,9 @@ def absence_list(request, filters: Query[AbsenceFilter]):
         )
     if filters.until:
         absences = absences.filter(starts_on__lte=filters.until)
-    return [
-        {
+    return Serialized(
+        absences.order_by("starts_on", "pk"),
+        lambda absence: {
             "id": absence.id,
             "url": request.build_absolute_uri(absence.get_absolute_url()),
             "user": absence.user.get_short_name(),
@@ -68,9 +72,8 @@ def absence_list(request, filters: Query[AbsenceFilter]):
             "days": absence.days,
             "reason": absence.get_reason_display(),
             "description": absence.description,
-        }
-        for absence in absences.order_by("starts_on", "pk")[:500]
-    ]
+        },
+    )
 
 
 class WorkingTimeFilter(Schema):

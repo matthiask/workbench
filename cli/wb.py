@@ -519,6 +519,40 @@ def _echo_invoice_list(invoices):
     console.print(table)
 
 
+def _page_options(fn):
+    fn = click.option(
+        "--offset",
+        type=click.IntRange(min=0),
+        default=0,
+        help="Skip this many results.",
+    )(fn)
+    return click.option(
+        "--limit",
+        type=click.IntRange(1, 1000),
+        help="Results per page, defaults to 100, at most 1000.",
+    )(fn)
+
+
+def _page_params(limit, offset):
+    return {
+        key: value for key, value in [("limit", limit), ("offset", offset)] if value
+    }
+
+
+def _echo_more(data, offset, what="results", *, note=""):
+    """Tell how many results there are if not all of them are shown"""
+    shown = len(data["items"])
+    if not offset and shown == data["count"]:
+        return
+    if shown:
+        message = f"Showing {offset + 1}–{offset + shown} of {data['count']} {what}"
+    else:
+        message = f"No {what} after the first {offset} of {data['count']}"
+    if offset + shown < data["count"]:
+        message += f", use --offset {offset + shown} for more"
+    click.secho(f"{message}. {note}".strip(), fg="yellow", err=True)
+
+
 def _period_options(default):
     """Options for the period of a report, ``default`` is its description"""
 
@@ -777,17 +811,18 @@ def users():
 @users.command("search")
 @click.argument("query", nargs=-1)
 @click.option("--all", "include_inactive", is_flag=True, help="Include inactive.")
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_users(query, include_inactive, as_json):
+def search_users(query, include_inactive, limit, offset, as_json):
     """Search users by name, short name or email address, active users by
     default"""
     params = {"q": " ".join(query), "include_inactive": _bool(include_inactive)}
-    data = _request("GET", "users/", params=params)
+    data = _request("GET", "users/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
         return
     table = _table("ID>", "Short name", "Name", "Email", "Teams")
-    for user in data:
+    for user in data["items"]:
         table.add_row(
             _link(user["id"], user["url"]),
             user["short_name"],
@@ -797,6 +832,7 @@ def search_users(query, include_inactive, as_json):
             ", ".join(user["teams"]),
         )
     console.print(table)
+    _echo_more(data, offset, "users")
 
 
 @cli.group()
@@ -809,20 +845,21 @@ def projects():
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.")
 @click.option("--all", "include_closed", is_flag=True, help="Include closed projects.")
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search(query, customer, owned_by, include_closed, as_json):
+def search(query, customer, owned_by, include_closed, limit, offset, as_json):
     """Search projects, open projects by default"""
     params = {"q": " ".join(query), "include_closed": _bool(include_closed)}
     if customer:
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
-    data = _request("GET", "projects/", params=params)
+    data = _request("GET", "projects/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
         return
     table = _table("ID>", "Code", "Title", "Customer", "Owned by", "Closed on")
-    for project in data:
+    for project in data["items"]:
         table.add_row(
             _link(project["id"], project["url"]),
             _link(project["code"], project["url"]),
@@ -832,6 +869,7 @@ def search(query, customer, owned_by, include_closed, as_json):
             project["closed_on"] or "",
         )
     console.print(table)
+    _echo_more(data, offset, "projects")
 
 
 @projects.command("show")
@@ -958,17 +996,22 @@ def contacts():
 @contacts.command("search")
 @click.argument("query", nargs=-1, required=True)
 @click.option("--all", "include_archived", is_flag=True, help="Include archived.")
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_contacts(query, include_archived, as_json):
+def search_contacts(query, include_archived, limit, offset, as_json):
     """Search organizations and people"""
     params = {"q": " ".join(query), "include_archived": _bool(include_archived)}
-    organizations = _request("GET", "contacts/organizations/", params=params)
-    people = _request("GET", "contacts/people/", params=params)
+    organizations = _request(
+        "GET", "contacts/organizations/", params=params | _page_params(limit, offset)
+    )
+    people = _request(
+        "GET", "contacts/people/", params=params | _page_params(limit, offset)
+    )
     if as_json:
         _echo_json({"organizations": organizations, "people": people})
         return
     table = _table("ID>", "Organization", title="Organizations")
-    for organization in organizations:
+    for organization in organizations["items"]:
         url = organization["url"]
         table.add_row(
             _link(organization["id"], url),
@@ -976,8 +1019,9 @@ def search_contacts(query, include_archived, as_json):
             + (" (archived)" if organization["is_archived"] else ""),
         )
     console.print(table)
+    _echo_more(organizations, offset, "organizations")
     table = _table("ID>", "Name", "Organization ID>", "Organization", title="People")
-    for person in people:
+    for person in people["items"]:
         organization = person["organization"] or {}
         table.add_row(
             _link(person["id"], person["url"]),
@@ -987,6 +1031,7 @@ def search_contacts(query, include_archived, as_json):
             _link(organization.get("name", ""), organization.get("url")),
         )
     console.print(table)
+    _echo_more(people, offset, "people")
 
 
 @cli.group()
@@ -1166,8 +1211,9 @@ def context(project_id):
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.")
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_offers(query, status, project, customer, owned_by, as_json):
+def search_offers(query, status, project, customer, owned_by, limit, offset, as_json):
     """Search offers, newest first"""
     params = {"q": " ".join(query)}
     if status:
@@ -1178,8 +1224,12 @@ def search_offers(query, status, project, customer, owned_by, as_json):
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
-    data = _request("GET", "offers/", params=params)
-    _echo_json(data) if as_json else _echo_offer_list(data)
+    data = _request("GET", "offers/", params=params | _page_params(limit, offset))
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_offer_list(data["items"])
+    _echo_more(data, offset, "offers")
 
 
 @offers.command()
@@ -1457,8 +1507,11 @@ def invoices():
 @click.option(
     "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced since."
 )
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_invoices(query, project, customer, status, open_, overdue, since, as_json):
+def search_invoices(
+    query, project, customer, status, open_, overdue, since, limit, offset, as_json
+):
     """Search invoices, newest first"""
     params = {"q": " ".join(query), "open": _bool(open_), "overdue": _bool(overdue)}
     if project:
@@ -1469,8 +1522,12 @@ def search_invoices(query, project, customer, status, open_, overdue, since, as_
         params["status"] = status
     if since:
         params["invoiced_since"] = since.date().isoformat()
-    data = _request("GET", "invoices/", params=params)
-    _echo_json(data) if as_json else _echo_invoice_list(data)
+    data = _request("GET", "invoices/", params=params | _page_params(limit, offset))
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_invoice_list(data["items"])
+    _echo_more(data, offset, "invoices")
 
 
 @invoices.command("show")
@@ -1595,8 +1652,11 @@ def _echo_notes(notes):
 @click.option("--invoice", type=int, help="Invoice ID.")
 @click.option("--recurring-invoice", type=int, help="Recurring invoice ID.")
 @click.option("--created-by", help="Short name.")
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_notes(query, deal, invoice, recurring_invoice, created_by, as_json):
+def search_notes(
+    query, deal, invoice, recurring_invoice, created_by, limit, offset, as_json
+):
     """Search notes, all of them or those of some objects, newest first"""
     params = {"q": " ".join(query)}
     for key, value in [
@@ -1607,11 +1667,12 @@ def search_notes(query, deal, invoice, recurring_invoice, created_by, as_json):
     ]:
         if value:
             params[key] = value
-    data = _request("GET", "notes/", params=params)
+    data = _request("GET", "notes/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
-    elif data:
-        _echo_notes(data)
+    elif data["items"]:
+        _echo_notes(data["items"])
+        _echo_more(data, offset, "notes")
     else:
         console.print("No notes found.")
 
@@ -1650,15 +1711,16 @@ def services():
 @click.argument("query", nargs=-1)
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--offer", type=int, help="Offer ID.")
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_services(query, project, offer, as_json):
+def search_services(query, project, offer, limit, offset, as_json):
     """Search services, ordered by project and offer"""
     params = {"q": " ".join(query)}
     if project:
         params["project"] = project
     if offer:
         params["offer"] = offer
-    data = _request("GET", "services/", params=params)
+    data = _request("GET", "services/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
         return
@@ -1673,7 +1735,7 @@ def search_services(query, project, offer, as_json):
         "Logged cost>",
         "Cost>",
     )
-    for service in data:
+    for service in data["items"]:
         notes = [
             note
             for note, flag in [
@@ -1695,6 +1757,7 @@ def search_services(query, project, offer, as_json):
             style="dim" if notes else None,
         )
     console.print(table)
+    _echo_more(data, offset, "services")
 
 
 @cli.group()
@@ -1715,9 +1778,20 @@ def hours():
 @click.option(
     "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered until."
 )
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_hours(
-    query, project, customer, offer, service, rendered_by, since, until, as_json
+    query,
+    project,
+    customer,
+    offer,
+    service,
+    rendered_by,
+    since,
+    until,
+    limit,
+    offset,
+    as_json,
 ):
     """Search logged hours, newest first"""
     params = {"q": " ".join(query)}
@@ -1734,7 +1808,9 @@ def search_hours(
         params["rendered_since"] = since.date().isoformat()
     if until:
         params["rendered_until"] = until.date().isoformat()
-    data = _request("GET", "logbook/hours/", params=params)
+    data = _request(
+        "GET", "logbook/hours/", params=params | _page_params(limit, offset)
+    )
     if as_json:
         _echo_json(data)
         return
@@ -1747,7 +1823,7 @@ def search_hours(
         "Description",
         show_footer=True,
     )
-    for row in data["hours"]:
+    for row in data["items"]:
         table.add_row(
             _link(row["rendered_on"], row["url"]),
             row["rendered_by"],
@@ -1759,11 +1835,7 @@ def search_hours(
     table.columns[0].footer = "Total"
     table.columns[4].footer = data["total_hours"]
     console.print(table)
-    if data["count"] > len(data["hours"]):
-        console.print(
-            f"Showing {len(data['hours'])} of {data['count']} entries,"
-            " the total includes all of them."
-        )
+    _echo_more(data, offset, "entries", note="The total includes all of them.")
 
 
 @cli.group()
@@ -1794,8 +1866,9 @@ def absences():
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="Absences starting on or before this date.",
 )
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_absences(user, reason, since, until, as_json):
+def search_absences(user, reason, since, until, limit, offset, as_json):
     """Search absences, current and upcoming ones by default"""
     params = {"since": (since.date() if since else dt.date.today()).isoformat()}
     if user:
@@ -1804,12 +1877,12 @@ def search_absences(user, reason, since, until, as_json):
         params["reason"] = reason
     if until:
         params["until"] = until.date().isoformat()
-    data = _request("GET", "absences/", params=params)
+    data = _request("GET", "absences/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
         return
     table = _table("User", "Starts on", "Ends on", "Days>", "Reason", "Description")
-    for absence in data:
+    for absence in data["items"]:
         table.add_row(
             _link(absence["user"], absence["url"]),
             absence["starts_on"],
@@ -1819,6 +1892,7 @@ def search_absences(user, reason, since, until, as_json):
             absence["description"],
         )
     console.print(table)
+    _echo_more(data, offset, "absences")
 
 
 @cli.group()
@@ -1840,6 +1914,7 @@ def costs():
 @click.option(
     "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered until."
 )
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_costs(
     query,
@@ -1851,6 +1926,8 @@ def search_costs(
     expenses,
     since,
     until,
+    limit,
+    offset,
     as_json,
 ):
     """Search logged costs, newest first"""
@@ -1868,7 +1945,9 @@ def search_costs(
         params["rendered_since"] = since.date().isoformat()
     if until:
         params["rendered_until"] = until.date().isoformat()
-    data = _request("GET", "logbook/costs/", params=params)
+    data = _request(
+        "GET", "logbook/costs/", params=params | _page_params(limit, offset)
+    )
     if as_json:
         _echo_json(data)
         return
@@ -1882,7 +1961,7 @@ def search_costs(
         "Description",
         show_footer=True,
     )
-    for row in data["costs"]:
+    for row in data["items"]:
         table.add_row(
             _link(row["rendered_on"], row["url"]),
             row["rendered_by"],
@@ -1896,11 +1975,7 @@ def search_costs(
     table.columns[4].footer = data["total_cost"]
     table.columns[5].footer = data["total_third_party_costs"]
     console.print(table)
-    if data["count"] > len(data["costs"]):
-        console.print(
-            f"Showing {len(data['costs'])} of {data['count']} entries,"
-            " the totals include all of them."
-        )
+    _echo_more(data, offset, "entries", note="The totals include all of them.")
 
 
 @cli.group("projected-invoices")
@@ -1917,8 +1992,9 @@ def projected_invoices():
 @click.option(
     "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced until."
 )
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_projected_invoices(project, customer, since, until, as_json):
+def search_projected_invoices(project, customer, since, until, limit, offset, as_json):
     """Search the planned invoicing (gross margin), oldest first"""
     params = {}
     if project:
@@ -1929,12 +2005,14 @@ def search_projected_invoices(project, customer, since, until, as_json):
         params["invoiced_since"] = since.date().isoformat()
     if until:
         params["invoiced_until"] = until.date().isoformat()
-    data = _request("GET", "projected-invoices/", params=params)
+    data = _request(
+        "GET", "projected-invoices/", params=params | _page_params(limit, offset)
+    )
     if as_json:
         _echo_json(data)
         return
     table = _table("Project", "Invoiced on", "Gross margin>", "Description")
-    for row in data:
+    for row in data["items"]:
         table.add_row(
             _link(row["project"]["code"], row["project"]["url"]),
             row["invoiced_on"],
@@ -1942,6 +2020,7 @@ def search_projected_invoices(project, customer, since, until, as_json):
             row["description"],
         )
     console.print(table)
+    _echo_more(data, offset, "projected invoices")
 
 
 @cli.group()
@@ -1956,15 +2035,16 @@ def deals():
 )
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.")
+@_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_deals(query, status, customer, owned_by, as_json):
+def search_deals(query, status, customer, owned_by, limit, offset, as_json):
     """Search deals, open deals by default"""
     params = {"q": " ".join(query), "status": status}
     if customer:
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
-    data = _request("GET", "deals/", params=params)
+    data = _request("GET", "deals/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
         return
@@ -1977,7 +2057,7 @@ def search_deals(query, status, customer, owned_by, as_json):
         "Decision expected on",
         "Value>",
     )
-    for deal in data:
+    for deal in data["items"]:
         table.add_row(
             _link(deal["id"], deal["url"]),
             deal["title"],
@@ -1988,6 +2068,7 @@ def search_deals(query, status, customer, owned_by, as_json):
             deal["value"],
         )
     console.print(table)
+    _echo_more(data, offset, "deals")
 
 
 @deals.command("show")

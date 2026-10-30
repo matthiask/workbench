@@ -70,6 +70,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   interface doesn't). Shared validation helpers for the APIs are in
   `workbench/tools/api.py`, also `DateRangeFilter` with `date_range()` (periods
   like `2026-Q3` or `last-month`) and `UsersFilter` with `filter_users()` for reports.
+  Search endpoints use ninja's `@paginate` (limit and offset, 100 per page,
+  at most 1000; responses are `{items, count}`) and return a `Serialized`
+  queryset from `workbench/tools/api.py` so that only the page is serialized,
+  ordered unambiguously (add `pk`). `TotalsPagination` adds totals of all
+  matches, e.g. the hours of the logbook search.
   Report endpoints require the same feature as the web view (squeeze:
   productivity, deals: deals, most others: controlling); the static
   `ReportingToken` only grants key data and cash data.

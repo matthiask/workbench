@@ -28,14 +28,16 @@ class DealsAPITest(TestCase):
         declined = factories.DealFactory.create(status=Deal.DECLINED)
         self.client.force_login(user)
 
-        data = self.client.get("/api/deals/").json()
+        data = self.client.get("/api/deals/").json()["items"]
         self.assertEqual([d["id"] for d in data], [deal.pk, declined.pk])
         self.assertEqual(data[0]["value"], "5000.00")
         self.assertEqual(data[0]["values"], [{"type": "Design", "value": "5000.00"}])
         self.assertEqual(data[0]["owned_by"], "ab")
 
         def ids(query):
-            return [d["id"] for d in self.client.get(f"/api/deals/{query}").json()]
+            return [
+                d["id"] for d in self.client.get(f"/api/deals/{query}").json()["items"]
+            ]
 
         self.assertEqual(ids("?status=open"), [deal.pk])
         self.assertEqual(ids("?owned_by=AB"), [deal.pk])

@@ -2,7 +2,8 @@ import datetime as dt
 from decimal import Decimal
 
 from django.db.models import Q
-from ninja import Router, Schema
+from ninja import Query, Router, Schema
+from ninja.pagination import paginate
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
@@ -15,6 +16,7 @@ from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project
+from workbench.tools.api import Serialized
 from workbench.tools.validation import monday
 
 
@@ -52,21 +54,28 @@ class UserOut(Schema):
     teams: list[str]
 
 
+class UserFilter(Schema):
+    q: str = ""
+    include_inactive: bool = False
+
+
 @router.get("/users/", response=list[UserOut])
-def user_list(request, q: str = "", *, include_inactive: bool = False):
+@paginate
+def user_list(request, filters: Query[UserFilter]):
     """Search users by name, short name or email address, e.g. for the short
     names which identify them in other APIs"""
-    users = User.objects.prefetch_related("teams")
-    if not include_inactive:
+    users = User.objects.prefetch_related("teams").order_by("_full_name", "pk")
+    if not filters.include_inactive:
         users = users.filter(is_active=True)
-    for term in q.split():
+    for term in filters.q.split():
         users = users.filter(
             Q(_full_name__icontains=term)
             | Q(_short_name__icontains=term)
             | Q(email__icontains=term)
         )
-    return [
-        {
+    return Serialized(
+        users,
+        lambda user: {
             "id": user.id,
             "url": request.build_absolute_uri(user.get_absolute_url()),
             "short_name": user.get_short_name(),
@@ -74,9 +83,8 @@ def user_list(request, q: str = "", *, include_inactive: bool = False):
             "email": user.email,
             "is_active": user.is_active,
             "teams": [team.name for team in user.teams.all()],
-        }
-        for user in users
-    ]
+        },
+    )
 
 
 class PlannedWorkThisWeek(Schema):

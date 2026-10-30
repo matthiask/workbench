@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _, override
 from ninja import Field, Query, Router, Schema
 from ninja.errors import HttpError, ValidationError
+from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
@@ -15,7 +16,7 @@ from workbench.offers.models import Offer
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.api import full_clean
+from workbench.tools.api import Serialized, full_clean
 
 
 # Same as in the web interface
@@ -198,9 +199,15 @@ class OfferFilter(Schema):
 
 
 @router.get("/offers/", response=list[OfferOut])
+@paginate
 def offer_list_search(request, filters: Query[OfferFilter]):
-    """Search offers, newest first, at most 50"""
-    offers = Offer.objects.select_related("project").prefetch_related("services")
+    """Search offers, newest first"""
+    offers = (
+        Offer.objects
+        .select_related("project")
+        .prefetch_related("services")
+        .order_by("-pk")
+    )
     if filters.project:
         offers = offers.filter(project=filters.project)
     if filters.customer:
@@ -211,9 +218,9 @@ def offer_list_search(request, filters: Query[OfferFilter]):
         offers = offers.filter(owned_by___short_name__iexact=filters.owned_by)
     if filters.q:
         offers = offers.search(filters.q)
-    return [
-        offer_out(offer, list(offer.services.all()), request) for offer in offers[:50]
-    ]
+    return Serialized(
+        offers, lambda offer: offer_out(offer, list(offer.services.all()), request)
+    )
 
 
 @router.get("/offers/{offer_id}/", response=OfferOut)

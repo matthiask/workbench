@@ -305,6 +305,20 @@ planned_work:
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(result.output.startswith("project_id,project,"))
 
+        factories.InvoiceFactory.create(
+            project=project, customer=project.customer, title="Follow-up"
+        )
+        result = self.wb("invoices", "search", "--project", project.pk, "--limit", 1)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(
+            "Showing 1–1 of 2 invoices, use --offset 1 for more.", result.output
+        )
+        result = self.wb(
+            "invoices", "search", "--project", project.pk, "--offset", 1, "--json"
+        )
+        self.assertIn('"count": 2', result.output)
+        self.assertNotIn("Showing", result.output)
+
         self.assertIn("Kick-off", self.wb("invoices", "search", "kick").output)
         self.assertIn(
             "Kick-off", self.wb("invoices", "search", "--project", project.pk).output

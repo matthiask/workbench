@@ -5,6 +5,7 @@ from typing import Literal
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from ninja import Query, Router, Schema
+from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
@@ -17,6 +18,7 @@ from workbench.contacts.api import (
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
+from workbench.tools.api import Serialized
 from workbench.tools.formats import Z2
 
 
@@ -88,8 +90,9 @@ class InvoiceFilter(Schema):
 
 
 @router.get("/invoices/", response=list[InvoiceOut])
+@paginate
 def invoice_list(request, filters: Query[InvoiceFilter]):
-    """Invoices, newest first, at most 200
+    """Invoices, newest first
 
     ``open`` are invoices in preparation or sent, ``overdue`` invoices sent and
     due for more than 15 days (as for reminders)."""
@@ -108,10 +111,10 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
         invoices = invoices.filter(invoiced_on__gte=filters.invoiced_since)
     if filters.q:
         invoices = invoices.search(filters.q)
-    return [
-        invoice_out(invoice, request)
-        for invoice in invoices.order_by("-invoiced_on", "-pk")[:200]
-    ]
+    return Serialized(
+        invoices.order_by("-invoiced_on", "-pk"),
+        lambda invoice: invoice_out(invoice, request),
+    )
 
 
 class ReminderInvoiceOut(InvoiceOut):
@@ -216,8 +219,9 @@ class ProjectedInvoiceFilter(Schema):
 
 
 @router.get("/projected-invoices/", response=list[ProjectedInvoiceOut])
+@paginate
 def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter]):
-    """Planned invoicing of all projects, oldest first, at most 200"""
+    """Planned invoicing of all projects, oldest first"""
     projected = ProjectedInvoice.objects.select_related("project")
     if filters.project:
         projected = projected.filter(project=filters.project)
@@ -227,7 +231,7 @@ def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter
         projected = projected.filter(invoiced_on__gte=filters.invoiced_since)
     if filters.invoiced_until:
         projected = projected.filter(invoiced_on__lte=filters.invoiced_until)
-    return [
-        _projected_invoice_out(row, request)
-        for row in projected.order_by("invoiced_on", "pk")[:200]
-    ]
+    return Serialized(
+        projected.order_by("invoiced_on", "pk"),
+        lambda row: _projected_invoice_out(row, request),
+    )

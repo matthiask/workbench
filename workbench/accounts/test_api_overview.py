@@ -44,7 +44,7 @@ class OverviewAPITest(TestCase):
         factories.UserFactory.create(_full_name="Hans Alt", is_active=False)
         self.client.force_login(user)
 
-        data = self.client.get("/api/users/?q=hans").json()
+        data = self.client.get("/api/users/?q=hans").json()["items"]
         self.assertEqual(
             data,
             [
@@ -59,7 +59,9 @@ class OverviewAPITest(TestCase):
                 }
             ],
         )
-        data = self.client.get("/api/users/?q=hans&include_inactive=true").json()
+        data = self.client.get("/api/users/?q=hans&include_inactive=true").json()[
+            "items"
+        ]
         self.assertEqual(len(data), 2)
-        data = self.client.get("/api/users/?q=HM+example").json()
+        data = self.client.get("/api/users/?q=HM+example").json()["items"]
         self.assertEqual([u["id"] for u in data], [user.pk])
