@@ -48,6 +48,16 @@ def form_errors(form, *, fields=None):
     ]
 
 
+def form_data(form):
+    """The data of an unbound form with the instance's current values, to
+    change some of them and validate the result with the same form like the
+    web interface does"""
+    return {
+        name: "" if (value := form[name].value()) is None else value
+        for name in form.fields
+    }
+
+
 def raise_form_errors(form, *, fields=None):
     raise NinjaValidationError(form_errors(form, fields=fields))
 

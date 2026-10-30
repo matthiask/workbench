@@ -239,6 +239,17 @@ list of the choices:
     wb deals create --title "Relaunch" --contact 345 --probability normal \
         --value Design=5000 --attribute Source=Referral --dry-run
 
+Change deals field by field, values by their type (`TYPE=` removes one), and
+close them like in Workbench: accepting or declining a deal also accepts or
+declines its related offers which haven't been accepted yet, unless you pick
+them with `--offer` or pass `--keep-offers`:
+
+    wb deals update 1234 --probability high --decision-expected-on 2026-12-15
+    wb deals update 1234 --value Design=6000 --value Hosting= --dry-run
+    wb deals close 1234 accepted --closing-type "Direct award"
+    wb deals close 1234 declined --closing-type "Too expensive" --notice "Chose a cheaper agency" --keep-planned-work
+    wb deals reopen 1234
+
 Deals accepted and declined in a period (this week by default), and who
 changed which deals:
 

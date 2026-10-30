@@ -484,6 +484,31 @@ planned_work:
             status=Deal.DECLINED,
             closed_on=dt.date.today(),
         )
+        open_deal = factories.DealFactory.create(
+            title="Website", owned_by=self.user, probability=Deal.NORMAL
+        )
+        result = self.wb(
+            "deals", "update", open_deal.pk, "--title", "Website 2027", "--dry-run"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Website 2027", result.output)
+        self.assertIn("Dry run", result.output)
+        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
+        result = self.wb(
+            "deals", "close", open_deal.pk, "accepted", "--closing-type", "x"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("'Won'", result.output)
+        result = self.wb(
+            "deals", "close", open_deal.pk, "accepted", "--closing-type", "won"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        open_deal.refresh_from_db()
+        self.assertEqual(open_deal.status, Deal.ACCEPTED)
+        result = self.wb("deals", "reopen", open_deal.pk)
+        open_deal.refresh_from_db()
+        self.assertEqual(open_deal.status, Deal.OPEN)
+
         result = self.wb("deals", "stats", "--user", "ab")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Relaunch", result.output)

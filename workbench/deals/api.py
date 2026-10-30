@@ -18,7 +18,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
-from workbench.deals.forms import DealForm
+from workbench.deals.forms import DealForm, SetStatusForm
 from workbench.deals.models import AttributeGroup, Deal, ValueType
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.tools.api import (
@@ -29,6 +29,7 @@ from workbench.tools.api import (
     date_range,
     filter_date_range,
     filter_users,
+    form_data,
     raise_form_errors,
 )
 from workbench.tools.formats import Z2
@@ -378,6 +379,59 @@ def _choices(objects):
     return ", ".join(repr(str(obj.title)) for obj in objects)
 
 
+def _values_and_attributes(data, form_data, error):
+    """Put the values and attributes given by title into the form data of a
+    ``DealForm``, return the form fields' locations in the request body
+
+    Values of ``None`` are removed. Required attribute groups must be in the
+    form data afterwards."""
+    fields = {}
+    value_types = list(ValueType.objects.filter(is_archived=False))
+    by_title = {vt.title.casefold(): vt for vt in value_types}
+    for title, value in data.values.items():
+        if vt := by_title.get(title.casefold()):
+            form_data[f"value_{vt.id}"] = "" if value is None else value
+            fields[f"value_{vt.id}"] = ["values", vt.title]
+        else:
+            error(
+                ["values", title],
+                _("Unknown value type. Choices: %s") % _choices(value_types),
+            )
+
+    groups = list(
+        AttributeGroup.objects.filter(is_archived=False).prefetch_related("attributes")
+    )
+    by_title = {group.title.casefold(): group for group in groups}
+    for title, attribute_title in data.attributes.items():
+        if not (group := by_title.get(title.casefold())):
+            error(
+                ["attributes", title],
+                _("Unknown attribute group. Choices: %s") % _choices(groups),
+            )
+            continue
+        attributes = [a for a in group.attributes.all() if not a.is_archived]
+        attribute = next(
+            (a for a in attributes if a.title.casefold() == attribute_title.casefold()),
+            None,
+        )
+        if attribute:
+            form_data[f"attribute_{group.id}"] = attribute.pk
+        else:
+            error(
+                ["attributes", group.title],
+                _("Unknown attribute. Choices: %s") % _choices(attributes),
+            )
+    for group in groups:
+        fields[f"attribute_{group.id}"] = ["attributes", group.title]
+        if group.is_required and not form_data.get(f"attribute_{group.id}"):
+            error(
+                ["attributes", group.title],
+                _("This field is required. Choices: %s")
+                % _choices(a for a in group.attributes.all() if not a.is_archived),
+            )
+    return fields
+
+
 @router.post("/deals/", response=DealCreated)
 def deal_create(request, data: DealIn, *, dry_run: bool = False):
     """Create a deal, validated like in the web interface
@@ -412,51 +466,7 @@ def deal_create(request, data: DealIn, *, dry_run: bool = False):
         "decision_expected_on": data.decision_expected_on or "",
         f"user_{request.user.pk}_contribution": 100,
     }
-    fields = {}
-
-    value_types = list(ValueType.objects.filter(is_archived=False))
-    by_title = {vt.title.casefold(): vt for vt in value_types}
-    for title, value in data.values.items():
-        if vt := by_title.get(title.casefold()):
-            form_data[f"value_{vt.id}"] = value
-            fields[f"value_{vt.id}"] = ["values", vt.title]
-        else:
-            error(
-                ["values", title],
-                _("Unknown value type. Choices: %s") % _choices(value_types),
-            )
-
-    groups = list(
-        AttributeGroup.objects.filter(is_archived=False).prefetch_related("attributes")
-    )
-    by_title = {group.title.casefold(): group for group in groups}
-    for title, attribute_title in data.attributes.items():
-        if not (group := by_title.get(title.casefold())):
-            error(
-                ["attributes", title],
-                _("Unknown attribute group. Choices: %s") % _choices(groups),
-            )
-            continue
-        attributes = [a for a in group.attributes.all() if not a.is_archived]
-        attribute = next(
-            (a for a in attributes if a.title.casefold() == attribute_title.casefold()),
-            None,
-        )
-        if attribute:
-            form_data[f"attribute_{group.id}"] = attribute.pk
-        else:
-            error(
-                ["attributes", group.title],
-                _("Unknown attribute. Choices: %s") % _choices(attributes),
-            )
-    for group in groups:
-        fields[f"attribute_{group.id}"] = ["attributes", group.title]
-        if group.is_required and f"attribute_{group.id}" not in form_data:
-            error(
-                ["attributes", group.title],
-                _("This field is required. Choices: %s")
-                % _choices(a for a in group.attributes.all() if not a.is_archived),
-            )
+    fields = _values_and_attributes(data, form_data, error)
 
     if errors:
         raise ValidationError(errors)
@@ -472,3 +482,147 @@ def deal_create(request, data: DealIn, *, dry_run: bool = False):
             transaction.set_rollback(True)
             result |= {"id": None, "code": None, "url": None}
     return result
+
+
+def _user_by_short_name(short_name, loc, error):
+    user = User.objects.filter(is_active=True, _short_name__iexact=short_name).first()
+    if not user:
+        error(loc, _("Unknown or inactive user %r.") % short_name)
+    return user
+
+
+def _save_deal(form, request, *, dry_run):
+    with transaction.atomic():
+        deal = form.save()
+        result = deal_out(deal, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+class DealPatch(Schema):
+    """Fields which aren't given are left alone"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    customer: int | None = Field(default=None, description="Organization ID.")
+    contact: int | None = Field(
+        default=None, description="ID of the contact person, null removes it."
+    )
+    owned_by: str | None = Field(default=None, description="Short name.")
+    probability: Literal["low", "normal", "high"] | None = None
+    decision_expected_on: dt.date | None = Field(
+        default=None, description="null removes the date."
+    )
+    values: dict[str, Decimal | None] = Field(
+        default={},
+        description="Values by the title of their value type, null removes a"
+        " value. Value types which aren't given are left alone.",
+    )
+    attributes: dict[str, str] = Field(
+        default={},
+        description="Attributes by the title of their group, groups which"
+        " aren't given are left alone.",
+    )
+
+
+@router.patch("/deals/{deal_id}/", response=DealOut)
+def deal_update(request, deal_id: int, data: DealPatch, *, dry_run: bool = False):
+    """Change a deal, validated like in the web interface
+
+    Warnings of the web interface are errors here; nothing is saved if
+    anything is invalid or with ``dry_run``. Use the status endpoint to close
+    or reopen deals."""
+    deal = get_object_or_404(Deal, pk=deal_id)
+    errors = []
+
+    def error(loc, msg):
+        errors.append({"loc": ["body", "data", *loc], "msg": msg})
+
+    values = form_data(DealForm(instance=deal, request=request))
+    patch = data.model_dump(exclude_unset=True, exclude={"values", "attributes"})
+    for field in ["title", "description", "customer", "contact"]:
+        if field in patch:
+            values[field] = patch[field] or ""
+    if "decision_expected_on" in patch:
+        values["decision_expected_on"] = patch["decision_expected_on"] or ""
+    if patch.get("probability"):
+        values["probability"] = PROBABILITIES[patch["probability"]]
+    if patch.get("owned_by"):
+        if user := _user_by_short_name(patch["owned_by"], ["owned_by"], error):
+            values["owned_by"] = user.pk
+    fields = _values_and_attributes(data, values, error)
+    if errors:
+        raise ValidationError(errors)
+
+    form = DealForm(values, instance=deal, request=request)
+    if not form.is_valid():
+        raise_form_errors(form, fields=fields)
+    return _save_deal(form, request, dry_run=dry_run)
+
+
+class DealStatusIn(Schema):
+    status: Literal["open", "accepted", "declined"]
+    closing_type: str | None = Field(
+        default=None,
+        description="Title of the award of contract or the reason for losing,"
+        " required when closing deals.",
+    )
+    closing_notice: str = ""
+    closed_on: dt.date | None = Field(default=None, description="Defaults to today.")
+    offers: list[int] | None = Field(
+        default=None,
+        description="IDs of related offers to accept or decline with the deal,"
+        " defaults to those which haven't been accepted yet (like the web"
+        " interface). Pass [] to leave the offers alone.",
+    )
+    delete_planned_work: bool | None = Field(
+        default=None,
+        description="Required when declining offers with planned work: delete"
+        " it or keep it.",
+    )
+
+
+@router.post("/deals/{deal_id}/status/", response=DealOut)
+def deal_status(request, deal_id: int, data: DealStatusIn, *, dry_run: bool = False):
+    """Close (accept or decline) or reopen a deal like in the web interface,
+    which also accepts or declines the related offers"""
+    deal = get_object_or_404(Deal, pk=deal_id)
+    deal.status = STATUSES[data.status]
+    form = SetStatusForm(instance=deal, request=request)
+    values = form_data(form)
+    errors = []
+
+    if "closing_type" in form.fields:
+        closing_types = list(form.fields["closing_type"].queryset)
+        closing_type = next(
+            (
+                ct
+                for ct in closing_types
+                if data.closing_type
+                and ct.title.casefold() == data.closing_type.casefold()
+            ),
+            None,
+        )
+        if closing_type:
+            values["closing_type"] = closing_type.pk
+        else:
+            errors.append({
+                "loc": ["body", "data", "closing_type"],
+                "msg": _("Unknown or missing closing type. Choices: %s")
+                % _choices(closing_types),
+            })
+        values["closing_notice"] = data.closing_notice
+        if data.closed_on:
+            values["closed_on"] = data.closed_on
+    if "related_offers" in form.fields and data.offers is not None:
+        values["related_offers"] = data.offers
+    if "delete_planned_work" in form.fields and data.delete_planned_work is not None:
+        values["delete_planned_work"] = int(data.delete_planned_work)
+    if errors:
+        raise ValidationError(errors)
+
+    form = SetStatusForm(values, instance=deal, request=request)
+    if not form.is_valid():
+        raise_form_errors(form, fields={"related_offers": ["offers"]})
+    return _save_deal(form, request, dry_run=dry_run)

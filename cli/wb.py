@@ -2375,6 +2375,162 @@ def _key_values(values, option):
     return result
 
 
+def _echo_saved_deal(data, *, dry_run, as_json):
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_deal(data)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
+
+
+@deals.command("update")
+@click.argument("deal_id", type=int)
+@click.option("--title")
+@click.option("--description", help="The text, or - to read it from stdin.")
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option("--contact", type=int, help="Person ID.")
+@click.option("--probability", type=click.Choice(["low", "normal", "high"]))
+@click.option(
+    "--decision-expected-on",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Required for a high probability.",
+)
+@click.option(
+    "--value",
+    "values",
+    multiple=True,
+    help="TYPE=AMOUNT, e.g. Design=5000; TYPE= removes the value.",
+)
+@click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
+@click.option("--owned-by", help="Short name.")
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_deal(
+    deal_id,
+    title,
+    description,
+    customer,
+    contact,
+    probability,
+    decision_expected_on,
+    values,
+    attributes,
+    owned_by,
+    dry_run,
+    as_json,
+):
+    """Change a deal, only the given fields
+
+    Close or reopen deals with `wb deals close` and `wb deals reopen`."""
+    data = {
+        key: value
+        for key, value in [
+            ("title", title),
+            ("description", _text(description)),
+            ("customer", customer),
+            ("contact", contact),
+            ("probability", probability),
+            ("owned_by", owned_by),
+        ]
+        if value is not None
+    }
+    if decision_expected_on:
+        data["decision_expected_on"] = decision_expected_on.date().isoformat()
+    if values:
+        data["values"] = {
+            key: value or None for key, value in _key_values(values, "--value").items()
+        }
+    if attributes:
+        data["attributes"] = _key_values(attributes, "--attribute")
+    if not data:
+        _terminate("Nothing to change.")
+    data = _request(
+        "PATCH", f"deals/{deal_id}/", params={"dry_run": _bool(dry_run)}, json=data
+    )
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
+@deals.command("close")
+@click.argument("deal_id", type=int)
+@click.argument("status", type=click.Choice(["accepted", "declined"]))
+@click.option(
+    "--closing-type",
+    required=True,
+    help="Award of contract or reason for losing, unknown ones are rejected"
+    " with a list of the choices.",
+)
+@click.option("--notice", default="", help="The text, or - to read it from stdin.")
+@click.option(
+    "--closed-on",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Defaults to today.",
+)
+@click.option(
+    "--offer",
+    "offers",
+    type=int,
+    multiple=True,
+    help="Related offer to accept or decline too, can be repeated. Defaults to"
+    " those which haven't been accepted yet.",
+)
+@click.option("--keep-offers", is_flag=True, help="Leave the related offers alone.")
+@click.option(
+    "--delete-planned-work/--keep-planned-work",
+    default=None,
+    help="Required when declining offers with planned work.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def close_deal(
+    deal_id,
+    status,
+    closing_type,
+    notice,
+    closed_on,
+    offers,
+    keep_offers,
+    delete_planned_work,
+    dry_run,
+    as_json,
+):
+    """Accept or decline a deal and its related offers like in Workbench"""
+    if offers and keep_offers:
+        _terminate("--offer and --keep-offers contradict each other.")
+    data = {
+        "status": status,
+        "closing_type": closing_type,
+        "closing_notice": _text(notice),
+        "delete_planned_work": delete_planned_work,
+    }
+    if closed_on:
+        data["closed_on"] = closed_on.date().isoformat()
+    if offers or keep_offers:
+        data["offers"] = list(offers)
+    data = _request(
+        "POST",
+        f"deals/{deal_id}/status/",
+        params={"dry_run": _bool(dry_run)},
+        json=data,
+    )
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
+@deals.command("reopen")
+@click.argument("deal_id", type=int)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def reopen_deal(deal_id, dry_run, as_json):
+    """Open a closed deal again"""
+    data = _request(
+        "POST",
+        f"deals/{deal_id}/status/",
+        params={"dry_run": _bool(dry_run)},
+        json={"status": "open"},
+    )
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
 @deals.command("stats")
 @_period_options("defaults to this week")
 @_users_options
@@ -2540,12 +2696,7 @@ def create_deal(
             "attributes": _key_values(attributes, "--attribute"),
         },
     )
-    if as_json:
-        _echo_json(data)
-        return
-    _echo_deal(data)
-    if dry_run:
-        console.print("Dry run, nothing has been saved.")
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
 
 
 def _echo_deal(data):
