@@ -1,54 +1,46 @@
 {% load fineforms i18n workbench %}
-<div class="notes mt-5">
-  <h3>{% translate 'notes'|capfirst %}</h3>
-  {% for note in notes %}
-    <div class="card mb-3">
-      <div class="card-header d-flex justify-content-between">
-        <h5 class="mb-1">{{ note.created_by }} at {{ note.created_at|local_date_format }}</h5>
-        <a href="{{ note.urls.update }}" class="btn btn-primary btn-sm align-self-start" data-ajaxmodal>
-          {% translate 'Update' %}
-        </a>
-      </div>
-      <div class="card-body">
-        <div class="card-title">
-          <strong>{{ note.title }}</strong>
-        </div>
-        <div class="card-text">{{ note.description|linebreaksbr|urlize }}</div>
-      </div>
-    </div>
-  {% endfor %}
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-1">{% translate 'Add note' %}</h5>
-      <button
-        type="button"
-        class="btn btn-primary btn-sm align-self-start"
-        data-bs-target="#note-add-form"
-        data-bs-toggle="collapse"
-        aria-expanded="false"
-      >
-        {% translate 'Toggle form' %}
-      </button>
-    </div>
-    <div class="card-body collapse" id="note-add-form">
+<section class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    {% translate 'notes'|capfirst %}
+    <button
+      type="button"
+      class="btn btn-quiet btn-sm"
+      data-bs-target="#note-add-form"
+      data-bs-toggle="collapse"
+      aria-expanded="false"
+    >
+      {% include "svg/plus.svg" %}
+      {% translate 'Add note' %}
+    </button>
+  </div>
+  <div class="collapse" id="note-add-form">
+    <div class="card-body border-bottom">
       <form method="POST" action="{% url 'notes_note_add' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
         {% include 'fineforms/warnings.html' %}
         {% ff_errors form %}
         {% ff_fields form %}
-        <div class="row">
-          <div class="col-sm-12">
-            <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-            {% if object.get_absolute_url %}
-              <a
-                href="{{ object.get_absolute_url }}"
-                class="btn float-end btn-outline-danger"
-              >{% translate 'Cancel' %}</a>
-            {% endif %}
-          </div>
-        </div>
+        <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
       </form>
     </div>
   </div>
-</div>
+  <div class="list-group list-group-flush">
+    {% for note in notes %}
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div class="min-w-0">
+            <strong>{{ note.title }}</strong>
+            <div class="wb-meta-label">{{ note.created_by }} &middot; {{ note.created_at|local_date_format }}</div>
+          </div>
+          <a href="{{ note.urls.update }}" class="btn btn-quiet btn-sm" data-ajaxmodal>{% translate 'Update' %}</a>
+        </div>
+        {% if note.description %}
+          <div class="mt-1">{{ note.description|linebreaksbr|urlize }}</div>
+        {% endif %}
+      </div>
+    {% empty %}
+      <div class="list-group-item text-secondary">&ndash;</div>
+    {% endfor %}
+  </div>
+</section>
