@@ -34,7 +34,18 @@ from rich.text import Text
 
 
 CONFIG = Path.home() / ".config" / "workbench.toml"
-VERSION = version("workbench-cli")
+
+
+def _version():
+    """The version of the checkout for editable installs, their metadata
+    keeps the version they were installed with"""
+    pyproject = Path(__file__).with_name("pyproject.toml")
+    if pyproject.exists():
+        return tomllib.loads(pyproject.read_text())["project"]["version"]
+    return version("workbench-cli")
+
+
+VERSION = _version()
 
 console = Console(markup=False, highlight=False)
 
@@ -437,7 +448,7 @@ def _echo_invoice_list(invoices):
 
 
 @click.group()
-@click.version_option(package_name="workbench-cli")
+@click.version_option(VERSION)
 def cli():
     pass
 
