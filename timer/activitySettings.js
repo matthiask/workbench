@@ -40,7 +40,7 @@ export const ActivitySettings = ({
           type="text"
           className="activity-title form-control"
           value={title}
-          placeholder="Titel"
+          placeholder={gettext("Title")}
           onChange={(e) => dispatchUpdate({ title: e.target.value })}
         />
       </div>
@@ -80,14 +80,14 @@ export const ActivitySettings = ({
           {gettext("OK")}
         </button>
         <button
-          className="btn btn-sm btn-danger ms-auto me-1"
+          className="btn btn-sm btn-quiet text-danger ms-auto me-1"
           type="button"
           onClick={() => removeActivity()}
         >
           {gettext("Remove")}
         </button>
         <button
-          className="btn btn-sm btn-warning"
+          className="btn btn-sm btn-quiet"
           type="button"
           onClick={() => resetActivity()}
         >

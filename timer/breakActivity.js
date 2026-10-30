@@ -6,7 +6,13 @@ import { openBreakForm, overwriteBreakElapsed, saveBreak } from "./actions.js"
 import { ActivitySettings } from "./activitySettings.js"
 import { gettext } from "./i18n.js"
 import * as icons from "./icons.js"
-import { clamp, prettyDuration, timestamp } from "./utils.js"
+import {
+  clamp,
+  colorStyle,
+  hasColor,
+  prettyDuration,
+  timestamp,
+} from "./utils.js"
 
 const createUpdater =
   ({ id, dispatch }) =>
@@ -70,11 +76,16 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
         nodeRef={ref}
       >
         <div
-          className="activity card px-2 py-2"
-          style={{ backgroundColor: activity.color }}
+          className={`activity is-break ${isRunning ? "is-active" : ""} ${
+            hasColor(activity.color) ? "has-color" : ""
+          } card`}
+          style={colorStyle(activity.color)}
           ref={ref}
         >
-          <div className="py-2 px-2 text-truncate js-drag-handle" title={title}>
+          <div
+            className="activity-title text-truncate js-drag-handle"
+            title={title}
+          >
             {title}
           </div>
           <div className="activity-body">
@@ -104,7 +115,7 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
               )}
               <div>
                 <button
-                  className={`btn btn-light btn-sm ${showSettings ? "active" : ""}`}
+                  className={`btn btn-quiet btn-sm btn-icon ${showSettings ? "active" : ""}`}
                   type="button"
                   onClick={() => setShowSettings(!showSettings)}
                   title={gettext("Settings")}
@@ -113,7 +124,7 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
                 </button>
                 {!isRunning && (
                   <button
-                    className="btn btn-sm ms-2 btn-light"
+                    className="btn btn-sm btn-icon ms-1 btn-quiet"
                     type="button"
                     onClick={() => {
                       dispatch({ type: "STOP", current })
@@ -125,7 +136,7 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
                   </button>
                 )}
                 <button
-                  className="btn btn-sm ms-2 btn-light"
+                  className="btn btn-sm btn-icon ms-1 btn-quiet"
                   type="button"
                   onClick={() => openBreakForm(dispatch, activity)}
                   title={gettext("Open break form")}
@@ -133,7 +144,9 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
                   {icons.pen}
                 </button>
                 <button
-                  className="btn btn-sm ms-2 btn-success"
+                  className={`btn btn-sm btn-icon ms-1 ${
+                    isRunning ? "btn-success" : "btn-quiet"
+                  }`}
                   type="button"
                   disabled={!isRunning}
                   onClick={() => saveBreak(dispatch, activity)}

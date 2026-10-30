@@ -48,11 +48,18 @@ export const Timer = connect(({ activities, current }) => ({
     <>
       <CreateActivity />
       <div className="total-seconds">
-        {gettext("Today")}: {hours.today}
-        <br />
-        {gettext("This week")}: {hours.week}
-        <br />
-        {gettext("Timer")}: {prettyDuration(totalSeconds)}
+        <span>
+          <span className="total-seconds-label">{gettext("Today")}</span>
+          {hours.today}
+        </span>
+        <span>
+          <span className="total-seconds-label">{gettext("This week")}</span>
+          {hours.week}
+        </span>
+        <span>
+          <span className="total-seconds-label">{gettext("Timer")}</span>
+          {prettyDuration(totalSeconds)}
+        </span>
       </div>
       <div className="activity-list">
         {activities.map((activity) =>

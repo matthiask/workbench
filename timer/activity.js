@@ -14,7 +14,7 @@ import {
 import { ActivitySettings } from "./activitySettings.js"
 import { gettext, OUTCOME } from "./i18n.js"
 import * as icons from "./icons.js"
-import { clamp, prettyDuration } from "./utils.js"
+import { clamp, colorStyle, hasColor, prettyDuration } from "./utils.js"
 
 const createUpdater =
   ({ id, dispatch }) =>
@@ -77,14 +77,14 @@ export const Activity = connect((state, ownProps) => ({
       nodeRef={ref}
     >
       <form
-        className={`activity ${
-          activity.isActive ? "is-active" : ""
-        } card px-2 py-2`}
-        style={{ backgroundColor: activity.color }}
+        className={`activity ${activity.isActive ? "is-active" : ""} ${
+          hasColor(activity.color) ? "has-color" : ""
+        } card`}
+        style={colorStyle(activity.color)}
         ref={ref}
       >
         <div
-          className="py-2 px-2 text-truncate js-drag-handle"
+          className="activity-title text-truncate js-drag-handle"
           title={activityTitle}
         >
           {activityTitle}
@@ -150,7 +150,7 @@ export const Activity = connect((state, ownProps) => ({
             </button>
             <div>
               <button
-                className={`btn btn-light btn-sm ${
+                className={`btn btn-quiet btn-sm btn-icon ${
                   showSettings ? "active" : ""
                 }`}
                 type="button"
@@ -160,9 +160,10 @@ export const Activity = connect((state, ownProps) => ({
                 {icons.cog}
               </button>
               <button
-                className={`btn btn-sm ms-2 ${
-                  activity.isActive ? "btn-warning" : "btn-light"
+                className={`btn btn-sm btn-icon ms-1 ${
+                  activity.isActive ? "btn-primary" : "btn-quiet"
                 }`}
+                title={activity.isActive ? gettext("Pause") : gettext("Start")}
                 type="button"
                 onClick={() =>
                   dispatch({
@@ -175,7 +176,7 @@ export const Activity = connect((state, ownProps) => ({
                 {activity.isActive ? icons.pause : icons.play}
               </button>
               <button
-                className="btn btn-sm ms-2 btn-light"
+                className="btn btn-sm btn-icon ms-1 btn-quiet"
                 disabled={!activity.project}
                 type="button"
                 onClick={() =>
@@ -189,8 +190,8 @@ export const Activity = connect((state, ownProps) => ({
                 {icons.pen}
               </button>
               <button
-                className={`btn btn-sm ms-2 ${
-                  isReady ? "btn-success" : "btn-light"
+                className={`btn btn-sm btn-icon ms-1 ${
+                  isReady ? "btn-success" : "btn-quiet"
                 }`}
                 disabled={!activity.project || !isReady}
                 type="button"

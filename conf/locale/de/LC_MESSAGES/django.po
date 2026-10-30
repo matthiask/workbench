@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 17:15+0100\n"
+"POT-Creation-Date: 2026-10-30 19:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -728,10 +728,8 @@ msgstr "ist Arbeitszeit"
 
 #: workbench/awt/models.py workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
-#: workbench/templates/planning/campaign_planning.html
-#: workbench/templates/planning/project_planning.html
-#: workbench/templates/planning/team_planning.html
-#: workbench/templates/planning/user_planning.html
+#: workbench/templates/awt/year_detail.html
+#: workbench/templates/planning/_new_dropdown.html
 msgid "absence"
 msgstr "Abwesenheit"
 
@@ -1097,7 +1095,7 @@ msgstr "Arbeit"
 msgid "weight"
 msgstr "Gewichtung"
 
-#: workbench/contacts/models.py
+#: workbench/contacts/models.py workbench/templates/contacts/person_form.html
 msgid "phone number"
 msgstr "Telefonnummer"
 
@@ -1109,7 +1107,7 @@ msgstr "Telefonnummern"
 msgid "Phone number invalid."
 msgstr "Telefonnummer ungültig."
 
-#: workbench/contacts/models.py
+#: workbench/contacts/models.py workbench/templates/contacts/person_form.html
 msgid "email address"
 msgstr "Emailadresse"
 
@@ -1151,7 +1149,8 @@ msgid "Completely overrides the postal address if set."
 msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 
 #: workbench/contacts/models.py workbench/invoices/models.py
-#: workbench/offers/models.py workbench/templates/invoices/invoice_detail.html
+#: workbench/offers/models.py workbench/templates/contacts/person_form.html
+#: workbench/templates/invoices/invoice_detail.html
 msgid "postal address"
 msgstr "Postadresse"
 
@@ -1902,6 +1901,7 @@ msgstr "%s Rechnungen in der Auswahl, das sind zu viele."
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/offers/offer_form.html
+#: workbench/templates/planning/planning_import.html
 #: workbench/templates/planning/project_planning.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/logbook_batch_update.html
@@ -2380,7 +2380,7 @@ msgstr "Stundensatz"
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
-#: workbench/templates/start.html workbench/templates/timestamps.html
+#: workbench/templates/timestamps.html
 msgid "hours"
 msgstr "Stunden"
 
@@ -2972,12 +2972,8 @@ msgstr "Geplante Arbeit, die zu diesem Meilenstein gehört, wird in dieser Farbe
 msgid "planned hours"
 msgstr "geplante Stunden"
 
-#: workbench/planning/models.py
-#: workbench/templates/planning/campaign_planning.html
+#: workbench/planning/models.py workbench/templates/planning/_new_dropdown.html
 #: workbench/templates/planning/planning_import.html
-#: workbench/templates/planning/project_planning.html
-#: workbench/templates/planning/team_planning.html
-#: workbench/templates/planning/user_planning.html
 msgid "milestone"
 msgstr "Meilenstein"
 
@@ -3005,8 +3001,7 @@ msgstr "%(planned_hours)s in %(weeks)s Wochen (%(per_week)s pro Woche)"
 msgid "provided by"
 msgstr "Erbracht von"
 
-#: workbench/planning/models.py
-#: workbench/templates/planning/project_planning.html
+#: workbench/planning/models.py workbench/templates/planning/_new_dropdown.html
 msgid "external work"
 msgstr "Kundenarbeit"
 
@@ -3064,7 +3059,7 @@ msgstr "Leistungstyp"
 #: workbench/planning/xlsx.py workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_profitability.html
 #: workbench/templates/reporting/hours_per_type.html
-#: workbench/templates/reporting/squeeze.html
+#: workbench/templates/reporting/squeeze.html workbench/templates/start.html
 msgid "Hours"
 msgstr "Stunden"
 
@@ -3776,6 +3771,7 @@ msgstr "Kopiere das Token jetzt, es wird nicht noch einmal angezeigt:"
 #: workbench/templates/projects/budgettransfer_form.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/timestamps.html
 msgid "Delete"
 msgstr "Löschen"
 
@@ -3784,12 +3780,12 @@ msgid "No API tokens yet."
 msgstr "Noch keine API-Tokens."
 
 #: workbench/templates/accounts/api_tokens.html
-msgid "Access"
-msgstr "Zugriff"
-
-#: workbench/templates/accounts/api_tokens.html
 msgid "Create token"
 msgstr "Token erstellen"
+
+#: workbench/templates/accounts/api_tokens.html
+msgid "Access"
+msgstr "Zugriff"
 
 #: workbench/templates/accounts/cli_login.html
 #: workbench/templates/accounts/cli_login_redirect.html
@@ -3865,6 +3861,7 @@ msgstr "Anmelden"
 
 #: workbench/templates/accounts/team_detail.html
 #: workbench/templates/accounts/user_base.html
+#: workbench/templates/planning/team_planning.html
 msgid "Retrospective"
 msgstr "Retrospektive"
 
@@ -3874,6 +3871,7 @@ msgid "Absence calendar"
 msgstr "Abwesenheitskalender"
 
 #: workbench/templates/accounts/team_detail.html
+#: workbench/templates/accounts/user_detail.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
@@ -3952,10 +3950,6 @@ msgstr ""
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
 msgstr "Aktive Nutzer:innen"
-
-#: workbench/templates/awt/year_detail.html
-msgid "facts"
-msgstr "Fakten"
 
 #: workbench/templates/awt/year_detail.html
 msgid "corrected"
@@ -4120,6 +4114,7 @@ msgstr "Habe eine Pause gemacht"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
+#: workbench/templates/planning/_new_dropdown.html
 #: workbench/templates/projects/project_detail.html
 msgid "New"
 msgstr "Neu"
@@ -4131,6 +4126,7 @@ msgstr "Neu"
 #: workbench/templates/generic/object_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/planning/project_planning.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 msgid "More actions"
@@ -4194,28 +4190,6 @@ msgstr "Letzte Geschäfte"
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
 
-#: workbench/templates/contacts/person_form.html
-#: workbench/templates/deals/deal_form.html
-#: workbench/templates/fineforms/submit.html
-#: workbench/templates/generic/object_form.html
-#: workbench/templates/logbook/loggedcost_form.html
-#: workbench/templates/logbook/loggedhours_form.html
-#: workbench/templates/modalform.html workbench/templates/notes/note_form.html
-#: workbench/templates/notes/widget.html
-#: workbench/templates/offers/offer_pricing.html
-#: workbench/templates/projects/budgettransfer_form.html
-#: workbench/templates/projects/project_projected_invoices_form.html
-msgid "Save"
-msgstr "Sichern"
-
-#: workbench/templates/contacts/person_form.html
-#: workbench/templates/generic/object_confirm_delete.html
-#: workbench/templates/modal_confirm_delete.html
-#: workbench/templates/offers/offer_pricing.html
-#: workbench/templates/projects/project_projected_invoices_form.html
-msgid "cancel"
-msgstr "Abbruch"
-
 #: workbench/templates/credit_control/creditentry_detail.html
 msgid "invoice total"
 msgstr "Rechnungstotal"
@@ -4223,16 +4197,12 @@ msgstr "Rechnungstotal"
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/deals/deal_list.html
 #: workbench/templates/generic/object_list.html
+#: workbench/templates/invoices/reminders.html
 #: workbench/templates/reporting/_budget_statistics_table.html
 #: workbench/templates/reporting/open_items_list.html
-#: workbench/templates/search.html
+#: workbench/templates/search.html workbench/templates/timestamps.html
 msgid "No results found."
 msgstr "Keine Resultate gefunden."
-
-#: workbench/templates/credit_control/export_debtors.html
-#: workbench/templates/generic/object_form.html
-msgid "continue"
-msgstr "Weiter"
 
 #: workbench/templates/credit_control/export_debtors.html
 msgid "Export"
@@ -4263,11 +4233,6 @@ msgstr "Offerte entfernen"
 msgid "No related offers"
 msgstr "Keine verbundenen Offerten"
 
-#: workbench/templates/deals/deal_form.html
-#: workbench/templates/generic/object_form.html
-msgid "Cancel"
-msgstr "Abbrechen"
-
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_list.html
@@ -4279,6 +4244,16 @@ msgstr "Herunterladen"
 msgid "Please correct the following errors:"
 msgstr "Bitte korrigiere die folgenden Fehler:"
 
+#: workbench/templates/fineforms/submit.html
+#: workbench/templates/generic/object_form.html
+#: workbench/templates/logbook/loggedcost_form.html
+#: workbench/templates/logbook/loggedhours_form.html
+#: workbench/templates/modalform.html workbench/templates/notes/note_form.html
+#: workbench/templates/notes/widget.html
+#: workbench/templates/projects/budgettransfer_form.html
+msgid "Save"
+msgstr "Sichern"
+
 #: workbench/templates/fineforms/warnings.html
 msgid "Ignore warnings"
 msgstr "Warnungen ignorieren"
@@ -4287,6 +4262,19 @@ msgstr "Warnungen ignorieren"
 #: workbench/templates/modal_confirm_delete.html
 msgid "delete"
 msgstr "Löschen"
+
+#: workbench/templates/generic/object_confirm_delete.html
+#: workbench/templates/modal_confirm_delete.html
+msgid "cancel"
+msgstr "Abbruch"
+
+#: workbench/templates/generic/object_form.html
+msgid "continue"
+msgstr "Weiter"
+
+#: workbench/templates/generic/object_form.html
+msgid "Cancel"
+msgstr "Abbrechen"
 
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
@@ -4368,6 +4356,10 @@ msgstr "kopieren"
 msgid "effort"
 msgstr "Aufwand"
 
+#: workbench/templates/logbook/_loggedhours_row.html workbench/timer/models.py
+msgid "timestamp"
+msgstr "Zeitmarke"
+
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 msgid "created"
@@ -4447,7 +4439,9 @@ msgid "Batch update"
 msgstr "Batch-Bearbeitung"
 
 #: workbench/templates/planning/campaign_planning.html
+#: workbench/templates/planning/campaign_planning_external.html
 #: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/project_planning_external.html
 msgid "External planning view"
 msgstr "Externe Planungsansicht"
 
@@ -4494,6 +4488,10 @@ msgid "Import"
 msgstr "Importieren"
 
 #: workbench/templates/planning/project_planning.html
+msgid "Download Gantt Chart"
+msgstr "Gantt-Chart herunterladen"
+
+#: workbench/templates/planning/project_planning.html
 #: workbench/templates/planning/user_planning.html
 msgid "History of planned work"
 msgstr "Geschichte der geplanten Arbeit"
@@ -4501,10 +4499,6 @@ msgstr "Geschichte der geplanten Arbeit"
 #: workbench/templates/planning/project_planning.html
 msgid "History of milestones"
 msgstr "Geschichte der Meilensteine"
-
-#: workbench/templates/planning/project_planning.html
-msgid "Download Gantt Chart"
-msgstr "Gantt-Chart herunterladen"
 
 #: workbench/templates/planning/project_planning_external.html
 msgid "back to project planning"
@@ -5187,10 +5181,6 @@ msgstr "Keine aktiven Projekte"
 msgid "today's hours"
 msgstr "Stunden von heute"
 
-#: workbench/templates/start.html workbench/timer/models.py
-msgid "timestamp"
-msgstr "Zeitmarke"
-
 #: workbench/templates/start.html
 msgid "no hours today"
 msgstr "keine Stunden heute"
@@ -5200,16 +5190,16 @@ msgid "all users' hours"
 msgstr "Stunden von allen"
 
 #: workbench/templates/timestamps.html
-msgid "during the week"
-msgstr "in der Woche"
-
-#: workbench/templates/timestamps.html
 msgid "Previous day"
 msgstr "Vorheriger Tag"
 
 #: workbench/templates/timestamps.html
 msgid "Controller"
 msgstr "Controller"
+
+#: workbench/templates/timestamps.html
+msgid "during the week"
+msgstr "in der Woche"
 
 #: workbench/templates/timestamps.html
 msgid "Really delete?"
@@ -5490,6 +5480,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "facts"
+#~ msgstr "Fakten"
 
 #~ msgid "Set date"
 #~ msgstr "Datum setzen"

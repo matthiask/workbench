@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 14:37+0200\n"
+"POT-Creation-Date: 2026-10-30 19:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,7 +91,7 @@ msgstr "Geplante Arbeit hinzufügen"
 
 #: conf/strings.js timer/breakActivity.js timer/createActivity.js
 msgid "Break"
-msgstr ""
+msgstr "Pause"
 
 #: conf/strings.js planning/index.js
 msgid "Efforts"
@@ -139,11 +139,15 @@ msgstr "Öffne das Stundenformular"
 
 #: conf/strings.js timer/actions.js
 msgid "Overwrite elapsed time (h:m:s or m:s or seconds)"
-msgstr ""
+msgstr "Vergangene Zeit überschreiben (h:m:s, m:s oder Sekunden)"
 
 #: conf/strings.js timer/actions.js
 msgid "Overwrite time (h:m:s or m:s or seconds)"
-msgstr ""
+msgstr "Zeit überschreiben (h:m:s, m:s oder Sekunden)"
+
+#: conf/strings.js timer/activity.js
+msgid "Pause"
+msgstr "Pause"
 
 #: conf/strings.js planning/index.js
 msgid "Planned hours per week"
@@ -163,7 +167,7 @@ msgstr "Zurücksetzen"
 
 #: conf/strings.js timer/breakActivity.js
 msgid "Save break"
-msgstr ""
+msgstr "Pause speichern"
 
 #: conf/strings.js timer/activity.js
 msgid "Select or search project..."
@@ -183,7 +187,11 @@ msgstr "Einstellungen"
 
 #: conf/strings.js timer/breakActivity.js
 msgid "Start break"
-msgstr ""
+msgstr "Pause starten"
+
+#: conf/strings.js timer/activity.js
+msgid "Start"
+msgstr "Starten"
 
 #: conf/strings.js timer/timer.js
 msgid "This week"
@@ -192,6 +200,10 @@ msgstr "Diese Woche"
 #: conf/strings.js timer/createActivity.js timer/timer.js
 msgid "Timer"
 msgstr "Timer"
+
+#: conf/strings.js timer/activitySettings.js
+msgid "Title"
+msgstr "Titel"
 
 #: conf/strings.js timer/timer.js
 msgid "Today"

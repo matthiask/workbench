@@ -7,18 +7,18 @@ export const CreateActivity = connect()(({ dispatch }) => {
   return (
     <div className="create-activity d-flex flex-column gap-1">
       <button
-        className="btn btn-secondary"
+        className="btn btn-primary"
         type="button"
         onClick={() => createActivity(dispatch)}
       >
-        +{gettext("Timer")}
+        + {gettext("Timer")}
       </button>
       <button
-        className="btn btn-secondary"
+        className="btn btn-quiet"
         type="button"
         onClick={() => createBreak(dispatch)}
       >
-        +{gettext("Break")}
+        + {gettext("Break")}
       </button>
     </div>
   )

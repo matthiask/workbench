@@ -26,3 +26,12 @@ export function containsJSON(response) {
   const contentType = response.headers.get("content-type")
   return contentType?.includes("application/json")
 }
+
+// White was the default color, uncolored activities use the theme's surface
+export function hasColor(color) {
+  return Boolean(color) && color.toLowerCase() !== "#ffffff"
+}
+
+export function colorStyle(color) {
+  return hasColor(color) ? { backgroundColor: color } : {}
+}
