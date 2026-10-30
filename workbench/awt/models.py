@@ -147,7 +147,7 @@ HIDDEN_REASON = "absent"
 def visible_absences(queryset, user, *, filtered):
     """Searching or filtering by reason would reveal the sickness of others
     even when the details are hidden, those absences are left out then"""
-    if not filtered or user.features[FEATURES.WORKING_TIME_CORRECTION]:
+    if not filtered or user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
         return queryset
     return queryset.exclude(models.Q(reason=Absence.SICKNESS) & ~models.Q(user=user))
 
@@ -227,7 +227,7 @@ class Absence(Model):
         """Paid leave entered or changed by others needs a confirmation"""
         if self.reason != self.PAID:
             self.confirmed_at = self.confirmed_by = None
-        elif user.features[FEATURES.WORKING_TIME_CORRECTION]:
+        elif user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
             if not self.confirmed_at:
                 self.confirm(user)
         elif not self.pk or set(changed_fields) & {
@@ -243,11 +243,11 @@ class Absence(Model):
 
     def details_visible_to(self, user):
         """Sickness is health data: only the absent person and people
-        correcting working time see the reason and the description"""
+        administrating personnel see the reason and the description"""
         return (
             self.reason != self.SICKNESS
             or self.user_id == user.id
-            or user.features[FEATURES.WORKING_TIME_CORRECTION]
+            or user.features[FEATURES.PERSONNEL_ADMINISTRATION]
         )
 
     def reason_for(self, user):
@@ -287,7 +287,7 @@ class Absence(Model):
             return False
         if (
             instance.reason == instance.CORRECTION
-            and not request.user.features[FEATURES.WORKING_TIME_CORRECTION]
+            and not request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
         ):
             messages.error(
                 request,

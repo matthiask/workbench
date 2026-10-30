@@ -173,7 +173,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   uses `hours`.
 - Sickness absences are health data ("besonders schützenswerte
   Personendaten"): only the absent person and users with
-  `WORKING_TIME_CORRECTION` see their reason and description
+  `PERSONNEL_ADMINISTRATION` see their reason and description
   (`Absence.details_visible_to()`, `reason_for()`, `description_for()`, the
   `absences` template filters; `visible_absences()` leaves them out of
   searches and reason filters). Others see an "absence". `Absence.__str__`
@@ -183,7 +183,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (fairy tasks) clears descriptions and history after three years, like
   the audit log pruning of absences.
   Descriptions of absences are optional. Paid leave counts right away but
-  needs a confirmation by someone with `WORKING_TIME_CORRECTION`
+  needs a confirmation by someone with `PERSONNEL_ADMINISTRATION`
   (`Absence.needs_confirmation`, `update_confirmation()` in the form,
   `Absence.objects.unconfirmed()`, listed under "needs action").
 - Contacts unused for five years are archived (`archive_unused_contacts()` in

@@ -29,7 +29,7 @@ def annual_working_time_view(request):
     user = request.GET.get("user")
     users = None
     # The report contains sickness absences, which are health data
-    if request.user.features[FEATURES.WORKING_TIME_CORRECTION]:
+    if request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
         if user == "active":
             users = active_users(year)
         elif user:
@@ -147,7 +147,7 @@ def absence_calendar(request, form):
             "absences_data": {
                 "absencesByPerson": absences,
                 "reasonList": Absence.REASON_CHOICES
-                if request.user.features[FEATURES.WORKING_TIME_CORRECTION]
+                if request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
                 else [*Absence.REASON_CHOICES, (HIDDEN_REASON, capfirst(_("absence")))],
                 "timeBoundaries": {
                     "start": time.mktime(monday(min(dates)).timetuple()) * 1000,
@@ -160,7 +160,7 @@ def absence_calendar(request, form):
     )
 
 
-@feature_required(FEATURES.WORKING_TIME_CORRECTION)
+@feature_required(FEATURES.PERSONNEL_ADMINISTRATION)
 @require_POST
 def confirm_absence(request, pk):
     absence = get_object_or_404(Absence, pk=pk)

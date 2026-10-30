@@ -67,7 +67,7 @@ class AbsenceSearchForm(Form):
         if (
             request.GET.get("export") == "xlsx"
             # The export contains the sickness of everyone
-            and request.user.features[FEATURES.WORKING_TIME_CORRECTION]
+            and request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
         ):
             xlsx = WorkbenchXLSXDocument()
             xlsx.table_from_queryset(queryset)
@@ -97,7 +97,7 @@ class AbsenceForm(ModelForm, WarningsForm):
             '<a href="#" data-hours-button="{hours}">{hours}</a>',
             hours=_("Enter hours"),
         )
-        if not self.request.user.features[FEATURES.WORKING_TIME_CORRECTION]:
+        if not self.request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
             self.fields["reason"].choices = [
                 choice
                 for choice in self.fields["reason"].choices

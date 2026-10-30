@@ -36,6 +36,9 @@ class UserFeatures:
         self.features = set(features)
 
     def __getattr__(self, key):
+        # Templates use the names, the values may differ (see FEATURES)
+        if key in FEATURES.__members__:
+            key = FEATURES[key].value
         try:
             setting = settings.FEATURES[key]
         except KeyError:

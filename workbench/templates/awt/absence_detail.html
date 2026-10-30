@@ -33,7 +33,7 @@
 {% endblock body %}
 
 {% block footer %}
-  {% if object.needs_confirmation and request.user.features.WORKING_TIME_CORRECTION %}
+  {% if object.needs_confirmation and request.user.features.PERSONNEL_ADMINISTRATION %}
     <form method="post" action="{{ object.urls.confirm }}" class="me-auto">
       {% csrf_token %}
       <button type="submit" class="btn btn-primary">{% translate 'Confirm' %}</button>

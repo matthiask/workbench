@@ -491,9 +491,9 @@ class AWTTest(TestCase):
             Absence(**kw, ends_on=dt.date(2022, 1, 30)).full_clean()
         self.assertEqual(list(cm.exception), msg)
 
-    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: F.NEVER})
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.NEVER})
     def test_correction(self):
-        """Absences with reason "correction" only with WORKING_TIME_CORRECTION"""
+        """Absences with reason "correction" only with PERSONNEL_ADMINISTRATION"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
@@ -760,9 +760,9 @@ class AWTTest(TestCase):
         with travel(dt.date(2021, 10, 11)):
             self.assertFalse(is_previous_month_locked_starting_today())
 
-    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: F.USER})
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
     def test_sickness_is_private(self):
-        """Only the absent person and people correcting working time see that
+        """Only the absent person and people administrating personnel see that
         and why someone is sick"""
         user = factories.UserFactory.create()
         absence = Absence.objects.create(
@@ -774,7 +774,7 @@ class AWTTest(TestCase):
         )
         colleague = factories.UserFactory.create()
         hr = factories.UserFactory.create()
-        hr._features.append(FEATURES.WORKING_TIME_CORRECTION)
+        hr._features.append(FEATURES.PERSONNEL_ADMINISTRATION)
         hr.save()
 
         def visible(viewer, url, text="Flu"):
@@ -870,13 +870,13 @@ class AWTTest(TestCase):
         self.assertFalse(actions.with_data(id=old.pk).exists())
         self.assertTrue(actions.with_data(id=recent.pk).exists())
 
-    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: F.USER})
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
     def test_paid_leave_confirmation(self):
         """Paid leave entered by others counts, but is confirmed by people
-        correcting working time"""
+        administrating personnel"""
         user = factories.UserFactory.create()
         hr = factories.UserFactory.create()
-        hr._features.append(FEATURES.WORKING_TIME_CORRECTION)
+        hr._features.append(FEATURES.PERSONNEL_ADMINISTRATION)
         hr.save()
 
         def create(by, reason=Absence.PAID):
@@ -900,7 +900,7 @@ class AWTTest(TestCase):
         self.assertFalse(create(user, Absence.VACATION).needs_confirmation)
         self.assertFalse(create(hr).needs_confirmation)
 
-        # Only people correcting working time confirm
+        # Only people administrating personnel confirm
         self.client.force_login(user)
         self.client.post(absence.urls["confirm"])
         absence.refresh_from_db()

@@ -61,7 +61,7 @@ def _needs_action(user):
                 "objects": RecurringInvoice.objects.maybe_actionable(),
             },
         ))
-    if user.features[FEATURES.WORKING_TIME_CORRECTION]:
+    if user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
         rows.append({
             "type": "unconfirmed_absences",
             "verbose_name_plural": _("Unconfirmed paid leave"),

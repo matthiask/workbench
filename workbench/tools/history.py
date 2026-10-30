@@ -280,7 +280,7 @@ def _accounts_user_cfg(user):
 
 def _awt_absence_cfg(user):
     # The reason and the description may be health data
-    if user.features[FEATURES.WORKING_TIME_CORRECTION]:
+    if user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
         return {"fields": EVERYTHING}
     return {"fields": {"user", "starts_on", "ends_on", "days"}}
 

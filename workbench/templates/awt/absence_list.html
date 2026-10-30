@@ -1,7 +1,7 @@
 {% extends "generic/object_list.html" %}
 {% load absences i18n workbench %}
 {% block search-form-buttons %}
-  {% if request.GET and request.user.features.WORKING_TIME_CORRECTION %}
+  {% if request.GET and request.user.features.PERSONNEL_ADMINISTRATION %}
     <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
       {% include 'svg/desktop-download.svg' %}
       XLSX

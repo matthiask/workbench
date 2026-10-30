@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:13+0100\n"
+"POT-Creation-Date: 2026-10-30 22:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: workbench/accounts/admin.py
+msgid "Enabled per user"
+msgstr "Pro Nutzer:in aktiviert"
+
+#: workbench/accounts/admin.py
+msgid "Enabled for everyone"
+msgstr "Für alle aktiviert"
+
+#: workbench/accounts/admin.py
+msgid "Not available"
+msgstr "Nicht verfügbar"
 
 #: workbench/accounts/admin.py
 msgid "feature"
@@ -177,14 +189,13 @@ msgstr "Zugriff auf nutzer:innenspezifische Produktivitätsberichte inkl. Auftei
 msgid "projected gross margin"
 msgstr "geplanter Umsatz"
 
-#: workbench/accounts/features.py workbench/awt/models.py workbench/awt/pdf.py
-#: workbench/templates/awt/year_detail.html
-msgid "Working time correction"
-msgstr "Arbeitszeit-Korrektur"
+#: workbench/accounts/features.py
+msgid "personnel administration"
+msgstr "Personaladministration"
 
 #: workbench/accounts/features.py
-msgid "This user may add and change absences of type Working time correction."
-msgstr "Diese Nutzer:in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen."
+msgid "Sees the reasons of sickness absences and the annual working time of everyone, confirms paid leave and records working time corrections."
+msgstr "Sieht die Gründe von Krankheitsabsenzen und die Jahresarbeitszeit aller, bestätigt bezahlten Urlaub und erfasst Arbeitszeit-Korrekturen."
 
 #: workbench/accounts/forms.py
 msgid "Contact your administrator to change this value."
@@ -706,6 +717,11 @@ msgstr "Schulbesuch durch Auszubildende"
 #: workbench/awt/models.py workbench/templates/awt/year_detail.html
 msgid "other reasons (no working time)"
 msgstr "Andere Gründe (keine Arbeitszeit)"
+
+#: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/year_detail.html
+msgid "Working time correction"
+msgstr "Arbeitszeit-Korrektur"
 
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
@@ -5554,6 +5570,9 @@ msgstr "Suchanfrage fehlt."
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
 
+#~ msgid "This user may add and change absences of type Working time correction."
+#~ msgstr "Diese Nutzer:in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen."
+
 #~ msgid "facts"
 #~ msgstr "Fakten"
 
@@ -5601,9 +5620,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "Total costs"
 #~ msgstr "Gesamtkosten"
-
-#~ msgid "Feature not available"
-#~ msgstr "Feature nicht verfügbar"
 
 #~ msgid "bookkeeping"
 #~ msgstr "Buchhaltung"

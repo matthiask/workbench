@@ -23,7 +23,7 @@
               {% endfor %}
             </div>
           </span>
-          {% if request.user.features.WORKING_TIME_CORRECTION %}
+          {% if request.user.features.PERSONNEL_ADMINISTRATION %}
             <a
               class="btn btn-quiet {% if request.GET.user == 'active' %}active{% endif %}"
               href="{% querystring user='active' %}"
@@ -35,7 +35,7 @@
           </a>
         </div>
       </div>
-      {% if request.user.features.WORKING_TIME_CORRECTION and request.GET.user == 'active' %}
+      {% if request.user.features.PERSONNEL_ADMINISTRATION and request.GET.user == 'active' %}
         <div class="wb-stats mb-4">
           <div class="wb-stat">
             <div class="wb-stat-label">{% translate 'vacation days available'|capfirst %}</div>

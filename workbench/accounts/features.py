@@ -50,7 +50,8 @@ class FEATURES(StrEnum):
     PRIDE = "PRIDE"
     PRODUCTIVITY = "PRODUCTIVITY"
     PROJECTED_GROSS_MARGIN = "PROJECTED_GROSS_MARGIN"
-    WORKING_TIME_CORRECTION = "WORKING_TIME_CORRECTION"
+    # Stored under its old name
+    PERSONNEL_ADMINISTRATION = "WORKING_TIME_CORRECTION"
 
 
 LABELS = {
@@ -129,10 +130,12 @@ LABELS = {
     FEATURES.PROJECTED_GROSS_MARGIN: {
         "label": capfirst(_("projected gross margin")),
     },
-    FEATURES.WORKING_TIME_CORRECTION: {
-        "label": capfirst(_("Working time correction")),
+    FEATURES.PERSONNEL_ADMINISTRATION: {
+        "label": capfirst(_("personnel administration")),
         "help_text": _(
-            "This user may add and change absences of type Working time correction."
+            "Sees the reasons of sickness absences and the annual working time"
+            " of everyone, confirms paid leave and records working time"
+            " corrections."
         ),
     },
 }
