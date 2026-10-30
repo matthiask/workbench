@@ -1521,3 +1521,22 @@ a.wb-row-title:hover {
   border-radius: var(--bs-border-radius);
   background: var(--wb-surface-muted);
 }
+
+a.wb-stat-link {
+  display: block;
+  color: inherit;
+
+  &:hover {
+    border-color: var(--bs-primary-border-subtle);
+  }
+
+  .hours-ring {
+    width: 0.9em;
+    height: 0.9em;
+    vertical-align: -0.05em;
+  }
+}
+
+a.wb-list-heading:hover {
+  color: var(--bs-link-hover-color);
+}

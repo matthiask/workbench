@@ -1,23 +1,26 @@
 {% load i18n workbench %}
-<div class="card mb-3 d-none d-md-block">
-  <div class="card-header bg-warning-subtle">
-    <h3 class="my-0 d-flex align-items-center justify-content-between">
-      {% if needs_action_list %}{{ user }}
-      {% else %}
-        {% translate 'Possibly requiring action' %}
-        <small><a href="{% url 'needs_action' %}">{% translate 'Everyone' %}</a></small>
-      {% endif %}
-    </h3>
+<section class="card mb-3 d-none d-md-block">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    {% if needs_action_list %}
+      <span>{{ user }}</span>
+    {% else %}
+      <span>{% translate 'Possibly requiring action' %}</span>
+      <a href="{% url 'needs_action' %}" class="fw-normal small">{% translate 'Everyone' %}</a>
+    {% endif %}
   </div>
-  <div class="card-body">
+  <div class="list-group list-group-flush">
     {% for row in needs_action %}
-      <h4 {% if not forloop.first %}class="mt-4"{% endif %}>
-        <a href="{{ row.url }}">{{ row.verbose_name_plural }}</a>
-      </h4>
-      {% for object in row.objects %}
-        {% link_or_none object with_badge=True %}
-        <br>
-      {% endfor %}
+      {% with objects=row.objects %}
+        {% if objects %}
+          <a href="{{ row.url }}" class="list-group-item wb-list-heading">
+            <span>{{ row.verbose_name_plural }}</span>
+            <span>{{ objects|length }}</span>
+          </a>
+          {% for object in objects %}
+            <div class="list-group-item">{% link_or_none object with_badge=True %}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
     {% endfor %}
   </div>
-</div>
+</section>

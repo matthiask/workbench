@@ -1,0 +1,22 @@
+{% load i18n workbench %}
+<a class="list-group-item list-group-item-action wb-row" href="{{ hours.get_absolute_url }}" data-ajaxmodal>
+  <div class="wb-row-main">
+    <div class="wb-row-meta">
+      <span>{{ hours.service.project_service_title }}</span>
+    </div>
+    <div>
+      {{ hours.description }}
+      {% if hours.timestamp %}
+        <span
+          class="wb-row-meta d-inline"
+          title="{% translate 'timestamp'|capfirst %}"
+        >@{{ hours.timestamp.pretty_time }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="wb-row-aside">
+    <span class="wb-row-amount">{{ hours.hours|hours }}</span>
+    <span class="wb-row-meta">{{ hours.rendered_by.get_short_name }} &middot;
+      {{ hours.created_at|date:'H:i' }}</span>
+  </div>
+</a>
