@@ -355,3 +355,30 @@ class PlanningTest(TestCase):
 
         response = self.client.get(service.project.urls["creatework"] + "?service=bla")
         self.assertEqual(response.status_code, 200)  # No crash
+
+    def test_decision_of_open_deal(self):
+        """Offers which aren't accepted show when their open deal should be
+        decided"""
+        offer = factories.OfferFactory.create()
+        # The external view only shows work belonging to milestones
+        milestone = factories.MilestoneFactory.create(
+            project=offer.project, date=in_days(30)
+        )
+        pw = factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, milestone=milestone, weeks=[monday()]
+        )
+        deal = factories.DealFactory.create(decision_expected_on=in_days(-3))
+        deal.related_offers.add(offer)
+
+        def decision(**kwargs):
+            report = reporting.project_planning(pw.project, **kwargs)
+            (project,) = report["projects_offers"]
+            (row,) = project["offers"]
+            return row["offer"].get("decision_overdue")
+
+        self.assertTrue(decision())
+        self.assertIsNone(decision(external_view=True))
+        deal.status = deal.ACCEPTED
+        deal.closed_on = dt.date.today()
+        deal.save()
+        self.assertIsNone(decision())

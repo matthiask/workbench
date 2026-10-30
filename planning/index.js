@@ -29,6 +29,9 @@ const capacityHeat = (hours) => {
 }
 const gettext = window.gettext || ((t) => t)
 const pgettext = window.pgettext || ((_ctx, t) => t)
+const interpolate =
+  window.interpolate ||
+  ((fmt, args) => args.reduce((s, a) => s.replace("%s", a), fmt))
 const fixed = (s, decimalPlaces) => Number.parseFloat(s).toFixed(decimalPlaces)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -623,6 +626,18 @@ function Offer({ offer, external_view, work_list }) {
       />
       {offer.id ? (
         <Cell row={row} column={1} className={classList.join(" ")}>
+          {offer.decision_expected_on ? (
+            <span
+              className={`planning--decision${
+                offer.decision_overdue ? " is-overdue" : ""
+              }`}
+              title={gettext("Decision expected on the open deal")}
+            >
+              {interpolate(gettext("decision %s"), [
+                offer.decision_expected_on,
+              ])}
+            </span>
+          ) : null}
           <a href={offer.url} target="_blank" rel="noopener noreferrer">
             {offer.title}
             {offer.is_declined ? gettext("(declined)") : ""}

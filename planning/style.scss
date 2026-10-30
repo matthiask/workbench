@@ -384,3 +384,14 @@
   height: 1rem;
   transform: scale(1.5);
 }
+
+// The open deal of an offer which isn't accepted yet
+.planning--decision {
+  margin-right: 0.5em;
+  color: var(--bs-secondary-color);
+  font-size: 85%;
+
+  &.is-overdue {
+    color: var(--bs-danger);
+  }
+}

@@ -6,11 +6,13 @@ from itertools import islice, starmap, takewhile
 from django.db import connections
 from django.db.models import Q, Sum
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
 from workbench.contacts.models import Organization
+from workbench.deals.models import Deal
 from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedHours
 from workbench.planning.models import ExternalWork, Milestone, PlannedWork
@@ -313,6 +315,32 @@ order by ph.date
             if not self._milestones[milestone.project][milestone]:
                 self.add_project_milestone(milestone.project, milestone)
 
+    @cached_property
+    def _decisions(self):
+        """When the open deals of offers are expected to be decided, so that
+        provisional work can be weighed against it"""
+        decisions = {}
+        for offer_id, date in Deal.objects.filter(
+            status=Deal.OPEN,
+            decision_expected_on__isnull=False,
+            related_offers__isnull=False,
+        ).values_list("related_offers", "decision_expected_on"):
+            decisions[offer_id] = min(date, decisions.get(offer_id, date))
+        return decisions
+
+    def _decision(self, offer):
+        if (
+            self.external
+            or offer.is_accepted
+            or offer.is_declined
+            or not (date := self._decisions.get(offer.id))
+        ):
+            return {}
+        return {
+            "decision_expected_on": local_date_format(date, fmt="d.m."),
+            "decision_overdue": date < dt.date.today(),
+        }
+
     def _offer_record(self, offer, work_list):
         date_from = min(pw["work"]["date_from"] for pw in work_list)
         date_until = max(pw["work"]["date_until"] for pw in work_list)
@@ -349,6 +377,7 @@ order by ph.date
                         "url": offer.get_absolute_url(),
                         "creatework": offer.project.urls["creatework"]
                         + f"?offer={offer.pk}",
+                        **self._decision(offer),
                     }
                     if offer
                     else {}
