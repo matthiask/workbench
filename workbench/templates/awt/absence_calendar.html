@@ -7,19 +7,21 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="d-flex w-100 align-items-start justify-content-between">
-    <h1 class="absences-title">{% translate 'Absence calendar' %}</h1>
-    <form method="get" class="d-flex flex-wrap form-search mb-3 ms-auto me-3" data-autosubmit>
-      {% if form.changed_data %}
-        <a class="btn btn-info" href="." title="{% translate 'Reset the filter form' %}" data-reset-filter>&times;</a>
-      {% endif %}
-      {% ff_fields form %}
-    </form>
-    <a href="{% url 'awt_absence_create' %}" class="btn btn-primary" data-ajaxmodal>
-      {% include 'svg/plus.svg' %}
-      {% translate 'absence'|capfirst %}
-    </a>
+  <div class="wb-page-header mb-3">
+    <h1 class="mb-0">{% translate 'Absence calendar' %}</h1>
+    <div class="wb-page-actions">
+      <a href="{% url 'awt_absence_create' %}" class="btn btn-primary" data-ajaxmodal>
+        {% include 'svg/plus.svg' %}
+        {% translate 'absence'|capfirst %}
+      </a>
+    </div>
   </div>
+  <form method="get" class="form-search" data-autosubmit>
+    {% ff_fields form %}
+    {% if form.changed_data %}
+      <a class="btn btn-sm btn-link" href="." data-reset-filter>{% translate 'Reset the filter form' %}</a>
+    {% endif %}
+  </form>
   <div id="absences-root" class="absences-wrapper"></div>
   {{ absences_data|json_script:'absences-data' }}
   <script src="{% url 'javascript-catalog' %}"></script>
