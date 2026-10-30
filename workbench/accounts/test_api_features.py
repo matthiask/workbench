@@ -46,6 +46,7 @@ class APIFeaturesTest(TestCase):
             f"/api/projects/{project.pk}/planning/context/",
             "/api/contacts/organizations/",
             "/api/logbook/hours/",
+            "/api/absences/",
             "/api/me/",
         ]:
             with self.subTest(url=url):
