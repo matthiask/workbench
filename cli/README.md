@@ -36,6 +36,10 @@ Enable completing commands, options and installations with Tab in your shell:
     echo 'eval "$(wb completion zsh)"' >> ~/.zshrc       # zsh
     wb completion fish > ~/.config/fish/completions/wb.fish   # fish
 
+Options which expect short names or teams (`--owned-by`, `--user`, `--team`
+etc.) are completed too; the names are fetched once a day and cached in
+`~/.cache/wb`.
+
 Log in, which opens the browser to authorize `wb`:
 
     wb login https://workbench.feinheit.ch

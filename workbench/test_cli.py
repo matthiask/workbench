@@ -53,6 +53,7 @@ class CLITest(TestCase):
             patch.object(wb.requests, "request", self.request),
             patch.object(wb, "CONFIG", self.directory / "workbench.toml"),
             patch.object(wb, "BUG_REPORTS", self.directory / "reports"),
+            patch.object(wb, "CACHE", self.directory / "cache"),
             patch.object(
                 wb, "console", Console(markup=False, highlight=False, width=250)
             ),
@@ -796,6 +797,42 @@ planned_work:
         # but not where a value is expected
         self.assertEqual(complete(["deals", "search", "--customer"], ""), [])
         self.assertEqual(complete(["deals", "search", "--status"], "o"), ["open"])
+
+    def test_completion_values(self):
+        """Short names and teams are completed from the API, cached for a day"""
+        _token, secret = APIToken.create_for(user=self.user, title="Tests")
+        factories.UserFactory.create(_short_name="abc")
+        factories.TeamFactory.create(name="Design")
+        wb.CONFIG.write_text(
+            'current = "http://testserver"\n'
+            f'[installations."http://testserver"]\ntoken = "{secret}"\n'
+        )
+
+        def complete(args, incomplete):
+            complete = get_completion_class("bash")(wb.cli, {}, "wb", "_WB_COMPLETE")
+            return [item.value for item in complete.get_completions(args, incomplete)]
+
+        self.assertEqual(
+            complete(["hours", "search", "--rendered-by"], "A"), ["ab", "abc"]
+        )
+        self.assertEqual(
+            complete(["reports", "green-hours", "--team"], "d"), ["Design"]
+        )
+
+        # Cached
+        factories.UserFactory.create(_short_name="abcd")
+        self.assertEqual(
+            complete(["deals", "search", "--owned-by"], "ab"), ["ab", "abc"]
+        )
+        for path in (self.directory / "cache").iterdir():
+            path.unlink()
+        self.assertIn("abcd", complete(["deals", "search", "--owned-by"], "ab"))
+
+        # Nothing without access
+        wb.CONFIG.write_text("")
+        for path in (self.directory / "cache").iterdir():
+            path.unlink()
+        self.assertEqual(complete(["deals", "search", "--owned-by"], ""), [])
 
     def test_auth(self):
         """wb is logged in to several installations and switches between them"""

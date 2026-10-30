@@ -39,6 +39,9 @@ from rich.text import Text
 
 CONFIG = Path.home() / ".config" / "workbench.toml"
 BUG_REPORTS = Path.home() / ".cache" / "wb"
+CACHE = Path.home() / ".cache" / "wb"
+# Short names and teams for completing options change rarely
+COMPLETION_TTL = 24 * 60 * 60
 
 
 def _version():
@@ -554,6 +557,54 @@ def _echo_more(data, offset, what="results", *, note=""):
     click.secho(f"{message}. {note}".strip(), fg="yellow", err=True)
 
 
+def _completion_values(name, path, key):
+    """Values for completing options, fetched from the API at most once a day
+    per installation; no values if anything fails"""
+    config = _read_config()
+    url = _url(os.environ.get("WORKBENCH_URL")) or config["current"]
+    token = os.environ.get("WORKBENCH_TOKEN") or (
+        config["installations"].get(url, {}).get("token")
+    )
+    if not url or not token:
+        return []
+    cache = CACHE / f"completion-{urlsplit(url).netloc}-{name}.json"
+    try:
+        if time.time() - cache.stat().st_mtime < COMPLETION_TTL:
+            return json.loads(cache.read_text())
+    except OSError, ValueError:
+        pass
+    try:
+        response = requests.request(
+            "GET",
+            urljoin(url, f"/api/{path}"),
+            headers={"authorization": f"Bearer {token}", "x-workbench-cli": VERSION},
+            params={"limit": 10000},
+            timeout=5,
+        )
+        values = sorted(item[key] for item in response.json()["items"])
+    except requests.RequestException, ValueError, KeyError, TypeError:
+        return []
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(values))
+    return values
+
+
+def _complete(values, incomplete):
+    return [
+        CompletionItem(value)
+        for value in values
+        if value.casefold().startswith(incomplete.casefold())
+    ]
+
+
+def _complete_short_names(ctx, param, incomplete):
+    return _complete(_completion_values("users", "users/", "short_name"), incomplete)
+
+
+def _complete_teams(ctx, param, incomplete):
+    return _complete(_completion_values("teams", "teams/", "name"), incomplete)
+
+
 def _flatten(row, prefix=""):
     """Nested objects become columns like ``project.code``, lists are joined"""
     result = {}
@@ -616,9 +667,13 @@ def _period_options(default):
 
 
 def _users_options(fn):
-    fn = click.option("--team", help="Team name.")(fn)
+    fn = click.option("--team", help="Team name.", shell_complete=_complete_teams)(fn)
     return click.option(
-        "--user", "users", multiple=True, help="Short name, can be repeated."
+        "--user",
+        "users",
+        multiple=True,
+        help="Short name, can be repeated.",
+        shell_complete=_complete_short_names,
     )(fn)
 
 
@@ -914,7 +969,7 @@ def projects():
 @projects.command()
 @click.argument("query", nargs=-1)
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--owned-by", help="Short name.")
+@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
 @click.option("--all", "include_closed", is_flag=True, help="Include closed projects.")
 @_page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -1027,7 +1082,11 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
     default="order",
     show_default=True,
 )
-@click.option("--owned-by", help="Short name, defaults to you.")
+@click.option(
+    "--owned-by",
+    help="Short name, defaults to you.",
+    shell_complete=_complete_short_names,
+)
 @click.option("--description", default="")
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
@@ -1081,7 +1140,7 @@ def _echo_saved_project(data, *, dry_run, as_json):
 @click.option(
     "--type", "type_", type=click.Choice(["order", "maintenance", "internal"])
 )
-@click.option("--owned-by", help="Short name.")
+@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
 @click.option("--close", is_flag=True, help="Close the project today.")
 @click.option(
     "--closed-on",
@@ -1359,7 +1418,7 @@ def context(project_id):
 )
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--owned-by", help="Short name.")
+@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
 @_period_options("filters the offer date")
 @_page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -2069,7 +2128,7 @@ def _echo_notes(notes):
 @click.option("--deal", type=int, help="Deal ID.")
 @click.option("--invoice", type=int, help="Invoice ID.")
 @click.option("--recurring-invoice", type=int, help="Recurring invoice ID.")
-@click.option("--created-by", help="Short name.")
+@click.option("--created-by", help="Short name.", shell_complete=_complete_short_names)
 @_period_options("filters the creation date")
 @_page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -2212,7 +2271,7 @@ def hours():
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--offer", type=int, help="Offer ID.")
 @click.option("--service", type=int, help="Service ID.")
-@click.option("--rendered-by", help="Short name.")
+@click.option("--rendered-by", help="Short name.", shell_complete=_complete_short_names)
 @_period_options("filters the date the work was done")
 @_page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -2284,7 +2343,7 @@ def absences():
 
 
 @absences.command("search")
-@click.option("--user", help="Short name.")
+@click.option("--user", help="Short name.", shell_complete=_complete_short_names)
 @click.option(
     "--reason",
     type=click.Choice([
@@ -2342,7 +2401,7 @@ def costs():
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--offer", type=int, help="Offer ID.")
 @click.option("--service", type=int, help="Service ID.")
-@click.option("--rendered-by", help="Short name.")
+@click.option("--rendered-by", help="Short name.", shell_complete=_complete_short_names)
 @click.option("--expenses", is_flag=True, help="Paid from someone's own pocket.")
 @_period_options("filters the date the work was done")
 @_page_options
@@ -2421,7 +2480,7 @@ def recurring_invoices():
 @recurring_invoices.command("search")
 @click.argument("query", nargs=-1)
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--owned-by", help="Short name.")
+@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
 @click.option(
     "--status",
     type=click.Choice(["open", "closed", "all"]),
@@ -2529,7 +2588,7 @@ def deals():
     "--status", type=click.Choice(["open", "accepted", "declined"]), default="open"
 )
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--owned-by", help="Short name.")
+@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
 @_period_options("filters the decision date (closed or expected)")
 @_page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -2633,7 +2692,7 @@ def _echo_saved_deal(data, *, dry_run, as_json):
     help="TYPE=AMOUNT, e.g. Design=5000; TYPE= removes the value.",
 )
 @click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
-@click.option("--owned-by", help="Short name.")
+@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_deal(
@@ -2894,7 +2953,11 @@ def deal_history(period, since, until, users, team, as_json):
 )
 @click.option("--value", "values", multiple=True, help="TYPE=AMOUNT, e.g. Design=5000.")
 @click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
-@click.option("--owned-by", help="Short name, defaults to you.")
+@click.option(
+    "--owned-by",
+    help="Short name, defaults to you.",
+    shell_complete=_complete_short_names,
+)
 @click.option("--description", default="")
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
@@ -3241,7 +3304,9 @@ def cash_data(date, as_json):
 
 @reports.command("working-time")
 @click.option("--year", type=int, help="Defaults to the current year.")
-@click.option("--user", help="Short name, defaults to you.")
+@click.option(
+    "--user", help="Short name, defaults to you.", shell_complete=_complete_short_names
+)
 @click.option(
     "--all",
     "all_",
@@ -3383,7 +3448,11 @@ def projected_gross_margin(as_csv, as_json):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="Cutoff date, defaults to today.",
 )
-@click.option("--owned-by", help="Short name, or 'inactive' for inactive users.")
+@click.option(
+    "--owned-by",
+    help="Short name, or 'inactive' for inactive users.",
+    shell_complete=_complete_short_names,
+)
 @click.option("--internal", is_flag=True, help="Internal projects only.")
 @click.option("--closed", is_flag=True, help="Projects closed during the last year.")
 @click.option(
