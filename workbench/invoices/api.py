@@ -18,6 +18,8 @@ from workbench.contacts.api import (
     organization_out,
     person_summary,
 )
+from workbench.contacts.models import Person
+from workbench.invoices.forms import SendReminderForm
 from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.tools.api import DateRangeFilter, Serialized, filter_date_range
@@ -204,6 +206,65 @@ def mark_reminded(request, data: Reminded, *, dry_run: bool = False):
         if dry_run:
             transaction.set_rollback(True)
     return result
+
+
+class SendReminder(Schema):
+    to: str | None = Field(
+        default=None,
+        description="Recipient, e.g. one of the contact's email addresses."
+        " Without it, only shows what would be sent.",
+    )
+
+
+class ReminderSent(Schema):
+    contact: PersonSummary
+    emails: list[str] = Field(description="The contact's email addresses.")
+    to: list[str]
+    cc: list[str]
+    bcc: list[str]
+    invoices: list[InvoiceOut]
+    sent: bool
+
+
+@router.post(
+    "/invoices/reminders/{int:contact_id}/send/",
+    response=ReminderSent,
+    auth=user_auth(feature=FEATURES.BOOKKEEPING),
+)
+def send_reminder(
+    request, contact_id: int, data: SendReminder, *, dry_run: bool = False
+):
+    """Send a dunning letter with the overdue invoices of the contact like in
+    the web interface, and mark them as reminded today. Without ``to`` or with
+    ``dry_run`` nothing is sent."""
+    contact = get_object_or_404(Person, pk=contact_id)
+    form = SendReminderForm({"email": data.to or ""}, contact=contact, request=request)
+    if not form.invoices:
+        raise ValidationError([
+            {
+                "loc": ["path", "contact_id"],
+                "msg": _("This contact has no overdue invoices."),
+            }
+        ])
+    send = data.to is not None and not dry_run
+    if data.to is not None and not form.is_valid():
+        raise ValidationError([
+            {"loc": ["body", "data", "to"], "msg": str(error)}
+            for error in form.errors.get("email", [])
+        ])
+    invoices = list(form.invoices)
+    if send:
+        form.process()
+    recipients = form.recipients(data.to)
+    if not data.to:
+        recipients["to"] = []
+    return {
+        "contact": person_summary(contact, request),
+        "emails": list(form.emails),
+        **recipients,
+        "invoices": [invoice_out(invoice, request) for invoice in invoices],
+        "sent": send,
+    }
 
 
 class PostponeReminders(Schema):

@@ -1028,18 +1028,31 @@ class SendReminderForm(Form):
 
         self.fields["email"] = forms.EmailField(label=_("email"))
 
+    def recipients(self, to):
+        """The recipient, the owners of the invoices and the sender in copy"""
+        return {
+            "to": [to],
+            "cc": sorted({
+                invoice.owned_by.email
+                for invoice in self.invoices
+                if invoice.owned_by.is_active
+            }),
+            "bcc": [
+                email
+                for email in [
+                    self.request.user.email,
+                    settings.WORKBENCH.REMINDER_FROM_EMAIL,
+                ]
+                if email
+            ],
+        }
+
     def process(self):
         mail = render_to_mail(
             "invoices/reminder_mail",
             {"WORKBENCH": settings.WORKBENCH},
             from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
-            to=[self.cleaned_data["email"]],
-            cc=list({
-                invoice.owned_by.email
-                for invoice in self.invoices
-                if invoice.owned_by.is_active
-            }),
-            bcc=[self.request.user.email, settings.WORKBENCH.REMINDER_FROM_EMAIL],
+            **self.recipients(self.cleaned_data["email"]),
         )
         with io.BytesIO() as buf:
             pdf = PDFDocument(buf)

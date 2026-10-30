@@ -117,6 +117,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `workbench/test_cli.py` runs the real CLI commands against the API (requests
   go through Django's test client); add a test there for new commands. The CLI
   is installed with the project's dev dependencies, not in the container.
+  `wb invoices send-reminder CONTACT --to EMAIL` sends dunning letters like
+  the web interface (`SendReminderForm`, bookkeeping feature); without
+  `--to` it only shows the addresses and invoices.
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only changes offers
   in preparation: create, replace, update and add, update, delete and reorder

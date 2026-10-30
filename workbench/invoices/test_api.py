@@ -1,5 +1,6 @@
 import datetime as dt
 
+from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
@@ -272,3 +273,65 @@ class InvoicesAPITest(TestCase):
         invoice.closed_on = dt.date.today()
         invoice.save()
         self.assertEqual(post({"until": None}).status_code, 409)
+
+    def test_send_reminder(self):
+        """Reminders are previewed without a recipient and sent with one"""
+        invoice = factories.InvoiceFactory.create(
+            status=Invoice.SENT, invoiced_on=in_days(-60), due_on=in_days(-30)
+        )
+        contact = invoice.contact
+        contact.emailaddresses.create(email="billing@example.com")
+        self.client.force_login(invoice.owned_by)
+        url = f"/api/invoices/reminders/{contact.pk}/send/"
+
+        response = self.client.post(url, {}, content_type="application/json")
+        self.assertEqual(response.status_code, 200, response.content)
+        preview = response.json()
+        self.assertFalse(preview["sent"])
+        self.assertEqual(preview["emails"], ["billing@example.com"])
+        self.assertEqual(preview["invoices"][0]["id"], invoice.pk)
+        self.assertEqual(len(mail.outbox), 0)
+
+        response = self.client.post(
+            url + "?dry_run=true",
+            {"to": "billing@example.com"},
+            content_type="application/json",
+        )
+        self.assertFalse(response.json()["sent"])
+        self.assertEqual(response.json()["to"], ["billing@example.com"])
+        self.assertEqual(len(mail.outbox), 0)
+
+        response = self.client.post(
+            url, {"to": "billing@example.com"}, content_type="application/json"
+        )
+        self.assertTrue(response.json()["sent"])
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["billing@example.com"])
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.last_reminded_on, dt.date.today())
+
+        # Nothing overdue anymore after reminding? Still overdue, but a
+        # contact without overdue invoices can't be reminded
+        other = factories.PersonFactory.create()
+        response = self.client.post(
+            f"/api/invoices/reminders/{other.pk}/send/",
+            {"to": "x@example.com"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+
+    @override_settings(
+        FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.BOOKKEEPING: F.NEVER}
+    )
+    def test_send_reminder_requires_bookkeeping(self):
+        """Like in the web interface"""
+        invoice = factories.InvoiceFactory.create(
+            status=Invoice.SENT, invoiced_on=in_days(-60), due_on=in_days(-30)
+        )
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            f"/api/invoices/reminders/{invoice.contact.pk}/send/",
+            {},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)

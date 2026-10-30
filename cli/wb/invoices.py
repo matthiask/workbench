@@ -243,6 +243,47 @@ def mark_reminded(invoice_ids, dry_run, as_json):
         console.print("Dry run, nothing has been saved.")
 
 
+@invoices.command("send-reminder")
+@click.argument("contact_id", type=int)
+@click.option("--to", help="Recipient, e.g. one of the contact's email addresses.")
+@click.option("--dry-run", is_flag=True, help="Show what would be sent only.")
+@click.option("--json", "as_json", is_flag=True)
+def send_reminder(contact_id, to, dry_run, as_json):
+    """Send a dunning letter with the overdue invoices of a contact
+
+    Without --to, shows the contact's email addresses and the invoices
+    without sending anything. The owners of the invoices and you get a copy,
+    the invoices are marked as reminded today. Requires the bookkeeping
+    feature."""
+    data = request(
+        "POST",
+        f"invoices/reminders/{contact_id}/send/",
+        params={"dry_run": format_bool(dry_run)},
+        json={"to": to},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    contact = data["contact"]
+    echo_fields(
+        contact["full_name"],
+        [
+            ("Email addresses", ", ".join(data["emails"]) or "(none)"),
+            ("To", ", ".join(data["to"])),
+            ("Cc", ", ".join(data["cc"])),
+            ("Bcc", ", ".join(data["bcc"])),
+        ],
+        url=contact["url"],
+    )
+    echo_invoice_list(data["invoices"], title="Overdue invoices")
+    if data["sent"]:
+        console.print("The reminder has been sent.")
+    elif not to:
+        console.print("Nothing sent, choose a recipient with --to.")
+    else:
+        console.print("Dry run, nothing has been sent.")
+
+
 @cli.group("recurring-invoices", invoke_without_command=True)
 @click.pass_context
 def recurring_invoices(ctx):

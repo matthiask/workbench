@@ -62,3 +62,16 @@ Lead with the three or four things which need attention, then the figures:
 
 Link projects, invoices and deals with the URLs from the JSON. Don't change
 anything in Workbench while preparing a summary.
+
+## Sending payment reminders
+
+Only when the user asks for it. Reminders are emails to customers, so show
+what would be sent first and send only after the user explicitly approves
+the recipient:
+
+    wb invoices send-reminder <contact_id>                     # Addresses and overdue invoices, sends nothing
+    wb invoices send-reminder <contact_id> --to <email> --dry-run
+    wb invoices send-reminder <contact_id> --to <email>
+
+The contact IDs are in `wb invoices reminders`. Sending marks the invoices
+as reminded today; requires the bookkeeping feature.

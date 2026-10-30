@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:30+0100\n"
+"POT-Creation-Date: 2026-10-30 22:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1905,6 +1905,10 @@ msgid "These invoices aren't overdue: %s"
 msgstr "Diese Rechnungen sind nicht überfällig: %s"
 
 #: workbench/invoices/api.py
+msgid "This contact has no overdue invoices."
+msgstr "Diese Kontaktperson hat keine überfälligen Rechnungen."
+
+#: workbench/invoices/api.py
 msgid "Reminders can only be postponed for sent invoices."
 msgstr "Zahlungserinnerungen können nur für versendete Rechnungen aufgeschoben werden."
 
@@ -2945,6 +2949,7 @@ msgid "Work is planned in or after the week of the milestone %(milestone)r: %(we
 msgstr "Arbeit ist in oder nach der Woche des Meilensteins %(milestone)r geplant: %(weeks)s"
 
 #: workbench/planning/api.py
+#, python-format
 msgid "%(what)s %(id)s doesn't belong to this project."
 msgstr "%(what)s %(id)s gehört nicht zu diesem Projekt."
 
