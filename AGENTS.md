@@ -9,6 +9,16 @@ Use `./runtests.sh` to run the full test suite. Accepts an optional module argum
 
 The tests need the local PostgreSQL container: `podman start local_postgres_1`.
 
+# Screenshots
+
+The dev server (`:8000`) needs a login. Sessions are signed cookies, so log in
+with `Client().force_login(user)` in `./manage.py shell` and pass
+`client.cookies["sessionid"].value` to a browser, e.g. Playwright through
+`uv run --with playwright python script.py` (the browsers are installed).
+Hide the debug toolbar with `localStorage.setItem('djdt.show', 'false')` in an
+init script; removing its elements breaks its JavaScript. The timer keeps its
+activities in local storage, fresh browser contexts start empty.
+
 # Fixing bugs
 
 1. Write a test which reproduces the bug.
