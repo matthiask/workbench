@@ -42,14 +42,23 @@ def _read_config():
     Older versions stored the URL and the token of a single installation."""
     config = tomllib.loads(CONFIG.read_text()) if CONFIG.exists() else {}
     if "url" in config:
-        return {
+        config = {
             "current": config["url"],
             "installations": {config["url"]: {"token": config.get("token", "")}},
         }
-    return {
-        "current": config.get("current"),
-        "installations": config.get("installations", {}),
-    }
+    # Older versions stored URLs as given, with or without a trailing slash.
+    # Entries without one come from newer versions and take precedence.
+    installations = {}
+    for url, installation in sorted(
+        config.get("installations", {}).items(),
+        key=lambda item: item[0] == _url(item[0]),
+    ):
+        installations[_url(url)] = installation
+    return {"current": _url(config.get("current")), "installations": installations}
+
+
+def _url(url):
+    return url.rstrip("/") if url else url
 
 
 def _write_config(config):
@@ -78,7 +87,7 @@ def _config():
 
     WORKBENCH_URL alone selects one of the installations wb is logged in to."""
     config = _read_config()
-    url = os.environ.get("WORKBENCH_URL") or config["current"]
+    url = _url(os.environ.get("WORKBENCH_URL")) or config["current"]
     token = os.environ.get("WORKBENCH_TOKEN") or (
         config["installations"].get(url, {}).get("token")
     )
@@ -434,7 +443,7 @@ def login(url, paste_token):
     auth`). Use --token on computers without a browser."""
     if not (url := url or _read_config()["current"]):
         _terminate("Which Workbench? Run `wb login URL`.")
-    url = url.rstrip("/")
+    url = _url(url)
     if paste_token:
         _save_config(url, click.prompt("API token", hide_input=True).strip())
         click.echo(f"Saved {CONFIG}")
