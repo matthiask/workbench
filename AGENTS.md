@@ -62,6 +62,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - The `wb` command line interface lives in `cli/` (separate package, installed
   with `uv tool install`). It is a thin client of the JSON API, keep the logic
   on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`.
+  Verbs: `search` (optional terms plus filters like `--project`, `--customer`,
+  `--owned-by`; the API supports the same filters), `show ID`, `create`.
+  `wb contacts search` finds both organizations and people, `wb organizations
+  show` and `wb people show` show them.
   Bump the version in `cli/pyproject.toml` when changing the CLI: the server
   reads it and tells users of older versions to upgrade. Raise `MINIMUM` in
   `workbench/cli_version.py` when older versions don't work anymore.
