@@ -107,7 +107,28 @@ def _bug_report(problem, details, *, args):
 
 class _Group(click.Group):
     """Commands which crash write a bug report instead of a traceback, set
-    WB_DEBUG to get the exception"""
+    WB_DEBUG to get the exception
+
+    ``aliases`` maps short names to commands, the help lists them
+    separately."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.aliases = {}
+
+    def get_command(self, ctx, cmd_name):
+        return super().get_command(ctx, self.aliases.get(cmd_name, cmd_name))
+
+    def resolve_command(self, ctx, args):
+        # Show the full name in usage and error messages
+        _name, command, args = super().resolve_command(ctx, args)
+        return command.name if command else None, command, args
+
+    def format_commands(self, ctx, formatter):
+        super().format_commands(ctx, formatter)
+        if self.aliases:
+            with formatter.section("Aliases"):
+                formatter.write_dl(sorted(self.aliases.items()))
 
     def main(self, args=None, **kwargs):
         args = sys.argv[1:] if args is None else list(args)

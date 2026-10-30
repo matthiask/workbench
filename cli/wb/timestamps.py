@@ -9,9 +9,17 @@ import click
 from wb.core import cli, console, echo_json, link, make_table, request
 
 
-@cli.group()
-def timestamps():
-    """Start and stop tasks, log the hours in Workbench"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def timestamps(ctx):
+    """Start and stop tasks, log the hours in Workbench
+
+    Without a command, lists today's timestamps."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(list_timestamps)
+
+
+cli.aliases["ts"] = "timestamps"
 
 
 def _time(value):

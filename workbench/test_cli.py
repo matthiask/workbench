@@ -699,6 +699,22 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("There are no timestamps today", result.output)
 
+    def test_timestamps_alias(self):
+        """wb ts is an alias for wb timestamps, which lists today's
+        timestamps without a command"""
+        result = self.wb("ts", "start", "Wireframes")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("T1: start at", result.output)
+        result = self.wb("ts")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Wireframes", result.output)
+        self.assertIn("Running since", result.output)
+        result = self.wb("timestamps")
+        self.assertIn("Wireframes", result.output)
+
+        result = self.wb("--help")
+        self.assertIn("Aliases:\n  ts  timestamps", result.output)
+
     def test_bug_reports(self):
         """Crashes and server errors write a bug report people can send"""
         person = factories.PersonFactory.create()
