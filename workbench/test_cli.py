@@ -342,17 +342,9 @@ planned_work:
         self.assertIn("Launch", result.output)
         self.assertIn("Dry run", result.output)
 
-    def test_reporting(self):
-        """Statistics, invoices, deals, overview and key figures"""
+    def test_logbook(self):
+        """Services, logged hours and costs, absences and project statistics"""
         project = factories.ProjectFactory.create(owned_by=self.user)
-        factories.InvoiceFactory.create(
-            project=project, customer=project.customer, title="Kick-off"
-        )
-        factories.ProjectedInvoiceFactory.create(
-            project=project, description="Planning"
-        )
-        factories.DealFactory.create(owned_by=self.user, title="Big deal")
-
         factories.LoggedHoursFactory.create(
             service=factories.ServiceFactory.create(project=project),
             rendered_by=self.user,
@@ -375,6 +367,20 @@ planned_work:
         result = self.wb("hours", "search", "--period", "last-year")
         self.assertNotIn("Wireframes", result.output)
 
+        factories.LoggedCostFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            cost=120,
+            description="Fonts",
+        )
+        result = self.wb("costs", "search", "--project", project.pk)
+        self.assertIn("Fonts", result.output)
+        self.assertIn("120.00", result.output)
+
+        result = self.wb("projects", "stats", project.pk, "--csv")
+        self.assertEqual(result.exit_code, 0)
+        self.assertTrue(result.output.startswith("project_id,project,"))
+
+    def test_absences(self):
         factories.AbsenceFactory.create(
             user=self.user, starts_on=in_days(7), description="Holidays"
         )
@@ -400,22 +406,20 @@ planned_work:
         self.assertIn("Holidays", result.output)
         self.assertNotIn("Past", result.output)
 
-        factories.LoggedCostFactory.create(
-            service=factories.ServiceFactory.create(project=project),
-            cost=120,
-            description="Fonts",
+    def test_invoices(self):
+        """Invoices, projected and recurring invoices, and pagination"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.InvoiceFactory.create(
+            project=project, customer=project.customer, title="Kick-off"
         )
-        result = self.wb("costs", "search", "--project", project.pk)
-        self.assertIn("Fonts", result.output)
-        self.assertIn("120.00", result.output)
-
-        result = self.wb("projects", "stats", project.pk, "--csv")
-        self.assertEqual(result.exit_code, 0)
-        self.assertTrue(result.output.startswith("project_id,project,"))
-
         factories.InvoiceFactory.create(
             project=project, customer=project.customer, title="Follow-up"
         )
+        factories.ProjectedInvoiceFactory.create(
+            project=project, description="Planning"
+        )
+        factories.RecurringInvoiceFactory.create(title="Hosting 2027")
+
         result = self.wb("invoices", "search", "--project", project.pk, "--limit", 1)
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(
@@ -433,6 +437,43 @@ planned_work:
         )
         result = self.wb("projected-invoices", "search", "--project", project.pk)
         self.assertIn("Planning", result.output)
+        result = self.wb("recurring-invoices", "search", "hosting")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Hosting 2027", result.output)
+
+    def test_invoice_reminders(self):
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        overdue = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            title="Kick-off",
+            status=Invoice.SENT,
+            invoiced_on=in_days(-70),
+            due_on=in_days(-40),
+        )
+        result = self.wb("invoices", "reminders")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Kick-off", result.output)
+        self.assertIn("40 days", result.output)
+        result = self.wb("invoices", "mark-reminded", overdue.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        overdue.refresh_from_db()
+        self.assertEqual(overdue.last_reminded_on, dt.date.today())
+        result = self.wb("invoices", "postpone-reminders", overdue.pk, in_days(40))
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Are you sure?", result.output)
+        result = self.wb(
+            "invoices", "postpone-reminders", overdue.pk, in_days(40), "--confirm"
+        )
+        self.assertIn("postponed until", result.output)
+        result = self.wb("invoices", "postpone-reminders", overdue.pk, "--clear")
+        self.assertIn("aren't postponed anymore", result.output)
+
+    def test_deals(self):
+        """Searching, creating, updating, closing and reopening deals"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.DealFactory.create(owned_by=self.user, title="Big deal")
         self.assertIn("Big deal", self.wb("deals", "search").output)
 
         factories.ValueTypeFactory.create(title="Design")
@@ -458,19 +499,77 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("--value expects KEY=VALUE", result.output)
 
+        open_deal = factories.DealFactory.create(
+            title="Website", owned_by=self.user, probability=Deal.NORMAL
+        )
+        result = self.wb(
+            "deals", "update", open_deal.pk, "--title", "Website 2027", "--dry-run"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Website 2027", result.output)
+        self.assertIn("Dry run", result.output)
+        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
+        result = self.wb(
+            "deals", "close", open_deal.pk, "accepted", "--closing-type", "x"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("'Won'", result.output)
+        result = self.wb(
+            "deals", "close", open_deal.pk, "accepted", "--closing-type", "won"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        open_deal.refresh_from_db()
+        self.assertEqual(open_deal.status, Deal.ACCEPTED)
+        result = self.wb("deals", "reopen", open_deal.pk)
+        open_deal.refresh_from_db()
+        self.assertEqual(open_deal.status, Deal.OPEN)
+
+    def test_deal_stats(self):
+        deal = factories.DealFactory.create(
+            title="Relaunch",
+            owned_by=self.user,
+            status=Deal.DECLINED,
+            closed_on=dt.date.today(),
+        )
+        result = self.wb("deals", "stats", "--user", "ab")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Relaunch", result.output)
+        result = self.wb("deals", "history")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(deal.code, result.output)
+
+    def test_me_and_teams(self):
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.DealFactory.create(owned_by=self.user, title="Big deal")
         result = self.wb("me")
         self.assertIn(project.code, result.output)
         self.assertIn("Big deal", result.output)
 
-        result = self.wb("reports", "cash-data", "--date", dt.date.today())
+        factories.TeamFactory.create(name="Design").members.add(self.user)
+        result = self.wb("teams", "search")
+        self.assertIn("Design", result.output)
+        self.assertIn("ab", result.output)
+
+    def test_planning_export(self):
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.PlannedWorkFactory.create(
+            project=project,
+            user=self.user,
+            title="Wireframes",
+            weeks=[monday()],
+            planned_hours=8,
+        )
+        result = self.wb("planning", "export", "--user", "ab")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Open invoices excl. tax", result.output)
-        self.assertIn("Planned invoicing", result.output)
-        result = self.wb("reports", "cash-data", "--json")
-        self.assertIn('"open_invoices"', result.output)
+        self.assertIn("Wireframes", result.output)
+        self.assertIn("ab free", result.output)
+        result = self.wb("planning", "export", "--project", project.pk, "--csv")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertTrue(result.output.startswith("week,project_id,"))
+        self.assertIn(f"{monday().isoformat()},{project.pk},", result.output)
 
     def test_reports(self):
-        """Reports as tables and as JSON"""
+        """Reports as tables, as JSON and as CSV"""
         project = factories.ProjectFactory.create(owned_by=self.user)
         service = factories.ServiceFactory.create(project=project, effort_rate=100)
         factories.LoggedHoursFactory.create(
@@ -516,72 +615,28 @@ planned_work:
                 self.assertEqual(result.exit_code, 0, result.output)
                 self.assertEqual(len(result.output.splitlines()), 2, result.output)
 
-        deal = factories.DealFactory.create(
-            title="Relaunch",
-            owned_by=self.user,
-            status=Deal.DECLINED,
-            closed_on=dt.date.today(),
-        )
-        open_deal = factories.DealFactory.create(
-            title="Website", owned_by=self.user, probability=Deal.NORMAL
-        )
-        result = self.wb(
-            "deals", "update", open_deal.pk, "--title", "Website 2027", "--dry-run"
-        )
-        self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Website 2027", result.output)
-        self.assertIn("Dry run", result.output)
-        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
-        result = self.wb(
-            "deals", "close", open_deal.pk, "accepted", "--closing-type", "x"
-        )
+        result = self.wb("reports", "hours-per-type", "--period", "nope")
         self.assertEqual(result.exit_code, 1)
-        self.assertIn("'Won'", result.output)
-        result = self.wb(
-            "deals", "close", open_deal.pk, "accepted", "--closing-type", "won"
-        )
-        self.assertEqual(result.exit_code, 0, result.output)
-        open_deal.refresh_from_db()
-        self.assertEqual(open_deal.status, Deal.ACCEPTED)
-        result = self.wb("deals", "reopen", open_deal.pk)
-        open_deal.refresh_from_db()
-        self.assertEqual(open_deal.status, Deal.OPEN)
+        self.assertIn("period", result.output)
 
-        result = self.wb("deals", "stats", "--user", "ab")
+    def test_key_data_and_cash_data(self):
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.InvoiceFactory.create(project=project, customer=project.customer)
+        result = self.wb("reports", "key-data", "--month", "2026-01")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Relaunch", result.output)
-        result = self.wb("deals", "history")
-        self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn(deal.code, result.output)
+        self.assertIn("Key data 2026-01", result.output)
+        self.assertIn("Deals funnel", result.output)
+        result = self.wb("reports", "key-data", "--month", "2026-01", "--json")
+        self.assertIn('"month": "2026-01"', result.output)
 
-        factories.RecurringInvoiceFactory.create(title="Hosting 2027")
-        result = self.wb("recurring-invoices", "search", "hosting")
+        result = self.wb("reports", "cash-data", "--date", dt.date.today())
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Hosting 2027", result.output)
-        factories.TeamFactory.create(name="Design").members.add(self.user)
-        result = self.wb("teams", "search")
-        self.assertIn("Design", result.output)
-        self.assertIn("ab", result.output)
+        self.assertIn("Open invoices excl. tax", result.output)
+        self.assertIn("Planned invoicing", result.output)
+        result = self.wb("reports", "cash-data", "--json")
+        self.assertIn('"open_invoices"', result.output)
 
-        result = self.wb("invoices", "reminders")
-        self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Kick-off", result.output)
-        self.assertIn("40 days", result.output)
-        overdue = Invoice.objects.get(title="Kick-off")
-        result = self.wb("invoices", "mark-reminded", overdue.pk)
-        self.assertEqual(result.exit_code, 0, result.output)
-        overdue.refresh_from_db()
-        self.assertEqual(overdue.last_reminded_on, dt.date.today())
-        result = self.wb("invoices", "postpone-reminders", overdue.pk, in_days(40))
-        self.assertEqual(result.exit_code, 1)
-        self.assertIn("Are you sure?", result.output)
-        result = self.wb(
-            "invoices", "postpone-reminders", overdue.pk, in_days(40), "--confirm"
-        )
-        self.assertIn("postponed until", result.output)
-        result = self.wb("invoices", "postpone-reminders", overdue.pk, "--clear")
-        self.assertIn("aren't postponed anymore", result.output)
-
+    def test_working_time(self):
         factories.YearFactory.create(working_time_model=self.user.working_time_model)
         factories.EmploymentFactory.create(
             user=self.user, date_from=dt.date.today().replace(month=1, day=1)
@@ -592,32 +647,6 @@ planned_work:
         result = self.wb("reports", "working-time", "--weekly")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(monday().isoformat(), result.output)
-
-        factories.PlannedWorkFactory.create(
-            project=project,
-            user=self.user,
-            title="Wireframes",
-            weeks=[monday()],
-            planned_hours=8,
-        )
-        result = self.wb("planning", "export", "--user", "ab")
-        self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Wireframes", result.output)
-        self.assertIn("ab free", result.output)
-        result = self.wb("planning", "export", "--project", project.pk, "--csv")
-        self.assertEqual(result.exit_code, 0, result.output)
-        self.assertTrue(result.output.startswith("week,project_id,"))
-        self.assertIn(f"{monday().isoformat()},{project.pk},", result.output)
-
-        result = self.wb("reports", "key-data", "--month", "2026-01")
-        self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Key data 2026-01", result.output)
-        self.assertIn("Deals funnel", result.output)
-        result = self.wb("reports", "key-data", "--month", "2026-01", "--json")
-        self.assertIn('"month": "2026-01"', result.output)
-        result = self.wb("reports", "hours-per-type", "--period", "nope")
-        self.assertEqual(result.exit_code, 1)
-        self.assertIn("period", result.output)
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_missing_feature(self):
