@@ -1,72 +1,104 @@
 {% extends "generic/object_detail.html" %}
 {% load i18n workbench %}
 {% block content %}
-  <div class="row">
-    <div class="col-md-6 offset-md-3">
-      <h1>{{ object|h }} {% history_link object %}</h1>
-      <table class="table table-striped">
-        <tr>
-          <th class="text-end">{% translate 'contact person'|capfirst %}</th>
-          <td>{% link_or_none object.owned_by %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'customer' %}</th>
-          <td>{% link_or_none object.customer %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'contact' %}</th>
-          <td>{% link_or_none object.contact %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'subtotal' %}</th>
-          <td>{{ object.subtotal|currency }}</td>
-        </tr>
-        {% if object.discount %}
-          <tr>
-            <th class="text-end">{% translate 'discount' %}</th>
-            <td>-{{ object.discount|currency }}</td>
-          </tr>
-        {% endif %}
-        <tr>
-          <th class="text-end">
-            {% if object.liable_to_vat %}{% translate 'total excl. tax' %}{% else %}{% translate 'total' %}{% endif %}
-          </th>
-          <td>{{ object.total_excl_tax|currency }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'third party costs' %}</th>
-          <td>{{ object.third_party_costs|currency }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'status' %}</th>
-          <td>
-            {{ object.status_badge }}
-            <br>
-            {{ object.pretty_next_period }}
-          </td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'description' %}</th>
-          <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'postal address' %}</th>
-          <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{{ object|label:'create_project' }}</th>
-          <td>{{ object.create_project|yesno:_('yes,no') }}</td>
-        </tr>
-      </table>
-      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">{% translate 'Copy' %}</a>
-      <a href="?create_invoices=1" class="btn btn-primary">
-        {% translate 'Create invoices' %}
-      </a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">
-        {% translate 'Delete' %}
-      </a>
-      {% notes object %}
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">
+        {{ object|h }}
+        {% history_link object %}
+        <span class="wb-title-badge">{{ object.status_badge }}</span>
+      </h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{% translate 'contact person'|capfirst %}</span>
+          {% link_or_none object.owned_by %}</span>
+        <span><span class="wb-meta-label">{% translate 'customer'|capfirst %}</span>
+          {% link_or_none object.customer %}</span>
+        <span><span class="wb-meta-label">{% translate 'contact'|capfirst %}</span>
+          {% link_or_none object.contact %}</span>
+      </div>
+    </div>
+    <div class="wb-page-actions">
+      <a href="?create_invoices=1" class="btn btn-primary">{% translate 'Create invoices' %}</a>
+      <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
+      <span class="dropdown">
+        <button
+          type="button"
+          class="btn btn-quiet btn-icon"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="{% translate 'More actions' %}"
+        >
+          {% include 'svg/kebab-horizontal.svg' %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="dropdown-item">{% translate 'Copy' %}</a>
+          <div class="dropdown-divider"></div>
+          <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
+        </div>
+      </span>
     </div>
   </div>
+
+  {% if object.description %}
+    <p class="wb-description">{{ object.description|linebreaksbr }}</p>
+  {% endif %}
+
+  <div class="wb-stats mb-3">
+    <div class="wb-stat">
+      <div class="wb-stat-label">
+        {% if object.liable_to_vat %}{% translate 'total excl. tax'|capfirst %}{% else %}{% translate 'total'|capfirst %}{% endif %}
+      </div>
+      <div class="wb-stat-value">{{ object.total_excl_tax|currency }}</div>
+    </div>
+    <div class="wb-stat">
+      <div class="wb-stat-label">{{ object|label:'periodicity' }}</div>
+      <div class="wb-stat-value">{{ object.get_periodicity_display }}</div>
+    </div>
+    <div class="wb-stat">
+      <div class="wb-stat-label">{{ object|label:'next_period_starts_on' }}</div>
+      <div class="wb-stat-value">{{ object.next_period_starts_on|local_date_format|default:"&ndash;" }}</div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'Details' %}</div>
+        <div class="card-body">
+          <dl class="wb-fields">
+            <dt>{% translate 'status'|capfirst %}</dt>
+            <dd>{{ object.pretty_next_period }}</dd>
+            <dt>{{ object|label:'postal_address' }}</dt>
+            <dd>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</dd>
+            <dt>{{ object|label:'create_project' }}</dt>
+            <dd>{{ object.create_project|yesno:_('yes,no') }}</dd>
+          </dl>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-5">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'total'|capfirst %}</div>
+        <div class="card-body">
+          <dl class="wb-fields wb-amounts">
+            <dt>{% translate 'subtotal'|capfirst %}</dt>
+            <dd>{{ object.subtotal|currency }}</dd>
+            {% if object.discount %}
+              <dt>{% translate 'discount'|capfirst %}</dt>
+              <dd>-{{ object.discount|currency }}</dd>
+            {% endif %}
+            <dt>
+              {% if object.liable_to_vat %}{% translate 'total excl. tax'|capfirst %}{% else %}{% translate 'total'|capfirst %}{% endif %}
+            </dt>
+            <dd><strong>{{ object.total_excl_tax|currency }}</strong></dd>
+            <dt>{% translate 'third party costs'|capfirst %}</dt>
+            <dd>{{ object.third_party_costs|currency }}</dd>
+          </dl>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  {% notes object %}
 {% endblock content %}

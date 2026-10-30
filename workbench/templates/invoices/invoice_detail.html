@@ -1,179 +1,168 @@
 {% extends "generic/object_detail.html" %}
 {% load i18n workbench %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-      <h1>{{ object|h }} {% history_link object %}</h1>
-      <table class="table table-striped">
-        <tr>
-          <th class="text-end">{% translate 'contact person'|capfirst %}</th>
-          <td>{% link_or_none object.owned_by %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'customer'|capfirst %}</th>
-          <td>
-            {% link_or_none object.customer %}
-            {% if object.customer.notes %}
-              <div style="margin-top: 1rem; padding: 0.75rem 1rem; border: 1px solid #ccc">
-                <strong
-                >{% translate 'notes of the organization' %}:</strong><br>{{ object.customer.notes|linebreaksbr }}
-              </div>
-            {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'contact'|capfirst %}</th>
-          <td>{% link_or_none object.contact %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'project'|capfirst %}</th>
-          <td>{% link_or_none object.project %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'invoiced on'|capfirst %}</th>
-          <td>{{ object.invoiced_on|local_date_format }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'status'|capfirst %}</th>
-          <td>
-            {{ object.status_badge }}
-            {{ object.payment_notice|linebreaksbr }}
-          </td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'Payment reminders sent at' %}</th>
-          <td>
-            {% for day in object.payment_reminders_sent_at %}
-              {{ day|local_date_format }}{% if not forloop.last %},{% endif %}
-            {% empty %}{% translate 'None yet' %}
-            {% endfor %}
-          </td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'description'|capfirst %}</th>
-          <td>{{ object.description|linebreaksbr|default:"&ndash;" }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'Service period' %}</th>
-          <td>{{ object.service_period|default:"&ndash;" }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'postal address'|capfirst %}</th>
-          <td>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</td>
-        </tr>
-        {% if object.type == object.SERVICES %}
-          <tr>
-            <th class="text-end">{% translate 'services'|capfirst %}</th>
-            <td>
-              <table class="table">
-                {% for service in object.services.all %}
-                  <tr>
-                    <td>
-                      <strong>{{ service.title }} {% history_link service %}</strong>
-                      <br>
-                      {{ service.description|linebreaksbr }}
-                    </td>
-                    <td class="text-end">{{ service.service_cost|currency }}</td>
-                    <td>
-                      <a
-                        class="inline"
-                        href="{{ service.urls.update }}"
-                        data-ajaxmodal
-                      >{% include 'svg/pencil.svg' %}</a>
-                      <a
-                        class="inline"
-                        href="{{ service.urls.delete }}"
-                        data-ajaxmodal
-                      >{% include 'svg/trashcan.svg' %}</a>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </table>
-            </td>
-          </tr>
-        {% endif %}
-        <tr>
-          <th class="text-end">{% translate 'subtotal'|capfirst %}</th>
-          <td>{{ object.subtotal|currency }}</td>
-        </tr>
-        {% if object.discount %}
-          <tr>
-            <th class="text-end">{% translate 'discount'|capfirst %}</th>
-            <td>
-              -{{ object.discount|currency }}
-            </td>
-          </tr>
-        {% endif %}
-        {% if object.down_payment_total %}
-          <tr>
-            <th class="text-end">
-              {% translate 'down payment total'|capfirst %}
-            </th>
-            <td>
-              -{{ object.down_payment_total|currency }}
-            </td>
-          </tr>
-        {% endif %}
-        {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
-          <tr>
-            <th class="text-end">
-              {% translate 'total excl. tax'|capfirst %}
-            </th>
-            <td>
-              {{ object.total_excl_tax|currency }}
-            </td>
-          </tr>
-        {% endif %}
-        <tr>
-          <th class="text-end">
-            {{ object.total_title }}
-          </th>
-          <td>
-            {{ object.total|currency }}
-          </td>
-        </tr>
-        <tr>
-          <th class="text-end">
-            {% translate 'third party costs'|capfirst %}
-          </th>
-          <td>
-            {{ object.third_party_costs|currency }}
-          </td>
-        </tr>
-      </table>
-      <span class="btn-group">
-        <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-          PDF
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">
+        {{ object|h }}
+        {% history_link object %}
+        <span class="wb-title-badge">{{ object.status_badge }}</span>
+      </h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{% translate 'contact person'|capfirst %}</span>
+          {% link_or_none object.owned_by %}</span>
+        <span><span class="wb-meta-label">{% translate 'customer'|capfirst %}</span>
+          {% link_or_none object.customer %}</span>
+        <span><span class="wb-meta-label">{% translate 'contact'|capfirst %}</span>
+          {% link_or_none object.contact %}</span>
+        <span><span class="wb-meta-label">{% translate 'project'|capfirst %}</span>
+          {% link_or_none object.project %}</span>
+      </div>
+    </div>
+    <div class="wb-page-actions">
+      <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+        {% include 'svg/file-pdf.svg' %}
+        PDF
+      </a>
+      <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
+      {% if object.type == object.SERVICES %}
+        <a href="{{ object.urls.xlsx }}" class="btn btn-quiet">
+          {% include 'svg/desktop-download.svg' %}
+          {% translate 'logbook'|capfirst %} (XLSX)
         </a>
+      {% endif %}
+      <span class="dropdown">
         <button
           type="button"
-          class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+          class="btn btn-quiet btn-icon"
           data-bs-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
+          title="{% translate 'More actions' %}"
         >
-          <span class="visually-hidden">
-            Toggle Dropdown
-          </span>
+          {% include 'svg/kebab-horizontal.svg' %}
         </button>
         <div class="dropdown-menu dropdown-menu-end">
           <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
             {% translate 'Download' %}
           </a>
+          <div class="dropdown-divider"></div>
+          <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
         </div>
       </span>
-      {% if object.type == object.SERVICES %}
-        <a href="{{ object.urls.xlsx }}" class="btn btn-primary">
-          {% translate 'logbook'|capfirst %} (XLSX)
-        </a>
-      {% endif %}
-      <a href="{{ object.urls.update }}" class="btn btn-primary">
-        {% translate 'Update' %}
-      </a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">
-        {% translate 'Delete' %}
-      </a>
-      {% notes object %}
     </div>
   </div>
+
+  {% if object.customer.notes %}
+    <div class="alert alert-warning">
+      <strong>{% translate 'notes of the organization' %}:</strong><br>{{ object.customer.notes|linebreaksbr }}
+    </div>
+  {% endif %}
+
+  <div class="wb-stats mb-3">
+    <div class="wb-stat">
+      <div class="wb-stat-label">{{ object.total_title }}</div>
+      <div class="wb-stat-value">{{ object.total|currency }}</div>
+    </div>
+    <div class="wb-stat">
+      <div class="wb-stat-label">{% translate 'third party costs'|capfirst %}</div>
+      <div class="wb-stat-value">{{ object.third_party_costs|currency }}</div>
+    </div>
+    <div class="wb-stat">
+      <div class="wb-stat-label">{% translate 'invoiced on'|capfirst %}</div>
+      <div class="wb-stat-value">{{ object.invoiced_on|local_date_format|default:"&ndash;" }}</div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'Details' %}</div>
+        <div class="card-body">
+          <dl class="wb-fields">
+            {% if object.payment_notice %}
+              <dt>{% translate 'status'|capfirst %}</dt>
+              <dd>{{ object.payment_notice|linebreaksbr }}</dd>
+            {% endif %}
+            <dt>{% translate 'Payment reminders sent at' %}</dt>
+            <dd>
+              {% for day in object.payment_reminders_sent_at %}
+                {{ day|local_date_format }}{% if not forloop.last %},{% endif %}
+              {% empty %}{% translate 'None yet' %}
+              {% endfor %}
+            </dd>
+            <dt>{% translate 'Service period' %}</dt>
+            <dd>{{ object.service_period|default:"&ndash;" }}</dd>
+            <dt>{% translate 'postal address'|capfirst %}</dt>
+            <dd>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</dd>
+            <dt>{% translate 'description'|capfirst %}</dt>
+            <dd>{{ object.description|linebreaksbr|default:"&ndash;" }}</dd>
+          </dl>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-5">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'total'|capfirst %}</div>
+        <div class="card-body">
+          <dl class="wb-fields wb-amounts">
+            <dt>{% translate 'subtotal'|capfirst %}</dt>
+            <dd>{{ object.subtotal|currency }}</dd>
+            {% if object.discount %}
+              <dt>{% translate 'discount'|capfirst %}</dt>
+              <dd>-{{ object.discount|currency }}</dd>
+            {% endif %}
+            {% if object.down_payment_total %}
+              <dt>{% translate 'down payment total'|capfirst %}</dt>
+              <dd>-{{ object.down_payment_total|currency }}</dd>
+            {% endif %}
+            {% if object.liable_to_vat and object.subtotal != object.total_excl_tax %}
+              <dt>{% translate 'total excl. tax'|capfirst %}</dt>
+              <dd>{{ object.total_excl_tax|currency }}</dd>
+            {% endif %}
+            <dt>{{ object.total_title }}</dt>
+            <dd><strong>{{ object.total|currency }}</strong></dd>
+          </dl>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  {% if object.type == object.SERVICES %}
+    <section class="card mt-3">
+      <div class="card-header">{% translate 'services'|capfirst %}</div>
+      <div class="list-group list-group-flush">
+        {% for service in object.services.all %}
+          <div class="list-group-item d-flex justify-content-between align-items-start gap-3">
+            <div class="min-w-0">
+              <strong>{{ service.title }}</strong>
+              {% history_link service %}
+              {% if service.description %}
+                <div class="text-secondary">{{ service.description|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+            <div class="d-flex align-items-center gap-1 text-nowrap">
+              <span class="me-2 wb-tabular">{{ service.service_cost|currency }}</span>
+              <a
+                class="btn btn-quiet btn-sm btn-icon"
+                href="{{ service.urls.update }}"
+                title="{% translate 'Update' %}"
+                data-ajaxmodal
+              >{% include 'svg/pencil.svg' %}</a>
+              <a
+                class="btn btn-quiet btn-sm btn-icon"
+                href="{{ service.urls.delete }}"
+                title="{% translate 'Delete' %}"
+                data-ajaxmodal
+              >{% include 'svg/trashcan.svg' %}</a>
+            </div>
+          </div>
+        {% empty %}
+          <div class="list-group-item text-secondary">&ndash;</div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% notes object %}
 {% endblock content %}

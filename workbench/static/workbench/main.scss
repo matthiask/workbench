@@ -1277,3 +1277,13 @@ a:hover {
     overflow-wrap: anywhere;
   }
 }
+
+// Amounts adding up to a total, right-aligned
+.wb-amounts dd {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-tabular {
+  font-variant-numeric: tabular-nums;
+}
