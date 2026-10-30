@@ -283,10 +283,13 @@ Controlling, as tables or with `--json`:
     wb reports open-items --date 2026-09-30
 
 Hours of a period, this week by default. Periods are years (`2026`), months
-(`2026-09`) or quarters (`2026-Q3`), `--from` and `--until` override their
-start and end. `--user` (repeatable) and `--team` filter the users:
+(`2026-09`), quarters (`2026-Q3`) or relative to today (`last-week`,
+`this-month`, `next-quarter`, `last-year` etc.), `--from` and `--until`
+override their start and end. `--user` (repeatable) and `--team` filter the
+users:
 
     wb reports hours-per-customer --period 2026-Q3
+    wb reports hours-per-customer --period last-month
     wb reports hours-per-type --period 2026-09 --team Design
     wb reports green-hours --from 2026-09-01 --until 2026-09-15
     wb reports planning-vs-logbook --user mk

@@ -526,7 +526,9 @@ def _period_options(default):
         for option in reversed([
             click.option(
                 "--period",
-                help=f"Year (2026), month (2026-09) or quarter (2026-Q3), {default}.",
+                help="Year (2026), month (2026-09), quarter (2026-Q3) or relative:"
+                " last-, this- or next-week, -month, -quarter or -year;"
+                f" {default}.",
             ),
             click.option(
                 "--from",

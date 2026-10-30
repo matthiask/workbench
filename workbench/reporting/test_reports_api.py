@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
@@ -37,12 +38,37 @@ class ReportsAPITest(TestCase):
         data = self.get(url)
         self.assertEqual(data["date_from"], monday().isoformat())
 
-        for period in ["2026-13", "2026-Q5", "last month"]:
+        for period in ["2026-13", "2026-Q5", "last month", "2026-00"]:
             response = self.client.get(url, {"period": period})
             self.assertEqual(response.status_code, 422)
         response = self.client.get(
             url, {"period": "2026-09", "date_from": "2026-10-01"}
         )
+        self.assertEqual(response.status_code, 422)
+
+    @travel("2026-02-11 12:00")
+    def test_relative_periods(self):
+        """Periods relative to today"""
+        for period, expected in [
+            ("last-week", ("2026-02-02", "2026-02-08")),
+            ("this-week", ("2026-02-09", "2026-02-15")),
+            ("next-week", ("2026-02-16", "2026-02-22")),
+            ("last-month", ("2026-01-01", "2026-01-31")),
+            ("next-month", ("2026-03-01", "2026-03-31")),
+            ("last-quarter", ("2025-10-01", "2025-12-31")),
+            ("this-quarter", ("2026-01-01", "2026-03-31")),
+            ("next-quarter", ("2026-04-01", "2026-06-30")),
+            ("last-year", ("2025-01-01", "2025-12-31")),
+        ]:
+            with self.subTest(period=period):
+                data = self.get("/api/hours-per-customer/", period=period)
+                self.assertEqual((data["date_from"], data["date_until"]), expected)
+
+        data = self.get(
+            "/api/hours-per-customer/", period="last-month", date_from="2026-01-15"
+        )
+        self.assertEqual(data["date_from"], "2026-01-15")
+        response = self.client.get("/api/hours-per-customer/", {"period": "last-day"})
         self.assertEqual(response.status_code, 422)
 
     def test_users(self):

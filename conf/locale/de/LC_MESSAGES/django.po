@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 12:02+0100\n"
+"POT-Creation-Date: 2026-10-30 12:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5181,8 +5181,8 @@ msgid "Split timestamp"
 msgstr "Zeitmarke teilen"
 
 #: workbench/tools/api.py
-msgid "Expected a year, a month or a quarter like 2026-Q3."
-msgstr "Erwartet wird ein Jahr, ein Monat oder ein Quartal wie 2026-Q3."
+msgid "Expected a year, a month or a quarter like 2026-Q3, or a relative period like last-month."
+msgstr "Erwartet wird ein Jahr, ein Monat oder ein Quartal wie 2026-Q3, oder ein relativer Zeitraum wie last-month."
 
 #: workbench/tools/api.py
 msgid "Invalid month."
