@@ -528,8 +528,8 @@ def _page_options(fn):
     )(fn)
     return click.option(
         "--limit",
-        type=click.IntRange(1, 1000),
-        help="Results per page, defaults to 100, at most 1000.",
+        type=click.IntRange(1, 10000),
+        help="Results per page, defaults to 100, at most 10000.",
     )(fn)
 
 

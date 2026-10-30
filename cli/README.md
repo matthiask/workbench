@@ -6,7 +6,7 @@ takes optional search terms and filters such as `--project`, `--customer` or
 `--owned-by`; `show` takes an ID.
 
 Searches show 100 results by default and tell you when there are more.
-`--limit` (at most 1000) and `--offset` page through them, e.g.
+`--limit` (at most 10000) and `--offset` page through them, e.g.
 `wb invoices search --open --limit 50 --offset 50`. With `--json` the results
 are in `items` and `count` is the number of all matches.
 
