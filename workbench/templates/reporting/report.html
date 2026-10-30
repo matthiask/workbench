@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load fineforms %}
+{% load fineforms i18n %}
 {% comment %}
   Page layout of reports: the heading and actions in the page header, the
   filters in their own row, tables in cards (wb-table-card).
@@ -17,6 +17,32 @@
       {% if form %}
         <form method="get" class="form-search" data-autosubmit>
           {% ff_fields form %}
+          {% if form.periods %}
+            <span class="dropdown">
+              <button
+                class="btn btn-quiet dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                title="{% translate 'Set predefined period' %}"
+              >
+                {% include "svg/calendar.svg" %}
+                {% translate 'Period' %}
+              </button>
+              <div class="dropdown-menu">
+                {% for date_from, date_until, label in form.periods %}
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-set-period="{{ date_from }}:{{ date_until }}"
+                  >{{ label|capfirst }}</a>
+                {% endfor %}
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" data-set-period=":{{ form.today }}">{% translate 'Until today' %}</a>
+              </div>
+            </span>
+          {% endif %}
         </form>
       {% endif %}
     {% endblock filters %}

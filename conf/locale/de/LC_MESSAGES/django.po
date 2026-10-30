@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 17:13+0100\n"
+"POT-Creation-Date: 2026-10-30 17:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2191,8 +2191,8 @@ msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
 #: workbench/invoices/models.py workbench/projects/forms.py
-#: workbench/reporting/views.py workbench/templates/base.html
-#: workbench/templates/start.html workbench/templates/timestamps.html
+#: workbench/templates/base.html workbench/templates/start.html
+#: workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
 
@@ -3697,14 +3697,6 @@ msgid "Date until"
 msgstr "Datum bis"
 
 #: workbench/reporting/views.py
-msgid "Set predefined period"
-msgstr "Vordefinierte Periode setzen"
-
-#: workbench/reporting/views.py
-msgid "Set date"
-msgstr "Datum setzen"
-
-#: workbench/reporting/views.py
 #, python-format
 msgid "Invoices for the selected period may not be complete yet (cutoff: %(cutoff)s)."
 msgstr "Die Rechnungen für den gewählten Zeitraum sind möglicherweise noch nicht vollständig (Stichtag: %(cutoff)s)."
@@ -5015,6 +5007,18 @@ msgstr "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)"
 msgid "thereof planned"
 msgstr "davon geplant"
 
+#: workbench/templates/reporting/report.html
+msgid "Set predefined period"
+msgstr "Vordefinierte Periode setzen"
+
+#: workbench/templates/reporting/report.html
+msgid "Period"
+msgstr "Zeitraum"
+
+#: workbench/templates/reporting/report.html
+msgid "Until today"
+msgstr "Bis heute"
+
 #: workbench/templates/reporting/squeeze.html
 msgid "Squeeze"
 msgstr "Squeeze"
@@ -5486,6 +5490,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Set date"
+#~ msgstr "Datum setzen"
 
 #~ msgid "Facts"
 #~ msgstr "Fakten"

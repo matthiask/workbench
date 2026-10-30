@@ -8,7 +8,6 @@ from django import forms
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render
-from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from more_itertools import chunked
@@ -503,22 +502,12 @@ class DateRangeFilterForm(Form):
         data.setdefault("date_until", (monday() + dt.timedelta(days=6)).isoformat())
         super().__init__(data, *args, **kwargs)
 
-        self.fields["date_from"].help_text = format_html(
-            "{}: {}",
-            _("Set predefined period"),
-            format_html_join(
-                ", ", '<a href="#" data-set-period="{}:{}">{}</a>', date_ranges()
-            ),
-        )
-        self.fields["date_until"].help_text = format_html(
-            "{}: {}",
-            _("Set date"),
-            format_html_join(
-                ", ",
-                '<a href="#" data-field-value="{}">{}</a>',
-                [(dt.date.today().isoformat(), _("today"))],
-            ),
-        )
+    def periods(self):
+        """Predefined periods offered next to the date fields"""
+        return date_ranges()
+
+    def today(self):
+        return dt.date.today().isoformat()
 
 
 class LastMonthDateRangeFilterForm(DateRangeFilterForm):
