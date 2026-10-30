@@ -276,7 +276,7 @@
                   </td>
                 </tr>
               {% endfor %}
-              <tr class="fw-semibold">
+              <tr class="fw-semibold align-baseline">
                 <td>{% translate 'total'|capfirst %}</td>
                 <td class="text-end text-nowrap">{{ projected_invoices_total|currency }}</td>
                 <td class="text-end">
@@ -290,7 +290,7 @@
             <div class="card-body text-secondary">&ndash;</div>
           {% endif %}
           {% if projected_warning %}
-            <div class="card-body pt-2">
+            <div class="card-body {% if projected_invoices_timeline %}pt-2{% endif %}">
               {% if projected_warning == "no_projected" %}
                 <div class="alert alert-warning py-1 mb-0" role="alert">
                   {% translate "No projected invoices have been entered" %}

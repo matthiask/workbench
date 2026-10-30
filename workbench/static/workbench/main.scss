@@ -454,8 +454,11 @@ tbody th > a {
   overflow-wrap: break-word;
 }
 
+// Takes no room, also not in flex rows with gaps
 .anchor-container {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .anchor {
@@ -1092,6 +1095,7 @@ a:hover {
 
   .wb-row-actions {
     width: auto;
+    margin-left: auto;
   }
 }
 
