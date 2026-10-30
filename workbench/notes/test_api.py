@@ -57,6 +57,20 @@ class NotesAPITest(TestCase):
         ):
             self.assertEqual(ids(), [on_deal.pk])
 
+    def test_deleted_objects(self):
+        """Notes of deleted objects are left out"""
+        user = factories.UserFactory.create()
+        deal = factories.DealFactory.create()
+        Note.objects.create(
+            content_object=deal, created_by=user, title="Gone", description="Gone"
+        )
+        deal.delete()
+        self.client.force_login(user)
+
+        response = self.client.get("/api/notes/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
     def test_create(self):
         """Notes are added to exactly one object, its owner is notified"""
         deal = factories.DealFactory.create()

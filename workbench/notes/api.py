@@ -67,6 +67,18 @@ def _content_types(user):
     }
 
 
+def _visible(types):
+    """Notes of existing objects the user may see; deleting objects doesn't
+    delete their notes"""
+    q = Q(pk__in=[])
+    for content_type, key in types.items():
+        q |= Q(
+            content_type=content_type,
+            object_id__in=TARGETS[key][0].objects.values("pk"),
+        )
+    return q
+
+
 class NoteFilter(Schema):
     q: str = ""
     deal: int | None = None
@@ -79,10 +91,10 @@ class NoteFilter(Schema):
 def note_list(request, filters: Query[NoteFilter]):
     """Notes on deals and invoices, newest first, at most 200
 
-    Notes on objects which require features the user hasn't got are left
-    out."""
+    Notes on objects which require features the user hasn't got and notes of
+    deleted objects are left out."""
     types = _content_types(request.user)
-    notes = Note.objects.filter(content_type__in=types).select_related(
+    notes = Note.objects.filter(_visible(types)).select_related(
         "created_by", "content_type"
     )
     objects = Q()
