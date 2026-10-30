@@ -1484,3 +1484,11 @@ a.wb-row-title:hover {
 .wb-month-columns td:nth-child(2n + 6) {
   background: var(--wb-surface-muted);
 }
+
+// Rows introducing a section of a table, e.g. the months or a reason
+.wb-table-heading > th {
+  background: var(--wb-surface-muted);
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
