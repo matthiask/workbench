@@ -128,6 +128,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   projects (`_project()` in `workbench/timer/api.py`).
 - Short names (`User._short_name`) are unique when case folding, unless blank.
   APIs identify people by their short name and match it case-insensitively.
+- The planning import (`wb planning import`) adds entries without an `id`,
+  updates those with one (only the given fields) and deletes the IDs listed
+  in `delete_milestones` and `delete_planned_work`; the context has the IDs.
+  Single planned work is added, changed and deleted with `wb planning work
+  add/update/delete` (`/api/projects/<id>/planning/work/`,
+  `/api/planning/work/<id>/`). All of them validate with
+  `_apply_planned_work()` in `workbench/planning/api.py`.
 - The planning import prompt is pasted into external LLMs. Keep personal data
   out of it: people are identified by their short name only (no email
   addresses or full names, see `plannable_users()` in

@@ -342,6 +342,40 @@ planned_work:
         self.assertIn("Launch", result.output)
         self.assertIn("Dry run", result.output)
 
+    def test_planned_work(self):
+        """Planned work is added, changed and deleted one by one"""
+        factories.service_types()
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        result = self.wb(
+            "planning",
+            "work",
+            "add",
+            project.pk,
+            "--title",
+            "Concept",
+            "--user",
+            "ab",
+            "--service-type",
+            "consulting",
+            "--week",
+            monday().isoformat(),
+            "--hours",
+            8,
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        pw = project.planned_work.get()
+        self.assertTrue(pw.is_provisional)
+
+        result = self.wb("planning", "work", "update", pw.pk, "--definitive")
+        self.assertEqual(result.exit_code, 0, result.output)
+        pw.refresh_from_db()
+        self.assertFalse(pw.is_provisional)
+        self.assertEqual(self.wb("planning", "work", "update", pw.pk).exit_code, 1)
+
+        result = self.wb("planning", "work", "delete", pw.pk)
+        self.assertIn(f"Deleted planned work: {pw.pk}", result.output)
+        self.assertFalse(project.planned_work.exists())
+
     def test_logbook(self):
         """Services, logged hours and costs, absences and project statistics"""
         project = factories.ProjectFactory.create(owned_by=self.user)

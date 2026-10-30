@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Schema
 from ninja.errors import ValidationError
@@ -13,7 +14,12 @@ from workbench.awt.models import Absence
 from workbench.offers.models import Offer
 from workbench.planning.models import ExternalWork, Milestone, PlannedWork
 from workbench.planning.reporting import Planning
-from workbench.planning.schemas import PlanningImport, planning_import_schema
+from workbench.planning.schemas import (
+    PlannedWorkIn,
+    PlannedWorkPatch,
+    PlanningImport,
+    planning_import_schema,
+)
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
@@ -71,6 +77,7 @@ class MilestoneOut(Schema):
 
 
 class PlannedWorkOut(Schema):
+    id: int
     title: str
     user: str | None
     service_type: str | None
@@ -79,6 +86,7 @@ class PlannedWorkOut(Schema):
     weeks: list[dt.date]
     planned_hours: Decimal
     is_provisional: bool
+    notes: str
 
 
 class AbsenceOut(Schema):
@@ -167,6 +175,7 @@ def project_planning_context(project):
         "milestones": list(project.milestones.all()),
         "planned_work": [
             {
+                "id": pw.id,
                 "title": pw.title,
                 "user": short_names.get(pw.user_id),
                 "service_type": pw.service_type.title if pw.service_type else None,
@@ -175,6 +184,7 @@ def project_planning_context(project):
                 "weeks": sorted(pw.weeks),
                 "planned_hours": pw.planned_hours,
                 "is_provisional": pw.is_provisional,
+                "notes": pw.notes,
             }
             for pw in project.planned_work.select_related(
                 "service_type", "offer__project"
@@ -218,7 +228,7 @@ class ImportedPlannedWork(Schema):
     id: int | None
     title: str
     user: str
-    service_type: str
+    service_type: str | None
     offer: str | None
     milestone: str | None
     weeks: list[dt.date]
@@ -234,6 +244,8 @@ class ImportWarning(Schema):
 class ImportResult(Schema):
     milestones: list[ImportedMilestone]
     planned_work: list[ImportedPlannedWork]
+    deleted_milestones: list[int] = []
+    deleted_planned_work: list[int] = []
     warnings: list[ImportWarning]
 
 
@@ -241,135 +253,113 @@ def _hours(value):
     return Decimal(str(value)).quantize(Decimal("0.1"))
 
 
-@router.post("/projects/{project_id}/planning/import/", response=ImportResult)
-def planning_import(
-    request, project_id: int, data: PlanningImport, *, dry_run: bool = False
+def _lookups(project):
+    """What planned work of the project may refer to"""
+    return {
+        "users": {
+            short_name.casefold(): user
+            for short_name, user in plannable_users().items()
+        },
+        "service_types": {st.title: st for st in ServiceType.objects.all()},
+        "offers": {
+            offer.code: offer
+            for offer in project.offers.exclude(status=Offer.DECLINED).select_related(
+                "project"
+            )
+        },
+        "milestones": {m.pk: m for m in project.milestones.all()},
+    }
+
+
+def _apply_planned_work(  # noqa: C901
+    pw, values, lookups, *, new_milestones, loc, errors, warnings
 ):
-    """Add milestones and planned work to the project
+    """Set the given fields of planned work, shared by the import and the
+    endpoints changing single planned work"""
+    for field in ["title", "notes", "is_provisional"]:
+        if field in values:
+            setattr(pw, field, values[field])
+    if "weeks" in values:
+        pw.weeks = sorted({monday(week) for week in values["weeks"]})
+    if "planned_hours" in values:
+        pw.planned_hours = _hours(values["planned_hours"])
 
-    Nothing is saved if anything is invalid or with ``dry_run``."""
-    project = get_object_or_404(Project, pk=project_id)
-    users_casefolded = {
-        short_name.casefold(): user for short_name, user in plannable_users().items()
-    }
-    service_types = {st.title: st for st in ServiceType.objects.all()}
-    offers = {
-        offer.code: offer
-        for offer in project.offers.exclude(status=Offer.DECLINED).select_related(
-            "project"
-        )
-    }
-    existing_milestones = {m.pk: m for m in project.milestones.all()}
-    errors = []
-    warnings = []
-
-    milestones = {}
-    for index, item in enumerate(data.milestones):
-        loc = ["body", "data", "milestones", index]
-        if item.key in milestones:
-            errors.append({
-                "loc": [*loc, "key"],
-                "msg": _("Duplicate milestone key %r.") % item.key,
-            })
-        milestone = Milestone(
-            project=project,
-            title=item.title,
-            date=item.date,
-            phase_starts_on=item.phase_starts_on,
-            estimated_total_hours=_hours(item.estimated_total_hours),
-        )
-        full_clean(milestone, loc, errors)
-        milestones[item.key] = milestone
-
-    planned_work = []
-    for index, item in enumerate(data.planned_work):
-        loc = ["body", "data", "planned_work", index]
-        pw = PlannedWork(
-            project=project,
-            created_by=request.user,
-            title=item.title,
-            notes=item.notes,
-            weeks=sorted({monday(week) for week in item.weeks}),
-            planned_hours=_hours(item.planned_hours),
-            is_provisional=item.is_provisional,
-        )
-
-        if user := users_casefolded.get(item.user.casefold()):
+    if "user" in values:
+        if user := lookups["users"].get(values["user"].casefold()):
             pw.user = user
         else:
             errors.append({
                 "loc": [*loc, "user"],
-                "msg": _("Unknown or inactive user %r.") % item.user,
+                "msg": _("Unknown or inactive user %r.") % values["user"],
             })
 
-        if service_type := service_types.get(item.service_type):
+    if "service_type" in values:
+        if service_type := lookups["service_types"].get(values["service_type"]):
             pw.service_type = service_type
         else:
             errors.append({
                 "loc": [*loc, "service_type"],
-                "msg": _("Unknown service type %r.") % item.service_type,
+                "msg": _("Unknown service type %r.") % values["service_type"],
             })
 
-        if item.offer is not None:
-            if offer := offers.get(item.offer):
-                pw.offer = offer
-            else:
-                errors.append({
-                    "loc": [*loc, "offer"],
-                    "msg": _("Unknown or declined offer %r.") % item.offer,
-                })
+    if "offer" in values:
+        if values["offer"] is None:
+            pw.offer = None
+        elif offer := lookups["offers"].get(values["offer"]):
+            pw.offer = offer
+        else:
+            errors.append({
+                "loc": [*loc, "offer"],
+                "msg": _("Unknown or declined offer %r.") % values["offer"],
+            })
 
-        if item.milestone is not None:
-            if milestone := (
-                milestones.get(item.milestone)
-                if isinstance(item.milestone, str)
-                else existing_milestones.get(item.milestone)
-            ):
-                pw.milestone = milestone
-                if after := [w for w in pw.weeks if w >= monday(milestone.date)]:
-                    warnings.append({
-                        "loc": [*loc, "weeks"],
-                        "msg": _(
-                            "Work is planned in or after the week of the"
-                            " milestone %(milestone)r: %(weeks)s"
-                        )
-                        % {
-                            "milestone": milestone.title,
-                            "weeks": ", ".join(week.isoformat() for week in after),
-                        },
-                    })
-            else:
-                errors.append({
-                    "loc": [*loc, "milestone"],
-                    "msg": _("Unknown milestone %r.") % item.milestone,
-                })
+    if "milestone" in values:
+        key = values["milestone"]
+        if key is None:
+            pw.milestone = None
+        elif milestone := (
+            new_milestones.get(key)
+            if isinstance(key, str)
+            else lookups["milestones"].get(key)
+        ):
+            pw.milestone = milestone
+        else:
+            errors.append({
+                "loc": [*loc, "milestone"],
+                "msg": _("Unknown milestone %r.") % key,
+            })
 
-        full_clean(
-            pw,
-            loc,
-            errors,
-            exclude=["user", "service_type", "offer", "milestone", "created_by"],
-        )
-        planned_work.append(pw)
+    if pw.milestone and pw.weeks:
+        if after := [w for w in pw.weeks if w >= monday(pw.milestone.date)]:
+            warnings.append({
+                "loc": [*loc, "weeks"],
+                "msg": _(
+                    "Work is planned in or after the week of the"
+                    " milestone %(milestone)r: %(weeks)s"
+                )
+                % {
+                    "milestone": pw.milestone.title,
+                    "weeks": ", ".join(week.isoformat() for week in after),
+                },
+            })
 
-    if errors:
-        raise ValidationError(errors)
+    full_clean(
+        pw,
+        loc,
+        errors,
+        exclude=["user", "service_type", "offer", "milestone", "created_by"],
+    )
 
-    if not dry_run:
-        with transaction.atomic():
-            for milestone in milestones.values():
-                milestone.save()
-            for pw in planned_work:
-                pw.save()
 
+def _import_result(*, milestones=(), planned_work=(), warnings=(), **deleted):
     return {
-        "milestones": list(milestones.values()),
+        "milestones": list(milestones),
         "planned_work": [
             {
                 "id": pw.pk,
                 "title": pw.title,
-                "user": pw.user.get_full_name(),
-                "service_type": pw.service_type.title,
+                "user": pw.user.get_short_name(),
+                "service_type": pw.service_type.title if pw.service_type else None,
                 "offer": pw.offer.code if pw.offer else None,
                 "milestone": pw.milestone.title if pw.milestone else None,
                 "weeks": pw.weeks,
@@ -378,8 +368,186 @@ def planning_import(
             }
             for pw in planned_work
         ],
-        "warnings": warnings,
+        "warnings": list(warnings),
+        **deleted,
     }
+
+
+def _existing(objects, ids, loc, errors, what):
+    """The objects of the project with the given IDs"""
+    found = []
+    for index, pk in enumerate(ids):
+        if pk in objects:
+            found.append(objects[pk])
+        else:
+            errors.append({
+                "loc": [*loc, index],
+                "msg": _("%(what)s %(id)s doesn't belong to this project.")
+                % {"what": capfirst(what), "id": pk},
+            })
+    return found
+
+
+@router.post("/projects/{project_id}/planning/import/", response=ImportResult)
+def planning_import(
+    request, project_id: int, data: PlanningImport, *, dry_run: bool = False
+):
+    """Add, update and delete milestones and planned work of the project
+
+    Entries with an ``id`` update existing ones (only the given fields),
+    entries without add new ones. Nothing is deleted unless listed in
+    ``delete_milestones`` or ``delete_planned_work``. Nothing is saved if
+    anything is invalid or with ``dry_run``."""
+    project = get_object_or_404(Project, pk=project_id)
+    lookups = _lookups(project)
+    existing_work = {pw.pk: pw for pw in project.planned_work.all()}
+    errors = []
+    warnings = []
+
+    milestones = []
+    new_milestones = {}
+    for index, item in enumerate(data.milestones):
+        loc = ["body", "data", "milestones", index]
+        if item.id is not None:
+            if not (milestone := lookups["milestones"].get(item.id)):
+                errors.append({
+                    "loc": [*loc, "id"],
+                    "msg": _("Unknown milestone %r.") % item.id,
+                })
+                continue
+        else:
+            milestone = Milestone(project=project)
+        if item.key is not None:
+            if item.key in new_milestones:
+                errors.append({
+                    "loc": [*loc, "key"],
+                    "msg": _("Duplicate milestone key %r.") % item.key,
+                })
+            new_milestones[item.key] = milestone
+        milestone.title = item.title
+        milestone.date = item.date
+        milestone.phase_starts_on = item.phase_starts_on
+        milestone.estimated_total_hours = _hours(item.estimated_total_hours)
+        full_clean(milestone, loc, errors)
+        milestones.append(milestone)
+
+    planned_work = []
+    for index, item in enumerate(data.planned_work):
+        loc = ["body", "data", "planned_work", index]
+        if item.id is not None:
+            if not (pw := existing_work.get(item.id)):
+                errors.append({
+                    "loc": [*loc, "id"],
+                    "msg": _("Unknown planned work %r.") % item.id,
+                })
+                continue
+            values = item.model_dump(exclude={"id"}, exclude_unset=True)
+        else:
+            pw = PlannedWork(project=project, created_by=request.user)
+            values = item.model_dump(exclude={"id"})
+        _apply_planned_work(
+            pw,
+            values,
+            lookups,
+            new_milestones=new_milestones,
+            loc=loc,
+            errors=errors,
+            warnings=warnings,
+        )
+        planned_work.append(pw)
+
+    delete_milestones = _existing(
+        lookups["milestones"],
+        data.delete_milestones,
+        ["body", "data", "delete_milestones"],
+        errors,
+        _("milestone"),
+    )
+    delete_work = _existing(
+        existing_work,
+        data.delete_planned_work,
+        ["body", "data", "delete_planned_work"],
+        errors,
+        _("planned work"),
+    )
+
+    if errors:
+        raise ValidationError(errors)
+
+    if not dry_run:
+        with transaction.atomic():
+            for milestone in milestones:
+                milestone.save()
+            for pw in planned_work:
+                pw.save()
+            for pw in delete_work:
+                pw.delete()
+            for milestone in delete_milestones:
+                milestone.delete()
+
+    return _import_result(
+        milestones=milestones,
+        planned_work=planned_work,
+        warnings=warnings,
+        deleted_milestones=data.delete_milestones,
+        deleted_planned_work=data.delete_planned_work,
+    )
+
+
+@router.post("/projects/{project_id}/planning/work/", response=ImportResult)
+def planned_work_create(
+    request, project_id: int, data: PlannedWorkIn, *, dry_run: bool = False
+):
+    """Add planned work to the project"""
+    if data.id is not None:
+        raise ValidationError([
+            {"loc": ["body", "data", "id"], "msg": _("Use PATCH to update work.")}
+        ])
+    project = get_object_or_404(Project, pk=project_id)
+    return planning_import(
+        request,
+        project.pk,
+        PlanningImport(planned_work=[data]),
+        dry_run=dry_run,
+    )
+
+
+def _planned_work(work_id):
+    return get_object_or_404(PlannedWork.objects.select_related("project"), pk=work_id)
+
+
+@router.patch("/planning/work/{int:work_id}/", response=ImportResult)
+def planned_work_update(
+    request, work_id: int, data: PlannedWorkPatch, *, dry_run: bool = False
+):
+    """Change single fields of planned work"""
+    pw = _planned_work(work_id)
+    values = data.model_dump(exclude_unset=True)
+    errors = []
+    warnings = []
+    _apply_planned_work(
+        pw,
+        values,
+        _lookups(pw.project),
+        new_milestones={},
+        loc=["body", "data"],
+        errors=errors,
+        warnings=warnings,
+    )
+    if errors:
+        raise ValidationError(errors)
+    if not dry_run:
+        pw.save()
+    return _import_result(planned_work=[pw], warnings=warnings)
+
+
+@router.delete("/planning/work/{int:work_id}/", response=ImportResult)
+def planned_work_delete(request, work_id: int, *, dry_run: bool = False):
+    """Delete planned work"""
+    pw = _planned_work(work_id)
+    if not dry_run:
+        pw.delete()
+    return _import_result(deleted_planned_work=[work_id])
 
 
 class PlanningExportFilter(DateRangeFilter, UsersFilter):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:17+0100\n"
+"POT-Creation-Date: 2026-10-30 22:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2931,13 +2931,13 @@ msgstr "%s zu Projekt kopieren"
 
 #: workbench/planning/api.py
 #, python-format
-msgid "Duplicate milestone key %r."
-msgstr "Doppelter Meilenstein-Schlüssel %r."
+msgid "Unknown or declined offer %r."
+msgstr "Unbekannte oder abgelehnte Offerte %r."
 
 #: workbench/planning/api.py
 #, python-format
-msgid "Unknown or declined offer %r."
-msgstr "Unbekannte oder abgelehnte Offerte %r."
+msgid "Unknown milestone %r."
+msgstr "Unbekannter Meilenstein %r."
 
 #: workbench/planning/api.py
 #, python-format
@@ -2945,9 +2945,38 @@ msgid "Work is planned in or after the week of the milestone %(milestone)r: %(we
 msgstr "Arbeit ist in oder nach der Woche des Meilensteins %(milestone)r geplant: %(weeks)s"
 
 #: workbench/planning/api.py
+msgid "%(what)s %(id)s doesn't belong to this project."
+msgstr "%(what)s %(id)s gehört nicht zu diesem Projekt."
+
+#: workbench/planning/api.py
 #, python-format
-msgid "Unknown milestone %r."
-msgstr "Unbekannter Meilenstein %r."
+msgid "Duplicate milestone key %r."
+msgstr "Doppelter Meilenstein-Schlüssel %r."
+
+#: workbench/planning/api.py
+#, python-format
+msgid "Unknown planned work %r."
+msgstr "Unbekannte geplante Arbeit %r."
+
+#: workbench/planning/api.py workbench/planning/models.py
+#: workbench/templates/planning/_new_dropdown.html
+#: workbench/templates/planning/planning_import.html
+msgid "milestone"
+msgstr "Meilenstein"
+
+#: workbench/planning/api.py workbench/planning/forms.py
+#: workbench/planning/models.py workbench/templates/base.html
+#: workbench/templates/planning/campaign_planning.html
+#: workbench/templates/planning/planning_import.html
+#: workbench/templates/planning/project_planning.html
+#: workbench/templates/planning/team_planning.html
+#: workbench/templates/planning/user_planning.html
+msgid "planned work"
+msgstr "geplante Arbeit"
+
+#: workbench/planning/api.py
+msgid "Use PATCH to update work."
+msgstr "Bestehende Arbeit mit PATCH ändern."
 
 #: workbench/planning/forms.py
 msgid "red"
@@ -3006,16 +3035,6 @@ msgstr "Der Meilenstein ist geplant am %(date)s, aber Arbeit ist geplant in der 
 msgid "The selected offer is declined."
 msgstr "Die ausgewählte Offerte ist abgelehnt."
 
-#: workbench/planning/forms.py workbench/planning/models.py
-#: workbench/templates/base.html
-#: workbench/templates/planning/campaign_planning.html
-#: workbench/templates/planning/planning_import.html
-#: workbench/templates/planning/project_planning.html
-#: workbench/templates/planning/team_planning.html
-#: workbench/templates/planning/user_planning.html
-msgid "planned work"
-msgstr "geplante Arbeit"
-
 #: workbench/planning/forms.py
 msgid "Move by weeks"
 msgstr "Um Wochen verschieben"
@@ -3053,11 +3072,6 @@ msgstr "Geplante Arbeit, die zu diesem Meilenstein gehört, wird in dieser Farbe
 #: workbench/templates/planning/planning_import.html
 msgid "planned hours"
 msgstr "geplante Stunden"
-
-#: workbench/planning/models.py workbench/templates/planning/_new_dropdown.html
-#: workbench/templates/planning/planning_import.html
-msgid "milestone"
-msgstr "Meilenstein"
 
 #: workbench/planning/models.py
 #: workbench/templates/planning/planning_import.html

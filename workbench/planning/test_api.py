@@ -62,8 +62,8 @@ class PlanningAPITest(TestCase):
         self.assertNotIn("@", str(data))
 
         work = data["import_schema"]["$defs"]["PlannedWorkIn"]["properties"]
-        self.assertEqual(work["user"]["enum"], short_names)
-        self.assertIn(service_type.title, work["service_type"]["enum"])
+        self.assertEqual(work["user"]["anyOf"][0]["enum"], short_names)
+        self.assertIn(service_type.title, work["service_type"]["anyOf"][0]["enum"])
         self.assertEqual(work["offer"]["anyOf"][0]["enum"], [offer.code])
 
         self.assertEqual(
@@ -279,3 +279,105 @@ class PlanningAPITest(TestCase):
         data = self.client.get("/api/planning/export/", {"project": 0}).json()
         self.assertEqual(data["since"], None)
         self.assertEqual(data["planned_work"], [])
+
+    def test_update_and_delete_by_import(self):
+        """Entries with an ID update existing ones, deletions are explicit"""
+        project = factories.ProjectFactory.create()
+        factories.service_types()
+        milestone = factories.MilestoneFactory.create(project=project, date=in_days(60))
+        pw = factories.PlannedWorkFactory.create(
+            project=project, weeks=[monday()], planned_hours=10, is_provisional=True
+        )
+        doomed = factories.PlannedWorkFactory.create(project=project, weeks=[monday()])
+        other = factories.PlannedWorkFactory.create(weeks=[monday()])
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/planning/import/"
+
+        # The context has the IDs for the round trip
+        context = self.client.get(f"/api/projects/{project.pk}/planning/context/")
+        self.assertEqual(
+            {row["id"] for row in context.json()["planned_work"]}, {pw.pk, doomed.pk}
+        )
+
+        response = self.client.post(
+            url,
+            {
+                "milestones": [
+                    {
+                        "id": milestone.pk,
+                        "title": "Launch",
+                        "date": in_days(70).isoformat(),
+                    }
+                ],
+                "planned_work": [{"id": pw.pk, "is_provisional": False}],
+                "delete_planned_work": [doomed.pk],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        pw.refresh_from_db()
+        milestone.refresh_from_db()
+        self.assertFalse(pw.is_provisional)
+        self.assertEqual(pw.planned_hours, 10)  # Left out, kept
+        self.assertEqual(milestone.title, "Launch")
+        self.assertFalse(project.planned_work.filter(pk=doomed.pk).exists())
+
+        # Other projects' work can't be changed or deleted through this project
+        response = self.client.post(
+            url,
+            {
+                "planned_work": [{"id": other.pk, "is_provisional": False}],
+                "delete_planned_work": [other.pk],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(len(response.json()["detail"]), 2)
+
+    def test_single_planned_work(self):
+        """Planned work is added, changed and deleted one by one"""
+        project = factories.ProjectFactory.create()
+        factories.service_types()
+        user = project.owned_by
+        self.client.force_login(user)
+
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/work/",
+            {
+                "title": "Concept",
+                "user": user._short_name,
+                "service_type": "consulting",
+                "weeks": [monday().isoformat()],
+                "planned_hours": 8,
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        (created,) = response.json()["planned_work"]
+        self.assertTrue(created["is_provisional"])
+        url = f"/api/planning/work/{created['id']}/"
+
+        response = self.client.patch(
+            url,
+            {
+                "is_provisional": False,
+                "weeks": [(monday() + dt.timedelta(days=7)).isoformat()],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        (updated,) = response.json()["planned_work"]
+        self.assertFalse(updated["is_provisional"])
+        self.assertEqual(updated["title"], "Concept")
+        self.assertEqual(updated["planned_hours"], "8.0")
+
+        response = self.client.patch(
+            url, {"user": "nobody"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+
+        response = self.client.delete(url + "?dry_run=true")
+        self.assertEqual(response.json()["deleted_planned_work"], [created["id"]])
+        self.assertTrue(project.planned_work.exists())
+        self.client.delete(url)
+        self.assertFalse(project.planned_work.exists())

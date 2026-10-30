@@ -1,6 +1,6 @@
 ---
 name: workbench-planning
-description: Plan a Workbench project (milestones and planned work per person and week) from its offers and a timeline using the `wb` CLI, or look at the planning and the capacity of people and teams. Use when the user wants to plan, schedule or staff a project in Workbench, or asks who has time when.
+description: Plan a Workbench project (milestones and planned work per person and week) from its offers and a timeline using the `wb` CLI, change existing planned work (e.g. make provisional work definitive once a deal is won, move or remove it), or look at the planning and the capacity of people and teams. Use when the user wants to plan, schedule, reschedule or staff a project in Workbench, or asks who has time when.
 ---
 
 # Planning Workbench projects
@@ -50,7 +50,10 @@ does what. Then write the plan as YAML to the scratchpad, e.g.
 - Only use the listed people (by short name), service types and offers (by
   code). Planned work references new milestones by their key and existing
   ones by their ID.
-- The import only adds; don't repeat existing milestones or planned work.
+- New entries have no `id`. To change existing milestones or planned work,
+  include them with their `id` from the context and only the fields to
+  change; to remove them, list their IDs in `delete_milestones` or
+  `delete_planned_work`. Nothing else is changed or deleted.
 - Estimate the hours from the offers' services, they should add up to the
   offered hours.
 - Mark work as provisional (`is_provisional: true`) unless the user says it's
@@ -69,5 +72,22 @@ week of its milestone. Check the capacity yourself with `wb planning export`
 
     wb planning import <project_id> <scratchpad>/plan.yaml
 
-Importing never changes or removes existing entries; changes to existing
-planned work are made in Workbench.
+## Changing single planned work
+
+Find the IDs with `wb planning context <project_id>` or `wb planning export
+--project <project_id>`. Show the change and use `--dry-run` first, change
+only after the user approves:
+
+    wb planning work update <id> --definitive              # The customer decided
+    wb planning work update <id> --week 2026-11-02 --week 2026-11-09 --hours 12
+    wb planning work update <id> --user <short name> --clear-milestone
+    wb planning work add <project_id> --title "Concept" --user <short name> \
+        --service-type "<service type>" --week <monday> --hours 8
+    wb planning work delete <id>
+
+`--week` takes any day of a week and can be repeated, giving `--week`
+replaces all weeks. New work is provisional unless `--definitive` is given.
+
+When a deal is won or lost (see the workbench-deals skill), look for
+provisional planned work on the offers related to the deal and offer to make
+it definitive or to delete it.
