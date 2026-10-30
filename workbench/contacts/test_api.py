@@ -20,6 +20,9 @@ class ContactsAPITest(TestCase):
 
         data = self.client.get("/api/contacts/organizations/?q=beispiel").json()
         self.assertEqual([o["id"] for o in data], [organization.pk])
+        self.assertEqual(
+            data[0]["url"], f"http://testserver{organization.get_absolute_url()}"
+        )
         data = self.client.get(
             "/api/contacts/organizations/?q=beispiel&include_archived=true"
         ).json()
@@ -28,7 +31,14 @@ class ContactsAPITest(TestCase):
         data = self.client.get("/api/contacts/people/?q=muster").json()
         self.assertEqual(data[0]["id"], person.pk)
         self.assertEqual(data[0]["full_name"], "Hans Muster")
+        self.assertEqual(
+            data[0]["url"], f"http://testserver{person.get_absolute_url()}"
+        )
         self.assertEqual(data[0]["organization"]["name"], "Beispiel")
+        self.assertEqual(
+            data[0]["organization"]["url"],
+            f"http://testserver{organization.get_absolute_url()}",
+        )
         data = self.client.get(
             f"/api/contacts/people/?organization={organization.pk}"
         ).json()
@@ -51,7 +61,14 @@ class ContactsAPITest(TestCase):
         self.assertEqual(data["name"], person.organization.name)
         self.assertEqual(
             data["people"],
-            [{"id": person.pk, "full_name": "Hans Muster", "is_archived": False}],
+            [
+                {
+                    "id": person.pk,
+                    "url": f"http://testserver{person.get_absolute_url()}",
+                    "full_name": "Hans Muster",
+                    "is_archived": False,
+                }
+            ],
         )
 
         data = self.client.get(f"/api/contacts/people/{person.pk}/").json()

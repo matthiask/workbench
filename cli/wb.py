@@ -288,7 +288,7 @@ def _echo_fields(title, fields, *, url=None):
     grid.add_column()
     for label, value in fields:
         if value:
-            grid.add_row(label, str(value))
+            grid.add_row(label, value if isinstance(value, Text) else str(value))
     console.print(grid)
 
 
@@ -791,9 +791,10 @@ def search_contacts(query, include_archived, as_json):
         return
     table = _table("ID>", "Organization", title="Organizations")
     for organization in organizations:
+        url = organization.get("url")
         table.add_row(
-            str(organization["id"]),
-            organization["name"]
+            _link(organization["id"], url),
+            _link(organization["name"], url)
             + (" (archived)" if organization["is_archived"] else ""),
         )
     console.print(table)
@@ -801,10 +802,11 @@ def search_contacts(query, include_archived, as_json):
     for person in people:
         organization = person["organization"] or {}
         table.add_row(
-            str(person["id"]),
-            person["full_name"] + (" (archived)" if person["is_archived"] else ""),
-            str(organization.get("id", "")),
-            organization.get("name", ""),
+            _link(person["id"], person.get("url")),
+            _link(person["full_name"], person.get("url"))
+            + (" (archived)" if person["is_archived"] else ""),
+            _link(organization.get("id", ""), organization.get("url")),
+            _link(organization.get("name", ""), organization.get("url")),
         )
     console.print(table)
 
@@ -839,8 +841,9 @@ def show_organization(organization_id, as_json):
     table = _table("ID>", "Name", title="People")
     for person in data["people"]:
         table.add_row(
-            str(person["id"]),
-            person["full_name"] + (" (archived)" if person["is_archived"] else ""),
+            _link(person["id"], person.get("url")),
+            _link(person["full_name"], person.get("url"))
+            + (" (archived)" if person["is_archived"] else ""),
         )
     console.print(table)
 
@@ -930,7 +933,10 @@ def _echo_person(data):
         data["full_name"] + (" (archived)" if data["is_archived"] else ""),
         [
             ("ID", data["id"]),
-            ("Organization", organization.get("name")),
+            (
+                "Organization",
+                _link(organization.get("name", ""), organization.get("url")),
+            ),
             ("Organization ID", organization.get("id")),
             ("Salutation", data["salutation"]),
             ("Primary contact", data["primary_contact"]),

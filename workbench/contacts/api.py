@@ -20,15 +20,46 @@ router = Router(tags=["contacts"])
 
 class OrganizationOut(Schema):
     id: int
+    url: str
     name: str
     is_archived: bool
 
 
-class PersonOut(Schema):
+class PersonSummary(Schema):
     id: int
+    url: str
     full_name: str
-    organization: OrganizationOut | None
     is_archived: bool
+
+
+class PersonOut(PersonSummary):
+    organization: OrganizationOut | None
+
+
+def organization_out(organization, request):
+    return {
+        "id": organization.id,
+        "url": request.build_absolute_uri(organization.get_absolute_url()),
+        "name": organization.name,
+        "is_archived": organization.is_archived,
+    }
+
+
+def person_summary(person, request):
+    return {
+        "id": person.id,
+        "url": request.build_absolute_uri(person.get_absolute_url()),
+        "full_name": person.full_name,
+        "is_archived": person.is_archived,
+    }
+
+
+def person_list_out(person, request):
+    return person_summary(person, request) | {
+        "organization": organization_out(person.organization, request)
+        if person.organization
+        else None
+    }
 
 
 @router.get("/contacts/organizations/", response=list[OrganizationOut])
@@ -39,7 +70,9 @@ def organization_list(request, q: str = "", *, include_archived: bool = False):
         organizations = organizations.active()
     if q:
         organizations = organizations.search(q)
-    return organizations[:50]
+    return [
+        organization_out(organization, request) for organization in organizations[:50]
+    ]
 
 
 @router.get("/contacts/people/", response=list[PersonOut])
@@ -58,17 +91,10 @@ def person_list(
         people = people.filter(organization=organization)
     if q:
         people = people.search(q)
-    return people[:50]
-
-
-class PersonSummary(Schema):
-    id: int
-    full_name: str
-    is_archived: bool
+    return [person_list_out(person, request) for person in people[:50]]
 
 
 class OrganizationDetail(OrganizationOut):
-    url: str
     is_private_person: bool
     notes: str
     primary_contact: str
@@ -83,16 +109,14 @@ def organization_detail(request, organization_id: int):
     organization = get_object_or_404(
         Organization.objects.select_related("primary_contact"), pk=organization_id
     )
-    return {
-        "id": organization.id,
-        "url": request.build_absolute_uri(organization.get_absolute_url()),
-        "name": organization.name,
-        "is_archived": organization.is_archived,
+    return organization_out(organization, request) | {
         "is_private_person": organization.is_private_person,
         "notes": organization.notes,
         "primary_contact": organization.primary_contact.get_short_name(),
         "groups": [group.title for group in organization.groups.all()],
-        "people": organization.people.all(),
+        "people": [
+            person_summary(person, request) for person in organization.people.all()
+        ],
     }
 
 
@@ -102,7 +126,6 @@ class ContactDetail(Schema):
 
 
 class PersonDetailOut(PersonOut):
-    url: str
     salutation: str
     notes: str
     primary_contact: str
@@ -124,12 +147,7 @@ def person_detail(request, person_id: int):
 
 
 def person_out(person, request):
-    return {
-        "id": person.id,
-        "url": request.build_absolute_uri(person.get_absolute_url()),
-        "full_name": person.full_name,
-        "organization": person.organization,
-        "is_archived": person.is_archived,
+    return person_list_out(person, request) | {
         "salutation": person.salutation,
         "notes": person.notes,
         "primary_contact": person.primary_contact.get_short_name(),
