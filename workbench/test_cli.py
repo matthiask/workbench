@@ -14,7 +14,6 @@ from click.testing import CliRunner
 from django.test import Client, TestCase
 from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
-from rich.console import Console
 
 from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
@@ -50,17 +49,15 @@ class CLITest(TestCase):
         self.addCleanup(directory.cleanup)
         self.directory = Path(directory.name)
         for patcher in [
-            patch.object(wb.requests, "request", self.request),
-            patch.object(wb, "CONFIG", self.directory / "workbench.toml"),
-            patch.object(wb, "BUG_REPORTS", self.directory / "reports"),
-            patch.object(wb, "CACHE", self.directory / "cache"),
-            patch.object(
-                wb, "console", Console(markup=False, highlight=False, width=250)
-            ),
+            patch.object(wb.core.requests, "request", self.request),
+            patch.object(wb.core, "CONFIG", self.directory / "workbench.toml"),
+            patch.object(wb.core, "BUG_REPORTS", self.directory / "reports"),
+            patch.object(wb.core, "CACHE", self.directory / "cache"),
+            patch.object(wb.core.console, "_width", 250),
         ]:
             patcher.start()
             self.addCleanup(patcher.stop)
-        wb._check_version.cache_clear()
+        wb.core._check_version.cache_clear()
 
     def tearDown(self):
         deactivate_all()
@@ -676,21 +673,21 @@ planned_work:
     def test_bug_reports(self):
         """Crashes and server errors write a bug report people can send"""
         person = factories.PersonFactory.create()
-        with patch.object(wb, "_echo_person", side_effect=KeyError("url")):
+        with patch.object(wb.contacts, "_echo_person", side_effect=KeyError("url")):
             result = self.wb("people", "show", person.pk, debug=False)
         self.assertEqual(result.exit_code, 1)
         self.assertIn("wb crashed (KeyError: 'url')", result.output)
         [report] = (self.directory / "reports").iterdir()
         self.assertIn(str(report), result.output)
         content = report.read_text()
-        self.assertIn(f"wb {wb.VERSION}", content)
+        self.assertIn(f"wb {wb.core.VERSION}", content)
         self.assertIn("Installation: http://testserver", content)
         self.assertIn(f"Command: wb people show {person.pk}", content)
         self.assertIn("Traceback", content)
         report.unlink()
 
         with (
-            patch.object(wb, "_echo_person", side_effect=KeyError("url")),
+            patch.object(wb.contacts, "_echo_person", side_effect=KeyError("url")),
             self.assertRaises(KeyError),
         ):
             self.wb("people", "show", person.pk)
@@ -747,8 +744,8 @@ planned_work:
                 self.target(*self.args)
 
         with (
-            patch.object(wb.webbrowser, "open", open_browser),
-            patch.object(wb, "threading", types.SimpleNamespace(Thread=Thread)),
+            patch.object(wb.core.webbrowser, "open", open_browser),
+            patch.object(wb.core, "threading", types.SimpleNamespace(Thread=Thread)),
         ):
             result = CliRunner().invoke(wb.cli, ["login", "http://testserver"])
             self.assertEqual(result.exit_code, 1)
@@ -758,7 +755,7 @@ planned_work:
             )
         self.assertEqual(result.exit_code, 0, result.output)
 
-        config = wb.CONFIG.read_text()
+        config = wb.core.CONFIG.read_text()
         self.assertIn('current = "http://testserver"', config)
         # Expired tokens are replaced with the same access
         self.assertIn('access = "read"', config)
@@ -770,7 +767,7 @@ planned_work:
         _token, old = APIToken.create_for(user=self.user, title="Old", access="write")
         _token, new = APIToken.create_for(user=self.user, title="New", access="write")
         # Older versions stored the URL as given
-        wb.CONFIG.write_text(f'url = "http://testserver/"\ntoken = "{old}"\n')
+        wb.core.CONFIG.write_text(f'url = "http://testserver/"\ntoken = "{old}"\n')
 
         result = CliRunner().invoke(
             wb.cli, ["login", "http://testserver", "--token"], input=new, env={}
@@ -796,7 +793,7 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("_WB_COMPLETE=bash_complete", result.output)
 
-        wb.CONFIG.write_text(
+        wb.core.CONFIG.write_text(
             'current = "https://a.example.com"\n'
             '[installations."https://a.example.com"]\ntoken = "a"\n'
             '[installations."https://b.example.org"]\ntoken = "b"\n'
@@ -831,7 +828,7 @@ planned_work:
         )
         factories.UserFactory.create(_short_name="abc")
         factories.TeamFactory.create(name="Design")
-        wb.CONFIG.write_text(
+        wb.core.CONFIG.write_text(
             'current = "http://testserver"\n'
             f'[installations."http://testserver"]\ntoken = "{secret}"\n'
         )
@@ -857,7 +854,7 @@ planned_work:
         self.assertIn("abcd", complete(["deals", "search", "--owned-by"], "ab"))
 
         # Nothing without access
-        wb.CONFIG.write_text("")
+        wb.core.CONFIG.write_text("")
         for path in (self.directory / "cache").iterdir():
             path.unlink()
         self.assertEqual(complete(["deals", "search", "--owned-by"], ""), [])
@@ -870,7 +867,9 @@ planned_work:
         other = factories.UserFactory.create()
         _token, second = APIToken.create_for(user=other, title="Second", access="write")
         # The configuration of older versions
-        wb.CONFIG.write_text(f'url = "http://first.example.com"\ntoken = "{first}"\n')
+        wb.core.CONFIG.write_text(
+            f'url = "http://first.example.com"\ntoken = "{first}"\n'
+        )
 
         def run(*args, env=None, input=None):
             return CliRunner().invoke(wb.cli, args, env=env or {}, input=input)

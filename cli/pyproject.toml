@@ -28,6 +28,6 @@ dependencies = [
 scripts.wb = "wb:cli"
 
 [tool.setuptools]
-py-modules = [
+packages = [
   "wb",
 ]

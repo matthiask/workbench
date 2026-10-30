@@ -66,6 +66,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`.
   Verbs: `search` (optional terms plus filters like `--project`, `--customer`,
   `--owned-by`; the API supports the same filters), `show ID`, `create`.
+  The package `cli/wb/` has one module per noun (`wb/offers.py`); `wb/core.py`
+  has the configuration, requests, output helpers and options they share.
   `wb contacts search` finds both organizations and people, `wb organizations
   show` and `wb people show` show them. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
