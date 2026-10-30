@@ -156,6 +156,19 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   uses `hours`.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
+- Page layout (see `projects/project_detail.html` and the contacts detail
+  pages): `.wb-page-header` with the title, `.wb-meta` below it and
+  `.wb-page-actions` (one primary action, `btn-quiet` buttons, a "New"
+  dropdown for related objects, a kebab `btn-icon` menu for rare or
+  destructive actions; no button bars at the bottom). Key figures are
+  `.wb-stats` tiles, label/value pairs `dl.wb-fields`, related lists
+  `list-group-flush` in cards. Styles live in
+  `workbench/static/workbench/main.scss` and must work in light and dark
+  mode (`data-bs-theme`).
+- Charts are server-side SVG, not chart.js: `bar_chart()` in
+  `workbench/tools/charts.py` rendered with `charts/bar_chart.html`, colors
+  from `.wb-series-1` to `-8`, `-muted` and `-neutral` (colors with a
+  meaning: good green/blue, bad orange, neutral grey).
 - Pre-commit hooks (via `prek`, not `pre-commit`) run on commit, ruff included, and auto-fix formatting. If a commit fails due to formatting, re-stage the auto-fixed files and commit again.
 - Template arithmetic is not supported in Django `{% if %}` tags — precompute derived values (thresholds, flags) in the view instead.
 - Use `speckenv` to load `.env` files in standalone Python scripts: `from speckenv import read_speckenv; read_speckenv(Path(__file__).parent / ".env")`
