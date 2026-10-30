@@ -1,7 +1,6 @@
 import datetime as dt
 from decimal import Decimal
 
-from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
@@ -15,6 +14,7 @@ from workbench.planning.models import Milestone, PlannedWork
 from workbench.planning.schemas import PlanningImport, planning_import_schema
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
+from workbench.tools.api import full_clean
 from workbench.tools.validation import monday
 
 
@@ -230,17 +230,6 @@ def _hours(value):
     return Decimal(str(value)).quantize(Decimal("0.1"))
 
 
-def _full_clean(instance, loc, errors, *, exclude=()):
-    try:
-        instance.full_clean(exclude=exclude)
-    except DjangoValidationError as exc:
-        errors.extend(
-            {"loc": [*loc, field], "msg": message}
-            for field, messages in exc.message_dict.items()
-            for message in messages
-        )
-
-
 @router.post("/projects/{project_id}/planning/import/", response=ImportResult)
 def planning_import(
     request, project_id: int, data: PlanningImport, *, dry_run: bool = False
@@ -278,7 +267,7 @@ def planning_import(
             phase_starts_on=item.phase_starts_on,
             estimated_total_hours=_hours(item.estimated_total_hours),
         )
-        _full_clean(milestone, loc, errors)
+        full_clean(milestone, loc, errors)
         milestones[item.key] = milestone
 
     planned_work = []
@@ -344,7 +333,7 @@ def planning_import(
                     "msg": _("Unknown milestone %r.") % item.milestone,
                 })
 
-        _full_clean(
+        full_clean(
             pw,
             loc,
             errors,

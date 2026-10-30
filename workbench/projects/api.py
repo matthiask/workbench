@@ -20,6 +20,7 @@ from workbench.projects.forms import ProjectForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
+from workbench.tools.api import raise_form_errors
 from workbench.tools.formats import Z1, Z2
 
 
@@ -140,20 +141,7 @@ def project_create(request, data: ProjectIn, *, dry_run: bool = False):
         request=request,
     )
     if not form.is_valid():
-        raise ValidationError(
-            [
-                {
-                    "loc": ["body", "data"] + ([field] if field != "__all__" else []),
-                    "msg": message,
-                }
-                for field, messages in form.errors.items()
-                for message in messages
-            ]
-            + [
-                {"loc": ["body", "data"], "msg": str(warning)}
-                for warning in form.warnings.values()
-            ]
-        )
+        raise_form_errors(form)
 
     with transaction.atomic():
         project = form.save()

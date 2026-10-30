@@ -14,6 +14,7 @@ from workbench.accounts.models import User
 from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm
 from workbench.deals.models import AttributeGroup, Deal, ValueType
+from workbench.tools.api import raise_form_errors
 
 
 # Same as in the web interface
@@ -237,21 +238,7 @@ def deal_create(request, data: DealIn, *, dry_run: bool = False):
 
     form = DealForm(form_data, request=request)
     if not form.is_valid():
-        raise ValidationError(
-            [
-                {
-                    "loc": ["body", "data"]
-                    + ([] if field == "__all__" else fields.get(field, [field])),
-                    "msg": message,
-                }
-                for field, messages in form.errors.items()
-                for message in messages
-            ]
-            + [
-                {"loc": ["body", "data"], "msg": str(warning)}
-                for warning in form.warnings.values()
-            ]
-        )
+        raise_form_errors(form, fields=fields)
 
     with transaction.atomic():
         deal = form.save()

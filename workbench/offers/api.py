@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Literal
 
 from django.conf import settings
-from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _, override
@@ -16,6 +15,7 @@ from workbench.offers.models import Offer
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
+from workbench.tools.api import full_clean
 
 
 # Same as in the web interface
@@ -226,17 +226,6 @@ def _decimal(value, exp):
     return None if value is None else Decimal(str(value)).quantize(Decimal(exp))
 
 
-def _full_clean(instance, loc, errors, *, exclude=()):
-    try:
-        instance.full_clean(exclude=exclude)
-    except DjangoValidationError as exc:
-        errors.extend(
-            {"loc": [*loc, field], "msg": message}
-            for field, messages in exc.message_dict.items()
-            for message in messages
-        )
-
-
 def _build_services(project, data, errors):
     service_types = {st.title: st for st in ServiceType.objects.all()}
     services = []
@@ -290,7 +279,7 @@ def _build_services(project, data, errors):
                 "msg": _("Either hours or a cost are required."),
             })
 
-        _full_clean(service, loc, errors, exclude=["project", "offer"])
+        full_clean(service, loc, errors, exclude=["project", "offer"])
         services.append(service)
     return services
 
@@ -346,7 +335,7 @@ def offer_create(request, project_id: int, data: OfferIn, *, dry_run: bool = Fal
         postal_address=postal_address or "",
         status=Offer.IN_PREPARATION,
     )
-    _full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
+    full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
     services = _build_services(project, data, errors)
 
     if errors:
@@ -385,7 +374,7 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = Fals
     offer.description = data.description
     if data.postal_address is not None:
         offer.postal_address = data.postal_address
-    _full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
+    full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
     services = _build_services(offer.project, data, errors)
 
     if errors:
