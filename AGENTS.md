@@ -65,7 +65,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Verbs: `search` (optional terms plus filters like `--project`, `--customer`,
   `--owned-by`; the API supports the same filters), `show ID`, `create`.
   `wb contacts search` finds both organizations and people, `wb organizations
-  show` and `wb people show` show them.
+  show` and `wb people show` show them. `wb people create` is mostly fed by
+  LLMs, so the API rejects duplicate names and email addresses (the web
+  interface doesn't). Shared validation helpers for the APIs are in
+  `workbench/tools/api.py`.
   Bump the version in `cli/pyproject.toml` when changing the CLI: the server
   reads it and tells users of older versions to upgrade. Raise `MINIMUM` in
   `workbench/cli_version.py` when older versions don't work anymore.
