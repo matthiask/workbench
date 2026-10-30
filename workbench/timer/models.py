@@ -316,6 +316,14 @@ class Timestamp(models.Model):
 
     save.alters_data = True
 
+    def slice(self):
+        """The slice of the day this timestamp belongs to"""
+        day = timezone.localdate(self.created_at)
+        for slice in Timestamp.objects.slices(self.user, day=day):
+            if slice.get("timestamp_id") == self.id:
+                return slice
+        return None
+
     @property
     def pretty_time(self):
         return local_date_format(self.created_at, fmt="H:i")

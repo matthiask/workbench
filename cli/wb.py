@@ -1863,10 +1863,17 @@ def _create_timestamp(type_, args, as_json):
     if as_json:
         _echo_json(timestamp)
         return
-    console.print(
-        f"{timestamp['type'].capitalize()} at {_time(timestamp['created_at'])}"
-        + (f": {timestamp['notes']}" if timestamp["notes"] else "")
+    _echo_timestamp(timestamp)
+
+
+def _echo_timestamp(timestamp, prefix=""):
+    """The timestamp and the duration of the task it stopped"""
+    text = f"{prefix}{timestamp['type']} at {_time(timestamp['created_at'])}" + (
+        f": {timestamp['notes']}" if timestamp["notes"] else ""
     )
+    if (slice := timestamp["slice"]) and slice["hours"] and slice["ends_at"]:
+        text += f" ({slice['hours']}h since {_time(slice['starts_at'])})"
+    console.print(text[0].upper() + text[1:])
 
 
 _TIMESTAMP_HELP = """
@@ -1913,6 +1920,7 @@ def list_timestamps(day, as_json):
         _echo_json(data)
         return
     table = _table(
+        "ID>",
         "From",
         "Until",
         "Hours>",
@@ -1925,6 +1933,7 @@ def list_timestamps(day, as_json):
     for slice in data["slices"]:
         project = slice["project"]
         table.add_row(
+            str(slice["timestamp_id"] or ""),
             _time(slice["starts_at"]),
             _time(slice["ends_at"]),
             slice["hours"] or "",
@@ -1935,9 +1944,32 @@ def list_timestamps(day, as_json):
             else "",
             style=None if slice["is_logged"] else "bold",
         )
-    table.columns[1].footer = "Logged"
-    table.columns[2].footer = data["logged_hours"]
+    table.columns[2].footer = "Logged"
+    table.columns[3].footer = data["logged_hours"]
     console.print(table)
+    console.print(f"Logged this week: {data['weekly_hours']}h")
+    if data["running_since"]:
+        console.print(
+            f"Running since {_time(data['running_since'])} ({data['running_hours']}h)",
+            style="bold",
+        )
+
+
+@timestamps.command("delete")
+@click.argument("timestamp_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def delete_timestamp(timestamp_id, as_json):
+    """Delete a timestamp, `wb timestamps list` shows the IDs"""
+    timestamp = _request("DELETE", f"timestamps/{timestamp_id}/")
+    _echo_json(timestamp) if as_json else _echo_timestamp(timestamp, "Deleted ")
+
+
+@timestamps.command()
+@click.option("--json", "as_json", is_flag=True)
+def undo(as_json):
+    """Delete the latest timestamp of today"""
+    timestamp = _request("DELETE", "timestamps/latest/")
+    _echo_json(timestamp) if as_json else _echo_timestamp(timestamp, "Deleted ")
 
 
 @cli.group()

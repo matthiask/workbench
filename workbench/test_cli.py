@@ -378,6 +378,18 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Wireframes review", result.output)
         self.assertIn("Log hours", result.output)
+        self.assertIn("Logged this week: 0.0h", result.output)
+        self.assertIn("Running since", result.output)
+
+        result = self.wb("timestamps", "undo")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Deleted start at", result.output)
+        result = self.wb("timestamps", "delete", timestamp.pk)
+        self.assertIn("Deleted stop at", result.output)
+        self.assertFalse(Timestamp.objects.exists())
+        result = self.wb("timestamps", "undo")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("There are no timestamps today", result.output)
 
     def test_bug_reports(self):
         """Crashes and server errors write a bug report people can send"""

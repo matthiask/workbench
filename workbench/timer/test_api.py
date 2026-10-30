@@ -23,9 +23,13 @@ class TimestampsAPITest(TestCase):
 
         data = create(type="start").json()
         self.assertEqual(data["created_at"], "2026-10-30T12:00:00+01:00")
-        data = create(type="stop", minutes=-5, notes="Wireframes").json()
-        self.assertEqual(data["created_at"], "2026-10-30T11:55:00+01:00")
+        self.assertIsNone(data["slice"]["ends_at"])
+        data = create(type="stop", minutes=30, notes="Wireframes").json()
+        self.assertEqual(data["created_at"], "2026-10-30T12:30:00+01:00")
         self.assertEqual(data["notes"], "Wireframes")
+        # The stopped task
+        self.assertEqual(data["slice"]["starts_at"], "2026-10-30T12:00:00+01:00")
+        self.assertEqual(data["slice"]["hours"], "0.5")
         data = create(type="stop", time="13:30").json()
         self.assertEqual(data["created_at"], "2026-10-30T13:30:00+01:00")
         self.assertEqual(Timestamp.objects.filter(user=user).count(), 3)
@@ -52,5 +56,30 @@ class TimestampsAPITest(TestCase):
         self.assertEqual(logged["project"]["id"], hours.service.project_id)
         self.assertIsNone(logged["log_hours_url"])
 
+        self.assertEqual(data["weekly_hours"], "2.0")
+        self.assertEqual(data["running_hours"], "0.1")
+
         data = self.client.get("/api/timestamps/?day=2026-10-29").json()
         self.assertEqual(data["slices"], [])
+        self.assertEqual(data["weekly_hours"], "2.0")
+        self.assertIsNone(data["running_since"])
+
+    def test_delete(self):
+        """Timestamps can be deleted, the latest of today undone"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        first = Timestamp.objects.create(user=user, type=Timestamp.START)
+        latest = Timestamp.objects.create(user=user, type=Timestamp.STOP)
+        other = Timestamp.objects.create(
+            user=factories.UserFactory.create(), type=Timestamp.STOP
+        )
+
+        response = self.client.delete("/api/timestamps/latest/")
+        self.assertEqual(response.json()["id"], latest.pk)
+        response = self.client.delete(f"/api/timestamps/{other.pk}/")
+        self.assertEqual(response.status_code, 404)
+        response = self.client.delete(f"/api/timestamps/{first.pk}/")
+        self.assertEqual(response.json()["id"], first.pk)
+        response = self.client.delete("/api/timestamps/latest/")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(list(Timestamp.objects.all()), [other])

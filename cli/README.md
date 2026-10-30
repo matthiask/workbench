@@ -237,8 +237,11 @@ workbench-tst. Both take an optional time (`13:30`) or minutes relative to now
     wb timestamps list
     wb timestamps list --day 2026-10-29
 
-`wb timestamps list` shows the day's slices; the unlogged ones link to the
-form for logging their hours in Workbench. If you miss `tst`, add
+Stopping a task shows how long it took. `wb timestamps list` shows the day's
+slices, the hours logged this week and since when the current task has been
+running; the unlogged slices link to the form for logging their hours in
+Workbench. `wb timestamps undo` deletes today's latest timestamp,
+`wb timestamps delete ID` any other one. If you miss `tst`, add
 `alias tst="wb timestamps"` to your shell's configuration.
 
 ## Absences

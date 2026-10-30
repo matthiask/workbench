@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.decorators import decorator_from_middleware
-from django.utils.timezone import localdate, make_aware
+from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
@@ -166,14 +166,6 @@ def delete_timestamp(request, pk):
     return HttpResponseRedirect(reverse("timestamps") + request.POST.get("next", ""))
 
 
-def _timestamp_slice(timestamp):
-    day = localdate(timestamp.created_at)
-    for slice in Timestamp.objects.slices(timestamp.user, day=day):
-        if slice.get("timestamp_id") == timestamp.id:
-            return slice
-    return None
-
-
 def split_timestamp(request, pk):
     timestamp = get_object_or_404(
         Timestamp.objects.filter(
@@ -183,7 +175,7 @@ def split_timestamp(request, pk):
         ),
         pk=pk,
     )
-    slice = _timestamp_slice(timestamp)
+    slice = timestamp.slice()
     if not slice or not slice.split_url:
         messages.error(request, _("This timestamp cannot be split."))
         return (
