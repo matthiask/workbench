@@ -72,8 +72,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `last-month`, `since`, `until`) with `date_range()` and `filter_date_range()`
   for reports and searches, and `UsersFilter` with `filter_users()` for
   reports. Cutoff dates are called `date`. Reports live at
-  `/api/reports/<name>/` with the names of `wb reports`, except key data and
-  cash data which integrations use. Responses have schemas and decimals are
+  `/api/reports/<name>/` with the names of `wb reports`; key data and cash
+  data are also served at their old URLs (`/api/key-data/`, `/api/cash-data/`,
+  hidden from the schema) for integrations. Responses have schemas and decimals are
   strings everywhere (`Amount`, `Hours`, `Days` and `Percentage` in
   `workbench/tools/api.py` round computed values), except key data and cash
   data which use `jsonable()` for the integrations.

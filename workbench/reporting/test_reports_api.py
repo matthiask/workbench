@@ -190,9 +190,9 @@ class ReportsAPITest(TestCase):
     def test_key_data_month(self):
         """Key data of a given month"""
         self.assertEqual(
-            self.get("/api/key-data/", month="2026-01")["month"], "2026-01"
+            self.get("/api/reports/key-data/", month="2026-01")["month"], "2026-01"
         )
-        response = self.client.get("/api/key-data/", {"month": "January"})
+        response = self.client.get("/api/reports/key-data/", {"month": "January"})
         self.assertEqual(response.status_code, 422)
 
     def test_squeeze(self):
@@ -249,7 +249,11 @@ class ReportsAPITest(TestCase):
         """The static token is only for key data and cash data"""
         self.client.logout()
         auth = {"Authorization": "Bearer secret"}
-        response = self.client.get("/api/key-data/", headers=auth)
+        response = self.client.get("/api/reports/key-data/", headers=auth)
         self.assertEqual(response.status_code, 200)
+        # The old URLs still work for integrations
+        for url in ["/api/key-data/", "/api/cash-data/"]:
+            response = self.client.get(url, headers=auth)
+            self.assertEqual(response.status_code, 200)
         response = self.client.get("/api/reports/budget/", headers=auth)
         self.assertEqual(response.status_code, 401)

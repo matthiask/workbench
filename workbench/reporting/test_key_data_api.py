@@ -22,7 +22,7 @@ def deal(value, **kwargs):
 class KeyDataAPITest(TestCase):
     def test_authentication(self):
         """The key data API requires the configured bearer token"""
-        url = "/api/key-data/"
+        url = "/api/reports/key-data/"
 
         with override_settings(KEY_DATA_API_TOKEN=""):
             self.assertEqual(self.client.get(url).status_code, 401)
@@ -64,7 +64,7 @@ class KeyDataAPITest(TestCase):
         deal(1, probability=Deal.LOW)
 
         response = self.client.get(
-            "/api/key-data/", headers={"Authorization": "Bearer secret"}
+            "/api/reports/key-data/", headers={"Authorization": "Bearer secret"}
         )
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -125,7 +125,7 @@ class KeyDataAPITest(TestCase):
         )
 
         response = self.client.get(
-            "/api/key-data/", headers={"Authorization": "Bearer secret"}
+            "/api/reports/key-data/", headers={"Authorization": "Bearer secret"}
         )
         data = response.json()
         self.assertEqual(data["canceled_invoices_total_excl_tax"], 300.0)

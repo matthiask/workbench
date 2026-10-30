@@ -34,7 +34,7 @@ class APITokenTest(TestCase):
         # The reporting API accepts tokens of users with the controlling feature
         self.assertEqual(
             self.client.get(
-                "/api/cash-data/", headers={"authorization": f"Bearer {secret}"}
+                "/api/reports/cash-data/", headers={"authorization": f"Bearer {secret}"}
             ).status_code,
             200,
         )

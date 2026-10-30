@@ -76,7 +76,9 @@ router = Router(
 )
 
 
-@router.get("/key-data/")
+# The old URLs keep working for integrations, but aren't documented anymore
+@router.get("/key-data/", include_in_schema=False)
+@router.get("/reports/key-data/")
 def key_data(request, month: str | None = None):
     """Key data of the given month (2026-09), the last month by default"""
     if month:
@@ -91,7 +93,8 @@ def key_data(request, month: str | None = None):
     return jsonable(key_data_for_month(first))
 
 
-@router.get("/cash-data/")
+@router.get("/cash-data/", include_in_schema=False)
+@router.get("/reports/cash-data/")
 def cash_data_api(request, date: dt.date | None = None):
     """Cash data as of the given date, today by default"""
     return jsonable(cash_data(date or dt.date.today()))

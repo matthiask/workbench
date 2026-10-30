@@ -29,8 +29,8 @@ class APIFeaturesTest(TestCase):
             ("get", "/api/invoices/"),
             ("get", "/api/recurring-invoices/"),
             ("get", f"/api/invoices/{invoice.pk}/"),
-            ("get", "/api/key-data/"),
-            ("get", "/api/cash-data/"),
+            ("get", "/api/reports/key-data/"),
+            ("get", "/api/reports/cash-data/"),
         ]:
             with self.subTest(method=method, url=url):
                 response = getattr(self.client, method)(

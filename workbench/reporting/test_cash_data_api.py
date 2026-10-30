@@ -33,7 +33,7 @@ def offer(project, cost, status):
 class CashDataAPITest(TestCase):
     def test_authentication(self):
         """The cash data API requires the key data API token"""
-        url = "/api/cash-data/"
+        url = "/api/reports/cash-data/"
         self.assertEqual(self.client.get(url).status_code, 401)
         response = self.client.get(url, headers={"Authorization": "Bearer nope"})
         self.assertEqual(response.status_code, 401)
@@ -69,7 +69,9 @@ class CashDataAPITest(TestCase):
         )
         invoice(subtotal=700, status=Invoice.IN_PREPARATION)
 
-        response = self.client.get("/api/cash-data/?date=2026-10-26", headers=AUTH)
+        response = self.client.get(
+            "/api/reports/cash-data/?date=2026-10-26", headers=AUTH
+        )
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
@@ -103,7 +105,9 @@ class CashDataAPITest(TestCase):
         self.assertIn("accruals", data)
 
         # Earlier dates are reconstructed where possible
-        data = self.client.get("/api/cash-data/?date=2026-10-19", headers=AUTH).json()
+        data = self.client.get(
+            "/api/reports/cash-data/?date=2026-10-19", headers=AUTH
+        ).json()
         self.assertEqual(data["open_invoices"]["total_excl_tax"], 6500.0)
         self.assertIsNone(data["planned_invoicing_by_month"])
         self.assertIsNone(data["planned_invoicing_overdue_excl_tax"])
@@ -135,7 +139,7 @@ class CashDataAPITest(TestCase):
         offer(unplanned, 3000, Offer.ACCEPTED)
         offer(unplanned, 9000, Offer.OFFERED)
 
-        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        data = self.client.get("/api/reports/cash-data/", headers=AUTH).json()
         self.assertEqual(data["date"], "2026-10-28")
         self.assertEqual(
             data["planned_invoicing_by_month"],
@@ -167,7 +171,7 @@ class CashDataAPITest(TestCase):
         internal = factories.ProjectFactory.create(type=Project.INTERNAL)
         invoice(project=internal, subtotal=1000, status=Invoice.PAID)
 
-        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        data = self.client.get("/api/reports/cash-data/", headers=AUTH).json()
         self.assertEqual(data["accruals"], 0.0)
 
     @travel("2026-10-28 08:00")
@@ -199,7 +203,7 @@ class CashDataAPITest(TestCase):
             hours=5,
         )
 
-        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        data = self.client.get("/api/reports/cash-data/", headers=AUTH).json()
         self.assertEqual(
             data["work_not_invoiced"],
             {
@@ -209,7 +213,9 @@ class CashDataAPITest(TestCase):
             },
         )
 
-        data = self.client.get("/api/cash-data/?date=2026-10-19", headers=AUTH).json()
+        data = self.client.get(
+            "/api/reports/cash-data/?date=2026-10-19", headers=AUTH
+        ).json()
         self.assertIsNone(data["work_not_invoiced"])
 
     @travel("2026-10-28 08:00")
@@ -227,7 +233,7 @@ class CashDataAPITest(TestCase):
         )
         accepted.save()
 
-        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        data = self.client.get("/api/reports/cash-data/", headers=AUTH).json()
         self.assertEqual(
             data["accepted_offers_not_invoiced"],
             {"total_excl_tax": 10000.0, "not_in_planned_invoicing_excl_tax": 0.0},
@@ -248,7 +254,7 @@ class CashDataAPITest(TestCase):
                 gross_margin=Decimal(gross_margin),
             )
 
-        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        data = self.client.get("/api/reports/cash-data/", headers=AUTH).json()
         self.assertEqual(
             data["planned_invoicing_by_month"][:2],
             [
@@ -260,7 +266,7 @@ class CashDataAPITest(TestCase):
 
         # Invoicing 2500 consumes the oldest projections first
         invoice(project=project, subtotal=2500, due_on=dt.date(2026, 11, 1))
-        data = self.client.get("/api/cash-data/", headers=AUTH).json()
+        data = self.client.get("/api/reports/cash-data/", headers=AUTH).json()
         self.assertEqual(
             data["planned_invoicing_by_month"][:2],
             [

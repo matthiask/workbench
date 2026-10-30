@@ -2744,7 +2744,9 @@ def reports():
 @click.option("--json", "as_json", is_flag=True)
 def key_data(month, as_json):
     """Key data of a month: Gross margin, green hours, deals etc."""
-    data = _request("GET", "key-data/", params={"month": month} if month else {})
+    data = _request(
+        "GET", "reports/key-data/", params={"month": month} if month else {}
+    )
     if as_json:
         _echo_json(data)
         return
@@ -2803,7 +2805,7 @@ def cash_data(date, as_json):
     Planned invoicing, accepted offers and work which hasn't been invoiced
     are only available for the current week."""
     params = {"date": date.date().isoformat()} if date else {}
-    data = _request("GET", "cash-data/", params=params)
+    data = _request("GET", "reports/cash-data/", params=params)
     if as_json:
         _echo_json(data)
         return
