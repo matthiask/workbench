@@ -519,6 +519,66 @@ def _echo_invoice_list(invoices):
     console.print(table)
 
 
+def _period_options(default):
+    """Options for the period of a report, ``default`` is its description"""
+
+    def decorator(fn):
+        for option in reversed([
+            click.option(
+                "--period",
+                help=f"Year (2026), month (2026-09) or quarter (2026-Q3), {default}.",
+            ),
+            click.option(
+                "--from",
+                "date_from",
+                type=click.DateTime(formats=["%Y-%m-%d"]),
+                help="Start of the period, overrides the period's start.",
+            ),
+            click.option(
+                "--until",
+                "date_until",
+                type=click.DateTime(formats=["%Y-%m-%d"]),
+                help="End of the period, overrides the period's end.",
+            ),
+        ]):
+            fn = option(fn)
+        return fn
+
+    return decorator
+
+
+def _users_options(fn):
+    fn = click.option("--team", help="Team name.")(fn)
+    return click.option(
+        "--user", "users", multiple=True, help="Short name, can be repeated."
+    )(fn)
+
+
+def _period_params(period, date_from, date_until, *, users=(), team=None):
+    params = {"period": period, "user": list(users), "team": team}
+    if date_from:
+        params["date_from"] = date_from.date().isoformat()
+    if date_until:
+        params["date_until"] = date_until.date().isoformat()
+    return {key: value for key, value in params.items() if value}
+
+
+def _amount(value):
+    return f"{value:.2f}" if value is not None else ""
+
+
+def _hours(value):
+    return f"{value:.1f}" if value is not None else ""
+
+
+def _percentage(value):
+    return f"{value:.0f}%" if value is not None else ""
+
+
+def _echo_period(data):
+    console.print(f"{data['date_from']} – {data['date_until']}", style="bold")
+
+
 @click.group(cls=_Group)
 @click.version_option(VERSION)
 def cli():
@@ -1746,6 +1806,112 @@ def _key_values(values, option):
     return result
 
 
+@deals.command("stats")
+@_period_options("defaults to this week")
+@_users_options
+@click.option("--json", "as_json", is_flag=True)
+def deal_stats(period, date_from, date_until, users, team, as_json):
+    """Deals accepted and declined in a period
+
+    Users filter the deals' owners; accepted deals are split between users
+    by their contributions."""
+    data = _request(
+        "GET",
+        "deals/stats/",
+        params=_period_params(period, date_from, date_until, users=users, team=team),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    accepted = data["accepted"]
+    console.print(
+        f"Accepted: {accepted['count']} deals, {_amount(accepted['sum'])}"
+        + (f" (target {_amount(accepted['target'])})" if accepted["target"] else "")
+    )
+    if accepted["deals"]:
+        table = _table("Value type", "Accepted>", "Target>", "Median age>")
+        for row in accepted["by_value_type"]:
+            table.add_row(
+                row["type"],
+                _amount(row["sum"]),
+                _amount(row["target"]),
+                f"{row['median_age_days']} days"
+                if row["median_age_days"] is not None
+                else "",
+            )
+        console.print(table)
+        table = _table("User", "Deals>", "Accepted>")
+        for row in accepted["by_user"]:
+            table.add_row(row["user"], str(row["count"]), _amount(row["sum"]))
+        console.print(table)
+        table = _table(
+            "Code",
+            "Title",
+            "Customer",
+            "Owner",
+            "Closed on",
+            "Value>",
+            title="Accepted",
+        )
+        for deal in accepted["deals"]:
+            table.add_row(
+                _link(deal["code"], deal["url"]),
+                deal["title"],
+                _link(deal["customer"]["name"], deal["customer"]["url"]),
+                deal["owned_by"],
+                deal["closed_on"],
+                _amount(deal["value"]),
+            )
+        console.print(table)
+    declined = data["declined"]
+    console.print(f"Declined: {declined['count']} deals, {_amount(declined['sum'])}")
+    if declined["deals"]:
+        table = _table(
+            "Code", "Title", "Customer", "Closing type", "Value>", title="Declined"
+        )
+        for deal in declined["deals"]:
+            table.add_row(
+                _link(deal["code"], deal["url"]),
+                deal["title"],
+                _link(deal["customer"]["name"], deal["customer"]["url"]),
+                deal["closing_type"],
+                _amount(deal["value"]),
+            )
+        console.print(table)
+
+
+@deals.command("history")
+@_period_options("defaults to this week")
+@_users_options
+@click.option("--json", "as_json", is_flag=True)
+def deal_history(period, date_from, date_until, users, team, as_json):
+    """Changes of deals in a period, users filter who made them"""
+    data = _request(
+        "GET",
+        "deals/history/",
+        params=_period_params(period, date_from, date_until, users=users, team=team),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    for change in data["changes"]:
+        deal = change["deal"]
+        console.print(
+            _link(f"{deal['code']} {deal['title']}", deal["url"])
+            if deal
+            else "(deleted deal)",
+            style="bold",
+        )
+        console.print(
+            f"{change['created_at'][:16].replace('T', ' ')}, {change['user']}",
+            style="dim",
+        )
+        for text in change["changes"]:
+            console.print(f"  {text}")
+
+
 @deals.command("create")
 @click.option("--title", required=True)
 @click.option(
@@ -2017,66 +2183,6 @@ def cash_data(date):
     """Cash data: Open invoices, planned invoicing, accruals etc."""
     params = {"date": date.date().isoformat()} if date else {}
     _echo_json(_request("GET", "cash-data/", params=params))
-
-
-def _period_options(default):
-    """Options for the period of a report, ``default`` is its description"""
-
-    def decorator(fn):
-        for option in reversed([
-            click.option(
-                "--period",
-                help=f"Year (2026), month (2026-09) or quarter (2026-Q3), {default}.",
-            ),
-            click.option(
-                "--from",
-                "date_from",
-                type=click.DateTime(formats=["%Y-%m-%d"]),
-                help="Start of the period, overrides the period's start.",
-            ),
-            click.option(
-                "--until",
-                "date_until",
-                type=click.DateTime(formats=["%Y-%m-%d"]),
-                help="End of the period, overrides the period's end.",
-            ),
-        ]):
-            fn = option(fn)
-        return fn
-
-    return decorator
-
-
-def _users_options(fn):
-    fn = click.option("--team", help="Team name.")(fn)
-    return click.option(
-        "--user", "users", multiple=True, help="Short name, can be repeated."
-    )(fn)
-
-
-def _period_params(period, date_from, date_until, *, users=(), team=None):
-    params = {"period": period, "user": list(users), "team": team}
-    if date_from:
-        params["date_from"] = date_from.date().isoformat()
-    if date_until:
-        params["date_until"] = date_until.date().isoformat()
-    return {key: value for key, value in params.items() if value}
-
-
-def _amount(value):
-    return f"{value:.2f}" if value is not None else ""
-
-
-def _hours(value):
-    return f"{value:.1f}" if value is not None else ""
-
-
-def _percentage(value):
-    return f"{value:.0f}%" if value is not None else ""
-
-
-def _echo_period(data):
-    console.print(f"{data['date_from']} – {data['date_until']}", style="bold")
 
 
 @reports.command("projected-gross-margin")

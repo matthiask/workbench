@@ -195,6 +195,13 @@ list of the choices:
     wb deals create --title "Relaunch" --contact 345 --probability normal \
         --value Design=5000 --attribute Source=Referral --dry-run
 
+Deals accepted and declined in a period (this week by default, periods work
+like for the reports), and who changed which deals:
+
+    wb deals stats --period 2026-Q3
+    wb deals stats --period 2026 --user mk
+    wb deals history --from 2026-10-01
+
 ## Notes
 
 Notes on deals, invoices and recurring invoices. Search all of them or those

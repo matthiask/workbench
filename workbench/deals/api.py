@@ -1,9 +1,12 @@
 import datetime as dt
+import html
 from decimal import Decimal
 from typing import Literal
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
@@ -15,7 +18,17 @@ from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm
 from workbench.deals.models import AttributeGroup, Deal, ValueType
-from workbench.tools.api import raise_form_errors
+from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
+from workbench.reporting.api import jsonable
+from workbench.tools.api import (
+    DateRangeFilter,
+    UsersFilter,
+    date_range,
+    filter_users,
+    raise_form_errors,
+)
+from workbench.tools.formats import Z2
+from workbench.tools.validation import monday
 
 
 # Same as in the web interface
@@ -103,6 +116,127 @@ def deal_list(request, filters: Query[DealFilter]):
         deals = deals.search(filters.q)
     deals = deals.order_by("status", "decision_expected_on", "-pk")
     return [deal_out(deal, request) for deal in deals[:200]]
+
+
+class StatsFilter(DateRangeFilter, UsersFilter):
+    pass
+
+
+def _this_week():
+    return [monday(), monday() + dt.timedelta(days=6)]
+
+
+def _deal_summary(deal, request):
+    return {
+        "id": deal.id,
+        "code": deal.code,
+        "url": request.build_absolute_uri(deal.get_absolute_url()),
+        "title": deal.title,
+        "customer": organization_out(deal.customer, request),
+        "owned_by": deal.owned_by.get_short_name(),
+        "value": deal.value,
+        "closed_on": deal.closed_on,
+    }
+
+
+@router.get("/deals/stats/")
+def deal_stats(request, filters: Query[StatsFilter]):
+    """Deals accepted and declined in the period (this week by default), with
+    accepted deals per user (split by contributions), month and value type,
+    compared to the value types' weekly targets. Users filter the deals'
+    owners. Ages are the days between creating and closing deals."""
+    period = date_range(filters, default=_this_week())
+    users = filter_users(filters)
+    accepted = accepted_deals(period, users=users)
+    declined = declined_deals(period).select_related("closing_type")
+    if users is not None:
+        declined = declined.filter(owned_by__in=users)
+
+    by_closing_type = {}
+    for deal in declined:
+        row = by_closing_type.setdefault(
+            str(deal.pretty_closing_type), {"count": 0, "sum": Z2}
+        )
+        row["count"] += 1
+        row["sum"] += deal.value
+
+    return jsonable({
+        "date_from": period[0],
+        "date_until": period[1],
+        "accepted": {
+            "count": accepted["count"],
+            "sum": accepted["sum"],
+            "target": accepted["target"],
+            "median_age_days": accepted["median_age"],
+            "by_user": [
+                {
+                    "user": row["user"].get_short_name(),
+                    "count": row["count"],
+                    "sum": row["sum"],
+                }
+                for row in accepted["by_user"]
+            ],
+            "by_value_type": [
+                {
+                    "type": row["type"].title,
+                    "sum": row["sum"],
+                    "target": row["target"],
+                    "median_age_days": row["median_age"],
+                }
+                for row in accepted["by_valuetype"]
+            ],
+            "by_month": [
+                {
+                    "month": f"{row['month']:%Y-%m}",
+                    "sum": row["sum"],
+                    "values": {
+                        value["type"].title: value["value"] for value in row["values"]
+                    },
+                }
+                for row in accepted["by_month_and_valuetype"]
+            ],
+            "deals": [_deal_summary(deal, request) for deal in accepted["deals"]],
+        },
+        "declined": {
+            "count": len(declined),
+            "sum": sum((deal.value for deal in declined), Z2),
+            "by_closing_type": by_closing_type,
+            "deals": [
+                _deal_summary(deal, request)
+                | {
+                    "closing_type": str(deal.pretty_closing_type),
+                    "closing_notice": deal.closing_notice,
+                }
+                for deal in declined
+            ],
+        },
+    })
+
+
+@router.get("/deals/history/")
+def deal_history_api(request, filters: Query[StatsFilter]):
+    """Changes of deals in the period (this week by default), oldest first;
+    users filter who made the changes"""
+    period = date_range(filters, default=_this_week())
+    changes = deal_history(period, users=filter_users(filters))
+    deals = Deal.objects.select_related("customer", "owned_by").in_bulk({
+        int(change.version.row_data["id"]) for change in changes
+    })
+    return jsonable({
+        "date_from": period[0],
+        "date_until": period[1],
+        "changes": [
+            {
+                "created_at": timezone.localtime(change.created_at),
+                "user": str(change.pretty_user_name),
+                "deal": _deal_summary(deal, request)
+                if (deal := deals.get(int(change.version.row_data["id"])))
+                else None,
+                "changes": [html.unescape(strip_tags(text)) for text in change.changes],
+            }
+            for change in changes
+        ],
+    })
 
 
 @router.get("/deals/{deal_id}/", response=DealOut)

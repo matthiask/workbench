@@ -45,11 +45,59 @@ class DealsAPITest(TestCase):
         data = self.client.get(f"/api/deals/{deal.pk}/").json()
         self.assertEqual(data["code"], deal.code)
 
+    def test_stats(self):
+        """Accepted and declined deals of a period, and their history"""
+        user = factories.UserFactory.create(_short_name="ab")
+        accepted = factories.DealFactory.create(title="Relaunch", owned_by=user)
+        Value.objects.create(
+            deal=accepted,
+            type=factories.ValueTypeFactory.create(title="Design"),
+            value=5000,
+        )
+        accepted.contributions.create(user=user)
+        accepted.status = Deal.ACCEPTED
+        accepted.closed_on = dt.date.today()
+        accepted.save()
+        declined = factories.DealFactory.create(
+            status=Deal.DECLINED,
+            closed_on=dt.date.today(),
+            closing_type=factories.ClosingTypeFactory.create(title="Too expensive"),
+        )
+        self.client.force_login(user)
+
+        data = self.client.get("/api/deals/stats/").json()
+        self.assertEqual(data["accepted"]["sum"], 5000)
+        self.assertEqual(
+            data["accepted"]["by_user"], [{"user": "ab", "count": 1, "sum": 5000}]
+        )
+        self.assertEqual(data["accepted"]["by_value_type"][0]["type"], "Design")
+        self.assertEqual(data["accepted"]["deals"][0]["id"], accepted.pk)
+        self.assertEqual(data["declined"]["deals"][0]["id"], declined.pk)
+        self.assertEqual(
+            data["declined"]["by_closing_type"],
+            {"Too expensive": {"count": 1, "sum": 0}},
+        )
+
+        data = self.client.get("/api/deals/stats/", {"user": "ab"}).json()
+        self.assertEqual(data["accepted"]["count"], 1)
+        self.assertEqual(data["declined"]["deals"], [])
+        data = self.client.get("/api/deals/stats/", {"period": "2020"}).json()
+        self.assertEqual(data["accepted"]["deals"], [])
+
+        data = self.client.get("/api/deals/history/").json()
+        relaunch = [c for c in data["changes"] if c["deal"]["id"] == accepted.pk]
+        self.assertTrue(relaunch)
+        self.assertTrue(
+            any("Relaunch" in text for c in relaunch for text in c["changes"])
+        )
+
     @override_settings(FEATURES={FEATURES.DEALS: F.NEVER})
     def test_feature(self):
         """Deals require the deals feature"""
         self.client.force_login(factories.UserFactory.create())
         self.assertEqual(self.client.get("/api/deals/").status_code, 403)
+        self.assertEqual(self.client.get("/api/deals/stats/").status_code, 403)
+        self.assertEqual(self.client.get("/api/deals/history/").status_code, 403)
         response = self.client.post("/api/deals/", {}, content_type="application/json")
         self.assertEqual(response.status_code, 403)
 

@@ -20,6 +20,7 @@ from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
 from workbench.contacts.models import Person
+from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.timer.models import Timestamp
@@ -386,6 +387,19 @@ planned_work:
                 result = self.wb("reports", *args, "--json")
                 self.assertEqual(result.exit_code, 0, result.output)
                 self.assertTrue(result.output.startswith("{"))
+
+        deal = factories.DealFactory.create(
+            title="Relaunch",
+            owned_by=self.user,
+            status=Deal.DECLINED,
+            closed_on=dt.date.today(),
+        )
+        result = self.wb("deals", "stats", "--user", "ab")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Relaunch", result.output)
+        result = self.wb("deals", "history")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(deal.code, result.output)
 
         result = self.wb("reports", "key-data", "--month", "2026-01")
         self.assertIn('"month": "2026-01"', result.output)
