@@ -1,19 +1,16 @@
 {% extends "contacts/object_list.html" %}
-
-{% load django_bootstrap5 i18n workbench %}
+{% load workbench %}
 
 {% block search-form-buttons %}
-  {{ block.super }}
   {% if request.GET %}
-    <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+    <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
       {% include 'svg/desktop-download.svg' %}
       XLSX
     </a>
-  {% endif %}
-  {% if request.GET %}
-    <a href="{% querystring export='vcard' %}" class="btn btn-primary">
+    <a href="{% querystring export='vcard' %}" class="btn btn-quiet">
       {% include 'svg/desktop-download.svg' %}
       vCard
     </a>
   {% endif %}
+  {{ block.super }}
 {% endblock search-form-buttons %}

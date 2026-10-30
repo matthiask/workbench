@@ -305,8 +305,15 @@ tbody th > a {
 }
 
 .form-search {
-  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
   margin-bottom: 1rem;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .form-search input,
@@ -318,10 +325,6 @@ tbody th > a {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.form-search > * {
-  margin-left: 0.25rem;
 }
 
 .form-search label:empty {
@@ -352,7 +355,7 @@ tbody th > a {
 }
 
 .progress-line {
-  height: 6px;
+  height: 4px;
 }
 
 [data-field-value] {
@@ -830,7 +833,6 @@ a:hover {
   box-shadow: var(--wb-shadow);
 
   .progress-line {
-    height: 4px;
     margin-top: 0.5rem;
   }
 }
@@ -961,7 +963,6 @@ a:hover {
   }
 
   .progress-line {
-    height: 4px;
     margin-top: 0.25rem;
   }
 }
@@ -1286,4 +1287,107 @@ a:hover {
 
 .wb-tabular {
   font-variant-numeric: tabular-nums;
+}
+
+// Rows of list pages: title and meta on the left, badges and amounts right
+.wb-subnav {
+  gap: 0.25rem;
+
+  .nav-link {
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--bs-border-radius);
+    color: var(--bs-secondary-color);
+    font-size: 0.9rem;
+
+    &:hover {
+      color: var(--bs-body-color);
+    }
+
+    &.active {
+      background: var(--bs-secondary-bg);
+      color: var(--bs-body-color);
+      font-weight: 500;
+    }
+  }
+}
+
+.wb-filter-chip svg {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+.wb-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.wb-row-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+a.wb-row-title,
+.wb-row-title {
+  display: block;
+  color: var(--bs-body-color);
+  font-weight: 600;
+}
+
+a.wb-row-title:hover {
+  color: var(--bs-link-hover-color);
+}
+
+.wb-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+}
+
+.wb-row-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  text-align: end;
+
+  .badge {
+    align-self: flex-end;
+  }
+}
+
+.wb-row-amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.wb-row-bar {
+  max-width: 14rem;
+  margin-top: 0.4rem;
+}
+
+.wb-list-heading {
+  display: flex;
+  justify-content: space-between;
+  background: var(--wb-surface-muted);
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding-block: 0.35rem;
+}
+
+.wb-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
 }

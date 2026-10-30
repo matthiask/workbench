@@ -1,27 +1,28 @@
 {% extends "generic/object_list.html" %}
-{% load django_bootstrap5 i18n workbench %}
+{% load workbench %}
 {% block search-form-buttons %}
   {% if request.GET and request.user.features.CONTROLLING %}
-    <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+    <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
       {% include 'svg/desktop-download.svg' %}
       XLSX
     </a>
   {% endif %}
 {% endblock search-form-buttons %}
 
-{% block objects %}
-  <div class="list-group list-group-flush">
-    {% for cost in object_list %}
-      <a class="list-group-item list-group-item-action px-0" href="{{ cost.get_absolute_url }}" data-ajaxmodal>
-        <small class="d-flex justify-content-between">
+{% block rows %}
+  {% for cost in object_list %}
+    <a class="list-group-item list-group-item-action wb-row" href="{{ cost.get_absolute_url }}" data-ajaxmodal>
+      <div class="wb-row-main">
+        <div class="wb-row-meta">
           <span>{{ cost.service.project_service_title }}</span>
-          <span>{{ cost.rendered_by.get_short_name }} / {{ cost.rendered_on|local_date_format }}</span>
-        </small>
-        <p class="mb-0">
-          <strong>{{ cost.cost|currency }}</strong>
-          {{ cost.description }}
-        </p>
-      </a>
-    {% endfor %}
-  </div>
-{% endblock objects %}
+        </div>
+        <div>{{ cost.description }}</div>
+      </div>
+      <div class="wb-row-aside">
+        <span class="wb-row-amount">{{ cost.cost|currency }}</span>
+        <span class="wb-row-meta">{{ cost.rendered_by.get_short_name }} &middot;
+          {{ cost.rendered_on|local_date_format }}</span>
+      </div>
+    </a>
+  {% endfor %}
+{% endblock rows %}

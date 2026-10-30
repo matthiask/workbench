@@ -1,24 +1,22 @@
 {% extends "projects/object_list.html" %}
-{% load django_bootstrap5 i18n workbench %}
-{% block objects %}
-  <div class="list-group list-group-flush">
-    {% for object in object_list %}
-      <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action px-0">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">{{ object|h }}</h5>
-          {{ object.status_badge }}
+{% load i18n workbench %}
+{% block rows %}
+  {% for object in object_list %}
+    <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+      <div class="wb-row-main">
+        <div class="wb-row-title">{{ object|h }}</div>
+        <div class="wb-row-meta">
+          <span>{{ object.project|h }}</span>
+          <span>{{ object.project.contact.name_with_organization|default:object.project.customer }}</span>
         </div>
-        <div class="row">
-          <div class="col-md-5 text-truncate">{{ object.project|h }}</div>
-          <div class="col-md-4 text-truncate">
-            {{ object.project.contact.name_with_organization|default:object.project.customer }}
-          </div>
-          <div class="col-md-3 text-truncate text-md-end">
-            {{ object.total_excl_tax|currency }} exkl. /
-            {{ object.total|currency }}
-          </div>
-        </div>
-      </a>
-    {% endfor %}
-  </div>
-{% endblock objects %}
+      </div>
+      <div class="wb-row-aside">
+        {{ object.status_badge }}
+        <span
+          class="wb-row-amount"
+          title="{% translate 'total excl. tax'|capfirst %}"
+        >{{ object.total_excl_tax|currency }}</span>
+      </div>
+    </a>
+  {% endfor %}
+{% endblock rows %}

@@ -1,5 +1,5 @@
 {% extends "generic/object_list.html" %}
-{% load django_bootstrap5 i18n workbench %}
+{% load workbench %}
 {% block search-form-buttons %}
   <a href="{{ view.model.urls.create }}" class="btn btn-primary" data-ajaxmodal>
     {% include "svg/plus.svg" %}
@@ -7,19 +7,20 @@
   </a>
 {% endblock search-form-buttons %}
 
-{% block objects %}
+{% block rows %}
   {% for object in object_list %}
-    <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action" data-ajaxmodal>
-      <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">{{ object|h }}</h5>
-        {{ object.status_badge }}
+    <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action wb-row" data-ajaxmodal>
+      <div class="wb-row-main">
+        <div class="wb-row-title">{{ object|h }}</div>
+        <div class="wb-row-meta">
+          <span>{{ object.project }}</span>
+          <span>{{ object.user.get_full_name }}</span>
+          <span>{{ object.pretty_from_until }}</span>
+        </div>
       </div>
-      <div class="d-flex justify-content-between">
-        <span class="w-50">{{ object.project }}</span>
-        <span>{{ object.planned_hours|hours }}</span>
-        <span>{{ object.user.get_full_name }}</span>
-        <span>{{ object.pretty_from_until }}</span>
+      <div class="wb-row-aside">
+        <span class="wb-row-amount">{{ object.planned_hours|hours }}</span>
       </div>
     </a>
   {% endfor %}
-{% endblock objects %}
+{% endblock rows %}

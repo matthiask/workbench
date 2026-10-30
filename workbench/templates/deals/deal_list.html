@@ -1,36 +1,46 @@
 {% extends "generic/object_list.html" %}
 {% load i18n workbench %}
 {% block search-form-buttons %}
-  {{ block.super }}
-  <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+  <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
     {% include 'svg/desktop-download.svg' %}
     XLSX
   </a>
+  {{ block.super }}
 {% endblock search-form-buttons %}
 
 {% block objects %}
-  <div class="row">
+  <div class="row g-3">
     {% for group in object_list|load_overview_attributes|group_deals_by_probability:view.search_form.should_group_deals %}
       <div class="col-lg-6 col-xl-4">
-        <div class="card mb-5">
+        <section class="card">
           <div class="card-header d-flex align-items-center justify-content-between">
-            <h5 class="mb-1">{{ group.title }}</h5>
-            <span>{{ group.sum|currency }}</span>
+            <span>{{ group.title }}</span>
+            <span class="wb-tabular">{{ group.sum|currency }}</span>
           </div>
           <div class="list-group list-group-flush">
             {% for object in group.deals %}
-              <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action">
-                <span style="float: right">{{ object.status_badge }}</span>
-                <h5 class="mb-1">{{ object|h }}</h5>
-                <div class="row">
-                  <div class="col-md-9">{{ object.contact.name_with_organization|default:object.customer }}</div>
-                  <div class="col-md-3 text-md-end">{{ object.value|currency }}</div>
+              <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+                <div class="wb-row-main">
+                  <div class="wb-row-title">{{ object|h }}</div>
+                  <div class="wb-row-meta">
+                    <span>{{ object.contact.name_with_organization|default:object.customer }}</span>
+                  </div>
+                  {% if object.overview_attributes %}
+                    <div class="wb-row-meta">{{ object.overview_attributes }}</div>
+                  {% endif %}
+                  <div class="mt-1">{{ object.status_badge }}</div>
                 </div>
-                {{ object.overview_attributes }}
+                <div class="wb-row-aside">
+                  <span class="wb-row-amount">{{ object.value|currency }}</span>
+                </div>
               </a>
             {% endfor %}
           </div>
-        </div>
+        </section>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="card"><div class="card-body text-secondary">{% translate 'No results found.' %}</div></div>
       </div>
     {% endfor %}
   </div>

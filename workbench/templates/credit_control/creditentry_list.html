@@ -2,40 +2,46 @@
 {% load i18n workbench %}
 {% block search-form-buttons %}
   {% if request.user.features.BOOKKEEPING %}
-    <a href="{{ view.model.urls.upload }}" class="btn btn-primary">{% translate 'Upload account statement' %}</a>
-    <a href="{{ view.model.urls.assign }}" class="btn btn-primary">{% translate 'Assign credit entries' %}</a>
+    <a href="{{ view.model.urls.upload }}" class="btn btn-quiet">{% translate 'Upload account statement' %}</a>
+    <a href="{{ view.model.urls.assign }}" class="btn btn-quiet">{% translate 'Assign credit entries' %}</a>
   {% endif %}
   {{ block.super }}
 {% endblock search-form-buttons %}
 
 {% block objects %}
-  <table class="table table-hover table-striped">
-    <thead>
-      <tr>
-        <th>{% translate 'ledger' %}</th>
-        <th>{% translate 'value date' %}</th>
-        <th>{% translate 'payment notice' %}</th>
-        <th class="text-end">{% translate 'total' %}</th>
-        <th>
-          {% translate 'invoice' %}, {% translate 'notes' %}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for entry in object_list %}
-        <tr>
-          <td>{{ entry.ledger }}</td>
-          <th>
-            <a href="{{ entry.get_absolute_url }}">{{ entry.value_date|local_date_format }}</a>
-          </th>
-          <td>{{ entry.payment_notice }}</td>
-          <td class="text-end">{{ entry.total|currency }}</td>
-          <td>
-            {% link_or_none entry.invoice none='' %}
-            {{ entry.notes|linebreaksbr }}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 wb-compact-table">
+        <thead>
+          <tr>
+            <th>{% translate 'value date'|capfirst %}</th>
+            <th>{% translate 'ledger'|capfirst %}</th>
+            <th>{% translate 'payment notice'|capfirst %}</th>
+            <th class="text-end">{% translate 'total'|capfirst %}</th>
+            <th>
+              {% translate 'invoice'|capfirst %}, {% translate 'notes' %}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in object_list %}
+            <tr>
+              <td class="text-nowrap">
+                <a href="{{ entry.get_absolute_url }}">{{ entry.value_date|local_date_format }}</a>
+              </td>
+              <td>{{ entry.ledger }}</td>
+              <td>{{ entry.payment_notice }}</td>
+              <td class="text-end text-nowrap">{{ entry.total|currency }}</td>
+              <td>
+                {% link_or_none entry.invoice none='' %}
+                {% if entry.notes %}<div class="text-secondary">{{ entry.notes|linebreaksbr }}</div>{% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-secondary">{% translate 'No results found.' %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock objects %}

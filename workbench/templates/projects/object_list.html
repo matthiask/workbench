@@ -1,20 +1,19 @@
 {% extends "generic/object_list.html" %}
-{% load django_bootstrap5 i18n mark_current workbench %}
+{% load i18n mark_current %}
 {% block content-title %}
-  <h1>
-    {% translate 'projects'|capfirst %}
-    <small>
-      <a {% if request.path == "/projects/" %}class="active"{% endif %} href="{% url 'projects_project_list' %}">
-        {% translate 'projects'|capfirst %}
-      </a>
-      {% mark_current request.path %}
-      {% if request.user.features.CONTROLLING %}
-        <a href="{% url 'offers_offer_list' %}">{% translate 'offers'|capfirst %}</a>
-      {% endif %}
-      {% if request.user.features.CAMPAIGNS %}
-        <a href="{% url 'projects_campaign_list' %}">{% translate 'campaigns'|capfirst %}</a>
-      {% endif %}
-      {% endmark_current %}
-    </small>
-  </h1>
+  <h1 class="mb-1">{% translate 'projects'|capfirst %}</h1>
+  <nav class="nav wb-subnav">
+    <a
+      class="nav-link {% if request.path == '/projects/' %}active{% endif %}"
+      href="{% url 'projects_project_list' %}"
+    >{% translate 'projects'|capfirst %}</a>
+    {% mark_current request.path %}
+    {% if request.user.features.CONTROLLING %}
+      <a class="nav-link" href="{% url 'offers_offer_list' %}">{% translate 'offers'|capfirst %}</a>
+    {% endif %}
+    {% if request.user.features.CAMPAIGNS %}
+      <a class="nav-link" href="{% url 'projects_campaign_list' %}">{% translate 'campaigns'|capfirst %}</a>
+    {% endif %}
+    {% endmark_current %}
+  </nav>
 {% endblock content-title %}

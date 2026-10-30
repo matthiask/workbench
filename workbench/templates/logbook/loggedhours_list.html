@@ -1,35 +1,35 @@
 {% extends "generic/object_list.html" %}
-
-{% load django_bootstrap5 i18n workbench %}
+{% load workbench %}
 
 {% block search-form-buttons %}
   {% if request.GET and request.user.features.CONTROLLING %}
-    <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
+    <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
       {% include 'svg/desktop-download.svg' %}
       XLSX
     </a>
   {% endif %}
 {% endblock search-form-buttons %}
 
-{% block objects %}
-  <div class="list-group list-group-flush">
-    {% for day, sum, instances in object_list|group_hours_by_day %}
-      <h5 class="mt-3 mb-3 d-flex justify-content-between">
-        <span>{{ day|local_date_format }}</span>
-        <span class="text-end">{{ sum }}h</span>
-      </h5>
-      {% for hours in instances %}
-        <a class="list-group-item list-group-item-action px-0" href="{{ hours.get_absolute_url }}" data-ajaxmodal>
-          <small class="d-flex justify-content-between">
+{% block rows %}
+  {% for day, sum, instances in object_list|group_hours_by_day %}
+    <div class="list-group-item wb-list-heading">
+      <span>{{ day|local_date_format }}</span>
+      <span>{{ sum|hours }}</span>
+    </div>
+    {% for hours in instances %}
+      <a class="list-group-item list-group-item-action wb-row" href="{{ hours.get_absolute_url }}" data-ajaxmodal>
+        <div class="wb-row-main">
+          <div class="wb-row-meta">
             <span>{{ hours.service.project_service_title }}</span>
-            <span class="text-nowrap">{{ hours.rendered_by.get_short_name }} / {{ hours.created_at|date:'H:i' }}</span>
-          </small>
-          <p class="mb-0">
-            <strong>{{ hours.hours|hours }}</strong>
-            {{ hours.description }}
-          </p>
-        </a>
-      {% endfor %}
+          </div>
+          <div>{{ hours.description }}</div>
+        </div>
+        <div class="wb-row-aside">
+          <span class="wb-row-amount">{{ hours.hours|hours }}</span>
+          <span class="wb-row-meta">{{ hours.rendered_by.get_short_name }} &middot;
+            {{ hours.created_at|date:'H:i' }}</span>
+        </div>
+      </a>
     {% endfor %}
-  </div>
-{% endblock objects %}
+  {% endfor %}
+{% endblock rows %}
