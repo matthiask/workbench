@@ -6,14 +6,15 @@ from django.conf import settings
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.audit.models import LoggedAction
 from workbench.awt.holidays import (
     get_public_holidays,
     get_zurich_holidays,
     weekdays_per_month,
 )
-from workbench.awt.models import Holiday, WorkingTimeModel, Year
+from workbench.awt.models import Absence, Holiday, WorkingTimeModel, Year
 from workbench.awt.reporting import annual_working_time_warnings
-from workbench.tools.validation import logbook_lock
+from workbench.tools.validation import in_days, logbook_lock
 
 
 def create_holidays():
@@ -101,3 +102,17 @@ def annual_working_time_warnings_mails():
                 to=[row["user"].email],
                 reply_to=[user.email for user in warning_all],
             ).send()
+
+
+def clear_sickness_descriptions():
+    """Descriptions of sickness absences may be health data and aren't needed
+    once the year is closed. The history of these absences contains them too
+    (also the update clearing them), it is removed as well."""
+    absences = Absence.objects.filter(
+        reason=Absence.SICKNESS, starts_on__lt=in_days(-2 * 366)
+    ).exclude(description="")
+    ids = [str(pk) for pk in absences.values_list("id", flat=True)]
+    if not ids:
+        return
+    absences.update(description="")
+    LoggedAction.objects.for_model(Absence).filter(row_data__id__in=ids).delete()

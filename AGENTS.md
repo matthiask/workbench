@@ -171,6 +171,17 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   annotate querysets with it); everything about
   time (utilization, productivity, planning, squeeze's hours, budgets in hours)
   uses `hours`.
+- Sickness absences are health data ("besonders schützenswerte
+  Personendaten"): only the absent person and users with
+  `WORKING_TIME_CORRECTION` see their reason and description
+  (`Absence.details_visible_to()`, `reason_for()`, `description_for()`, the
+  `absences` template filters; `visible_absences()` leaves them out of
+  searches and reason filters). Others see an "absence". `Absence.__str__`
+  contains neither. Planning and its mails use `public_text()`. The annual
+  working time report of others requires the feature, the history shows
+  reasons and descriptions only with it, and `clear_sickness_descriptions()`
+  (fairy tasks) clears descriptions and history after two years.
+  Descriptions of absences are optional.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Page layout (see `projects/project_detail.html` and the contacts detail

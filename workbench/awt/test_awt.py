@@ -11,6 +11,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import User
+from workbench.audit.models import LoggedAction
 from workbench.awt.models import Absence, Employment, Holiday, Year
 from workbench.awt.reporting import (
     active_users,
@@ -19,6 +20,7 @@ from workbench.awt.reporting import (
 )
 from workbench.awt.tasks import (
     annual_working_time_warnings_mails,
+    clear_sickness_descriptions,
     create_holidays,
     is_previous_month_locked_starting_today,
 )
@@ -830,3 +832,37 @@ class AWTTest(TestCase):
             reason=Absence.VACATION,
         )
         self.assertEqual(str(absence), f"Absence {absence.pretty_period}")
+
+    def test_clear_sickness_descriptions(self):
+        """Descriptions of old sickness absences are cleared, their history too"""
+        kwargs = {"user": factories.UserFactory.create(), "days": 1}
+        old = Absence.objects.create(
+            starts_on=in_days(-800),
+            reason=Absence.SICKNESS,
+            description="Flu",
+            **kwargs,
+        )
+        recent = Absence.objects.create(
+            starts_on=in_days(-400),
+            reason=Absence.SICKNESS,
+            description="Cold",
+            **kwargs,
+        )
+        vacation = Absence.objects.create(
+            starts_on=in_days(-800),
+            reason=Absence.VACATION,
+            description="Beach",
+            **kwargs,
+        )
+
+        clear_sickness_descriptions()
+
+        old.refresh_from_db()
+        recent.refresh_from_db()
+        vacation.refresh_from_db()
+        self.assertEqual(old.description, "")
+        self.assertEqual(recent.description, "Cold")
+        self.assertEqual(vacation.description, "Beach")
+        actions = LoggedAction.objects.for_model(Absence)
+        self.assertFalse(actions.with_data(id=old.pk).exists())
+        self.assertTrue(actions.with_data(id=recent.pk).exists())
