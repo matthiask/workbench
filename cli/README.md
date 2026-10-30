@@ -42,6 +42,10 @@ warning, the CLI fails and you have to use the web interface.
     wb projects create --title "Online Marketing 2027" --contact 345 --dry-run
     wb projects create --title "Online Marketing 2027" --contact 345
 
+`wb organizations show 123` and `wb people show 345` show the details of the
+search results, e.g. the people of an organization or the email addresses of a
+person.
+
 The customer is the contact's organization unless you pass `--customer`.
 `--type` is `order` (default), `maintenance` or `internal`, `--owned-by` takes a
 short name and defaults to you.

@@ -642,7 +642,7 @@ def create_project(
 
 @cli.group()
 def contacts():
-    """Find organizations and people"""
+    """Search organizations and people"""
 
 
 @contacts.command("search")
@@ -675,6 +675,84 @@ def search_contacts(query, include_archived, as_json):
             organization.get("name", ""),
         )
     console.print(table)
+
+
+@cli.group()
+def organizations():
+    """Look at organizations, search them with `wb contacts search`"""
+
+
+@organizations.command("show")
+@click.argument("organization_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_organization(organization_id, as_json):
+    """Show an organization and its people"""
+    data = _request("GET", f"contacts/organizations/{organization_id}/")
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_fields(
+        data["name"] + (" (archived)" if data["is_archived"] else ""),
+        [
+            ("ID", data["id"]),
+            ("Primary contact", data["primary_contact"]),
+            ("Groups", ", ".join(data["groups"])),
+            ("URL", data["url"]),
+        ],
+        url=data["url"],
+    )
+    if data["notes"]:
+        console.print()
+        console.print(data["notes"])
+    table = _table("ID>", "Name", title="People")
+    for person in data["people"]:
+        table.add_row(
+            str(person["id"]),
+            person["full_name"] + (" (archived)" if person["is_archived"] else ""),
+        )
+    console.print(table)
+
+
+@cli.group()
+def people():
+    """Look at people, search them with `wb contacts search`"""
+
+
+@people.command("show")
+@click.argument("person_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_person(person_id, as_json):
+    """Show a person and their contact details"""
+    data = _request("GET", f"contacts/people/{person_id}/")
+    if as_json:
+        _echo_json(data)
+        return
+    organization = data["organization"] or {}
+    _echo_fields(
+        data["full_name"] + (" (archived)" if data["is_archived"] else ""),
+        [
+            ("ID", data["id"]),
+            ("Organization", organization.get("name")),
+            ("Organization ID", organization.get("id")),
+            ("Salutation", data["salutation"]),
+            ("Primary contact", data["primary_contact"]),
+            ("Groups", ", ".join(data["groups"])),
+            *(
+                (f"{label} ({detail['type']})", detail["value"])
+                for label, key in [
+                    ("Email", "email_addresses"),
+                    ("Phone", "phone_numbers"),
+                    ("Address", "postal_addresses"),
+                ]
+                for detail in data[key]
+            ),
+            ("URL", data["url"]),
+        ],
+        url=data["url"],
+    )
+    if data["notes"]:
+        console.print()
+        console.print(data["notes"])
 
 
 @cli.group()

@@ -110,6 +110,10 @@ class CLITest(TestCase):
 
         result = self.wb("contacts", "search", project.customer.name.split()[0])
         self.assertIn(project.customer.name, result.output)
+        result = self.wb("organizations", "show", project.customer_id)
+        self.assertIn(project.contact.full_name, result.output)
+        result = self.wb("people", "show", project.contact_id)
+        self.assertIn(project.customer.name, result.output)
 
         result = self.wb(
             "projects",
