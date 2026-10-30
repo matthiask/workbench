@@ -2,19 +2,30 @@ import datetime as dt
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from ninja import Router, Schema
+from ninja import Query, Router, Schema
 from ninja.errors import ValidationError
 
 from workbench.accounts.models import User
 from workbench.awt.models import Absence
 from workbench.offers.models import Offer
-from workbench.planning.models import Milestone, PlannedWork
+from workbench.planning.models import ExternalWork, Milestone, PlannedWork
+from workbench.planning.reporting import Planning
 from workbench.planning.schemas import PlanningImport, planning_import_schema
+from workbench.projects.api import project_summary
 from workbench.projects.models import Project
+from workbench.reporting.api import jsonable
 from workbench.services.models import ServiceType
-from workbench.tools.api import full_clean
+from workbench.tools.api import (
+    DateRangeFilter,
+    UsersFilter,
+    date_range,
+    filter_users,
+    full_clean,
+)
+from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
 
 
@@ -369,3 +380,149 @@ def planning_import(
         ],
         "warnings": warnings,
     }
+
+
+class PlanningExportFilter(DateRangeFilter, UsersFilter):
+    project: int | None = None
+    campaign: int | None = None
+
+
+def _mondays(date_from, date_until):
+    week = monday(date_from)
+    while week <= date_until:
+        yield week
+        week += dt.timedelta(days=7)
+
+
+@router.get("/planning/")
+def planning_export(request, filters: Query[PlanningExportFilter]):
+    """Planned work, milestones and external work, optionally of a project, a
+    campaign, users or a team
+
+    The period is the whole planning of projects and campaigns, otherwise
+    the current and the next eleven weeks by default. Planned hours are
+    distributed evenly over the weeks of the planned work. Milestones and
+    external work are those of the projects with planned work, or of the
+    project or campaign. The capacity (hours not planned yet, less absences
+    and holidays) is reported for users and teams."""
+    work = PlannedWork.objects.select_related(
+        "project", "offer__project", "user", "service_type", "milestone"
+    )
+    milestones = Milestone.objects.select_related("project")
+    external_work = ExternalWork.objects.select_related(
+        "project", "provided_by", "service_type", "milestone"
+    )
+    if filters.project is not None:
+        work = work.filter(project=filters.project)
+    if filters.campaign is not None:
+        work = work.filter(project__campaign=filters.campaign)
+    users = filter_users(filters)
+    if users is not None:
+        work = work.filter(user__in=users)
+
+    if (
+        filters.period
+        or filters.date_from
+        or filters.date_until
+        or (filters.project is None and filters.campaign is None)
+    ):
+        period = date_range(
+            filters, default=[monday(), monday() + dt.timedelta(days=83)]
+        )
+        weeks = list(_mondays(*period))
+        work = work.filter(weeks__overlap=weeks)
+    else:
+        weeks = sorted({week for pw in work for week in pw.weeks})
+        period = [weeks[0], weeks[-1] + dt.timedelta(days=6)] if weeks else [None, None]
+        weeks = list(_mondays(*period)) if weeks else []
+    work = list(work)
+
+    projects = Q(project__in={pw.project_id for pw in work})
+    if filters.project is not None:
+        projects |= Q(project=filters.project)
+    if filters.campaign is not None:
+        projects |= Q(project__campaign=filters.campaign)
+    if weeks:
+        milestones = milestones.filter(
+            projects, date__range=[weeks[0], weeks[-1] + dt.timedelta(days=6)]
+        )
+        external_work = external_work.filter(projects, weeks__overlap=weeks)
+    else:
+        milestones = milestones.filter(projects)
+        external_work = external_work.filter(projects)
+
+    by_week = {week: {"planned": Z1, "provisional": Z1} for week in weeks}
+    planned_work = []
+    for pw in sorted(work, key=lambda pw: (min(pw.weeks), pw.project_id, pw.pk)):
+        per_week = pw.planned_hours / len(pw.weeks)
+        in_period = [week for week in pw.weeks if week in by_week]
+        for week in in_period:
+            by_week[week]["planned"] += per_week
+            if pw.is_provisional:
+                by_week[week]["provisional"] += per_week
+        planned_work.append({
+            "id": pw.id,
+            "url": request.build_absolute_uri(pw.get_absolute_url()),
+            "project": project_summary(pw.project, request),
+            "offer": {"id": pw.offer.id, "code": pw.offer.code, "title": pw.offer.title}
+            if pw.offer
+            else None,
+            "milestone": pw.milestone.title if pw.milestone else None,
+            "user": pw.user.get_short_name(),
+            "title": pw.title,
+            "service_type": pw.service_type.title if pw.service_type else None,
+            "is_provisional": pw.is_provisional,
+            "planned_hours": pw.planned_hours,
+            "hours_per_week": per_week,
+            "hours_in_period": per_week * len(in_period),
+            "weeks": sorted(pw.weeks),
+        })
+
+    capacity = None
+    if users is not None and weeks:
+        active = sorted(users.filter(is_active=True))
+        if active:
+            rows = Planning(weeks=weeks, users=active).capacity()["by_user"]
+            capacity = [
+                {
+                    "user": user.get_short_name(),
+                    "weeks": {
+                        week.isoformat(): hours
+                        for week, hours in zip(weeks, row["capacity"], strict=True)
+                    },
+                }
+                for user, row in zip(active, rows, strict=True)
+            ]
+
+    return jsonable({
+        "date_from": period[0],
+        "date_until": period[1],
+        "weeks": [{"week": week} | hours for week, hours in by_week.items()],
+        "planned_work": planned_work,
+        "milestones": [
+            {
+                "id": milestone.id,
+                "url": request.build_absolute_uri(milestone.urls["detail"]),
+                "project": project_summary(milestone.project, request),
+                "title": milestone.title,
+                "date": milestone.date,
+                "phase_starts_on": milestone.phase_starts_on,
+                "estimated_total_hours": milestone.estimated_total_hours,
+            }
+            for milestone in milestones.order_by("date", "pk")
+        ],
+        "external_work": [
+            {
+                "id": ew.id,
+                "url": request.build_absolute_uri(ew.get_absolute_url()),
+                "project": project_summary(ew.project, request),
+                "title": ew.title,
+                "provided_by": ew.provided_by.name,
+                "service_type": ew.service_type.title if ew.service_type else None,
+                "milestone": ew.milestone.title if ew.milestone else None,
+                "weeks": sorted(ew.weeks),
+            }
+            for ew in sorted(external_work, key=lambda ew: (min(ew.weeks), ew.pk))
+        ],
+        "capacity": capacity,
+    })

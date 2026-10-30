@@ -214,3 +214,66 @@ class PlanningAPITest(TestCase):
             headers={"X-CSRFToken": client.cookies["csrftoken"].value},
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_export(self):
+        """Planned work, milestones and capacity of a period or a project"""
+        user = factories.UserFactory.create(_short_name="ab")
+        factories.EmploymentFactory.create(user=user, date_from=in_days(-30))
+        project = factories.ProjectFactory.create(
+            campaign=factories.CampaignFactory.create()
+        )
+        week = monday()
+        work = factories.PlannedWorkFactory.create(
+            project=project,
+            user=user,
+            title="Design",
+            planned_hours=20,
+            weeks=[week, week + dt.timedelta(days=7)],
+        )
+        later = factories.PlannedWorkFactory.create(
+            project=project,
+            title="Launch",
+            planned_hours=5,
+            weeks=[week + dt.timedelta(days=140)],
+            is_provisional=True,
+        )
+        milestone = factories.MilestoneFactory.create(
+            project=project, date=week + dt.timedelta(days=11)
+        )
+        self.client.force_login(user)
+
+        data = self.client.get("/api/planning/").json()
+        self.assertEqual(data["date_from"], week.isoformat())
+        self.assertEqual(len(data["weeks"]), 12)
+        self.assertEqual([w["id"] for w in data["planned_work"]], [work.id])
+        self.assertEqual(data["planned_work"][0]["hours_per_week"], 10)
+        self.assertEqual(data["weeks"][0]["planned"], 10)
+        self.assertEqual([m["id"] for m in data["milestones"]], [milestone.id])
+        self.assertIsNone(data["capacity"])
+
+        # A project's whole planning
+        data = self.client.get("/api/planning/", {"project": project.pk}).json()
+        self.assertEqual([w["id"] for w in data["planned_work"]], [work.id, later.id])
+        self.assertEqual(len(data["weeks"]), 21)
+        self.assertEqual(data["weeks"][-1]["provisional"], 5)
+        data = self.client.get("/api/planning/", {"campaign": project.campaign_id})
+        self.assertEqual(len(data.json()["planned_work"]), 2)
+
+        # Capacity of users, the period overrides the project's
+        data = self.client.get(
+            "/api/planning/",
+            {
+                "user": "ab",
+                "date_from": week.isoformat(),
+                "date_until": week.isoformat(),
+            },
+        ).json()
+        self.assertEqual(len(data["weeks"]), 1)
+        self.assertEqual(data["planned_work"][0]["hours_in_period"], 10)
+        [capacity] = data["capacity"]
+        self.assertEqual(capacity["user"], "ab")
+        self.assertEqual(list(capacity["weeks"]), [week.isoformat()])
+
+        data = self.client.get("/api/planning/", {"project": 0}).json()
+        self.assertEqual(data["date_from"], None)
+        self.assertEqual(data["planned_work"], [])

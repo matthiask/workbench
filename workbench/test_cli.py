@@ -417,6 +417,22 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(monday().isoformat(), result.output)
 
+        factories.PlannedWorkFactory.create(
+            project=project,
+            user=self.user,
+            title="Wireframes",
+            weeks=[monday()],
+            planned_hours=8,
+        )
+        result = self.wb("planning", "export", "--user", "ab")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Wireframes", result.output)
+        self.assertIn("ab free", result.output)
+        result = self.wb("planning", "export", "--project", project.pk, "--csv")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertTrue(result.output.startswith("week,project_id,"))
+        self.assertIn(f"{monday().isoformat()},{project.pk},", result.output)
+
         result = self.wb("reports", "key-data", "--month", "2026-01")
         self.assertIn('"month": "2026-01"', result.output)
         result = self.wb("reports", "hours-per-type", "--period", "nope")

@@ -319,6 +319,16 @@ plan, validate it and import it:
 Importing only adds milestones and planned work, it never changes or removes
 existing entries.
 
+Export the planning of a project or a campaign, or of users or a team (the
+next twelve weeks by default, periods work like for the reports) with their
+capacity per week. `--csv` writes one row per planned work and week, for
+spreadsheets:
+
+    wb planning export --project 1234
+    wb planning export --campaign 56 --csv > campaign.csv
+    wb planning export --team Design --period 2026-Q4
+    wb planning export --user mk --from 2026-11-02 --until 2026-11-29
+
 ## Project statistics
 
 Hours (offered, logged, planned), amounts (sold, invoiced, logged work which
