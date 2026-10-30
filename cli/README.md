@@ -425,9 +425,13 @@ skill which turns a specification into an offer using `wb`: it finds the
 project, fetches the context, drafts the offer, reviews it with you, validates
 it with `--dry-run` and only creates it after your approval.
 `skills/workbench-contact/` adds people from email signatures, business cards
-and the like, after looking for existing records. Link all of them into your
-personal skills to use them in any directory (run it again when skills are
-added):
+and the like, after looking for existing records. `skills/workbench-deals/`
+keeps the sales pipeline up to date, `skills/workbench-planning/` plans
+projects from their offers and the capacity of the people, and
+`skills/workbench-controlling/` writes controlling summaries from the reports
+(reading only). The skills which change something always use `--dry-run`
+first and ask before writing. Link all of them into your personal skills to
+use them in any directory (run it again when skills are added):
 
     for skill in "$PWD"/cli/skills/*/; do ln -sfn "${skill%/}" ~/.claude/skills/; done
 
