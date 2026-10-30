@@ -1,7 +1,9 @@
 import datetime as dt
+import io
 from decimal import Decimal
 
 from django.test import TestCase
+from openpyxl import load_workbook
 
 from workbench import factories
 from workbench.invoices.models import Invoice
@@ -288,3 +290,35 @@ class StatisticsTest(TestCase):
             hours.service.project.urls["cost_by_month_and_service_xlsx"]
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_cost_by_month_without_declined_offers(self):
+        """Declined offers are left out unless work has been logged on them"""
+        project = factories.ProjectFactory.create()
+        accepted = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        declined = factories.OfferFactory.create(project=project, status=Offer.DECLINED)
+        delivered = factories.OfferFactory.create(
+            project=project, status=Offer.DECLINED
+        )
+        factories.ServiceFactory.create(
+            project=project, offer=accepted, title="Concept"
+        )
+        factories.ServiceFactory.create(
+            project=project, offer=declined, title="Unwanted"
+        )
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(
+                project=project, offer=delivered, title="Delivered anyway"
+            )
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["cost_by_month_and_service_xlsx"])
+        cells = {
+            str(cell.value)
+            for row in load_workbook(io.BytesIO(response.content)).active.iter_rows()
+            for cell in row
+            if cell.value is not None
+        }
+        self.assertTrue(any("Concept" in cell for cell in cells))
+        self.assertTrue(any("Delivered anyway" in cell for cell in cells))
+        self.assertFalse(any("Unwanted" in cell for cell in cells))

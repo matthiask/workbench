@@ -258,7 +258,9 @@ def cost_by_month_and_service_xlsx(request, pk):
 
     for service in Service.objects.filter(project=project).select_related("offer"):
         service_budget[service] = service.service_cost
-        if service.offer:
+        # Declined offers only appear when work was logged or invoiced on
+        # them, below
+        if service.offer and not service.offer.is_declined:
             offers[service.offer].add(service)
             offer_budget[service.offer] = service.offer.total_excl_tax
 
@@ -268,6 +270,7 @@ def cost_by_month_and_service_xlsx(request, pk):
         service_invoiced[service.project_service] = service.service_cost
         if offer := service.project_service.offer:
             offer_invoiced[offer] += service.service_cost
+            offers[offer].add(service.project_service)
 
     for hours in (
         LoggedHours.objects
