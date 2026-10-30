@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 from decimal import Decimal
 from typing import Literal
 
@@ -21,8 +22,22 @@ from workbench.tools.validation import monday
 router = Router(tags=["timer"])
 
 
+def _codes(user, day):
+    """Short codes of the day's timestamps: T1, T2, ... in chronological order
+
+    Deleting a timestamp renumbers the following ones."""
+    timestamps = Timestamp.objects.filter(user=user, created_at__date=day).order_by(
+        "created_at", "pk"
+    )
+    return {
+        pk: f"T{index}"
+        for index, pk in enumerate(timestamps.values_list("pk", flat=True), 1)
+    }
+
+
 class SliceOut(Schema):
     timestamp_id: int | None
+    timestamp_code: str | None
     starts_at: dt.datetime | None
     ends_at: dt.datetime | None
     hours: Decimal | None
@@ -37,9 +52,10 @@ def _local(value):
     return localtime(value) if value else None
 
 
-def _slice_out(slice, request):
+def _slice_out(slice, request, *, codes):
     return {
         "timestamp_id": slice.get("timestamp_id"),
+        "timestamp_code": codes.get(slice.get("timestamp_id")),
         "starts_at": _local(slice.get("starts_at")),
         "ends_at": _local(slice.get("ends_at")),
         "hours": slice.elapsed_hours,
@@ -70,6 +86,7 @@ class TimestampIn(Schema):
 
 class TimestampOut(Schema):
     id: int
+    code: str
     type: str
     created_at: dt.datetime
     notes: str
@@ -77,13 +94,15 @@ class TimestampOut(Schema):
 
 
 def _timestamp_out(timestamp, request, *, with_slice=True):
+    codes = _codes(timestamp.user, localdate(timestamp.created_at))
     slice = timestamp.slice() if with_slice else None
     return {
         "id": timestamp.id,
+        "code": codes[timestamp.id],
         "type": timestamp.type,
         "created_at": localtime(timestamp.created_at),
         "notes": timestamp.notes,
-        "slice": _slice_out(slice, request) if slice else None,
+        "slice": _slice_out(slice, request, codes=codes) if slice else None,
     }
 
 
@@ -124,12 +143,20 @@ def timestamp_delete_latest(request):
     return result
 
 
-@router.delete("/timestamps/{int:timestamp_id}/", response=TimestampOut)
-def timestamp_delete(request, timestamp_id: int):
-    """Delete a timestamp, the IDs are in the list of slices"""
-    timestamp = get_object_or_404(
-        Timestamp.objects.filter(user=request.user), pk=timestamp_id
-    )
+@router.delete("/timestamps/{timestamp}/", response=TimestampOut)
+def timestamp_delete(request, timestamp: str, day: dt.date | None = None):
+    """Delete a timestamp by its code (T1, T2, ... of the day, today by
+    default) or its ID, both are in the list of slices"""
+    timestamps = Timestamp.objects.filter(user=request.user)
+    if match := re.fullmatch(r"[tT]([0-9]+)", timestamp):
+        codes = {
+            code: pk for pk, code in _codes(request.user, day or localdate()).items()
+        }
+        timestamp = get_object_or_404(timestamps, pk=codes.get(f"T{int(match[1])}", 0))
+    elif re.fullmatch(r"[0-9]+", timestamp):
+        timestamp = get_object_or_404(timestamps, pk=timestamp)
+    else:
+        raise HttpError(404, _("Use a code like T1 or an ID."))
     result = _timestamp_out(timestamp, request, with_slice=False)
     timestamp.delete()
     return result
@@ -157,6 +184,7 @@ def timestamp_list(request, day: dt.date | None = None):
     now = timezone.now()
     day = day or localdate(now)
     slices = Timestamp.objects.slices(request.user, day=day)
+    codes = _codes(request.user, day)
     running_since = None
     if day == localdate(now) and slices:
         running_since = slices[-1].get("ends_at") or slices[-1].get("starts_at")
@@ -183,5 +211,5 @@ def timestamp_list(request, day: dt.date | None = None):
         ).elapsed_hours
         if running_since
         else None,
-        "slices": [_slice_out(slice, request) for slice in slices],
+        "slices": [_slice_out(slice, request, codes=codes) for slice in slices],
     }

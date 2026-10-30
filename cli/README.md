@@ -241,7 +241,9 @@ Stopping a task shows how long it took. `wb timestamps list` shows the day's
 slices, the hours logged this week and since when the current task has been
 running; the unlogged slices link to the form for logging their hours in
 Workbench. `wb timestamps undo` deletes today's latest timestamp,
-`wb timestamps delete ID` any other one. If you miss `tst`, add
+`wb timestamps delete T3` any other one by the code from the list (or by its
+ID, add `--day` for codes of other days). The following timestamps are
+renumbered, so the new list is shown afterwards. If you miss `tst`, add
 `alias tst="wb timestamps"` to your shell's configuration.
 
 ## Absences

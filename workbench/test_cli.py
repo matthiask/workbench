@@ -366,10 +366,10 @@ planned_work:
         """Tasks are started and stopped like with the old tst command"""
         result = self.wb("timestamps", "start")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Start at", result.output)
+        self.assertIn("T1: start at", result.output)
         result = self.wb("timestamps", "stop", "-5", "Wireframes", "review")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn(": Wireframes review", result.output)
+        self.assertIn(", Wireframes review", result.output)
         timestamp = Timestamp.objects.filter(user=self.user).first()
         self.assertEqual(timestamp.notes, "Wireframes review")
         self.assertEqual(timestamp.type, Timestamp.STOP)
@@ -383,9 +383,11 @@ planned_work:
 
         result = self.wb("timestamps", "undo")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Deleted start at", result.output)
-        result = self.wb("timestamps", "delete", timestamp.pk)
-        self.assertIn("Deleted stop at", result.output)
+        self.assertIn("Deleted T2: start at", result.output)
+        # The renumbered list
+        self.assertIn("Wireframes review", result.output)
+        result = self.wb("timestamps", "delete", "t1")
+        self.assertIn("Deleted T1: stop at", result.output)
         self.assertFalse(Timestamp.objects.exists())
         result = self.wb("timestamps", "undo")
         self.assertEqual(result.exit_code, 1)

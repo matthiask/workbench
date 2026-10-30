@@ -17,7 +17,7 @@ from functools import cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from importlib.metadata import version
 from pathlib import Path
-from urllib.parse import parse_qs, urlencode, urljoin, urlsplit
+from urllib.parse import parse_qs, quote, urlencode, urljoin, urlsplit
 
 import click
 import requests
@@ -1868,12 +1868,14 @@ def _create_timestamp(type_, args, as_json):
 
 def _echo_timestamp(timestamp, prefix=""):
     """The timestamp and the duration of the task it stopped"""
-    text = f"{prefix}{timestamp['type']} at {_time(timestamp['created_at'])}" + (
-        f": {timestamp['notes']}" if timestamp["notes"] else ""
+    text = (
+        f"{prefix}{timestamp['code']}: {timestamp['type']}"
+        f" at {_time(timestamp['created_at'])}"
+        + (f", {timestamp['notes']}" if timestamp["notes"] else "")
     )
     if (slice := timestamp["slice"]) and slice["hours"] and slice["ends_at"]:
         text += f" ({slice['hours']}h since {_time(slice['starts_at'])})"
-    console.print(text[0].upper() + text[1:])
+    console.print(text)
 
 
 _TIMESTAMP_HELP = """
@@ -1916,11 +1918,12 @@ def list_timestamps(day, as_json):
     Unlogged slices link to the form for logging their hours."""
     params = {"day": day.date().isoformat()} if day else {}
     data = _request("GET", "timestamps/", params=params)
-    if as_json:
-        _echo_json(data)
-        return
+    _echo_json(data) if as_json else _echo_timestamps(data)
+
+
+def _echo_timestamps(data):
     table = _table(
-        "ID>",
+        "Code",
         "From",
         "Until",
         "Hours>",
@@ -1933,7 +1936,7 @@ def list_timestamps(day, as_json):
     for slice in data["slices"]:
         project = slice["project"]
         table.add_row(
-            str(slice["timestamp_id"] or ""),
+            slice["timestamp_code"] or "",
             _time(slice["starts_at"]),
             _time(slice["ends_at"]),
             slice["hours"] or "",
@@ -1955,21 +1958,41 @@ def list_timestamps(day, as_json):
         )
 
 
+def _echo_deleted(timestamp, as_json):
+    """The deleted timestamp and the day's renumbered timestamps"""
+    if as_json:
+        _echo_json(timestamp)
+        return
+    _echo_timestamp(timestamp, "Deleted ")
+    day = dt.datetime.fromisoformat(timestamp["created_at"]).date().isoformat()
+    _echo_timestamps(_request("GET", "timestamps/", params={"day": day}))
+
+
 @timestamps.command("delete")
-@click.argument("timestamp_id", type=int)
+@click.argument("timestamp")
+@click.option(
+    "--day",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Day of the code, defaults to today.",
+)
 @click.option("--json", "as_json", is_flag=True)
-def delete_timestamp(timestamp_id, as_json):
-    """Delete a timestamp, `wb timestamps list` shows the IDs"""
-    timestamp = _request("DELETE", f"timestamps/{timestamp_id}/")
-    _echo_json(timestamp) if as_json else _echo_timestamp(timestamp, "Deleted ")
+def delete_timestamp(timestamp, day, as_json):
+    """Delete a timestamp by its code (T1, T2, ...) or its ID
+
+    `wb timestamps list` shows the codes. Deleting a timestamp renumbers the
+    following ones, the new codes are shown afterwards."""
+    params = {"day": day.date().isoformat()} if day else {}
+    _echo_deleted(
+        _request("DELETE", f"timestamps/{quote(timestamp, safe='')}/", params=params),
+        as_json,
+    )
 
 
 @timestamps.command()
 @click.option("--json", "as_json", is_flag=True)
 def undo(as_json):
     """Delete the latest timestamp of today"""
-    timestamp = _request("DELETE", "timestamps/latest/")
-    _echo_json(timestamp) if as_json else _echo_timestamp(timestamp, "Deleted ")
+    _echo_deleted(_request("DELETE", "timestamps/latest/"), as_json)
 
 
 @cli.group()

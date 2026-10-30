@@ -74,9 +74,25 @@ class TimestampsAPITest(TestCase):
             user=factories.UserFactory.create(), type=Timestamp.STOP
         )
 
+        third = Timestamp.objects.create(user=user, type=Timestamp.STOP)
+
+        data = self.client.get("/api/timestamps/").json()
+        self.assertEqual(
+            [s["timestamp_code"] for s in data["slices"]], ["T2", "T3"]
+        )  # The start and the first stop are merged into one slice
+
         response = self.client.delete("/api/timestamps/latest/")
-        self.assertEqual(response.json()["id"], latest.pk)
+        self.assertEqual(response.json()["id"], third.pk)
+        self.assertEqual(response.json()["code"], "T3")
         response = self.client.delete(f"/api/timestamps/{other.pk}/")
+        self.assertEqual(response.status_code, 404)
+        response = self.client.delete("/api/timestamps/t2/")
+        self.assertEqual(response.json()["id"], latest.pk)
+        response = self.client.delete("/api/timestamps/T2/")
+        self.assertEqual(response.status_code, 404)
+        response = self.client.delete("/api/timestamps/T1/?day=2020-01-01")
+        self.assertEqual(response.status_code, 404)
+        response = self.client.delete("/api/timestamps/bla/")
         self.assertEqual(response.status_code, 404)
         response = self.client.delete(f"/api/timestamps/{first.pk}/")
         self.assertEqual(response.json()["id"], first.pk)
