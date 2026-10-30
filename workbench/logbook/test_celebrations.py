@@ -87,7 +87,7 @@ class CelebrationsTest(TestCase):
     def test_hours_targets(self):
         """Daily and weekly targets follow the working time model and employment"""
         user = factories.UserFactory.create()
-        self.assertIsNone(user.daily_hours_target)
+        self.assertIsNone(user.hours_targets)
         self.assertIsNone(user.hours["today_target"])
         self.assertIsNone(user.hours["week_target"])
 
@@ -96,15 +96,17 @@ class CelebrationsTest(TestCase):
         )
         factories.EmploymentFactory.create(user=user, percentage=80)
 
+        # Part-time work means fewer days, a day still has its hours
         user = User.objects.get(pk=user.pk)
-        self.assertEqual(user.hours["today_target"], Decimal("6.7"))
-        self.assertEqual(user.hours["week_target"], Decimal("33.5"))
+        self.assertEqual(user.hours["today_target"], Decimal("8.4"))
+        self.assertEqual(user.hours["week_target"], Decimal("33.6"))
 
         factories.LoggedHoursFactory.create(rendered_by=user, hours=7)
         self.client.force_login(user)
         response = self.client.get("/")
-        self.assertContains(response, 'class="hours-ring complete"')
-        self.assertContains(response, "stroke-dasharray: 20.9 100")
+        self.assertNotContains(response, 'class="hours-ring complete"')
+        self.assertContains(response, "stroke-dasharray: 83.3 100")
+        self.assertContains(response, "stroke-dasharray: 20.8 100")
 
     @travel("2026-09-30 12:00")  # Wednesday
     def test_milestones(self):
