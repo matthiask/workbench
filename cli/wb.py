@@ -1,4 +1,5 @@
 import csv
+import datetime as dt
 import json
 import os
 import secrets
@@ -1037,6 +1038,61 @@ def search_hours(
             f"Showing {len(data['hours'])} of {data['count']} entries,"
             " the total includes all of them."
         )
+
+
+@cli.group()
+def absences():
+    """Look at absences"""
+
+
+@absences.command("search")
+@click.option("--user", help="Short name.")
+@click.option(
+    "--reason",
+    type=click.Choice([
+        "vacation",
+        "sickness",
+        "paid",
+        "school",
+        "other",
+        "correction",
+    ]),
+)
+@click.option(
+    "--since",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Absences ending on or after this date, defaults to today.",
+)
+@click.option(
+    "--until",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Absences starting on or before this date.",
+)
+@click.option("--json", "as_json", is_flag=True)
+def search_absences(user, reason, since, until, as_json):
+    """Search absences, current and upcoming ones by default"""
+    params = {"since": (since.date() if since else dt.date.today()).isoformat()}
+    if user:
+        params["user"] = user
+    if reason:
+        params["reason"] = reason
+    if until:
+        params["until"] = until.date().isoformat()
+    data = _request("GET", "absences/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table("User", "Starts on", "Ends on", "Days>", "Reason", "Description")
+    for absence in data:
+        table.add_row(
+            _link(absence["user"], absence["url"]),
+            absence["starts_on"],
+            absence["ends_on"] or "",
+            absence["days"],
+            absence["reason"],
+            absence["description"],
+        )
+    console.print(table)
 
 
 @cli.group("projected-invoices")

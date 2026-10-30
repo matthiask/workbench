@@ -143,6 +143,13 @@ them works in the CLI:
     wb hours search --rendered-by mk --since 2026-10-01
     wb hours search wireframes --customer 345
 
+## Absences
+
+Current and upcoming absences of everyone, or of a period:
+
+    wb absences search
+    wb absences search --user mk --reason vacation --since 2026-01-01
+
 ## Reports
 
 Key figures as JSON, for users with the controlling feature:

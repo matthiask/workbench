@@ -218,6 +218,14 @@ planned_work:
         self.assertIn("Wireframes", result.output)
         self.assertIn("3.0", result.output)
 
+        factories.AbsenceFactory.create(
+            user=self.user, starts_on=in_days(7), description="Holidays"
+        )
+        factories.AbsenceFactory.create(starts_on=in_days(-7), description="Past")
+        result = self.wb("absences", "search")
+        self.assertIn("Holidays", result.output)
+        self.assertNotIn("Past", result.output)
+
         result = self.wb("projects", "stats", project.pk, "--csv")
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(result.output.startswith("project_id,project,"))
