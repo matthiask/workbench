@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:45+0100\n"
+"POT-Creation-Date: 2026-10-30 23:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1000,6 +1000,10 @@ msgid "contacts"
 msgstr "Kontakte"
 
 #: workbench/contacts/forms.py
+msgid "All groups"
+msgstr "Alle Gruppen"
+
+#: workbench/contacts/forms.py
 msgid "Archived"
 msgstr "Archiviert"
 
@@ -1007,10 +1011,6 @@ msgstr "Archiviert"
 #: workbench/projects/forms.py workbench/reporting/views.py
 msgid "All"
 msgstr "Alle"
-
-#: workbench/contacts/forms.py
-msgid "All groups"
-msgstr "Alle Gruppen"
 
 #: workbench/contacts/forms.py workbench/deals/forms.py
 #: workbench/projects/forms.py
@@ -4228,20 +4228,34 @@ msgid "took a break"
 msgstr "Habe eine Pause gemacht"
 
 #: workbench/templates/contacts/group_list.html
+#, python-format
 msgid "%(count)s person"
 msgid_plural "%(count)s people"
 msgstr[0] "%(count)s Person"
 msgstr[1] "%(count)s Personen"
 
 #: workbench/templates/contacts/group_list.html
+#, python-format
 msgid "%(count)s organization"
 msgid_plural "%(count)s organizations"
 msgstr[0] "%(count)s Organisation"
 msgstr[1] "%(count)s Organisationen"
 
 #: workbench/templates/contacts/group_list.html
+msgid "%(count)s archived"
+msgid_plural "%(count)s archived"
+msgstr[0] "%(count)s archiviert"
+msgstr[1] "%(count)s archiviert"
+
+#: workbench/templates/contacts/group_list.html
 msgid "archived"
 msgstr "archiviert"
+
+#: workbench/templates/contacts/object_list.html
+msgid "This group also contains %(count)s archived contact."
+msgid_plural "This group also contains %(count)s archived contacts."
+msgstr[0] "Diese Gruppe enthält zusätzlich %(count)s archivierten Kontakt."
+msgstr[1] "Diese Gruppe enthält zusätzlich %(count)s archivierte Kontakte."
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html

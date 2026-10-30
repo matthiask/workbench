@@ -28,6 +28,17 @@
               {{ count }} organizations
             {% endblocktranslate %}
           </span>
+          {% with archived=group.archived_people_count|add:group.archived_organizations_count %}
+            {% if archived %}
+              <span>
+                {% blocktranslate count count=archived trimmed %}
+                  {{ count }} archived
+                {% plural %}
+                  {{ count }} archived
+                {% endblocktranslate %}
+              </span>
+            {% endif %}
+          {% endwith %}
           {% if group.is_archived %}<span class="badge text-bg-secondary">{% translate 'archived' %}</span>{% endif %}
         </div>
       </div>

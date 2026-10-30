@@ -10,3 +10,18 @@
     {% endmark_current %}
   </nav>
 {% endblock content-title %}
+
+{% block objects %}
+  {% with archived=view.search_form.archived_in_group %}
+    {% if archived %}
+      <p class="text-secondary small mb-2">
+        {% blocktranslate count count=archived trimmed %}
+          This group also contains {{ count }} archived contact.
+        {% plural %}
+          This group also contains {{ count }} archived contacts.
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+  {% endwith %}
+  {{ block.super }}
+{% endblock objects %}

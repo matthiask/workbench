@@ -585,3 +585,23 @@ class GroupsTest(TestCase):
                     content.index('<optgroup label="Archived">'),
                     content.index(">Newsletter 2015</option>"),
                 )
+
+    def test_archived_members(self):
+        """People see that a group contains archived contacts, but not which"""
+        self.client.force_login(factories.UserFactory.create())
+        group = Group.objects.create(title="Newsletter")
+        active = factories.PersonFactory.create(family_name="Active")
+        archived = factories.PersonFactory.create(family_name="Gone", is_archived=True)
+        active.groups.add(group)
+        archived.groups.add(group)
+
+        content = self.client.get(Group.urls["list"]).content.decode()
+        self.assertIn("1 person", content)
+        self.assertIn("1 archived", content)
+
+        response = self.client.get(group.get_absolute_url())
+        self.assertContains(response, "This group also contains 1 archived contact.")
+        self.assertNotContains(response, "Gone")
+        # Asking for all contacts shows them, the note isn't needed then
+        response = self.client.get(group.get_absolute_url() + "&s=all")
+        self.assertNotContains(response, "archived contact")

@@ -86,6 +86,12 @@ class GroupSearchForm(Form):
             organizations_count=Count(
                 "organization", filter=Q(organization__is_archived=False), distinct=True
             ),
+            archived_people_count=Count(
+                "person", filter=Q(person__is_archived=True), distinct=True
+            ),
+            archived_organizations_count=Count(
+                "organization", filter=Q(organization__is_archived=True), distinct=True
+            ),
         ).order_by(Lower("title"), "pk")
 
 
@@ -120,6 +126,12 @@ class OrganizationSearchForm(Form):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q")).active()
         return self.apply_renamed(queryset, "g", "groups")
+
+    def archived_in_group(self):
+        """Archived organizations aren't listed, the number is shown"""
+        if group := self.cleaned_data.get("g"):
+            return Organization.objects.filter(groups=group, is_archived=True).count()
+        return 0
 
 
 class PersonSearchForm(Form):
@@ -177,6 +189,14 @@ class PersonSearchForm(Form):
             collapse_inactive=True, myself=True
         )
         self.fields["g"].choices = group_choices()
+
+    def archived_in_group(self):
+        """Archived people of the group aren't listed unless asked for, the
+        number is shown"""
+        data = self.cleaned_data
+        if (group := data.get("g")) and not data.get("s"):
+            return Person.objects.filter(groups=group, is_archived=True).count()
+        return 0
 
     def filter(self, queryset):
         data = self.cleaned_data
