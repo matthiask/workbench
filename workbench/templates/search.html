@@ -5,42 +5,52 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-md-12">
-      <h1>{% translate 'Search' %}</h1>
-      {% for result in results %}
-        <h3>
-          <a href="{{ result.url }}?q={{ query }}">{{ result.verbose_name_plural }}</a>
-        </h3>
-        {% for result in result.results %}
-          {% if forloop.first %}<ul>{% endif %}
-          {% if forloop.counter == 101 %}
-            <li>{% translate 'Only showing 100 items. Additional results have been omitted.' %}</li>
-          {% else %}
-            <li>
-              <a href="{{ result.get_absolute_url }}">
-                {{ result|h }}
-                {{ result.status_badge }}
-                {% if result.organization %}({{ result.organization }}){% endif %}
-              </a>
-            </li>
-          {% endif %}
-          {% if forloop.last %}</ul>{% endif %}
-        {% empty %}
-          <p>
-            {% translate 'No results found.' %}
-          </p>
-        {% endfor %}
-      {% endfor %}
+  <div class="wb-report-narrow">
+    <div class="wb-page-header">
+      <h1 class="mb-0 min-w-0">
+        {% translate 'Search' %}
+        {% if query %}<span class="wb-heading-note">{{ query }}</span>{% endif %}
+      </h1>
     </div>
+    {% for result in results %}
+      <section class="card mb-3">
+        <div class="card-header">
+          <a
+            href="{{ result.url }}?q={{ query|urlencode }}"
+            class="text-reset"
+          >{{ result.verbose_name_plural|capfirst }}</a>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for result in result.results %}
+            {% if forloop.counter == 101 %}
+              <div class="list-group-item text-secondary">
+                {% translate 'Only showing 100 items. Additional results have been omitted.' %}
+              </div>
+            {% else %}
+              <a href="{{ result.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+                <span class="wb-row-main">
+                  {{ result|h }}
+                  {% if result.organization %}<span
+                      class="wb-row-meta d-inline"
+                    >{{ result.organization }}</span>{% endif %}
+                </span>
+                {{ result.status_badge }}
+              </a>
+            {% endif %}
+          {% empty %}
+            <div class="list-group-item text-secondary">{% translate 'No results found.' %}</div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
   </div>
 {% endblock content %}
 
 {% block js %}
   {{ block.super }}
   <script>
-  $(function() {
-    $('form[role=search] input').focus();
-  });
+    $(function() {
+      $('form[role=search] input').focus();
+    });
   </script>
 {% endblock js %}

@@ -5,110 +5,102 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <h1>{% translate 'Keyboard shortcuts' %}</h1>
-      <table class="table" data-shortcuts>
+  <div class="wb-form-page">
+    <div class="wb-page-header">
+      <h1 class="mb-0">{% translate 'Keyboard shortcuts' %}</h1>
+    </div>
+    <section class="card mb-3 wb-table-card">
+      <table class="table mb-0" data-shortcuts>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-Q</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-Q</kbd></th>
           <td>{% translate 'Search everything' %}</td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-F</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-F</kbd></th>
           <td>{% translate 'Focus the search form in list views' %}</td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-Return</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-Return</kbd></th>
           <td>{% translate 'Submit the current form' %}</td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-H</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-H</kbd></th>
           <td>{% translate 'Home' %}</td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-C</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-C</kbd></th>
           <td>{% translate 'people'|capfirst %}</td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-Shift-C</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-Shift-C</kbd></th>
           <td>{% translate 'Jump to person' %}</td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-P</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-P</kbd></th>
           <td>{% translate 'projects'|capfirst %}</td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">Ctrl-Shift-P</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-Shift-P</kbd></th>
           <td>{% translate 'Jump to project' %}</td>
         </tr>
         {% if request.user.features.CONTROLLING %}
           <tr>
-            <th class="text-end text-nowrap">Ctrl-O</th>
+            <th class="text-end text-nowrap"><kbd>Ctrl-O</kbd></th>
             <td>{% translate 'offers'|capfirst %}</td>
           </tr>
           <tr>
-            <th class="text-end text-nowrap">Ctrl-R</th>
+            <th class="text-end text-nowrap"><kbd>Ctrl-R</kbd></th>
             <td>{% translate 'invoices'|capfirst %}</td>
           </tr>
         {% endif %}
         <tr>
-          <th class="text-end text-nowrap">Ctrl-T</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-T</kbd></th>
           <td>{% translate 'timestamps'|capfirst %}</td>
         </tr>
         {% if request.user.features.DEALS %}
           <tr>
-            <th class="text-end text-nowrap">Ctrl-D</th>
+            <th class="text-end text-nowrap"><kbd>Ctrl-D</kbd></th>
             <td>{% translate 'deals'|capfirst %}</td>
           </tr>
         {% endif %}
         <tr>
-          <th class="text-end text-nowrap">Ctrl-L</th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-L</kbd></th>
           <td>
             {% translate 'Log hours in active project or in any project if none is active' %}
           </td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">
-            Ctrl-Shift-L
-          </th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-Shift-L</kbd></th>
           <td>
             {% translate 'Log hours in any project' %}
           </td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">
-            Ctrl-K
-          </th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-K</kbd></th>
           <td>
             {% translate 'Log costs in active project or in any project if none is active' %}
           </td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">
-            Ctrl-Shift-K
-          </th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-Shift-K</kbd></th>
           <td>
             {% translate 'Log costs in any project' %}
           </td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">
-            Ctrl-B
-          </th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-B</kbd></th>
           <td>
             {% translate 'Log a break' %}
           </td>
         </tr>
         <tr>
-          <th class="text-end text-nowrap">
-            Ctrl-Shift-B
-          </th>
+          <th class="text-end text-nowrap"><kbd>Ctrl-Shift-B</kbd></th>
           <td>
             {% translate 'breaks'|capfirst %}
           </td>
         </tr>
       </table>
-    </div>
+    </section>
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function () {

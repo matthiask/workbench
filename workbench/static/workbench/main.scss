@@ -1544,3 +1544,17 @@ a.wb-stat-link {
 a.wb-list-heading:hover {
   color: var(--bs-link-hover-color);
 }
+
+.wb-not-found {
+  max-width: 32rem;
+  margin: 6rem auto;
+  text-align: center;
+}
+
+kbd {
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  background: var(--wb-surface-muted);
+  color: var(--bs-body-color);
+  font-family: inherit;
+  font-size: 0.8rem;
+}

@@ -54,7 +54,9 @@
           </section>
         {% endblock fields %}
         <div class="wb-form-actions">
-          <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
+          <button type="submit" class="btn btn-primary">
+            {% block submit_label %}{% translate 'Save' %}{% endblock %}
+          </button>
           {% if object.get_absolute_url %}
             <a href="{{ object.get_absolute_url }}" class="btn btn-quiet">{% translate 'Cancel' %}</a>
           {% endif %}
