@@ -18,6 +18,7 @@ from urllib.parse import parse_qs, urlencode, urljoin, urlsplit
 import click
 import requests
 import yaml
+from click.shell_completion import CompletionItem, get_completion_class
 from rich import box
 from rich.console import Console
 from rich.style import Style
@@ -458,6 +459,20 @@ def login(url, paste_token):
         _browser_login(url)
 
 
+@cli.command()
+@click.argument("shell", type=click.Choice(["bash", "zsh", "fish"]))
+def completion(shell):
+    """Print the script which completes wb's commands in your shell
+
+    bash: echo 'eval "$(wb completion bash)"' >> ~/.bashrc
+
+    zsh: echo 'eval "$(wb completion zsh)"' >> ~/.zshrc
+
+    fish: wb completion fish > ~/.config/fish/completions/wb.fish"""
+    complete = get_completion_class(shell)(cli, {}, "wb", "_WB_COMPLETE")
+    click.echo(complete.source())
+
+
 @cli.group()
 def auth():
     """Switch between the Workbench installations you're logged in to
@@ -476,8 +491,16 @@ def list_installations():
         click.echo(f"{'*' if url == config['current'] else ' '} {url}")
 
 
+def _complete_installations(ctx, param, incomplete):
+    return [
+        CompletionItem(url)
+        for url in sorted(_read_config()["installations"])
+        if incomplete in url
+    ]
+
+
 @auth.command("switch")
-@click.argument("name")
+@click.argument("name", shell_complete=_complete_installations)
 def switch_installation(name):
     """Use another installation, NAME is any unique part of its URL"""
     config = _read_config()

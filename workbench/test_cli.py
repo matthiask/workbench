@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import wb
+from click.shell_completion import ShellComplete
 from click.testing import CliRunner
 from django.test import Client, TestCase
 from django.test.utils import override_settings
@@ -424,6 +425,26 @@ planned_work:
         self.assertEqual(
             result.output, "  http://testserver\n* https://other.example.com\n"
         )
+
+    def test_completion(self):
+        """Shells complete commands and the installations to switch to"""
+        result = CliRunner().invoke(wb.cli, ["completion", "bash"])
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("_WB_COMPLETE=bash_complete", result.output)
+
+        wb.CONFIG.write_text(
+            'current = "https://a.example.com"\n'
+            '[installations."https://a.example.com"]\ntoken = "a"\n'
+            '[installations."https://b.example.org"]\ntoken = "b"\n'
+        )
+
+        def complete(args, incomplete):
+            complete = ShellComplete(wb.cli, {}, "wb", "_WB_COMPLETE")
+            return [item.value for item in complete.get_completions(args, incomplete)]
+
+        self.assertIn("switch", complete(["auth"], ""))
+        self.assertEqual(complete(["auth", "switch"], "org"), ["https://b.example.org"])
+        self.assertEqual(complete(["deals", "search", "--status"], "o"), ["open"])
 
     def test_auth(self):
         """wb is logged in to several installations and switches between them"""

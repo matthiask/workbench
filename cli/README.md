@@ -14,6 +14,12 @@ Upgrade it when `wb` tells you to:
 
     uv tool upgrade workbench-cli
 
+Enable completing commands, options and installations with Tab in your shell:
+
+    echo 'eval "$(wb completion bash)"' >> ~/.bashrc     # bash
+    echo 'eval "$(wb completion zsh)"' >> ~/.zshrc       # zsh
+    wb completion fish > ~/.config/fish/completions/wb.fish   # fish
+
 Log in, which opens the browser to authorize `wb`:
 
     wb login https://workbench.feinheit.ch
