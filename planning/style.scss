@@ -1,4 +1,13 @@
+// The grid lies on a card surface, it may be wider than the page
 .planning-wrapper {
+  width: max-content;
+  min-width: 100%;
+  padding: 0.75rem 1rem;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: var(--wb-surface);
+  box-shadow: var(--wb-shadow);
+
   --grid-gap: 0.125rem;
   --title-column-width: 25rem;
   --action-width: 3.5rem;
@@ -67,21 +76,21 @@
   position: sticky;
   top: var(--navbar-height, 0px);
   z-index: 5;
-  background-color: var(--bs-body-bg);
+  background-color: var(--wb-surface);
 }
 
 .planning--row-label {
   position: sticky;
   left: 0;
   z-index: 1;
-  background-color: var(--bs-body-bg);
+  background-color: var(--wb-surface);
 }
 
 .planning--title {
   position: sticky;
   left: 0;
   z-index: 1;
-  background-color: white;
+  background-color: var(--wb-surface);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -119,7 +128,7 @@
 }
 
 [data-bs-theme="dark"] .planning--title {
-  background-color: var(--bs-body-bg);
+  background-color: var(--wb-surface);
 
   &.is-project {
     border-top: 1px solid #555;
@@ -259,7 +268,7 @@
       line-height: 1.3;
       white-space: nowrap;
       color: var(--bs-emphasis-color);
-      background-color: color-mix(in srgb, var(--bs-body-bg) 85%, transparent);
+      background-color: color-mix(in srgb, var(--wb-surface) 85%, transparent);
     }
   }
 
