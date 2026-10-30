@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 08:55+0100\n"
+"POT-Creation-Date: 2026-10-30 09:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2648,6 +2648,11 @@ msgstr "Arbeitslast in den Fachbereichen"
 #: workbench/notes/admin.py
 msgid "content object"
 msgstr "Inhaltsobjekt"
+
+#: workbench/notes/api.py
+#, python-format
+msgid "Add the note to exactly one of %s."
+msgstr "Füge die Notiz genau einem von %s hinzu."
 
 #: workbench/notes/forms.py
 msgid "Unable to determine the object this note should be added to."

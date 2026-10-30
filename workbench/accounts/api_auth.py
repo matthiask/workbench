@@ -6,7 +6,7 @@ from workbench.accounts.features import LABELS
 from workbench.accounts.models import APIToken
 
 
-def _check_feature(user, feature):
+def check_feature(user, feature):
     if user and feature and not user.features[feature]:
         raise HttpError(
             403,
@@ -29,7 +29,7 @@ class UserToken(HttpBearer):
             request.user = user
             # The user middleware only does this for sessions
             activate(user.language)
-            return _check_feature(user, self.feature)
+            return check_feature(user, self.feature)
         return None
 
 
@@ -39,7 +39,7 @@ class UserSession(SessionAuth):
         self.feature = feature
 
     def authenticate(self, request, key):
-        return _check_feature(super().authenticate(request, key), self.feature)
+        return check_feature(super().authenticate(request, key), self.feature)
 
 
 def user_auth(*, feature=None):
