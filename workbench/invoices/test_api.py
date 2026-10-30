@@ -236,3 +236,39 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         invoice.refresh_from_db()
         self.assertEqual(invoice.last_reminded_on, dt.date.today())
+
+    def test_postpone_reminders(self):
+        """Reminders of sent invoices are postponed for up to 60 days, more
+        than 30 days have to be confirmed"""
+        invoice = factories.InvoiceFactory.create(
+            status=Invoice.SENT, invoiced_on=in_days(-60), due_on=in_days(-30)
+        )
+        self.client.force_login(invoice.owned_by)
+        url = f"/api/invoices/{invoice.pk}/postpone-reminders/"
+
+        def post(data):
+            return self.client.post(url, data, content_type="application/json")
+
+        response = post({"until": in_days(10).isoformat()})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["postpone_reminders_until"], in_days(10).isoformat()
+        )
+        self.assertEqual(self.client.get("/api/invoices/reminders/").json(), [])
+
+        response = post({"until": in_days(40).isoformat()})
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("Are you sure?", response.content.decode())
+        response = post({"until": in_days(40).isoformat(), "confirm": True})
+        self.assertEqual(response.status_code, 200, response.content)
+        response = post({"until": in_days(70).isoformat(), "confirm": True})
+        self.assertEqual(response.status_code, 422)
+
+        response = post({"until": None})
+        invoice.refresh_from_db()
+        self.assertIsNone(invoice.postpone_reminders_until)
+
+        invoice.status = Invoice.PAID
+        invoice.closed_on = dt.date.today()
+        invoice.save()
+        self.assertEqual(post({"until": None}).status_code, 409)

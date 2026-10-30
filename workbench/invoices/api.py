@@ -7,7 +7,7 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
-from ninja.errors import ValidationError
+from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
@@ -21,7 +21,8 @@ from workbench.contacts.api import (
 from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.tools.api import DateRangeFilter, Serialized, filter_date_range
-from workbench.tools.formats import Z2
+from workbench.tools.formats import Z2, local_date_format
+from workbench.tools.validation import in_days
 
 
 # Same as in the web interface
@@ -54,6 +55,7 @@ class InvoiceOut(Schema):
     total_excl_tax: Decimal
     total: Decimal
     third_party_costs: Decimal | None
+    postpone_reminders_until: dt.date | None
 
 
 def invoice_out(invoice, request):
@@ -78,6 +80,7 @@ def invoice_out(invoice, request):
         "total_excl_tax": invoice.total_excl_tax,
         "total": invoice.total,
         "third_party_costs": invoice.third_party_costs,
+        "postpone_reminders_until": invoice.postpone_reminders_until,
     }
 
 
@@ -201,6 +204,67 @@ def mark_reminded(request, data: Reminded, *, dry_run: bool = False):
         if dry_run:
             transaction.set_rollback(True)
     return result
+
+
+class PostponeReminders(Schema):
+    until: dt.date | None = Field(
+        description="No reminders before this date, null postpones nothing."
+    )
+    confirm: bool = Field(
+        default=False,
+        description="Confirms postponing by more than 30 days, which the web"
+        " interface asks about too.",
+    )
+
+
+@router.post("/invoices/{invoice_id}/postpone-reminders/", response=InvoiceOut)
+def postpone_reminders(request, invoice_id: int, data: PostponeReminders):
+    """Leave a sent invoice out of the reminders until a date, e.g. while a
+    question of the customer is being clarified"""
+    invoice = get_object_or_404(
+        Invoice.objects.select_related("project", "customer", "owned_by"),
+        pk=invoice_id,
+    )
+    if invoice.status != Invoice.SENT:
+        raise HttpError(409, _("Reminders can only be postponed for sent invoices."))
+    loc = ["body", "data", "until"]
+    if data.until and data.until > in_days(Invoice.MAX_POSTPONE_REMINDERS_DAYS):
+        raise ValidationError([
+            {
+                "loc": loc,
+                "msg": _(
+                    "Reminders cannot be postponed by more than %(days)s days"
+                    " (that would be later than %(date)s)."
+                )
+                % {
+                    "days": Invoice.MAX_POSTPONE_REMINDERS_DAYS,
+                    "date": local_date_format(
+                        in_days(Invoice.MAX_POSTPONE_REMINDERS_DAYS)
+                    ),
+                },
+            }
+        ])
+    if (
+        data.until
+        and data.until > in_days(Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS)
+        and not data.confirm
+    ):
+        raise ValidationError([
+            {
+                "loc": loc,
+                "msg": _(
+                    "You are postponing reminders until %(date)s, which is more"
+                    " than %(days)s days from now. Are you sure?"
+                )
+                % {
+                    "date": local_date_format(data.until),
+                    "days": Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS,
+                },
+            }
+        ])
+    invoice.postpone_reminders_until = data.until
+    invoice.save(update_fields=["postpone_reminders_until"])
+    return invoice_out(invoice, request)
 
 
 @router.get("/invoices/{invoice_id}/", response=InvoiceOut)

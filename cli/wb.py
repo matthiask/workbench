@@ -1943,6 +1943,38 @@ def _echo_reminders(data):
     console.print(table)
 
 
+@invoices.command("postpone-reminders")
+@click.argument("invoice_id", type=int)
+@click.argument("until", type=click.DateTime(formats=["%Y-%m-%d"]), required=False)
+@click.option("--clear", is_flag=True, help="Don't postpone reminders anymore.")
+@click.option(
+    "--confirm", is_flag=True, help="Postpone by more than 30 days (at most 60)."
+)
+@click.option("--json", "as_json", is_flag=True)
+def postpone_reminders(invoice_id, until, clear, confirm, as_json):
+    """Leave a sent invoice out of the reminders until a date, e.g. while a
+    question of the customer is being clarified"""
+    if bool(until) == clear:
+        _terminate("Pass either a date or --clear.")
+    data = _request(
+        "POST",
+        f"invoices/{invoice_id}/postpone-reminders/",
+        json={
+            "until": until.date().isoformat() if until else None,
+            "confirm": confirm,
+        },
+    )
+    if as_json:
+        _echo_json(data)
+    elif data["postpone_reminders_until"]:
+        console.print(
+            f"Reminders of {data['code']} are postponed until"
+            f" {data['postpone_reminders_until']}."
+        )
+    else:
+        console.print(f"Reminders of {data['code']} aren't postponed anymore.")
+
+
 @invoices.command("mark-reminded")
 @click.argument("invoice_ids", type=int, nargs=-1, required=True)
 @click.option("--dry-run", is_flag=True, help="Validate only.")

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 13:44+0100\n"
+"POT-Creation-Date: 2026-10-30 13:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1843,6 +1843,20 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 msgid "These invoices aren't overdue: %s"
 msgstr "Diese Rechnungen sind nicht überfällig: %s"
 
+#: workbench/invoices/api.py
+msgid "Reminders can only be postponed for sent invoices."
+msgstr "Zahlungserinnerungen können nur für versendete Rechnungen aufgeschoben werden."
+
+#: workbench/invoices/api.py workbench/invoices/models.py
+#, python-format
+msgid "Reminders cannot be postponed by more than %(days)s days (that would be later than %(date)s)."
+msgstr "Zahlungserinnerungen können höchstens %(days)s Tage aufgeschoben werden (also nicht später als %(date)s)."
+
+#: workbench/invoices/api.py workbench/invoices/forms.py
+#, python-format
+msgid "You are postponing reminders until %(date)s, which is more than %(days)s days from now. Are you sure?"
+msgstr "Du schiebst die Zahlungserinnerungen bis am %(date)s auf, das sind mehr als %(days)s Tage ab heute. Bist Du sicher?"
+
 #: workbench/invoices/forms.py
 msgid "Due"
 msgstr "Fällig"
@@ -1908,11 +1922,6 @@ msgstr "Anzahlungen anwenden"
 #: workbench/invoices/forms.py
 msgid "This invoice is freezed, only a small subset of fields are editable."
 msgstr "Diese Rechnung ist eingefroren, nur wenige Felder sind bearbeitbar."
-
-#: workbench/invoices/forms.py
-#, python-format
-msgid "You are postponing reminders until %(date)s, which is more than %(days)s days from now. Are you sure?"
-msgstr "Du schiebst die Zahlungserinnerungen bis am %(date)s auf, das sind mehr als %(days)s Tage ab heute. Bist Du sicher?"
 
 #: workbench/invoices/forms.py
 msgid "A negative subtotal is almost certainly an error. Did you want to create a credit?"
@@ -2116,11 +2125,6 @@ msgstr "Ungültiger Status wenn \"Geschlossen am\"-Feld schon gesetzt ist."
 #: workbench/invoices/models.py
 msgid "Due date has to be after invoice date."
 msgstr "Fälligkeitsdatum muss später als Rechnungsdatum sein."
-
-#: workbench/invoices/models.py
-#, python-format
-msgid "Reminders cannot be postponed by more than %(days)s days (that would be later than %(date)s)."
-msgstr "Zahlungserinnerungen können höchstens %(days)s Tage aufgeschoben werden (also nicht später als %(date)s)."
 
 #: workbench/invoices/models.py
 #, python-format

@@ -548,6 +548,15 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         overdue.refresh_from_db()
         self.assertEqual(overdue.last_reminded_on, dt.date.today())
+        result = self.wb("invoices", "postpone-reminders", overdue.pk, in_days(40))
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Are you sure?", result.output)
+        result = self.wb(
+            "invoices", "postpone-reminders", overdue.pk, in_days(40), "--confirm"
+        )
+        self.assertIn("postponed until", result.output)
+        result = self.wb("invoices", "postpone-reminders", overdue.pk, "--clear")
+        self.assertIn("aren't postponed anymore", result.output)
 
         factories.YearFactory.create(working_time_model=self.user.working_time_model)
         factories.EmploymentFactory.create(
