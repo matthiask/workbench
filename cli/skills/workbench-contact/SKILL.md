@@ -46,6 +46,8 @@ address_on_first_name_terms: true
 organization: 345                  # or: new_organization: Beispiel AG
 email_addresses:
   - email: hans@example.com
+  - type: private
+    email: hans.muster@example.org
 phone_numbers:
   - type: mobile
     phone_number: 079 123 45 67
@@ -63,7 +65,8 @@ Guidelines:
   genders; ask if `address` or the salutation are unclear.
 - The salutation is in the language of the correspondence (usually German).
   Use first-name terms only if the data or the user says so.
-- `type` defaults to work; use e.g. mobile or private where it's clear.
+- `type` of email addresses, phone numbers and postal addresses defaults to
+  work; use e.g. mobile or private where it's clear.
 - Quote postal codes and house numbers so they stay strings.
 - Leave out `notes` unless the user wants to keep something, and never put
   sensitive information there.

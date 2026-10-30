@@ -59,6 +59,8 @@ salutation: Lieber Hans
 new_organization: Beispiel AG
 email_addresses:
   - email: hans@example.com
+  - type: private
+    email: hans.muster@example.org
 phone_numbers:
   - type: mobile
     phone_number: 079 123 45 67

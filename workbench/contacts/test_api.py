@@ -75,7 +75,10 @@ class ContactsAPITest(TestCase):
             "address": "Herr",
             "salutation": "Lieber Hans",
             "new_organization": "Beispiel AG",
-            "email_addresses": [{"email": "hans@example.com"}],
+            "email_addresses": [
+                {"email": "hans@example.com"},
+                {"type": "private", "email": "hans@example.org"},
+            ],
             "phone_numbers": [{"type": "mobile", "phone_number": "079 123 45 67"}],
             "postal_addresses": [
                 {
@@ -107,7 +110,10 @@ class ContactsAPITest(TestCase):
         self.assertEqual(created.organization.name, "Beispiel AG")
         self.assertEqual(created.organization.primary_contact, user)
         self.assertEqual(created.primary_contact, user)
-        self.assertEqual(created.emailaddresses.get().email, "hans@example.com")
+        self.assertEqual(
+            [(e.type, e.email) for e in created.emailaddresses.all()],
+            [("work", "hans@example.com"), ("private", "hans@example.org")],
+        )
         self.assertIn("Bahnhofstrasse 1", created.postaladdresses.get().postal_address)
         # The details are searchable
         self.assertIn("hans@example.com", created._fts)
@@ -119,7 +125,12 @@ class ContactsAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(
             [e["loc"][2:] for e in response.json()["detail"]],
-            [["email_addresses", 0, "email"], [], ["new_organization"]],
+            [
+                ["email_addresses", 0, "email"],
+                ["email_addresses", 1, "email"],
+                [],
+                ["new_organization"],
+            ],
         )
         person["email_addresses"] = []
         person["new_organization"] = None
