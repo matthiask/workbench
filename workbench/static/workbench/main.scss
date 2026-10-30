@@ -325,9 +325,12 @@ tbody th > a {
   }
 }
 
-.form-search input,
-.form-search select {
+.form-search input {
   max-width: 10em;
+}
+
+.form-search select {
+  max-width: 16em;
 }
 
 .form-group {
