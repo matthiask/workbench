@@ -22,6 +22,23 @@ class MilestoneSearchForm(Form):
         return queryset.select_related("project")
 
 
+# Rainbow colors for milestones, from the palette of the service types
+MILESTONE_COLORS = [
+    ("#e03131", _("red")),
+    ("#f76707", _("orange")),
+    ("#fcc419", _("yellow")),
+    ("#37b24d", _("green")),
+    ("#1098ad", _("cyan")),
+    ("#3b5bdb", _("blue")),
+    ("#7048e8", _("violet")),
+    ("#d6336c", _("pink")),
+]
+
+
+class ColorSelect(forms.RadioSelect):
+    template_name = "planning/color_select.html"
+
+
 @add_prefix("modal")
 class MilestoneForm(ModelForm):
     class Meta:
@@ -40,6 +57,20 @@ class MilestoneForm(ModelForm):
             self.project = kwargs["instance"].project
         super().__init__(*args, **kwargs)
         self.instance.project = self.project
+
+        choices = [("", _("Color of the service type")), *MILESTONE_COLORS]
+        # Keep colors entered before the swatches existed
+        if (color := self.instance.color) and color.lower() not in dict(choices):
+            choices.append((color, color))
+        field = self.fields["color"]
+        self.fields["color"] = forms.ChoiceField(
+            label=field.label,
+            help_text=field.help_text,
+            choices=choices,
+            required=False,
+            widget=ColorSelect,
+        )
+        self.initial["color"] = (self.instance.color or "").lower()
 
     def clean(self):
         data = super().clean()

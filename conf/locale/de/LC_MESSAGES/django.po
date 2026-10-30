@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 19:03+0100\n"
+"POT-Creation-Date: 2026-10-30 21:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2905,6 +2905,43 @@ msgid "Unknown milestone %r."
 msgstr "Unbekannter Meilenstein %r."
 
 #: workbench/planning/forms.py
+msgid "red"
+msgstr "rot"
+
+#: workbench/planning/forms.py
+msgid "orange"
+msgstr "orange"
+
+#: workbench/planning/forms.py
+msgid "yellow"
+msgstr "gelb"
+
+#: workbench/planning/forms.py workbench/templates/reporting/green_hours.html
+#: workbench/templates/reporting/key_data.html
+msgid "green"
+msgstr "grün"
+
+#: workbench/planning/forms.py
+msgid "cyan"
+msgstr "türkis"
+
+#: workbench/planning/forms.py
+msgid "blue"
+msgstr "blau"
+
+#: workbench/planning/forms.py
+msgid "violet"
+msgstr "violett"
+
+#: workbench/planning/forms.py
+msgid "pink"
+msgstr "pink"
+
+#: workbench/planning/forms.py
+msgid "Color of the service type"
+msgstr "Farbe der Leistungsart"
+
+#: workbench/planning/forms.py
 #, python-format
 msgid "The following work is planned after the new milestone date: %(work)s."
 msgstr "Die folgenden Arbeiten sind geplant nach dem neuen Meilenstein-Datum: %(work)s."
@@ -4817,11 +4854,6 @@ msgstr "Geburtstag"
 #: workbench/templates/reporting/birthdays.html
 msgid "Age on birthday"
 msgstr "Alter am Geburtstag"
-
-#: workbench/templates/reporting/green_hours.html
-#: workbench/templates/reporting/key_data.html
-msgid "green"
-msgstr "Grün"
 
 #: workbench/templates/reporting/hours_per_type.html
 msgid "Target value"

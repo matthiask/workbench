@@ -1,0 +1,17 @@
+{% comment %}
+  Colors as swatches, the label is shown as a tooltip and for screen readers
+{% endcomment %}
+<div class="wb-color-select">
+  {% for group, options, index in widget.optgroups %}
+    {% for option in options %}
+      <label
+        class="wb-color-swatch {% if not option.value %}is-default{% endif %}"
+        title="{{ option.label|capfirst }}"
+        {% if option.value %}style="--swatch: {{ option.value }}"{% endif %}
+      >
+        {% include "django/forms/widgets/input.html" with widget=option %}
+        <span class="visually-hidden">{{ option.label|capfirst }}</span>
+      </label>
+    {% endfor %}
+  {% endfor %}
+</div>

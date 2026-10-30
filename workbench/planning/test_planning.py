@@ -8,7 +8,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.accounts.models import User
 from workbench.planning import reporting
-from workbench.planning.forms import PlannedWorkSearchForm
+from workbench.planning.forms import MilestoneForm, PlannedWorkSearchForm
 from workbench.planning.models import PlannedWork
 from workbench.tools.validation import in_days, monday
 
@@ -100,6 +100,32 @@ class PlanningTest(TestCase):
         self.assertEqual(colors[pw.id], "#123456")
         self.assertEqual(colors[other.id], "")
         self.assertEqual(project["project"]["milestones"][0]["color"], "#123456")
+
+    def test_milestone_color_choices(self):
+        """Milestone colors are chosen from swatches, not typed as hex codes"""
+        milestone = factories.MilestoneFactory.create(date=in_days(10), color="#123456")
+        request = RequestFactory().get("/")
+        request.user = milestone.project.owned_by
+
+        def form(color, instance=milestone):
+            return MilestoneForm(
+                {
+                    "modal-date": milestone.date.isoformat(),
+                    "modal-title": "Launch",
+                    "modal-estimated_total_hours": "0",
+                    "modal-color": color,
+                },
+                instance=instance,
+                request=request,
+            )
+
+        # Colors entered before are kept as an additional choice
+        self.assertIn('value="#123456"', str(form("#123456")["color"]))
+        self.assertTrue(form("#3b5bdb").is_valid())
+        self.assertTrue(form("").is_valid())
+        self.assertFalse(form("rot").is_valid())
+        other = factories.MilestoneFactory.create(date=in_days(10))
+        self.assertFalse(form("#123456", instance=other).is_valid())
 
     def test_planning_search_forms(self):
         """Planning request search form branch test"""
