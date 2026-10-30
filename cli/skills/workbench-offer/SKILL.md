@@ -114,13 +114,41 @@ preparation and still has to be checked and sent in Workbench.
 
 ## Revising an offer
 
-Offers in preparation can be replaced entirely, as long as nothing has been
-logged on their services yet:
+Offers in preparation are changed service by service. Look at the current
+offer first; its table shows the IDs of the services:
+
+    wb offers show <offer_id>
+
+Change only what was asked, one command per change, each one first with
+`--dry-run`:
+
+    wb offers update <offer_id> --title "<title>" --description - < <scratchpad>/text.txt
+    wb offers services add <offer_id> --title "<title>" --service-type "<type>" --hours 12 --after <service_id> --dry-run
+    wb offers services add <offer_id> <scratchpad>/service.yaml --dry-run
+    wb offers services update <offer_id> <service_id> --hours 20 --dry-run
+    wb offers services update <offer_id> <service_id> <scratchpad>/service.yaml --dry-run
+    wb offers services delete <offer_id> <service_id> --dry-run
+    wb offers services reorder <offer_id> <service_id> <service_id> ... --dry-run
+
+- `update` only sends the given fields, everything else stays as it is.
+  `--clear-hours` and `--clear-cost` remove values, `--optional` and
+  `--no-optional` switch whether a service counts towards the total.
+- A service file contains a single service like in step 3 (`title`,
+  `description`, `service_type`, `hours`, `cost`, ...); options override it.
+  Use files for longer descriptions.
+- Show the user how the change affects the totals (the dry run prints the
+  whole offer) and run the command without `--dry-run` only after their
+  explicit approval.
+- Services with logged hours or costs can be changed but not deleted, and the
+  last service of an offer can't be deleted.
+
+Only for a completely new version of the offer, replace it entirely (as long
+as nothing has been logged on its services yet), again with the user's
+explicit approval:
 
     wb offers show <offer_id> --json
     wb offers replace <offer_id> <scratchpad>/offer.yaml --dry-run
     wb offers replace <offer_id> <scratchpad>/offer.yaml
 
 `replace` swaps title, description and all services, so start from the
-current offer (`wb offers show --json`) and change only what was asked.
-Replacing also needs the user's explicit approval.
+current offer and keep what wasn't asked to change.

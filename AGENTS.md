@@ -96,8 +96,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   go through Django's test client); add a test there for new commands. The CLI
   is installed with the project's dev dependencies, not in the container.
   Hours are not logged through the CLI on purpose: the warnings of the web
-  interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only creates and
-  replaces offers in preparation. Service types only suggest the effort type
+  interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only changes offers
+  in preparation: create, replace, update and add, update, delete and reorder
+  single services, all with the rules of `_apply_service()`. Service types only suggest the effort type
   and the hourly rate, both can be set freely.
 - Short names (`User._short_name`) are unique when case folding, unless blank.
   APIs identify people by their short name and match it case-insensitively.

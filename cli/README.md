@@ -165,12 +165,28 @@ created in preparation; review and send them in Workbench.
     wb offers create 1234 offer.yaml --dry-run
     wb offers create 1234 offer.yaml
 
-Offers in preparation can be replaced as long as no hours or costs have been
-logged on their services:
+Offers in preparation can be changed service by service. `wb offers show`
+lists the IDs of the services; every change shows the offer with its new
+totals, `--dry-run` without saving anything:
 
     wb offers search --project 1234
     wb offers search relaunch --status offered
     wb offers show 5678
+    wb offers update 5678 --title "Relaunch 2027" --description - < text.txt
+    wb offers services add 5678 --title "Newsletter" --service-type "Programmierung & IT" --hours 12 --after 901 --dry-run
+    wb offers services add 5678 service.yaml
+    wb offers services update 5678 902 --hours 20 --description "Incl. testing"
+    wb offers services update 5678 903 --clear-cost --optional
+    wb offers services delete 5678 904
+    wb offers services reorder 5678 903 901 902
+
+Services are given with options or as YAML (or JSON) files like a service of
+`wb offers create`; options override the file. `update` only changes the given
+fields. Services with logged hours or costs can be changed but not deleted.
+
+A new version of the whole offer replaces it, as long as no hours or costs
+have been logged on its services:
+
     wb offers replace 5678 offer.yaml --dry-run
     wb offers replace 5678 offer.yaml
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 12:19+0100\n"
+"POT-Creation-Date: 2026-10-30 13:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2695,6 +2695,26 @@ msgstr "Nur Offerten in Vorbereitung können ersetzt werden."
 #: workbench/offers/api.py
 msgid "Services of this offer already have logged hours or costs, they cannot be replaced."
 msgstr "Auf Leistungen dieser Offerte wurden bereits Stunden oder Kosten erfasst, sie können nicht ersetzt werden."
+
+#: workbench/offers/api.py
+msgid "Only offers in preparation can be changed."
+msgstr "Nur Offerten in Vorbereitung können geändert werden."
+
+#: workbench/offers/api.py
+msgid "The offer has no service with this ID."
+msgstr "Die Offerte hat keine Leistung mit dieser ID."
+
+#: workbench/offers/api.py
+msgid "Hours or costs have been logged on this service, it cannot be deleted."
+msgstr "Auf dieser Leistung wurden bereits Stunden oder Kosten erfasst, sie kann nicht gelöscht werden."
+
+#: workbench/offers/api.py
+msgid "The last service of an offer cannot be deleted."
+msgstr "Die letzte Leistung einer Offerte kann nicht gelöscht werden."
+
+#: workbench/offers/api.py
+msgid "Expected the IDs of all services of the offer once."
+msgstr "Erwartet werden die IDs aller Leistungen der Offerte, jede genau einmal."
 
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html

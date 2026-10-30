@@ -148,7 +148,7 @@ class OffersAPITest(TestCase):
                 ["body", "data", "services", 0, "service_type"],
                 ["body", "data", "services", 1, "hours"],
                 ["body", "data", "services", 2],
-                ["body", "data", "services", 3, "effort_rate"],
+                ["body", "data", "services", 3, "hourly_rate"],
             ],
         )
         self.assertFalse(Offer.objects.exists())
@@ -261,3 +261,205 @@ class OffersAPITest(TestCase):
         relaunch.save()
         self.assertEqual(ids("?period=2026-09"), [relaunch.pk])
         self.assertEqual(ids("?until=2026-08-31"), [])
+
+
+class OfferServicesAPITest(TestCase):
+    """Editing single services of offers in preparation"""
+
+    def tearDown(self):
+        deactivate_all()
+
+    def setUp(self):
+        factories.service_types()
+        self.project = factories.ProjectFactory.create()
+        factories.PostalAddressFactory.create(person=self.project.contact)
+        self.client.force_login(self.project.owned_by)
+        response = self.client.post(
+            f"/api/projects/{self.project.pk}/offers/",
+            {
+                "title": "Relaunch",
+                "services": [
+                    {"title": "Concept", "service_type": "consulting", "hours": 10},
+                    {"title": "Hosting", "cost": 500},
+                ],
+            },
+            content_type="application/json",
+        )
+        self.offer = Offer.objects.get(pk=response.json()["id"])
+        self.concept, self.hosting = self.offer.services.all()
+        self.url = f"/api/offers/{self.offer.pk}/"
+
+    def send(self, method, path="", data=None, **params):
+        query = "?dry_run=true" if params.get("dry_run") else ""
+        return getattr(self.client, method)(
+            f"{self.url}{path}{query}", data, content_type="application/json"
+        )
+
+    def test_output(self):
+        """Services have their position and their service type"""
+        data = self.client.get(self.url).json()
+        self.assertEqual(
+            [(s["position"], s["service_type"]) for s in data["services"]],
+            [(10, "consulting"), (20, None)],
+        )
+        self.concept.effort_rate = 200
+        self.concept.save()
+        data = self.client.get(self.url).json()
+        self.assertIsNone(data["services"][0]["service_type"])
+
+    def test_update_offer(self):
+        """The title, the description and the postal address are changed
+        separately"""
+        response = self.send("patch", data={"title": "Website"}, dry_run=True)
+        self.assertEqual(response.json()["title"], "Website")
+        self.assertEqual(response.json()["id"], self.offer.pk)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.title, "Relaunch")
+
+        response = self.send("patch", data={"description": "New"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(
+            (self.offer.title, self.offer.description), ("Relaunch", "New")
+        )
+
+        response = self.send("patch", data={"title": ""})
+        self.assertEqual(response.status_code, 422)
+
+    def test_add(self):
+        """Services are added at the end or after another service"""
+        service = {"title": "Design", "service_type": "production", "hours": 5}
+        response = self.send("post", "services/", service, dry_run=True)
+        data = response.json()
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual([s["title"] for s in data["services"]][-1], "Design")
+        self.assertIsNone(data["services"][-1]["id"])
+        self.assertEqual(data["services"][0]["id"], self.concept.pk)
+        self.assertEqual(data["total_excl_tax"], "3900.00")
+        self.assertEqual(self.offer.services.count(), 2)
+
+        response = self.send("post", "services/", service | {"after": self.concept.pk})
+        data = response.json()
+        self.assertEqual(
+            [(s["title"], s["position"]) for s in data["services"]],
+            [("Concept", 10), ("Design", 20), ("Hosting", 30)],
+        )
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.total_excl_tax, Decimal("3900.00"))
+
+        response = self.send("post", "services/", service | {"after": 0})
+        self.assertEqual(response.status_code, 422)
+        response = self.send("post", "services/", {"title": "Nothing"})
+        self.assertEqual(response.status_code, 422)
+
+    def test_update(self):
+        """Only the given fields change, null clears values"""
+        path = f"services/{self.concept.pk}/"
+        response = self.send("patch", path, {"hours": 12}, dry_run=True)
+        self.assertEqual(response.json()["total_excl_tax"], "3500.00")
+        self.concept.refresh_from_db()
+        self.assertEqual(self.concept.effort_hours, 10)
+
+        # Service types fill in the effort type and the rate...
+        response = self.send("patch", path, {"service_type": "production"})
+        self.concept.refresh_from_db()
+        self.assertEqual(
+            (self.concept.title, self.concept.effort_type, self.concept.effort_rate),
+            ("Concept", "production", 180),
+        )
+        # ... unless they are given too
+        self.send("patch", path, {"service_type": "consulting", "hourly_rate": 200})
+        self.concept.refresh_from_db()
+        self.assertEqual(
+            (self.concept.effort_type, self.concept.effort_rate), ("consulting", 200)
+        )
+
+        path = f"services/{self.hosting.pk}/"
+        response = self.send("patch", path, {"cost": None})
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("Either hours or a cost", response.content.decode())
+        response = self.send(
+            "patch", path, {"cost": None, "service_type": "consulting", "hours": 1}
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.hosting.refresh_from_db()
+        self.assertIsNone(self.hosting.cost)
+        self.assertEqual(self.hosting.service_cost, 250)
+
+        response = self.send(
+            "patch", path, {"hours": 2, "effort_type": None, "hourly_rate": None}
+        )
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]], [["body", "data", "hours"]]
+        )
+
+        # Logged hours don't prevent changes, like in the web interface
+        factories.LoggedHoursFactory.create(service=self.hosting)
+        response = self.send("patch", path, {"description": "Servers"})
+        self.assertEqual(response.status_code, 200, response.content)
+
+    def test_flat_rate(self):
+        """Flat rates win"""
+        self.project.flat_rate = 160
+        self.project.save()
+        response = self.send(
+            "patch", f"services/{self.concept.pk}/", {"hourly_rate": 300}
+        )
+        self.assertEqual(response.json()["services"][0]["effort_rate"], "160.00")
+
+    def test_delete(self):
+        """Services without logbook entries can be deleted, but not the last
+        one"""
+        response = self.send("delete", f"services/{self.hosting.pk}/", dry_run=True)
+        self.assertEqual(response.json()["total_excl_tax"], "2500.00")
+        self.assertEqual(self.offer.services.count(), 2)
+
+        factories.LoggedHoursFactory.create(service=self.hosting)
+        response = self.send("delete", f"services/{self.hosting.pk}/")
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("logged", response.content.decode())
+
+        response = self.send("delete", f"services/{self.concept.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual([s.pk for s in self.offer.services.all()], [self.hosting.pk])
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.total_excl_tax, Decimal("500.00"))
+
+        response = self.send("delete", f"services/{self.hosting.pk}/")
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("last service", response.content.decode())
+
+    def test_reorder(self):
+        """Services are reordered by listing all their IDs"""
+        order = {"services": [self.hosting.pk, self.concept.pk]}
+        response = self.send("post", "services/reorder/", order)
+        self.assertEqual(
+            [s["title"] for s in response.json()["services"]], ["Hosting", "Concept"]
+        )
+        self.assertEqual(
+            [s.pk for s in self.offer.services.all()],
+            [self.hosting.pk, self.concept.pk],
+        )
+        for services in [[self.hosting.pk], [self.hosting.pk] * 2, [1, 2]]:
+            response = self.send("post", "services/reorder/", {"services": services})
+            self.assertEqual(response.status_code, 422)
+
+    def test_not_in_preparation(self):
+        """Only offers in preparation are changed, only their own services"""
+        other = factories.ServiceFactory.create(project=self.project)
+        response = self.send("patch", f"services/{other.pk}/", {"hours": 1})
+        self.assertEqual(response.status_code, 404)
+        response = self.send("delete", f"services/{other.pk}/")
+        self.assertEqual(response.status_code, 404)
+
+        self.offer.status = Offer.OFFERED
+        self.offer.save()
+        for method, path, data in [
+            ("patch", "", {"title": "X"}),
+            ("post", "services/", {"title": "X", "cost": 1}),
+            ("patch", f"services/{self.concept.pk}/", {"hours": 1}),
+            ("delete", f"services/{self.concept.pk}/", None),
+            ("post", "services/reorder/", {"services": []}),
+        ]:
+            with self.subTest(method=method, path=path):
+                self.assertEqual(self.send(method, path, data).status_code, 409)

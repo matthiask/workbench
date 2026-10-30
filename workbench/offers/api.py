@@ -88,8 +88,13 @@ def offer_import_schema(*, service_types):
 
 class ServiceOut(Schema):
     id: int | None
+    position: int
     title: str
     description: str
+    service_type: str | None = Field(
+        description="The service type with the same effort type and hourly rate,"
+        " if there is one."
+    )
     effort_type: str
     effort_hours: Decimal | None
     effort_rate: Decimal | None
@@ -128,7 +133,19 @@ class OfferContext(Schema):
     import_schema: dict
 
 
+def _service_type_titles(request):
+    """Service types by effort type and hourly rate, cached per request"""
+    if not hasattr(request, "_service_type_titles"):
+        request._service_type_titles = {
+            (st.title, st.hourly_rate): st.title for st in ServiceType.objects.all()
+        }
+    return request._service_type_titles
+
+
 def offer_out(offer, services, request):
+    titles = _service_type_titles(request)
+    for service in services:
+        service.service_type = titles.get((service.effort_type, service.effort_rate))
     return {
         "id": offer.pk,
         "code": offer.code if offer.pk else None,
@@ -230,66 +247,102 @@ def _decimal(value, exp):
     return None if value is None else Decimal(str(value)).quantize(Decimal(exp))
 
 
+# Model fields and their names in the API
+SERVICE_FIELDS = {"effort_hours": "hours", "effort_rate": "hourly_rate"}
+
+
+def _apply_service(service, values, *, service_types, loc, errors):
+    """Apply ``values`` (fields of a ``ServiceIn``) to the service
+
+    Creating, replacing, adding and updating services all use these rules.
+    ``None`` clears a value, fields which aren't in ``values`` are left
+    alone. Service types fill in the effort type and the hourly rate unless
+    those are given too, the project's flat rate always wins."""
+    for field in ["title", "description"]:
+        if field in values:
+            setattr(service, field, values[field] or "")
+    if "is_optional" in values:
+        service.is_optional = bool(values["is_optional"])
+    for field, model_field, exp in [
+        ("hours", "effort_hours", "0.0"),
+        ("cost", "cost", "0.00"),
+        ("third_party_costs", "third_party_costs", "0.00"),
+    ]:
+        if field in values:
+            setattr(service, model_field, _decimal(values[field], exp))
+
+    unknown_service_type = False
+    if (title := values.get("service_type")) is not None:
+        if service_type := service_types.get(title):
+            service.effort_type = service_type.title
+            service.effort_rate = service_type.hourly_rate
+        else:
+            unknown_service_type = True
+            errors.append({
+                "loc": [*loc, "service_type"],
+                "msg": _("Unknown service type %r.") % title,
+            })
+    if "effort_type" in values:
+        service.effort_type = values["effort_type"] or ""
+    if "hourly_rate" in values:
+        service.effort_rate = _decimal(values["hourly_rate"], "0.00")
+    if service.project.flat_rate is not None:
+        with override(settings.WORKBENCH.PDF_LANGUAGE):
+            service.effort_type = _("flat rate")
+        service.effort_rate = service.project.flat_rate
+
+    if (
+        service.effort_hours is not None
+        and not service.effort_type
+        and service.effort_rate is None
+        and not unknown_service_type
+    ):
+        errors.append({
+            "loc": [*loc, "hours"],
+            "msg": _(
+                "Hours require an effort type and an hourly rate,"
+                " e.g. from a service type."
+            ),
+        })
+    if service.effort_hours is None and service.cost is None:
+        errors.append({
+            "loc": [*loc],
+            "msg": _("Either hours or a cost are required."),
+        })
+
+    service_errors = []
+    full_clean(service, loc, service_errors, exclude=["project", "offer"])
+    for error in service_errors:
+        error["loc"][-1] = SERVICE_FIELDS.get(error["loc"][-1], error["loc"][-1])
+    errors.extend(service_errors)
+
+
+def _service_types():
+    return {st.title: st for st in ServiceType.objects.all()}
+
+
 def _build_services(project, data, errors):
-    service_types = {st.title: st for st in ServiceType.objects.all()}
+    service_types = _service_types()
     services = []
     for index, item in enumerate(data.services):
-        loc = ["body", "data", "services", index]
-        service = Service(
-            project=project,
-            title=item.title,
-            description=item.description,
-            effort_hours=_decimal(item.hours, "0.0"),
-            cost=_decimal(item.cost, "0.00"),
-            third_party_costs=_decimal(item.third_party_costs, "0.00"),
-            is_optional=item.is_optional,
-            position=10 * (index + 1),
+        service = Service(project=project, position=10 * (index + 1))
+        _apply_service(
+            service,
+            item.model_dump(exclude_none=True),
+            service_types=service_types,
+            loc=["body", "data", "services", index],
+            errors=errors,
         )
-
-        if item.service_type is not None:
-            if service_type := service_types.get(item.service_type):
-                service.effort_type = service_type.title
-                service.effort_rate = service_type.hourly_rate
-            else:
-                errors.append({
-                    "loc": [*loc, "service_type"],
-                    "msg": _("Unknown service type %r.") % item.service_type,
-                })
-        if item.effort_type is not None:
-            service.effort_type = item.effort_type
-        if item.hourly_rate is not None:
-            service.effort_rate = _decimal(item.hourly_rate, "0.00")
-        if project.flat_rate is not None:
-            with override(settings.WORKBENCH.PDF_LANGUAGE):
-                service.effort_type = _("flat rate")
-            service.effort_rate = project.flat_rate
-
-        if (
-            item.hours is not None
-            and not service.effort_type
-            and service.effort_rate is None
-            and (item.service_type is None or item.service_type in service_types)
-        ):
-            errors.append({
-                "loc": [*loc, "hours"],
-                "msg": _(
-                    "Hours require an effort type and an hourly rate,"
-                    " e.g. from a service type."
-                ),
-            })
-        if item.hours is None and item.cost is None:
-            errors.append({
-                "loc": [*loc],
-                "msg": _("Either hours or a cost are required."),
-            })
-
-        full_clean(service, loc, errors, exclude=["project", "offer"])
         services.append(service)
     return services
 
 
 def _save(offer, services, request, *, dry_run, delete=()):
-    """Save everything and return the offer, roll back with ``dry_run``"""
+    """Save everything and return the offer, roll back with ``dry_run``
+
+    Objects which only exist because of the dry run have no ID and URL."""
+    existing = set(offer.services.values_list("id", flat=True)) if offer.pk else set()
+    is_new = offer.pk is None
     with transaction.atomic():
         for service in delete:
             service.delete()
@@ -301,9 +354,11 @@ def _save(offer, services, request, *, dry_run, delete=()):
         result = offer_out(offer, list(offer.services.all()), request)
         if dry_run:
             transaction.set_rollback(True)
-            result |= {"id": None, "url": None}
+            if is_new:
+                result |= {"id": None, "code": None, "url": None}
             for service in result["services"]:
-                service.id = None
+                if service.id not in existing:
+                    service.id = None
     return result
 
 
@@ -348,24 +403,32 @@ def offer_create(request, project_id: int, data: OfferIn, *, dry_run: bool = Fal
     return _save(offer, services, request, dry_run=dry_run)
 
 
-@router.put("/offers/{offer_id}/", response=OfferOut)
-def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = False):
-    """Replace an offer in preparation and all its services
-
-    Nothing is saved if anything is invalid or with ``dry_run``."""
+def _offer_in_preparation(offer_id, message):
     offer = get_object_or_404(
         Offer.objects.select_related("project__customer", "project__contact"),
         pk=offer_id,
     )
     if offer.status != Offer.IN_PREPARATION:
-        raise HttpError(409, _("Only offers in preparation can be replaced."))
+        raise HttpError(409, message)
+    return offer
+
+
+def _has_logbook(service):
+    return service.loggedhours.exists() or service.loggedcosts.exists()
+
+
+@router.put("/offers/{offer_id}/", response=OfferOut)
+def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = False):
+    """Replace an offer in preparation and all its services
+
+    Nothing is saved if anything is invalid or with ``dry_run``."""
+    offer = _offer_in_preparation(
+        offer_id, _("Only offers in preparation can be replaced.")
+    )
 
     errors = []
     existing = list(offer.services.all())
-    if any(
-        service.loggedhours.exists() or service.loggedcosts.exists()
-        for service in existing
-    ):
+    if any(_has_logbook(service) for service in existing):
         errors.append({
             "loc": ["path", "offer_id"],
             "msg": _(
@@ -385,3 +448,173 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = Fals
         raise ValidationError(errors)
 
     return _save(offer, services, request, dry_run=dry_run, delete=existing)
+
+
+def _changeable_offer(offer_id):
+    return _offer_in_preparation(
+        offer_id, _("Only offers in preparation can be changed.")
+    )
+
+
+class OfferPatch(Schema):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    postal_address: str | None = None
+
+
+@router.patch("/offers/{offer_id}/", response=OfferOut)
+def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: bool = False):
+    """Change the title, the description or the postal address of an offer
+    in preparation; fields which aren't given are left alone"""
+    offer = _changeable_offer(offer_id)
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(offer, field, value or "")
+    errors = []
+    full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
+    if errors:
+        raise ValidationError(errors)
+    return _save(offer, [], request, dry_run=dry_run)
+
+
+def _renumbered(services):
+    for index, service in enumerate(services):
+        service.position = 10 * (index + 1)
+    return services
+
+
+class ServiceAdd(ServiceIn):
+    after: int | None = Field(
+        default=None,
+        description="ID of the service after which the new one is inserted,"
+        " defaults to the end.",
+    )
+
+
+@router.post("/offers/{offer_id}/services/", response=OfferOut)
+def offer_service_add(
+    request, offer_id: int, data: ServiceAdd, *, dry_run: bool = False
+):
+    """Add a service to an offer in preparation, at the end or after another
+    service"""
+    offer = _changeable_offer(offer_id)
+    services = list(offer.services.all())
+    index = len(services)
+    errors = []
+    if data.after is not None:
+        try:
+            index = 1 + [service.id for service in services].index(data.after)
+        except ValueError:
+            errors.append({
+                "loc": ["body", "data", "after"],
+                "msg": _("The offer has no service with this ID."),
+            })
+    service = Service(project=offer.project)
+    _apply_service(
+        service,
+        data.model_dump(exclude_none=True, exclude={"after"}),
+        service_types=_service_types(),
+        loc=["body", "data"],
+        errors=errors,
+    )
+    if errors:
+        raise ValidationError(errors)
+    services.insert(index, service)
+    return _save(offer, _renumbered(services), request, dry_run=dry_run)
+
+
+class ServicePatch(Schema):
+    """Fields which aren't given are left alone, ``null`` clears values"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    service_type: str | None = Field(
+        default=None,
+        description="Title of a service type. Fills in the effort type and the"
+        " hourly rate unless they are given too.",
+    )
+    effort_type: str | None = Field(default=None, max_length=50)
+    hours: float | None = Field(default=None, ge=0)
+    hourly_rate: float | None = Field(default=None, ge=0)
+    cost: float | None = None
+    third_party_costs: float | None = Field(default=None, ge=0)
+    is_optional: bool | None = None
+
+
+@router.patch("/offers/{offer_id}/services/{int:service_id}/", response=OfferOut)
+def offer_service_update(
+    request,
+    offer_id: int,
+    service_id: int,
+    data: ServicePatch,
+    *,
+    dry_run: bool = False,
+):
+    """Change a service of an offer in preparation, also when hours or costs
+    have already been logged on it (like in the web interface)"""
+    offer = _changeable_offer(offer_id)
+    service = get_object_or_404(offer.services.select_related("project"), pk=service_id)
+    errors = []
+    _apply_service(
+        service,
+        data.model_dump(exclude_unset=True),
+        service_types=_service_types(),
+        loc=["body", "data"],
+        errors=errors,
+    )
+    if errors:
+        raise ValidationError(errors)
+    return _save(offer, [service], request, dry_run=dry_run)
+
+
+@router.delete("/offers/{offer_id}/services/{int:service_id}/", response=OfferOut)
+def offer_service_delete(
+    request, offer_id: int, service_id: int, *, dry_run: bool = False
+):
+    """Delete a service of an offer in preparation, unless hours or costs have
+    been logged on it; offers keep at least one service"""
+    offer = _changeable_offer(offer_id)
+    service = get_object_or_404(offer.services.all(), pk=service_id)
+    errors = []
+    if _has_logbook(service):
+        errors.append({
+            "loc": ["path", "service_id"],
+            "msg": _(
+                "Hours or costs have been logged on this service, it cannot be deleted."
+            ),
+        })
+    if offer.services.count() == 1:
+        errors.append({
+            "loc": ["path", "service_id"],
+            "msg": _("The last service of an offer cannot be deleted."),
+        })
+    if errors:
+        raise ValidationError(errors)
+    return _save(offer, [], request, dry_run=dry_run, delete=[service])
+
+
+class ServiceOrder(Schema):
+    services: list[int] = Field(
+        description="The IDs of all services of the offer in the new order."
+    )
+
+
+@router.post("/offers/{offer_id}/services/reorder/", response=OfferOut)
+def offer_service_reorder(
+    request, offer_id: int, data: ServiceOrder, *, dry_run: bool = False
+):
+    """Reorder the services of an offer in preparation"""
+    offer = _changeable_offer(offer_id)
+    services = {service.id: service for service in offer.services.all()}
+    if sorted(data.services) != sorted(services):
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "services"],
+                "msg": _("Expected the IDs of all services of the offer once."),
+            }
+        ])
+    return _save(
+        offer,
+        _renumbered([services[id] for id in data.services]),
+        request,
+        dry_run=dry_run,
+    )
