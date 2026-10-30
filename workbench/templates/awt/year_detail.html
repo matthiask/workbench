@@ -142,8 +142,10 @@
       {% endfor %}
       {% for data in statistics %}
         {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
-          <section class="card mb-3 wb-table-card">
-            <div class="card-header"><a href="{% querystring user=user.pk %}" class="text-reset">{{ user }}</a></div>
+          <section class="card mb-3 mt-5 wb-table-card">
+            <div class="card-header">
+              <h2 class="h4 mb-0"><a href="{% querystring user=user.pk %}">{{ user }}</a></h2>
+            </div>
             <div class="table-responsive">
               <table class="table table-sm mb-0 wb-compact-table wb-awt-table">
                 <tr class="wb-table-heading">
