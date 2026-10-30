@@ -218,6 +218,29 @@ planned_work:
         self.assertIn("Planning", result.output)
         self.assertIn("Big deal", self.wb("deals", "search").output)
 
+        factories.ValueTypeFactory.create(title="Design")
+        result = self.wb(
+            "deals",
+            "create",
+            "--title",
+            "Bigger deal",
+            "--contact",
+            project.contact_id,
+            "--probability",
+            "normal",
+            "--value",
+            "design=5000",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("5000.00", result.output)
+        self.assertIn("Dry run", result.output)
+        result = self.wb(
+            "deals", "create", "--title", "X", "--probability", "low", "--value", "nope"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--value expects KEY=VALUE", result.output)
+
         result = self.wb("me")
         self.assertIn(project.code, result.output)
         self.assertIn("Big deal", result.output)

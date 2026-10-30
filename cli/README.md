@@ -121,11 +121,18 @@ The planned invoicing (gross margin, without third party costs):
 
 ## Deals
 
-Deals are read-only in the CLI and require the deals feature:
+Deals require the deals feature:
 
     wb deals search                     # Open deals
     wb deals search --status accepted relaunch
     wb deals show 1234
+
+Create deals like projects; you are their main driving force. Values are given
+by value type and attributes by their group, unknown ones are rejected with a
+list of the choices:
+
+    wb deals create --title "Relaunch" --contact 345 --probability normal \
+        --value Design=5000 --attribute Source=Referral --dry-run
 
 ## Reports
 

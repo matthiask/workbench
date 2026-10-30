@@ -1010,7 +1010,7 @@ def search_projected_invoices(project, customer, since, until, as_json):
 
 @cli.group()
 def deals():
-    """Look at the sales pipeline"""
+    """Look at and add to the sales pipeline"""
 
 
 @deals.command("search")
@@ -1060,11 +1060,86 @@ def search_deals(query, status, customer, owned_by, as_json):
 def show_deal(deal_id, as_json):
     """Show a deal"""
     data = _request("GET", f"deals/{deal_id}/")
+    _echo_json(data) if as_json else _echo_deal(data)
+
+
+def _key_values(values, option):
+    """Parse ``KEY=VALUE`` options into a dict"""
+    result = {}
+    for pair in values:
+        key, sep, value = pair.partition("=")
+        if not sep:
+            _terminate(f"{option} expects KEY=VALUE, got {pair!r}.")
+        result[key.strip()] = value.strip()
+    return result
+
+
+@deals.command("create")
+@click.option("--title", required=True)
+@click.option(
+    "--customer", type=int, help="Organization ID, defaults to the contact's."
+)
+@click.option("--contact", type=int, help="Person ID.")
+@click.option(
+    "--probability", type=click.Choice(["low", "normal", "high"]), required=True
+)
+@click.option(
+    "--decision-expected-on",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Required for a high probability.",
+)
+@click.option("--value", "values", multiple=True, help="TYPE=AMOUNT, e.g. Design=5000.")
+@click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
+@click.option("--owned-by", help="Short name, defaults to you.")
+@click.option("--description", default="")
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_deal(
+    title,
+    customer,
+    contact,
+    probability,
+    decision_expected_on,
+    values,
+    attributes,
+    owned_by,
+    description,
+    dry_run,
+    as_json,
+):
+    """Create a deal, you are its main driving force
+
+    Find the customer and the contact with `wb contacts search`. Unknown
+    value types and attributes are rejected with a list of the choices."""
+    data = _request(
+        "POST",
+        "deals/",
+        params={"dry_run": _bool(dry_run)},
+        json={
+            "title": title,
+            "description": description,
+            "customer": customer,
+            "contact": contact,
+            "owned_by": owned_by,
+            "probability": probability,
+            "decision_expected_on": decision_expected_on.date().isoformat()
+            if decision_expected_on
+            else None,
+            "values": _key_values(values, "--value"),
+            "attributes": _key_values(attributes, "--attribute"),
+        },
+    )
     if as_json:
         _echo_json(data)
         return
+    _echo_deal(data)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
+
+
+def _echo_deal(data):
     _echo_fields(
-        f"{data['code']} {data['title']}",
+        f"{data['code'] or '(new deal)'} {data['title']}",
         [
             ("ID", data["id"]),
             ("Customer", data["customer"]),
