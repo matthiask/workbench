@@ -164,6 +164,17 @@ list of the choices:
     wb deals create --title "Relaunch" --contact 345 --probability normal \
         --value Design=5000 --attribute Source=Referral --dry-run
 
+## Notes
+
+Notes on deals, invoices and recurring invoices. Search all of them or those
+of some objects:
+
+    wb notes search budget
+    wb notes search --deal 1234
+    wb notes create --deal 1234 --title "Call" --description "Budget approved."
+
+Like in Workbench, adding a note notifies the owner of the deal or invoice.
+
 ## Services
 
 Services with their hours and costs, and what has been logged on them so far.

@@ -1013,6 +1013,78 @@ def show_invoice(invoice_id, as_json):
 
 
 @cli.group()
+def notes():
+    """Search and add notes on deals and invoices"""
+
+
+def _echo_notes(notes):
+    for note in notes:
+        obj = note["object"]
+        console.print(
+            _link(f"{obj['name']} ({obj['type']} {obj['id']})", obj["url"]),
+            style="bold",
+        )
+        console.print(
+            f"{note['title']} – {note['created_by']}, {note['created_at'][:10]}",
+            style="dim",
+        )
+        console.print(note["description"])
+        console.print()
+
+
+@notes.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--deal", type=int, help="Deal ID.")
+@click.option("--invoice", type=int, help="Invoice ID.")
+@click.option("--recurring-invoice", type=int, help="Recurring invoice ID.")
+@click.option("--created-by", help="Short name.")
+@click.option("--json", "as_json", is_flag=True)
+def search_notes(query, deal, invoice, recurring_invoice, created_by, as_json):
+    """Search notes, all of them or those of some objects, newest first"""
+    params = {"q": " ".join(query)}
+    for key, value in [
+        ("deal", deal),
+        ("invoice", invoice),
+        ("recurring_invoice", recurring_invoice),
+        ("created_by", created_by),
+    ]:
+        if value:
+            params[key] = value
+    data = _request("GET", "notes/", params=params)
+    if as_json:
+        _echo_json(data)
+    elif data:
+        _echo_notes(data)
+    else:
+        console.print("No notes found.")
+
+
+@notes.command("create")
+@click.option("--deal", type=int, help="Deal ID.")
+@click.option("--invoice", type=int, help="Invoice ID.")
+@click.option("--recurring-invoice", type=int, help="Recurring invoice ID.")
+@click.option("--title", required=True)
+@click.option("--description", required=True)
+@click.option("--json", "as_json", is_flag=True)
+def create_note(deal, invoice, recurring_invoice, title, description, as_json):
+    """Add a note to exactly one deal, invoice or recurring invoice
+
+    Like in Workbench, the owner of the deal or invoice is notified by email."""
+    data = _request(
+        "POST",
+        "notes/",
+        json={
+            "title": title,
+            "description": description,
+            "deal": deal,
+            "invoice": invoice,
+            "recurring_invoice": recurring_invoice,
+        },
+    )
+    _echo_json(data) if as_json else _echo_notes([data])
+
+
+@cli.group()
 def services():
     """Look at services and the hours and costs logged on them"""
 

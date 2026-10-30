@@ -99,6 +99,25 @@ class CLITest(TestCase):
         project = factories.ProjectFactory.create(title="Relaunch", owned_by=self.user)
         factories.OfferFactory.create(project=project, title="Phase 1")
 
+        deal = factories.DealFactory.create(title="Noted deal")
+        result = self.wb(
+            "notes",
+            "create",
+            "--deal",
+            deal.pk,
+            "--title",
+            "Call",
+            "--description",
+            "Budget approved",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb("notes", "search", "budget")
+        self.assertIn("Noted deal", result.output)
+        self.assertIn("Budget approved", result.output)
+        result = self.wb("notes", "create", "--title", "Call", "--description", "x")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("exactly one of deal, invoice, recurring_invoice", result.output)
+
         result = self.wb("me")
         self.assertEqual(result.exit_code, 0)
         self.assertIn(self.user.get_full_name(), result.output)
