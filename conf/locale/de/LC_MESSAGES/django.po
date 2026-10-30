@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 21:48+0100\n"
+"POT-Creation-Date: 2026-10-30 22:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -726,7 +726,8 @@ msgstr "sind Ferien"
 msgid "is working time"
 msgstr "ist Arbeitszeit"
 
-#: workbench/awt/models.py workbench/templates/awt/absence_calendar.html
+#: workbench/awt/models.py workbench/awt/views.py workbench/planning/updates.py
+#: workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/awt/year_detail.html
 #: workbench/templates/planning/_new_dropdown.html
@@ -737,6 +738,10 @@ msgstr "Abwesenheit"
 #: workbench/templates/base.html
 msgid "absences"
 msgstr "Abwesenheiten"
+
+#: workbench/awt/models.py
+msgid "You are not permitted to edit the absences of others."
+msgstr "Du darfst die Abwesenheiten anderer nicht bearbeiten."
 
 #: workbench/awt/models.py
 msgid "Absences of past years are locked."

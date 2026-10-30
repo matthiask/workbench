@@ -1,5 +1,5 @@
 {% extends "generic/object_detail.html" %}
-{% load i18n workbench %}
+{% load absences i18n workbench %}
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-sm-12">
@@ -23,19 +23,19 @@
               {% endfor %}
             </div>
           </span>
-          {% if request.user.features.CONTROLLING %}
+          {% if request.user.features.WORKING_TIME_CORRECTION %}
             <a
               class="btn btn-quiet {% if request.GET.user == 'active' %}active{% endif %}"
               href="{% querystring user='active' %}"
             >{% translate 'active users' %}</a>
-            <a class="btn btn-quiet" href="{% querystring export='pdf' %}">
-              {% include 'svg/file-pdf.svg' %}
-              PDF
-            </a>
           {% endif %}
+          <a class="btn btn-quiet" href="{% querystring export='pdf' %}">
+            {% include 'svg/file-pdf.svg' %}
+            PDF
+          </a>
         </div>
       </div>
-      {% if request.user.features.CONTROLLING and request.GET.user == 'active' %}
+      {% if request.user.features.WORKING_TIME_CORRECTION and request.GET.user == 'active' %}
         <div class="wb-stats mb-4">
           <div class="wb-stat">
             <div class="wb-stat-label">{% translate 'vacation days available'|capfirst %}</div>
@@ -503,7 +503,10 @@
                         {{ absence.days|days }}
                       </td>
                       <td>
-                        {% link_or_none absence %}
+                        <a
+                          href="{{ absence.get_absolute_url }}"
+                          data-ajaxmodal
+                        >{{ absence|absence_title:request.user }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -548,7 +551,10 @@
                         {{ absence.days|days }}
                       </td>
                       <td>
-                        {% link_or_none absence %}
+                        <a
+                          href="{{ absence.get_absolute_url }}"
+                          data-ajaxmodal
+                        >{{ absence|absence_title:request.user }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -582,7 +588,10 @@
                         {{ absence.days|days }}
                       </td>
                       <td>
-                        {% link_or_none absence %}
+                        <a
+                          href="{{ absence.get_absolute_url }}"
+                          data-ajaxmodal
+                        >{{ absence|absence_title:request.user }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -610,7 +619,10 @@
                         {{ absence.days|days }}
                       </td>
                       <td>
-                        {% link_or_none absence %}
+                        <a
+                          href="{{ absence.get_absolute_url }}"
+                          data-ajaxmodal
+                        >{{ absence|absence_title:request.user }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -630,7 +642,10 @@
                         {{ absence.days|days }}
                       </td>
                       <td>
-                        {% link_or_none absence %}
+                        <a
+                          href="{{ absence.get_absolute_url }}"
+                          data-ajaxmodal
+                        >{{ absence|absence_title:request.user }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -650,7 +665,10 @@
                         {{ absence.days|days }}
                       </td>
                       <td>
-                        {% link_or_none absence %}
+                        <a
+                          href="{{ absence.get_absolute_url }}"
+                          data-ajaxmodal
+                        >{{ absence|absence_title:request.user }}</a>
                       </td>
                     </tr>
                   {% endfor %}

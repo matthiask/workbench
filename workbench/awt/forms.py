@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
-from workbench.awt.models import Absence, Year
+from workbench.awt.models import Absence, Year, visible_absences
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
 from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -48,12 +48,18 @@ class AbsenceSearchForm(Form):
             queryset = queryset.filter(user=data.get("u"))
         if data.get("reason"):
             queryset = queryset.filter(reason=data.get("reason"))
+        queryset = visible_absences(
+            queryset,
+            self.request.user,
+            filtered=bool(data.get("q") or data.get("reason")),
+        )
         return queryset.select_related("user")
 
     def response(self, request, queryset):
         if (
             request.GET.get("export") == "xlsx"
-            and request.user.features[FEATURES.CONTROLLING]
+            # The export contains the sickness of everyone
+            and request.user.features[FEATURES.WORKING_TIME_CORRECTION]
         ):
             xlsx = WorkbenchXLSXDocument()
             xlsx.table_from_queryset(queryset)

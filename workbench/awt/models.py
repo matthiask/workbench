@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.contrib import messages
 from django.db import models
+from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
@@ -138,6 +139,18 @@ class Employment(Model):
         raise_if_errors(errors, exclude)
 
 
+# The reason shown instead of sickness to people who may not see it
+HIDDEN_REASON = "absent"
+
+
+def visible_absences(queryset, user, *, filtered):
+    """Searching or filtering by reason would reveal the sickness of others
+    even when the details are hidden, those absences are left out then"""
+    if not filtered or user.features[FEATURES.WORKING_TIME_CORRECTION]:
+        return queryset
+    return queryset.exclude(models.Q(reason=Absence.SICKNESS) & ~models.Q(user=user))
+
+
 @model_urls
 class Absence(Model):
     open_in_modal = True
@@ -164,7 +177,7 @@ class Absence(Model):
     starts_on = models.DateField(_("starts on"))
     ends_on = models.DateField(_("ends on"), blank=True, null=True)
     days = models.DecimalField(_("days"), max_digits=4, decimal_places=2)
-    description = models.TextField(_("description"))
+    description = models.TextField(_("description"), blank=True)
     reason = models.CharField(_("reason"), max_length=10, choices=REASON_CHOICES)
     is_vacation = models.BooleanField(_("is vacation"), default=True)
     is_working_time = models.BooleanField(_("is working time"), default=True)
@@ -175,7 +188,32 @@ class Absence(Model):
         verbose_name_plural = _("absences")
 
     def __str__(self):
-        return self.description
+        # Neither the reason nor the description, both may be health data
+        return f"{capfirst(gettext('absence'))} {self.pretty_period}"
+
+    def details_visible_to(self, user):
+        """Sickness is health data: only the absent person and people
+        correcting working time see the reason and the description"""
+        return (
+            self.reason != self.SICKNESS
+            or self.user_id == user.id
+            or user.features[FEATURES.WORKING_TIME_CORRECTION]
+        )
+
+    def reason_for(self, user):
+        """The reason (key, label) the user may see"""
+        if self.details_visible_to(user):
+            return self.reason, self.get_reason_display()
+        return HIDDEN_REASON, capfirst(gettext("absence"))
+
+    def description_for(self, user):
+        return self.description if self.details_visible_to(user) else ""
+
+    def public_text(self):
+        """What everyone may see, e.g. in the planning"""
+        if self.reason == self.SICKNESS:
+            return capfirst(gettext("absence"))
+        return " - ".join(filter(None, [self.get_reason_display(), self.description]))
 
     def save(self, *args, **kwargs):
         self.is_vacation = self.reason == self.VACATION
@@ -186,6 +224,11 @@ class Absence(Model):
 
     @classmethod
     def allow_update(cls, instance, request):
+        if not instance.details_visible_to(request.user):
+            messages.error(
+                request, _("You are not permitted to edit the absences of others.")
+            )
+            return False
         if (
             not instance.user.features[FEATURES.LATE_LOGGING]
             and instance.starts_on.year < dt.date.today().year

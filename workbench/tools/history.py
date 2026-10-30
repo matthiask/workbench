@@ -278,6 +278,13 @@ def _accounts_user_cfg(user):
     return {"fields": fields, "related": related}
 
 
+def _awt_absence_cfg(user):
+    # The reason and the description may be health data
+    if user.features[FEATURES.WORKING_TIME_CORRECTION]:
+        return {"fields": EVERYTHING}
+    return {"fields": {"user", "starts_on", "ends_on", "days"}}
+
+
 def _credit_control_creditentry_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
@@ -498,7 +505,7 @@ HISTORY = {
     User: _accounts_user_cfg,
     Team: {"fields": EVERYTHING},
     SpecialistField: {"fields": EVERYTHING},
-    Absence: {"fields": EVERYTHING},
+    Absence: _awt_absence_cfg,
     Year: {"fields": EVERYTHING},
     CreditEntry: _credit_control_creditentry_cfg,
     Contribution: _deals_contribution_cfg,

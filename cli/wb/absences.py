@@ -102,7 +102,7 @@ def search_absences(user, reason, period, since, until, limit, offset, as_csv, a
     ]),
     required=True,
 )
-@click.option("--description", required=True)
+@click.option("--description", default="", help="Optional.")
 @click.option(
     "--user", help="Short name, defaults to you.", shell_complete=complete_short_names
 )

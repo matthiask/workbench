@@ -757,3 +757,76 @@ class AWTTest(TestCase):
             self.assertFalse(is_previous_month_locked_starting_today())
         with travel(dt.date(2021, 10, 11)):
             self.assertFalse(is_previous_month_locked_starting_today())
+
+    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: F.USER})
+    def test_sickness_is_private(self):
+        """Only the absent person and people correcting working time see that
+        and why someone is sick"""
+        user = factories.UserFactory.create()
+        absence = Absence.objects.create(
+            user=user,
+            starts_on=dt.date.today(),
+            days=1,
+            description="Flu",
+            reason=Absence.SICKNESS,
+        )
+        colleague = factories.UserFactory.create()
+        hr = factories.UserFactory.create()
+        hr._features.append(FEATURES.WORKING_TIME_CORRECTION)
+        hr.save()
+
+        def visible(viewer, url, text="Flu"):
+            self.client.force_login(viewer)
+            response = self.client.get(
+                url, headers={"x-requested-with": "XMLHttpRequest"}
+            )
+            self.assertEqual(response.status_code, 200)
+            return text in response.content.decode()
+
+        for url in [
+            absence.urls["detail"],
+            "/absences/",
+            "/report/absence-calendar/",
+            "/api/absences/",
+        ]:
+            with self.subTest(url=url):
+                self.assertTrue(visible(user, url))
+                self.assertTrue(visible(hr, url))
+                self.assertFalse(visible(colleague, url))
+        # The reason itself (lists and the calendar offer it as a filter)
+        self.assertFalse(visible(colleague, absence.urls["detail"], "sickness"))
+        self.assertFalse(visible(colleague, "/api/absences/", "sickness"))
+
+        # Filtering or searching would reveal the sickness of others
+        link = f'href="{absence.urls["detail"]}"'
+        self.assertFalse(visible(colleague, "/absences/?reason=sickness", link))
+        self.assertTrue(visible(hr, "/absences/?reason=sickness", link))
+        self.assertFalse(visible(colleague, "/absences/?q=flu", link))
+        self.assertTrue(visible(colleague, "/absences/", link))
+        self.assertFalse(
+            visible(colleague, "/api/absences/?reason=sickness", user.get_short_name())
+        )
+
+        # History and the annual working time report
+        history = f"/history/awt_absence/id/{absence.pk}/"
+        self.assertFalse(visible(colleague, history))
+        self.assertTrue(visible(hr, history))
+        report = f"/report/annual-working-time/?user={user.pk}"
+        self.assertFalse(visible(colleague, report, user.get_full_name()))
+        self.assertTrue(visible(hr, report, user.get_full_name()))
+
+        self.client.force_login(colleague)
+        response = self.client.get(absence.urls["update"])
+        self.assertRedirects(
+            response, absence.urls["detail"], fetch_redirect_response=False
+        )
+
+    def test_absence_without_description(self):
+        """Descriptions are optional"""
+        absence = Absence.objects.create(
+            user=factories.UserFactory.create(),
+            starts_on=dt.date.today(),
+            days=1,
+            reason=Absence.VACATION,
+        )
+        self.assertEqual(str(absence), f"Absence {absence.pretty_period}")

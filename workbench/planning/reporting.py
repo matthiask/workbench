@@ -232,7 +232,7 @@ class Planning:
             for idx, week in weeks:
                 self._absences[absence.user][idx].append((
                     hours / len(weeks),
-                    f"{absence.get_reason_display()} - {absence.description}",
+                    absence.public_text(),
                     absence.urls["detail"],
                 ))
                 self._by_week[week] += hours / len(weeks)

@@ -1,7 +1,7 @@
 {% extends "generic/object_list.html" %}
-{% load workbench %}
+{% load absences workbench %}
 {% block search-form-buttons %}
-  {% if request.GET and request.user.features.CONTROLLING %}
+  {% if request.GET and request.user.features.WORKING_TIME_CORRECTION %}
     <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
       {% include 'svg/desktop-download.svg' %}
       XLSX
@@ -20,10 +20,10 @@
     {% endifchanged %}
     <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action wb-row" data-ajaxmodal>
       <div class="wb-row-main">
-        <div class="wb-row-title">{{ object|h }}</div>
+        <div class="wb-row-title">{{ object|absence_title:request.user }}</div>
         <div class="wb-row-meta">
           <span>{{ object.user.get_full_name }}</span>
-          <span>{{ object.get_reason_display }}</span>
+          <span>{{ object|absence_reason:request.user }}</span>
           <span>{{ object.pretty_status }}</span>
         </div>
       </div>

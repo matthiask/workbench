@@ -11,6 +11,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.dateparse import parse_date
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
@@ -312,8 +313,13 @@ def changes(*, since):
     return dict(changes)
 
 
+def _public_reasons():
+    """Sickness is health data, the mails only say that someone is absent"""
+    return dict(Absence.REASON_CHOICES) | {Absence.SICKNESS: capfirst(_("absence"))}
+
+
 def pretty_changes_absence(*, users):
-    reasons = dict(Absence.REASON_CHOICES)
+    reasons = _public_reasons()
 
     def prettifier(changes):
         def _row(row):
@@ -341,8 +347,9 @@ def pretty_changes_absence(*, users):
         return [
             _row(row)
             for row in changes
-            # Both fields are derived from the reason.
-            if row["field"] not in {"is_vacation", "is_working_time"}
+            # Both fields are derived from the reason, the description may
+            # contain health data.
+            if row["field"] not in {"is_vacation", "is_working_time", "description"}
         ]
 
     return prettifier
@@ -357,9 +364,11 @@ def pretty_absence(x, *, users):
         if ends_on and ends_on != starts_on
         else local_date_format(starts_on)
     )
-    reason = dict(Absence.REASON_CHOICES).get(x["reason"], x["reason"])
+    reason = _public_reasons().get(x["reason"], x["reason"])
     absence = f"{user}: {reason}, {period} ({days_format(Decimal(x['days']))})"
-    return f"{absence} {x['description']}" if x["description"] else absence
+    if x["description"] and x["reason"] != Absence.SICKNESS:
+        return f"{absence} {x['description']}"
+    return absence
 
 
 def absence_touches_future(actions, *, today):

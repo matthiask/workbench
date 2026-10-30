@@ -1,7 +1,7 @@
 {% extends "modal.html" %}
-{% load i18n workbench %}
+{% load absences i18n workbench %}
 {% block title %}
-  {{ object }} {% history_link object %}
+  {{ object|absence_title:request.user }} {% history_link object %}
 {% endblock title %}
 
 {% block body %}
@@ -11,9 +11,13 @@
     <dt>{% translate 'absence'|capfirst %}</dt>
     <dd>{{ object.pretty_status }}</dd>
     <dt>{% translate 'reason'|capfirst %}</dt>
-    <dd>{{ object.get_reason_display }}</dd>
-    <dt>{% translate 'description'|capfirst %}</dt>
-    <dd>{{ object.description|linebreaksbr }}</dd>
+    <dd>{{ object|absence_reason:request.user }}</dd>
+    {% with description=object|absence_description:request.user %}
+      {% if description %}
+        <dt>{% translate 'description'|capfirst %}</dt>
+        <dd>{{ description|linebreaksbr }}</dd>
+      {% endif %}
+    {% endwith %}
   </dl>
 {% endblock body %}
 

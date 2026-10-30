@@ -131,7 +131,7 @@ const Absence = ({ absence, person }) => {
       data-ajaxmodal
       className={`absence absence--${absence.reason}`}
       style={style}
-      title={`${absence.reasonDisplay} – ${absence.description}`}
+      title={label(absence)}
       onMouseEnter={() => {
         setShowPopup(true)
       }}
@@ -139,13 +139,15 @@ const Absence = ({ absence, person }) => {
         setShowPopup(false)
       }}
     >
-      <span className="absence__label">
-        {`${absence.reasonDisplay} – ${absence.description}`}
-      </span>
+      <span className="absence__label">{label(absence)}</span>
       {showPopup ? <Popup absence={absence} /> : null}
     </a>
   )
 }
+
+// Descriptions are optional, and hidden for the sickness of others
+const label = (absence) =>
+  [absence.reasonDisplay, absence.description].filter(Boolean).join(" – ")
 
 const Now = () => {
   const style = {
@@ -164,7 +166,11 @@ const Popup = ({ absence }) => {
       <p>
         {readableDate(new Date(absence.startsOn))} –{" "}
         {readableDate(new Date(absence.endsOn))} <br />
-        {gettext("Description")}: {absence.description} <br />
+        {absence.description ? (
+          <>
+            {gettext("Description")}: {absence.description} <br />
+          </>
+        ) : null}
         {gettext("Days")}: {absence.days}d <br />
       </p>
     </div>

@@ -13,7 +13,7 @@ from workbench.accounts.api_auth import check_feature
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.forms import AbsenceForm
-from workbench.awt.models import Absence
+from workbench.awt.models import Absence, visible_absences
 from workbench.awt.reporting import (
     active_users,
     annual_working_time,
@@ -61,6 +61,7 @@ def absence_list(request, filters: Query[AbsenceFilter]):
         absences = absences.filter(user___short_name__iexact=filters.user)
     if filters.reason:
         absences = absences.filter(reason=filters.reason)
+    absences = visible_absences(absences, request.user, filtered=bool(filters.reason))
     since, until = date_range(filters)
     if since:
         absences = absences.filter(
@@ -82,8 +83,8 @@ def _absence_out(absence, request):
         "starts_on": absence.starts_on,
         "ends_on": absence.ends_on,
         "days": absence.days,
-        "reason": absence.get_reason_display(),
-        "description": absence.description,
+        "reason": absence.reason_for(request.user)[1],
+        "description": absence.description_for(request.user),
     }
 
 
@@ -97,7 +98,7 @@ class AbsenceIn(Schema):
     )
     days: Decimal = Field(gt=0, description="Working days, e.g. 0.5.")
     reason: Literal["vacation", "sickness", "paid", "school", "other", "correction"]
-    description: str = Field(min_length=1)
+    description: str = ""
 
 
 @router.post("/absences/", response=AbsenceOut)

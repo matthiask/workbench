@@ -6,12 +6,13 @@ from django.contrib import messages
 from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.awt.forms import CalendarFilterForm
-from workbench.awt.models import Absence, Year
+from workbench.awt.models import HIDDEN_REASON, Absence, Year
 from workbench.awt.pdf import annual_working_time_pdf
 from workbench.awt.reporting import active_users, annual_working_time
 from workbench.tools.validation import filter_form, monday
@@ -26,10 +27,12 @@ def annual_working_time_view(request):
 
     user = request.GET.get("user")
     users = None
-    if user == "active" and request.user.features[FEATURES.CONTROLLING]:
-        users = active_users(year)
-    elif user and user != "active":
-        users = User.objects.filter(id=user)
+    # The report contains sickness absences, which are health data
+    if request.user.features[FEATURES.WORKING_TIME_CORRECTION]:
+        if user == "active":
+            users = active_users(year)
+        elif user:
+            users = User.objects.filter(id=user)
     if not users:
         users = [request.user]
     statistics = annual_working_time(year, users=users)
@@ -118,8 +121,8 @@ def absence_calendar(request, form):
             "absences": [
                 {
                     "id": absence.id,
-                    "reason": absence.reason,
-                    "reasonDisplay": absence.get_reason_display(),
+                    "reason": absence.reason_for(request.user)[0],
+                    "reasonDisplay": absence.reason_for(request.user)[1],
                     "startsOn": time.mktime(max(absence.starts_on, cutoff).timetuple())
                     * 1000,
                     "endsOn": time.mktime(
@@ -127,7 +130,7 @@ def absence_calendar(request, form):
                     )
                     * 1000,
                     "days": absence.days,
-                    "description": absence.description,
+                    "description": absence.description_for(request.user),
                 }
                 for absence in absences[user.id]
             ],
@@ -141,7 +144,9 @@ def absence_calendar(request, form):
         {
             "absences_data": {
                 "absencesByPerson": absences,
-                "reasonList": Absence.REASON_CHOICES,
+                "reasonList": Absence.REASON_CHOICES
+                if request.user.features[FEATURES.WORKING_TIME_CORRECTION]
+                else [*Absence.REASON_CHOICES, (HIDDEN_REASON, capfirst(_("absence")))],
                 "timeBoundaries": {
                     "start": time.mktime(monday(min(dates)).timetuple()) * 1000,
                     "end": time.mktime(max(dates).timetuple()) * 1000,
