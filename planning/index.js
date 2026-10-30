@@ -11,7 +11,22 @@ import React, {
 import { createRoot } from "react-dom/client"
 
 const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
-const opacityClamp = (value) => clamp(0.3, value, 1)
+// Hours are shown as a tint of their color, stronger tints get white text
+const heat = (percentage) => {
+  const value = Math.round(clamp(0, percentage, 100))
+  return {
+    className: `is-heat${value >= 55 ? " is-strong" : ""}${value ? "" : " is-zero"}`,
+    style: { "--heat": `${value}%` },
+  }
+}
+const hoursHeat = (hours) => heat(hours ? 12 + (hours / 14) * 88 : 0)
+const capacityHeat = (hours) => {
+  const { className, style } = heat(Math.abs(hours) * 5)
+  return {
+    className: `${className} ${hours < 0 ? "is-over" : "is-free"}`,
+    style,
+  }
+}
 const gettext = window.gettext || ((t) => t)
 const pgettext = window.pgettext || ((_ctx, t) => t)
 const fixed = (s, decimalPlaces) => Number.parseFloat(s).toFixed(decimalPlaces)
@@ -230,19 +245,20 @@ function TotalByWeek({ by_week, title }) {
       >
         <strong>{title}</strong>
       </Cell>
-      {by_week.map((hours, idx) => (
-        <Cell
-          key={idx}
-          row={row}
-          column={FIRST_DATA_COLUMN + idx}
-          className="planning--range planning--small is-total"
-          style={{
-            opacity: opacityClamp(0.3 + Number.parseFloat(hours) / 20),
-          }}
-        >
-          {fixed(hours, 0)}
-        </Cell>
-      ))}
+      {by_week.map((hours, idx) => {
+        const { className, style } = hoursHeat(Number.parseFloat(hours))
+        return (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + idx}
+            className={`planning--range planning--small is-total ${className}`}
+            style={style}
+          >
+            {fixed(hours, 0)}
+          </Cell>
+        )
+      })}
     </>
   )
 }
@@ -261,22 +277,20 @@ function Capacity({ total, by_user }) {
       >
         <strong>{gettext("Remaining capacity per week")}</strong>
       </Cell>
-      {total.map((hours, idx) => (
-        <Cell
-          key={idx}
-          row={row}
-          column={FIRST_DATA_COLUMN + idx}
-          className="planning--range planning--small is-delta"
-          style={{
-            backgroundColor:
-              hours > 0
-                ? `hsl(var(--_good), ${clamp(0, hours * 3, 50)}%, 70%)`
-                : `hsl(var(--_bad), ${clamp(0, -hours * 5, 70)}%, 70%)`,
-          }}
-        >
-          {fixed(hours, 0)}
-        </Cell>
-      ))}
+      {total.map((hours, idx) => {
+        const { className, style } = capacityHeat(hours)
+        return (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + idx}
+            className={`planning--range planning--small is-delta ${className}`}
+            style={style}
+          >
+            {fixed(hours, 0)}
+          </Cell>
+        )
+      })}
       {by_user.length > 1
         ? by_user.map((user, idx) => <UserCapacity key={idx} {...user} />)
         : null}
@@ -300,22 +314,20 @@ function UserCapacity({ user, capacity }) {
       >
         {user.name}
       </Cell>
-      {capacity.map((hours, idx) => (
-        <Cell
-          key={idx}
-          row={row}
-          column={FIRST_DATA_COLUMN + idx}
-          className="planning--range planning--small is-user-capacity"
-          style={{
-            backgroundColor:
-              hours > 0
-                ? `hsl(var(--_good), ${clamp(0, hours * 3, 50)}%, 70%)`
-                : `hsl(var(--_bad), ${clamp(0, -hours * 5, 70)}%, 70%)`,
-          }}
-        >
-          {fixed(hours, 0)}
-        </Cell>
-      ))}
+      {capacity.map((hours, idx) => {
+        const { className, style } = capacityHeat(hours)
+        return (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + idx}
+            className={`planning--range planning--small is-user-capacity ${className}`}
+            style={style}
+          >
+            {fixed(hours, 0)}
+          </Cell>
+        )
+      })}
     </>
   )
 }
@@ -413,15 +425,14 @@ function Project({
           hours = Number.parseFloat(hours)
           if (!hours) return null
 
+          const { className, style } = hoursHeat(hours)
           return (
             <Cell
               key={idx}
               row={row}
               column={FIRST_DATA_COLUMN + idx}
-              className="planning--range planning--small is-project"
-              style={{
-                opacity: opacityClamp(0.3 + hours / 20),
-              }}
+              className={`planning--range planning--small is-project ${className}`}
+              style={style}
             >
               {hours.toFixed(1)}
             </Cell>
@@ -460,15 +471,14 @@ function WorkedHours({ project }) {
         hours = Number.parseFloat(hours)
         if (!hours) return null
 
+        const { className, style } = hoursHeat(hours)
         return (
           <Cell
             key={idx}
             row={row}
             column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-worked no-pr"
-            style={{
-              opacity: opacityClamp(0.3 + hours / 20),
-            }}
+            className={`planning--range planning--small is-worked no-pr ${className}`}
+            style={style}
           >
             {fixed(hours, 1)}
           </Cell>

@@ -18,33 +18,23 @@
   --default-height: 1.4rem;
   --range-height: 1.4rem;
 
-  --stripe1: rgba(239, 239, 239, 0.8);
-  --stripe2: rgba(241, 241, 255, 0.8);
-  --stripe3: rgba(244, 244, 244, 0.8);
-  --stripe4: rgba(249, 249, 249, 0.8);
+  // Tints of the theme colors work in light and dark mode alike
+  --stripe1: var(--wb-surface-muted);
+  --stripe2: color-mix(in srgb, var(--bs-primary) 6%, var(--wb-surface));
+  --stripe3: color-mix(in srgb, var(--bs-body-color) 3%, transparent);
+  --stripe4: color-mix(in srgb, var(--bs-body-color) 2.5%, transparent);
 
-  --planning: #186662;
-  --absences: rgba(221, 255, 240, 0.8);
-  --milestones: rgba(255, 200, 200, 0.3);
-  --external: rgba(240, 173, 78, 0.2);
+  --absences: color-mix(in srgb, var(--bs-info) 10%, var(--wb-surface));
+  --milestones: color-mix(in srgb, var(--bs-pink) 8%, transparent);
+  --external: color-mix(in srgb, var(--bs-warning) 8%, transparent);
 
-  --_good: 230;
-  --_bad: 0;
+  // Colors of the hours shown as tints
+  --planned: var(--bs-primary);
+  --logged: var(--bs-success);
+  --free: var(--bs-success);
+  --over: var(--bs-danger);
 
-  min-width: min-content;
   position: relative;
-}
-
-[data-bs-theme="dark"] .planning-wrapper {
-  --stripe1: rgba(60, 60, 60, 0.8);
-  --stripe2: rgba(50, 50, 80, 0.8);
-  --stripe3: rgba(55, 55, 55, 0.8);
-  --stripe4: rgba(50, 50, 50, 0.8);
-
-  --planning: #2ca89f;
-  --absences: rgba(50, 120, 90, 0.8);
-  --milestones: rgba(150, 60, 60, 0.5);
-  --external: rgba(180, 120, 60, 0.3);
 }
 
 .planning {
@@ -62,6 +52,7 @@
     );
   grid-template-rows: auto repeat(var(--rows), var(--default-height));
   font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
 
 .planning--sticky-header {
@@ -96,11 +87,12 @@
   text-overflow: ellipsis;
 
   &.is-project {
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--bs-border-color);
     background-color: var(--stripe1);
+    font-weight: 600;
 
     &.is-closed a {
-      color: grey;
+      color: var(--bs-secondary-color);
     }
   }
   &.is-worked {
@@ -128,15 +120,6 @@
 }
 
 [data-bs-theme="dark"] .planning--title {
-  background-color: var(--wb-surface);
-
-  &.is-project {
-    border-top: 1px solid #555;
-
-    &.is-closed a {
-      color: #999;
-    }
-  }
   &.is-offer {
     &.is-not-accepted a {
       color: rgba(255, 180, 80, 1);
@@ -149,21 +132,13 @@
 
 .planning--small {
   font-size: 90%;
-  color: #555;
+  color: var(--bs-secondary-color);
   line-height: 1.7;
-}
-
-[data-bs-theme="dark"] .planning--small {
-  color: #eee;
 }
 
 .planning--smaller {
   font-size: 70%;
-  color: #555;
-}
-
-[data-bs-theme="dark"] .planning--smaller {
-  color: #ccc;
+  color: var(--bs-secondary-color);
 }
 
 .planning--add-pw {
@@ -180,13 +155,9 @@
 }
 
 .planning--stripe1 {
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--bs-border-color);
   background-color: var(--stripe1);
   padding: 10px 0;
-}
-
-[data-bs-theme="dark"] .planning--stripe1 {
-  border-top: 1px solid #555;
 }
 
 .planning--stripe2 {
@@ -202,11 +173,7 @@
 }
 
 .planning--this-week {
-  background-color: #b0efe6;
-}
-
-[data-bs-theme="dark"] .planning--this-week {
-  background-color: #2a5550;
+  background-color: color-mix(in srgb, var(--bs-primary) 12%, transparent);
 }
 
 .planning--absences {
@@ -225,20 +192,39 @@
   text-align: center;
   padding: 0 3px;
   transition: opacity 0.2s;
-  border-radius: 3px;
+  border-radius: 4px;
   position: relative;
   height: var(--range-height);
 
-  &.is-project {
-    background-color: var(--bs-indigo);
+  // Weekly hours: a tint of their color, see heat() in index.js
+  &.is-heat {
+    --heat-color: var(--planned);
+    background-color: color-mix(
+      in srgb,
+      var(--heat-color) var(--heat),
+      var(--wb-surface-muted)
+    );
+    color: var(--bs-body-color);
+
+    &.is-strong {
+      color: #fff;
+    }
+
+    &.is-zero {
+      color: var(--bs-secondary-color);
+    }
   }
 
   &.is-worked {
-    background-color: blue;
+    --heat-color: var(--logged);
   }
 
-  [data-bs-theme="dark"] &.is-worked {
-    background-color: #4d79ff;
+  &.is-free {
+    --heat-color: var(--free);
+  }
+
+  &.is-over {
+    --heat-color: var(--over);
   }
 
   &.is-milestone {
@@ -272,33 +258,13 @@
     }
   }
 
-  &.is-total {
-    background-color: var(--bs-purple);
-  }
-
-  &.is-capacity {
-    background-color: #888;
-  }
-
-  [data-bs-theme="dark"] &.is-capacity {
-    background-color: #666;
-  }
-
-  &.is-user-capacity {
-    background-color: #bbb;
-  }
-
-  [data-bs-theme="dark"] &.is-user-capacity {
-    background-color: #777;
-  }
-
   &.is-pw {
     background-color: var(--st-color, var(--bs-teal));
   }
 
   &.is-absence,
   &.is-project-absence {
-    background-color: var(--bs-blue);
+    background-color: var(--bs-info);
   }
 
   &.is-absence-graphic {
@@ -320,7 +286,7 @@
   &.is-project-absence {
     span {
       position: absolute;
-      color: #666;
+      color: var(--bs-secondary-color);
       font-size: 85%;
       left: 100%;
       text-align: left;
@@ -329,28 +295,13 @@
     }
   }
 
-  [data-bs-theme="dark"] &.is-pw span,
-  [data-bs-theme="dark"] &.is-project-absence span {
-    color: #ccc;
-  }
-
   &.is-pw.is-provisional {
     background-image: repeating-linear-gradient(
       125deg,
       var(--st-color, var(--bs-teal)) 0,
       var(--st-color, var(--bs-teal)) 5px,
-      #ccc 5px,
-      #ccc 8px
-    );
-  }
-
-  [data-bs-theme="dark"] &.is-pw.is-provisional {
-    background-image: repeating-linear-gradient(
-      125deg,
-      var(--st-color, var(--bs-teal)) 0,
-      var(--st-color, var(--bs-teal)) 5px,
-      #555 5px,
-      #555 8px
+      var(--wb-surface) 5px,
+      var(--wb-surface) 8px
     );
   }
 }
@@ -370,21 +321,17 @@
   z-index: 1;
   top: 80%;
   left: 0;
-  background: #fff;
-  box-shadow: 0 0 3px 0 rgba(0, 0, 50, 0.3);
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius-sm);
+  background: var(--wb-surface);
+  box-shadow: 0 8px 24px rgba(15, 20, 30, 0.12);
   text-align: left;
   min-width: 10rem;
   padding: 0.5rem 0.5rem 0.25rem 0.5rem;
   line-height: 1.3;
 
   display: none;
-  color: var(--bs-dark);
-}
-
-[data-bs-theme="dark"] .description-popup {
-  background: #2a2a2a;
-  box-shadow: 0 0 3px 0 rgba(255, 255, 255, 0.2);
-  color: var(--bs-light);
+  color: var(--bs-body-color);
 }
 
 .description-popup p {
