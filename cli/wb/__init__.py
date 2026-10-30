@@ -12,6 +12,7 @@ from wb import (  # noqa: F401 Register the commands
     planning,
     projects,
     reports,
+    search,
     services,
     timestamps,
     users,

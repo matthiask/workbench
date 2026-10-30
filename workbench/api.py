@@ -13,6 +13,7 @@ from workbench.offers.api import router as offers_router
 from workbench.planning.api import router as planning_router
 from workbench.projects.api import router as projects_router
 from workbench.reporting.api import router as reporting_router
+from workbench.search import router as search_router
 from workbench.timer.api import router as timer_router
 
 
@@ -33,4 +34,5 @@ api.add_router("/", offers_router)
 api.add_router("/", planning_router)
 api.add_router("/", projects_router)
 api.add_router("/", reporting_router)
+api.add_router("/", search_router)
 api.add_router("/", timer_router)

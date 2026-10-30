@@ -550,6 +550,30 @@ planned_work:
         self.assertIn("Design", result.output)
         self.assertIn("ab", result.output)
 
+    def test_search(self):
+        """wb search finds everything like the web interface's search field"""
+        project = factories.ProjectFactory.create(title="Relaunch website")
+        factories.OfferFactory.create(project=project, title="Relaunch phase 1")
+        factories.ProjectFactory.create(title="Relaunch shop")
+        factories.PersonFactory.create(given_name="Ronja", family_name="Relaunch")
+
+        result = self.wb("search", "relaunch")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Relaunch website", result.output)
+        self.assertIn("Relaunch phase 1", result.output)
+        self.assertIn("Ronja", result.output)
+        self.assertIn("(people)", result.output)
+
+        self.assertIn(
+            "Projects (projects), 1 of 2",
+            self.wb("search", "relaunch", "--limit", 1).output,
+        )
+        result = self.wb("search", "relaunch", "--limit", 1, "--json")
+        self.assertIn('"count": 2', result.output)
+
+        self.assertIn("No results found.", self.wb("search", "nothing").output)
+        self.assertEqual(self.wb("search").exit_code, 2)
+
     def test_planning_export(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         factories.PlannedWorkFactory.create(

@@ -12,13 +12,13 @@ from django.utils.translation import gettext as _
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
-from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
-from workbench.projects.models import Campaign, Project
+from workbench.projects.models import Project
+from workbench.search import list_url, search_sources
 from workbench.tools.history import HISTORY, changes
 from workbench.tools.validation import in_days
 
@@ -156,28 +156,11 @@ def needs_action(request):
 def search(request):
     results = []
     if q := request.GET.get("q", ""):
-        sources = [
-            Project.objects.select_related("owned_by"),
-        ]
-        if request.user.features[FEATURES.CAMPAIGNS]:
-            sources.append(Campaign.objects.select_related("owned_by"))
-        sources.extend([
-            Organization.objects.active(),
-            Person.objects.active().select_related("organization"),
-        ])
-        if request.user.features[FEATURES.CONTROLLING]:
-            sources.extend([
-                Invoice.objects.select_related("project", "owned_by"),
-                RecurringInvoice.objects.all(),
-                Offer.objects.select_related("project", "owned_by").order_by("-pk"),
-                Deal.objects.order_by("-pk"),
-            ])
+        sources = search_sources(request.user)
         results = [
             {
                 "verbose_name_plural": queryset.model._meta.verbose_name_plural,
-                "url": reverse(
-                    f"{queryset.model._meta.app_label}_{queryset.model._meta.model_name}_list"
-                ),
+                "url": list_url(queryset.model),
                 "results": queryset.search(q)[:101],
             }
             for queryset in sources
