@@ -20,6 +20,7 @@ from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
 from workbench.contacts.models import Person
+from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days, monday
@@ -341,6 +342,56 @@ planned_work:
         result = self.wb("reports", "cash-data", "--date", dt.date.today())
         self.assertEqual(result.exit_code, 0)
         self.assertIn('"open_invoices"', result.output)
+
+    def test_reports(self):
+        """Reports as tables and as JSON"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        service = factories.ServiceFactory.create(project=project, effort_rate=100)
+        factories.LoggedHoursFactory.create(
+            service=service, rendered_by=self.user, hours=3
+        )
+        factories.LoggedCostFactory.create(
+            service=service, cost=150, third_party_costs=120
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            title="Kick-off",
+            status=Invoice.SENT,
+            invoiced_on=in_days(-40),
+            due_on=in_days(-10),
+            subtotal=200,
+        )
+        factories.ProjectedInvoiceFactory.create(
+            project=project, invoiced_on=in_days(30), gross_margin=1000
+        )
+
+        for args, expected in [
+            (["projected-gross-margin"], "920.00"),
+            (["budget", "--owned-by", "ab"], project.code),
+            (["third-party-costs"], "120.00"),
+            (["open-items"], "Kick-off"),
+            (["hours-per-customer", "--user", "ab"], project.customer.name),
+            (["hours-per-type"], "ab"),
+            (["green-hours", "--period", f"{dt.date.today():%Y-%m}"], "3.0"),
+            (["planning-vs-logbook"], project.customer.name),
+            (["logging"], "ab"),
+            (["squeeze", "--from", in_days(-7), "--until", dt.date.today()], "ab"),
+        ]:
+            with self.subTest(args=args):
+                result = self.wb("reports", *args)
+                self.assertEqual(result.exit_code, 0, result.output)
+                self.assertIn(expected, result.output)
+                result = self.wb("reports", *args, "--json")
+                self.assertEqual(result.exit_code, 0, result.output)
+                self.assertTrue(result.output.startswith("{"))
+
+        result = self.wb("reports", "key-data", "--month", "2026-01")
+        self.assertIn('"month": "2026-01"', result.output)
+        result = self.wb("reports", "hours-per-type", "--period", "nope")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("period", result.output)
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_missing_feature(self):

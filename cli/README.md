@@ -255,10 +255,35 @@ Current and upcoming absences of everyone, or of a period:
 
 ## Reports
 
-Key figures as JSON, for users with the controlling feature:
+The reports require the same features as in the web interface, most of them
+the controlling feature. Key figures as JSON:
 
     wb reports key-data
+    wb reports key-data --month 2026-09
     wb reports cash-data --date 2026-09-30
+
+Controlling, as tables or with `--json`:
+
+    wb reports budget --owned-by mk
+    wb reports budget --filter old-projects
+    wb reports projected-gross-margin
+    wb reports third-party-costs
+    wb reports open-items --date 2026-09-30
+
+Hours of a period, this week by default. Periods are years (`2026`), months
+(`2026-09`) or quarters (`2026-Q3`), `--from` and `--until` override their
+start and end. `--user` (repeatable) and `--team` filter the users:
+
+    wb reports hours-per-customer --period 2026-Q3
+    wb reports hours-per-type --period 2026-09 --team Design
+    wb reports green-hours --from 2026-09-01 --until 2026-09-15
+    wb reports planning-vs-logbook --user mk
+    wb reports logging --period 2026-09
+
+Gross margin per user and project of the last month by default, requires the
+productivity feature:
+
+    wb reports squeeze --period 2026-Q3
 
 ## Planning
 

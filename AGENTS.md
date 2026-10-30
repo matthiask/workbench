@@ -68,7 +68,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   show` and `wb people show` show them. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Shared validation helpers for the APIs are in
-  `workbench/tools/api.py`.
+  `workbench/tools/api.py`, also `DateRangeFilter` with `date_range()` (periods
+  like `2026-Q3`) and `UsersFilter` with `filter_users()` for reports.
+  Report endpoints require the same feature as the web view (squeeze:
+  productivity, deals: deals, most others: controlling); the static
+  `ReportingToken` only grants key data and cash data.
   Organizations (e.g. customers) and projects are nested with their ID, name
   or code and URL (`organization_out()` in `workbench/contacts/api.py`,
   `project_summary()` in `workbench/projects/api.py`) so the CLI can link

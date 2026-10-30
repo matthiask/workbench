@@ -1997,13 +1997,14 @@ def undo(as_json):
 
 @cli.group()
 def reports():
-    """Key figures, require the controlling feature (JSON output)"""
+    """Reports, most of them require the controlling feature"""
 
 
 @reports.command("key-data")
-def key_data():
-    """Key data of the last month"""
-    _echo_json(_request("GET", "key-data/"))
+@click.option("--month", help="Month like 2026-09, defaults to the last month.")
+def key_data(month):
+    """Key data of a month (JSON output)"""
+    _echo_json(_request("GET", "key-data/", params={"month": month} if month else {}))
 
 
 @reports.command("cash-data")
@@ -2016,3 +2017,509 @@ def cash_data(date):
     """Cash data: Open invoices, planned invoicing, accruals etc."""
     params = {"date": date.date().isoformat()} if date else {}
     _echo_json(_request("GET", "cash-data/", params=params))
+
+
+def _period_options(default):
+    """Options for the period of a report, ``default`` is its description"""
+
+    def decorator(fn):
+        for option in reversed([
+            click.option(
+                "--period",
+                help=f"Year (2026), month (2026-09) or quarter (2026-Q3), {default}.",
+            ),
+            click.option(
+                "--from",
+                "date_from",
+                type=click.DateTime(formats=["%Y-%m-%d"]),
+                help="Start of the period, overrides the period's start.",
+            ),
+            click.option(
+                "--until",
+                "date_until",
+                type=click.DateTime(formats=["%Y-%m-%d"]),
+                help="End of the period, overrides the period's end.",
+            ),
+        ]):
+            fn = option(fn)
+        return fn
+
+    return decorator
+
+
+def _users_options(fn):
+    fn = click.option("--team", help="Team name.")(fn)
+    return click.option(
+        "--user", "users", multiple=True, help="Short name, can be repeated."
+    )(fn)
+
+
+def _period_params(period, date_from, date_until, *, users=(), team=None):
+    params = {"period": period, "user": list(users), "team": team}
+    if date_from:
+        params["date_from"] = date_from.date().isoformat()
+    if date_until:
+        params["date_until"] = date_until.date().isoformat()
+    return {key: value for key, value in params.items() if value}
+
+
+def _amount(value):
+    return f"{value:.2f}" if value is not None else ""
+
+
+def _hours(value):
+    return f"{value:.1f}" if value is not None else ""
+
+
+def _percentage(value):
+    return f"{value:.0f}%" if value is not None else ""
+
+
+def _echo_period(data):
+    console.print(f"{data['date_from']} – {data['date_until']}", style="bold")
+
+
+@reports.command("projected-gross-margin")
+@click.option("--json", "as_json", is_flag=True)
+def projected_gross_margin(as_json):
+    """Planned invoicing of open projects which hasn't been invoiced yet"""
+    data = _request("GET", "projected-gross-margin/")
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table("Month", "Gross margin>", show_footer=True)
+    for month, value in data["monthly"].items():
+        table.add_row(month, _amount(value))
+    table.columns[0].footer = "Total"
+    table.columns[1].footer = _amount(sum(data["monthly"].values()))
+    console.print(table)
+    table = _table("Code", "Title", "Owner", "Projected>", "Invoiced>", "Not invoiced>")
+    for row in data["projects"]:
+        project = row["project"]
+        table.add_row(
+            _link(project["code"], project["url"]),
+            project["title"],
+            row["owned_by"],
+            _amount(row["projected_total"]),
+            _amount(row["gross_margin"]),
+            _amount(row["not_invoiced"]),
+        )
+    console.print(table)
+
+
+@reports.command("budget")
+@click.option(
+    "--cutoff-date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Defaults to today.",
+)
+@click.option("--owned-by", help="Short name, or 'inactive' for inactive users.")
+@click.option("--internal", is_flag=True, help="Internal projects only.")
+@click.option("--closed", is_flag=True, help="Projects closed during the last year.")
+@click.option(
+    "--filter",
+    "filter_",
+    type=click.Choice([
+        "no-invoices",
+        "maintenance",
+        "old-projects",
+        "no-projected-gross-margin",
+    ]),
+)
+@click.option("--json", "as_json", is_flag=True)
+def budget(cutoff_date, owned_by, internal, closed, filter_, as_json):
+    """Project budget statistics: Logged work compared to offers and invoices
+
+    Delta is the logbook minus the invoiced amount, positive for work which
+    hasn't been invoiced yet."""
+    params = {
+        "owned_by": owned_by,
+        "internal": _bool(internal) if internal else None,
+        "closed_during_the_last_year": _bool(closed) if closed else None,
+        "s": filter_,
+    }
+    if cutoff_date:
+        params["cutoff_date"] = cutoff_date.date().isoformat()
+    data = _request(
+        "GET",
+        "project-budget-statistics/",
+        params={key: value for key, value in params.items() if value},
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table(
+        "Code",
+        "Title",
+        "Owner",
+        "Offered h>",
+        "Logged h>",
+        "Logbook>",
+        "Sold>",
+        "Invoiced>",
+        "Delta>",
+        "Projected>",
+        show_footer=True,
+    )
+    for row in data["projects"]:
+        project = row["project"]
+        table.add_row(
+            _link(project["code"], project["url"]),
+            project["title"],
+            row["owned_by"],
+            _hours(row["service_hours"]),
+            _hours(row["hours"]),
+            _amount(row["logbook"]),
+            _amount(row["sold"]),
+            _amount(row["invoiced"]),
+            _amount(row["delta"]),
+            _amount(row["projected_gross_margin"]),
+        )
+    overall = data["overall"]
+    table.columns[0].footer = "Total"
+    for index, key, fmt in [
+        (3, "service_hours", _hours),
+        (4, "hours", _hours),
+        (5, "logbook", _amount),
+        (6, "sold", _amount),
+        (7, "invoiced", _amount),
+        (9, "projected_gross_margin", _amount),
+    ]:
+        table.columns[index].footer = fmt(overall[key])
+    console.print(table)
+    console.print(
+        f"Not invoiced yet: {_amount(overall['delta_positive'])},"
+        f" accruals: {_amount(overall['delta_negative'])}"
+    )
+
+
+@reports.command("third-party-costs")
+@click.option(
+    "--this-year",
+    is_flag=True,
+    help="Also projects closed during the current year.",
+)
+@click.option("--json", "as_json", is_flag=True)
+def third_party_costs(this_year, as_json):
+    """Third party costs logged and invoiced per project
+
+    Delta is positive for costs which haven't been invoiced yet."""
+    data = _request(
+        "GET",
+        "third-party-costs/",
+        params={"this_year": _bool(this_year)} if this_year else {},
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table(
+        "Code",
+        "Title",
+        "Owner",
+        "Offered>",
+        "Logged>",
+        "Logged (future)>",
+        "Invoiced>",
+        "Delta>",
+        show_footer=True,
+    )
+    for row in data["projects"]:
+        project = row["project"]
+        table.add_row(
+            _link(project["code"], project["url"]),
+            project["title"],
+            row["owned_by"],
+            _amount(row["offered"]),
+            _amount(row["logged"]["past"]),
+            _amount(row["logged"]["future"]),
+            _amount(row["invoiced"]),
+            _amount(row["delta"]),
+        )
+    table.columns[0].footer = "Total"
+    table.columns[3].footer = _amount(data["total_offered"])
+    table.columns[4].footer = _amount(data["total_logged"]["past"])
+    table.columns[5].footer = _amount(data["total_logged"]["future"])
+    table.columns[6].footer = _amount(data["total_invoiced"])
+    console.print(table)
+    console.print(
+        f"Not invoiced yet: {_amount(data['total_not_invoiced'])},"
+        f" invoiced too much: {_amount(data['total_invoiced_too_much'])}"
+    )
+
+
+@reports.command("open-items")
+@click.option(
+    "--date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Cutoff date, defaults to today.",
+)
+@click.option("--json", "as_json", is_flag=True)
+def open_items(date, as_json):
+    """Invoices sent but not paid on the cutoff date"""
+    data = _request(
+        "GET",
+        "open-items/",
+        params={"cutoff_date": date.date().isoformat()} if date else {},
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_invoice_list(data["invoices"])
+    table = _table("Due in the week of", "Total excl. tax>", "Total>")
+    for week in data["weeks"]:
+        table.add_row(
+            week["week"], _amount(week["total_excl_tax"]), _amount(week["total"])
+        )
+    console.print(table)
+    console.print(
+        f"Total excl. tax: {_amount(data['total_excl_tax'])},"
+        f" total: {_amount(data['total'])}"
+    )
+
+
+@reports.command("hours-per-customer")
+@_period_options("defaults to this week")
+@_users_options
+@click.option("--json", "as_json", is_flag=True)
+def hours_per_customer(period, date_from, date_until, users, team, as_json):
+    """Logged hours per customer and user"""
+    data = _request(
+        "GET",
+        "hours-per-customer/",
+        params=_period_params(period, date_from, date_until, users=users, team=team),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    table = _table(
+        "Customer", "Total>", *(f"{user}>" for user in data["users"]), show_footer=True
+    )
+    for row in data["customers"]:
+        table.add_row(
+            _link(row["customer"]["name"], row["customer"]["url"]),
+            _hours(row["total_hours"]),
+            *(_hours(row["users"].get(user)) for user in data["users"]),
+        )
+    table.columns[0].footer = "Total"
+    table.columns[1].footer = _hours(data["total_hours"])
+    for index, hours in enumerate(data["users"].values(), 2):
+        table.columns[index].footer = _hours(hours)
+    console.print(table)
+
+
+@reports.command("hours-per-type")
+@_period_options("defaults to this week")
+@_users_options
+@click.option("--json", "as_json", is_flag=True)
+def hours_per_type(period, date_from, date_until, users, team, as_json):
+    """Logged hours per user, external and per internal type
+
+    Shows the percentage reached and expected (in parentheses)."""
+    data = _request(
+        "GET",
+        "hours-per-type/",
+        params=_period_params(period, date_from, date_until, users=users, team=team),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    types = (
+        [type["type"] for type in data["users"][0]["types"]] if data["users"] else []
+    )
+    table = _table("User", "Total>", *(f"{type}>" for type in types))
+    for row in data["users"]:
+        table.add_row(
+            row["user"],
+            _hours(row["total"]),
+            *(
+                f"{_hours(type['hours'])} {_percentage(type['reached_percentage'])}"
+                f" ({_percentage(type['expected_percentage'])})"
+                for type in row["types"]
+            ),
+        )
+    console.print(table)
+
+
+@reports.command("green-hours")
+@_period_options("defaults to this week")
+@_users_options
+@click.option("--json", "as_json", is_flag=True)
+def green_hours(period, date_from, date_until, users, team, as_json):
+    """Profitable, overdrawn, maintenance and internal hours per user
+
+    Green hours are profitable and maintenance hours."""
+    data = _request(
+        "GET",
+        "green-hours/",
+        params=_period_params(period, date_from, date_until, users=users, team=team),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    table = _table(
+        "User",
+        "Profitable>",
+        "Overdrawn>",
+        "Maintenance>",
+        "Internal>",
+        "Total>",
+        "Green>",
+        show_footer=True,
+    )
+
+    def cells(row):
+        return [
+            _hours(row["profitable"]),
+            _hours(row["overdrawn"]),
+            _hours(row["maintenance"]),
+            _hours(row["internal"]),
+            _hours(row["total"]),
+            _percentage(row["percentage"]),
+        ]
+
+    for row in data["users"]:
+        table.add_row(row["user"], *cells(row))
+    if data["total"]:
+        table.columns[0].footer = "Total"
+        for index, value in enumerate(cells(data["total"]), 1):
+            table.columns[index].footer = value
+    console.print(table)
+
+
+@reports.command("planning-vs-logbook")
+@_period_options("defaults to this week")
+@_users_options
+@click.option("--json", "as_json", is_flag=True)
+def planning_vs_logbook(period, date_from, date_until, users, team, as_json):
+    """Planned and logged hours per customer
+
+    The allocation is the customer's share of the logged hours relative to
+    its share of the planned hours."""
+    data = _request(
+        "GET",
+        "planning-vs-logbook/",
+        params=_period_params(period, date_from, date_until, users=users, team=team),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    table = _table(
+        "Customer", "Planned>", "Logged>", "Diff>", "Allocation>", show_footer=True
+    )
+    for row in data["customers"]:
+        table.add_row(
+            _link(row["customer"]["name"], row["customer"]["url"]),
+            _hours(row["planned"]),
+            _hours(row["logged"]),
+            _hours(row["diff"]),
+            _percentage(row["allocation"]),
+        )
+    table.columns[0].footer = "Total"
+    table.columns[1].footer = _hours(data["planned"])
+    table.columns[2].footer = _hours(data["logged"])
+    table.columns[3].footer = _hours(data["diff"])
+    table.columns[4].footer = _percentage(data["logged_percentage"])
+    console.print(table)
+
+
+@reports.command("logging")
+@_period_options("defaults to this week")
+@click.option("--json", "as_json", is_flag=True)
+def logging_report(period, date_from, date_until, as_json):
+    """How and when users log their hours, and insufficient breaks"""
+    data = _request(
+        "GET", "logging/", params=_period_params(period, date_from, date_until)
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    table = _table(
+        "User",
+        "Entries>",
+        "Hours>",
+        "Per entry>",
+        "Delay>",
+        "Logging",
+        "Breaks too short>",
+    )
+    for row in data["users"]:
+        breaks = row["insufficient_breaks"]
+        table.add_row(
+            row["user"],
+            str(row["logged_hours"]["count"]),
+            _hours(row["logged_hours"]["sum"]),
+            _hours(row["logged_hours"]["avg"]),
+            f"{row['mean_logging_delay_hours']:.0f}h",
+            row["logging"],
+            f"{len(breaks['days'])}/{breaks['of']} days",
+            style="red" if breaks["warning"] else None,
+        )
+    console.print(table)
+
+
+@reports.command("squeeze")
+@_period_options("defaults to the last month")
+@click.option("--json", "as_json", is_flag=True)
+def squeeze(period, date_from, date_until, as_json):
+    """Gross margin per user and project, requires the productivity feature
+
+    Projects' gross margins are split between users by hours weighted with
+    the hourly rate. The delta compares the gross margin to the expected
+    gross margin."""
+    data = _request(
+        "GET", "squeeze/", params=_period_params(period, date_from, date_until)
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_period(data)
+    if data["may_be_incomplete"]:
+        click.secho(
+            "Invoices for the selected period may not be complete yet.",
+            fg="yellow",
+            err=True,
+        )
+    table = _table(
+        "User",
+        "Hours>",
+        "Gross margin>",
+        "Rate>",
+        "Expected>",
+        "Delta>",
+        "External>",
+        show_footer=True,
+    )
+
+    def cells(row):
+        return [
+            _hours(row["hours_in_range"]),
+            _amount(row["gross_margin"]),
+            _amount(row["rate"]),
+            _amount(row["expected_gross_margin"]),
+            _amount(row["delta"]),
+            _percentage(row["external_percentage"]),
+        ]
+
+    for row in data["users"]:
+        table.add_row(row["user"], *cells(row))
+    table.columns[0].footer = "Total"
+    for index, value in enumerate(cells(data["totals"]), 1):
+        table.columns[index].footer = value
+    console.print(table)
+    table = _table("Code", "Title", "Hours>", "Gross margin>", "Rate>", "Users")
+    for row in data["projects"]:
+        project = row["project"]
+        table.add_row(
+            _link(project["code"], project["url"]),
+            project["title"],
+            _hours(row["hours_in_range"]),
+            _amount(row["gross_margin_in_range"]),
+            _amount(row["rate"]),
+            ", ".join(row["users"]),
+        )
+    console.print(table)

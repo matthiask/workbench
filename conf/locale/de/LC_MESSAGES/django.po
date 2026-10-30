@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 09:08+0100\n"
+"POT-Creation-Date: 2026-10-30 11:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3421,6 +3421,10 @@ msgstr "Statistik"
 msgid "Logbook batch update"
 msgstr "Logbuch-Batch-Bearbeitung"
 
+#: workbench/reporting/api.py
+msgid "Expected a month like 2026-09."
+msgstr "Erwartet wird ein Monat wie 2026-09."
+
 #: workbench/reporting/models.py workbench/reporting/views.py
 msgid "cutoff date"
 msgstr "Stichtag"
@@ -5135,6 +5139,18 @@ msgstr "Tiefe Wahrscheinlichkeit"
 msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
 
+#: workbench/timer/api.py
+msgid "Pass either time or minutes."
+msgstr "Entweder eine Zeit oder Minuten angeben."
+
+#: workbench/timer/api.py
+msgid "There are no timestamps today."
+msgstr "Heute gibt es keine Zeitmarken."
+
+#: workbench/timer/api.py
+msgid "Use a code like T1 or an ID."
+msgstr "Einen Code wie T1 oder eine ID verwenden."
+
 #: workbench/timer/models.py
 msgid "Stop"
 msgstr "Stop"
@@ -5159,6 +5175,27 @@ msgstr "Die Zeitmarke wurde erfolgreich geteilt."
 #: workbench/timer/views.py
 msgid "Split timestamp"
 msgstr "Zeitmarke teilen"
+
+#: workbench/tools/api.py
+msgid "Expected a year, a month or a quarter like 2026-Q3."
+msgstr "Erwartet wird ein Jahr, ein Monat oder ein Quartal wie 2026-Q3."
+
+#: workbench/tools/api.py
+msgid "Invalid month."
+msgstr "Ungültiger Monat."
+
+#: workbench/tools/api.py
+msgid "The end of the period must not be before its start."
+msgstr "Das Ende des Zeitraums darf nicht vor dessen Beginn liegen."
+
+#: workbench/tools/api.py
+msgid "Unknown team."
+msgstr "Unbekanntes Team."
+
+#: workbench/tools/api.py
+#, python-format
+msgid "Unknown users: %s"
+msgstr "Unbekannte Benutzer:innen: %s"
 
 #: workbench/tools/csv.py
 msgid "Export selected items as CSV"
