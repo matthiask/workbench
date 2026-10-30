@@ -970,6 +970,75 @@ def show_invoice(invoice_id, as_json):
         console.print(data["description"])
 
 
+@cli.group()
+def hours():
+    """Look at logged hours, log them in Workbench"""
+
+
+@hours.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--project", type=int, help="Project ID.")
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option("--offer", type=int, help="Offer ID.")
+@click.option("--service", type=int, help="Service ID.")
+@click.option("--rendered-by", help="Short name.")
+@click.option(
+    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered since."
+)
+@click.option(
+    "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered until."
+)
+@click.option("--json", "as_json", is_flag=True)
+def search_hours(
+    query, project, customer, offer, service, rendered_by, since, until, as_json
+):
+    """Search logged hours, newest first"""
+    params = {"q": " ".join(query)}
+    for key, value in [
+        ("project", project),
+        ("customer", customer),
+        ("offer", offer),
+        ("service", service),
+        ("rendered_by", rendered_by),
+    ]:
+        if value:
+            params[key] = value
+    if since:
+        params["rendered_since"] = since.date().isoformat()
+    if until:
+        params["rendered_until"] = until.date().isoformat()
+    data = _request("GET", "logbook/hours/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table(
+        "Rendered on",
+        "By",
+        "Project",
+        "Service",
+        "Hours>",
+        "Description",
+        show_footer=True,
+    )
+    for row in data["hours"]:
+        table.add_row(
+            _link(row["rendered_on"], row["url"]),
+            row["rendered_by"],
+            row["project"],
+            row["service"],
+            row["hours"],
+            row["description"],
+        )
+    table.columns[0].footer = "Total"
+    table.columns[4].footer = data["total_hours"]
+    console.print(table)
+    if data["count"] > len(data["hours"]):
+        console.print(
+            f"Showing {len(data['hours'])} of {data['count']} entries,"
+            " the total includes all of them."
+        )
+
+
 @cli.group("projected-invoices")
 def projected_invoices():
     """Look at the planned invoicing"""

@@ -206,6 +206,18 @@ planned_work:
         )
         factories.DealFactory.create(owned_by=self.user, title="Big deal")
 
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            rendered_by=self.user,
+            hours=3,
+            description="Wireframes",
+        )
+        result = self.wb(
+            "hours", "search", "--project", project.pk, "--rendered-by", "ab"
+        )
+        self.assertIn("Wireframes", result.output)
+        self.assertIn("3.0", result.output)
+
         result = self.wb("projects", "stats", project.pk, "--csv")
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(result.output.startswith("project_id,project,"))

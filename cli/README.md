@@ -134,6 +134,15 @@ list of the choices:
     wb deals create --title "Relaunch" --contact 345 --probability normal \
         --value Design=5000 --attribute Source=Referral --dry-run
 
+## Logged hours
+
+Hours are logged in Workbench, its forms warn about many mistakes. Searching
+them works in the CLI:
+
+    wb hours search --project 1234
+    wb hours search --rendered-by mk --since 2026-10-01
+    wb hours search wireframes --customer 345
+
 ## Reports
 
 Key figures as JSON, for users with the controlling feature:
