@@ -230,8 +230,8 @@ skill which turns a specification into an offer using `wb`: it finds the
 project, fetches the context, drafts the offer, reviews it with you, validates
 it with `--dry-run` and only creates it after your approval.
 `skills/workbench-contact/` adds people from email signatures, business cards
-and the like, after looking for existing records. Link them into your personal
-skills to use them in any directory:
+and the like, after looking for existing records. Link all of them into your
+personal skills to use them in any directory (run it again when skills are
+added):
 
-    ln -sfn "$PWD/cli/skills/workbench-offer" ~/.claude/skills/workbench-offer
-    ln -sfn "$PWD/cli/skills/workbench-contact" ~/.claude/skills/workbench-contact
+    for skill in "$PWD"/cli/skills/*/; do ln -sfn "${skill%/}" ~/.claude/skills/; done
