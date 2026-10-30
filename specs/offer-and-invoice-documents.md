@@ -269,22 +269,17 @@ render the stored HTML directly, it's sanitised.
 Copying stays HTML to HTML: invoices from offers (`create_services_from_offer`),
 from the logbook, from recurring invoices; copying offers.
 
-#### Markdown in the APIs
+#### HTML in the APIs
+
+The JSON APIs take and return the same HTML as the editor. Input from the
+API goes through the same sanitising as input from the editor (the field's
+nh3 configuration), so the API can't store anything the editor couldn't:
+disallowed tags are removed (keeping their text), attributes and styles
+stripped. No Markdown, no second format, no conversion back and forth.
 
 The offers API is mostly fed by LLMs through `wb` and the `workbench-offer`
-skill. They write good Markdown and bad HTML. So the JSON APIs speak
-Markdown for these fields:
-
-- Input: Markdown, converted on the server (`markdown-it-py` with only the
-  allowed syntax enabled), then sanitised like editor input. Raw HTML in the
-  Markdown is escaped, not passed through. Headings in fields which don't
-  allow them become bold paragraphs, or are rejected with a clear error (see
-  open questions).
-- Output: HTML converted back to Markdown (`markdownify` or a small converter
-  for the restricted tag set). For the restricted set the round trip
-  Markdown → HTML → Markdown is stable; a test makes sure of it, since
-  `wb offers show` followed by replacing the offer must not mangle text.
-- `wb` prints the Markdown as is; it's readable in a terminal.
+skill; the small tag set (`p`, `br`, `strong`, `em`, `ul`, `ol`, `li`, `a`,
+`h2`, `h3`) is easy for them to write correctly when the skill lists it.
 
 This is a breaking change of the API (descriptions were plain text). Fine as
 long as the CLI has no users outside Feinheit; raise `MINIMUM` in
@@ -292,14 +287,15 @@ long as the CLI has no users outside Feinheit; raise `MINIMUM` in
 
 ### API and CLI
 
-- `workbench/offers/api.py`: descriptions as Markdown (above); accept
+- `workbench/offers/api.py`: descriptions as HTML (above); accept
   `section_title` and `section_description` per service when creating and
   replacing offers; return them in the offer detail. Same for the invoices
   API where it exposes descriptions.
-- `wb offers show` prints sections and the Markdown descriptions;
+- `wb offers show` prints sections and the descriptions (as text, through
+  `html_to_text()` on the server or a small converter in the CLI);
   `wb offers create` takes them from the JSON input. Bump the CLI version.
 - `workbench-offer` skill: explain when to use sections (a few groups of
-  related services, not one section per service), and which Markdown is
+  related services, not one section per service), and which tags are
   allowed (lists, bold, italic, links; headings only in the offer and section
   descriptions).
 
@@ -336,7 +332,7 @@ descriptions); they can be developed and reviewed separately.
    behind `?renderer=weasyprint` to compare against reportlab, with plain
    text descriptions rendered through `linebreaks` in the meantime.
 2. **Rich text**: field helper with django-prose-editor and sanitising,
-   `html_to_text()` and its call sites, Markdown conversion in the APIs, CLI
+   `html_to_text()` and its call sites, sanitised HTML in the APIs, CLI
    and skill updates, the data migration converting existing descriptions.
    From then on WeasyPrint is the only renderer for offers and invoices; remove
    `process_offer()`, `process_invoice()` and friends from `pdf.py`. Keep
@@ -349,10 +345,9 @@ descriptions); they can be developed and reviewed separately.
 ## 7. Open questions
 
 - Subtotals per section: always, never, or a checkbox on the offer?
-- Markdown headings in fields which don't allow headings (service
-  descriptions): reject with an error, or downgrade to bold paragraphs?
-  Rejecting teaches LLMs the rule through the error message; downgrading is
-  friendlier for humans.
+- Disallowed tags sent through the API (e.g. a heading in a service
+  description): silently stripped by nh3 like editor input, or rejected with
+  an error? Rejecting teaches LLMs the rule through the error message.
 - With headings allowed in the offer description, are sections still needed
   as fields, or could the offer description and service descriptions carry
   all the structure? Sections are the only way to put text *between*
