@@ -7,6 +7,7 @@ from wb.core import (
     cli,
     complete_short_names,
     console,
+    echo_actionable,
     echo_csv,
     echo_fields,
     echo_invoice_list,
@@ -24,9 +25,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def invoices():
-    """Look at invoices"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def invoices(ctx):
+    """Look at invoices
+
+    Without a command, lists your invoices which may need action."""
+    if ctx.invoked_subcommand is None:
+        echo_actionable("invoices", "controlling")
 
 
 @invoices.command("search")
@@ -237,9 +243,14 @@ def mark_reminded(invoice_ids, dry_run, as_json):
         console.print("Dry run, nothing has been saved.")
 
 
-@cli.group("recurring-invoices")
-def recurring_invoices():
-    """Look at recurring invoices, requires the controlling feature"""
+@cli.group("recurring-invoices", invoke_without_command=True)
+@click.pass_context
+def recurring_invoices(ctx):
+    """Look at recurring invoices, requires the controlling feature
+
+    Without a command, lists the open ones."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_recurring_invoices)
 
 
 @recurring_invoices.command("search")
@@ -299,9 +310,14 @@ def search_recurring_invoices(
     echo_more(data, offset, "recurring invoices")
 
 
-@cli.group("projected-invoices")
-def projected_invoices():
-    """Look at the planned invoicing"""
+@cli.group("projected-invoices", invoke_without_command=True)
+@click.pass_context
+def projected_invoices(ctx):
+    """Look at the planned invoicing
+
+    Without a command, lists all of them."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_projected_invoices)
 
 
 @projected_invoices.command("search")

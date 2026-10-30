@@ -6,6 +6,7 @@ from wb.core import (
     cli,
     complete_short_names,
     console,
+    echo_actionable,
     echo_csv,
     echo_fields,
     echo_json,
@@ -26,9 +27,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def deals():
-    """Look at and add to the sales pipeline"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def deals(ctx):
+    """Look at and add to the sales pipeline
+
+    Without a command, lists your deals which may need action."""
+    if ctx.invoked_subcommand is None:
+        echo_actionable("deals", "deals")
 
 
 @deals.command("search")

@@ -18,6 +18,7 @@ from wb.core import (
     format_bool,
     link,
     make_table,
+    me,
     page_options,
     page_params,
     request,
@@ -26,9 +27,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def projects():
-    """Find and create projects"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def projects(ctx):
+    """Find and create projects
+
+    Without a command, lists your open projects."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search, owned_by=me()["short_name"])
 
 
 @projects.command()

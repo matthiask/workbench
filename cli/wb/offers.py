@@ -5,6 +5,7 @@ import click
 from wb.core import (
     cli,
     complete_short_names,
+    echo_actionable,
     echo_csv,
     echo_json,
     echo_more,
@@ -23,9 +24,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def offers():
-    """Create and update offers"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def offers(ctx):
+    """Create and update offers
+
+    Without a command, lists your offers which may need action."""
+    if ctx.invoked_subcommand is None:
+        echo_actionable("offers", "controlling")
 
 
 @offers.command()

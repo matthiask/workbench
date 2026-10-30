@@ -550,6 +550,41 @@ planned_work:
         self.assertIn("Design", result.output)
         self.assertIn("ab", result.output)
 
+    def test_defaults(self):
+        """Nouns without a command show what's most often wanted"""
+        project = factories.ProjectFactory.create(owned_by=self.user, title="Mine")
+        factories.ProjectFactory.create(title="Someone else's")
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            rendered_by=self.user,
+            description="Wireframes",
+        )
+        factories.DealFactory.create(owned_by=self.user, title="Big deal")
+        factories.AbsenceFactory.create(
+            user=self.user, starts_on=in_days(7), description="Holidays"
+        )
+        factories.TeamFactory.create(name="Design").members.add(self.user)
+
+        result = self.wb("projects")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Mine", result.output)
+        self.assertNotIn("Someone else's", result.output)
+        self.assertIn("Wireframes", self.wb("hours").output)
+        self.assertIn("Big deal", self.wb("deals").output)
+        self.assertIn("No offers which may need action", self.wb("offers").output)
+        self.assertIn("Holidays", self.wb("absences").output)
+        self.assertIn("ab", self.wb("planning").output)
+        self.assertIn(self.user.get_full_name(), self.wb("users").output)
+        self.assertIn("Design", self.wb("teams").output)
+        for noun in ["invoices", "recurring-invoices", "projected-invoices"]:
+            self.assertEqual(self.wb(noun).exit_code, 0)
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
+    def test_defaults_missing_feature(self):
+        result = self.wb("offers")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Requires the controlling feature", result.output)
+
     def test_search(self):
         """wb search finds everything like the web interface's search field"""
         project = factories.ProjectFactory.create(title="Relaunch website")

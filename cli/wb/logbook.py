@@ -12,6 +12,7 @@ from wb.core import (
     format_bool,
     link,
     make_table,
+    me,
     page_options,
     page_params,
     period_options,
@@ -20,9 +21,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def hours():
-    """Look at logged hours, log them in Workbench"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def hours(ctx):
+    """Look at logged hours, log them in Workbench
+
+    Without a command, lists your hours of this week."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_hours, rendered_by=me()["short_name"], period="this-week")
 
 
 @hours.command("search")

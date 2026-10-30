@@ -15,6 +15,7 @@ from wb.core import (
     format_bool,
     link,
     make_table,
+    me,
     page_options,
     page_params,
     period_options,
@@ -23,9 +24,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def absences():
-    """Look at absences"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def absences(ctx):
+    """Look at absences
+
+    Without a command, lists your current and upcoming absences."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_absences, user=me()["short_name"])
 
 
 @absences.command("search")

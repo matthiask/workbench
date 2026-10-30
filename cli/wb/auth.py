@@ -17,9 +17,11 @@ from wb.core import (
     browser_login,
     cli,
     console,
+    echo_deal_list,
     echo_fields,
     echo_invoice_list,
     echo_json,
+    echo_offer_list,
     installation_url,
     link,
     make_table,
@@ -105,12 +107,17 @@ def completion(shell):
     click.echo(complete.source())
 
 
-@cli.group()
-def auth():
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def auth(ctx):
     """Switch between the Workbench installations you're logged in to
 
     `wb login URL` adds installations. Setting WORKBENCH_URL uses another
-    installation for a single command."""
+    installation for a single command.
+
+    Without a command, lists the installations."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(list_installations)
 
 
 @auth.command("list")
@@ -207,28 +214,8 @@ def me(as_json):
     console.print(table)
 
     if data["offers"] is not None:
-        table = make_table("ID>", "Code", "Title", "Status", "Total>", title="Offers")
-        for offer in data["offers"]:
-            table.add_row(
-                link(offer["id"], offer["url"]),
-                link(offer["code"], offer["url"]),
-                offer["title"],
-                offer["status"],
-                offer["total"],
-            )
-        console.print(table)
+        echo_offer_list(data["offers"], title="Offers")
     if data["invoices"] is not None:
         echo_invoice_list(data["invoices"])
     if data["deals"] is not None:
-        table = make_table(
-            "ID>", "Title", "Customer", "Decision expected on", "Value>", title="Deals"
-        )
-        for deal in data["deals"]:
-            table.add_row(
-                link(deal["id"], deal["url"]),
-                deal["title"],
-                link(deal["customer"]["name"], deal["customer"]["url"]),
-                deal["decision_expected_on"] or "",
-                deal["value"],
-            )
-        console.print(table)
+        echo_deal_list(data["deals"], title="Deals")

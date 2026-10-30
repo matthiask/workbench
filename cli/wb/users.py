@@ -16,9 +16,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def users():
-    """Find users and their short names"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def users(ctx):
+    """Find users and their short names
+
+    Without a command, lists the active users."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_users)
 
 
 @users.command("search")
@@ -48,9 +53,14 @@ def search_users(query, include_inactive, limit, offset, as_json):
     echo_more(data, offset, "users")
 
 
-@cli.group()
-def teams():
-    """Find teams and their members, e.g. for the --team option"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def teams(ctx):
+    """Find teams and their members, e.g. for the --team option
+
+    Without a command, lists all teams."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_teams)
 
 
 @teams.command("search")

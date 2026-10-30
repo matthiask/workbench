@@ -451,11 +451,11 @@ def echo_offer(offer):
     console.print(totals)
 
 
-def echo_offer_list(offers):
+def echo_offer_list(offers, *, title=None):
     if not offers:
         console.print("No offers yet.")
         return
-    table = make_table("ID>", "Code", "Title", "Status", "Total>")
+    table = make_table("ID>", "Code", "Title", "Status", "Total>", title=title)
     for offer in offers:
         table.add_row(
             link(offer["id"], offer["url"]),
@@ -538,7 +538,45 @@ def echo_stats_csv(projects):
             ])
 
 
-def echo_invoice_list(invoices):
+def echo_deal_list(deals, *, title=None):
+    table = make_table(
+        "ID>", "Title", "Customer", "Decision expected on", "Value>", title=title
+    )
+    for deal in deals:
+        table.add_row(
+            link(deal["id"], deal["url"]),
+            deal["title"],
+            link(deal["customer"]["name"], deal["customer"]["url"]),
+            deal["decision_expected_on"] or "",
+            deal["value"],
+        )
+    console.print(table)
+
+
+def me():
+    """The authenticated user"""
+    return request("GET", "me/")
+
+
+def echo_actionable(key, feature):
+    """Echo the offers, invoices or deals of ``wb me`` which may need action,
+    the default of their nouns"""
+    items = request("GET", "me/overview/")[key]
+    if items is None:
+        terminate(f"Requires the {feature} feature.")
+    if not items:
+        console.print(f"No {key} which may need action.")
+        return
+    {
+        "offers": lambda: echo_offer_list(items, title="Offers which may need action"),
+        "invoices": lambda: echo_invoice_list(
+            items, title="Invoices which may need action"
+        ),
+        "deals": lambda: echo_deal_list(items, title="Deals which may need action"),
+    }[key]()
+
+
+def echo_invoice_list(invoices, *, title="Invoices"):
     table = make_table(
         "ID>",
         "Code",
@@ -548,7 +586,7 @@ def echo_invoice_list(invoices):
         "Invoiced on",
         "Due on",
         "Total excl. tax>",
-        title="Invoices",
+        title=title,
     )
     for invoice in invoices:
         table.add_row(

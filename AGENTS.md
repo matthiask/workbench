@@ -66,6 +66,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`.
   Verbs: `search` (optional terms plus filters like `--project`, `--customer`,
   `--owned-by`; the API supports the same filters), `show ID`, `create`.
+  Nouns without a verb show the most common list (`invoke_without_command`):
+  `wb projects` your open projects, `wb hours` your hours of this week, `wb
+  offers`/`invoices`/`deals` yours which may need action (like `wb me`), `wb
+  users`, `wb teams`, `wb auth` the installations; nouns which need a search
+  term show the help. `wb search` searches everything like the search field
+  of the web interface (`/api/search/`, sources shared with the web view in
+  `workbench/search.py`).
   The package `cli/wb/` has one module per noun (`wb/offers.py`); `wb/core.py`
   has the configuration, requests, output helpers and options they share.
   `wb contacts search` finds both organizations and people, `wb organizations

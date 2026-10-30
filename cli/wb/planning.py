@@ -16,6 +16,7 @@ from wb.core import (
     link,
     load,
     make_table,
+    me,
     period_options,
     period_params,
     request,
@@ -23,9 +24,14 @@ from wb.core import (
 )
 
 
-@cli.group()
-def planning():
-    """Plan projects: milestones and planned work"""
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def planning(ctx):
+    """Plan projects: milestones and planned work
+
+    Without a command, shows your planning of the next twelve weeks."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(planning_export, users=(me()["short_name"],))
 
 
 @planning.command("export")
