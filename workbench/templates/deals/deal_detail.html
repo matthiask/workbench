@@ -1,125 +1,148 @@
 {% extends "generic/object_detail.html" %}
 {% load i18n workbench %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8 col-xl-6">
-      <h1>{{ object|h }} {% history_link object %}</h1>
-      <table class="table table-striped">
-        <tr>
-          <th class="text-end">{{ object|label:'customer' }}</th>
-          <td>{% link_or_none object.customer %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{{ object|label:'contact' }}</th>
-          <td>{% link_or_none object.contact %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{{ object|label:'probability' }}</th>
-          <td>{{ object.get_probability_display }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{{ object|label:'decision_expected_on' }}</th>
-          <td>{{ object.decision_expected_on|local_date_format }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{{ object|label:'status' }}</th>
-          <td>
-            <div class="row justify-content-between">
-              <div class="col">
-                {{ object.status_badge }}
-                {% if object.status != object.OPEN %}
-                  <br>
-                  {{ object.pretty_closing_type }}
-                  <br>
-                  {{ object.closing_notice|linebreaksbr }}
-                {% endif %}
-              </div>
-              <div class="col-auto">
-                <a
-                  data-ajaxmodal
-                  href="{{ object.urls.set_status }}?status={{ object.OPEN }}"
-                  class="btn btn-sm btn-info"
-                >
-                  {% translate 'open'|capfirst %}
-                </a>
-                <a
-                  data-ajaxmodal
-                  href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}"
-                  class="btn btn-sm btn-success"
-                >
-                  {% translate 'accepted'|capfirst %}
-                </a>
-                <a
-                  data-ajaxmodal
-                  href="{{ object.urls.set_status }}?status={{ object.DECLINED }}"
-                  class="btn btn-sm btn-danger"
-                >
-                  {% translate 'declined'|capfirst %}
-                </a>
-              </div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <th class="text-end">{{ object|label:'description' }}</th>
-          <td>{{ object.description|linebreaksbr|urlize|default:"&ndash;" }}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{{ object|label:'value' }}</th>
-          <td>
-            <strong>{{ object.value|currency }}</strong>
-            <br>
-            {% for value in object.values.select_related %}
-              {{ value.type }}: {{ value }}
-              <br>
-            {% endfor %}
-          </td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'contact person'|capfirst %}</th>
-          <td>{% link_or_none object.owned_by %}</td>
-        </tr>
-        <tr>
-          <th class="text-end">{% translate 'contributions'|capfirst %}</th>
-          <td>
-            {% for c in object.all_contributions %}
-              {{ c.user }}: {% if c.pretty %}{{ c.pretty }}{% else %}{{ c.value|currency }}{% endif %}
-              <br>
-            {% endfor %}
-          </td>
-        </tr>
-        {% for attribute in object.attributes.select_related %}
-          <tr>
-            <th class="text-end">{{ attribute.group }}</th>
-            <td>{{ attribute }}</td>
-          </tr>
-        {% endfor %}
-        <tr>
-          <th class="text-end">{{ object|label:'related_offers' }}</th>
-          <td>
-            {% for offer in object.get_related_offers %}
-              <div class="clearfix mb-2">
-                <form method="post" action="{{ object.urls.remove_offer }}" class="float-end">
-                  {% csrf_token %}
-                  <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
-                  <button type="submit" title="{% translate 'Unlink offer' %}" class="btn btn-outline-danger btn-sm">
-                    &times;
-                  </button>
-                </form>
-                {% link_or_none offer with_badge=True %}
-              </div>
-            {% empty %}
-              {% translate 'No related offers' %}
-            {% endfor %}
-          </td>
-        </tr>
-      </table>
-      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.add_offer }}" class="btn btn-primary" data-ajaxmodal>{% translate 'Link offer' %}</a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">
-        {% translate 'Delete' %}
-      </a>
-      {% notes object %}
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">
+        {{ object|h }}
+        {% history_link object %}
+        <span class="wb-title-badge">{{ object.status_badge }}</span>
+      </h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{% translate 'contact person'|capfirst %}</span>
+          {% link_or_none object.owned_by %}</span>
+        <span><span class="wb-meta-label">{{ object|label:'customer' }}</span>
+          {% link_or_none object.customer %}</span>
+        <span><span class="wb-meta-label">{{ object|label:'contact' }}</span>
+          {% link_or_none object.contact %}</span>
+      </div>
+    </div>
+    <div class="wb-page-actions">
+      <span class="dropdown">
+        <button
+          class="btn btn-primary dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          {{ object|label:'status' }}
+        </button>
+        <div class="dropdown-menu">
+          <a
+            data-ajaxmodal
+            href="{{ object.urls.set_status }}?status={{ object.OPEN }}"
+            class="dropdown-item"
+          >{% translate 'open'|capfirst %}</a>
+          <a
+            data-ajaxmodal
+            href="{{ object.urls.set_status }}?status={{ object.ACCEPTED }}"
+            class="dropdown-item"
+          >{% translate 'accepted'|capfirst %}</a>
+          <a
+            data-ajaxmodal
+            href="{{ object.urls.set_status }}?status={{ object.DECLINED }}"
+            class="dropdown-item"
+          >{% translate 'declined'|capfirst %}</a>
+        </div>
+      </span>
+      <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
+      <a href="{{ object.urls.add_offer }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Link offer' %}</a>
+      <span class="dropdown">
+        <button
+          type="button"
+          class="btn btn-quiet btn-icon"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="{% translate 'More actions' %}"
+        >
+          {% include 'svg/kebab-horizontal.svg' %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
+        </div>
+      </span>
     </div>
   </div>
+
+  {% if object.description %}
+    <p class="wb-description">{{ object.description|linebreaksbr|urlize }}</p>
+  {% endif %}
+
+  <div class="wb-stats mb-3">
+    <div class="wb-stat">
+      <div class="wb-stat-label">{{ object|label:'value' }}</div>
+      <div class="wb-stat-value">{{ object.value|currency }}</div>
+    </div>
+    <div class="wb-stat">
+      <div class="wb-stat-label">{{ object|label:'probability' }}</div>
+      <div class="wb-stat-value">{{ object.get_probability_display }}</div>
+    </div>
+    <div class="wb-stat">
+      <div class="wb-stat-label">{{ object|label:'decision_expected_on' }}</div>
+      <div class="wb-stat-value">{{ object.decision_expected_on|local_date_format|default:"&ndash;" }}</div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'Details' %}</div>
+        <div class="card-body">
+          <dl class="wb-fields">
+            {% if object.status != object.OPEN %}
+              <dt>{{ object|label:'closing_type' }}</dt>
+              <dd>
+                {{ object.pretty_closing_type }}
+                {% if object.closing_notice %}
+                  <div class="text-secondary">{{ object.closing_notice|linebreaksbr }}</div>
+                {% endif %}
+              </dd>
+            {% endif %}
+            {% for value in object.values.select_related %}
+              <dt>{{ value.type }}</dt>
+              <dd>{{ value.value|currency }}</dd>
+            {% endfor %}
+            <dt>{% translate 'contributions'|capfirst %}</dt>
+            <dd>
+              {% for c in object.all_contributions %}
+                {{ c.user }}: {% if c.pretty %}{{ c.pretty }}{% else %}{{ c.value|currency }}{% endif %}
+                <br>
+              {% empty %}
+                &ndash;
+              {% endfor %}
+            </dd>
+            {% for attribute in object.attributes.select_related %}
+              <dt>{{ attribute.group }}</dt>
+              <dd>{{ attribute }}</dd>
+            {% endfor %}
+          </dl>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-6">
+      <section class="card h-100">
+        <div class="card-header">{{ object|label:'related_offers' }}</div>
+        <div class="list-group list-group-flush">
+          {% for offer in object.get_related_offers %}
+            <div class="list-group-item d-flex justify-content-between align-items-center gap-2">
+              <div class="min-w-0">{% link_or_none offer with_badge=True %}</div>
+              <form method="post" action="{{ object.urls.remove_offer }}">
+                {% csrf_token %}
+                <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
+                <button type="submit" title="{% translate 'Unlink offer' %}" class="btn btn-quiet btn-sm btn-icon">
+                  {% include 'svg/x.svg' %}
+                </button>
+              </form>
+            </div>
+          {% empty %}
+            <div class="list-group-item text-secondary">{% translate 'No related offers' %}</div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+
+  {% notes object %}
 {% endblock content %}
