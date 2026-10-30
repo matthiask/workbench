@@ -1,9 +1,11 @@
 import datetime as dt
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.tools.validation import in_days
 
@@ -123,3 +125,46 @@ class InvoicesAPITest(TestCase):
             rows(f"?invoiced_until={in_days(45).isoformat()}"),
             [(sooner.project.code, "2000.00")],
         )
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
+    def test_reminders(self):
+        """Overdue invoices per customer and contact, available without the
+        controlling feature like in the web interface"""
+        project = factories.ProjectFactory.create()
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            status=Invoice.SENT,
+            invoiced_on=in_days(-60),
+            due_on=in_days(-30),
+            subtotal=100,
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            status=Invoice.SENT,
+            invoiced_on=in_days(-60),
+            due_on=in_days(-30),
+            postpone_reminders_until=in_days(10),
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            status=Invoice.SENT,
+            invoiced_on=in_days(-20),
+            due_on=in_days(-10),
+        )
+        self.client.force_login(project.owned_by)
+
+        [group] = self.client.get("/api/invoices/reminders/").json()
+        self.assertEqual(group["customer"]["id"], project.customer_id)
+        self.assertEqual(group["contact"]["id"], project.contact_id)
+        self.assertEqual(group["total_excl_tax"], "100.00")
+        [row] = group["invoices"]
+        self.assertEqual(row["id"], invoice.id)
+        self.assertEqual(row["days_overdue"], 30)
+        self.assertIsNone(row["last_reminded_on"])
+
+        self.assertEqual(self.client.get("/api/invoices/").status_code, 403)

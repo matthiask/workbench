@@ -360,8 +360,8 @@ planned_work:
             contact=project.contact,
             title="Kick-off",
             status=Invoice.SENT,
-            invoiced_on=in_days(-40),
-            due_on=in_days(-10),
+            invoiced_on=in_days(-70),
+            due_on=in_days(-40),
             subtotal=200,
         )
         factories.ProjectedInvoiceFactory.create(
@@ -400,6 +400,11 @@ planned_work:
         result = self.wb("deals", "history")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(deal.code, result.output)
+
+        result = self.wb("invoices", "reminders")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Kick-off", result.output)
+        self.assertIn("40 days", result.output)
 
         result = self.wb("reports", "key-data", "--month", "2026-01")
         self.assertIn('"month": "2026-01"', result.output)

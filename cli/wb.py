@@ -1365,6 +1365,58 @@ def show_invoice(invoice_id, as_json):
         console.print(data["description"])
 
 
+@invoices.command("reminders")
+@click.option("--json", "as_json", is_flag=True)
+def invoice_reminders(as_json):
+    """Overdue invoices to remind customers of, per customer and contact"""
+    data = _request("GET", "invoices/reminders/")
+    if as_json:
+        _echo_json(data)
+        return
+    if not data:
+        console.print("No overdue invoices.")
+        return
+    table = _table(
+        "Code",
+        "Title",
+        "Invoiced on",
+        "Due on",
+        "Overdue>",
+        "Last reminded on",
+        "Total excl. tax>",
+    )
+    for group in data:
+        contact = group["contact"]
+        table.add_row(
+            Text.assemble(
+                _link(group["customer"]["name"], group["customer"]["url"]),
+                " / ",
+                _link(contact["full_name"], contact["url"])
+                if contact
+                else "(contact missing)",
+                style="bold",
+            ),
+            "",
+            "",
+            "",
+            "",
+            "",
+            group["total_excl_tax"],
+            style="bold",
+        )
+        for invoice in group["invoices"]:
+            table.add_row(
+                _link(invoice["code"], invoice["url"]),
+                invoice["title"],
+                invoice["invoiced_on"],
+                invoice["due_on"],
+                f"{invoice['days_overdue']} days",
+                invoice["last_reminded_on"] or "",
+                invoice["total_excl_tax"],
+            )
+    console.print(table)
+
+
 @cli.group()
 def notes():
     """Search and add notes on deals and invoices"""

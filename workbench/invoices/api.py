@@ -2,15 +2,22 @@ import datetime as dt
 from decimal import Decimal
 from typing import Literal
 
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from ninja import Query, Router, Schema
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
-from workbench.contacts.api import OrganizationOut, organization_out
+from workbench.contacts.api import (
+    OrganizationOut,
+    PersonSummary,
+    organization_out,
+    person_summary,
+)
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
+from workbench.tools.formats import Z2
 
 
 # Same as in the web interface
@@ -105,6 +112,58 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
         invoice_out(invoice, request)
         for invoice in invoices.order_by("-invoiced_on", "-pk")[:200]
     ]
+
+
+class ReminderInvoiceOut(InvoiceOut):
+    last_reminded_on: dt.date | None
+    days_overdue: int
+
+
+class Reminders(Schema):
+    customer: OrganizationOut
+    contact: PersonSummary | None
+    total_excl_tax: Decimal
+    total: Decimal
+    invoices: list[ReminderInvoiceOut]
+
+
+# The web interface's reminders aren't restricted either
+@router.get("/invoices/reminders/", response=list[Reminders], auth=user_auth())
+def reminders(request):
+    """Invoices overdue for more than 15 days whose reminders haven't been
+    postponed, per customer and contact; contacts reminded longest ago
+    first"""
+    invoices = (
+        Invoice.objects
+        .overdue()
+        .select_related("customer", "contact__organization", "owned_by", "project")
+        .order_by(F("last_reminded_on").asc(nulls_first=True), "invoiced_on")
+    )
+    today = dt.date.today()
+    nested = {}
+    for invoice in invoices:
+        row = nested.setdefault(
+            (invoice.customer, invoice.contact),
+            {
+                "customer": organization_out(invoice.customer, request),
+                "contact": person_summary(invoice.contact, request)
+                if invoice.contact
+                else None,
+                "total_excl_tax": Z2,
+                "total": Z2,
+                "invoices": [],
+            },
+        )
+        row["total_excl_tax"] += invoice.total_excl_tax
+        row["total"] += invoice.total
+        row["invoices"].append(
+            invoice_out(invoice, request)
+            | {
+                "last_reminded_on": invoice.last_reminded_on,
+                "days_overdue": (today - invoice.due_on).days,
+            }
+        )
+    return list(nested.values())
 
 
 @router.get("/invoices/{invoice_id}/", response=InvoiceOut)

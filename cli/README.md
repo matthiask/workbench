@@ -175,6 +175,11 @@ Invoices are read-only in the CLI:
     wb invoices search hosting --customer 345
     wb invoices show 5678
 
+Overdue invoices to remind customers of, per customer and contact, like the
+reminders in the web interface (without postponed reminders):
+
+    wb invoices reminders
+
 The planned invoicing (gross margin, without third party costs):
 
     wb projected-invoices search --project 1234
