@@ -15,24 +15,25 @@ def full_clean(instance, loc, errors, *, exclude=()):
         )
 
 
-def raise_form_errors(form, *, fields=None):
-    """Raise the errors of the invalid form; warnings of the web interface
-    are errors too
+def form_errors(form, *, fields=None):
+    """Errors of the invalid form; warnings of the web interface are errors
+    too
 
     ``fields`` maps form fields to their location in the request body."""
     fields = fields or {}
-    raise NinjaValidationError(
-        [
-            {
-                "loc": ["body", "data"]
-                + ([] if field == "__all__" else fields.get(field, [field])),
-                "msg": message,
-            }
-            for field, messages in form.errors.items()
-            for message in messages
-        ]
-        + [
-            {"loc": ["body", "data"], "msg": str(warning)}
-            for warning in form.warnings.values()
-        ]
-    )
+    return [
+        {
+            "loc": ["body", "data"]
+            + ([] if field == "__all__" else fields.get(field, [field])),
+            "msg": message,
+        }
+        for field, messages in form.errors.items()
+        for message in messages
+    ] + [
+        {"loc": ["body", "data"], "msg": str(warning)}
+        for warning in form.warnings.values()
+    ]
+
+
+def raise_form_errors(form, *, fields=None):
+    raise NinjaValidationError(form_errors(form, fields=fields))

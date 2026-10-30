@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 08:43+0100\n"
+"POT-Creation-Date: 2026-10-30 08:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -902,6 +902,25 @@ msgstr "Filter ungültig, keine Abwesenheiten verfügbar."
 #: workbench/cli_version.py
 msgid "Your wb is too old for this Workbench, please upgrade it: uv tool upgrade workbench-cli"
 msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: uv tool upgrade workbench-cli"
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "Already used by %(person)s (ID %(id)s)."
+msgstr "Wird bereits von %(person)s (ID %(id)s) verwendet."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "%(person)s (ID %(id)s) exists already. Allow duplicates if this is someone else."
+msgstr "%(person)s (ID %(id)s) existiert bereits. Erlaube Duplikate, falls es sich um jemand anderes handelt."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "%(organization)s (ID %(id)s) exists already. Use its ID or allow duplicates."
+msgstr "%(organization)s (ID %(id)s) existiert bereits. Verwende ihre ID oder erlaube Duplikate."
+
+#: workbench/contacts/api.py
+msgid "Either use an existing organization or create a new one."
+msgstr "Verwende entweder eine existierende Organisation oder erstelle eine neue."
 
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
