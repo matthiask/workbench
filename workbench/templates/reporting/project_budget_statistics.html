@@ -1,27 +1,28 @@
-{% extends "base.html" %}
+{% extends "reporting/report.html" %}
 {% load fineforms i18n workbench %}
 {% block title %}
   {% translate 'Project budget statistics' %} - {{ block.super }}
 {% endblock title %}
 
-{% block content %}
-  <div class="wb-page-header mb-3">
-    <h1 class="mb-0">{% translate 'Project budget statistics' %}</h1>
-    <div class="wb-page-actions">
-      <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
-        {% include 'svg/desktop-download.svg' %}
-        XLSX
-      </a>
-    </div>
-  </div>
+{% block heading %}{% translate 'Project budget statistics' %}{% endblock %}
 
+{% block actions %}
+  <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
+    {% include 'svg/desktop-download.svg' %}
+    XLSX
+  </a>
+{% endblock actions %}
+
+{% block filters %}
   <form method="get" class="form-search" data-autosubmit>
     {% ff_fields form %}
     {% if form.changed_data %}
       <a class="btn btn-sm btn-link" href="." data-reset-filter>{% translate 'Reset' %}</a>
     {% endif %}
   </form>
+{% endblock filters %}
 
+{% block report %}
   <div class="wb-stats wb-stats-5 mb-3">
     <div class="wb-stat">
       <div class="wb-stat-label" title="{% translate 'Offered and accepted' %}">{% translate 'sold'|capfirst %}</div>
@@ -58,4 +59,4 @@
   </div>
 
   {% include "reporting/_budget_statistics_table.html" with report=True %}
-{% endblock content %}
+{% endblock report %}

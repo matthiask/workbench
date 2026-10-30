@@ -1,146 +1,154 @@
-{% extends "base.html" %}
+{% extends "reporting/report.html" %}
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Accepted deals' %} - {{ block.super }}
 {% endblock title %}
 
-{% block content %}
-  <div class="row justify-content-center">
-    <div class="col-sm-12 col-md-8">
-      <h1>{% translate 'Accepted deals' %}</h1>
-      <form method="get" class="mb-3" data-autosubmit>
-        {% ff_fields form %}
-      </form>
-      <table class="table table-sm table-striped">
-        <thead>
-          <tr>
-            <th>{% translate 'month'|capfirst %}</th>
-            {% for row in stats.by_valuetype %}
-              <th class="text-end">{{ row.type }}</th>
-              <th></th>
-            {% endfor %}
-            <th class="text-end">{% translate 'total'|capfirst %}</th>
+{% block report_width %}wb-report-narrow{% endblock %}
+
+{% block heading %}{% translate 'Accepted deals' %}{% endblock %}
+
+{% block report %}
+  <section class="card mb-3 wb-table-card">
+    <table class="table table-sm table-hover mb-0 wb-compact-table">
+      <thead>
+        <tr>
+          <th>{% translate 'month'|capfirst %}</th>
+          {% for row in stats.by_valuetype %}
+            <th class="text-end">{{ row.type }}</th>
             <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in stats.by_month_and_valuetype %}
-            <tr>
-              <td>{{ row.month|date:'F Y' }}</td>
-              {% for value in row.values %}
-                <td class="text-end">{{ value.value|currency }}</td>
-                <td></td>
-              {% endfor %}
-              <td class="text-end">{{ row.sum|currency }}</td>
+          {% endfor %}
+          <th class="text-end">{% translate 'total'|capfirst %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in stats.by_month_and_valuetype %}
+          <tr>
+            <td>{{ row.month|date:'F Y' }}</td>
+            {% for value in row.values %}
+              <td class="text-end">{{ value.value|currency }}</td>
               <td></td>
-            </tr>
-          {% endfor %}
-          <tr>
-            <th>{% translate 'total'|capfirst %}</th>
-            {% for row in stats.by_valuetype %}
-              <th class="text-end">{{ row.sum|currency }}</th>
-              <th>
-                <div style="margin:-5px 0;display:inline-block">{% pie row.sum row.target type='good' size=28 %}</div>
-              </th>
             {% endfor %}
-            <th class="text-end">{{ stats.sum|currency }}</th>
+            <td class="text-end">{{ row.sum|currency }}</td>
+            <td></td>
+          </tr>
+        {% endfor %}
+        <tr>
+          <th>{% translate 'total'|capfirst %}</th>
+          {% for row in stats.by_valuetype %}
+            <th class="text-end">{{ row.sum|currency }}</th>
             <th>
-              <div style="margin:-5px 0;display:inline-block">{% pie stats.sum stats.target type='good' size=28 %}</div>
+              <div style="margin: -5px 0; display: inline-block">{% pie row.sum row.target type='good' size=28 %}</div>
             </th>
-          </tr>
-          <tr>
-            <th>{% translate 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }} {% translate 'weeks' %})</th>
-            {% for row in stats.by_valuetype %}
-              <th class="text-end">{{ row.target|currency }}</th>
-              <th></th>
-            {% endfor %}
-            <th class="text-end">{{ stats.target|currency }}</th>
+          {% endfor %}
+          <th class="text-end">{{ stats.sum|currency }}</th>
+          <th>
+            <div style="margin: -5px 0; display: inline-block">
+              {% pie stats.sum stats.target type='good' size=28 %}
+            </div>
+          </th>
+        </tr>
+        <tr>
+          <th>
+            {% translate 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }}
+            {% translate 'weeks' %})
+          </th>
+          {% for row in stats.by_valuetype %}
+            <th class="text-end">{{ row.target|currency }}</th>
             <th></th>
-          </tr>
-          <tr>
-            <th>{% translate 'median age' %}</th>
-            {% for row in stats.by_valuetype %}
-              <th class="text-end">{% if row.median_age is not None %}{{ row.median_age }} {% translate 'days' %}{% endif %}</th>
-              <th></th>
-            {% endfor %}
-            <th class="text-end">{% if stats.median_age is not None %}{{ stats.median_age }} {% translate 'days' %}{% endif %}</th>
+          {% endfor %}
+          <th class="text-end">{{ stats.target|currency }}</th>
+          <th></th>
+        </tr>
+        <tr>
+          <th>{% translate 'median age' %}</th>
+          {% for row in stats.by_valuetype %}
+            <th class="text-end">
+              {% if row.median_age is not None %}{{ row.median_age }} {% translate 'days' %}{% endif %}
+            </th>
             <th></th>
-        </tbody>
-      </table>
-      <br>
+          {% endfor %}
+          <th class="text-end">
+            {% if stats.median_age is not None %}{{ stats.median_age }} {% translate 'days' %}{% endif %}
+          </th>
+          <th></th>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-      <table class="table table-sm table-striped">
-        <thead>
+  <section class="card mb-3 wb-table-card">
+    <table class="table table-sm table-hover mb-0 wb-compact-table">
+      <thead>
+        <tr>
+          <th>{% translate 'user'|capfirst %}</th>
+          <th class="text-end">{% translate 'count'|capfirst %}</th>
+          <th></th>
+          <th class="text-end">{% translate 'value'|capfirst %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in stats.by_user %}
           <tr>
-            <th>{% translate 'user'|capfirst %}</th>
-            <th class="text-end">{% translate 'count'|capfirst %}</th>
-            <th></th>
-            <th class="text-end">{% translate 'value'|capfirst %}</th>
+            <td>
+              <a href="deals/{% querystring user=row.user.id %}" data-ajaxmodal>{{ row.user }}</a>
+            </td>
+            <td class="text-end">
+              {{ row.count }}
+            </td>
+            <td class="text-end">
+              <div style="margin: -5px 0; display: inline-block">
+                {% pie row.sum stats.sum type='good' size=28 %}
+              </div>
+            </td>
+            <td class="text-end">
+              {{ row.sum|currency }}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {% for row in stats.by_user %}
-            <tr>
-              <td>
-                <a href="deals/{% querystring user=row.user.id %}"
-                   data-ajaxmodal>{{ row.user }}</a>
-              </td>
-              <td class="text-end">
-                {{ row.count }}
-              </td>
-              <td class="text-end">
-                <div style="margin:-5px 0;display:inline-block">
-                  {% pie row.sum stats.sum type='good' size=28 %}
-                </div>
-              </td>
-              <td class="text-end">
-                {{ row.sum|currency }}
-              </td>
-            </tr>
-          {% endfor %}
-          <tr>
-            <th>
-              {% translate 'total'|capfirst %}
-            </th>
-            <th class="text-end">
-              {{ stats.count }}
-            </th>
-            <th>
-            </th>
-            <th class="text-end">
-              {{ stats.sum|currency }}
-            </th>
-          </tr>
-        </tbody>
-      </table>
-      <br>
+        {% endfor %}
+        <tr>
+          <th>
+            {% translate 'total'|capfirst %}
+          </th>
+          <th class="text-end">
+            {{ stats.count }}
+          </th>
+          <th></th>
+          <th class="text-end">
+            {{ stats.sum|currency }}
+          </th>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-      <table class="table table-sm table-striped">
-        <thead>
+  <section class="card mb-3 wb-table-card">
+    <table class="table table-sm table-hover mb-0 wb-compact-table">
+      <thead>
+        <tr>
+          <th>{% translate 'deal'|capfirst %}</th>
+          <th class="text-end">{% translate 'value'|capfirst %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for deal in stats.deals %}
           <tr>
-            <th>{% translate 'deal'|capfirst %}</th>
-            <th class="text-end">{% translate 'value'|capfirst %}</th>
+            <td>{% link_or_none deal with_badge=True %}</td>
+            <td class="text-end">
+              {{ deal.value|currency }}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {% for deal in stats.deals %}
-            <tr>
-              <td>{% link_or_none deal with_badge=True %}</td>
-              <td class="text-end">
-                {{ deal.value|currency }}
-              </td>
-            </tr>
-          {% endfor %}
-          <tr>
-            <th>
-              {% translate 'total'|capfirst %}
-            </th>
-            <th class="text-end">
-              {{ stats.sum|currency }}
-            </th>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-{% endblock content %}
+        {% endfor %}
+        <tr>
+          <th>
+            {% translate 'total'|capfirst %}
+          </th>
+          <th class="text-end">
+            {{ stats.sum|currency }}
+          </th>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+{% endblock report %}

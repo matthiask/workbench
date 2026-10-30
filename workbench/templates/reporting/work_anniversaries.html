@@ -1,60 +1,57 @@
-{% extends "base.html" %}
+{% extends "reporting/report.html" %}
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Work anniversaries' %} - {{ block.super }}
 {% endblock title %}
 
-{% block content %}
-  <div class="row justify-content-center">
-    <div class="col-sm-12 col-lg-8">
-      <h1>{% translate 'Work anniversaries' %}</h1>
-      <table class="table table-sm table-striped">
-        <thead>
+{% block report_width %}wb-report-narrow{% endblock %}
+
+{% block heading %}{% translate 'Work anniversaries' %}{% endblock %}
+
+{% block report %}
+  <section class="card mb-3 wb-table-card">
+    <table class="table table-sm table-hover mb-0 wb-compact-table">
+      <thead>
+        <tr>
+          <th>{% translate 'user'|capfirst %}</th>
+          <th>{% translate 'Started on' %}</th>
+          <th class="text-end">{% translate 'Work anniversary' %}</th>
+          <th>{% translate 'On' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for anniversary in work_anniversaries %}
+          {% ifchanged anniversary.already %}
+            {% if not forloop.first %}
+              <tr class="wb-table-gap"><td colspan="4"></td></tr>
+            {% endif %}
+          {% endifchanged %}
           <tr>
-            <th>{% translate 'user'|capfirst %}</th>
-            <th>{% translate 'Started on' %}</th>
-            <th class="text-end">{% translate 'Work anniversary' %}</th>
-            <th>{% translate 'On' %}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for anniversary in work_anniversaries %}
-            {% ifchanged anniversary.already %}
-              {% if not forloop.first %}
-                <tr>
-                  <td colspan="4">
-                    <hr>
-                  </td>
-                </tr>
+            <td>{{ anniversary.user.get_full_name }}</td>
+            <td>
+              {% if anniversary.user.date_of_employment %}
+                {{ anniversary.user.date_of_employment|local_date_format }}
+              {% else %}
+                &ndash;
               {% endif %}
-            {% endifchanged %}
-            <tr>
-              <td>{{ anniversary.user.get_full_name }}</td>
-              <td>
-                {% if anniversary.user.date_of_employment %}
-                  {{ anniversary.user.date_of_employment|local_date_format }}
-                {% else %}
-                  &ndash;
-                {% endif %}
-              </td>
-              <td class="text-end">
-                {% if anniversary.anniversary %}
-                  {{ anniversary.anniversary }}.
-                {% else %}
-                  ✨
-                {% endif %}
-              </td>
-              <td>
-                {% if anniversary.user.date_of_employment %}
-                  {{ anniversary.this_year|local_date_format }}
-                {% else %}
-                  &ndash;
-                {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-{% endblock content %}
+            </td>
+            <td class="text-end">
+              {% if anniversary.anniversary %}
+                {{ anniversary.anniversary }}.
+              {% else %}
+                ✨
+              {% endif %}
+            </td>
+            <td>
+              {% if anniversary.user.date_of_employment %}
+                {{ anniversary.this_year|local_date_format }}
+              {% else %}
+                &ndash;
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock report %}

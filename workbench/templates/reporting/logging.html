@@ -1,109 +1,107 @@
-{% extends "base.html" %}
+{% extends "reporting/report.html" %}
 {% load fineforms i18n static workbench %}
 {% block title %}
   {% translate 'Logging statistics' %} - {{ block.super }}
 {% endblock title %}
 
-{% block content %}
-  <div class="row justify-content-center">
-    <div class="col-sm-12 col-lg-8">
-      <h1>{% translate 'Logging statistics' %}</h1>
-      <form method="get" class="mb-3" data-autosubmit>
-        {% ff_fields form %}
-      </form>
-      <table class="table table-sm table-striped">
-        <thead>
+{% block report_width %}wb-report-narrow{% endblock %}
+
+{% block heading %}{% translate 'Logging statistics' %}{% endblock %}
+
+{% block report %}
+  <section class="card mb-3 wb-table-card">
+    <table class="table table-sm table-hover mb-0 wb-compact-table">
+      <thead>
+        <tr>
+          <th>{% translate 'user'|capfirst %}</th>
+          <th>{% translate 'Point in time of logging' %}</th>
+          <th class="text-end">{% translate 'Count' %}</th>
+          <th class="text-end">{% translate 'Sum' %}</th>
+          <th class="text-end">{% translate 'Average' %}</th>
+          <th class="text-end">{% translate 'Days with insufficient breaks' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in logbook_stats.users %}
           <tr>
-            <th>{% translate 'user'|capfirst %}</th>
-            <th>{% translate 'Point in time of logging' %}</th>
-            <th class="text-end">{% translate 'Count' %}</th>
-            <th class="text-end">{% translate 'Sum' %}</th>
-            <th class="text-end">{% translate 'Average' %}</th>
-            <th class="text-end">{% translate 'Days with insufficient breaks' %}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in logbook_stats.users %}
-            <tr>
-              <td>{{ row.user }}</td>
-              <td>
-                <span
-                  class="badge text-bg-{{ row.mean_logging_delay.classification.1 }}"
-                  title="{{ row.mean_logging_delay.classification.2 }}"
-                >
-                  {{ row.mean_logging_delay.classification.0 }}
-                </span>
-              </td>
-              <td class="text-end">{{ row.logged_hours_stats.count }}</td>
-              <td class="text-end">{{ row.logged_hours_stats.sum|hours }}</td>
-              <td class="text-end">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
-              <td class="text-end">
-                {% if row.insufficient_breaks.days %}
-                  <div class="modal fade" id="insufficient_breaks-{{ row.user.id }}">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h4 class="modal-title">
-                            {% translate "Days with insufficient breaks" %}
-                          </h4>
-                        </div>
-                        <div class="modal-body text-start fw-normal">
-                          {% if row.user == request.user %}
-                            {% for day in row.insufficient_breaks.days %}
-                              <a
-                                href="{% url 'timestamps' %}?day={{ day.isoformat }}"
-                              >{{ day|local_date_format:'D d.m.Y' }}</a><br>
-                            {% endfor %}
-                          {% else %}
-                            {% for day in row.insufficient_breaks.days %}
-                              {{ day|local_date_format:'D d.m.Y' }}<br>
-                            {% endfor %}
-                          {% endif %}
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            {% translate 'Close' %}
-                          </button>
-                        </div>
+            <td>{{ row.user }}</td>
+            <td>
+              <span
+                class="badge text-bg-{{ row.mean_logging_delay.classification.1 }}"
+                title="{{ row.mean_logging_delay.classification.2 }}"
+              >
+                {{ row.mean_logging_delay.classification.0 }}
+              </span>
+            </td>
+            <td class="text-end">{{ row.logged_hours_stats.count }}</td>
+            <td class="text-end">{{ row.logged_hours_stats.sum|hours }}</td>
+            <td class="text-end">{{ row.logged_hours_stats.avg|stringformat:'.2f' }}h</td>
+            <td class="text-end">
+              {% if row.insufficient_breaks.days %}
+                <div class="modal fade" id="insufficient_breaks-{{ row.user.id }}">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title">
+                          {% translate "Days with insufficient breaks" %}
+                        </h4>
+                      </div>
+                      <div class="modal-body text-start fw-normal">
+                        {% if row.user == request.user %}
+                          {% for day in row.insufficient_breaks.days %}
+                            <a
+                              href="{% url 'timestamps' %}?day={{ day.isoformat }}"
+                            >{{ day|local_date_format:'D d.m.Y' }}</a><br>
+                          {% endfor %}
+                        {% else %}
+                          {% for day in row.insufficient_breaks.days %}
+                            {{ day|local_date_format:'D d.m.Y' }}<br>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                          {% translate 'Close' %}
+                        </button>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <a
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#insufficient_breaks-{{ row.user.id }}"
-                    class="{% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}"
-                  >
-                    {{ row.insufficient_breaks.days_count }} / {{ row.insufficient_breaks.of }}
-                    {% pie row.insufficient_breaks.days_count row.insufficient_breaks.of %}
-                  </a>
-                {% else %}
+                <a
+                  href="#"
+                  data-bs-toggle="modal"
+                  data-bs-target="#insufficient_breaks-{{ row.user.id }}"
+                  class="{% if row.insufficient_breaks.danger %}text-danger fw-bold{% endif %}"
+                >
                   {{ row.insufficient_breaks.days_count }} / {{ row.insufficient_breaks.of }}
                   {% pie row.insufficient_breaks.days_count row.insufficient_breaks.of %}
-                {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-          <tr>
-            <th>{% translate 'total'|capfirst %}</th>
-            <th></th>
-            <th class="text-end">{{ logbook_stats.logged_hours_stats.count }}</th>
-            <th class="text-end">{{ logbook_stats.logged_hours_stats.sum|hours }}</th>
-            <th class="text-end">
-              {% if logbook_stats.logged_hours_stats.avg is None %}
-                &ndash;
+                </a>
               {% else %}
-                {{ logbook_stats.logged_hours_stats.avg|stringformat:'.2f' }}h
+                {{ row.insufficient_breaks.days_count }} / {{ row.insufficient_breaks.of }}
+                {% pie row.insufficient_breaks.days_count row.insufficient_breaks.of %}
               {% endif %}
-            </th>
-            <th class="text-end">
-              {{ logbook_stats.insufficient_breaks.days_count }} / {{ logbook_stats.insufficient_breaks.of }}
-              {% pie logbook_stats.insufficient_breaks.days_count logbook_stats.insufficient_breaks.of %}
-            </th>
+            </td>
           </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-{% endblock content %}
+        {% endfor %}
+        <tr class="wb-total-row">
+          <th>{% translate 'total'|capfirst %}</th>
+          <th></th>
+          <th class="text-end">{{ logbook_stats.logged_hours_stats.count }}</th>
+          <th class="text-end">{{ logbook_stats.logged_hours_stats.sum|hours }}</th>
+          <th class="text-end">
+            {% if logbook_stats.logged_hours_stats.avg is None %}
+              &ndash;
+            {% else %}
+              {{ logbook_stats.logged_hours_stats.avg|stringformat:'.2f' }}h
+            {% endif %}
+          </th>
+          <th class="text-end">
+            {{ logbook_stats.insufficient_breaks.days_count }} / {{ logbook_stats.insufficient_breaks.of }}
+            {% pie logbook_stats.insufficient_breaks.days_count logbook_stats.insufficient_breaks.of %}
+          </th>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+{% endblock report %}

@@ -1,17 +1,13 @@
-{% extends "base.html" %}
+{% extends "reporting/report.html" %}
 {% load fineforms i18n workbench %}
 {% block title %}
   {% translate 'Deal history' %} - {{ block.super }}
 {% endblock title %}
 
-{% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-      <h1>{% translate 'Deal history' %}</h1>
-      <form method="get" class="mb-3" data-autosubmit>
-        {% ff_fields form %}
-      </form>
-      {% include '_history.html' with changes=stats %}
-    </div>
-  </div>
-{% endblock content %}
+{% block report_width %}wb-report-narrow{% endblock %}
+
+{% block heading %}{% translate 'Deal history' %}{% endblock %}
+
+{% block report %}
+  {% include '_history.html' with changes=stats %}
+{% endblock report %}

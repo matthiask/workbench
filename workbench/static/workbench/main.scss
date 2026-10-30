@@ -302,7 +302,7 @@ tbody th > a {
   position: sticky;
   z-index: 1;
   top: 47px;
-  background: var(--bs-body-bg);
+  background: var(--wb-surface);
 }
 
 .inline {
@@ -1402,7 +1402,8 @@ a.wb-row-title:hover {
 }
 
 // Totals above the rows of a table
-.wb-total-row > td {
+.wb-total-row > td,
+.wb-total-row > th {
   background: var(--wb-surface-muted);
   font-weight: 600;
 }
@@ -1418,4 +1419,58 @@ a.wb-row-title:hover {
 .wb-scroll-menu {
   max-height: 20rem;
   overflow-y: auto;
+}
+
+// Reports: tables in cards, narrow reports centered
+.wb-report-narrow {
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.wb-heading-note {
+  color: var(--bs-secondary-color);
+  font-size: 0.6em;
+  font-weight: 400;
+}
+
+.wb-table-card {
+  --bs-table-bg: transparent;
+  overflow: visible;
+
+  > .table,
+  > .table-responsive > .table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  thead th {
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+    vertical-align: bottom;
+  }
+
+  thead .wb-total-row th {
+    color: var(--bs-body-color);
+    font-size: inherit;
+    font-weight: 600;
+  }
+
+  tfoot th {
+    background: var(--wb-surface-muted);
+  }
+}
+
+.wb-table-gap > td {
+  height: 0.5rem;
+  padding: 0;
+  background: var(--wb-surface-muted);
+}
+
+// Shade alternate column groups of wide tables
+.wb-type-columns tbody td:nth-child(6n + 3),
+.wb-type-columns tbody td:nth-child(6n + 4),
+.wb-type-columns tbody td:nth-child(6n + 5),
+.wb-month-columns th:nth-child(2n + 6),
+.wb-month-columns td:nth-child(2n + 6) {
+  background: var(--wb-surface-muted);
 }

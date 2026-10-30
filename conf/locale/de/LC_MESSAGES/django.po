@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 17:05+0100\n"
+"POT-Creation-Date: 2026-10-30 17:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1273,7 +1273,6 @@ msgstr "Valuta"
 #: workbench/credit_control/models.py workbench/credit_control/reporting.py
 #: workbench/expenses/models.py workbench/expenses/views.py
 #: workbench/templates/credit_control/creditentry_list.html
-#: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/projects/project_detail.html
@@ -1362,9 +1361,7 @@ msgstr "Total exkl. MwSt"
 #: workbench/credit_control/reporting.py workbench/deals/models.py
 #: workbench/expenses/forms.py workbench/expenses/views.py
 #: workbench/invoices/models.py workbench/offers/models.py
-#: workbench/projects/forms.py
-#: workbench/templates/expenses/expensereport_detail.html
-#: workbench/templates/invoices/invoice_detail.html
+#: workbench/projects/forms.py workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "status"
 msgstr "Status"
@@ -4138,6 +4135,7 @@ msgstr "Neu"
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/deals/deal_detail.html
+#: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/generic/object_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
@@ -4234,6 +4232,7 @@ msgstr "Rechnungstotal"
 #: workbench/templates/deals/deal_list.html
 #: workbench/templates/generic/object_list.html
 #: workbench/templates/reporting/_budget_statistics_table.html
+#: workbench/templates/reporting/open_items_list.html
 #: workbench/templates/search.html
 msgid "No results found."
 msgstr "Keine Resultate gefunden."
@@ -4847,10 +4846,6 @@ msgid "Reached"
 msgstr "Erreicht"
 
 #: workbench/templates/reporting/key_data.html
-msgid "Facts"
-msgstr "Fakten"
-
-#: workbench/templates/reporting/key_data.html
 msgid "Service hours in open orders"
 msgstr "Leistungsstunden in offenen Aufträgen"
 
@@ -5023,10 +5018,6 @@ msgstr "davon geplant"
 #: workbench/templates/reporting/squeeze.html
 msgid "Squeeze"
 msgstr "Squeeze"
-
-#: workbench/templates/reporting/squeeze.html
-msgid "Export XLSX"
-msgstr "XLSX exportieren"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Without rate"
@@ -5495,6 +5486,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Facts"
+#~ msgstr "Fakten"
+
+#~ msgid "Export XLSX"
+#~ msgstr "XLSX exportieren"
 
 #~ msgid "Reset the filter form"
 #~ msgstr "Suchformular zurücksetzen"

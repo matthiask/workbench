@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load fineforms %}
+{% comment %}
+  Page layout of reports: the heading and actions in the page header, the
+  filters in their own row, tables in cards (wb-table-card).
+{% endcomment %}
+
+{% block content %}
+  <div class="wb-report {% block report_width %}{% endblock %}">
+    <div class="wb-page-header mb-3">
+      <h1 class="mb-0 min-w-0">{% block heading %}{% endblock %}</h1>
+      <div class="wb-page-actions">
+        {% block actions %}{% endblock %}
+      </div>
+    </div>
+    {% block filters %}
+      {% if form %}
+        <form method="get" class="form-search" data-autosubmit>
+          {% ff_fields form %}
+        </form>
+      {% endif %}
+    {% endblock filters %}
+    {% block report %}{% endblock %}
+  </div>
+{% endblock content %}

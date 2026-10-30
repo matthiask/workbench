@@ -1,80 +1,85 @@
-{% extends "base.html" %}
-{% load fineforms i18n workbench %}
+{% extends "reporting/report.html" %}
+{% load i18n workbench %}
 {% block title %}
   {% translate 'Open items list' %} - {{ block.super }}
 {% endblock title %}
 
-{% block content %}
-  <div class="row">
-    <div class="col-sm-12">
-      <h1>{% translate 'Open items list' %}</h1>
-      <form method="get" class="mb-3" data-autosubmit>
-        {% ff_fields form %}
-      </form>
-      <table class="table table-sm table-hover table-responsive-lg">
-        <thead class="sticky">
-          <tr>
-            <th class="w-100">{% translate 'invoice'|capfirst %}</th>
-            <th class="text-nowrap text-end">{% translate 'invoiced on'|capfirst %}</th>
-            <th class="text-nowrap text-end">{% translate 'total excl. tax'|capfirst %}</th>
-            <th class="text-nowrap text-end">{% translate 'total'|capfirst %}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for invoice in open_items_list.list %}
+{% block heading %}{% translate 'Open items list' %}{% endblock %}
+
+{% block actions %}
+  <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
+    {% include 'svg/desktop-download.svg' %}
+    XLSX
+  </a>
+{% endblock actions %}
+
+{% block report %}
+  <div class="wb-stats mb-3">
+    <div class="wb-stat">
+      <div class="wb-stat-label">{% translate 'total excl. tax'|capfirst %}</div>
+      <div class="wb-stat-value">{{ open_items_list.total_excl_tax|currency }}</div>
+    </div>
+    <div class="wb-stat">
+      <div class="wb-stat-label">{% translate 'total'|capfirst %}</div>
+      <div class="wb-stat-value">{{ open_items_list.total|currency }}</div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-xl-8">
+      <section class="card wb-table-card">
+        <table class="table table-sm table-hover mb-0 wb-compact-table">
+          <thead class="sticky">
             <tr>
-              <td>
-                <a href="{{ invoice.get_absolute_url }}">
-                  {{ invoice.customer }}
-                  <br>
-                  {{ invoice|h }}
+              <th class="w-100">{% translate 'invoice'|capfirst %}</th>
+              <th class="text-nowrap text-end">{% translate 'invoiced on'|capfirst %}</th>
+              <th class="text-nowrap text-end">{% translate 'total excl. tax'|capfirst %}</th>
+              <th class="text-nowrap text-end">{% translate 'total'|capfirst %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for invoice in open_items_list.list %}
+              <tr>
+                <td>
+                  <a href="{{ invoice.get_absolute_url }}">{{ invoice|h }}</a>
                   {{ invoice.status_badge }}
-                </a>
-              </td>
-              <td class="text-end">{{ invoice.invoiced_on|local_date_format }}</td>
-              <td class="text-end">{{ invoice.total_excl_tax|currency }}</td>
-              <td class="text-end">{{ invoice.total|currency }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          <th>{% translate 'total'|capfirst %}</th>
-          <th></th>
-          <th class="text-end">{{ open_items_list.total_excl_tax|currency }}</th>
-          <th class="text-end">{{ open_items_list.total|currency }}</th>
-        </tfoot>
-      </table>
-      <a href="{% querystring export='xlsx' %}" class="btn btn-primary">
-        {% include 'svg/desktop-download.svg' %}
-        XLSX
-      </a>
-
-      <br>
-      <br>
-
+                  <div class="wb-row-meta">{{ invoice.customer }}</div>
+                </td>
+                <td class="text-end">{{ invoice.invoiced_on|local_date_format }}</td>
+                <td class="text-end">{{ invoice.total_excl_tax|currency }}</td>
+                <td class="text-end">{{ invoice.total|currency }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4" class="text-secondary">{% translate 'No results found.' %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
     </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-12 col-md-6 col-lg-4">
-      <h2>{% translate 'Due in calendar week' %}</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>{% translate 'week'|capfirst %}</th>
-            <th class="text-end">{% translate 'total excl. tax'|capfirst %}</th>
-            <th class="text-end">{% translate 'total'|capfirst %}</th>
-        </thead>
-        <tbody>
-          {% for week, per_week in open_items_list.weeks %}
+    <div class="col-xl-4">
+      <section class="card wb-table-card">
+        <div class="card-header">{% translate 'Due in calendar week' %}</div>
+        <table class="table table-sm mb-0 wb-compact-table">
+          <thead>
             <tr>
-              <td>KW{{ week|date:'W Y' }}</td>
-              <td class="text-end">{{ per_week.total_excl_tax|currency }}</td>
-              <td class="text-end">{{ per_week.total|currency }}</td>
+              <th>{% translate 'week'|capfirst %}</th>
+              <th class="text-end">{% translate 'total excl. tax'|capfirst %}</th>
+              <th class="text-end">{% translate 'total'|capfirst %}</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {% for week, per_week in open_items_list.weeks %}
+              <tr>
+                <td>KW{{ week|date:'W Y' }}</td>
+                <td class="text-end">{{ per_week.total_excl_tax|currency }}</td>
+                <td class="text-end">{{ per_week.total|currency }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
     </div>
   </div>
-{% endblock content %}
+{% endblock report %}
