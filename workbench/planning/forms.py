@@ -153,16 +153,26 @@ class PlannedWorkForm(ModelForm):
             "notes": Textarea,
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: C901
         self.project = kwargs.pop("project", None)
         if not self.project:  # Updating
             self.project = kwargs["instance"].project
 
         initial = kwargs.setdefault("initial", {})
         request = kwargs["request"]
-        for field in ["offer"]:
+        for field in ["offer", "milestone"]:
             if value := request.GET.get(field):
                 initial.setdefault(field, value)
+        # Weeks dragged in the planning
+        weeks = set()
+        for value in request.GET.getlist("weeks"):
+            try:
+                if day := parse_date(value):
+                    weeks.add(monday(day))
+            except ValueError:
+                pass
+        if weeks:
+            initial.setdefault("weeks", sorted(weeks))
 
         if offer_id := request.GET.get("plan_offer"):
             try:

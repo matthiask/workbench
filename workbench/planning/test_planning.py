@@ -421,6 +421,26 @@ class PlanningTest(TestCase):
         response = self.client.get(service.project.urls["creatework"] + "?service=bla")
         self.assertEqual(response.status_code, 200)  # No crash
 
+    def test_initialize_form_using_weeks(self):
+        """Weeks dragged in the planning and the milestone of the row are
+        filled in"""
+        milestone = factories.MilestoneFactory.create(date=in_days(60))
+        self.client.force_login(milestone.project.owned_by)
+
+        weeks = [monday() + dt.timedelta(days=days) for days in (7, 14)]
+        response = self.client.get(
+            milestone.project.urls["creatework"]
+            + f"?milestone={milestone.pk}&weeks={weeks[0]}&weeks={weeks[1]}"
+        )
+        form = response.context["form"]
+        self.assertEqual(form["weeks"].value(), weeks)
+        self.assertEqual(form["milestone"].value(), str(milestone.pk))
+
+        response = self.client.get(
+            milestone.project.urls["creatework"] + "?weeks=bla&weeks=2026-13-40"
+        )
+        self.assertEqual(response.context["form"]["weeks"].value(), [monday()])
+
     def test_decision_of_open_deal(self):
         """Offers which aren't accepted show when their open deal should be
         decided"""

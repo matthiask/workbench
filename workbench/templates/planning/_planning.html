@@ -1,5 +1,5 @@
 {% load rspack_assets %}
-<div id="planning-root" class="planning-wrapper"></div>
+<div id="planning-root" class="planning-wrapper" data-csrf-token="{{ csrf_token }}"></div>
 {{ planning_data|json_script:'planning-data' }}
 <script src="{% url 'javascript-catalog' %}"></script>
 {% if not TESTING %}

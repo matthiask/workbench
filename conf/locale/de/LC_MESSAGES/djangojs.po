@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:35+0100\n"
+"POT-Creation-Date: 2026-10-30 23:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -98,12 +98,21 @@ msgid "Break"
 msgstr "Pause"
 
 #: conf/strings.js planning/index.js
+msgid "Close"
+msgstr "Schliessen"
+
+#: conf/strings.js planning/index.js
+#, javascript-format
 msgid "decision %s"
 msgstr "Entscheid %s"
 
 #: conf/strings.js planning/index.js
 msgid "Decision expected on the open deal"
 msgstr "Erwarteter Entscheid des offenen Geschäfts"
+
+#: conf/strings.js planning/index.js
+msgid "Drag to plan work in these weeks"
+msgstr "Ziehen, um in diesen Wochen Arbeit einzuplanen"
 
 #: conf/strings.js planning/index.js
 msgid "Efforts"
@@ -241,6 +250,39 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
+
+#: planning/drag.js
+#, javascript-format
+msgid "KW %s"
+msgstr "KW %s"
+
+#: planning/drag.js
+#, javascript-format
+msgid "KW %s–%s"
+msgstr "KW %s–%s"
+
+#: planning/drag.js
+msgid "1 week"
+msgstr "1 Woche"
+
+#: planning/drag.js
+#, javascript-format
+msgid "%s weeks"
+msgstr "%s Wochen"
+
+#: planning/drag.js
+#, javascript-format
+msgid "%sh per week"
+msgstr "%sh pro Woche"
+
+#: planning/drag.js
+msgid "Saving..."
+msgstr "Speichern..."
+
+#: planning/drag.js
+#, javascript-format
+msgid "Unable to save the planned work: %s"
+msgstr "Die geplante Arbeit konnte nicht gespeichert werden: %s"
 
 #~ msgid "Concurrent absences"
 #~ msgstr "Parallele Absenzen"

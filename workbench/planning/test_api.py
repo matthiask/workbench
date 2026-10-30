@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 
 from django.test import Client, TestCase
 from django.utils.translation import deactivate_all
@@ -214,6 +215,25 @@ class PlanningAPITest(TestCase):
             headers={"X-CSRFToken": client.cookies["csrftoken"].value},
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_drag_csrf(self):
+        """Dragging work in the planning saves it with the page's CSRF token"""
+        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(pw.user)
+
+        response = client.get(pw.project.urls["planning"])
+        token = re.search(r'data-csrf-token="([^"]+)"', response.content.decode())
+        week = monday() + dt.timedelta(days=7)
+        response = client.patch(
+            f"/api/planning/work/{pw.pk}/",
+            {"weeks": [week.isoformat()]},
+            content_type="application/json",
+            headers={"X-CSRFToken": token[1]},
+        )
+        self.assertEqual(response.status_code, 200)
+        pw.refresh_from_db()
+        self.assertEqual(pw.weeks, [week])
 
     def test_export(self):
         """Planned work, milestones and capacity of a period or a project"""

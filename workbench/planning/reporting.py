@@ -111,6 +111,7 @@ class Planning:
                     "url": pw.get_absolute_url(),
                     "date_from": date_from,
                     "date_until": date_until,
+                    "weeks": sorted(pw.weeks),
                     "range": "{} – {}".format(
                         local_date_format(date_from, fmt="d.m."),
                         local_date_format(date_until, fmt="d.m."),
@@ -213,6 +214,7 @@ class Planning:
                 "phase_starts_on": start if milestone.phase_starts_on else None,
                 "weekday": milestone.date.isocalendar()[2],
                 "url": milestone.urls["detail"],
+                "creatework": project.urls["creatework"] + f"?milestone={milestone.pk}",
                 "weeks": weeks,
                 "graphical_weeks": graphical_weeks,
             })

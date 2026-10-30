@@ -9,6 +9,8 @@ import React, {
 } from "react"
 import { createRoot } from "react-dom/client"
 
+import { usePlanningDrag } from "./drag"
+
 const clamp = (min, value, max) => Math.max(Math.min(value, max), min)
 // Hours are shown as a tint of their color, stronger tints get white text
 const heat = (percentage) => {
@@ -51,6 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 const RowContext = createContext()
+// The state of dragging in the grid and the number of weeks shown
+const DragContext = createContext({
+  drag: null,
+  weeks: 0,
+  mondays: [],
+  editable: false,
+})
 
 const FIRST_DATA_COLUMN = 6
 
@@ -67,8 +76,45 @@ function months(weeks) {
   return months
 }
 
-function Planning({ data }) {
+function Planning({ data: initialData }) {
   const gridRef = useRef(null)
+  const [data, setData] = useState(initialData)
+  const [drag, setDrag] = useState(null)
+  const [status, setStatus] = useState(null)
+
+  // Fetch the page again and render its data, e.g. after moving work
+  const reload = async () => {
+    const response = await fetch(window.location.href, {
+      credentials: "include",
+    })
+    const doc = new DOMParser().parseFromString(
+      await response.text(),
+      "text/html",
+    )
+    setData(JSON.parse(doc.querySelector("#planning-data").textContent))
+  }
+
+  const findWork = (id) => {
+    for (const { project, offers } of data.projects_offers) {
+      for (const { work_list } of [
+        ...(offers || []),
+        ...(project.milestones || []),
+      ]) {
+        const entry = work_list?.find(({ work }) => work.id === id)
+        if (entry) return entry.work
+      }
+    }
+    return null
+  }
+
+  const dragHandlers = usePlanningDrag({
+    gridRef,
+    data,
+    findWork,
+    setDrag,
+    setStatus,
+    reload,
+  })
 
   // Separate row contexts for the sticky header and the scrolling body.
   // headerRowCtx starts at 3 so TotalByWeek/Capacity follow the 3 fixed
@@ -133,105 +179,165 @@ function Planning({ data }) {
   }, [bodyRowCtx.current, bodyRowCtx.firstProjectRow, bodyRowCtx])
 
   return (
-    <RowContext.Provider value={bodyRowCtx}>
-      <div
-        ref={gridRef}
-        className={`planning${data.external_view ? " external" : ""}`}
-        style={{
-          "--weeks": data.weeks.length + 1,
-        }}
-      >
-        {/* Column stripe backgrounds — start at row 2 so they cover only the
+    <DragContext.Provider
+      value={{
+        drag,
+        weeks: data.weeks.length,
+        mondays: data.weeks.map((week) => week.monday),
+        editable: !data.external_view,
+      }}
+    >
+      <RowContext.Provider value={bodyRowCtx}>
+        <div
+          ref={gridRef}
+          className={`planning${data.external_view ? " external" : ""}`}
+          style={{
+            "--weeks": data.weeks.length + 1,
+          }}
+          {...(data.external_view ? {} : dragHandlers)}
+        >
+          {/* Spans the week columns, used to find the week below the pointer */}
+          <Cell
+            row="2"
+            column={FIRST_DATA_COLUMN}
+            colspan={`span ${data.weeks.length}`}
+            className="planning--ruler"
+            data-weeks-ruler
+          />
+          {/* Column stripe backgrounds — start at row 2 so they cover only the
             body rows; the sticky header has its own solid background. */}
-        {data.weeks.map((_, idx) => {
-          return idx % 2 ? null : (
+          {data.weeks.map((_, idx) => {
+            return idx % 2 ? null : (
+              <Cell
+                key={idx}
+                row="2"
+                rowspan="-1"
+                column={FIRST_DATA_COLUMN + idx}
+                className="planning--stripe4"
+              />
+            )
+          })}
+          {data.this_week_index === null ? null : (
             <Cell
-              key={idx}
+              key="this_week_index"
               row="2"
               rowspan="-1"
-              column={FIRST_DATA_COLUMN + idx}
-              className="planning--stripe4"
+              column={FIRST_DATA_COLUMN + data.this_week_index}
+              className="planning--this-week"
             />
-          )
-        })}
-        {data.this_week_index === null ? null : (
-          <Cell
-            key="this_week_index"
-            row="2"
-            rowspan="-1"
-            column={FIRST_DATA_COLUMN + data.this_week_index}
-            className="planning--this-week"
-          />
-        )}
+          )}
 
-        {/* Sticky header — occupies outer grid row 1 and spans all columns.
+          {/* Sticky header — occupies outer grid row 1 and spans all columns.
             Uses CSS subgrid so its children align with the outer columns.
             A separate RowContext supplies row numbers relative to the header
             subgrid instead of the outer grid. */}
-        <RowContext.Provider value={headerRowCtx}>
-          <div className="planning--sticky-header">
-            {months(data.weeks).map((month, idx) => (
-              <Cell
-                key={idx}
-                className="planning--scale text-center planning--small"
-                row={1}
-                column={FIRST_DATA_COLUMN + month.index}
-              >
-                <strong>{month.month}</strong>
-              </Cell>
-            ))}
-            {data.weeks.map((week, idx) => (
-              <Cell
-                key={idx}
-                className="planning--scale text-center planning--small"
-                row={2}
-                column={FIRST_DATA_COLUMN + idx}
-              >
-                {week.week}
-              </Cell>
-            ))}
-            {data.weeks.map((week, idx) => (
-              <Cell
-                key={idx}
-                className="planning--scale text-center planning--smaller"
-                row={3}
-                column={FIRST_DATA_COLUMN + idx}
-              >
-                {week.period}
-              </Cell>
-            ))}
-            {data.external_view || (
-              <>
-                <TotalByWeek
-                  by_week={data.by_week}
-                  title={gettext("Planned hours per week")}
-                />
-                <TotalByWeek
-                  by_week={data.by_week_provisional}
-                  title={gettext("Of which provisional")}
-                />
-                {data.capacity && <Capacity {...data.capacity} />}
-              </>
+          <RowContext.Provider value={headerRowCtx}>
+            <div className="planning--sticky-header">
+              {months(data.weeks).map((month, idx) => (
+                <Cell
+                  key={idx}
+                  className="planning--scale text-center planning--small"
+                  row={1}
+                  column={FIRST_DATA_COLUMN + month.index}
+                >
+                  <strong>{month.month}</strong>
+                </Cell>
+              ))}
+              {data.weeks.map((week, idx) => (
+                <Cell
+                  key={idx}
+                  className="planning--scale text-center planning--small"
+                  row={2}
+                  column={FIRST_DATA_COLUMN + idx}
+                >
+                  {week.week}
+                </Cell>
+              ))}
+              {data.weeks.map((week, idx) => (
+                <Cell
+                  key={idx}
+                  className="planning--scale text-center planning--smaller"
+                  row={3}
+                  column={FIRST_DATA_COLUMN + idx}
+                >
+                  {week.period}
+                </Cell>
+              ))}
+              {data.external_view || (
+                <>
+                  <TotalByWeek
+                    by_week={data.by_week}
+                    title={gettext("Planned hours per week")}
+                  />
+                  <TotalByWeek
+                    by_week={data.by_week_provisional}
+                    title={gettext("Of which provisional")}
+                  />
+                  {data.capacity && <Capacity {...data.capacity} />}
+                </>
+              )}
+            </div>
+          </RowContext.Provider>
+
+          {data.projects_offers.map((project) => (
+            <Project
+              key={project.project.id}
+              {...project}
+              external_view={data.external_view}
+              collapse={collapse.includes(project.project.id)}
+              toggleCollapse={() => {
+                toggleCollapse(project.project.id)
+              }}
+            />
+          ))}
+
+          <Absences absences={data.absences} />
+
+          {drag?.kind === "create" ? (
+            <Cell
+              row={drag.row}
+              column={FIRST_DATA_COLUMN + drag.from}
+              colspan={`span ${1 + drag.to - drag.from}`}
+              className="planning--range is-create-preview"
+            />
+          ) : null}
+        </div>
+        {status ? (
+          <div
+            className={`planning--status alert alert-${status.level}`}
+            role="status"
+          >
+            {status.text}
+            {status.level === "info" ? null : (
+              <button
+                type="button"
+                className="btn-close ms-3"
+                aria-label={gettext("Close")}
+                onClick={() => setStatus(null)}
+              />
             )}
           </div>
-        </RowContext.Provider>
-
-        {data.projects_offers.map((project) => (
-          <Project
-            key={project.project.id}
-            {...project}
-            external_view={data.external_view}
-            collapse={collapse.includes(project.project.id)}
-            toggleCollapse={() => {
-              toggleCollapse(project.project.id)
-            }}
-          />
-        ))}
-
-        <Absences absences={data.absences} />
-      </div>
-    </RowContext.Provider>
+        ) : null}
+      </RowContext.Provider>
+    </DragContext.Provider>
   )
+}
+
+// Pressing and dragging in rows of projects, offers and milestones selects
+// weeks for new planned work, see usePlanningDrag()
+const CreateZone = ({ row, url }) => {
+  const { weeks, editable } = useContext(DragContext)
+  return editable && url ? (
+    <Cell
+      row={row}
+      column={FIRST_DATA_COLUMN}
+      colspan={`span ${weeks}`}
+      className="planning--create-zone"
+      title={gettext("Drag to plan work in these weeks")}
+      data-create-url={url}
+      data-row={row}
+    />
+  ) : null
 }
 
 function TotalByWeek({ by_week, title }) {
@@ -422,6 +528,9 @@ function Project({
           {fixed(project.planned_hours, 0)}h
         </Cell>
       )}
+      {project.is_closed ? null : (
+        <CreateZone row={row} url={project.creatework} />
+      )}
       {external_view ||
         by_week.map((hours, idx) => {
           hours = Number.parseFloat(hours)
@@ -447,7 +556,16 @@ function Project({
           {project.milestones ? <Milestones project={project} /> : null}
           {external_work && <ExternalExpenses {...{ external_work }} />}
           {offers?.map((offer, idx) => (
-            <Offer key={idx} {...offer} external_view={external_view} />
+            <Offer
+              key={idx}
+              {...offer}
+              external_view={external_view}
+              createUrl={
+                project.is_closed || offer.offer.is_declined
+                  ? null
+                  : offer.offer.creatework || project.creatework
+              }
+            />
           ))}
         </>
       )}
@@ -525,14 +643,18 @@ const Milestones = ({ project }) => {
         {gettext("milestones")}
       </Cell>
       {project.milestones.map((m) => (
-        <Milestone key={m.id} m={m} />
+        <Milestone
+          key={m.id}
+          m={m}
+          createUrl={project.is_closed ? null : m.creatework}
+        />
       ))}
     </>
   )
 }
 
 // A component of its own so that the rows of its work follow the milestone
-const Milestone = ({ m }) => {
+const Milestone = ({ m, createUrl }) => {
   const ctx = useContext(RowContext)
   const row = ctx.next()
   return (
@@ -541,6 +663,7 @@ const Milestone = ({ m }) => {
         style={{ gridRow: row, gridColumn: "1 / -1" }}
         className="planning--milestones"
       />
+      <CreateZone row={row} url={createUrl} />
       <Cell
         row={row}
         column={1}
@@ -611,7 +734,7 @@ const Milestone = ({ m }) => {
   )
 }
 
-function Offer({ offer, external_view, work_list }) {
+function Offer({ offer, external_view, work_list, createUrl }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
 
@@ -663,6 +786,7 @@ function Offer({ offer, external_view, work_list }) {
       >
         {offer.range}
       </Cell>
+      <CreateZone row={row} url={createUrl} />
       {external_view || (
         <Cell row={row} column={4} className="planning--small text-end">
           {fixed(offer.planned_hours, 0)}h
@@ -686,6 +810,22 @@ const offerClassName = (offer) =>
 function Work({ work, hours_per_week, absences, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
+  const { drag, editable, mondays } = useContext(DragContext)
+  const dragged = drag?.kind === "work" && drag.id === work.id
+
+  if (dragged) {
+    // Preview of the new weeks while dragging
+    const weeks = new Set(drag.weeks)
+    hours_per_week = mondays.map((monday) => (weeks.has(monday) ? 1 : 0))
+  }
+  // Edges of work continuing outside the visible weeks cannot be dragged
+  const resizable = (range) => ({
+    start: editable && (range.start > 0 || work.weeks[0] >= mondays[0]),
+    end:
+      editable &&
+      (range.start + range.length < mondays.length ||
+        work.weeks[work.weeks.length - 1] <= mondays[mondays.length - 1]),
+  })
 
   return (
     <>
@@ -702,11 +842,7 @@ function Work({ work, hours_per_week, absences, isEven }) {
           work.is_provisional ? "is-provisional" : ""
         } ${offerClassName(work.offer)} planning--small ps-5`}
       >
-        <a
-          href={work.url}
-          data-ajaxmodal
-          title={work.offer ? work.offer.title : undefined}
-        >
+        <a href={work.url} data-ajaxmodal>
           {work.title}
         </a>
       </Cell>
@@ -766,14 +902,30 @@ function Work({ work, hours_per_week, absences, isEven }) {
             colspan={`span ${range.length}`}
             className={`planning--range planning--small is-pw ${
               work.is_provisional ? "is-provisional" : ""
-            } st-${work.service_type_id}`}
+            } st-${work.service_type_id}${editable ? " is-draggable" : ""}${
+              dragged ? " is-dragged" : ""
+            }`}
             style={milestoneColorStyle(work.color)}
             tag="a"
             href={work.url}
             data-ajaxmodal
             title={work.tooltip}
+            draggable={false}
+            {...(editable
+              ? {
+                  "data-work-id": work.id,
+                  "data-range-start": range.start,
+                  "data-range-end": range.start + range.length - 1,
+                }
+              : {})}
           >
+            {resizable(range).start ? (
+              <span className="planning--resize is-start" data-resize="start" />
+            ) : null}
             <span className="no-pr">{work.text}</span>
+            {resizable(range).end ? (
+              <span className="planning--resize is-end" data-resize="end" />
+            ) : null}
           </Cell>
         ))}
       {absences.length > 0 &&

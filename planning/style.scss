@@ -402,3 +402,78 @@
     color: var(--bs-danger);
   }
 }
+
+// Dragging, see drag.js
+.planning--ruler {
+  pointer-events: none;
+}
+
+.planning--create-zone {
+  cursor: cell;
+}
+
+.planning--range {
+  &.is-draggable {
+    cursor: grab;
+  }
+
+  &.is-dragged {
+    opacity: 0.8;
+    outline: 2px solid var(--bs-body-color);
+    outline-offset: -1px;
+  }
+
+  &.is-create-preview {
+    background-color: color-mix(in srgb, var(--bs-primary) 35%, transparent);
+    border: 2px dashed var(--bs-primary);
+    pointer-events: none;
+  }
+}
+
+// Grab the edges of planned work to make it longer or shorter
+.planning--resize {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+
+  &.is-start {
+    left: 0;
+  }
+  &.is-end {
+    right: 0;
+  }
+
+  .planning--range:hover > & {
+    background-color: color-mix(in srgb, var(--bs-body-color) 25%, transparent);
+  }
+  .planning--range:hover > &.is-start {
+    border-radius: 4px 0 0 4px;
+  }
+  .planning--range:hover > &.is-end {
+    border-radius: 0 4px 4px 0;
+  }
+}
+
+body.planning-dragging {
+  user-select: none;
+
+  .planning,
+  .planning * {
+    cursor: grabbing !important;
+  }
+}
+
+.planning--status {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  max-width: min(40rem, calc(100vw - 2rem));
+  margin: 0;
+  box-shadow: var(--wb-shadow);
+}

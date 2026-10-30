@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 23:31+0100\n"
+"POT-Creation-Date: 2026-10-30 23:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3181,10 +3181,6 @@ msgid "Status"
 msgstr "Status"
 
 #: workbench/planning/xlsx.py
-msgid "Milestone"
-msgstr "Meilenstein"
-
-#: workbench/planning/xlsx.py
 msgid "Provisional"
 msgstr "Provisorisch"
 
@@ -3195,6 +3191,10 @@ msgstr "Geplante Arbeit"
 #: workbench/planning/xlsx.py
 msgid "External Work"
 msgstr "Kundenarbeit"
+
+#: workbench/planning/xlsx.py
+msgid "Milestone"
+msgstr "Meilenstein"
 
 #: workbench/planning/xlsx.py workbench/templates/reporting/squeeze.html
 msgid "Project"
@@ -4242,6 +4242,7 @@ msgstr[0] "%(count)s Organisation"
 msgstr[1] "%(count)s Organisationen"
 
 #: workbench/templates/contacts/group_list.html
+#, python-format
 msgid "%(count)s archived"
 msgid_plural "%(count)s archived"
 msgstr[0] "%(count)s archiviert"
@@ -4252,6 +4253,7 @@ msgid "archived"
 msgstr "archiviert"
 
 #: workbench/templates/contacts/object_list.html
+#, python-format
 msgid "This group also contains %(count)s archived contact."
 msgid_plural "This group also contains %(count)s archived contacts."
 msgstr[0] "Diese Gruppe enthält zusätzlich %(count)s archivierten Kontakt."
