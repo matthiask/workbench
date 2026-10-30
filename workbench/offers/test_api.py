@@ -249,4 +249,8 @@ class OffersAPITest(TestCase):
         self.assertEqual(ids(f"?q={other.project.code}"), [other.pk])
         self.assertEqual(ids("?status=declined"), [other.pk])
         self.assertEqual(ids("?owned_by=AB"), [relaunch.pk])
+        self.assertEqual(ids(f"?project={other.project_id}"), [other.pk])
+        self.assertEqual(
+            ids(f"?customer={relaunch.project.customer_id}"), [relaunch.pk]
+        )
         self.assertEqual(self.client.get("/api/offers/?status=nope").status_code, 422)

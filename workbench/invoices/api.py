@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Literal
 
 from django.shortcuts import get_object_or_404
-from ninja import Query, Router, Schema
+from ninja import Field, Query, Router, Schema
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
@@ -67,6 +67,7 @@ def invoice_out(invoice, request):
 
 
 class InvoiceFilter(Schema):
+    q: str = ""
     project: int | None = None
     customer: int | None = None
     status: Literal["in_preparation", "sent", "paid", "canceled"] | None = None
@@ -94,6 +95,8 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
         invoices = invoices.overdue()
     if filters.invoiced_since:
         invoices = invoices.filter(invoiced_on__gte=filters.invoiced_since)
+    if filters.q:
+        invoices = invoices.search(filters.q)
     return [
         invoice_out(invoice, request)
         for invoice in invoices.order_by("-invoiced_on", "-pk")[:200]
@@ -112,6 +115,7 @@ def invoice_detail(request, invoice_id: int):
 
 
 class ProjectedInvoiceOut(Schema):
+    project: str = Field(alias="project.code")
     invoiced_on: dt.date
     gross_margin: Decimal
     description: str
@@ -124,4 +128,26 @@ def projected_invoice_list(request, project_id: int):
     """Planned invoicing of the project (gross margin, third party costs are
     not included)"""
     project = get_object_or_404(Project, pk=project_id)
-    return ProjectedInvoice.objects.filter(project=project)
+    return ProjectedInvoice.objects.filter(project=project).select_related("project")
+
+
+class ProjectedInvoiceFilter(Schema):
+    project: int | None = None
+    customer: int | None = None
+    invoiced_since: dt.date | None = None
+    invoiced_until: dt.date | None = None
+
+
+@router.get("/projected-invoices/", response=list[ProjectedInvoiceOut])
+def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter]):
+    """Planned invoicing of all projects, oldest first, at most 200"""
+    projected = ProjectedInvoice.objects.select_related("project")
+    if filters.project:
+        projected = projected.filter(project=filters.project)
+    if filters.customer:
+        projected = projected.filter(project__customer=filters.customer)
+    if filters.invoiced_since:
+        projected = projected.filter(invoiced_on__gte=filters.invoiced_since)
+    if filters.invoiced_until:
+        projected = projected.filter(invoiced_on__lte=filters.invoiced_until)
+    return projected.order_by("invoiced_on", "pk")[:200]

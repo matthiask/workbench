@@ -17,12 +17,19 @@ class ProjectsAPITest(TestCase):
 
     def test_project_list(self):
         """Projects can be searched"""
-        project = factories.ProjectFactory.create(title="Relaunch")
-        factories.ProjectFactory.create(title="Other")
+        project = factories.ProjectFactory.create(
+            title="Relaunch",
+            owned_by=factories.UserFactory.create(_short_name="ab"),
+        )
+        other = factories.ProjectFactory.create(title="Other")
         self.client.force_login(project.owned_by)
 
-        data = self.client.get("/api/projects/?q=relaunch").json()
-        self.assertEqual([p["id"] for p in data], [project.pk])
+        def ids(query=""):
+            return {p["id"] for p in self.client.get(f"/api/projects/{query}").json()}
+
+        self.assertEqual(ids("?q=relaunch"), {project.pk})
+        self.assertEqual(ids(f"?customer={other.customer_id}"), {other.pk})
+        self.assertEqual(ids("?owned_by=AB"), {project.pk})
 
     def test_stats(self):
         """Statistics of the selected projects"""

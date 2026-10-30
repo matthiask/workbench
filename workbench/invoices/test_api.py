@@ -46,6 +46,7 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(ids("?overdue=true"), {sent.pk})
         self.assertEqual(ids("?status=paid"), {paid.pk})
         self.assertEqual(ids("?invoiced_since=2026-01-01"), {sent.pk})
+        self.assertEqual(ids(f"?q={paid.code}"), {paid.pk})
         self.assertEqual(self.client.get("/api/invoices/?status=nope").status_code, 422)
 
         data = self.client.get(f"/api/invoices/{sent.pk}/").json()
@@ -70,9 +71,47 @@ class InvoicesAPITest(TestCase):
             data,
             [
                 {
+                    "project": project.code,
                     "invoiced_on": in_days(30).isoformat(),
                     "gross_margin": "1000.00",
                     "description": "Kick-off",
                 }
             ],
+        )
+
+    def test_projected_invoices_search(self):
+        """The planned invoicing of all projects can be filtered"""
+        later = factories.ProjectedInvoiceFactory.create(
+            invoiced_on=in_days(60), gross_margin=1000
+        )
+        sooner = factories.ProjectedInvoiceFactory.create(
+            invoiced_on=in_days(30), gross_margin=2000
+        )
+        self.client.force_login(later.project.owned_by)
+
+        def rows(query=""):
+            return [
+                (row["project"], row["gross_margin"])
+                for row in self.client.get(f"/api/projected-invoices/{query}").json()
+            ]
+
+        self.assertEqual(
+            rows(),
+            [(sooner.project.code, "2000.00"), (later.project.code, "1000.00")],
+        )
+        self.assertEqual(
+            rows(f"?project={later.project.pk}"),
+            [(later.project.code, "1000.00")],
+        )
+        self.assertEqual(
+            rows(f"?customer={sooner.project.customer_id}"),
+            [(sooner.project.code, "2000.00")],
+        )
+        self.assertEqual(
+            rows(f"?invoiced_since={in_days(45).isoformat()}"),
+            [(later.project.code, "1000.00")],
+        )
+        self.assertEqual(
+            rows(f"?invoiced_until={in_days(45).isoformat()}"),
+            [(sooner.project.code, "2000.00")],
         )

@@ -52,13 +52,24 @@ def project_out(project, request):
     }
 
 
+class ProjectFilter(Schema):
+    q: str = ""
+    customer: int | None = None
+    owned_by: str | None = None
+    include_closed: bool = False
+
+
 @router.get("/projects/", response=list[ProjectOut])
-def project_list(request, q: str = "", *, include_closed: bool = False):
+def project_list(request, filters: Query[ProjectFilter]):
     """Search projects, open projects only by default"""
     projects = Project.objects.select_related("customer", "owned_by")
-    if not include_closed:
+    if not filters.include_closed:
         projects = projects.open()
-    if q:
+    if filters.customer:
+        projects = projects.filter(customer=filters.customer)
+    if filters.owned_by:
+        projects = projects.filter(owned_by___short_name__iexact=filters.owned_by)
+    if q := filters.q:
         projects = projects.search(q)
     return [project_out(project, request) for project in projects[:50]]
 

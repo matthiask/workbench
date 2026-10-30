@@ -192,6 +192,8 @@ class OfferFilter(Schema):
         Literal["in_preparation", "service_group", "offered", "accepted", "declined"]
         | None
     ) = None
+    project: int | None = None
+    customer: int | None = None
     owned_by: str | None = None
 
 
@@ -199,6 +201,10 @@ class OfferFilter(Schema):
 def offer_list_search(request, filters: Query[OfferFilter]):
     """Search offers, newest first, at most 50"""
     offers = Offer.objects.select_related("project").prefetch_related("services")
+    if filters.project:
+        offers = offers.filter(project=filters.project)
+    if filters.customer:
+        offers = offers.filter(project__customer=filters.customer)
     if filters.status:
         offers = offers.filter(status=OFFER_STATUSES[filters.status])
     if filters.owned_by:
