@@ -32,3 +32,34 @@ class ContactsAPITest(TestCase):
             f"/api/contacts/people/?organization={organization.pk}"
         ).json()
         self.assertEqual([p["id"] for p in data], [person.pk])
+
+    def test_detail(self):
+        """Organizations and people with their contact details"""
+        person = factories.PersonFactory.create(
+            given_name="Hans",
+            family_name="Muster",
+            organization=factories.OrganizationFactory.create(),
+        )
+        person.emailaddresses.create(type="work", email="hans@example.com")
+        person.phonenumbers.create(phone_number="+41 44 123 45 67")
+        self.client.force_login(factories.UserFactory.create())
+
+        data = self.client.get(
+            f"/api/contacts/organizations/{person.organization_id}/"
+        ).json()
+        self.assertEqual(data["name"], person.organization.name)
+        self.assertEqual(
+            data["people"],
+            [{"id": person.pk, "full_name": "Hans Muster", "is_archived": False}],
+        )
+
+        data = self.client.get(f"/api/contacts/people/{person.pk}/").json()
+        self.assertEqual(data["full_name"], "Hans Muster")
+        self.assertEqual(data["organization"]["id"], person.organization_id)
+        self.assertEqual(
+            data["email_addresses"], [{"type": "work", "value": "hans@example.com"}]
+        )
+        self.assertEqual(data["phone_numbers"][0]["value"], "+41 44 123 45 67")
+        self.assertEqual(data["url"], f"http://testserver{person.get_absolute_url()}")
+
+        self.assertEqual(self.client.get("/api/contacts/people/0/").status_code, 404)
