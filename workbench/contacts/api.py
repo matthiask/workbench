@@ -177,7 +177,13 @@ class PostalAddressIn(Schema):
     country: str = Field(default="CH", description="ISO 3166-1 alpha-2 code.")
 
 
-class PersonIn(Schema):
+class DetailsIn(Schema):
+    email_addresses: list[EmailAddressIn] = []
+    phone_numbers: list[PhoneNumberIn] = []
+    postal_addresses: list[PostalAddressIn] = []
+
+
+class PersonIn(DetailsIn):
     given_name: str = Field(min_length=1, max_length=100)
     family_name: str = Field(min_length=1, max_length=100)
     address: str = Field(
@@ -203,9 +209,6 @@ class PersonIn(Schema):
         min_length=1,
         description="Name of an organization to create with the person.",
     )
-    email_addresses: list[EmailAddressIn] = []
-    phone_numbers: list[PhoneNumberIn] = []
-    postal_addresses: list[PostalAddressIn] = []
 
 
 class PersonCreated(PersonDetailOut):
@@ -223,21 +226,27 @@ def person_context(request):
     return {"import_schema": PersonIn.model_json_schema()}
 
 
+def _email_errors(data):
+    """Email addresses are never used twice"""
+    return [
+        {
+            "loc": ["body", "data", "email_addresses", index, "email"],
+            "msg": _("Already used by %(person)s (ID %(id)s).")
+            % {"person": existing.person, "id": existing.person_id},
+        }
+        for index, item in enumerate(data.email_addresses)
+        for existing in EmailAddress.objects.filter(
+            email__iexact=item.email
+        ).select_related("person")
+    ]
+
+
 def _duplicates(data, *, allow_duplicates):
-    errors = []
+    errors = _email_errors(data)
 
     def error(loc, msg):
         errors.append({"loc": ["body", "data", *loc], "msg": msg})
 
-    for index, item in enumerate(data.email_addresses):
-        for existing in EmailAddress.objects.filter(
-            email__iexact=item.email
-        ).select_related("person"):
-            error(
-                ["email_addresses", index, "email"],
-                _("Already used by %(person)s (ID %(id)s).")
-                % {"person": existing.person, "id": existing.person_id},
-            )
     if allow_duplicates:
         return errors
     for person in Person.objects.active().filter(
@@ -266,16 +275,28 @@ def _duplicates(data, *, allow_duplicates):
     return errors
 
 
-def _details(data):
-    """Unsaved email addresses, phone numbers and postal addresses"""
+def _details(data, errors):
+    """Validated, unsaved email addresses, phone numbers and postal
+    addresses"""
+    details = []
     for key, model, items in [
         ("email_addresses", EmailAddress, data.email_addresses),
         ("phone_numbers", PhoneNumber, data.phone_numbers),
         ("postal_addresses", PostalAddress, data.postal_addresses),
     ]:
         for index, item in enumerate(items):
-            fields = item.dict(exclude_none=True)
-            yield ["body", "data", key, index], model(**fields)
+            detail = model(**item.dict(exclude_none=True))
+            full_clean(detail, ["body", "data", key, index], errors, exclude=["person"])
+            details.append(detail)
+    return details
+
+
+def _save_details(person, details):
+    for detail in details:
+        detail.person = person
+        detail.save()
+    # Update the search index with the details
+    person.save()
 
 
 @router.post("/contacts/people/", response=PersonCreated)
@@ -297,9 +318,7 @@ def person_create(
         })
     errors.extend(_duplicates(data, allow_duplicates=allow_duplicates))
 
-    details = list(_details(data))
-    for loc, detail in details:
-        full_clean(detail, loc, errors, exclude=["person"])
+    details = _details(data, errors)
 
     with transaction.atomic():
         organization = data.organization
@@ -330,14 +349,44 @@ def person_create(
             raise ValidationError(errors)
 
         person = form.save()
-        for _loc, detail in details:
-            detail.person = person
-            detail.save()
-        # Update the search index with the details
-        person.save()
+        _save_details(person, details)
 
         result = person_out(person, request)
         if dry_run:
             transaction.set_rollback(True)
             result |= {"id": None, "url": None}
+    return result
+
+
+@router.post("/contacts/people/{int:person_id}/details/", response=PersonCreated)
+def person_add_details(
+    request, person_id: int, data: DetailsIn, *, dry_run: bool = False
+):
+    """Add email addresses, phone numbers and postal addresses to a person
+
+    Never changes or removes existing details. Email addresses which are
+    already in use and phone numbers the person has already are rejected."""
+    person = get_object_or_404(
+        Person.objects.select_related("organization", "primary_contact"), pk=person_id
+    )
+    errors = _email_errors(data)
+    details = _details(data, errors)
+    numbers = set(person.phonenumbers.values_list("phone_number", flat=True))
+    errors.extend(
+        {
+            "loc": ["body", "data", "phone_numbers", index, "phone_number"],
+            "msg": _("%(person)s has this phone number already.") % {"person": person},
+        }
+        for index, detail in enumerate(d for d in details if isinstance(d, PhoneNumber))
+        # Phone numbers have been normalized by full_clean()
+        if detail.phone_number in numbers
+    )
+    if errors:
+        raise ValidationError(errors)
+
+    with transaction.atomic():
+        _save_details(person, details)
+        result = person_out(person, request)
+        if dry_run:
+            transaction.set_rollback(True)
     return result

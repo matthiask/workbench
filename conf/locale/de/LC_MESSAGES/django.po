@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 09:06+0100\n"
+"POT-Creation-Date: 2026-10-30 09:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -921,6 +921,11 @@ msgstr "%(organization)s (ID %(id)s) existiert bereits. Verwende ihre ID oder er
 #: workbench/contacts/api.py
 msgid "Either use an existing organization or create a new one."
 msgstr "Verwende entweder eine existierende Organisation oder erstelle eine neue."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "%(person)s has this phone number already."
+msgstr "%(person)s hat diese Telefonnummer bereits."
 
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html

@@ -164,3 +164,45 @@ class ContactsAPITest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         data = self.client.get("/api/contacts/people/context/").json()
         self.assertIn("salutation", data["import_schema"]["properties"])
+
+    def test_add_details(self):
+        """Details are added to existing people, never changed or removed"""
+        person = factories.PersonFactory.create()
+        person.phonenumbers.create(phone_number="+41791234567")
+        person.emailaddresses.create(email="hans@example.com")
+        self.client.force_login(factories.UserFactory.create())
+        url = f"/api/contacts/people/{person.pk}/details/"
+
+        response = self.client.post(
+            url,
+            {
+                "email_addresses": [{"email": "HANS@example.com"}],
+                "phone_numbers": [{"phone_number": "079 123 45 67"}],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"][2:] for e in response.json()["detail"]],
+            [["email_addresses", 0, "email"], ["phone_numbers", 0, "phone_number"]],
+        )
+
+        details = {
+            "phone_numbers": [{"type": "work", "phone_number": "044 123 45 67"}],
+            "postal_addresses": [
+                {"street": "Bahnhofstrasse", "postal_code": "8001", "city": "Zürich"}
+            ],
+        }
+        response = self.client.post(
+            f"{url}?dry_run=true", details, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(len(response.json()["phone_numbers"]), 2)
+        self.assertEqual(person.phonenumbers.count(), 1)
+
+        response = self.client.post(url, details, content_type="application/json")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(person.phonenumbers.count(), 2)
+        self.assertEqual(person.postaladdresses.count(), 1)
+        person.refresh_from_db()
+        self.assertIn("+41441234567", person._fts)
