@@ -3,27 +3,25 @@
 {% block title %}{{ object }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <h1>{{ object|h }} {% history_link object %}</h1>
-      <ul class="nav nav-tabs my-3">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ user.urls.detail }}">{% translate 'user'|capfirst %}</a>
-        </li>
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{{ object|h }} {% history_link object %}</h1>
+      <nav class="nav wb-subnav">
+        <a
+          class="nav-link {% if request.path == user.urls.detail %}active{% endif %}"
+          href="{{ user.urls.detail }}"
+        >{% translate 'user'|capfirst %}</a>
         {% mark_current request.path %}
         {% if request.user.features.PLANNING %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ user.urls.planning }}">{% translate 'Planning' %}</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ user.urls.retrospective }}">{% translate 'Retrospective' %}</a>
-          </li>
+          <a class="nav-link" href="{{ user.urls.planning }}">{% translate 'Planning' %}</a>
+          <a class="nav-link" href="{{ user.urls.retrospective }}">{% translate 'Retrospective' %}</a>
         {% endif %}
-        <li class="nav-item">
-          <a class="nav-link" href="{{ user.urls.statistics }}">{% translate 'Statistics' %}</a>
-        </li>
+        <a class="nav-link" href="{{ user.urls.statistics }}">{% translate 'Statistics' %}</a>
         {% endmark_current %}
-      </ul>
+      </nav>
+    </div>
+    <div class="wb-page-actions">
+      {% block actions %}{% endblock %}
     </div>
   </div>
   {% block inner_content %}{% endblock %}

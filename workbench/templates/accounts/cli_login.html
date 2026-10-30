@@ -3,35 +3,39 @@
 {% block title %}{% translate 'Authorize wb' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <h1>{% translate 'Authorize wb' %}</h1>
-      <p>
-        {% if name %}
-          {% blocktranslate trimmed %}
-            The <code>wb</code> command line interface on <strong>{{ name }}</strong> wants to access Workbench in your
-            name.
-          {% endblocktranslate %}
-        {% else %}
-          {% blocktranslate trimmed %}
-            The <code>wb</code> command line interface wants to access Workbench in your name.
-          {% endblocktranslate %}
-        {% endif %}
-        {% blocktranslate trimmed %}
-          The access expires after {{ days }} days, <code>wb</code> will ask you to authorize it again.
-        {% endblocktranslate %}
-      </p>
-      <p>
-        {% translate 'access'|capfirst %}: <strong>{{ access.label }}</strong>
-        {% if access == "write" %}
-          ({% translate 'wb can change offers, deals, projects and more in your name.' %})
-        {% endif %}
-      </p>
-      <p>{% translate 'Only continue if you just started wb yourself.' %}</p>
-      <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">{% translate 'Authorize' %}</button>
-      </form>
+  <div class="wb-form-page">
+    <div class="wb-page-header">
+      <h1 class="mb-0">{% translate 'Authorize wb' %}</h1>
     </div>
+    <section class="card mb-3">
+      <div class="card-body">
+        <p>
+          {% if name %}
+            {% blocktranslate trimmed %}
+              The <code>wb</code> command line interface on <strong>{{ name }}</strong> wants to access Workbench in
+              your name.
+            {% endblocktranslate %}
+          {% else %}
+            {% blocktranslate trimmed %}
+              The <code>wb</code> command line interface wants to access Workbench in your name.
+            {% endblocktranslate %}
+          {% endif %}
+          {% blocktranslate trimmed %}
+            The access expires after {{ days }} days, <code>wb</code> will ask you to authorize it again.
+          {% endblocktranslate %}
+        </p>
+        <p>
+          {% translate 'access'|capfirst %}: <strong>{{ access.label }}</strong>
+          {% if access == "write" %}
+            ({% translate 'wb can change offers, deals, projects and more in your name.' %})
+          {% endif %}
+        </p>
+        <p class="text-secondary">{% translate 'Only continue if you just started wb yourself.' %}</p>
+        <form method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">{% translate 'Authorize' %}</button>
+        </form>
+      </div>
+    </section>
   </div>
 {% endblock content %}

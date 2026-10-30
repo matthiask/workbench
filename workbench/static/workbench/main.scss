@@ -841,6 +841,10 @@ a:hover {
     &.wb-stats-5 {
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
+
+    &.wb-stats-8 {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
   }
 }
 

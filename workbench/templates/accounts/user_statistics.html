@@ -5,25 +5,27 @@
 {% endblock title %}
 
 {% block inner_content %}
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <h2 class="mt-4">{% translate 'Hours per week' %}</h2>
+  <div class="wb-stats wb-stats-8 mb-3">
+    {% for row in logged_hours.hours_per_week|slice:"-8:" %}
+      <a href="{{ row.url }}" class="wb-stat wb-stat-link">
+        <div class="wb-stat-label">KW{{ row.week|date:"W" }}</div>
+        <div class="wb-stat-value">{{ row.hours|hours }}</div>
+      </a>
+    {% endfor %}
+  </div>
 
-      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap">
-        {% url 'logbook_loggedhours_list' as base %}
-        {% for row in logged_hours.hours_per_week|slice:"-8:" %}
-          <a href="{{ row.url }}" style="text-align: center">
-            KW{{ row.week|date:"W" }}
-            <h3>{{ row.hours|hours }}</h3>
-          </a>
-        {% endfor %}
-      </div>
-
+  <section class="card mb-3">
+    <div class="card-header">{% translate 'Hours per week' %}</div>
+    <div class="card-body">
       {% translate 'Hours per week' as label %}
       {% include "charts/bar_chart.html" with chart=hours_per_week_chart label=label %}
-      <h2 class="mt-4">{% translate 'Hours per customer' %}</h2>
+    </div>
+  </section>
+  <section class="card mb-3">
+    <div class="card-header">{% translate 'Hours per customer' %}</div>
+    <div class="card-body">
       {% translate 'Hours per customer' as label %}
       {% include "charts/bar_chart.html" with chart=hours_per_customer_chart label=label %}
     </div>
-  </div>
+  </section>
 {% endblock inner_content %}

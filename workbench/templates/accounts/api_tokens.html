@@ -3,32 +3,36 @@
 {% block title %}{% translate 'API tokens' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-      <h1>{% translate 'API tokens' %}</h1>
-      <p>
-        {% blocktranslate trimmed %}
-          API tokens give command line tools like <code>wb</code> access to Workbench in your name. They expire after
-          {{ days }} days. <code>wb login</code> creates tokens through the browser; create them here for computers
-          without a browser.
-        {% endblocktranslate %}
-      </p>
+  <div class="wb-form-page wb-form-page-wide">
+    <div class="wb-page-header">
+      <div class="min-w-0">
+        <h1 class="mb-1">{% translate 'API tokens' %}</h1>
+        <p class="wb-description mb-0">
+          {% blocktranslate trimmed %}
+            API tokens give command line tools like <code>wb</code> access to Workbench in your name. They expire after
+            {{ days }} days. <code>wb login</code> creates tokens through the browser; create them here for computers
+            without a browser.
+          {% endblocktranslate %}
+        </p>
+      </div>
+    </div>
 
-      {% if secret %}
-        <div class="alert alert-success">
-          <p>{% translate 'Copy the token now, it will not be shown again:' %}</p>
-          <code class="user-select-all">{{ secret }}</code>
-        </div>
-      {% endif %}
+    {% if secret %}
+      <div class="alert alert-success">
+        <p>{% translate 'Copy the token now, it will not be shown again:' %}</p>
+        <code class="user-select-all">{{ secret }}</code>
+      </div>
+    {% endif %}
 
-      <table class="table table-striped">
+    <section class="card mb-3 wb-table-card">
+      <table class="table table-sm table-hover mb-0 align-middle">
         <thead>
           <tr>
-            <th>{% translate 'title' %}</th>
-            <th>{% translate 'access' %}</th>
-            <th>{% translate 'created at' %}</th>
-            <th>{% translate 'last used at' %}</th>
-            <th>{% translate 'expires at' %}</th>
+            <th>{% translate 'title'|capfirst %}</th>
+            <th>{% translate 'access'|capfirst %}</th>
+            <th class="text-nowrap">{% translate 'created at'|capfirst %}</th>
+            <th class="text-nowrap">{% translate 'last used at'|capfirst %}</th>
+            <th class="text-nowrap">{% translate 'expires at'|capfirst %}</th>
             <th></th>
           </tr>
         </thead>
@@ -37,42 +41,56 @@
             <tr>
               <td>{{ token.title }}</td>
               <td>{{ token.get_access_display }}</td>
-              <td>{{ token.created_at|date:'SHORT_DATETIME_FORMAT' }}</td>
-              <td>{{ token.last_used_at|date:'SHORT_DATETIME_FORMAT'|default:'-' }}</td>
-              <td>{{ token.expires_at|date:'SHORT_DATETIME_FORMAT' }}</td>
+              <td class="text-nowrap">{{ token.created_at|date:'SHORT_DATETIME_FORMAT' }}</td>
+              <td class="text-nowrap">{{ token.last_used_at|date:'SHORT_DATETIME_FORMAT'|default:'-' }}</td>
+              <td class="text-nowrap">{{ token.expires_at|date:'SHORT_DATETIME_FORMAT' }}</td>
               <td class="text-end">
                 <form method="POST">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-sm btn-outline-danger" name="delete" value="{{ token.pk }}">
-                    {% translate 'Delete' %}
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-quiet btn-icon"
+                    name="delete"
+                    value="{{ token.pk }}"
+                    title="{% translate 'Delete' %}"
+                    aria-label="{% translate 'Delete' %}"
+                  >
+                    {% include 'svg/trashcan.svg' %}
                   </button>
                 </form>
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="6">{% translate 'No API tokens yet.' %}</td></tr>
+            <tr>
+              <td colspan="6" class="text-secondary">{% translate 'No API tokens yet.' %}</td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
+    </section>
 
-      <form method="POST" class="d-flex gap-2">
-        {% csrf_token %}
-        <input
-          type="text"
-          name="title"
-          class="form-control"
-          maxlength="100"
-          required
-          placeholder="{% translate 'title' %}"
-        >
-        <select name="access" class="form-select w-auto" required>
-          <option value="">{% translate 'Access' %}</option>
-          {% for value, label in access_choices %}
-            <option value="{{ value }}">{{ label }}</option>
-          {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-primary text-nowrap">{% translate 'Create token' %}</button>
-      </form>
-    </div>
+    <section class="card mb-3">
+      <div class="card-header">{% translate 'Create token' %}</div>
+      <div class="card-body">
+        <form method="POST" class="d-flex flex-wrap gap-2">
+          {% csrf_token %}
+          <input
+            type="text"
+            name="title"
+            class="form-control w-auto flex-grow-1"
+            maxlength="100"
+            required
+            placeholder="{% translate 'title'|capfirst %}"
+          >
+          <select name="access" class="form-select w-auto" required>
+            <option value="">{% translate 'Access' %}</option>
+            {% for value, label in access_choices %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary text-nowrap">{% translate 'Create token' %}</button>
+        </form>
+      </div>
+    </section>
   </div>
 {% endblock content %}

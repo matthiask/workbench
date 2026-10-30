@@ -1,30 +1,32 @@
 {% extends "accounts/user_base.html" %}
 {% load i18n workbench %}
+{% block actions %}
+  {% if object == request.user %}
+    <a href="{% url 'accounts_update' %}" class="btn btn-primary">{% translate 'Update' %}</a>
+  {% endif %}
+{% endblock actions %}
+
 {% block inner_content %}
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <section class="card">
-        <div class="card-body">
-          <dl class="wb-fields">
-            {% for name, value in object|field_value_pairs:'email,is_active,_short_name,_full_name,language,working_time_model,person' %}
-              <dt>{{ name }}</dt>
-              <dd>{% link_or_none value %}</dd>
-            {% endfor %}
-            {% if user.features.PLANNING %}
-              <dt>{% translate 'planning hours per day'|capfirst %}</dt>
-              <dd>{{ user.planning_hours_per_day|hours }}</dd>
-            {% endif %}
-            <dt>{% translate 'teams'|capfirst %}</dt>
-            <dd>
-              {% for team in object.teams.all %}
-                {% link_or_none team %}{% if not forloop.last %},{% endif %}
-              {% empty %}
-                &ndash;
-              {% endfor %}
-            </dd>
-          </dl>
-        </div>
-      </section>
+  <section class="card">
+    <div class="card-body">
+      <dl class="wb-fields">
+        {% for name, value in object|field_value_pairs:'email,is_active,_short_name,_full_name,language,working_time_model,person' %}
+          <dt>{{ name }}</dt>
+          <dd>{% link_or_none value %}</dd>
+        {% endfor %}
+        {% if user.features.PLANNING %}
+          <dt>{% translate 'planning hours per day'|capfirst %}</dt>
+          <dd>{{ user.planning_hours_per_day|hours }}</dd>
+        {% endif %}
+        <dt>{% translate 'teams'|capfirst %}</dt>
+        <dd>
+          {% for team in object.teams.all %}
+            {% link_or_none team %}{% if not forloop.last %},{% endif %}
+          {% empty %}
+            &ndash;
+          {% endfor %}
+        </dd>
+      </dl>
     </div>
-  </div>
+  </section>
 {% endblock inner_content %}
