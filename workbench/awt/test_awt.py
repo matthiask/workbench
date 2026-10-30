@@ -831,7 +831,10 @@ class AWTTest(TestCase):
             days=1,
             reason=Absence.VACATION,
         )
-        self.assertEqual(str(absence), f"Absence {absence.pretty_period}")
+        self.assertEqual(
+            str(absence),
+            f"Absence {absence.pretty_period} ({absence.user.get_short_name()})",
+        )
 
     def test_clear_sickness_descriptions(self):
         """Descriptions of old sickness absences are cleared, their history too"""
@@ -866,3 +869,63 @@ class AWTTest(TestCase):
         actions = LoggedAction.objects.for_model(Absence)
         self.assertFalse(actions.with_data(id=old.pk).exists())
         self.assertTrue(actions.with_data(id=recent.pk).exists())
+
+    @override_settings(FEATURES={FEATURES.WORKING_TIME_CORRECTION: F.USER})
+    def test_paid_leave_confirmation(self):
+        """Paid leave entered by others counts, but is confirmed by people
+        correcting working time"""
+        user = factories.UserFactory.create()
+        hr = factories.UserFactory.create()
+        hr._features.append(FEATURES.WORKING_TIME_CORRECTION)
+        hr.save()
+
+        def create(by, reason=Absence.PAID):
+            self.client.force_login(by)
+            response = self.client.post(
+                Absence.urls["create"],
+                {
+                    "modal-user": user.pk,
+                    "modal-starts_on": dt.date.today().isoformat(),
+                    "modal-days": 1,
+                    "modal-reason": reason,
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+            self.assertEqual(response.status_code, 201)
+            return Absence.objects.latest("pk")
+
+        absence = create(user)
+        self.assertTrue(absence.needs_confirmation)
+        self.assertEqual(list(Absence.objects.unconfirmed()), [absence])
+        self.assertFalse(create(user, Absence.VACATION).needs_confirmation)
+        self.assertFalse(create(hr).needs_confirmation)
+
+        # Only people correcting working time confirm
+        self.client.force_login(user)
+        self.client.post(absence.urls["confirm"])
+        absence.refresh_from_db()
+        self.assertTrue(absence.needs_confirmation)
+
+        self.client.force_login(hr)
+        response = self.client.get("/")
+        self.assertContains(response, "Unconfirmed paid leave")
+        self.client.post(absence.urls["confirm"])
+        absence.refresh_from_db()
+        self.assertFalse(absence.needs_confirmation)
+        self.assertEqual(absence.confirmed_by, hr)
+
+        # Changes by others need another confirmation
+        self.client.force_login(user)
+        response = self.client.post(
+            absence.urls["update"],
+            {
+                "modal-user": user.pk,
+                "modal-starts_on": dt.date.today().isoformat(),
+                "modal-days": 2,
+                "modal-reason": Absence.PAID,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        absence.refresh_from_db()
+        self.assertTrue(absence.needs_confirmation)

@@ -12,6 +12,7 @@ from django.utils.translation import gettext as _
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
+from workbench.awt.models import Absence
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedHours
@@ -60,6 +61,13 @@ def _needs_action(user):
                 "objects": RecurringInvoice.objects.maybe_actionable(),
             },
         ))
+    if user.features[FEATURES.WORKING_TIME_CORRECTION]:
+        rows.append({
+            "type": "unconfirmed_absences",
+            "verbose_name_plural": _("Unconfirmed paid leave"),
+            "url": Absence.urls["list"] + "?s=unconfirmed",
+            "objects": Absence.objects.unconfirmed().select_related("user"),
+        })
     rows.append({
         "type": "old_projects",
         "verbose_name_plural": _("Old projects"),

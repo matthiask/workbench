@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:10+0100\n"
+"POT-Creation-Date: 2026-10-30 22:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -509,6 +509,19 @@ msgstr "Suche"
 msgid "All reasons"
 msgstr "Alle Gründe"
 
+#: workbench/awt/forms.py workbench/credit_control/forms.py
+#: workbench/deals/forms.py workbench/invoices/forms.py
+#: workbench/offers/forms.py
+msgid "All states"
+msgstr "Alle Stati"
+
+#: workbench/awt/forms.py workbench/awt/pdf.py
+#: workbench/templates/awt/absence_detail.html
+#: workbench/templates/awt/absence_list.html
+#: workbench/templates/awt/year_detail.html
+msgid "Unconfirmed"
+msgstr "Unbestätigt"
+
 #: workbench/awt/forms.py
 msgid "Enter hours"
 msgstr "Stunden eingeben"
@@ -726,6 +739,14 @@ msgstr "sind Ferien"
 msgid "is working time"
 msgstr "ist Arbeitszeit"
 
+#: workbench/awt/models.py
+msgid "confirmed at"
+msgstr "bestätigt am"
+
+#: workbench/awt/models.py
+msgid "confirmed by"
+msgstr "bestätigt von"
+
 #: workbench/awt/models.py workbench/awt/views.py workbench/planning/updates.py
 #: workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
@@ -924,6 +945,10 @@ msgstr "Generiert am %(day)s"
 #: workbench/awt/views.py
 msgid "Filter invalid, no absences available."
 msgstr "Filter ungültig, keine Abwesenheiten verfügbar."
+
+#: workbench/awt/views.py
+msgid "The absence has been confirmed."
+msgstr "Die Abwesenheit wurde bestätigt."
 
 #: workbench/cli_version.py
 msgid "Your wb is too old for this Workbench, please upgrade it: uv tool upgrade workbench-cli"
@@ -1175,11 +1200,6 @@ msgstr "Zu Person springen"
 #: workbench/credit_control/apps.py
 msgid "credit control"
 msgstr "Debitorenmanagement"
-
-#: workbench/credit_control/forms.py workbench/deals/forms.py
-#: workbench/invoices/forms.py workbench/offers/forms.py
-msgid "All states"
-msgstr "Alle Stati"
 
 #: workbench/credit_control/forms.py
 msgid "Pending"
@@ -3963,6 +3983,14 @@ msgstr "Hinweis auf Jubiläum"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
+#: workbench/templates/awt/absence_detail.html
+msgid "confirmed"
+msgstr "bestätigt"
+
+#: workbench/templates/awt/absence_detail.html
+msgid "Confirm"
+msgstr "Bestätigen"
+
 #: workbench/templates/awt/awt_warning_mail.txt
 msgid "Annual working time warnings"
 msgstr "Arbeitszeit-Warnungen"
@@ -5508,6 +5536,10 @@ msgstr "Stunden insgesamt"
 #: workbench/views.py
 msgid "Provisional planned work in the near future"
 msgstr "Provisorische geplante Arbeiten in näherer Zukunft"
+
+#: workbench/views.py
+msgid "Unconfirmed paid leave"
+msgstr "Unbestätigter bezahlter Urlaub"
 
 #: workbench/views.py
 msgid "Old projects"

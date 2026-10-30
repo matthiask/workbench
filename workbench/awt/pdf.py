@@ -281,7 +281,21 @@ def user_stats_pdf(data):
             ("absence_correction", _("Working time correction")),
         ]:
             table = [
-                [absence.pretty_period, days(absence.days), absence.description]
+                [
+                    absence.pretty_period,
+                    days(absence.days),
+                    " ".join(
+                        filter(
+                            None,
+                            [
+                                absence.description,
+                                f"({_('Unconfirmed')})"
+                                if absence.needs_confirmation
+                                else "",
+                            ],
+                        )
+                    ),
+                ]
                 for absence in data["absences"][key]
             ]
             if table:

@@ -129,7 +129,9 @@ const Absence = ({ absence, person }) => {
     <a
       href={`/absences/${absence.id}/`}
       data-ajaxmodal
-      className={`absence absence--${absence.reason}`}
+      className={`absence absence--${absence.reason}${
+        absence.isConfirmed ? "" : " absence--unconfirmed"
+      }`}
       style={style}
       title={label(absence)}
       onMouseEnter={() => {
@@ -147,7 +149,13 @@ const Absence = ({ absence, person }) => {
 
 // Descriptions are optional, and hidden for the sickness of others
 const label = (absence) =>
-  [absence.reasonDisplay, absence.description].filter(Boolean).join(" – ")
+  [
+    absence.reasonDisplay,
+    absence.description,
+    absence.isConfirmed ? "" : gettext("Unconfirmed"),
+  ]
+    .filter(Boolean)
+    .join(" – ")
 
 const Now = () => {
   const style = {

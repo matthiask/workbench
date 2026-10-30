@@ -1,5 +1,5 @@
 {% extends "generic/object_list.html" %}
-{% load absences workbench %}
+{% load absences i18n workbench %}
 {% block search-form-buttons %}
   {% if request.GET and request.user.features.WORKING_TIME_CORRECTION %}
     <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
@@ -25,6 +25,9 @@
           <span>{{ object.user.get_full_name }}</span>
           <span>{{ object|absence_reason:request.user }}</span>
           <span>{{ object.pretty_status }}</span>
+          {% if object.needs_confirmation %}<span
+              class="badge text-bg-warning"
+            >{% translate 'Unconfirmed' %}</span>{% endif %}
         </div>
       </div>
     </a>

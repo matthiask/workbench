@@ -42,6 +42,9 @@ class AbsenceOut(Schema):
     days: Decimal
     reason: str
     description: str
+    is_confirmed: bool = Field(
+        description="False for paid leave not checked yet, it counts anyway."
+    )
 
 
 class AbsenceFilter(DateRangeFilter):
@@ -85,6 +88,7 @@ def _absence_out(absence, request):
         "days": absence.days,
         "reason": absence.reason_for(request.user)[1],
         "description": absence.description_for(request.user),
+        "is_confirmed": not absence.needs_confirmation,
     }
 
 

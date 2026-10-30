@@ -5,11 +5,12 @@ from collections import defaultdict
 from django.contrib import messages
 from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 
-from workbench.accounts.features import FEATURES
+from workbench.accounts.features import FEATURES, feature_required
 from workbench.accounts.models import User
 from workbench.awt.forms import CalendarFilterForm
 from workbench.awt.models import HIDDEN_REASON, Absence, Year
@@ -131,6 +132,7 @@ def absence_calendar(request, form):
                     * 1000,
                     "days": absence.days,
                     "description": absence.description_for(request.user),
+                    "isConfirmed": not absence.needs_confirmation,
                 }
                 for absence in absences[user.id]
             ],
@@ -156,3 +158,13 @@ def absence_calendar(request, form):
             "form": form,
         },
     )
+
+
+@feature_required(FEATURES.WORKING_TIME_CORRECTION)
+@require_POST
+def confirm_absence(request, pk):
+    absence = get_object_or_404(Absence, pk=pk)
+    absence.confirm(request.user)
+    absence.save()
+    messages.success(request, _("The absence has been confirmed."))
+    return redirect(absence.urls["list"] + "?s=unconfirmed")

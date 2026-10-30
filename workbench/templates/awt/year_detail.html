@@ -592,6 +592,9 @@
                           href="{{ absence.get_absolute_url }}"
                           data-ajaxmodal
                         >{{ absence|absence_title:request.user }}</a>
+                        {% if absence.needs_confirmation %}
+                          <span class="badge text-bg-warning">{% translate 'Unconfirmed' %}</span>
+                        {% endif %}
                       </td>
                     </tr>
                   {% endfor %}

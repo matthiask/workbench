@@ -32,6 +32,12 @@ class AbsenceSearchForm(Form):
         choices=[("", _("All reasons")), *Absence.REASON_CHOICES],
         label="",
     )
+    s = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        choices=[("", _("All states")), ("unconfirmed", _("Unconfirmed"))],
+        label="",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -48,6 +54,8 @@ class AbsenceSearchForm(Form):
             queryset = queryset.filter(user=data.get("u"))
         if data.get("reason"):
             queryset = queryset.filter(reason=data.get("reason"))
+        if data.get("s") == "unconfirmed":
+            queryset = queryset.unconfirmed()
         queryset = visible_absences(
             queryset,
             self.request.user,
@@ -124,6 +132,12 @@ class AbsenceForm(ModelForm, WarningsForm):
                 )
 
         return data
+
+    def save(self, *args, **kwargs):
+        self.instance.update_confirmation(
+            self.request.user, changed_fields=self.changed_data
+        )
+        return super().save(*args, **kwargs)
 
 
 class CalendarFilterForm(Form):

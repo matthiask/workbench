@@ -181,7 +181,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   working time report of others requires the feature, the history shows
   reasons and descriptions only with it, and `clear_sickness_descriptions()`
   (fairy tasks) clears descriptions and history after two years.
-  Descriptions of absences are optional.
+  Descriptions of absences are optional. Paid leave counts right away but
+  needs a confirmation by someone with `WORKING_TIME_CORRECTION`
+  (`Absence.needs_confirmation`, `update_confirmation()` in the form,
+  `Absence.objects.unconfirmed()`, listed under "needs action").
 - Contacts unused for five years are archived (`archive_unused_contacts()` in
   `workbench/contacts/tasks.py`, fairy tasks). Reverse relations are
   discovered with `_meta.get_fields()`; `_recent()` says which related

@@ -296,3 +296,14 @@ $z-index: (
     }
   }
 }
+
+// Paid leave not confirmed yet
+.absence--unconfirmed {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0,
+    transparent 5px,
+    rgba(255, 255, 255, 0.35) 5px,
+    rgba(255, 255, 255, 0.35) 8px
+  );
+}

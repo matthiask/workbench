@@ -75,7 +75,7 @@ def search_absences(user, reason, period, since, until, limit, offset, as_csv, a
             absence["starts_on"],
             absence["ends_on"] or "",
             absence["days"],
-            absence["reason"],
+            absence["reason"] + ("" if absence["is_confirmed"] else " (unconfirmed)"),
             absence["description"],
         )
     console.print(table)

@@ -3,6 +3,7 @@ from django.urls import path
 from workbench import generic
 from workbench.awt.forms import AbsenceForm, AbsenceSearchForm
 from workbench.awt.models import Absence, Holiday
+from workbench.awt.views import confirm_absence
 
 
 urlpatterns = [
@@ -37,6 +38,7 @@ urlpatterns = [
         ),
         name="awt_absence_delete",
     ),
+    path("<int:pk>/confirm/", confirm_absence, name="awt_absence_confirm"),
     path(
         "holiday/<int:pk>/",
         generic.DetailView.as_view(model=Holiday),

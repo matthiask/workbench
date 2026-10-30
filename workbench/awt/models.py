@@ -2,13 +2,14 @@ import datetime as dt
 
 from django.contrib import messages
 from django.db import models
+from django.utils import timezone
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.tools.formats import days, hours, local_date_format
-from workbench.tools.models import HoursField, Model, MoneyField
+from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
@@ -151,6 +152,11 @@ def visible_absences(queryset, user, *, filtered):
     return queryset.exclude(models.Q(reason=Absence.SICKNESS) & ~models.Q(user=user))
 
 
+class AbsenceQuerySet(SearchQuerySet):
+    def unconfirmed(self):
+        return self.filter(reason=Absence.PAID, confirmed_at__isnull=True)
+
+
 @model_urls
 class Absence(Model):
     open_in_modal = True
@@ -181,6 +187,17 @@ class Absence(Model):
     reason = models.CharField(_("reason"), max_length=10, choices=REASON_CHOICES)
     is_vacation = models.BooleanField(_("is vacation"), default=True)
     is_working_time = models.BooleanField(_("is working time"), default=True)
+    confirmed_at = models.DateTimeField(_("confirmed at"), blank=True, null=True)
+    confirmed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("confirmed by"),
+        related_name="+",
+    )
+
+    objects = AbsenceQuerySet.as_manager()
 
     class Meta:
         ordering = ["-starts_on", "-pk"]
@@ -189,7 +206,40 @@ class Absence(Model):
 
     def __str__(self):
         # Neither the reason nor the description, both may be health data
-        return f"{capfirst(gettext('absence'))} {self.pretty_period}"
+        return (
+            f"{capfirst(gettext('absence'))} {self.pretty_period}"
+            f" ({self.user.get_short_name()})"
+        )
+
+    @property
+    def needs_confirmation(self):
+        """Paid leave counts right away, but is checked by people correcting
+        working time"""
+        return self.reason == self.PAID and not self.confirmed_at
+
+    def confirm(self, user):
+        self.confirmed_at = timezone.now()
+        self.confirmed_by = user
+
+    confirm.alters_data = True
+
+    def update_confirmation(self, user, *, changed_fields):
+        """Paid leave entered or changed by others needs a confirmation"""
+        if self.reason != self.PAID:
+            self.confirmed_at = self.confirmed_by = None
+        elif user.features[FEATURES.WORKING_TIME_CORRECTION]:
+            if not self.confirmed_at:
+                self.confirm(user)
+        elif not self.pk or set(changed_fields) & {
+            "user",
+            "starts_on",
+            "ends_on",
+            "days",
+            "reason",
+        }:
+            self.confirmed_at = self.confirmed_by = None
+
+    update_confirmation.alters_data = True
 
     def details_visible_to(self, user):
         """Sickness is health data: only the absent person and people
