@@ -368,6 +368,10 @@ planned_work:
         self.assertIn("3.0", result.output)
         result = self.wb("hours", "search", "--period", "this-month")
         self.assertIn("Wireframes", result.output)
+        result = self.wb("hours", "search", "--csv")
+        self.assertTrue(result.output.startswith("id,url,rendered_on,"), result.output)
+        self.assertIn("project.code", result.output.splitlines()[0])
+        self.assertIn("Wireframes", result.output)
         result = self.wb("hours", "search", "--period", "last-year")
         self.assertNotIn("Wireframes", result.output)
 
@@ -491,6 +495,9 @@ planned_work:
                 result = self.wb("reports", *args, "--json")
                 self.assertEqual(result.exit_code, 0, result.output)
                 self.assertTrue(result.output.startswith("{"))
+                result = self.wb("reports", *args, "--csv")
+                self.assertEqual(result.exit_code, 0, result.output)
+                self.assertEqual(len(result.output.splitlines()), 2, result.output)
 
         deal = factories.DealFactory.create(
             title="Relaunch",

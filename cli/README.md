@@ -8,7 +8,12 @@ takes optional search terms and filters such as `--project`, `--customer` or
 Searches show 100 results by default and tell you when there are more.
 `--limit` (at most 10000) and `--offset` page through them, e.g.
 `wb invoices search --open --limit 50 --offset 50`. With `--json` the results
-are in `items` and `count` is the number of all matches.
+are in `items` and `count` is the number of all matches. `--csv` writes one
+row per result for spreadsheets, nested objects become columns like
+`project.code`; reports write the rows of their main table. Combined with
+`--limit`, e.g. all hours of last month:
+
+    wb hours search --period last-month --limit 10000 --csv > hours.csv
 
 Searches and reports of a period take `--period`: a year (`2026`), a month
 (`2026-09`), a quarter (`2026-Q3`) or relative to today (`last-week`,

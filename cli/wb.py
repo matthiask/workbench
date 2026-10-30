@@ -554,6 +554,37 @@ def _echo_more(data, offset, what="results", *, note=""):
     click.secho(f"{message}. {note}".strip(), fg="yellow", err=True)
 
 
+def _flatten(row, prefix=""):
+    """Nested objects become columns like ``project.code``, lists are joined"""
+    result = {}
+    for key, value in row.items():
+        if isinstance(value, dict):
+            result |= _flatten(value, f"{prefix}{key}.")
+        elif isinstance(value, list):
+            result[f"{prefix}{key}"] = ", ".join(
+                json.dumps(item, ensure_ascii=False)
+                if isinstance(item, (dict, list))
+                else str(item)
+                for item in value
+            )
+        else:
+            result[f"{prefix}{key}"] = "" if value is None else value
+    return result
+
+
+def _without(row, key):
+    return {k: v for k, v in row.items() if k != key}
+
+
+def _echo_csv(rows):
+    rows = [_flatten(row) for row in rows]
+    writer = csv.DictWriter(
+        sys.stdout, fieldnames=list(dict.fromkeys(key for row in rows for key in row))
+    )
+    writer.writeheader()
+    writer.writerows(rows)
+
+
 def _period_options(default):
     """Options for the period of a report or a search, ``default`` describes
     it"""
@@ -886,8 +917,9 @@ def projects():
 @click.option("--owned-by", help="Short name.")
 @click.option("--all", "include_closed", is_flag=True, help="Include closed projects.")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
-def search(query, customer, owned_by, include_closed, limit, offset, as_json):
+def search(query, customer, owned_by, include_closed, limit, offset, as_csv, as_json):
     """Search projects, open projects by default"""
     params = {"q": " ".join(query), "include_closed": _bool(include_closed)}
     if customer:
@@ -895,6 +927,10 @@ def search(query, customer, owned_by, include_closed, limit, offset, as_json):
     if owned_by:
         params["owned_by"] = owned_by
     data = _request("GET", "projects/", params=params | _page_params(limit, offset))
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -1326,6 +1362,7 @@ def context(project_id):
 @click.option("--owned-by", help="Short name.")
 @_period_options("filters the offer date")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_offers(
     query,
@@ -1338,6 +1375,7 @@ def search_offers(
     until,
     limit,
     offset,
+    as_csv,
     as_json,
 ):
     """Search offers, newest first"""
@@ -1352,6 +1390,10 @@ def search_offers(
         params["owned_by"] = owned_by
     params |= _period_params(period, since, until)
     data = _request("GET", "offers/", params=params | _page_params(limit, offset))
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -1809,6 +1851,7 @@ def invoices():
 @click.option("--overdue", is_flag=True, help="Due for more than 15 days.")
 @_period_options("filters the invoice date")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_invoices(
     query,
@@ -1822,6 +1865,7 @@ def search_invoices(
     until,
     limit,
     offset,
+    as_csv,
     as_json,
 ):
     """Search invoices, newest first"""
@@ -1834,6 +1878,10 @@ def search_invoices(
         params["status"] = status
     params |= _period_params(period, since, until)
     data = _request("GET", "invoices/", params=params | _page_params(limit, offset))
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2024,6 +2072,7 @@ def _echo_notes(notes):
 @click.option("--created-by", help="Short name.")
 @_period_options("filters the creation date")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_notes(
     query,
@@ -2036,6 +2085,7 @@ def search_notes(
     until,
     limit,
     offset,
+    as_csv,
     as_json,
 ):
     """Search notes, all of them or those of some objects, newest first"""
@@ -2050,6 +2100,10 @@ def search_notes(
             params[key] = value
     params |= _period_params(period, since, until)
     data = _request("GET", "notes/", params=params | _page_params(limit, offset))
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
     elif data["items"]:
@@ -2094,8 +2148,9 @@ def services():
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--offer", type=int, help="Offer ID.")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
-def search_services(query, project, offer, limit, offset, as_json):
+def search_services(query, project, offer, limit, offset, as_csv, as_json):
     """Search services, ordered by project and offer"""
     params = {"q": " ".join(query)}
     if project:
@@ -2103,6 +2158,10 @@ def search_services(query, project, offer, limit, offset, as_json):
     if offer:
         params["offer"] = offer
     data = _request("GET", "services/", params=params | _page_params(limit, offset))
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2156,6 +2215,7 @@ def hours():
 @click.option("--rendered-by", help="Short name.")
 @_period_options("filters the date the work was done")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_hours(
     query,
@@ -2169,6 +2229,7 @@ def search_hours(
     until,
     limit,
     offset,
+    as_csv,
     as_json,
 ):
     """Search logged hours, newest first"""
@@ -2186,6 +2247,10 @@ def search_hours(
     data = _request(
         "GET", "logbook/hours/", params=params | _page_params(limit, offset)
     )
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2233,8 +2298,9 @@ def absences():
 )
 @_period_options("absences overlapping it, current and upcoming ones by default")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
-def search_absences(user, reason, period, since, until, limit, offset, as_json):
+def search_absences(user, reason, period, since, until, limit, offset, as_csv, as_json):
     """Search absences, current and upcoming ones by default"""
     params = _period_params(period, since, until) or {
         "since": dt.date.today().isoformat()
@@ -2244,6 +2310,10 @@ def search_absences(user, reason, period, since, until, limit, offset, as_json):
     if reason:
         params["reason"] = reason
     data = _request("GET", "absences/", params=params | _page_params(limit, offset))
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2276,6 +2346,7 @@ def costs():
 @click.option("--expenses", is_flag=True, help="Paid from someone's own pocket.")
 @_period_options("filters the date the work was done")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_costs(
     query,
@@ -2290,6 +2361,7 @@ def search_costs(
     until,
     limit,
     offset,
+    as_csv,
     as_json,
 ):
     """Search logged costs, newest first"""
@@ -2307,6 +2379,10 @@ def search_costs(
     data = _request(
         "GET", "logbook/costs/", params=params | _page_params(limit, offset)
     )
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2353,9 +2429,10 @@ def recurring_invoices():
     help="Open ones are those which still renew, the default.",
 )
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_recurring_invoices(
-    query, customer, owned_by, status, limit, offset, as_json
+    query, customer, owned_by, status, limit, offset, as_csv, as_json
 ):
     """Search recurring invoices, by customer"""
     params = {"q": " ".join(query), "status": status}
@@ -2366,6 +2443,10 @@ def search_recurring_invoices(
     data = _request(
         "GET", "recurring-invoices/", params=params | _page_params(limit, offset)
     )
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2404,9 +2485,10 @@ def projected_invoices():
 @click.option("--customer", type=int, help="Organization ID.")
 @_period_options("filters the planned invoice date")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_projected_invoices(
-    project, customer, period, since, until, limit, offset, as_json
+    project, customer, period, since, until, limit, offset, as_csv, as_json
 ):
     """Search the planned invoicing (gross margin), oldest first"""
     params = _period_params(period, since, until)
@@ -2417,6 +2499,10 @@ def search_projected_invoices(
     data = _request(
         "GET", "projected-invoices/", params=params | _page_params(limit, offset)
     )
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2446,9 +2532,20 @@ def deals():
 @click.option("--owned-by", help="Short name.")
 @_period_options("filters the decision date (closed or expected)")
 @_page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_deals(
-    query, status, customer, owned_by, period, since, until, limit, offset, as_json
+    query,
+    status,
+    customer,
+    owned_by,
+    period,
+    since,
+    until,
+    limit,
+    offset,
+    as_csv,
+    as_json,
 ):
     """Search deals, open deals by default"""
     params = {"q": " ".join(query), "status": status}
@@ -2458,6 +2555,10 @@ def search_deals(
         params["owned_by"] = owned_by
     params |= _period_params(period, since, until)
     data = _request("GET", "deals/", params=params | _page_params(limit, offset))
+    if as_csv:
+        _echo_csv(data["items"])
+        _echo_more(data, offset)
+        return
     if as_json:
         _echo_json(data)
         return
@@ -2663,8 +2764,9 @@ def reopen_deal(deal_id, dry_run, as_json):
 @deals.command("stats")
 @_period_options("defaults to this week")
 @_users_options
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def deal_stats(period, since, until, users, team, as_json):
+def deal_stats(period, since, until, users, team, as_csv, as_json):
     """Deals accepted and declined in a period
 
     Users filter the deals' owners; accepted deals are split between users
@@ -2674,6 +2776,12 @@ def deal_stats(period, since, until, users, team, as_json):
         "deals/stats/",
         params=_period_params(period, since, until, users=users, team=team),
     )
+    if as_csv:
+        _echo_csv(
+            [deal | {"status": "accepted"} for deal in data["accepted"]["deals"]]
+            + [deal | {"status": "declined"} for deal in data["declined"]["deals"]]
+        )
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3141,8 +3249,9 @@ def cash_data(date, as_json):
     help="Everyone employed during the year, requires the controlling feature.",
 )
 @click.option("--weekly", is_flag=True, help="Show the hours per week.")
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def working_time(year, user, all_, weekly, as_json):
+def working_time(year, user, all_, weekly, as_csv, as_json):
     """Annual working time: Target, logged hours, absences and balance
 
     The balance per week compares the working time to a target based on the
@@ -3158,6 +3267,13 @@ def working_time(year, user, all_, weekly, as_json):
         "reports/working-time/",
         params={key: value for key, value in params.items() if value},
     )
+    if as_csv:
+        _echo_csv([
+            {"user": row["user"]} | entry
+            for row in data["users"]
+            for entry in (row["weeks"] if weekly else row["months"])
+        ])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3230,10 +3346,14 @@ def working_time(year, user, all_, weekly, as_json):
 
 
 @reports.command("projected-gross-margin")
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def projected_gross_margin(as_json):
+def projected_gross_margin(as_csv, as_json):
     """Planned invoicing of open projects which hasn't been invoiced yet"""
     data = _request("GET", "reports/projected-gross-margin/")
+    if as_csv:
+        _echo_csv(data["projects"])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3276,8 +3396,9 @@ def projected_gross_margin(as_json):
         "no-projected-gross-margin",
     ]),
 )
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def budget(date, owned_by, internal, closed, filter_, as_json):
+def budget(date, owned_by, internal, closed, filter_, as_csv, as_json):
     """Project budget statistics: Logged work compared to offers and invoices
 
     Delta is the logbook minus the invoiced amount, positive for work which
@@ -3295,6 +3416,9 @@ def budget(date, owned_by, internal, closed, filter_, as_json):
         "reports/budget/",
         params={key: value for key, value in params.items() if value},
     )
+    if as_csv:
+        _echo_csv(data["projects"])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3349,8 +3473,9 @@ def budget(date, owned_by, internal, closed, filter_, as_json):
     is_flag=True,
     help="Also projects closed during the current year.",
 )
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def third_party_costs(this_year, as_json):
+def third_party_costs(this_year, as_csv, as_json):
     """Third party costs logged and invoiced per project
 
     Delta is positive for costs which haven't been invoiced yet."""
@@ -3359,6 +3484,9 @@ def third_party_costs(this_year, as_json):
         "reports/third-party-costs/",
         params={"this_year": _bool(this_year)} if this_year else {},
     )
+    if as_csv:
+        _echo_csv(data["projects"])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3403,14 +3531,18 @@ def third_party_costs(this_year, as_json):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="Cutoff date, defaults to today.",
 )
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def open_items(date, as_json):
+def open_items(date, as_csv, as_json):
     """Invoices sent but not paid on the cutoff date"""
     data = _request(
         "GET",
         "reports/open-items/",
         params={"date": date.date().isoformat()} if date else {},
     )
+    if as_csv:
+        _echo_csv(data["invoices"])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3430,14 +3562,18 @@ def open_items(date, as_json):
 @reports.command("hours-per-customer")
 @_period_options("defaults to this week")
 @_users_options
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def hours_per_customer(period, since, until, users, team, as_json):
+def hours_per_customer(period, since, until, users, team, as_csv, as_json):
     """Logged hours per customer and user"""
     data = _request(
         "GET",
         "reports/hours-per-customer/",
         params=_period_params(period, since, until, users=users, team=team),
     )
+    if as_csv:
+        _echo_csv(data["customers"])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3461,8 +3597,9 @@ def hours_per_customer(period, since, until, users, team, as_json):
 @reports.command("hours-per-type")
 @_period_options("defaults to this week")
 @_users_options
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def hours_per_type(period, since, until, users, team, as_json):
+def hours_per_type(period, since, until, users, team, as_csv, as_json):
     """Logged hours per user, external and per internal type
 
     Shows the percentage reached and expected (in parentheses)."""
@@ -3471,6 +3608,12 @@ def hours_per_type(period, since, until, users, team, as_json):
         "reports/hours-per-type/",
         params=_period_params(period, since, until, users=users, team=team),
     )
+    if as_csv:
+        _echo_csv([
+            row | {"types": {type["type"]: type["hours"] for type in row["types"]}}
+            for row in data["users"]
+        ])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3495,8 +3638,9 @@ def hours_per_type(period, since, until, users, team, as_json):
 @reports.command("green-hours")
 @_period_options("defaults to this week")
 @_users_options
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def green_hours(period, since, until, users, team, as_json):
+def green_hours(period, since, until, users, team, as_csv, as_json):
     """Profitable, overdrawn, maintenance and internal hours per user
 
     Green hours are profitable and maintenance hours."""
@@ -3505,6 +3649,9 @@ def green_hours(period, since, until, users, team, as_json):
         "reports/green-hours/",
         params=_period_params(period, since, until, users=users, team=team),
     )
+    if as_csv:
+        _echo_csv(data["users"])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3542,8 +3689,9 @@ def green_hours(period, since, until, users, team, as_json):
 @reports.command("planning-vs-logbook")
 @_period_options("defaults to this week")
 @_users_options
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def planning_vs_logbook(period, since, until, users, team, as_json):
+def planning_vs_logbook(period, since, until, users, team, as_csv, as_json):
     """Planned and logged hours per customer
 
     The allocation is the customer's share of the logged hours relative to
@@ -3553,6 +3701,9 @@ def planning_vs_logbook(period, since, until, users, team, as_json):
         "reports/planning-vs-logbook/",
         params=_period_params(period, since, until, users=users, team=team),
     )
+    if as_csv:
+        _echo_csv([_without(row, "weeks") for row in data["customers"]])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3578,12 +3729,16 @@ def planning_vs_logbook(period, since, until, users, team, as_json):
 
 @reports.command("logging")
 @_period_options("defaults to this week")
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def logging_report(period, since, until, as_json):
+def logging_report(period, since, until, as_csv, as_json):
     """How and when users log their hours, and insufficient breaks"""
     data = _request(
         "GET", "reports/logging/", params=_period_params(period, since, until)
     )
+    if as_csv:
+        _echo_csv(data["users"])
+        return
     if as_json:
         _echo_json(data)
         return
@@ -3614,8 +3769,9 @@ def logging_report(period, since, until, as_json):
 
 @reports.command("squeeze")
 @_period_options("defaults to the last month")
+@click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def squeeze(period, since, until, as_json):
+def squeeze(period, since, until, as_csv, as_json):
     """Gross margin per user and project, requires the productivity feature
 
     Projects' gross margins are split between users by hours weighted with
@@ -3624,6 +3780,9 @@ def squeeze(period, since, until, as_json):
     data = _request(
         "GET", "reports/squeeze/", params=_period_params(period, since, until)
     )
+    if as_csv:
+        _echo_csv([_without(row, "projects") for row in data["users"]])
+        return
     if as_json:
         _echo_json(data)
         return
