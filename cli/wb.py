@@ -2,12 +2,15 @@ import csv
 import datetime as dt
 import json
 import os
+import platform
 import secrets
+import shlex
 import socket
 import sys
 import threading
 import time
 import tomllib
+import traceback
 import webbrowser
 from functools import cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -34,6 +37,7 @@ from rich.text import Text
 
 
 CONFIG = Path.home() / ".config" / "workbench.toml"
+BUG_REPORTS = Path.home() / ".cache" / "wb"
 
 
 def _version():
@@ -53,6 +57,66 @@ console = Console(markup=False, highlight=False)
 def _terminate(msg):
     click.echo(msg, file=sys.stderr)
     sys.exit(1)
+
+
+class _ServerError(Exception):
+    """Workbench failed, the bug report contains the request and the response"""
+
+    def __init__(self, status_code, details):
+        super().__init__(status_code)
+        self.status_code = status_code
+        self.details = details
+
+
+def _bug_report(problem, details, *, args):
+    """Write what's needed to fix a bug into a file people can send"""
+    try:
+        url = _url(os.environ.get("WORKBENCH_URL")) or _read_config()["current"]
+    except Exception:  # noqa: BLE001
+        url = None
+    now = dt.datetime.now().astimezone()
+    report = "\n".join([
+        f"wb {VERSION}, Python {platform.python_version()} on {platform.platform()}",
+        f"Installation: {url or 'unknown'}",
+        f"Command: {shlex.join(['wb', *args])}",
+        f"Time: {now.isoformat(timespec='seconds')}",
+        "",
+        details,
+    ])
+    path = BUG_REPORTS / f"bug-report-{now:%Y%m%d-%H%M%S}.txt"
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(report)
+    except OSError:
+        _terminate(
+            f"{problem} Please send this to the people running Workbench:\n\n{report}"
+        )
+    _terminate(
+        f"{problem} Please send {path} to the people running Workbench"
+        " and tell them what you tried to do."
+    )
+
+
+class _Group(click.Group):
+    """Commands which crash write a bug report instead of a traceback, set
+    WB_DEBUG to get the exception"""
+
+    def main(self, args=None, **kwargs):
+        args = sys.argv[1:] if args is None else list(args)
+        try:
+            return super().main(args, **kwargs)
+        except Exception as exc:
+            if os.environ.get("WB_DEBUG"):
+                raise
+            if isinstance(exc, _ServerError):
+                _bug_report(
+                    f"Workbench failed ({exc.status_code}).", exc.details, args=args
+                )
+            _bug_report(
+                f"wb crashed ({type(exc).__name__}: {exc}).",
+                traceback.format_exc(),
+                args=args,
+            )
 
 
 def _read_config():
@@ -240,6 +304,13 @@ def _request(method, path, *, optional=False, **kwargs):
         return None
     if response.status_code == 422:
         _terminate("\n".join(_error(error) for error in response.json()["detail"]))
+    if response.status_code >= 500:
+        raise _ServerError(
+            response.status_code,
+            f"{method} {path} {kwargs.get('params') or ''}\n"
+            f"{response.status_code} {response.headers.get('date', '')}\n\n"
+            f"{response.text[:2000]}",
+        )
     if not response.ok:
         try:
             detail = response.json()["detail"]
@@ -447,7 +518,7 @@ def _echo_invoice_list(invoices):
     console.print(table)
 
 
-@click.group()
+@click.group(cls=_Group)
 @click.version_option(VERSION)
 def cli():
     pass

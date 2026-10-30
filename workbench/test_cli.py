@@ -49,6 +49,7 @@ class CLITest(TestCase):
         for patcher in [
             patch.object(wb.requests, "request", self.request),
             patch.object(wb, "CONFIG", self.directory / "workbench.toml"),
+            patch.object(wb, "BUG_REPORTS", self.directory / "reports"),
             patch.object(
                 wb, "console", Console(markup=False, highlight=False, width=250)
             ),
@@ -73,13 +74,17 @@ class CLITest(TestCase):
             )
         return Response(response)
 
-    def wb(self, *args, user=None, token=None):
+    def wb(self, *args, user=None, token=None, debug=True):
         if not token:
             _token, token = APIToken.create_for(user=user or self.user, title="Tests")
         result = CliRunner().invoke(
             wb.cli,
             [str(arg) for arg in args],
-            env={"WORKBENCH_URL": "http://testserver", "WORKBENCH_TOKEN": token},
+            env={
+                "WORKBENCH_URL": "http://testserver",
+                "WORKBENCH_TOKEN": token,
+                "WB_DEBUG": "1" if debug else "",
+            },
         )
         if result.exception and not isinstance(result.exception, SystemExit):
             raise result.exception
@@ -351,6 +356,42 @@ planned_work:
         result = self.wb("me", token="wb_nope")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("wb login", result.output)
+
+    def test_bug_reports(self):
+        """Crashes and server errors write a bug report people can send"""
+        person = factories.PersonFactory.create()
+        with patch.object(wb, "_echo_person", side_effect=KeyError("url")):
+            result = self.wb("people", "show", person.pk, debug=False)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("wb crashed (KeyError: 'url')", result.output)
+        [report] = (self.directory / "reports").iterdir()
+        self.assertIn(str(report), result.output)
+        content = report.read_text()
+        self.assertIn(f"wb {wb.VERSION}", content)
+        self.assertIn("Installation: http://testserver", content)
+        self.assertIn(f"Command: wb people show {person.pk}", content)
+        self.assertIn("Traceback", content)
+        report.unlink()
+
+        with (
+            patch.object(wb, "_echo_person", side_effect=KeyError("url")),
+            self.assertRaises(KeyError),
+        ):
+            self.wb("people", "show", person.pk)
+
+        with patch.object(
+            self.api_client,
+            "get",
+            return_value=types.SimpleNamespace(
+                status_code=500, headers={}, content=b"Server Error (500)"
+            ),
+        ):
+            result = self.wb("people", "show", person.pk, debug=False)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Workbench failed (500).", result.output)
+        [report] = (self.directory / "reports").iterdir()
+        self.assertIn(f"GET contacts/people/{person.pk}/", report.read_text())
+        self.assertIn("Server Error (500)", report.read_text())
 
     def test_versions(self):
         """Outdated CLIs are told to upgrade, too old ones are rejected"""

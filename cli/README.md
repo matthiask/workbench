@@ -270,3 +270,10 @@ personal skills to use them in any directory (run it again when skills are
 added):
 
     for skill in "$PWD"/cli/skills/*/; do ln -sfn "${skill%/}" ~/.claude/skills/; done
+
+## Bug reports
+
+When `wb` crashes or Workbench fails, `wb` writes a bug report with the
+command, the versions and the traceback or the server's response to
+`~/.cache/wb/` and tells you where it is. Send it to the people running
+Workbench. Set `WB_DEBUG=1` to get the exception instead.
