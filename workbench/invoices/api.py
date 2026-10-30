@@ -7,6 +7,7 @@ from ninja import Field, Query, Router, Schema
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
+from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.projects.models import Project
 
@@ -31,7 +32,7 @@ class InvoiceOut(Schema):
     type: str
     status: str
     project: str | None
-    customer: str
+    customer: OrganizationOut
     owned_by: str
     invoiced_on: dt.date | None
     due_on: dt.date | None
@@ -53,7 +54,7 @@ def invoice_out(invoice, request):
         "type": invoice.get_type_display(),
         "status": invoice.get_status_display(),
         "project": invoice.project.code if invoice.project else None,
-        "customer": invoice.customer.name,
+        "customer": organization_out(invoice.customer, request),
         "owned_by": invoice.owned_by.get_short_name(),
         "invoiced_on": invoice.invoiced_on,
         "due_on": invoice.due_on,

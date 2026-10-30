@@ -11,6 +11,7 @@ from ninja.errors import ValidationError
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm
 from workbench.deals.models import AttributeGroup, Deal, ValueType
@@ -40,7 +41,7 @@ class DealOut(Schema):
     url: str
     title: str
     description: str
-    customer: str
+    customer: OrganizationOut
     owned_by: str
     status: str
     probability: str
@@ -61,7 +62,7 @@ def deal_out(deal, request):
         "url": request.build_absolute_uri(deal.get_absolute_url()),
         "title": deal.title,
         "description": deal.description,
-        "customer": deal.customer.name,
+        "customer": organization_out(deal.customer, request),
         "owned_by": deal.owned_by.get_short_name(),
         "status": deal.get_status_display(),
         "probability": deal.get_probability_display(),

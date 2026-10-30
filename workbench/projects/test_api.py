@@ -31,6 +31,17 @@ class ProjectsAPITest(TestCase):
         self.assertEqual(ids(f"?customer={other.customer_id}"), {other.pk})
         self.assertEqual(ids("?owned_by=AB"), {project.pk})
 
+        data = self.client.get(f"/api/projects/{project.pk}/").json()
+        self.assertEqual(
+            data["customer"],
+            {
+                "id": project.customer_id,
+                "url": f"http://testserver{project.customer.get_absolute_url()}",
+                "name": project.customer.name,
+                "is_archived": False,
+            },
+        )
+
     def test_stats(self):
         """Statistics of the selected projects"""
         project = factories.ProjectFactory.create()

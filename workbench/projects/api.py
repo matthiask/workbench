@@ -13,6 +13,7 @@ from ninja.errors import HttpError, ValidationError
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.planning.models import PlannedWork
@@ -33,7 +34,7 @@ class ProjectOut(Schema):
     url: str
     title: str
     description: str
-    customer: str
+    customer: OrganizationOut
     owned_by: str
     flat_rate: Decimal | None
     closed_on: dt.date | None
@@ -46,7 +47,7 @@ def project_out(project, request):
         "url": request.build_absolute_uri(project.get_absolute_url()),
         "title": project.title,
         "description": project.description,
-        "customer": project.customer.name,
+        "customer": organization_out(project.customer, request),
         "owned_by": project.owned_by.get_short_name(),
         "flat_rate": project.flat_rate,
         "closed_on": project.closed_on,

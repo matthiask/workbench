@@ -69,6 +69,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Shared validation helpers for the APIs are in
   `workbench/tools/api.py`.
+  Organizations (e.g. customers) are nested with their ID, name and URL
+  (`organization_out()` in `workbench/contacts/api.py`) so the CLI can link
+  them.
   Bump the version in `cli/pyproject.toml` when changing the CLI: the server
   reads it and tells users of older versions to upgrade. Raise `MINIMUM` in
   `workbench/cli_version.py` when older versions don't work anymore.

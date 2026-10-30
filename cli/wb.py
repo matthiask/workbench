@@ -427,7 +427,7 @@ def _echo_invoice_list(invoices):
             _link(invoice["id"], invoice["url"]),
             _link(invoice["code"], invoice["url"]),
             invoice["title"],
-            invoice["customer"],
+            _link(invoice["customer"]["name"], invoice["customer"]["url"]),
             invoice["status"],
             invoice["invoiced_on"] or "",
             invoice["due_on"] or "",
@@ -575,7 +575,7 @@ def me(as_json):
             _link(project["id"], project["url"]),
             _link(project["code"], project["url"]),
             project["title"],
-            project["customer"],
+            _link(project["customer"]["name"], project["customer"]["url"]),
         )
     console.print(table)
 
@@ -617,7 +617,7 @@ def me(as_json):
             table.add_row(
                 _link(deal["id"], deal["url"]),
                 deal["title"],
-                deal["customer"],
+                _link(deal["customer"]["name"], deal["customer"]["url"]),
                 deal["decision_expected_on"] or "",
                 deal["value"],
             )
@@ -652,7 +652,7 @@ def search(query, customer, owned_by, include_closed, as_json):
             _link(project["id"], project["url"]),
             _link(project["code"], project["url"]),
             project["title"],
-            project["customer"],
+            _link(project["customer"]["name"], project["customer"]["url"]),
             project["owned_by"],
             project["closed_on"] or "",
         )
@@ -674,7 +674,10 @@ def show_project(project_id, as_json):
         f"{project['code']} {project['title']}",
         [
             ("ID", project["id"]),
-            ("Customer", project["customer"]),
+            (
+                "Customer",
+                _link(project["customer"]["name"], project["customer"]["url"]),
+            ),
             ("Owned by", project["owned_by"]),
             ("Flat rate", project["flat_rate"]),
             ("Closed on", project["closed_on"]),
@@ -762,7 +765,7 @@ def create_project(
         f"{data['code']} {data['title']}",
         [
             ("ID", data["id"]),
-            ("Customer", data["customer"]),
+            ("Customer", _link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
             ("URL", data["url"]),
         ],
@@ -791,7 +794,7 @@ def search_contacts(query, include_archived, as_json):
         return
     table = _table("ID>", "Organization", title="Organizations")
     for organization in organizations:
-        url = organization.get("url")
+        url = organization["url"]
         table.add_row(
             _link(organization["id"], url),
             _link(organization["name"], url)
@@ -802,8 +805,8 @@ def search_contacts(query, include_archived, as_json):
     for person in people:
         organization = person["organization"] or {}
         table.add_row(
-            _link(person["id"], person.get("url")),
-            _link(person["full_name"], person.get("url"))
+            _link(person["id"], person["url"]),
+            _link(person["full_name"], person["url"])
             + (" (archived)" if person["is_archived"] else ""),
             _link(organization.get("id", ""), organization.get("url")),
             _link(organization.get("name", ""), organization.get("url")),
@@ -841,8 +844,8 @@ def show_organization(organization_id, as_json):
     table = _table("ID>", "Name", title="People")
     for person in data["people"]:
         table.add_row(
-            _link(person["id"], person.get("url")),
-            _link(person["full_name"], person.get("url"))
+            _link(person["id"], person["url"]),
+            _link(person["full_name"], person["url"])
             + (" (archived)" if person["is_archived"] else ""),
         )
     console.print(table)
@@ -1165,7 +1168,7 @@ def show_invoice(invoice_id, as_json):
             ("ID", data["id"]),
             ("Type", data["type"]),
             ("Status", data["status"]),
-            ("Customer", data["customer"]),
+            ("Customer", _link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
             ("Invoiced on", data["invoiced_on"]),
             ("Due on", data["due_on"]),
@@ -1592,7 +1595,7 @@ def search_deals(query, status, customer, owned_by, as_json):
         table.add_row(
             _link(deal["id"], deal["url"]),
             deal["title"],
-            deal["customer"],
+            _link(deal["customer"]["name"], deal["customer"]["url"]),
             deal["owned_by"],
             deal["probability"],
             deal["decision_expected_on"] or "",
@@ -1689,7 +1692,7 @@ def _echo_deal(data):
         f"{data['code'] or '(new deal)'} {data['title']}",
         [
             ("ID", data["id"]),
-            ("Customer", data["customer"]),
+            ("Customer", _link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
             ("Contributors", ", ".join(data["contributors"])),
             ("Status", data["status"]),
