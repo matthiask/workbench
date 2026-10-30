@@ -598,6 +598,7 @@ class GroupsTest(TestCase):
         content = self.client.get(Group.urls["list"]).content.decode()
         self.assertIn("1 person", content)
         self.assertIn("1 archived", content)
+        self.assertIn(f'href="/contacts/organizations/?g={group.pk}"', content)
 
         response = self.client.get(group.get_absolute_url())
         self.assertContains(response, "This group also contains 1 archived contact.")

@@ -14,20 +14,20 @@
       <div class="wb-row-main">
         <a href="{{ group.get_absolute_url }}" class="wb-row-title">{{ group }}</a>
         <div class="wb-row-meta">
-          <span>
+          <a href="{% url 'contacts_person_list' %}?g={{ group.pk }}">
             {% blocktranslate count count=group.people_count trimmed %}
               {{ count }} person
             {% plural %}
               {{ count }} people
             {% endblocktranslate %}
-          </span>
-          <span>
+          </a>
+          <a href="{% url 'contacts_organization_list' %}?g={{ group.pk }}">
             {% blocktranslate count count=group.organizations_count trimmed %}
               {{ count }} organization
             {% plural %}
               {{ count }} organizations
             {% endblocktranslate %}
-          </span>
+          </a>
           {% with archived=group.archived_people_count|add:group.archived_organizations_count %}
             {% if archived %}
               <span>
