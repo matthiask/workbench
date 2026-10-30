@@ -2,18 +2,30 @@ import datetime as dt
 from decimal import Decimal
 from typing import Literal
 
+from django.db import transaction
 from django.shortcuts import get_object_or_404
-from ninja import Query, Router, Schema
+from django.utils.translation import gettext as _
+from ninja import Field, Query, Router, Schema
+from ninja.errors import ValidationError
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
-from workbench.deals.models import Deal
+from workbench.accounts.models import User
+from workbench.contacts.models import Person
+from workbench.deals.forms import DealForm
+from workbench.deals.models import AttributeGroup, Deal, ValueType
 
 
 # Same as in the web interface
 router = Router(auth=user_auth(feature=FEATURES.DEALS), tags=["deals"])
 
 STATUSES = {"open": Deal.OPEN, "accepted": Deal.ACCEPTED, "declined": Deal.DECLINED}
+# Unknown isn't offered in the web interface
+PROBABILITIES = {
+    "low": Deal.LOW,
+    "normal": Deal.NORMAL,
+    "high": Deal.HIGH,
+}
 
 
 class ValueOut(Schema):
@@ -100,3 +112,151 @@ def deal_detail(request, deal_id: int):
         ),
         request,
     )
+
+
+class DealIn(Schema):
+    title: str = Field(min_length=1, max_length=200)
+    description: str = ""
+    customer: int | None = Field(
+        default=None,
+        description="ID of the customer organization, defaults to the contact's"
+        " organization.",
+    )
+    contact: int | None = Field(
+        default=None, description="ID of the contact person at the customer."
+    )
+    owned_by: str | None = Field(
+        default=None,
+        description="Short name of the person responsible, defaults to the"
+        " authenticated user.",
+    )
+    probability: Literal["low", "normal", "high"]
+    decision_expected_on: dt.date | None = None
+    values: dict[str, Decimal] = Field(
+        default={}, description="Values by the title of their value type."
+    )
+    attributes: dict[str, str] = Field(
+        default={},
+        description="Attributes by the title of their group; required groups"
+        " must be given.",
+    )
+
+
+class DealCreated(DealOut):
+    id: int | None
+    code: str | None
+    url: str | None
+
+
+def _choices(objects):
+    return ", ".join(repr(str(obj.title)) for obj in objects)
+
+
+@router.post("/deals/", response=DealCreated)
+def deal_create(request, data: DealIn, *, dry_run: bool = False):
+    """Create a deal, validated like in the web interface
+
+    You are its main driving force. Warnings of the web interface are errors
+    here; nothing is saved if anything is invalid or with ``dry_run``."""
+    errors = []
+
+    def error(loc, msg):
+        errors.append({"loc": ["body", "data", *loc], "msg": msg})
+
+    owned_by = request.user
+    if data.owned_by is not None:
+        owned_by = User.objects.filter(
+            is_active=True, _short_name__iexact=data.owned_by
+        ).first()
+        if not owned_by:
+            error(["owned_by"], _("Unknown or inactive user %r.") % data.owned_by)
+
+    customer = data.customer
+    if customer is None and data.contact:
+        contact = Person.objects.filter(pk=data.contact).first()
+        customer = contact.organization_id if contact else None
+
+    form_data = {
+        "title": data.title,
+        "description": data.description,
+        "customer": customer or "",
+        "contact": data.contact or "",
+        "owned_by": owned_by.pk if owned_by else "",
+        "probability": PROBABILITIES[data.probability],
+        "decision_expected_on": data.decision_expected_on or "",
+        f"user_{request.user.pk}_contribution": 100,
+    }
+    fields = {}
+
+    value_types = list(ValueType.objects.filter(is_archived=False))
+    by_title = {vt.title.casefold(): vt for vt in value_types}
+    for title, value in data.values.items():
+        if vt := by_title.get(title.casefold()):
+            form_data[f"value_{vt.id}"] = value
+            fields[f"value_{vt.id}"] = ["values", vt.title]
+        else:
+            error(
+                ["values", title],
+                _("Unknown value type. Choices: %s") % _choices(value_types),
+            )
+
+    groups = list(
+        AttributeGroup.objects.filter(is_archived=False).prefetch_related("attributes")
+    )
+    by_title = {group.title.casefold(): group for group in groups}
+    for title, attribute_title in data.attributes.items():
+        if not (group := by_title.get(title.casefold())):
+            error(
+                ["attributes", title],
+                _("Unknown attribute group. Choices: %s") % _choices(groups),
+            )
+            continue
+        attributes = [a for a in group.attributes.all() if not a.is_archived]
+        attribute = next(
+            (a for a in attributes if a.title.casefold() == attribute_title.casefold()),
+            None,
+        )
+        if attribute:
+            form_data[f"attribute_{group.id}"] = attribute.pk
+        else:
+            error(
+                ["attributes", group.title],
+                _("Unknown attribute. Choices: %s") % _choices(attributes),
+            )
+    for group in groups:
+        fields[f"attribute_{group.id}"] = ["attributes", group.title]
+        if group.is_required and f"attribute_{group.id}" not in form_data:
+            error(
+                ["attributes", group.title],
+                _("This field is required. Choices: %s")
+                % _choices(a for a in group.attributes.all() if not a.is_archived),
+            )
+
+    if errors:
+        raise ValidationError(errors)
+
+    form = DealForm(form_data, request=request)
+    if not form.is_valid():
+        raise ValidationError(
+            [
+                {
+                    "loc": ["body", "data"]
+                    + ([] if field == "__all__" else fields.get(field, [field])),
+                    "msg": message,
+                }
+                for field, messages in form.errors.items()
+                for message in messages
+            ]
+            + [
+                {"loc": ["body", "data"], "msg": str(warning)}
+                for warning in form.warnings.values()
+            ]
+        )
+
+    with transaction.atomic():
+        deal = form.save()
+        result = deal_out(deal, request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "code": None, "url": None}
+    return result

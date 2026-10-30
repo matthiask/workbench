@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 15:53+0100\n"
+"POT-Creation-Date: 2026-10-30 08:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1358,6 +1358,31 @@ msgstr "Zahlungseingänge zuweisen"
 #: workbench/credit_control/views.py workbench/templates/base.html
 msgid "Export debtors"
 msgstr "Debitoren exportieren"
+
+#: workbench/deals/api.py workbench/planning/api.py workbench/projects/api.py
+#, python-format
+msgid "Unknown or inactive user %r."
+msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
+
+#: workbench/deals/api.py
+#, python-format
+msgid "Unknown value type. Choices: %s"
+msgstr "Unbekannter Werttyp. Auswahl: %s"
+
+#: workbench/deals/api.py
+#, python-format
+msgid "Unknown attribute group. Choices: %s"
+msgstr "Unbekannte Attributgruppe. Auswahl: %s"
+
+#: workbench/deals/api.py
+#, python-format
+msgid "Unknown attribute. Choices: %s"
+msgstr "Unbekanntes Attribut. Auswahl: %s"
+
+#: workbench/deals/api.py
+#, python-format
+msgid "This field is required. Choices: %s"
+msgstr "Dieses Feld ist zwingend erforderlich. Auswahl: %s"
 
 #: workbench/deals/apps.py workbench/deals/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
@@ -2769,11 +2794,6 @@ msgstr "%s zu Projekt kopieren"
 #, python-format
 msgid "Duplicate milestone key %r."
 msgstr "Doppelter Meilenstein-Schlüssel %r."
-
-#: workbench/planning/api.py workbench/projects/api.py
-#, python-format
-msgid "Unknown or inactive user %r."
-msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
 
 #: workbench/planning/api.py
 #, python-format

@@ -50,3 +50,88 @@ class DealsAPITest(TestCase):
         """Deals require the deals feature"""
         self.client.force_login(factories.UserFactory.create())
         self.assertEqual(self.client.get("/api/deals/").status_code, 403)
+        response = self.client.post("/api/deals/", {}, content_type="application/json")
+        self.assertEqual(response.status_code, 403)
+
+    def test_create(self):
+        """Deals are created like in the web interface"""
+        user = factories.UserFactory.create(_short_name="ab")
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        factories.ValueTypeFactory.create(title="Design")
+        group = factories.AttributeGroupFactory.create(title="Source")
+        group.attributes.create(title="Referral")
+        self.client.force_login(user)
+
+        deal = {
+            "title": "Relaunch",
+            "contact": person.pk,
+            "probability": "normal",
+            "values": {"design": 5000},
+            "attributes": {"Source": "referral"},
+        }
+        response = self.client.post(
+            "/api/deals/?dry_run=true", deal, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], None)
+        self.assertEqual(response.json()["value"], "5000.00")
+        self.assertFalse(Deal.objects.exists())
+
+        response = self.client.post(
+            "/api/deals/", deal, content_type="application/json"
+        )
+        created = Deal.objects.get()
+        self.assertEqual(response.json()["code"], created.code)
+        self.assertEqual(created.customer, person.organization)
+        self.assertEqual(created.owned_by, user)
+        self.assertEqual(created.value, 5000)
+        self.assertEqual([a.title for a in created.attributes.all()], ["Referral"])
+        self.assertEqual(created.contributions.get().user, user)
+
+    def test_create_errors(self):
+        """Unknown value types and missing attributes list the choices"""
+        group = factories.AttributeGroupFactory.create(title="Source")
+        group.attributes.create(title="Referral")
+        customer = factories.OrganizationFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.post(
+            "/api/deals/",
+            {
+                "title": "Relaunch",
+                "customer": customer.pk,
+                "probability": "high",
+                "values": {"Nope": 100},
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [(e["loc"][2:], e["msg"]) for e in response.json()["detail"]],
+            [
+                (["values", "Nope"], "Unknown value type. Choices: "),
+                (
+                    ["attributes", "Source"],
+                    "This field is required. Choices: 'Referral'",
+                ),
+            ],
+        )
+
+        # Errors of the form
+        response = self.client.post(
+            "/api/deals/",
+            {
+                "title": "Relaunch",
+                "customer": customer.pk,
+                "probability": "high",
+                "attributes": {"Source": "Referral"},
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"][2:], ["decision_expected_on"]
+        )
+        self.assertFalse(Deal.objects.exists())
