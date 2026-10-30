@@ -11,24 +11,24 @@ class ContactsAPITest(TestCase):
 
     def test_search(self):
         """Organizations and people can be searched"""
-        organization = factories.OrganizationFactory.create(name="Espoir")
-        factories.OrganizationFactory.create(name="Espoir alt", is_archived=True)
+        organization = factories.OrganizationFactory.create(name="Beispiel")
+        factories.OrganizationFactory.create(name="Beispiel alt", is_archived=True)
         person = factories.PersonFactory.create(
             given_name="Hans", family_name="Muster", organization=organization
         )
         self.client.force_login(factories.UserFactory.create())
 
-        data = self.client.get("/api/contacts/organizations/?q=espoir").json()
+        data = self.client.get("/api/contacts/organizations/?q=beispiel").json()
         self.assertEqual([o["id"] for o in data], [organization.pk])
         data = self.client.get(
-            "/api/contacts/organizations/?q=espoir&include_archived=true"
+            "/api/contacts/organizations/?q=beispiel&include_archived=true"
         ).json()
         self.assertEqual(len(data), 2)
 
         data = self.client.get("/api/contacts/people/?q=muster").json()
         self.assertEqual(data[0]["id"], person.pk)
         self.assertEqual(data[0]["full_name"], "Hans Muster")
-        self.assertEqual(data[0]["organization"]["name"], "Espoir")
+        self.assertEqual(data[0]["organization"]["name"], "Beispiel")
         data = self.client.get(
             f"/api/contacts/people/?organization={organization.pk}"
         ).json()
@@ -74,8 +74,8 @@ class ContactsAPITest(TestCase):
             "family_name": "Muster",
             "address": "Herr",
             "salutation": "Lieber Hans",
-            "new_organization": "Espoir AG",
-            "email_addresses": [{"email": "hans@espoir.ch"}],
+            "new_organization": "Beispiel AG",
+            "email_addresses": [{"email": "hans@example.com"}],
             "phone_numbers": [{"type": "mobile", "phone_number": "079 123 45 67"}],
             "postal_addresses": [
                 {
@@ -94,7 +94,7 @@ class ContactsAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         data = response.json()
         self.assertEqual(data["id"], None)
-        self.assertEqual(data["organization"]["name"], "Espoir AG")
+        self.assertEqual(data["organization"]["name"], "Beispiel AG")
         self.assertEqual(data["phone_numbers"][0]["value"], "+41791234567")
         self.assertFalse(Person.objects.exists())
         self.assertFalse(Organization.objects.exists())
@@ -104,13 +104,13 @@ class ContactsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
         created = Person.objects.get()
-        self.assertEqual(created.organization.name, "Espoir AG")
+        self.assertEqual(created.organization.name, "Beispiel AG")
         self.assertEqual(created.organization.primary_contact, user)
         self.assertEqual(created.primary_contact, user)
-        self.assertEqual(created.emailaddresses.get().email, "hans@espoir.ch")
+        self.assertEqual(created.emailaddresses.get().email, "hans@example.com")
         self.assertIn("Bahnhofstrasse 1", created.postaladdresses.get().postal_address)
         # The details are searchable
-        self.assertIn("hans@espoir.ch", created._fts)
+        self.assertIn("hans@example.com", created._fts)
 
         # Duplicates
         response = self.client.post(
@@ -142,7 +142,7 @@ class ContactsAPITest(TestCase):
                 "given_name": "Hans",
                 "family_name": "Muster",
                 "salutation": "Hans",
-                "new_organization": "Espoir AG",
+                "new_organization": "Beispiel AG",
                 "email_addresses": [{"email": "nope"}],
                 "phone_numbers": [{"phone_number": "123"}],
             },

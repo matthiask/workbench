@@ -160,19 +160,19 @@ class CLITest(TestCase):
 given_name: Hans
 family_name: Muster
 salutation: Lieber Hans
-new_organization: Espoir AG
+new_organization: Beispiel AG
 email_addresses:
-  - email: hans@espoir.ch
+  - email: hans@example.com
 """
         )
         result = self.wb("people", "create", person, "--dry-run")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("hans@espoir.ch", result.output)
+        self.assertIn("hans@example.com", result.output)
         self.assertIn("Dry run", result.output)
 
         result = self.wb("people", "create", person)
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Espoir AG", result.output)
+        self.assertIn("Beispiel AG", result.output)
 
         result = self.wb("people", "create", person, "--allow-duplicates")
         self.assertEqual(result.exit_code, 1)

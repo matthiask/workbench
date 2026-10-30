@@ -41,9 +41,9 @@ family_name: Muster
 address: Herr
 salutation: Lieber Hans           # or: Sehr geehrter Herr Muster
 address_on_first_name_terms: true
-organization: 345                  # or: new_organization: Espoir AG
+organization: 345                  # or: new_organization: Beispiel AG
 email_addresses:
-  - email: hans@espoir.ch
+  - email: hans@example.com
 phone_numbers:
   - type: mobile
     phone_number: 079 123 45 67

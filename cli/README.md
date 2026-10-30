@@ -38,7 +38,7 @@ Find the customer and the contact, then create the project. Projects are
 validated like in the web interface; where the web interface would show a
 warning, the CLI fails and you have to use the web interface.
 
-    wb contacts search espoir
+    wb contacts search beispiel
     wb projects create --title "Online Marketing 2027" --contact 345 --dry-run
     wb projects create --title "Online Marketing 2027" --contact 345
 
@@ -56,9 +56,9 @@ given_name: Hans
 family_name: Muster
 address: Herr
 salutation: Lieber Hans
-new_organization: Espoir AG
+new_organization: Beispiel AG
 email_addresses:
-  - email: hans@espoir.ch
+  - email: hans@example.com
 phone_numbers:
   - type: mobile
     phone_number: 079 123 45 67
