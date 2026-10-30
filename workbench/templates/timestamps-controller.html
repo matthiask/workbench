@@ -9,62 +9,99 @@
     <link rel="icon" sizes="192x192" href="{% static 'workbench/lib/timestamps.png' %}">
     <title>Timestamps</title>
     <style>
-      body {
-        box-sizing: border-box;
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        min-height: 90vh;
-        background: #212529;
-        color: #f8f9fa;
-        font-family: sans-serif;
+      :root {
+        color-scheme: light dark;
+        --bg: #f4f5f7;
+        --surface: #fff;
+        --text: #1d2127;
+        --muted: rgba(29, 33, 39, 0.62);
+        --border: #cdd2d9;
+        --start: #4257c8;
+        --stop: #d63a3a;
+        --success: #2f9e6b;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #111318;
+          --surface: #1a1d23;
+          --text: #dfe2e7;
+          --muted: rgba(223, 226, 231, 0.6);
+          --border: #3a3f49;
+          --start: #6b7fe0;
+          --stop: #e05a5a;
+          --success: #4cc38a;
+        }
       }
 
       *,
       *::before,
       *::after {
-        box-sizing: inherit;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 1rem;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
       }
 
       main {
+        width: 100%;
         max-width: 30rem;
+        margin-inline: auto;
       }
 
       main > * + * {
         margin-top: 1rem;
       }
 
+      h1 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.25rem;
+      }
+
       input {
-        padding: 0.25rem;
-        padding: 0.25rem 0.5rem;
-        border: 1px solid grey;
-        background: inherit;
+        display: block;
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        background: var(--surface);
         color: inherit;
-        font-size: 2rem;
+        font: inherit;
+        font-size: 1.25rem;
       }
 
       input::placeholder {
-        color: #999;
-      }
-
-      .notes input {
-        width: 100%;
+        color: var(--muted);
       }
 
       input + input {
-        margin-top: 1rem;
+        margin-top: 0.5rem;
       }
 
       .buttons {
         display: grid;
-        grid-gap: 0.5rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
       }
 
       button {
-        padding: 1.5rem;
+        padding: 1.25rem;
         border: none;
+        border-radius: 0.75rem;
         color: #fff;
-        font-size: 2rem;
+        font: inherit;
+        font-weight: 600;
+        font-size: 1.5rem;
         cursor: pointer;
       }
 
@@ -73,23 +110,21 @@
       }
 
       [data-type='start'] {
-        grid-row: 1;
-        grid-column: 1;
-        background: #9954bb;
+        background: var(--start);
       }
+
       [data-type='stop'] {
-        grid-row: 1;
-        grid-column: 2;
-        background: #cc1e6e;
+        background: var(--stop);
       }
 
       #status {
         min-height: 1.5rem;
+        color: var(--stop);
         text-align: center;
       }
 
-      .success {
-        color: #9954bb;
+      #status.success {
+        color: var(--success);
       }
     </style>
     <script>
