@@ -141,6 +141,9 @@ Change only what was asked, one command per change, each one first with
   explicit approval.
 - Services with logged hours or costs can be changed but not deleted, and the
   last service of an offer can't be deleted.
+- Services without hours or a cost are allowed (Workbench only warns), e.g.
+  when several people estimate their own services one after the other. Only
+  touch the services you were asked about, never fill in or delete others.
 
 Only for a completely new version of the offer, replace it entirely (as long
 as nothing has been logged on its services yet), again with the user's

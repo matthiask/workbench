@@ -1308,6 +1308,8 @@ def _echo_changed_offer(data, *, dry_run, as_json):
         _echo_json(data)
         return
     _echo_offer(data)
+    for warning in data["warnings"]:
+        click.secho(f"Warning: {_error(warning)}", fg="yellow", err=True)
     if dry_run:
         click.secho("Dry run, nothing has been saved.", fg="yellow", err=True)
 

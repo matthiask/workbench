@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 13:06+0100\n"
+"POT-Creation-Date: 2026-10-30 13:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2681,8 +2681,9 @@ msgid "Hours require an effort type and an hourly rate, e.g. from a service type
 msgstr "Stunden benötigen eine Aufwandsart und einen Stundensatz, z.B. von einem Leistungstyp."
 
 #: workbench/offers/api.py
-msgid "Either hours or a cost are required."
-msgstr "Entweder Stunden oder Kosten sind nötig."
+#, python-format
+msgid "%s: Neither hours nor a cost have been given yet."
+msgstr "%s: Es wurden noch weder Stunden noch Kosten angegeben."
 
 #: workbench/offers/api.py
 msgid "The project is closed."

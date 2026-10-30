@@ -105,6 +105,11 @@ class ServiceOut(Schema):
     is_optional: bool
 
 
+class OfferWarning(Schema):
+    loc: list[str | int]
+    msg: str
+
+
 class OfferOut(Schema):
     id: int | None
     code: str | None
@@ -119,6 +124,12 @@ class OfferOut(Schema):
     tax_rate: Decimal
     total: Decimal
     services: list[ServiceOut]
+    warnings: list[OfferWarning] = Field(
+        default=[],
+        description="Things to look at in the services which were just written,"
+        " e.g. services without hours or a cost (allowed, like in the web"
+        " interface).",
+    )
 
 
 class ServiceTypeOut(Schema):
@@ -251,7 +262,7 @@ def _decimal(value, exp):
 SERVICE_FIELDS = {"effort_hours": "hours", "effort_rate": "hourly_rate"}
 
 
-def _apply_service(service, values, *, service_types, loc, errors):
+def _apply_service(service, values, *, service_types, loc, errors, warnings):
     """Apply ``values`` (fields of a ``ServiceIn``) to the service
 
     Creating, replacing, adding and updating services all use these rules.
@@ -304,10 +315,13 @@ def _apply_service(service, values, *, service_types, loc, errors):
                 " e.g. from a service type."
             ),
         })
+    # Allowed like in the web interface, e.g. for offers which several
+    # people estimate one service after the other
     if service.effort_hours is None and service.cost is None:
-        errors.append({
+        warnings.append({
             "loc": [*loc],
-            "msg": _("Either hours or a cost are required."),
+            "msg": _("%s: Neither hours nor a cost have been given yet.")
+            % service.title,
         })
 
     service_errors = []
@@ -321,7 +335,7 @@ def _service_types():
     return {st.title: st for st in ServiceType.objects.all()}
 
 
-def _build_services(project, data, errors):
+def _build_services(project, data, errors, warnings):
     service_types = _service_types()
     services = []
     for index, item in enumerate(data.services):
@@ -332,12 +346,13 @@ def _build_services(project, data, errors):
             service_types=service_types,
             loc=["body", "data", "services", index],
             errors=errors,
+            warnings=warnings,
         )
         services.append(service)
     return services
 
 
-def _save(offer, services, request, *, dry_run, delete=()):
+def _save(offer, services, request, *, dry_run, delete=(), warnings=()):
     """Save everything and return the offer, roll back with ``dry_run``
 
     Objects which only exist because of the dry run have no ID and URL."""
@@ -352,6 +367,7 @@ def _save(offer, services, request, *, dry_run, delete=()):
             service.save(skip_related_model=True)
         offer.save()  # Recalculate the total
         result = offer_out(offer, list(offer.services.all()), request)
+        result["warnings"] = list(warnings)
         if dry_run:
             transaction.set_rollback(True)
             if is_new:
@@ -395,12 +411,13 @@ def offer_create(request, project_id: int, data: OfferIn, *, dry_run: bool = Fal
         status=Offer.IN_PREPARATION,
     )
     full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
-    services = _build_services(project, data, errors)
+    warnings = []
+    services = _build_services(project, data, errors, warnings)
 
     if errors:
         raise ValidationError(errors)
 
-    return _save(offer, services, request, dry_run=dry_run)
+    return _save(offer, services, request, dry_run=dry_run, warnings=warnings)
 
 
 def _offer_in_preparation(offer_id, message):
@@ -442,12 +459,20 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = Fals
     if data.postal_address is not None:
         offer.postal_address = data.postal_address
     full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
-    services = _build_services(offer.project, data, errors)
+    warnings = []
+    services = _build_services(offer.project, data, errors, warnings)
 
     if errors:
         raise ValidationError(errors)
 
-    return _save(offer, services, request, dry_run=dry_run, delete=existing)
+    return _save(
+        offer,
+        services,
+        request,
+        dry_run=dry_run,
+        delete=existing,
+        warnings=warnings,
+    )
 
 
 def _changeable_offer(offer_id):
@@ -509,17 +534,21 @@ def offer_service_add(
                 "msg": _("The offer has no service with this ID."),
             })
     service = Service(project=offer.project)
+    warnings = []
     _apply_service(
         service,
         data.model_dump(exclude_none=True, exclude={"after"}),
         service_types=_service_types(),
         loc=["body", "data"],
         errors=errors,
+        warnings=warnings,
     )
     if errors:
         raise ValidationError(errors)
     services.insert(index, service)
-    return _save(offer, _renumbered(services), request, dry_run=dry_run)
+    return _save(
+        offer, _renumbered(services), request, dry_run=dry_run, warnings=warnings
+    )
 
 
 class ServicePatch(Schema):
@@ -553,17 +582,18 @@ def offer_service_update(
     have already been logged on it (like in the web interface)"""
     offer = _changeable_offer(offer_id)
     service = get_object_or_404(offer.services.select_related("project"), pk=service_id)
-    errors = []
+    errors, warnings = [], []
     _apply_service(
         service,
         data.model_dump(exclude_unset=True),
         service_types=_service_types(),
         loc=["body", "data"],
         errors=errors,
+        warnings=warnings,
     )
     if errors:
         raise ValidationError(errors)
-    return _save(offer, [service], request, dry_run=dry_run)
+    return _save(offer, [service], request, dry_run=dry_run, warnings=warnings)
 
 
 @router.delete("/offers/{offer_id}/services/{int:service_id}/", response=OfferOut)

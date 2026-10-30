@@ -147,7 +147,6 @@ class OffersAPITest(TestCase):
                 ["body", "data", "postal_address"],
                 ["body", "data", "services", 0, "service_type"],
                 ["body", "data", "services", 1, "hours"],
-                ["body", "data", "services", 2],
                 ["body", "data", "services", 3, "hourly_rate"],
             ],
         )
@@ -349,8 +348,20 @@ class OfferServicesAPITest(TestCase):
 
         response = self.send("post", "services/", service | {"after": 0})
         self.assertEqual(response.status_code, 422)
-        response = self.send("post", "services/", {"title": "Nothing"})
-        self.assertEqual(response.status_code, 422)
+        # Services without hours and costs are allowed like in the web
+        # interface, e.g. to estimate them later
+        response = self.send("post", "services/", {"title": "Nothing"}, dry_run=True)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["warnings"],
+            [
+                {
+                    "loc": ["body", "data"],
+                    "msg": "Nothing: Neither hours nor a cost have been given yet.",
+                }
+            ],
+        )
+        self.assertEqual(self.client.get(self.url).json()["warnings"], [])
 
     def test_update(self):
         """Only the given fields change, null clears values"""
@@ -375,9 +386,9 @@ class OfferServicesAPITest(TestCase):
         )
 
         path = f"services/{self.hosting.pk}/"
-        response = self.send("patch", path, {"cost": None})
-        self.assertEqual(response.status_code, 422)
-        self.assertIn("Either hours or a cost", response.content.decode())
+        response = self.send("patch", path, {"cost": None}, dry_run=True)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(len(response.json()["warnings"]), 1)
         response = self.send(
             "patch", path, {"cost": None, "service_type": "consulting", "hours": 1}
         )

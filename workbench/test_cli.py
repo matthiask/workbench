@@ -271,8 +271,8 @@ services:
         result = self.wb(
             "offers", "services", "update", created.pk, hosting.pk, "--clear-cost"
         )
-        self.assertEqual(result.exit_code, 1)
-        self.assertIn("Either hours or a cost", result.output)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Warning: Hosting: Neither hours nor a cost", result.output)
         result = self.wb(
             "offers",
             "services",
