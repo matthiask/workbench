@@ -212,6 +212,8 @@ planned_work:
             hours=3,
             description="Wireframes",
         )
+        result = self.wb("services", "search", "--project", project.pk)
+        self.assertIn("3.0", result.output)
         result = self.wb(
             "hours", "search", "--project", project.pk, "--rendered-by", "ab"
         )

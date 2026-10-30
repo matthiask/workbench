@@ -134,6 +134,15 @@ list of the choices:
     wb deals create --title "Relaunch" --contact 345 --probability normal \
         --value Design=5000 --attribute Source=Referral --dry-run
 
+## Services
+
+Services with their hours and costs, and what has been logged on them so far.
+Rates are shown with the offers (`wb offers show`) and the project statistics.
+
+    wb services search --project 1234
+    wb services search --offer 5678
+    wb services search hosting
+
 ## Logged hours
 
 Hours are logged in Workbench, its forms warn about many mistakes. Searching
