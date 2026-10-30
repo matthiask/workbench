@@ -1,30 +1,14 @@
-{% extends "base.html" %}
+{% extends "generic/object_detail.html" %}
 {% load i18n workbench %}
-{% block title %}{{ object }} - {{ block.super }}{% endblock %}
 
-{% block content %}
-  <div class="row">
-    <div class="col-md-6 offset-md-3">
-      <h1>{{ object|h }} {% history_link object %}</h1>
-      <table class="table table-striped">
-        {% for name, value in object|field_value_pairs %}
-          <tr>
-            <th class="text-end">{{ name }}</th>
-            <td>{% link_or_none value %}</td>
-          </tr>
-        {% endfor %}
-        <tr>
-          <th class="text-end">{% translate 'invoice'|capfirst %}</th>
-          <td>
-            {% link_or_none object.invoice with_badge=True %}
-            {% if object.invoice %}
-              {% translate 'invoice total'|capfirst %}: {{ object.invoice.total|currency }}
-            {% endif %}
-          </td>
-        </tr>
-      </table>
-      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
-    </div>
-  </div>
-{% endblock content %}
+{% block extra_fields %}
+  <dt>{% translate 'invoice'|capfirst %}</dt>
+  <dd>
+    {% link_or_none object.invoice with_badge=True %}
+    {% if object.invoice %}
+      <div class="text-secondary">
+        {% translate 'invoice total'|capfirst %}: {{ object.invoice.total|currency }}
+      </div>
+    {% endif %}
+  </dd>
+{% endblock extra_fields %}

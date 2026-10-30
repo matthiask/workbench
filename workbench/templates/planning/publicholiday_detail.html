@@ -5,14 +5,12 @@
 {% endblock title %}
 
 {% block body %}
-  <table class="table table-striped">
+  <dl class="wb-fields">
     {% for name, value in object|field_value_pairs %}
-      <tr>
-        <th class="text-end">{{ name }}</th>
-        <td>{% link_or_none value %}</td>
-      </tr>
+      <dt>{{ name }}</dt>
+      <dd>{% link_or_none value %}</dd>
     {% endfor %}
-  </table>
+  </dl>
 {% endblock body %}
 
 {% block footer %}{% endblock %}
