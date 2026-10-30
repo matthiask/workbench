@@ -1264,6 +1264,88 @@ def search_absences(user, reason, since, until, as_json):
     console.print(table)
 
 
+@cli.group()
+def costs():
+    """Look at logged costs, log them in Workbench"""
+
+
+@costs.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--project", type=int, help="Project ID.")
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option("--offer", type=int, help="Offer ID.")
+@click.option("--service", type=int, help="Service ID.")
+@click.option("--rendered-by", help="Short name.")
+@click.option("--expenses", is_flag=True, help="Paid from someone's own pocket.")
+@click.option(
+    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered since."
+)
+@click.option(
+    "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered until."
+)
+@click.option("--json", "as_json", is_flag=True)
+def search_costs(
+    query,
+    project,
+    customer,
+    offer,
+    service,
+    rendered_by,
+    expenses,
+    since,
+    until,
+    as_json,
+):
+    """Search logged costs, newest first"""
+    params = {"q": " ".join(query), "expenses": _bool(expenses)}
+    for key, value in [
+        ("project", project),
+        ("customer", customer),
+        ("offer", offer),
+        ("service", service),
+        ("rendered_by", rendered_by),
+    ]:
+        if value:
+            params[key] = value
+    if since:
+        params["rendered_since"] = since.date().isoformat()
+    if until:
+        params["rendered_until"] = until.date().isoformat()
+    data = _request("GET", "logbook/costs/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table(
+        "Rendered on",
+        "By",
+        "Project",
+        "Service",
+        "Cost>",
+        "Third party>",
+        "Description",
+        show_footer=True,
+    )
+    for row in data["costs"]:
+        table.add_row(
+            _link(row["rendered_on"], row["url"]),
+            row["rendered_by"],
+            row["project"],
+            row["service"],
+            row["cost"],
+            row["third_party_costs"] or "",
+            row["description"] + (" (expenses)" if row["are_expenses"] else ""),
+        )
+    table.columns[0].footer = "Total"
+    table.columns[4].footer = data["total_cost"]
+    table.columns[5].footer = data["total_third_party_costs"]
+    console.print(table)
+    if data["count"] > len(data["costs"]):
+        console.print(
+            f"Showing {len(data['costs'])} of {data['count']} entries,"
+            " the totals include all of them."
+        )
+
+
 @cli.group("projected-invoices")
 def projected_invoices():
     """Look at the planned invoicing"""

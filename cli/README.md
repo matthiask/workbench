@@ -184,14 +184,16 @@ Rates are shown with the offers (`wb offers show`) and the project statistics.
     wb services search --offer 5678
     wb services search hosting
 
-## Logged hours
+## Logged hours and costs
 
-Hours are logged in Workbench, its forms warn about many mistakes. Searching
-them works in the CLI:
+Hours and costs are logged in Workbench, its forms warn about many mistakes.
+Searching them works in the CLI:
 
     wb hours search --project 1234
     wb hours search --rendered-by mk --since 2026-10-01
     wb hours search wireframes --customer 345
+    wb costs search --project 1234
+    wb costs search --expenses --rendered-by mk
 
 ## Absences
 

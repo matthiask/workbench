@@ -272,6 +272,15 @@ planned_work:
         self.assertIn("Holidays", result.output)
         self.assertNotIn("Past", result.output)
 
+        factories.LoggedCostFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            cost=120,
+            description="Fonts",
+        )
+        result = self.wb("costs", "search", "--project", project.pk)
+        self.assertIn("Fonts", result.output)
+        self.assertIn("120.00", result.output)
+
         result = self.wb("projects", "stats", project.pk, "--csv")
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(result.output.startswith("project_id,project,"))
