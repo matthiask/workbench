@@ -568,3 +568,20 @@ class GroupsTest(TestCase):
         self.assertNotContains(response, "Newsletter 2015")
         response = self.client.get(person.urls["update"])
         self.assertContains(response, "Newsletter 2015")
+
+    def test_group_filter(self):
+        """Archived groups are offered separately in the filters"""
+        self.client.force_login(factories.UserFactory.create())
+        Group.objects.create(title="Team")
+        Group.objects.create(title="Newsletter 2015", is_archived=True)
+        for url in ["/contacts/people/", "/contacts/organizations/"]:
+            with self.subTest(url=url):
+                content = self.client.get(url).content.decode()
+                self.assertLess(
+                    content.index('<optgroup label="Active">'),
+                    content.index(">Team</option>"),
+                )
+                self.assertLess(
+                    content.index('<optgroup label="Archived">'),
+                    content.index(">Newsletter 2015</option>"),
+                )

@@ -36,6 +36,21 @@ from workbench.tools.vcard import person_to_vcard, render_vcard_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
+def group_choices():
+    """Groups for filters, archived groups separately at the end"""
+    groups = {False: [], True: []}
+    for group in Group.objects.order_by(Lower("title"), "pk"):
+        groups[group.is_archived].append((group.pk, group.title))
+    return [
+        ("", _("All groups")),
+        *[
+            (label, groups[archived])
+            for archived, label in [(False, _("Active")), (True, _("Archived"))]
+            if groups[archived]
+        ],
+    ]
+
+
 class GroupSearchForm(Form):
     q = forms.CharField(
         required=False,
@@ -97,6 +112,10 @@ class OrganizationSearchForm(Form):
         label="",
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["g"].choices = group_choices()
+
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q")).active()
@@ -157,6 +176,7 @@ class PersonSearchForm(Form):
         self.fields["primary_contact"].choices = User.objects.choices(
             collapse_inactive=True, myself=True
         )
+        self.fields["g"].choices = group_choices()
 
     def filter(self, queryset):
         data = self.cleaned_data
