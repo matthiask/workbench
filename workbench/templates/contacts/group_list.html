@@ -1,0 +1,41 @@
+{% extends "contacts/object_list.html" %}
+{% load i18n %}
+
+{% block search-form-buttons %}
+  <a href="{{ view.model.urls.create }}" class="btn btn-primary" data-ajaxmodal>
+    {% include "svg/plus.svg" %}
+    {{ view.meta.verbose_name|capfirst }}
+  </a>
+{% endblock search-form-buttons %}
+
+{% block rows %}
+  {% for group in object_list %}
+    <div class="list-group-item wb-row align-items-center">
+      <div class="wb-row-main">
+        <a href="{{ group.get_absolute_url }}" class="wb-row-title">{{ group }}</a>
+        <div class="wb-row-meta">
+          <span>
+            {% blocktranslate count count=group.people_count trimmed %}
+              {{ count }} person
+            {% plural %}
+              {{ count }} people
+            {% endblocktranslate %}
+          </span>
+          <span>
+            {% blocktranslate count count=group.organizations_count trimmed %}
+              {{ count }} organization
+            {% plural %}
+              {{ count }} organizations
+            {% endblocktranslate %}
+          </span>
+          {% if group.is_archived %}<span class="badge text-bg-secondary">{% translate 'archived' %}</span>{% endif %}
+        </div>
+      </div>
+      <a
+        href="{{ group.urls.update }}"
+        class="btn btn-quiet btn-sm"
+        data-ajaxmodal
+      >{% translate 'Update' %}</a>
+    </div>
+  {% endfor %}
+{% endblock rows %}

@@ -18,6 +18,8 @@ from workbench.tools.validation import raise_if_errors
 
 @model_urls
 class Group(Model):
+    open_in_modal = True
+
     title = models.CharField(_("title"), max_length=100)
     is_archived = models.BooleanField(
         _("is archived"),
@@ -35,6 +37,10 @@ class Group(Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        # Groups are lists of people
+        return Person.urls["list"] + f"?g={self.pk}"
 
 
 class OrganizationQuerySet(SearchQuerySet):

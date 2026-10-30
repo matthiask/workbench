@@ -3,12 +3,14 @@ from django.urls import path
 
 from workbench import generic
 from workbench.contacts.forms import (
+    GroupForm,
+    GroupSearchForm,
     OrganizationDeleteForm,
     OrganizationForm,
     PersonForm,
     PersonSearchForm,
 )
-from workbench.contacts.models import Organization, Person
+from workbench.contacts.models import Group, Organization, Person
 from workbench.contacts.views import OrganizationListView, person_vcard, select
 
 
@@ -94,4 +96,26 @@ urlpatterns = [
         name="contacts_person_delete",
     ),
     path("people/<int:pk>/vcard/", person_vcard, name="contacts_person_vcard"),
+    path(
+        "groups/",
+        generic.ListView.as_view(model=Group, search_form_class=GroupSearchForm),
+        name="contacts_group_list",
+    ),
+    path(
+        "groups/create/",
+        generic.CreateView.as_view(model=Group, form_class=GroupForm),
+        name="contacts_group_create",
+    ),
+    path(
+        "groups/<int:pk>/update/",
+        generic.UpdateView.as_view(model=Group, form_class=GroupForm),
+        name="contacts_group_update",
+    ),
+    path(
+        "groups/<int:pk>/delete/",
+        generic.DeleteView.as_view(
+            model=Group, template_name="modal_confirm_delete.html"
+        ),
+        name="contacts_group_delete",
+    ),
 ]

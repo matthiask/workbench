@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:33+0100\n"
+"POT-Creation-Date: 2026-10-30 22:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1000,13 +1000,17 @@ msgid "contacts"
 msgstr "Kontakte"
 
 #: workbench/contacts/forms.py
-msgid "All groups"
-msgstr "Alle Gruppen"
+msgid "Archived"
+msgstr "Archiviert"
 
 #: workbench/contacts/forms.py workbench/expenses/forms.py
 #: workbench/projects/forms.py workbench/reporting/views.py
 msgid "All"
 msgstr "Alle"
+
+#: workbench/contacts/forms.py
+msgid "All groups"
+msgstr "Alle Gruppen"
 
 #: workbench/contacts/forms.py workbench/deals/forms.py
 #: workbench/projects/forms.py
@@ -1062,7 +1066,7 @@ msgstr "Kontakte, die nur in archivierten Gruppen sind, werden nach fünf Jahren
 msgid "group"
 msgstr "Gruppe"
 
-#: workbench/contacts/models.py
+#: workbench/contacts/models.py workbench/templates/contacts/object_list.html
 msgid "groups"
 msgstr "Gruppen"
 
@@ -3856,6 +3860,7 @@ msgstr "Kopiere das Token jetzt, es wird nicht noch einmal angezeigt:"
 
 #: workbench/templates/accounts/api_tokens.html
 #: workbench/templates/awt/absence_detail.html
+#: workbench/templates/contacts/group_form.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
@@ -3974,6 +3979,7 @@ msgstr "Abwesenheitskalender"
 #: workbench/templates/accounts/team_detail.html
 #: workbench/templates/accounts/user_detail.html
 #: workbench/templates/awt/absence_detail.html
+#: workbench/templates/contacts/group_list.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/deals/deal_detail.html
@@ -4220,6 +4226,22 @@ msgstr "Stunden erfassen"
 #: workbench/templates/projects/project_detail.html
 msgid "took a break"
 msgstr "Habe eine Pause gemacht"
+
+#: workbench/templates/contacts/group_list.html
+msgid "%(count)s person"
+msgid_plural "%(count)s people"
+msgstr[0] "%(count)s Person"
+msgstr[1] "%(count)s Personen"
+
+#: workbench/templates/contacts/group_list.html
+msgid "%(count)s organization"
+msgid_plural "%(count)s organizations"
+msgstr[0] "%(count)s Organisation"
+msgstr[1] "%(count)s Organisationen"
+
+#: workbench/templates/contacts/group_list.html
+msgid "archived"
+msgstr "archiviert"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html

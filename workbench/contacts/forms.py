@@ -4,7 +4,8 @@ from collections import OrderedDict
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.db.models.functions import Lower
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
@@ -33,6 +34,51 @@ from workbench.tools.models import ProtectedError, SlowCollector
 from workbench.tools.substitute_with import substitute_with
 from workbench.tools.vcard import person_to_vcard, render_vcard_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
+
+
+class GroupSearchForm(Form):
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": _("Search")}
+        ),
+        label="",
+    )
+    s = forms.ChoiceField(
+        choices=[
+            ("", _("Active")),
+            ("archived", _("Archived")),
+            ("all", _("All")),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="",
+    )
+
+    def filter(self, queryset):
+        data = self.cleaned_data
+        if q := data.get("q"):
+            queryset = queryset.filter(title__icontains=q)
+        if data.get("s") == "archived":
+            queryset = queryset.filter(is_archived=True)
+        elif data.get("s") != "all":
+            queryset = queryset.filter(is_archived=False)
+        # Aggregations ignore the default ordering
+        return queryset.annotate(
+            people_count=Count(
+                "person", filter=Q(person__is_archived=False), distinct=True
+            ),
+            organizations_count=Count(
+                "organization", filter=Q(organization__is_archived=False), distinct=True
+            ),
+        ).order_by(Lower("title"), "pk")
+
+
+@add_prefix("modal")
+class GroupForm(ModelForm):
+    class Meta:
+        model = Group
+        fields = ["title", "is_archived"]
 
 
 class OrganizationSearchForm(Form):
@@ -197,6 +243,18 @@ class OrganizationForm(ModelForm):
             "groups": forms.CheckboxSelectMultiple(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["groups"].queryset = _offered_groups(self.instance)
+
+
+def _offered_groups(instance):
+    """Archived groups only for contacts already in them"""
+    return Group.objects.filter(
+        Q(is_archived=False)
+        | Q(pk__in=instance.groups.values("pk") if instance.pk else [])
+    )
+
 
 class OrganizationDeleteForm(ModelForm):
     class Meta:
@@ -266,6 +324,7 @@ class PersonForm(ModelForm):
             initial["organization"] = organization
 
         super().__init__(*args, **kwargs)
+        self.fields["groups"].queryset = _offered_groups(self.instance)
         kwargs.pop("request")
         self.formsets = (
             OrderedDict((

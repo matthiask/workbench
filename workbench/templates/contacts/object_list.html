@@ -6,6 +6,7 @@
     {% mark_current request.path %}
     <a class="nav-link" href="{% url 'contacts_person_list' %}">{% translate 'people'|capfirst %}</a>
     <a class="nav-link" href="{% url 'contacts_organization_list' %}">{% translate 'organizations'|capfirst %}</a>
+    <a class="nav-link" href="{% url 'contacts_group_list' %}">{% translate 'groups'|capfirst %}</a>
     {% endmark_current %}
   </nav>
 {% endblock content-title %}

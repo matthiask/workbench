@@ -524,3 +524,47 @@ class ArchiveContactsTest(TestCase):
             for field in tasks._reverse_relations(model):
                 with self.subTest(model=model, field=field):
                     self.assertIn(field.related_model, recent)
+
+
+class GroupsTest(TestCase):
+    def test_groups(self):
+        """Groups are managed in Workbench, archived ones aren't offered"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.post(
+            Group.urls["create"],
+            {"modal-title": "Newsletter"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 201)
+        group = Group.objects.get()
+        person = factories.PersonFactory.create()
+        person.groups.add(group)
+
+        response = self.client.get(Group.urls["list"])
+        self.assertContains(response, "Newsletter")
+        self.assertContains(response, "1 person")
+
+        # Sorted by title, counting doesn't change that
+        Group.objects.create(title="b-list")
+        Group.objects.create(title="Alumni")
+        content = self.client.get(Group.urls["list"]).content.decode()
+        self.assertLess(content.index("Alumni"), content.index("b-list"))
+        self.assertLess(content.index("b-list"), content.index("Newsletter"))
+
+        response = self.client.post(
+            group.urls["update"],
+            {"modal-title": "Newsletter 2015", "modal-is_archived": "on"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        link = f'href="{group.get_absolute_url()}"'
+        self.assertNotContains(self.client.get(Group.urls["list"]), link)
+        self.assertContains(self.client.get(Group.urls["list"] + "?s=archived"), link)
+
+        # Archived groups are offered only to contacts already in them
+        other = factories.PersonFactory.create()
+        response = self.client.get(other.urls["update"])
+        self.assertNotContains(response, "Newsletter 2015")
+        response = self.client.get(person.urls["update"])
+        self.assertContains(response, "Newsletter 2015")
