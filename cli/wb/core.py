@@ -59,7 +59,7 @@ VERSION = _version()
 console = Console(markup=False, highlight=False)
 
 
-def _terminate(msg):
+def terminate(msg):
     click.echo(msg, file=sys.stderr)
     sys.exit(1)
 
@@ -76,7 +76,10 @@ class _ServerError(Exception):
 def _bug_report(problem, details, *, args):
     """Write what's needed to fix a bug into a file people can send"""
     try:
-        url = _url(os.environ.get("WORKBENCH_URL")) or _read_config()["current"]
+        url = (
+            installation_url(os.environ.get("WORKBENCH_URL"))
+            or read_config()["current"]
+        )
     except Exception:  # noqa: BLE001
         url = None
     now = dt.datetime.now().astimezone()
@@ -93,10 +96,10 @@ def _bug_report(problem, details, *, args):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(report)
     except OSError:
-        _terminate(
+        terminate(
             f"{problem} Please send this to the people running Workbench:\n\n{report}"
         )
-    _terminate(
+    terminate(
         f"{problem} Please send {path} to the people running Workbench"
         " and tell them what you tried to do."
     )
@@ -124,7 +127,7 @@ class _Group(click.Group):
             )
 
 
-def _read_config():
+def read_config():
     """The current installation's URL and the tokens of all installations
 
     Older versions stored the URL and the token of a single installation."""
@@ -139,13 +142,16 @@ def _read_config():
     installations = {}
     for url, installation in sorted(
         config.get("installations", {}).items(),
-        key=lambda item: item[0] == _url(item[0]),
+        key=lambda item: item[0] == installation_url(item[0]),
     ):
-        installations[_url(url)] = installation
-    return {"current": _url(config.get("current")), "installations": installations}
+        installations[installation_url(url)] = installation
+    return {
+        "current": installation_url(config.get("current")),
+        "installations": installations,
+    }
 
 
-def _url(url):
+def installation_url(url):
     """The scheme and the host which identify an installation, URLs may be
     pasted from the browser"""
     if not url:
@@ -156,7 +162,7 @@ def _url(url):
     return f"{parts.scheme}://{parts.netloc.lower()}"
 
 
-def _write_config(config):
+def write_config(config):
     lines = [f"current = {json.dumps(config['current'])}"]
     for url, installation in sorted(config["installations"].items()):
         lines += [
@@ -171,30 +177,30 @@ def _write_config(config):
     CONFIG.chmod(0o600)
 
 
-def _save_config(url, token, access=None):
+def save_config(url, token, access=None):
     """Store the token of the installation and make it the current one
 
     The access is remembered to ask for the same access when the token
     expires; it is unknown for pasted tokens."""
-    config = _read_config()
+    config = read_config()
     config["installations"][url] = {"token": token} | (
         {"access": access} if access else {}
     )
     config["current"] = url
-    _write_config(config)
+    write_config(config)
 
 
 def _config():
     """URL and token from the environment or from the configuration file
 
     WORKBENCH_URL alone selects one of the installations wb is logged in to."""
-    config = _read_config()
-    url = _url(os.environ.get("WORKBENCH_URL")) or config["current"]
+    config = read_config()
+    url = installation_url(os.environ.get("WORKBENCH_URL")) or config["current"]
     token = os.environ.get("WORKBENCH_TOKEN") or (
         config["installations"].get(url, {}).get("token")
     )
     if not url or not token:
-        _terminate("Not configured yet. Run `wb login URL` first.")
+        terminate("Not configured yet. Run `wb login URL` first.")
     return url, token
 
 
@@ -206,13 +212,13 @@ def _can_login_again(url):
     only with the same access as before."""
     if not sys.stdin.isatty() or os.environ.get("WORKBENCH_TOKEN"):
         return None
-    return _read_config()["installations"].get(url, {}).get("access")
+    return read_config()["installations"].get(url, {}).get("access")
 
 
 LOGIN_TIMEOUT = 300
 
 
-def _browser_login(url, access):
+def browser_login(url, access):
     """Authorize wb in the browser and store the token
 
     Workbench posts the token to a server listening on a local port, the
@@ -258,8 +264,8 @@ def _browser_login(url, access):
         while "token" not in result and time.monotonic() < deadline:
             server.handle_request()
     if "token" not in result:
-        _terminate("Timed out waiting for the browser.")
-    _save_config(url, result["token"], access)
+        terminate("Timed out waiting for the browser.")
+    save_config(url, result["token"], access)
     click.echo(f"Saved {CONFIG}", err=True)
     return result["token"]
 
@@ -283,7 +289,7 @@ def _check_version(latest):
         )
 
 
-def _error(error):
+def format_error(error):
     """A validation error, prefixed with the field if there is one"""
     if loc := ".".join(str(part) for part in error["loc"][2:]):
         return f"{loc}: {error['msg']}"
@@ -300,10 +306,10 @@ def _send(method, url, path, token, **kwargs):
             **kwargs,
         )
     except requests.RequestException as exc:
-        _terminate(str(exc))
+        terminate(str(exc))
 
 
-def _request(method, path, *, optional=False, **kwargs):
+def request(method, path, *, optional=False, **kwargs):
     """Request the API, terminate on errors
 
     ``optional`` requests return ``None`` if access is denied, e.g. because
@@ -313,15 +319,15 @@ def _request(method, path, *, optional=False, **kwargs):
     response = _send(method, url, path, token, **kwargs)
     if response.status_code == 401 and (access := _can_login_again(url)):
         click.secho("Your access has expired.", fg="yellow", err=True)
-        token = _browser_login(url, access)
+        token = browser_login(url, access)
         response = _send(method, url, path, token, **kwargs)
     _check_version(response.headers.get("x-workbench-cli-latest"))
     if response.status_code == 401:
-        _terminate("Not authorized (anymore). Run `wb login` to log in again.")
+        terminate("Not authorized (anymore). Run `wb login` to log in again.")
     if response.status_code == 403 and optional:
         return None
     if response.status_code == 422:
-        _terminate("\n".join(_error(error) for error in response.json()["detail"]))
+        terminate("\n".join(format_error(error) for error in response.json()["detail"]))
     if response.status_code >= 500:
         raise _ServerError(
             response.status_code,
@@ -334,7 +340,7 @@ def _request(method, path, *, optional=False, **kwargs):
             detail = response.json()["detail"]
         except ValueError, KeyError, TypeError:
             detail = response.text
-        _terminate(f"{response.status_code}: {detail}")
+        terminate(f"{response.status_code}: {detail}")
     return response.json()
 
 
@@ -348,28 +354,28 @@ _Loader.yaml_implicit_resolvers = {
 }
 
 
-def _load(file):
+def load(file):
     """Load data from a YAML or JSON file"""
     try:
         return yaml.load(file, Loader=_Loader)
     except yaml.YAMLError as exc:
-        _terminate(f"Invalid YAML or JSON: {exc}")
+        terminate(f"Invalid YAML or JSON: {exc}")
 
 
-def _bool(value):
+def format_bool(value):
     return "true" if value else "false"
 
 
-def _echo_json(data):
+def echo_json(data):
     click.echo(json.dumps(data, indent=2, ensure_ascii=False))
 
 
-def _link(text, url):
+def link(text, url):
     """Text which links to the URL in terminals supporting hyperlinks"""
     return Text(str(text), style=Style(link=url)) if url else str(text)
 
 
-def _table(*columns, **kwargs):
+def make_table(*columns, **kwargs):
     """A table with headings, columns ending in ">" are right-aligned"""
     table = Table(box=box.SIMPLE_HEAD, **kwargs)
     for column in columns:
@@ -380,9 +386,9 @@ def _table(*columns, **kwargs):
     return table
 
 
-def _echo_fields(title, fields, *, url=None):
+def echo_fields(title, fields, *, url=None):
     """A bold title followed by the non-empty fields"""
-    console.print(_link(title, url), style="bold")
+    console.print(link(title, url), style="bold")
     grid = Table.grid(padding=(0, 2))
     grid.add_column(style="dim")
     grid.add_column()
@@ -392,13 +398,13 @@ def _echo_fields(title, fields, *, url=None):
     console.print(grid)
 
 
-def _echo_offer(offer):
-    _echo_fields(
+def echo_offer(offer):
+    echo_fields(
         f"{offer['code'] or '(new offer)'} {offer['title']}",
         [("ID", offer["id"]), ("Status", offer["status"]), ("URL", offer["url"])],
         url=offer["url"],
     )
-    table = _table(
+    table = make_table(
         "ID>", "Service", "Effort type", "Hours>", "Rate>", "Cost>", show_footer=True
     )
     for service in offer["services"]:
@@ -424,15 +430,15 @@ def _echo_offer(offer):
     console.print(totals)
 
 
-def _echo_offer_list(offers):
+def echo_offer_list(offers):
     if not offers:
         console.print("No offers yet.")
         return
-    table = _table("ID>", "Code", "Title", "Status", "Total>")
+    table = make_table("ID>", "Code", "Title", "Status", "Total>")
     for offer in offers:
         table.add_row(
-            _link(offer["id"], offer["url"]),
-            _link(offer["code"], offer["url"]),
+            link(offer["id"], offer["url"]),
+            link(offer["code"], offer["url"]),
             offer["title"],
             offer["status"],
             offer["total"],
@@ -440,8 +446,8 @@ def _echo_offer_list(offers):
     console.print(table)
 
 
-def _echo_stats(projects):
-    table = _table(
+def echo_stats(projects):
+    table = make_table(
         "Code",
         "Title",
         "Closed on",
@@ -457,7 +463,7 @@ def _echo_stats(projects):
     for stats in projects:
         project = stats["project"]
         table.add_row(
-            _link(project["code"], project["url"]),
+            link(project["code"], project["url"]),
             project["title"],
             project["closed_on"] or "",
             stats["hours"]["offered"],
@@ -472,7 +478,7 @@ def _echo_stats(projects):
     console.print(table)
 
 
-def _echo_stats_csv(projects):
+def echo_stats_csv(projects):
     writer = csv.writer(sys.stdout)
     writer.writerow([
         "project_id",
@@ -511,8 +517,8 @@ def _echo_stats_csv(projects):
             ])
 
 
-def _echo_invoice_list(invoices):
-    table = _table(
+def echo_invoice_list(invoices):
+    table = make_table(
         "ID>",
         "Code",
         "Title",
@@ -525,10 +531,10 @@ def _echo_invoice_list(invoices):
     )
     for invoice in invoices:
         table.add_row(
-            _link(invoice["id"], invoice["url"]),
-            _link(invoice["code"], invoice["url"]),
+            link(invoice["id"], invoice["url"]),
+            link(invoice["code"], invoice["url"]),
             invoice["title"],
-            _link(invoice["customer"]["name"], invoice["customer"]["url"]),
+            link(invoice["customer"]["name"], invoice["customer"]["url"]),
             invoice["status"],
             invoice["invoiced_on"] or "",
             invoice["due_on"] or "",
@@ -537,7 +543,7 @@ def _echo_invoice_list(invoices):
     console.print(table)
 
 
-def _page_options(fn):
+def page_options(fn):
     fn = click.option(
         "--offset",
         type=click.IntRange(min=0),
@@ -551,13 +557,13 @@ def _page_options(fn):
     )(fn)
 
 
-def _page_params(limit, offset):
+def page_params(limit, offset):
     return {
         key: value for key, value in [("limit", limit), ("offset", offset)] if value
     }
 
 
-def _echo_more(data, offset, what="results", *, note=""):
+def echo_more(data, offset, what="results", *, note=""):
     """Tell how many results there are if not all of them are shown"""
     shown = len(data["items"])
     if not offset and shown == data["count"]:
@@ -574,8 +580,8 @@ def _echo_more(data, offset, what="results", *, note=""):
 def _completion_values(name, path, key):
     """Values for completing options, fetched from the API at most once a day
     per installation; no values if anything fails"""
-    config = _read_config()
-    url = _url(os.environ.get("WORKBENCH_URL")) or config["current"]
+    config = read_config()
+    url = installation_url(os.environ.get("WORKBENCH_URL")) or config["current"]
     token = os.environ.get("WORKBENCH_TOKEN") or (
         config["installations"].get(url, {}).get("token")
     )
@@ -611,7 +617,7 @@ def _complete(values, incomplete):
     ]
 
 
-def _complete_short_names(ctx, param, incomplete):
+def complete_short_names(ctx, param, incomplete):
     return _complete(_completion_values("users", "users/", "short_name"), incomplete)
 
 
@@ -637,11 +643,11 @@ def _flatten(row, prefix=""):
     return result
 
 
-def _without(row, key):
+def without(row, key):
     return {k: v for k, v in row.items() if k != key}
 
 
-def _echo_csv(rows):
+def echo_csv(rows):
     rows = [_flatten(row) for row in rows]
     writer = csv.DictWriter(
         sys.stdout, fieldnames=list(dict.fromkeys(key for row in rows for key in row))
@@ -650,7 +656,7 @@ def _echo_csv(rows):
     writer.writerows(rows)
 
 
-def _period_options(default):
+def period_options(default):
     """Options for the period of a report or a search, ``default`` describes
     it"""
 
@@ -680,18 +686,18 @@ def _period_options(default):
     return decorator
 
 
-def _users_options(fn):
+def users_options(fn):
     fn = click.option("--team", help="Team name.", shell_complete=_complete_teams)(fn)
     return click.option(
         "--user",
         "users",
         multiple=True,
         help="Short name, can be repeated.",
-        shell_complete=_complete_short_names,
+        shell_complete=complete_short_names,
     )(fn)
 
 
-def _period_params(period, since, until, *, users=(), team=None):
+def period_params(period, since, until, *, users=(), team=None):
     params = {"period": period, "user": list(users), "team": team}
     if since:
         params["since"] = since.date().isoformat()
@@ -700,28 +706,28 @@ def _period_params(period, since, until, *, users=(), team=None):
     return {key: value for key, value in params.items() if value}
 
 
-def _number(value, places):
+def format_number(value, places):
     """Format decimals (strings in the API) and numbers"""
     return f"{float(value):.{places}f}" if value is not None else ""
 
 
-def _amount(value):
-    return _number(value, 2)
+def format_amount(value):
+    return format_number(value, 2)
 
 
-def _hours(value):
-    return _number(value, 1)
+def format_hours(value):
+    return format_number(value, 1)
 
 
-def _days(value):
-    return _number(value, 1)
+def format_days(value):
+    return format_number(value, 1)
 
 
-def _percentage(value):
-    return f"{_number(value, 0)}%" if value is not None else ""
+def format_percentage(value):
+    return f"{format_number(value, 0)}%" if value is not None else ""
 
 
-def _echo_period(data):
+def echo_period(data):
     console.print(f"{data['since']} – {data['until']}", style="bold")
 
 
@@ -731,6 +737,6 @@ def cli():
     pass
 
 
-def _text(value):
+def text_or_stdin(value):
     """Texts given as ``-`` are read from stdin"""
     return sys.stdin.read() if value == "-" else value

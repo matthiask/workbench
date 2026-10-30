@@ -5,21 +5,21 @@ import datetime as dt
 import click
 
 from wb.core import (
-    _bool,
-    _complete_short_names,
-    _echo_csv,
-    _echo_fields,
-    _echo_json,
-    _echo_more,
-    _link,
-    _page_options,
-    _page_params,
-    _period_options,
-    _period_params,
-    _request,
-    _table,
     cli,
+    complete_short_names,
     console,
+    echo_csv,
+    echo_fields,
+    echo_json,
+    echo_more,
+    format_bool,
+    link,
+    make_table,
+    page_options,
+    page_params,
+    period_options,
+    period_params,
+    request,
 )
 
 
@@ -29,7 +29,7 @@ def absences():
 
 
 @absences.command("search")
-@click.option("--user", help="Short name.", shell_complete=_complete_short_names)
+@click.option("--user", help="Short name.", shell_complete=complete_short_names)
 @click.option(
     "--reason",
     type=click.Choice([
@@ -41,31 +41,31 @@ def absences():
         "correction",
     ]),
 )
-@_period_options("absences overlapping it, current and upcoming ones by default")
-@_page_options
+@period_options("absences overlapping it, current and upcoming ones by default")
+@page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_absences(user, reason, period, since, until, limit, offset, as_csv, as_json):
     """Search absences, current and upcoming ones by default"""
-    params = _period_params(period, since, until) or {
+    params = period_params(period, since, until) or {
         "since": dt.date.today().isoformat()
     }
     if user:
         params["user"] = user
     if reason:
         params["reason"] = reason
-    data = _request("GET", "absences/", params=params | _page_params(limit, offset))
+    data = request("GET", "absences/", params=params | page_params(limit, offset))
     if as_csv:
-        _echo_csv(data["items"])
-        _echo_more(data, offset)
+        echo_csv(data["items"])
+        echo_more(data, offset)
         return
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    table = _table("User", "Starts on", "Ends on", "Days>", "Reason", "Description")
+    table = make_table("User", "Starts on", "Ends on", "Days>", "Reason", "Description")
     for absence in data["items"]:
         table.add_row(
-            _link(absence["user"], absence["url"]),
+            link(absence["user"], absence["url"]),
             absence["starts_on"],
             absence["ends_on"] or "",
             absence["days"],
@@ -73,7 +73,7 @@ def search_absences(user, reason, period, since, until, limit, offset, as_csv, a
             absence["description"],
         )
     console.print(table)
-    _echo_more(data, offset, "absences")
+    echo_more(data, offset, "absences")
 
 
 @absences.command("create")
@@ -98,7 +98,7 @@ def search_absences(user, reason, period, since, until, limit, offset, as_csv, a
 )
 @click.option("--description", required=True)
 @click.option(
-    "--user", help="Short name, defaults to you.", shell_complete=_complete_short_names
+    "--user", help="Short name, defaults to you.", shell_complete=complete_short_names
 )
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
@@ -106,10 +106,10 @@ def create_absence(
     starts_on, ends_on, days, reason, description, user, dry_run, as_json
 ):
     """Create an absence like in Workbench, e.g. your vacation"""
-    data = _request(
+    data = request(
         "POST",
         "absences/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json={
             "user": user,
             "starts_on": starts_on.date().isoformat(),
@@ -120,9 +120,9 @@ def create_absence(
         },
     )
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    _echo_fields(
+    echo_fields(
         f"{data['user']}: {data['reason']}",
         [
             ("ID", data["id"]),

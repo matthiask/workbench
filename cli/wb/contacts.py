@@ -3,18 +3,18 @@
 import click
 
 from wb.core import (
-    _bool,
-    _echo_fields,
-    _echo_json,
-    _echo_more,
-    _link,
-    _load,
-    _page_options,
-    _page_params,
-    _request,
-    _table,
     cli,
     console,
+    echo_fields,
+    echo_json,
+    echo_more,
+    format_bool,
+    link,
+    load,
+    make_table,
+    page_options,
+    page_params,
+    request,
 )
 
 
@@ -26,42 +26,44 @@ def contacts():
 @contacts.command("search")
 @click.argument("query", nargs=-1, required=True)
 @click.option("--all", "include_archived", is_flag=True, help="Include archived.")
-@_page_options
+@page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_contacts(query, include_archived, limit, offset, as_json):
     """Search organizations and people"""
-    params = {"q": " ".join(query), "include_archived": _bool(include_archived)}
-    organizations = _request(
-        "GET", "contacts/organizations/", params=params | _page_params(limit, offset)
+    params = {"q": " ".join(query), "include_archived": format_bool(include_archived)}
+    organizations = request(
+        "GET", "contacts/organizations/", params=params | page_params(limit, offset)
     )
-    people = _request(
-        "GET", "contacts/people/", params=params | _page_params(limit, offset)
+    people = request(
+        "GET", "contacts/people/", params=params | page_params(limit, offset)
     )
     if as_json:
-        _echo_json({"organizations": organizations, "people": people})
+        echo_json({"organizations": organizations, "people": people})
         return
-    table = _table("ID>", "Organization", title="Organizations")
+    table = make_table("ID>", "Organization", title="Organizations")
     for organization in organizations["items"]:
         url = organization["url"]
         table.add_row(
-            _link(organization["id"], url),
-            _link(organization["name"], url)
+            link(organization["id"], url),
+            link(organization["name"], url)
             + (" (archived)" if organization["is_archived"] else ""),
         )
     console.print(table)
-    _echo_more(organizations, offset, "organizations")
-    table = _table("ID>", "Name", "Organization ID>", "Organization", title="People")
+    echo_more(organizations, offset, "organizations")
+    table = make_table(
+        "ID>", "Name", "Organization ID>", "Organization", title="People"
+    )
     for person in people["items"]:
         organization = person["organization"] or {}
         table.add_row(
-            _link(person["id"], person["url"]),
-            _link(person["full_name"], person["url"])
+            link(person["id"], person["url"]),
+            link(person["full_name"], person["url"])
             + (" (archived)" if person["is_archived"] else ""),
-            _link(organization.get("id", ""), organization.get("url")),
-            _link(organization.get("name", ""), organization.get("url")),
+            link(organization.get("id", ""), organization.get("url")),
+            link(organization.get("name", ""), organization.get("url")),
         )
     console.print(table)
-    _echo_more(people, offset, "people")
+    echo_more(people, offset, "people")
 
 
 @cli.group()
@@ -74,11 +76,11 @@ def organizations():
 @click.option("--json", "as_json", is_flag=True)
 def show_organization(organization_id, as_json):
     """Show an organization and its people"""
-    data = _request("GET", f"contacts/organizations/{organization_id}/")
+    data = request("GET", f"contacts/organizations/{organization_id}/")
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    _echo_fields(
+    echo_fields(
         data["name"] + (" (archived)" if data["is_archived"] else ""),
         [
             ("ID", data["id"]),
@@ -91,11 +93,11 @@ def show_organization(organization_id, as_json):
     if data["notes"]:
         console.print()
         console.print(data["notes"])
-    table = _table("ID>", "Name", title="People")
+    table = make_table("ID>", "Name", title="People")
     for person in data["people"]:
         table.add_row(
-            _link(person["id"], person["url"]),
-            _link(person["full_name"], person["url"])
+            link(person["id"], person["url"]),
+            link(person["full_name"], person["url"])
             + (" (archived)" if person["is_archived"] else ""),
         )
     console.print(table)
@@ -111,8 +113,8 @@ def people():
 @click.option("--json", "as_json", is_flag=True)
 def show_person(person_id, as_json):
     """Show a person and their contact details"""
-    data = _request("GET", f"contacts/people/{person_id}/")
-    _echo_json(data) if as_json else _echo_person(data)
+    data = request("GET", f"contacts/people/{person_id}/")
+    echo_json(data) if as_json else _echo_person(data)
 
 
 @people.command("context")
@@ -121,7 +123,7 @@ def people_context():
 
     Feed this to an LLM together with an email signature, a business card
     or whatever you've got."""
-    _echo_json(_request("GET", "contacts/people/context/"))
+    echo_json(request("GET", "contacts/people/context/"))
 
 
 @people.command("create")
@@ -138,17 +140,17 @@ def create_person(file, dry_run, allow_duplicates, as_json):
 
     Search for the person and their organization with `wb contacts search`
     first. Email addresses which are already in use are always rejected."""
-    data = _request(
+    data = request(
         "POST",
         "contacts/people/",
         params={
-            "dry_run": _bool(dry_run),
-            "allow_duplicates": _bool(allow_duplicates),
+            "dry_run": format_bool(dry_run),
+            "allow_duplicates": format_bool(allow_duplicates),
         },
-        json=_load(file),
+        json=load(file),
     )
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
     _echo_person(data)
     if dry_run:
@@ -166,14 +168,14 @@ def add_person_details(person_id, file, dry_run, as_json):
     The YAML or JSON file contains email_addresses, phone_numbers and
     postal_addresses like for `wb people create`. Existing details are never
     changed or removed."""
-    data = _request(
+    data = request(
         "POST",
         f"contacts/people/{person_id}/details/",
-        params={"dry_run": _bool(dry_run)},
-        json=_load(file),
+        params={"dry_run": format_bool(dry_run)},
+        json=load(file),
     )
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
     _echo_person(data)
     if dry_run:
@@ -182,13 +184,13 @@ def add_person_details(person_id, file, dry_run, as_json):
 
 def _echo_person(data):
     organization = data["organization"] or {}
-    _echo_fields(
+    echo_fields(
         data["full_name"] + (" (archived)" if data["is_archived"] else ""),
         [
             ("ID", data["id"]),
             (
                 "Organization",
-                _link(organization.get("name", ""), organization.get("url")),
+                link(organization.get("name", ""), organization.get("url")),
             ),
             ("Organization ID", organization.get("id")),
             ("Salutation", data["salutation"]),

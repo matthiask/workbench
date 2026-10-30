@@ -3,23 +3,23 @@
 import click
 
 from wb.core import (
-    _bool,
-    _complete_short_names,
-    _echo_csv,
-    _echo_json,
-    _echo_more,
-    _echo_offer,
-    _echo_offer_list,
-    _error,
-    _load,
-    _page_options,
-    _page_params,
-    _period_options,
-    _period_params,
-    _request,
-    _terminate,
-    _text,
     cli,
+    complete_short_names,
+    echo_csv,
+    echo_json,
+    echo_more,
+    echo_offer,
+    echo_offer_list,
+    format_bool,
+    format_error,
+    load,
+    page_options,
+    page_params,
+    period_options,
+    period_params,
+    request,
+    terminate,
+    text_or_stdin,
 )
 
 
@@ -34,7 +34,7 @@ def context(project_id):
     """Print the project, its offers, service types and the offer schema
 
     Feed this to an LLM together with the specification of the offer."""
-    _echo_json(_request("GET", f"projects/{project_id}/offers/context/"))
+    echo_json(request("GET", f"projects/{project_id}/offers/context/"))
 
 
 @offers.command("search")
@@ -51,9 +51,9 @@ def context(project_id):
 )
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
-@_period_options("filters the offer date")
-@_page_options
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@period_options("filters the offer date")
+@page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_offers(
@@ -80,17 +80,17 @@ def search_offers(
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
-    params |= _period_params(period, since, until)
-    data = _request("GET", "offers/", params=params | _page_params(limit, offset))
+    params |= period_params(period, since, until)
+    data = request("GET", "offers/", params=params | page_params(limit, offset))
     if as_csv:
-        _echo_csv(data["items"])
-        _echo_more(data, offset)
+        echo_csv(data["items"])
+        echo_more(data, offset)
         return
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    _echo_offer_list(data["items"])
-    _echo_more(data, offset, "offers")
+    echo_offer_list(data["items"])
+    echo_more(data, offset, "offers")
 
 
 @offers.command()
@@ -98,8 +98,8 @@ def search_offers(
 @click.option("--json", "as_json", is_flag=True)
 def show(offer_id, as_json):
     """Show an offer"""
-    data = _request("GET", f"offers/{offer_id}/")
-    _echo_json(data) if as_json else _echo_offer(data)
+    data = request("GET", f"offers/{offer_id}/")
+    echo_json(data) if as_json else echo_offer(data)
 
 
 @offers.command()
@@ -109,11 +109,11 @@ def show(offer_id, as_json):
 @click.option("--json", "as_json", is_flag=True)
 def create(project_id, file, dry_run, as_json):
     """Create an offer in preparation from a YAML or JSON file"""
-    data = _request(
+    data = request(
         "POST",
         f"projects/{project_id}/offers/",
-        params={"dry_run": _bool(dry_run)},
-        json=_load(file),
+        params={"dry_run": format_bool(dry_run)},
+        json=load(file),
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
 
@@ -128,22 +128,22 @@ def replace(offer_id, file, dry_run, as_json):
 
     Use this for a new version of the whole offer; `wb offers update` and
     `wb offers services` change parts of it."""
-    data = _request(
+    data = request(
         "PUT",
         f"offers/{offer_id}/",
-        params={"dry_run": _bool(dry_run)},
-        json=_load(file),
+        params={"dry_run": format_bool(dry_run)},
+        json=load(file),
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
 
 
 def _echo_changed_offer(data, *, dry_run, as_json):
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    _echo_offer(data)
+    echo_offer(data)
     for warning in data["warnings"]:
-        click.secho(f"Warning: {_error(warning)}", fg="yellow", err=True)
+        click.secho(f"Warning: {format_error(warning)}", fg="yellow", err=True)
     if dry_run:
         click.secho("Dry run, nothing has been saved.", fg="yellow", err=True)
 
@@ -164,17 +164,17 @@ def update_offer(offer_id, title, description, discount, dry_run, as_json):
         key: value
         for key, value in [
             ("title", title),
-            ("description", _text(description)),
+            ("description", text_or_stdin(description)),
             ("discount", discount),
         ]
         if value is not None
     }
     if not data:
-        _terminate("Nothing to change, pass --title, --description or --discount.")
-    data = _request(
+        terminate("Nothing to change, pass --title, --description or --discount.")
+    data = request(
         "PATCH",
         f"offers/{offer_id}/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json=data,
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
@@ -210,11 +210,11 @@ def _service_options(fn):
 
 def _service_data(file, **values):
     """The service from the YAML or JSON file, the options override it"""
-    data = _load(file) if file else {}
+    data = load(file) if file else {}
     if not isinstance(data, dict):
-        _terminate("The file has to contain a single service.")
+        terminate("The file has to contain a single service.")
     if values.get("description") is not None:
-        values["description"] = _text(values["description"])
+        values["description"] = text_or_stdin(values["description"])
     return data | {key: value for key, value in values.items() if value is not None}
 
 
@@ -232,10 +232,10 @@ def add_service(offer_id, file, optional, after, dry_run, as_json, **values):
     The service is read from a YAML or JSON file (like a service of `wb offers
     create`) or given with options, which override the file."""
     data = _service_data(file, **values, is_optional=optional or None, after=after)
-    data = _request(
+    data = request(
         "POST",
         f"offers/{offer_id}/services/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json=data,
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
@@ -268,15 +268,15 @@ def update_service(
     data = _service_data(file, **values, is_optional=optional)
     for flag, field in [(clear_hours, "hours"), (clear_cost, "cost")]:
         if flag and data.get(field) is not None:
-            _terminate(f"--clear-{field} and --{field} contradict each other.")
+            terminate(f"--clear-{field} and --{field} contradict each other.")
         if flag:
             data[field] = None
     if not data:
-        _terminate("Nothing to change.")
-    data = _request(
+        terminate("Nothing to change.")
+    data = request(
         "PATCH",
         f"offers/{offer_id}/services/{service_id}/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json=data,
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
@@ -289,10 +289,10 @@ def update_service(
 @click.option("--json", "as_json", is_flag=True)
 def delete_service(offer_id, service_id, dry_run, as_json):
     """Delete a service on which nothing has been logged yet"""
-    data = _request(
+    data = request(
         "DELETE",
         f"offers/{offer_id}/services/{service_id}/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
 
@@ -304,10 +304,10 @@ def delete_service(offer_id, service_id, dry_run, as_json):
 @click.option("--json", "as_json", is_flag=True)
 def reorder_services(offer_id, service_ids, dry_run, as_json):
     """Put the services in the given order, all their IDs are required"""
-    data = _request(
+    data = request(
         "POST",
         f"offers/{offer_id}/services/reorder/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json={"services": list(service_ids)},
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)

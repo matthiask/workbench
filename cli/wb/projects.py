@@ -5,24 +5,24 @@ import datetime as dt
 import click
 
 from wb.core import (
-    _bool,
-    _complete_short_names,
-    _echo_csv,
-    _echo_fields,
-    _echo_json,
-    _echo_more,
-    _echo_offer_list,
-    _echo_stats,
-    _echo_stats_csv,
-    _link,
-    _page_options,
-    _page_params,
-    _request,
-    _table,
-    _terminate,
-    _text,
     cli,
+    complete_short_names,
     console,
+    echo_csv,
+    echo_fields,
+    echo_json,
+    echo_more,
+    echo_offer_list,
+    echo_stats,
+    echo_stats_csv,
+    format_bool,
+    link,
+    make_table,
+    page_options,
+    page_params,
+    request,
+    terminate,
+    text_or_stdin,
 )
 
 
@@ -34,38 +34,38 @@ def projects():
 @projects.command()
 @click.argument("query", nargs=-1)
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option("--all", "include_closed", is_flag=True, help="Include closed projects.")
-@_page_options
+@page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search(query, customer, owned_by, include_closed, limit, offset, as_csv, as_json):
     """Search projects, open projects by default"""
-    params = {"q": " ".join(query), "include_closed": _bool(include_closed)}
+    params = {"q": " ".join(query), "include_closed": format_bool(include_closed)}
     if customer:
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
-    data = _request("GET", "projects/", params=params | _page_params(limit, offset))
+    data = request("GET", "projects/", params=params | page_params(limit, offset))
     if as_csv:
-        _echo_csv(data["items"])
-        _echo_more(data, offset)
+        echo_csv(data["items"])
+        echo_more(data, offset)
         return
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    table = _table("ID>", "Code", "Title", "Customer", "Owned by", "Closed on")
+    table = make_table("ID>", "Code", "Title", "Customer", "Owned by", "Closed on")
     for project in data["items"]:
         table.add_row(
-            _link(project["id"], project["url"]),
-            _link(project["code"], project["url"]),
+            link(project["id"], project["url"]),
+            link(project["code"], project["url"]),
             project["title"],
-            _link(project["customer"]["name"], project["customer"]["url"]),
+            link(project["customer"]["name"], project["customer"]["url"]),
             project["owned_by"],
             project["closed_on"] or "",
         )
     console.print(table)
-    _echo_more(data, offset, "projects")
+    echo_more(data, offset, "projects")
 
 
 @projects.command("show")
@@ -73,22 +73,22 @@ def search(query, customer, owned_by, include_closed, limit, offset, as_csv, as_
 @click.option("--json", "as_json", is_flag=True)
 def show_project(project_id, as_json):
     """Show a project and its offers"""
-    project = _request("GET", f"projects/{project_id}/")
+    project = request("GET", f"projects/{project_id}/")
     # Offers require the controlling feature
-    offers = _request(
+    offers = request(
         "GET", "offers/", params={"project": project_id, "limit": 1000}, optional=True
     )
     offers = offers["items"] if offers else None
     if as_json:
-        _echo_json(project | {"offers": offers})
+        echo_json(project | {"offers": offers})
         return
-    _echo_fields(
+    echo_fields(
         f"{project['code']} {project['title']}",
         [
             ("ID", project["id"]),
             (
                 "Customer",
-                _link(project["customer"]["name"], project["customer"]["url"]),
+                link(project["customer"]["name"], project["customer"]["url"]),
             ),
             ("Owned by", project["owned_by"]),
             ("Flat rate", project["flat_rate"]),
@@ -102,7 +102,7 @@ def show_project(project_id, as_json):
         console.print(project["description"])
     if offers is not None:
         console.print()
-        _echo_offer_list(offers)
+        echo_offer_list(offers)
 
 
 @projects.command()
@@ -122,16 +122,16 @@ def show_project(project_id, as_json):
 )
 def stats(project_ids, open_, closed_since, as_json, as_csv):
     """Hours, amounts and gross margins of projects"""
-    params = {"ids": project_ids, "open": _bool(open_)}
+    params = {"ids": project_ids, "open": format_bool(open_)}
     if closed_since:
         params["closed_since"] = closed_since.date().isoformat()
-    data = _request("GET", "projects/stats/", params=params)
+    data = request("GET", "projects/stats/", params=params)
     if as_json:
-        _echo_json(data)
+        echo_json(data)
     elif as_csv:
-        _echo_stats_csv(data)
+        echo_stats_csv(data)
     else:
-        _echo_stats(data)
+        echo_stats(data)
 
 
 @projects.command("create")
@@ -150,7 +150,7 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
 @click.option(
     "--owned-by",
     help="Short name, defaults to you.",
-    shell_complete=_complete_short_names,
+    shell_complete=complete_short_names,
 )
 @click.option("--description", default="")
 @click.option("--dry-run", is_flag=True, help="Validate only.")
@@ -161,10 +161,10 @@ def create_project(
     """Create a project
 
     Find the customer and the contact with `wb contacts search`."""
-    data = _request(
+    data = request(
         "POST",
         "projects/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json={
             "title": title,
             "description": description,
@@ -179,13 +179,13 @@ def create_project(
 
 def _echo_saved_project(data, *, dry_run, as_json):
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    _echo_fields(
+    echo_fields(
         f"{data['code']} {data['title']}",
         [
             ("ID", data["id"]),
-            ("Customer", _link(data["customer"]["name"], data["customer"]["url"])),
+            ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
             ("Closed on", data["closed_on"]),
             ("URL", data["url"]),
@@ -205,7 +205,7 @@ def _echo_saved_project(data, *, dry_run, as_json):
 @click.option(
     "--type", "type_", type=click.Choice(["order", "maintenance", "internal"])
 )
-@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option("--close", is_flag=True, help="Close the project today.")
 @click.option(
     "--closed-on",
@@ -231,12 +231,12 @@ def update_project(
 ):
     """Change, close or reopen a project, only the given fields"""
     if sum(map(bool, [close, closed_on, reopen])) > 1:
-        _terminate("Use only one of --close, --closed-on and --reopen.")
+        terminate("Use only one of --close, --closed-on and --reopen.")
     data = {
         key: value
         for key, value in [
             ("title", title),
-            ("description", _text(description)),
+            ("description", text_or_stdin(description)),
             ("customer", customer),
             ("contact", contact),
             ("type", type_),
@@ -251,11 +251,11 @@ def update_project(
     elif reopen:
         data["closed_on"] = None
     if not data:
-        _terminate("Nothing to change.")
-    data = _request(
+        terminate("Nothing to change.")
+    data = request(
         "PATCH",
         f"projects/{project_id}/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json=data,
     )
     _echo_saved_project(data, dry_run=dry_run, as_json=as_json)

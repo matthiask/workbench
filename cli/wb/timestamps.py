@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 import click
 
-from wb.core import _echo_json, _link, _request, _table, cli, console
+from wb.core import cli, console, echo_json, link, make_table, request
 
 
 @cli.group()
@@ -30,9 +30,9 @@ def _create_timestamp(type_, args, as_json):
         data["minutes"] = int(args[0])
         args = args[1:]
     data["notes"] = " ".join(args)
-    timestamp = _request("POST", "timestamps/", json=data)
+    timestamp = request("POST", "timestamps/", json=data)
     if as_json:
-        _echo_json(timestamp)
+        echo_json(timestamp)
         return
     _echo_timestamp(timestamp)
 
@@ -88,12 +88,12 @@ def list_timestamps(day, as_json):
 
     Unlogged slices link to the form for logging their hours."""
     params = {"day": day.date().isoformat()} if day else {}
-    data = _request("GET", "timestamps/", params=params)
-    _echo_json(data) if as_json else _echo_timestamps(data)
+    data = request("GET", "timestamps/", params=params)
+    echo_json(data) if as_json else _echo_timestamps(data)
 
 
 def _echo_timestamps(data):
-    table = _table(
+    table = make_table(
         "Code",
         "From",
         "Until",
@@ -101,7 +101,7 @@ def _echo_timestamps(data):
         "Description",
         "Project",
         "",
-        title=_link(f"Timestamps {data['day']}", data["url"]),
+        title=link(f"Timestamps {data['day']}", data["url"]),
         show_footer=True,
     )
     for slice in data["slices"]:
@@ -112,10 +112,8 @@ def _echo_timestamps(data):
             _time(slice["ends_at"]),
             slice["hours"] or "",
             slice["description"] + (f" {slice['comment']}" if slice["comment"] else ""),
-            _link(project["code"], project["url"]) if project else "",
-            _link("Log hours", slice["log_hours_url"])
-            if slice["log_hours_url"]
-            else "",
+            link(project["code"], project["url"]) if project else "",
+            link("Log hours", slice["log_hours_url"]) if slice["log_hours_url"] else "",
             style=None if slice["is_logged"] else "bold",
         )
     table.columns[2].footer = "Logged"
@@ -132,11 +130,11 @@ def _echo_timestamps(data):
 def _echo_deleted(timestamp, as_json):
     """The deleted timestamp and the day's renumbered timestamps"""
     if as_json:
-        _echo_json(timestamp)
+        echo_json(timestamp)
         return
     _echo_timestamp(timestamp, "Deleted ")
     day = dt.datetime.fromisoformat(timestamp["created_at"]).date().isoformat()
-    _echo_timestamps(_request("GET", "timestamps/", params={"day": day}))
+    _echo_timestamps(request("GET", "timestamps/", params={"day": day}))
 
 
 @timestamps.command("delete")
@@ -154,7 +152,7 @@ def delete_timestamp(timestamp, day, as_json):
     following ones, the new codes are shown afterwards."""
     params = {"day": day.date().isoformat()} if day else {}
     _echo_deleted(
-        _request("DELETE", f"timestamps/{quote(timestamp, safe='')}/", params=params),
+        request("DELETE", f"timestamps/{quote(timestamp, safe='')}/", params=params),
         as_json,
     )
 
@@ -163,4 +161,4 @@ def delete_timestamp(timestamp, day, as_json):
 @click.option("--json", "as_json", is_flag=True)
 def undo(as_json):
     """Delete the latest timestamp of today"""
-    _echo_deleted(_request("DELETE", "timestamps/latest/"), as_json)
+    _echo_deleted(request("DELETE", "timestamps/latest/"), as_json)

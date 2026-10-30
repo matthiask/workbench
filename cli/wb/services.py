@@ -3,16 +3,16 @@
 import click
 
 from wb.core import (
-    _echo_csv,
-    _echo_json,
-    _echo_more,
-    _link,
-    _page_options,
-    _page_params,
-    _request,
-    _table,
     cli,
     console,
+    echo_csv,
+    echo_json,
+    echo_more,
+    link,
+    make_table,
+    page_options,
+    page_params,
+    request,
 )
 
 
@@ -25,7 +25,7 @@ def services():
 @click.argument("query", nargs=-1)
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--offer", type=int, help="Offer ID.")
-@_page_options
+@page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_services(query, project, offer, limit, offset, as_csv, as_json):
@@ -35,15 +35,15 @@ def search_services(query, project, offer, limit, offset, as_csv, as_json):
         params["project"] = project
     if offer:
         params["offer"] = offer
-    data = _request("GET", "services/", params=params | _page_params(limit, offset))
+    data = request("GET", "services/", params=params | page_params(limit, offset))
     if as_csv:
-        _echo_csv(data["items"])
-        _echo_more(data, offset)
+        echo_csv(data["items"])
+        echo_more(data, offset)
         return
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    table = _table(
+    table = make_table(
         "ID>",
         "Project",
         "Offer",
@@ -64,8 +64,8 @@ def search_services(query, project, offer, limit, offset, as_csv, as_json):
             if flag
         ]
         table.add_row(
-            _link(service["id"], service["url"]),
-            _link(service["project"]["code"], service["project"]["url"]),
+            link(service["id"], service["url"]),
+            link(service["project"]["code"], service["project"]["url"]),
             service["offer"] or "",
             service["title"] + (f" ({', '.join(notes)})" if notes else ""),
             service["effort_type"],
@@ -76,4 +76,4 @@ def search_services(query, project, offer, limit, offset, as_csv, as_json):
             style="dim" if notes else None,
         )
     console.print(table)
-    _echo_more(data, offset, "services")
+    echo_more(data, offset, "services")

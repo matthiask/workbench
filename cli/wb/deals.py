@@ -3,26 +3,26 @@
 import click
 
 from wb.core import (
-    _amount,
-    _bool,
-    _complete_short_names,
-    _echo_csv,
-    _echo_fields,
-    _echo_json,
-    _echo_more,
-    _echo_period,
-    _link,
-    _page_options,
-    _page_params,
-    _period_options,
-    _period_params,
-    _request,
-    _table,
-    _terminate,
-    _text,
-    _users_options,
     cli,
+    complete_short_names,
     console,
+    echo_csv,
+    echo_fields,
+    echo_json,
+    echo_more,
+    echo_period,
+    format_amount,
+    format_bool,
+    link,
+    make_table,
+    page_options,
+    page_params,
+    period_options,
+    period_params,
+    request,
+    terminate,
+    text_or_stdin,
+    users_options,
 )
 
 
@@ -37,9 +37,9 @@ def deals():
     "--status", type=click.Choice(["open", "accepted", "declined"]), default="open"
 )
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
-@_period_options("filters the decision date (closed or expected)")
-@_page_options
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@period_options("filters the decision date (closed or expected)")
+@page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_deals(
@@ -61,16 +61,16 @@ def search_deals(
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
-    params |= _period_params(period, since, until)
-    data = _request("GET", "deals/", params=params | _page_params(limit, offset))
+    params |= period_params(period, since, until)
+    data = request("GET", "deals/", params=params | page_params(limit, offset))
     if as_csv:
-        _echo_csv(data["items"])
-        _echo_more(data, offset)
+        echo_csv(data["items"])
+        echo_more(data, offset)
         return
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    table = _table(
+    table = make_table(
         "ID>",
         "Title",
         "Customer",
@@ -81,16 +81,16 @@ def search_deals(
     )
     for deal in data["items"]:
         table.add_row(
-            _link(deal["id"], deal["url"]),
+            link(deal["id"], deal["url"]),
             deal["title"],
-            _link(deal["customer"]["name"], deal["customer"]["url"]),
+            link(deal["customer"]["name"], deal["customer"]["url"]),
             deal["owned_by"],
             deal["probability"],
             deal["decision_expected_on"] or "",
             deal["value"],
         )
     console.print(table)
-    _echo_more(data, offset, "deals")
+    echo_more(data, offset, "deals")
 
 
 @deals.command("show")
@@ -98,8 +98,8 @@ def search_deals(
 @click.option("--json", "as_json", is_flag=True)
 def show_deal(deal_id, as_json):
     """Show a deal"""
-    data = _request("GET", f"deals/{deal_id}/")
-    _echo_json(data) if as_json else _echo_deal(data)
+    data = request("GET", f"deals/{deal_id}/")
+    echo_json(data) if as_json else _echo_deal(data)
 
 
 def _key_values(values, option):
@@ -108,14 +108,14 @@ def _key_values(values, option):
     for pair in values:
         key, sep, value = pair.partition("=")
         if not sep:
-            _terminate(f"{option} expects KEY=VALUE, got {pair!r}.")
+            terminate(f"{option} expects KEY=VALUE, got {pair!r}.")
         result[key.strip()] = value.strip()
     return result
 
 
 def _echo_saved_deal(data, *, dry_run, as_json):
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
     _echo_deal(data)
     if dry_run:
@@ -141,7 +141,7 @@ def _echo_saved_deal(data, *, dry_run, as_json):
     help="TYPE=AMOUNT, e.g. Design=5000; TYPE= removes the value.",
 )
 @click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
-@click.option("--owned-by", help="Short name.", shell_complete=_complete_short_names)
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_deal(
@@ -165,7 +165,7 @@ def update_deal(
         key: value
         for key, value in [
             ("title", title),
-            ("description", _text(description)),
+            ("description", text_or_stdin(description)),
             ("customer", customer),
             ("contact", contact),
             ("probability", probability),
@@ -182,9 +182,12 @@ def update_deal(
     if attributes:
         data["attributes"] = _key_values(attributes, "--attribute")
     if not data:
-        _terminate("Nothing to change.")
-    data = _request(
-        "PATCH", f"deals/{deal_id}/", params={"dry_run": _bool(dry_run)}, json=data
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"deals/{deal_id}/",
+        params={"dry_run": format_bool(dry_run)},
+        json=data,
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
 
@@ -234,21 +237,21 @@ def close_deal(
 ):
     """Accept or decline a deal and its related offers like in Workbench"""
     if offers and keep_offers:
-        _terminate("--offer and --keep-offers contradict each other.")
+        terminate("--offer and --keep-offers contradict each other.")
     data = {
         "status": status,
         "closing_type": closing_type,
-        "closing_notice": _text(notice),
+        "closing_notice": text_or_stdin(notice),
         "delete_planned_work": delete_planned_work,
     }
     if closed_on:
         data["closed_on"] = closed_on.date().isoformat()
     if offers or keep_offers:
         data["offers"] = list(offers)
-    data = _request(
+    data = request(
         "POST",
         f"deals/{deal_id}/status/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json=data,
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
@@ -260,18 +263,18 @@ def close_deal(
 @click.option("--json", "as_json", is_flag=True)
 def reopen_deal(deal_id, dry_run, as_json):
     """Open a closed deal again"""
-    data = _request(
+    data = request(
         "POST",
         f"deals/{deal_id}/status/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json={"status": "open"},
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
 
 
 @deals.command("stats")
-@_period_options("defaults to this week")
-@_users_options
+@period_options("defaults to this week")
+@users_options
 @click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
 def deal_stats(period, since, until, users, team, as_csv, as_json):
@@ -279,47 +282,47 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
 
     Users filter the deals' owners; accepted deals are split between users
     by their contributions."""
-    data = _request(
+    data = request(
         "GET",
         "deals/stats/",
-        params=_period_params(period, since, until, users=users, team=team),
+        params=period_params(period, since, until, users=users, team=team),
     )
     if as_csv:
-        _echo_csv(
+        echo_csv(
             [deal | {"status": "accepted"} for deal in data["accepted"]["deals"]]
             + [deal | {"status": "declined"} for deal in data["declined"]["deals"]]
         )
         return
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    _echo_period(data)
+    echo_period(data)
     accepted = data["accepted"]
     console.print(
-        f"Accepted: {accepted['count']} deals, {_amount(accepted['sum'])}"
+        f"Accepted: {accepted['count']} deals, {format_amount(accepted['sum'])}"
         + (
-            f" (target {_amount(accepted['target'])})"
+            f" (target {format_amount(accepted['target'])})"
             if float(accepted["target"])
             else ""
         )
     )
     if accepted["deals"]:
-        table = _table("Value type", "Accepted>", "Target>", "Median age>")
+        table = make_table("Value type", "Accepted>", "Target>", "Median age>")
         for row in accepted["by_value_type"]:
             table.add_row(
                 row["type"],
-                _amount(row["sum"]),
-                _amount(row["target"]),
+                format_amount(row["sum"]),
+                format_amount(row["target"]),
                 f"{row['median_age_days']} days"
                 if row["median_age_days"] is not None
                 else "",
             )
         console.print(table)
-        table = _table("User", "Deals>", "Accepted>")
+        table = make_table("User", "Deals>", "Accepted>")
         for row in accepted["by_user"]:
-            table.add_row(row["user"], str(row["count"]), _amount(row["sum"]))
+            table.add_row(row["user"], str(row["count"]), format_amount(row["sum"]))
         console.print(table)
-        table = _table(
+        table = make_table(
             "Code",
             "Title",
             "Customer",
@@ -330,50 +333,52 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
         )
         for deal in accepted["deals"]:
             table.add_row(
-                _link(deal["code"], deal["url"]),
+                link(deal["code"], deal["url"]),
                 deal["title"],
-                _link(deal["customer"]["name"], deal["customer"]["url"]),
+                link(deal["customer"]["name"], deal["customer"]["url"]),
                 deal["owned_by"],
                 deal["closed_on"],
-                _amount(deal["value"]),
+                format_amount(deal["value"]),
             )
         console.print(table)
     declined = data["declined"]
-    console.print(f"Declined: {declined['count']} deals, {_amount(declined['sum'])}")
+    console.print(
+        f"Declined: {declined['count']} deals, {format_amount(declined['sum'])}"
+    )
     if declined["deals"]:
-        table = _table(
+        table = make_table(
             "Code", "Title", "Customer", "Closing type", "Value>", title="Declined"
         )
         for deal in declined["deals"]:
             table.add_row(
-                _link(deal["code"], deal["url"]),
+                link(deal["code"], deal["url"]),
                 deal["title"],
-                _link(deal["customer"]["name"], deal["customer"]["url"]),
+                link(deal["customer"]["name"], deal["customer"]["url"]),
                 deal["closing_type"],
-                _amount(deal["value"]),
+                format_amount(deal["value"]),
             )
         console.print(table)
 
 
 @deals.command("history")
-@_period_options("defaults to this week")
-@_users_options
+@period_options("defaults to this week")
+@users_options
 @click.option("--json", "as_json", is_flag=True)
 def deal_history(period, since, until, users, team, as_json):
     """Changes of deals in a period, users filter who made them"""
-    data = _request(
+    data = request(
         "GET",
         "deals/history/",
-        params=_period_params(period, since, until, users=users, team=team),
+        params=period_params(period, since, until, users=users, team=team),
     )
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
-    _echo_period(data)
+    echo_period(data)
     for change in data["changes"]:
         deal = change["deal"]
         console.print(
-            _link(f"{deal['code']} {deal['title']}", deal["url"])
+            link(f"{deal['code']} {deal['title']}", deal["url"])
             if deal
             else "(deleted deal)",
             style="bold",
@@ -405,7 +410,7 @@ def deal_history(period, since, until, users, team, as_json):
 @click.option(
     "--owned-by",
     help="Short name, defaults to you.",
-    shell_complete=_complete_short_names,
+    shell_complete=complete_short_names,
 )
 @click.option("--description", default="")
 @click.option("--dry-run", is_flag=True, help="Validate only.")
@@ -427,10 +432,10 @@ def create_deal(
 
     Find the customer and the contact with `wb contacts search`. Unknown
     value types and attributes are rejected with a list of the choices."""
-    data = _request(
+    data = request(
         "POST",
         "deals/",
-        params={"dry_run": _bool(dry_run)},
+        params={"dry_run": format_bool(dry_run)},
         json={
             "title": title,
             "description": description,
@@ -449,11 +454,11 @@ def create_deal(
 
 
 def _echo_deal(data):
-    _echo_fields(
+    echo_fields(
         f"{data['code'] or '(new deal)'} {data['title']}",
         [
             ("ID", data["id"]),
-            ("Customer", _link(data["customer"]["name"], data["customer"]["url"])),
+            ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
             ("Contributors", ", ".join(data["contributors"])),
             ("Status", data["status"]),
@@ -466,7 +471,7 @@ def _echo_deal(data):
         ],
         url=data["url"],
     )
-    table = _table("Value type", "Value>", show_footer=True)
+    table = make_table("Value type", "Value>", show_footer=True)
     for value in data["values"]:
         table.add_row(value["type"], value["value"])
     table.columns[0].footer = "Total"

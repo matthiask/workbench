@@ -6,20 +6,20 @@ import sys
 import click
 
 from wb.core import (
-    _bool,
-    _echo_json,
-    _echo_period,
-    _error,
-    _hours,
-    _link,
-    _load,
-    _period_options,
-    _period_params,
-    _request,
-    _table,
-    _users_options,
     cli,
     console,
+    echo_json,
+    echo_period,
+    format_bool,
+    format_error,
+    format_hours,
+    link,
+    load,
+    make_table,
+    period_options,
+    period_params,
+    request,
+    users_options,
 )
 
 
@@ -31,11 +31,11 @@ def planning():
 @planning.command("export")
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--campaign", type=int, help="Campaign ID.")
-@_period_options(
+@period_options(
     "defaults to the whole planning of projects and campaigns, otherwise"
     " to the next twelve weeks"
 )
-@_users_options
+@users_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per work and week.")
 @click.option("--json", "as_json", is_flag=True)
 def planning_export(
@@ -45,14 +45,14 @@ def planning_export(
 
     The capacity (hours not planned yet, less absences and holidays) is shown
     when filtering by users or a team."""
-    params = _period_params(period, since, until, users=users, team=team)
+    params = period_params(period, since, until, users=users, team=team)
     if project:
         params["project"] = project
     if campaign:
         params["campaign"] = campaign
-    data = _request("GET", "planning/export/", params=params)
+    data = request("GET", "planning/export/", params=params)
     if as_json:
-        _echo_json(data)
+        echo_json(data)
     elif as_csv:
         _echo_planning_csv(data)
     else:
@@ -104,8 +104,8 @@ def _echo_planning(data):
     if not data["since"]:
         console.print("Nothing planned yet.")
         return
-    _echo_period(data)
-    table = _table(
+    echo_period(data)
+    table = make_table(
         "Project",
         "Offer",
         "Title",
@@ -119,31 +119,31 @@ def _echo_planning(data):
     for work in data["planned_work"]:
         project = work["project"]
         table.add_row(
-            _link(project["code"], project["url"]),
+            link(project["code"], project["url"]),
             work["offer"]["code"] if work["offer"] else "",
-            _link(work["title"], work["url"]),
+            link(work["title"], work["url"]),
             work["user"],
             work["weeks"][0],
             work["weeks"][-1],
-            _hours(work["planned_hours"]),
-            _hours(work["hours_per_week"]),
+            format_hours(work["planned_hours"]),
+            format_hours(work["hours_per_week"]),
             style="dim" if work["is_provisional"] else None,
         )
     console.print(table)
     if any(work["is_provisional"] for work in data["planned_work"]):
         console.print("Provisional work is dimmed.", style="dim")
     if data["milestones"]:
-        table = _table("Date", "Project", "Milestone", "Hours>", title="Milestones")
+        table = make_table("Date", "Project", "Milestone", "Hours>", title="Milestones")
         for milestone in data["milestones"]:
             table.add_row(
                 milestone["date"],
-                _link(milestone["project"]["code"], milestone["project"]["url"]),
-                _link(milestone["title"], milestone["url"]),
-                _hours(milestone["estimated_total_hours"]),
+                link(milestone["project"]["code"], milestone["project"]["url"]),
+                link(milestone["title"], milestone["url"]),
+                format_hours(milestone["estimated_total_hours"]),
             )
         console.print(table)
     if data["external_work"]:
-        table = _table(
+        table = make_table(
             "Project",
             "Title",
             "Provided by",
@@ -153,15 +153,15 @@ def _echo_planning(data):
         )
         for work in data["external_work"]:
             table.add_row(
-                _link(work["project"]["code"], work["project"]["url"]),
-                _link(work["title"], work["url"]),
+                link(work["project"]["code"], work["project"]["url"]),
+                link(work["title"], work["url"]),
                 work["provided_by"],
                 work["weeks"][0],
                 work["weeks"][-1],
             )
         console.print(table)
     capacity = data["capacity"] or []
-    table = _table(
+    table = make_table(
         "Week",
         "Planned>",
         "Provisional>",
@@ -171,9 +171,9 @@ def _echo_planning(data):
     for week in data["weeks"]:
         table.add_row(
             week["week"],
-            _hours(week["planned"]),
-            _hours(week["provisional"]),
-            *(_hours(row["weeks"][week["week"]]) for row in capacity),
+            format_hours(week["planned"]),
+            format_hours(week["provisional"]),
+            *(format_hours(row["weeks"][week["week"]]) for row in capacity),
         )
     console.print(table)
 
@@ -184,7 +184,7 @@ def planning_context(project_id):
     """Print everything needed to plan a project and the import schema
 
     Feed this to an LLM together with the plan, e.g. the offer and a timeline."""
-    _echo_json(_request("GET", f"projects/{project_id}/planning/context/"))
+    echo_json(request("GET", f"projects/{project_id}/planning/context/"))
 
 
 @planning.command("import")
@@ -194,17 +194,17 @@ def planning_context(project_id):
 @click.option("--json", "as_json", is_flag=True)
 def planning_import(project_id, file, dry_run, as_json):
     """Add milestones and planned work from a YAML or JSON file"""
-    data = _request(
+    data = request(
         "POST",
         f"projects/{project_id}/planning/import/",
-        params={"dry_run": _bool(dry_run)},
-        json=_load(file),
+        params={"dry_run": format_bool(dry_run)},
+        json=load(file),
     )
     if as_json:
-        _echo_json(data)
+        echo_json(data)
         return
     if data["milestones"]:
-        table = _table("Milestone", "Date", "Phase starts on", "Estimated hours>")
+        table = make_table("Milestone", "Date", "Phase starts on", "Estimated hours>")
         for milestone in data["milestones"]:
             table.add_row(
                 milestone["title"],
@@ -213,7 +213,7 @@ def planning_import(project_id, file, dry_run, as_json):
                 milestone["estimated_total_hours"],
             )
         console.print(table)
-    table = _table(
+    table = make_table(
         "Planned work",
         "User",
         "Service type",
@@ -235,6 +235,6 @@ def planning_import(project_id, file, dry_run, as_json):
         )
     console.print(table)
     for warning in data["warnings"]:
-        click.secho(f"Warning: {_error(warning)}", fg="yellow", err=True)
+        click.secho(f"Warning: {format_error(warning)}", fg="yellow", err=True)
     if dry_run:
         console.print("Dry run, nothing has been saved.")
