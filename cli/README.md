@@ -18,7 +18,7 @@ Log in, which opens the browser to authorize `wb`:
 
     wb login https://workbench.feinheit.ch
 
-Check it with `wb whoami`. Access expires after 30 days; `wb` then opens the
+Check it with `wb me`. Access expires after 30 days; `wb` then opens the
 browser again by itself. On computers without a browser, create a token in
 Workbench ("API tokens" in the user menu) and use `wb login URL --token`.
 
@@ -28,9 +28,9 @@ The URL and the token are stored in `~/.config/workbench.toml`. The
 
 ## What's on your plate
 
-`wb me` shows your open projects, this week's planned work, and the offers,
-invoices and deals which may need action (the latter depending on your
-features).
+`wb me` shows who you are, your open projects, this week's planned work, and
+the offers, invoices and deals which may need action (the latter depending on
+your features).
 
 ## Creating projects
 

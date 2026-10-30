@@ -410,33 +410,24 @@ def login(url, paste_token):
 
 @cli.command()
 @click.option("--json", "as_json", is_flag=True)
-def whoami(as_json):
-    """Show the user and the Workbench installation the token belongs to"""
-    data = _request("GET", "me/")
-    if as_json:
-        _echo_json(data)
-        return
-    _echo_fields(
-        data["full_name"],
-        [
-            ("Short name", data["short_name"]),
-            ("Email", data["email"]),
-            ("Workbench", data["url"]),
-        ],
-        url=data["url"],
-    )
-
-
-@cli.command()
-@click.option("--json", "as_json", is_flag=True)
 def me(as_json):
-    """What's on your plate: projects, this week's planning, offers, invoices
-    and deals which may need action"""
+    """Who you are and what's on your plate: projects, this week's planning,
+    offers, invoices and deals which may need action"""
+    user = _request("GET", "me/")
     data = _request("GET", "me/overview/")
     if as_json:
-        _echo_json(data)
+        _echo_json({"user": user} | data)
         return
 
+    _echo_fields(
+        user["full_name"],
+        [
+            ("Short name", user["short_name"]),
+            ("Email", user["email"]),
+            ("Workbench", user["url"]),
+        ],
+        url=user["url"],
+    )
     table = _table("ID>", "Code", "Title", "Customer", title="Your open projects")
     for project in data["projects"]:
         table.add_row(

@@ -99,7 +99,7 @@ class CLITest(TestCase):
         project = factories.ProjectFactory.create(title="Relaunch", owned_by=self.user)
         factories.OfferFactory.create(project=project, title="Phase 1")
 
-        result = self.wb("whoami")
+        result = self.wb("me")
         self.assertEqual(result.exit_code, 0)
         self.assertIn(self.user.get_full_name(), result.output)
 
@@ -242,19 +242,19 @@ planned_work:
 
     def test_unauthorized(self):
         """Invalid tokens tell people to log in again"""
-        result = self.wb("whoami", token="wb_nope")
+        result = self.wb("me", token="wb_nope")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("wb login", result.output)
 
     def test_versions(self):
         """Outdated CLIs are told to upgrade, too old ones are rejected"""
         with patch.object(cli_version, "LATEST", "99.0.0"):
-            result = self.wb("whoami")
+            result = self.wb("me")
         self.assertEqual(result.exit_code, 0)
         self.assertIn("wb 99.0.0 is available", result.output)
 
         with patch.object(cli_version, "MINIMUM", (99, 0, 0)):
-            result = self.wb("whoami")
+            result = self.wb("me")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("uv tool upgrade workbench-cli", result.output)
 
