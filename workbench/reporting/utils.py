@@ -96,20 +96,23 @@ def effort_cost_by_project(logged_hours):
     ``{project_id: {"cost": ..., "hours_rate_undefined": ..., "hours": ...}}``.
 
     Hours on services without an effort rate aren't valued, they are only
-    reported in ``hours_rate_undefined``."""
+    reported in ``hours_rate_undefined``. The cost uses the invoiced hours,
+    the hours are the time spent."""
+    from workbench.logbook.models import INVOICED_HOURS
+
     projects = defaultdict(
         lambda: {"cost": Z2, "hours_rate_undefined": Z1, "hours": Z1}
     )
-    for project, rate, hours in (
+    for project, rate, hours, invoiced_hours in (
         logged_hours
         .order_by()
         .values("service__project", "service__effort_rate")
-        .annotate(s=Sum("hours"))
-        .values_list("service__project", "service__effort_rate", "s")
+        .annotate(s=Sum("hours"), invoiced=Sum(INVOICED_HOURS))
+        .values_list("service__project", "service__effort_rate", "s", "invoiced")
     ):
         if rate is None:
             projects[project]["hours_rate_undefined"] += hours
         else:
-            projects[project]["cost"] += rate * hours
+            projects[project]["cost"] += rate * invoiced_hours
         projects[project]["hours"] += hours
     return projects

@@ -15,7 +15,7 @@ from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.utils import recurring
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
 from workbench.projects.models import Project
 from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceBase
@@ -505,7 +505,7 @@ class Invoice(ModelWithTotal):
                     rendered_on__lte=logbook_cutoff_date
                 )
 
-            hours = not_archived_effort.aggregate(Sum("hours"))["hours__sum"] or Z1
+            hours = not_archived_effort.aggregate(s=Sum(INVOICED_HOURS))["s"] or Z1
             cost = not_archived_costs.aggregate(Sum("cost"))["cost__sum"] or Z2
 
             if hours or cost:

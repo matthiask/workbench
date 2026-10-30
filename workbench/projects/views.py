@@ -10,7 +10,7 @@ from xlsxdocument import XLSXDocument
 from workbench import generic
 from workbench.invoices.models import Service as InvoiceService
 from workbench.logbook.forms import LogbookBatchForm
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.squeeze import project_gross_margin
@@ -212,13 +212,16 @@ def cost_by_month_and_service_xlsx(request, pk):
         if offer := service.project_service.offer:
             offer_invoiced[offer] += service.service_cost
 
-    for hours in LoggedHours.objects.filter(service__project=project).select_related(
-        "service__offer"
+    for hours in (
+        LoggedHours.objects
+        .filter(service__project=project)
+        .annotate(hours_to_invoice=INVOICED_HOURS)
+        .select_related("service__offer")
     ):
         month = hours.rendered_on.replace(day=1)
         months.add(month)
 
-        c = (hours.service.effort_rate or 0) * hours.hours
+        c = (hours.service.effort_rate or 0) * hours.hours_to_invoice
         project_costs[month] += c
         service_costs[hours.service][month] += c
         offer_costs[hours.service.offer][month] += c

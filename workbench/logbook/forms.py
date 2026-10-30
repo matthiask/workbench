@@ -352,7 +352,14 @@ class LoggedHoursForm(ModelForm):
 
     class Meta:
         model = LoggedHours
-        fields = ("rendered_by", "rendered_on", "service", "hours", "description")
+        fields = (
+            "rendered_by",
+            "rendered_on",
+            "service",
+            "hours",
+            "invoiced_hours",
+            "description",
+        )
         widgets = {"description": Textarea({"rows": 2})}
 
     def __init__(self, *args, **kwargs):
@@ -371,6 +378,7 @@ class LoggedHoursForm(ModelForm):
                         "service": hours.service_id,
                         "rendered_on": hours.rendered_on.isoformat(),
                         "hours": hours.hours,
+                        "invoiced_hours": hours.invoiced_hours,
                         "description": hours.description,
                     })
 
@@ -512,6 +520,19 @@ class LoggedHoursForm(ModelForm):
                     ),
                     code="you-are-late",
                 )
+
+        if (
+            data.get("hours")
+            and data.get("invoiced_hours") is not None
+            and data["invoiced_hours"] < data["hours"]
+        ):
+            self.add_warning(
+                _(
+                    "The invoiced hours are lower than the hours."
+                    " Invoice all the time spent if possible."
+                ),
+                code="invoiced-hours-lower",
+            )
 
         if (
             all(data.get(f) for f in ["rendered_by", "rendered_on", "hours"])

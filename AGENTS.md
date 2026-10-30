@@ -143,6 +143,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   internal projects; open invoices include all invoices. `work_not_invoiced`
   is the positive side of the project budget statistics' delta (logged work
   valued at effort rates), `accruals` the negative side.
+- `LoggedHours.invoiced_hours` (optional) is what the work is worth if that
+  is more than the time spent (the form warns about lower values). Value and
+  invoice logged work with `INVOICED_HOURS`
+  (`Coalesce("invoiced_hours", "hours")` in `workbench/logbook/models.py`,
+  annotate querysets with it); everything about
+  time (utilization, productivity, planning, squeeze's hours, budgets in hours)
+  uses `hours`.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Pre-commit hooks (via `prek`, not `pre-commit`) run on commit, ruff included, and auto-fix formatting. If a commit fails due to formatting, re-stage the auto-fixed files and commit again.

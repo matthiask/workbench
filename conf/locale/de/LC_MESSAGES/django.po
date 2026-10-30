@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 14:02+0100\n"
+"POT-Creation-Date: 2026-10-30 16:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2502,6 +2502,10 @@ msgid "You are a bit late. Please try logging your hours immediately upon finish
 msgstr "Du bist ein bisschen spät dran. Bitte versuche, deine Arbeitsstunden direkt nach Arbeitserledigung zu erfassen."
 
 #: workbench/logbook/forms.py
+msgid "The invoiced hours are lower than the hours. Invoice all the time spent if possible."
+msgstr "Die verrechneten Stunden sind tiefer als die Stunden. Verrechne wenn möglich die ganze aufgewendete Zeit."
+
+#: workbench/logbook/forms.py
 msgid "This seems to be a duplicate. Is it?"
 msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
 
@@ -2553,6 +2557,11 @@ msgstr "Zu Leistung verschieben"
 #: workbench/logbook/models.py
 msgid "rendered by"
 msgstr "Erbracht von"
+
+#: workbench/logbook/models.py
+#: workbench/templates/logbook/loggedhours_detail.html
+msgid "invoiced hours"
+msgstr "Verrechnete Stunden"
 
 #: workbench/logbook/models.py
 msgid "invoice service"
@@ -4362,6 +4371,10 @@ msgstr "Spesen in Fremdwährung"
 #: workbench/templates/logbook/loggedhours_form.html
 msgid "new service"
 msgstr "Neue Leistung"
+
+#: workbench/templates/logbook/loggedhours_form.html
+msgid "The invoiced hours field takes precedence when creating invoices."
+msgstr "Die verrechneten Stunden haben beim Erstellen von Rechnungen Vorrang."
 
 #: workbench/templates/needs_action.html
 msgid "needs action"

@@ -1,4 +1,5 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -47,6 +48,40 @@ class LogbookTest(TestCase):
 
         hours = LoggedHours.objects.get()
         self.assertEqual(hours.description, "Test")
+        self.assertIsNone(hours.invoiced_hours)
+        self.assertContains(
+            self.client.get(
+                hours.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
+            ),
+            "The invoiced hours field takes precedence when creating invoices.",
+        )
+
+        response = self.client.post(
+            hours.urls["update"],
+            {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": hours.rendered_on.isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-invoiced_hours": "1.0",
+                "modal-description": "Test",
+                WarningsForm.ignore_warnings_id: "maybe-duplicate",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        hours.refresh_from_db()
+        self.assertEqual(hours.hours, Decimal("0.1"))
+        self.assertEqual(hours.invoiced_hours, 1)
+
+        response = send(url=hours.urls["update"], hours="2.0", invoiced_hours="1.0")
+        self.assertContains(response, "The invoiced hours are lower than the hours.")
+        self.assertContains(
+            self.client.get(
+                hours.urls["detail"], headers={"x-requested-with": "XMLHttpRequest"}
+            ),
+            "Invoiced hours",
+        )
 
         response = send()
         self.assertContains(response, "This seems to be a duplicate.")

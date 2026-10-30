@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Any
 
 from django.db.models import Sum
-from ninja import Query, Router, Schema
+from ninja import Field, Query, Router, Schema
 from ninja.pagination import paginate
 
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -27,6 +27,10 @@ class LoggedHoursOut(Schema):
     rendered_on: dt.date
     rendered_by: str
     hours: Decimal
+    invoiced_hours: Decimal | None = Field(
+        description="If set, the work is valued and invoiced with these hours"
+        " instead of the hours, e.g. if it's worth more than the time spent."
+    )
     description: str
     project: ProjectSummary
     service_id: int
@@ -88,7 +92,10 @@ def logged_hours_list(request, filters: Query[LoggedHoursFilter]):
         hours.select_related("rendered_by", "service__project").order_by(
             "-rendered_on", "-created_at", "-pk"
         ),
-        lambda row: _entry_out(row, request) | {"hours": row.hours},
+        lambda row: (
+            _entry_out(row, request)
+            | {"hours": row.hours, "invoiced_hours": row.invoiced_hours}
+        ),
         totals={
             "total_hours": hours.order_by().aggregate(Sum("hours"))["hours__sum"] or Z1
         },

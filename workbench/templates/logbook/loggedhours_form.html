@@ -49,7 +49,15 @@
     {{ form.progress_on_selectable_services|json_script }}
   </div>
 
-  {% ff_field form.hours %}
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-6">{% ff_field form.hours %}</div>
+      <div class="col-6">{% ff_field form.invoiced_hours %}</div>
+    </div>
+    <small class="form-text text-muted">
+      {% translate "The invoiced hours field takes precedence when creating invoices." %}
+    </small>
+  </div>
   {% ff_field form.description %}
 {% endblock body %}
 

@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -19,6 +20,11 @@ from workbench.tools.formats import (
 from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import logbook_lock, raise_if_errors
+
+
+# The hours logged work is valued and invoiced with, the time spent itself is
+# always ``hours``
+INVOICED_HOURS = Coalesce("invoiced_hours", "hours")
 
 
 @model_urls
@@ -48,6 +54,7 @@ class LoggedHours(Model):
         verbose_name=_("rendered by"),
     )
     hours = HoursField(_("hours"), validators=[MinValueValidator(Decimal("0.1"))])
+    invoiced_hours = HoursField(_("invoiced hours"), blank=True, null=True)
     description = models.TextField(_("description"))
 
     invoice_service = models.ForeignKey(

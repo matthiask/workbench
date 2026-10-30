@@ -5,10 +5,13 @@ from django.core.exceptions import ValidationError
 from django.db.models import ProtectedError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.invoices.models import Invoice
+from workbench.logbook.models import LoggedHours
+from workbench.reporting.utils import effort_cost_by_project
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
@@ -145,6 +148,47 @@ class InvoicesTest(TestCase):
             self.client.post(invoice.urls["delete"]), invoice.urls["list"]
         )
         self.assertEqual(Invoice.objects.count(), 0)
+
+    def test_invoiced_hours(self):
+        """Invoiced hours replace the hours when valuing and invoicing logged
+        work, the hours themselves stay the time spent"""
+        service = factories.ServiceFactory.create(effort_rate=200)
+        project = service.project
+        factories.LoggedHoursFactory.create(service=service, hours=1)
+        factories.LoggedHoursFactory.create(
+            service=service, hours=Decimal("0.5"), invoiced_hours=2
+        )
+
+        gs = project.grouped_services
+        self.assertEqual(gs["logged_hours"], Decimal("1.5"))
+        self.assertEqual(gs["total_logged_cost"], 600)
+        self.assertEqual(
+            effort_cost_by_project(LoggedHours.objects.all())[project.id],
+            {"cost": 600, "hours_rate_undefined": 0, "hours": Decimal("1.5")},
+        )
+
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.subtotal, 600)
+        self.assertEqual(invoice.services.get().effort_hours, 3)
+
+        self.client.force_login(project.owned_by)
+        self.assertEqual(self.client.get(invoice.urls["xlsx"]).status_code, 200)
+        self.assertEqual(
+            self.client.get(
+                reverse(
+                    "projects_project_cost_by_month_and_service_xlsx",
+                    args=(project.pk,),
+                )
+            ).status_code,
+            200,
+        )
 
     def test_create_service_invoice_from_logbook(self):
         """Service invoice creation from the logbook works and results in the

@@ -12,7 +12,7 @@ from workbench import generic
 from workbench.contacts.models import Person
 from workbench.invoices.forms import SendReminderForm
 from workbench.invoices.models import Invoice
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
 from workbench.tools.pdf import invoice_filename, pdf_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -63,9 +63,12 @@ class InvoiceXLSXView(generic.DetailView):
         hours = defaultdict(list)
         cost = defaultdict(list)
 
-        for entry in LoggedHours.objects.filter(
-            invoice_service__invoice=self.object
-        ).reverse():
+        for entry in (
+            LoggedHours.objects
+            .filter(invoice_service__invoice=self.object)
+            .annotate(hours_to_invoice=INVOICED_HOURS)
+            .reverse()
+        ):
             hours[entry.invoice_service_id].append(entry)
         for entry in LoggedCost.objects.filter(
             invoice_service__invoice=self.object
@@ -89,8 +92,10 @@ class InvoiceXLSXView(generic.DetailView):
                     entry.rendered_on,
                     "",
                     "",
-                    entry.hours,
-                    entry.hours * service.effort_rate if service.effort_rate else "",
+                    entry.hours_to_invoice,
+                    entry.hours_to_invoice * service.effort_rate
+                    if service.effort_rate
+                    else "",
                 ]
                 for entry in hours[service.id]
             )

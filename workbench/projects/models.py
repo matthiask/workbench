@@ -457,7 +457,7 @@ class Project(Model):
     def grouped_services(self):
         # Avoid circular imports
         from workbench.deals.models import Deal
-        from workbench.logbook.models import LoggedCost, LoggedHours
+        from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
         from workbench.reporting.utils import sum_by
 
         # Logged vs. service hours
@@ -483,6 +483,7 @@ class Project(Model):
         )
 
         logged_hours_per_service_and_user = defaultdict(dict)
+        invoiced_hours_per_service = defaultdict(lambda: Z1)
         logged_hours_per_user = defaultdict(lambda: Z1)
         logged_hours_per_effort_rate = defaultdict(lambda: Z1)
 
@@ -491,9 +492,10 @@ class Project(Model):
             .order_by()
             .filter(service__project=self)
             .values("service", "rendered_by")
-            .annotate(Sum("hours"))
+            .annotate(Sum("hours"), invoiced_hours=Sum(INVOICED_HOURS))
         ):
             logged_hours_per_user[row["rendered_by"]] += row["hours__sum"]
+            invoiced_hours_per_service[row["service"]] += row["invoiced_hours"]
             logged_hours_per_service_and_user[row["service"]][row["rendered_by"]] = row[
                 "hours__sum"
             ]
@@ -510,7 +512,7 @@ class Project(Model):
                 service__effort_rate__isnull=False,
             ),
             key="service",
-            field="hours",
+            field=INVOICED_HOURS,
             default=Z1,
         )
         not_archived_logged_cost_per_service = sum_by(
@@ -569,7 +571,9 @@ class Project(Model):
                     accepted_offers_service_cost += service.service_cost
 
             if service.effort_rate is not None:
-                total_logged_cost += service.effort_rate * row["logged_hours"]
+                total_logged_cost += (
+                    service.effort_rate * invoiced_hours_per_service[service.id]
+                )
             else:
                 total_logged_hours_rate_undefined += row["logged_hours"]
                 if not service.is_declined and not service.is_budget_retainer:
