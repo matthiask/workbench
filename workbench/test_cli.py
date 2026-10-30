@@ -396,6 +396,39 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
 
         config = wb.CONFIG.read_text()
-        self.assertIn('url = "http://testserver"', config)
+        self.assertIn('current = "http://testserver"', config)
         token = re.search(r'token = "([^"]+)"', config).group(1)
         self.assertEqual(APIToken.objects.user_for(token), self.user)
+
+    def test_auth(self):
+        """wb is logged in to several installations and switches between them"""
+        _token, first = APIToken.create_for(user=self.user, title="First")
+        other = factories.UserFactory.create()
+        _token, second = APIToken.create_for(user=other, title="Second")
+        # The configuration of older versions
+        wb.CONFIG.write_text(f'url = "http://first.example.com"\ntoken = "{first}"\n')
+
+        def run(*args, env=None, input=None):
+            return CliRunner().invoke(wb.cli, args, env=env or {}, input=input)
+
+        result = run("login", "http://second.example.com/", "--token", input=second)
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = run("auth", "list")
+        self.assertEqual(
+            result.output,
+            "  http://first.example.com\n* http://second.example.com\n",
+        )
+        self.assertIn(other.get_full_name(), run("me").output)
+
+        result = run("auth", "switch", "example")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Several installations match", result.output)
+        self.assertEqual(
+            run("auth", "switch", "first").output, "Using http://first.example.com\n"
+        )
+        self.assertIn(self.user.get_full_name(), run("me").output)
+
+        # WORKBENCH_URL selects another installation for one command
+        result = run("me", env={"WORKBENCH_URL": "http://second.example.com"})
+        self.assertIn(other.get_full_name(), result.output)
+        self.assertIn("* http://first.example.com", run("auth", "list").output)

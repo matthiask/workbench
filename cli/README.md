@@ -22,9 +22,17 @@ Check it with `wb me`. Access expires after 30 days; `wb` then opens the
 browser again by itself. On computers without a browser, create a token in
 Workbench ("API tokens" in the user menu) and use `wb login URL --token`.
 
-The URL and the token are stored in `~/.config/workbench.toml`. The
+Logging in to another installation adds it and makes it the current one.
+Switch between them with any unique part of their URL:
+
+    wb auth list
+    wb auth switch feinheit
+
+The URLs and the tokens are stored in `~/.config/workbench.toml`. The
 `WORKBENCH_URL` and `WORKBENCH_TOKEN` environment variables take precedence;
-`wb` doesn't log in again by itself when they are used.
+`WORKBENCH_URL` alone uses another installation you're logged in to for a
+single command. `wb` doesn't log in again by itself when `WORKBENCH_TOKEN` is
+used.
 
 ## What's on your plate
 

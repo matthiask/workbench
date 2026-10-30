@@ -37,20 +37,51 @@ def _terminate(msg):
 
 
 def _read_config():
-    return tomllib.loads(CONFIG.read_text()) if CONFIG.exists() else {}
+    """The current installation's URL and the tokens of all installations
+
+    Older versions stored the URL and the token of a single installation."""
+    config = tomllib.loads(CONFIG.read_text()) if CONFIG.exists() else {}
+    if "url" in config:
+        return {
+            "current": config["url"],
+            "installations": {config["url"]: {"token": config.get("token", "")}},
+        }
+    return {
+        "current": config.get("current"),
+        "installations": config.get("installations", {}),
+    }
 
 
-def _save_config(url, token):
+def _write_config(config):
+    lines = [f"current = {json.dumps(config['current'])}"]
+    for url, installation in sorted(config["installations"].items()):
+        lines += [
+            "",
+            f"[installations.{json.dumps(url)}]",
+            f"token = {json.dumps(installation['token'])}",
+        ]
     CONFIG.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG.write_text(f"url = {json.dumps(url)}\ntoken = {json.dumps(token)}\n")
+    CONFIG.write_text("\n".join(lines) + "\n")
     CONFIG.chmod(0o600)
 
 
-def _config():
-    """URL and token from the environment or from the configuration file"""
+def _save_config(url, token):
+    """Store the token of the installation and make it the current one"""
     config = _read_config()
-    url = os.environ.get("WORKBENCH_URL") or config.get("url")
-    token = os.environ.get("WORKBENCH_TOKEN") or config.get("token")
+    config["installations"][url] = {"token": token}
+    config["current"] = url
+    _write_config(config)
+
+
+def _config():
+    """URL and token from the environment or from the configuration file
+
+    WORKBENCH_URL alone selects one of the installations wb is logged in to."""
+    config = _read_config()
+    url = os.environ.get("WORKBENCH_URL") or config["current"]
+    token = os.environ.get("WORKBENCH_TOKEN") or (
+        config["installations"].get(url, {}).get("token")
+    )
     if not url or not token:
         _terminate("Not configured yet. Run `wb login URL` first.")
     return url, token
@@ -398,15 +429,55 @@ def cli():
 def login(url, paste_token):
     """Authorize wb to access Workbench in your name
 
-    Opens the browser; the URL defaults to the one used last time. Use
-    --token on computers without a browser."""
-    if not (url := url or _read_config().get("url")):
+    Opens the browser; the URL defaults to the current installation. Logging
+    in to another installation adds it and makes it the current one (see `wb
+    auth`). Use --token on computers without a browser."""
+    if not (url := url or _read_config()["current"]):
         _terminate("Which Workbench? Run `wb login URL`.")
+    url = url.rstrip("/")
     if paste_token:
         _save_config(url, click.prompt("API token", hide_input=True).strip())
         click.echo(f"Saved {CONFIG}")
     else:
         _browser_login(url)
+
+
+@cli.group()
+def auth():
+    """Switch between the Workbench installations you're logged in to
+
+    `wb login URL` adds installations. Setting WORKBENCH_URL uses another
+    installation for a single command."""
+
+
+@auth.command("list")
+def list_installations():
+    """List the installations, the current one is marked with *"""
+    config = _read_config()
+    if not config["installations"]:
+        _terminate("Not configured yet. Run `wb login URL` first.")
+    for url in sorted(config["installations"]):
+        click.echo(f"{'*' if url == config['current'] else ' '} {url}")
+
+
+@auth.command("switch")
+@click.argument("name")
+def switch_installation(name):
+    """Use another installation, NAME is any unique part of its URL"""
+    config = _read_config()
+    urls = sorted(config["installations"])
+    matches = [url for url in urls if url == name] or [
+        url for url in urls if name in url
+    ]
+    if len(matches) != 1:
+        _terminate(
+            f"{'Several' if matches else 'No'} installations match {name!r}:"
+            f" {', '.join(matches or urls) or '(none)'}. Add new ones with"
+            " `wb login URL`."
+        )
+    config["current"] = matches[0]
+    _write_config(config)
+    click.echo(f"Using {matches[0]}")
 
 
 @cli.command()
