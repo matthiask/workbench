@@ -400,8 +400,8 @@ planned_work:
         token = re.search(r'token = "([^"]+)"', config).group(1)
         self.assertEqual(APIToken.objects.user_for(token), self.user)
 
-    def test_auth_trailing_slash(self):
-        """URLs with and without a trailing slash are the same installation"""
+    def test_auth_urls(self):
+        """Installations are identified by the scheme and the host only"""
         _token, old = APIToken.create_for(user=self.user, title="Old")
         _token, new = APIToken.create_for(user=self.user, title="New")
         # Older versions stored the URL as given
@@ -413,6 +413,17 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         result = CliRunner().invoke(wb.cli, ["auth", "list"], env={})
         self.assertEqual(result.output, "* http://testserver\n")
+
+        # Pasted from the browser, or without the scheme
+        for url in ["http://TestServer/accounts/login/?next=/", "other.example.com"]:
+            result = CliRunner().invoke(
+                wb.cli, ["login", url, "--token"], input=new, env={}
+            )
+            self.assertEqual(result.exit_code, 0, result.output)
+        result = CliRunner().invoke(wb.cli, ["auth", "list"], env={})
+        self.assertEqual(
+            result.output, "  http://testserver\n* https://other.example.com\n"
+        )
 
     def test_auth(self):
         """wb is logged in to several installations and switches between them"""

@@ -13,7 +13,7 @@ from functools import cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from importlib.metadata import version
 from pathlib import Path
-from urllib.parse import parse_qs, urlencode, urljoin
+from urllib.parse import parse_qs, urlencode, urljoin, urlsplit
 
 import click
 import requests
@@ -46,8 +46,8 @@ def _read_config():
             "current": config["url"],
             "installations": {config["url"]: {"token": config.get("token", "")}},
         }
-    # Older versions stored URLs as given, with or without a trailing slash.
-    # Entries without one come from newer versions and take precedence.
+    # Older versions stored URLs as given. Entries which are normalized
+    # already come from newer versions and take precedence.
     installations = {}
     for url, installation in sorted(
         config.get("installations", {}).items(),
@@ -58,7 +58,14 @@ def _read_config():
 
 
 def _url(url):
-    return url.rstrip("/") if url else url
+    """The scheme and the host which identify an installation, URLs may be
+    pasted from the browser"""
+    if not url:
+        return url
+    if "://" not in url:
+        url = f"https://{url}"
+    parts = urlsplit(url)
+    return f"{parts.scheme}://{parts.netloc.lower()}"
 
 
 def _write_config(config):
