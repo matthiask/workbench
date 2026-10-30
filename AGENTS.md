@@ -229,6 +229,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   attribute is evaluated (and the query run) twice.
 - The "add issue to project" GitHub Actions workflow is duplicated across individual repos and should be consolidated into the org-level `.github` repo (org-level workflows apply to all repos). The cross-app parent warning workflow goes there too. See `specs/github-cost-allocation-report.md`.
 
+# Deployments
+
+Each installation's deployed commit is the branch `origin/latest/<installation>`
+(e.g. `latest/workbench-fhag`). Run `git fetch` and compare them with `main`
+to see what is live where, e.g. `git rev-list --count
+origin/latest/workbench-fhag..origin/main` for the commits not deployed yet.
+
 # Committing
 
 - Commit feature by feature: one self-contained change per commit, not a single
