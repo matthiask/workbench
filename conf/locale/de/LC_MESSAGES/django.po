@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 17:02+0100\n"
+"POT-Creation-Date: 2026-10-30 17:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3927,8 +3927,8 @@ msgstr "Hinweis auf Jubiläum"
 #: workbench/templates/awt/absence_calendar.html
 #: workbench/templates/generic/object_list.html
 #: workbench/templates/reporting/project_budget_statistics.html
-msgid "Reset the filter form"
-msgstr "Suchformular zurücksetzen"
+msgid "Reset"
+msgstr "Zurücksetzen"
 
 #: workbench/templates/awt/awt_warning_mail.txt
 msgid "Annual working time warnings"
@@ -5495,6 +5495,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Reset the filter form"
+#~ msgstr "Suchformular zurücksetzen"
 
 #~ msgid "Toggle form"
 #~ msgstr "Formular anzeigen"
