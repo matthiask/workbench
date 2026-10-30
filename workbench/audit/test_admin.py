@@ -29,3 +29,17 @@ class AuditTest(TestCase):
         self.assertNotContains(response, "<select")
         self.assertNotContains(response, "<textarea")
         # print(response, response.content.decode("utf-8"))
+
+    def test_timestamps(self):
+        """Actions are logged with the time of their statement, not with the
+        start of their transaction (e.g. a request or a management command)"""
+        project = factories.ProjectFactory.create()
+        project.title = "Changed"
+        project.save()
+        created, changed = (
+            LoggedAction.objects
+            .for_model(project)
+            .with_data(id=project.id)
+            .order_by("event_id")
+        )
+        self.assertLess(created.created_at, changed.created_at)

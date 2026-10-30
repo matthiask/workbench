@@ -62,7 +62,7 @@ BEGIN
         nextval('audit_logged_actions_event_id_seq'), -- event_id
         TG_TABLE_NAME::text,                          -- table_name
         current_setting('application_name'),
-        current_timestamp,                            -- action_tstamp_tx
+        statement_timestamp(),                        -- not the transaction start
         substring(TG_OP,1,1),                         -- action
         NULL, NULL                                    -- row_data, changed_fields
         );
