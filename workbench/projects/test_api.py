@@ -207,3 +207,41 @@ class ProjectsAPITest(TestCase):
                     [e["loc"] for e in response.json()["detail"]],
                     [["body", "data", "customer"]],
                 )
+
+    def test_services(self):
+        """Services with their logged hours and costs"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        design = factories.ServiceFactory.create(
+            project=project,
+            offer=offer,
+            title="Design",
+            effort_type="Design",
+            effort_hours=10,
+            effort_rate=200,
+        )
+        hosting = factories.ServiceFactory.create(
+            project=project, title="Hosting", cost=500
+        )
+        factories.LoggedHoursFactory.create(service=design, hours=3)
+        factories.LoggedHoursFactory.create(service=design, hours=2)
+        factories.LoggedCostFactory.create(service=hosting, cost=100)
+        factories.ServiceFactory.create(title="Other project")
+        self.client.force_login(project.owned_by)
+
+        data = self.client.get(f"/api/services/?project={project.pk}").json()
+        self.assertEqual(
+            [
+                (s["title"], s["offer"], s["service_hours"], s["logged_hours"])
+                for s in data
+            ],
+            [("Design", offer.code, "10.0", "5.0"), ("Hosting", None, "0.0", "0.0")],
+        )
+        self.assertEqual(data[1]["cost"], "500.00")
+        self.assertEqual(data[1]["logged_cost"], "100.00")
+        self.assertNotIn("effort_rate", data[0])
+
+        data = self.client.get(f"/api/services/?offer={offer.pk}").json()
+        self.assertEqual([s["id"] for s in data], [design.pk])
+        data = self.client.get("/api/services/?q=hosting").json()
+        self.assertEqual([s["id"] for s in data], [hosting.pk])

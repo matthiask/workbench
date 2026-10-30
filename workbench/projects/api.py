@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Literal
 
 from django.db import transaction
-from django.db.models import Q, Sum
+from django.db.models import DecimalField, OuterRef, Q, Subquery, Sum
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
@@ -14,10 +14,10 @@ from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.invoices.models import Invoice
-from workbench.logbook.models import LoggedHours
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import ProjectForm
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.tools.formats import Z1, Z2
@@ -386,3 +386,91 @@ def project_stats(request, filters: Query[StatsFilter]):
         }
 
     return [project_stats(project) for project in projects]
+
+
+class ServiceOut(Schema):
+    id: int
+    url: str
+    project_id: int
+    project: str
+    offer_id: int | None
+    offer: str | None
+    offer_status: str | None
+    title: str
+    description: str
+    external_reference: str
+    effort_type: str
+    service_hours: Decimal
+    logged_hours: Decimal
+    cost: Decimal | None
+    logged_cost: Decimal
+    is_optional: bool
+    is_logging_allowed: bool
+
+
+class ServiceFilter(Schema):
+    q: str = ""
+    project: int | None = None
+    offer: int | None = None
+
+
+def _sum_of(model, field):
+    """Subquery summing up ``field`` of the service's logbook entries"""
+    return Subquery(
+        model.objects
+        .filter(service=OuterRef("pk"))
+        .order_by()
+        .values("service")
+        .annotate(total=Sum(field))
+        .values("total"),
+        output_field=DecimalField(),
+    )
+
+
+@router.get("/services/", response=list[ServiceOut])
+def service_list(request, filters: Query[ServiceFilter]):
+    """Services with their logged hours and costs, at most 200
+
+    Same as on the project page: rates and amounts other than costs require
+    the controlling feature (see the offers and the project statistics)."""
+    services = (
+        Service.objects
+        .select_related("project", "offer__project")
+        .annotate(
+            logged_hours=_sum_of(LoggedHours, "hours"),
+            logged_cost=_sum_of(LoggedCost, "cost"),
+        )
+        .order_by("project", "offer_id", "position", "pk")
+    )
+    if filters.project:
+        services = services.filter(project=filters.project)
+    if filters.offer:
+        services = services.filter(offer=filters.offer)
+    if filters.q:
+        services = services.search(filters.q)
+    return [
+        {
+            "id": service.id,
+            "url": request.build_absolute_uri(
+                f"{service.project.get_absolute_url()}#service{service.pk}"
+            ),
+            "project_id": service.project_id,
+            "project": service.project.code,
+            "offer_id": service.offer_id,
+            "offer": service.offer.code if service.offer else None,
+            "offer_status": service.offer.get_status_display()
+            if service.offer
+            else None,
+            "title": service.title,
+            "description": service.description,
+            "external_reference": service.external_reference,
+            "effort_type": service.effort_type,
+            "service_hours": service.service_hours,
+            "logged_hours": service.logged_hours or Z1,
+            "cost": service.cost,
+            "logged_cost": service.logged_cost or Z2,
+            "is_optional": service.is_optional,
+            "is_logging_allowed": service.is_logging_allowed(),
+        }
+        for service in services[:200]
+    ]
