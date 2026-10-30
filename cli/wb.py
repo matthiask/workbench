@@ -1169,6 +1169,12 @@ def show_invoice(invoice_id, as_json):
             ("Type", data["type"]),
             ("Status", data["status"]),
             ("Customer", _link(data["customer"]["name"], data["customer"]["url"])),
+            (
+                "Project",
+                _link(f"{project['code']} {project['title']}", project["url"])
+                if (project := data["project"])
+                else None,
+            ),
             ("Owned by", data["owned_by"]),
             ("Invoiced on", data["invoiced_on"]),
             ("Due on", data["due_on"]),
@@ -1301,7 +1307,7 @@ def search_services(query, project, offer, as_json):
         ]
         table.add_row(
             _link(service["id"], service["url"]),
-            service["project"],
+            _link(service["project"]["code"], service["project"]["url"]),
             service["offer"] or "",
             service["title"] + (f" ({', '.join(notes)})" if notes else ""),
             service["effort_type"],
@@ -1368,7 +1374,7 @@ def search_hours(
         table.add_row(
             _link(row["rendered_on"], row["url"]),
             row["rendered_by"],
-            row["project"],
+            _link(row["project"]["code"], row["project"]["url"]),
             row["service"],
             row["hours"],
             row["description"],
@@ -1503,7 +1509,7 @@ def search_costs(
         table.add_row(
             _link(row["rendered_on"], row["url"]),
             row["rendered_by"],
-            row["project"],
+            _link(row["project"]["code"], row["project"]["url"]),
             row["service"],
             row["cost"],
             row["third_party_costs"] or "",
@@ -1553,7 +1559,10 @@ def search_projected_invoices(project, customer, since, until, as_json):
     table = _table("Project", "Invoiced on", "Gross margin>", "Description")
     for row in data:
         table.add_row(
-            row["project"], row["invoiced_on"], row["gross_margin"], row["description"]
+            _link(row["project"]["code"], row["project"]["url"]),
+            row["invoiced_on"],
+            row["gross_margin"],
+            row["description"],
         )
     console.print(table)
 

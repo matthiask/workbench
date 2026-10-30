@@ -3,12 +3,13 @@ from decimal import Decimal
 from typing import Literal
 
 from django.shortcuts import get_object_or_404
-from ninja import Field, Query, Router, Schema
+from ninja import Query, Router, Schema
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.invoices.models import Invoice, ProjectedInvoice
+from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
 
 
@@ -31,7 +32,7 @@ class InvoiceOut(Schema):
     description: str
     type: str
     status: str
-    project: str | None
+    project: ProjectSummary | None
     customer: OrganizationOut
     owned_by: str
     invoiced_on: dt.date | None
@@ -53,7 +54,9 @@ def invoice_out(invoice, request):
         "description": invoice.description,
         "type": invoice.get_type_display(),
         "status": invoice.get_status_display(),
-        "project": invoice.project.code if invoice.project else None,
+        "project": project_summary(invoice.project, request)
+        if invoice.project
+        else None,
         "customer": organization_out(invoice.customer, request),
         "owned_by": invoice.owned_by.get_short_name(),
         "invoiced_on": invoice.invoiced_on,
@@ -116,10 +119,19 @@ def invoice_detail(request, invoice_id: int):
 
 
 class ProjectedInvoiceOut(Schema):
-    project: str = Field(alias="project.code")
+    project: ProjectSummary
     invoiced_on: dt.date
     gross_margin: Decimal
     description: str
+
+
+def _projected_invoice_out(projected_invoice, request):
+    return {
+        "project": project_summary(projected_invoice.project, request),
+        "invoiced_on": projected_invoice.invoiced_on,
+        "gross_margin": projected_invoice.gross_margin,
+        "description": projected_invoice.description,
+    }
 
 
 @router.get(
@@ -129,7 +141,12 @@ def projected_invoice_list(request, project_id: int):
     """Planned invoicing of the project (gross margin, third party costs are
     not included)"""
     project = get_object_or_404(Project, pk=project_id)
-    return ProjectedInvoice.objects.filter(project=project).select_related("project")
+    return [
+        _projected_invoice_out(row, request)
+        for row in ProjectedInvoice.objects.filter(project=project).select_related(
+            "project"
+        )
+    ]
 
 
 class ProjectedInvoiceFilter(Schema):
@@ -151,4 +168,7 @@ def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter
         projected = projected.filter(invoiced_on__gte=filters.invoiced_since)
     if filters.invoiced_until:
         projected = projected.filter(invoiced_on__lte=filters.invoiced_until)
-    return projected.order_by("invoiced_on", "pk")[:200]
+    return [
+        _projected_invoice_out(row, request)
+        for row in projected.order_by("invoiced_on", "pk")[:200]
+    ]

@@ -34,7 +34,7 @@ class LogbookAPITest(TestCase):
         self.assertEqual(data["total_hours"], "3.5")
         self.assertEqual(data["count"], 2)
         self.assertEqual([row["id"] for row in data["hours"]], [mine.pk, other.pk])
-        self.assertEqual(data["hours"][0]["project"], service.project.code)
+        self.assertEqual(data["hours"][0]["project"]["code"], service.project.code)
         self.assertEqual(data["hours"][0]["service"], "Design")
         self.assertEqual(data["hours"][0]["rendered_by"], "ab")
 

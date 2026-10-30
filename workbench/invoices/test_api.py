@@ -51,7 +51,10 @@ class InvoicesAPITest(TestCase):
 
         data = self.client.get(f"/api/invoices/{sent.pk}/").json()
         self.assertEqual(data["code"], sent.code)
-        self.assertEqual(data["project"], project.code)
+        self.assertEqual(data["project"]["code"], project.code)
+        self.assertEqual(
+            data["project"]["url"], f"http://testserver{project.get_absolute_url()}"
+        )
         self.assertEqual(data["total_excl_tax"], "100.00")
         self.assertEqual(data["url"], f"http://testserver{sent.get_absolute_url()}")
 
@@ -71,7 +74,12 @@ class InvoicesAPITest(TestCase):
             data,
             [
                 {
-                    "project": project.code,
+                    "project": {
+                        "id": project.pk,
+                        "code": project.code,
+                        "title": project.title,
+                        "url": f"http://testserver{project.get_absolute_url()}",
+                    },
                     "invoiced_on": in_days(30).isoformat(),
                     "gross_margin": "1000.00",
                     "description": "Kick-off",
@@ -91,7 +99,7 @@ class InvoicesAPITest(TestCase):
 
         def rows(query=""):
             return [
-                (row["project"], row["gross_margin"])
+                (row["project"]["code"], row["gross_margin"])
                 for row in self.client.get(f"/api/projected-invoices/{query}").json()
             ]
 

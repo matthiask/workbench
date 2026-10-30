@@ -5,6 +5,7 @@ from django.db.models import Count, Sum
 from ninja import Query, Router, Schema
 
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.projects.api import ProjectSummary, project_summary
 from workbench.tools.formats import Z1, Z2
 
 
@@ -19,8 +20,7 @@ class LoggedHoursOut(Schema):
     rendered_by: str
     hours: Decimal
     description: str
-    project_id: int
-    project: str
+    project: ProjectSummary
     service_id: int
     service: str
 
@@ -69,8 +69,7 @@ def _entry_out(entry, request):
         "rendered_on": entry.rendered_on,
         "rendered_by": entry.rendered_by.get_short_name(),
         "description": entry.description,
-        "project_id": entry.service.project_id,
-        "project": entry.service.project.code,
+        "project": project_summary(entry.service.project, request),
         "service_id": entry.service_id,
         "service": entry.service.title,
     }
@@ -101,8 +100,7 @@ class LoggedCostOut(Schema):
     third_party_costs: Decimal | None
     are_expenses: bool
     description: str
-    project_id: int
-    project: str
+    project: ProjectSummary
     service_id: int
     service: str
 

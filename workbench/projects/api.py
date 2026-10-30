@@ -28,6 +28,22 @@ from workbench.tools.formats import Z1, Z2
 router = Router(tags=["projects"])
 
 
+class ProjectSummary(Schema):
+    id: int
+    code: str
+    title: str
+    url: str
+
+
+def project_summary(project, request):
+    return {
+        "id": project.id,
+        "code": project.code,
+        "title": project.title,
+        "url": request.build_absolute_uri(project.get_absolute_url()),
+    }
+
+
 class ProjectOut(Schema):
     id: int
     code: str
@@ -380,8 +396,7 @@ def project_stats(request, filters: Query[StatsFilter]):
 class ServiceOut(Schema):
     id: int
     url: str
-    project_id: int
-    project: str
+    project: ProjectSummary
     offer_id: int | None
     offer: str | None
     offer_status: str | None
@@ -443,8 +458,7 @@ def service_list(request, filters: Query[ServiceFilter]):
             "url": request.build_absolute_uri(
                 f"{service.project.get_absolute_url()}#service{service.pk}"
             ),
-            "project_id": service.project_id,
-            "project": service.project.code,
+            "project": project_summary(service.project, request),
             "offer_id": service.offer_id,
             "offer": service.offer.code if service.offer else None,
             "offer_status": service.offer.get_status_display()
