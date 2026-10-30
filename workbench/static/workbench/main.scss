@@ -1558,3 +1558,23 @@ kbd {
   font-family: inherit;
   font-size: 0.8rem;
 }
+
+// Timestamps: slices which still need hours or a break are marked
+.wb-slice {
+  align-items: center;
+
+  .wb-row-actions {
+    width: auto;
+  }
+}
+
+.wb-slice-time {
+  flex-shrink: 0;
+  width: 6.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-slice-open {
+  box-shadow: inset 3px 0 0 var(--bs-primary);
+}

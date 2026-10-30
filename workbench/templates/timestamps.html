@@ -5,172 +5,166 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-lg-10 col-xl-8">
-      <h2>{% translate "timestamps"|capfirst %}</h2>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-lg-10 col-xl-8">
-      <div class="card mb-3">
-        <div class="card-header d-flex w-100 justify-content-between">
-          <h3 class="my-0">
-            <small>
-              {% if is_today %}
-                <a
-                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}&amp;date_until={% now 'Y-m-d' %}"
-                >
-                  {% hours_ring request.user.hours.today request.user.hours.today_target 'today' %}
-                  {{ request.user.hours.today|hours }} {% translate 'today' %}
-                </a>
-                /
-                <a
-                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}"
-                >
-                  {% hours_ring request.user.hours.week request.user.hours.week_target 'week' %}
-                  {{ request.user.hours.week|hours }} {% translate 'this week' %}
-                  (KW{{ week_range.0|date:'W' }})
-                </a>
-              {% else %}
-                {{ day|local_date_format:'l d.m.Y' }} /
-                <a
-                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ day.isoformat }}&amp;date_until={{ day.isoformat }}"
-                >{{ hours|hours }}</a> /
-                <a
-                  href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}"
-                >
-                  {{ weekly_hours|hours }}
-                  {% if is_this_week %}{% translate 'this week' %}
-                  {% else %}{% translate 'during the week' %}
-                  {% endif %}
-                  (KW{{ week_range.0|date:'W' }})
-                </a>
-              {% endif %}
-            </small>
-          </h3>
-          <div>
-            {% if not is_today %}
-              <a
-                href="{% url 'timestamps' %}"
-                class="btn btn-primary btn-sm align-self-start"
-                data-today-link
-              >
-                {% translate 'today'|capfirst %}
-              </a>
-            {% endif %}
-            <a
-              href="?day={{ previous.isoformat }}"
-              class="
-                btn btn-primary btn-sm align-self-start
-                {% if not previous %}
-                disabled
-                {% endif %}
-              "
-              title="{% translate 'Previous day' %}"
-              {% if not previous %}aria-disabled="true"{% endif %}
-            >
-              &laquo;
-            </a>
-            <a
-              href="?day={{ next.isoformat }}"
-              class="
-                btn btn-primary btn-sm align-self-start
-                {% if not next %}
-                disabled
-                {% endif %}
-              "
-              title="{% translate 'Next day' %}"
-              {% if not next %}aria-disabled="true"{% endif %}
-            >
-              &raquo;
-            </a>
-            <a
-              href="{% url 'timestamps-controller' %}?token={{ request.user.token }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
-              class="btn btn-primary btn-sm align-self-start"
-              target="_blank"
-              rel="noopener noreferrer"
-              onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false"
-            >
-              {% translate 'Controller' %}
-            </a>
-          </div>
-        </div>
-        <div class="list-group list-group-flush">
-          {% for slice in slices %}
-            <div class="list-group-item">
-              <div class="d-flex w-100">
-                <div>
-                  <strong>{{ slice.starts_at|date:'H:i'|default:'?' }} -
-                    {{ slice.ends_at|date:'H:i'|default:'?' }}</strong>
-                  {% if slice.elapsed_hours %}({{ slice.elapsed_hours|hours:True }}){% endif %}
-                  {{ slice.description }}
-                  {% if slice.comment %}<em>{{ slice.comment }}</em>{% endif %}
-                  {% if slice.project %}<br><small class="text-body-secondary">{{ slice.project }}</small>{% endif %}
-                </div>
-                <div class="ms-auto">
-                  {% if slice.hours_create_url %}
-                    <a
-                      href="{{ slice.hours_create_url }}"
-                      data-ajaxmodal
-                      class="btn btn-sm align-self-start btn-primary"
-                    >
-                      {% translate 'hours'|capfirst %}
-                    </a>
-                  {% endif %}
-                  {% if not forloop.first and slice.break_create_url %}
-                    <a
-                      href="{{ slice.break_create_url }}"
-                      data-ajaxmodal
-                      class="btn btn-sm align-self-start btn-primary"
-                    >
-                      {% translate 'break'|capfirst %}
-                    </a>
-                  {% endif %}
-                  {% if slice.logged_hours %}
-                    <a
-                      href="{{ slice.logged_hours.get_absolute_url }}"
-                      data-ajaxmodal
-                      class="btn btn-sm btn-outline-primary"
-                    >
-                      {% translate 'hours'|capfirst %}
-                    </a>
-                  {% elif slice.logged_break %}
-                    <a
-                      href="{{ slice.logged_break.get_absolute_url }}"
-                      data-ajaxmodal
-                      class="btn btn-sm btn-outline-primary"
-                    >
-                      {% translate 'break'|capfirst %}
-                    </a>
-                  {% elif slice.timestamp_id %}
-                    <form
-                      class="d-inline"
-                      method="post"
-                      action="{% url 'delete_timestamp' slice.timestamp_id %}"
-                      onsubmit="return confirm('{% translate 'Really delete?'|escapejs %}')"
-                    >
-                      {% csrf_token %}
-                      <input type="hidden" name="next" value="?{{ request.GET.urlencode }}">
-                      <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
-                    </form>
-                  {% endif %}
-                  {% if slice.split_url %}
-                    <a
-                      href="{{ slice.split_url }}"
-                      data-ajaxmodal
-                      class="btn btn-sm align-self-start btn-primary"
-                      title="{% translate 'Split' %}"
-                    >
-                      <span aria-hidden="true">{% include 'svg/repo-forked.svg' %}</span>
-                      <span class="visually-hidden">{% translate 'Split' %}</span>
-                    </a>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          {% endfor %}
+  <div class="wb-form-page wb-form-page-wide">
+    <div class="wb-page-header">
+      <div class="min-w-0">
+        <h1 class="mb-1">{% translate "timestamps"|capfirst %}</h1>
+        <div class="wb-meta">
+          <span>{{ day|local_date_format:'l d.m.Y' }}</span>
+          <span>KW{{ week_range.0|date:'W' }}</span>
         </div>
       </div>
+      <div class="wb-page-actions">
+        {% if not is_today %}
+          <a href="{% url 'timestamps' %}" class="btn btn-quiet" data-today-link>{% translate 'today'|capfirst %}</a>
+        {% endif %}
+        <span class="btn-group">
+          <a
+            href="?day={{ previous.isoformat }}"
+            class="btn btn-quiet btn-icon {% if not previous %}disabled{% endif %}"
+            title="{% translate 'Previous day' %}"
+            aria-label="{% translate 'Previous day' %}"
+            {% if not previous %}aria-disabled="true"{% endif %}
+          >{% include 'svg/chevron-left.svg' %}</a>
+          <a
+            href="?day={{ next.isoformat }}"
+            class="btn btn-quiet btn-icon {% if not next %}disabled{% endif %}"
+            title="{% translate 'Next day' %}"
+            aria-label="{% translate 'Next day' %}"
+            {% if not next %}aria-disabled="true"{% endif %}
+          >{% include 'svg/chevron-right.svg' %}</a>
+        </span>
+        <a
+          href="{% url 'timestamps-controller' %}?token={{ request.user.token }}&amp;url={{ url }}&amp;title={{ WORKBENCH.TITLE }}"
+          class="btn btn-quiet"
+          target="_blank"
+          rel="noopener noreferrer"
+          onclick="window.open(this.href, 'timestamps', 'innerHeight=450,innerWidth=400,resizable=yes,scrollbars=yes,alwaysOnTop=yes,location=no,menubar=no,toolbar=no');return false"
+        >
+          {% include 'svg/link-external.svg' %}
+          {% translate 'Controller' %}
+        </a>
+      </div>
     </div>
+
+    <div class="wb-stats mb-3">
+      {% if is_today %}
+        <a
+          class="wb-stat wb-stat-link"
+          href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}&amp;date_until={% now 'Y-m-d' %}"
+        >
+          <div class="wb-stat-label">{% translate 'today'|capfirst %}</div>
+          <div class="wb-stat-value">
+            {% hours_ring request.user.hours.today request.user.hours.today_target 'today' %}
+            {{ request.user.hours.today|hours }}
+            {% if request.user.hours.today_target %}<span class="wb-stat-of">/
+                {{ request.user.hours.today_target|hours }}</span>{% endif %}
+          </div>
+        </a>
+        <a
+          class="wb-stat wb-stat-link"
+          href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}"
+        >
+          <div class="wb-stat-label">{% translate 'this week'|capfirst %}</div>
+          <div class="wb-stat-value">
+            {% hours_ring request.user.hours.week request.user.hours.week_target 'week' %}
+            {{ request.user.hours.week|hours }}
+            {% if request.user.hours.week_target %}<span class="wb-stat-of">/
+                {{ request.user.hours.week_target|hours }}</span>{% endif %}
+          </div>
+        </a>
+      {% else %}
+        <a
+          class="wb-stat wb-stat-link"
+          href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ day.isoformat }}&amp;date_until={{ day.isoformat }}"
+        >
+          <div class="wb-stat-label">{{ day|local_date_format:'l' }}</div>
+          <div class="wb-stat-value">{{ hours|hours }}</div>
+        </a>
+        <a
+          class="wb-stat wb-stat-link"
+          href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ week_range.0.isoformat }}&amp;date_until={{ week_range.1.isoformat }}"
+        >
+          <div class="wb-stat-label">
+            {% if is_this_week %}{% translate 'this week'|capfirst %}{% else %}{% translate 'during the week'|capfirst %}{% endif %}
+          </div>
+          <div class="wb-stat-value">{{ weekly_hours|hours }}</div>
+        </a>
+      {% endif %}
+    </div>
+
+    <section class="card mb-3">
+      <div class="list-group list-group-flush">
+        {% for slice in slices %}
+          <div class="list-group-item wb-row wb-slice {% if slice.hours_create_url %}wb-slice-open{% endif %}">
+            <div class="wb-slice-time">
+              {{ slice.starts_at|date:'H:i'|default:'?' }}&ndash;{{ slice.ends_at|date:'H:i'|default:'?' }}
+              {% if slice.elapsed_hours %}<div class="wb-row-meta">{{ slice.elapsed_hours|hours:True }}</div>{% endif %}
+            </div>
+            <div class="wb-row-main">
+              {% if slice.project %}<div class="wb-row-meta">{{ slice.project }}</div>{% endif %}
+              <div>
+                {{ slice.description }}
+                {% if slice.comment %}<em class="text-secondary">{{ slice.comment }}</em>{% endif %}
+              </div>
+            </div>
+            <div class="wb-row-actions">
+              {% if slice.hours_create_url %}
+                <a href="{{ slice.hours_create_url }}" data-ajaxmodal class="btn btn-sm btn-primary">
+                  {% include 'svg/plus.svg' %}
+                  {% translate 'hours'|capfirst %}
+                </a>
+              {% endif %}
+              {% if not forloop.first and slice.break_create_url %}
+                <a href="{{ slice.break_create_url }}" data-ajaxmodal class="btn btn-sm btn-quiet">
+                  {% include 'svg/plus.svg' %}
+                  {% translate 'break'|capfirst %}
+                </a>
+              {% endif %}
+              {% if slice.logged_hours %}
+                <a href="{{ slice.logged_hours.get_absolute_url }}" data-ajaxmodal class="btn btn-sm btn-quiet">
+                  {% include 'svg/check.svg' %}
+                  {% translate 'hours'|capfirst %}
+                </a>
+              {% elif slice.logged_break %}
+                <a href="{{ slice.logged_break.get_absolute_url }}" data-ajaxmodal class="btn btn-sm btn-quiet">
+                  {% include 'svg/check.svg' %}
+                  {% translate 'break'|capfirst %}
+                </a>
+              {% elif slice.timestamp_id %}
+                <form
+                  class="d-inline"
+                  method="post"
+                  action="{% url 'delete_timestamp' slice.timestamp_id %}"
+                  onsubmit="return confirm('{% translate 'Really delete?'|escapejs %}')"
+                >
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="?{{ request.GET.urlencode }}">
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-quiet btn-icon"
+                    title="{% translate 'Delete' %}"
+                    aria-label="{% translate 'Delete' %}"
+                  >
+                    {% include 'svg/x.svg' %}
+                  </button>
+                </form>
+              {% endif %}
+              {% if slice.split_url %}
+                <a
+                  href="{{ slice.split_url }}"
+                  data-ajaxmodal
+                  class="btn btn-sm btn-quiet btn-icon"
+                  title="{% translate 'Split' %}"
+                  aria-label="{% translate 'Split' %}"
+                >{% include 'svg/repo-forked.svg' %}</a>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="list-group-item text-secondary">{% translate 'No results found.' %}</div>
+        {% endfor %}
+      </div>
+    </section>
   </div>
 {% endblock content %}
