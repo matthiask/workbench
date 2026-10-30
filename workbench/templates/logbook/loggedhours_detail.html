@@ -6,66 +6,50 @@
 {% endblock title %}
 
 {% block body %}
-  <table class="table table-striped">
-    <tr>
-      <th class="text-end">{% translate 'project'|capfirst %}</th>
-      <td>{% link_or_none object.service.project %}</td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'service'|capfirst %}</th>
-      <td>{% link_or_none object.service %}</td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'created'|capfirst %}</th>
-      <td>
-        {{ object.created_at|local_date_format }} {% translate 'by' %}
-        {{ object.created_by.get_short_name }}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'rendered'|capfirst %}</th>
-      <td>
-        {{ object.rendered_on|local_date_format }} {% translate 'by' %}
-        {{ object.rendered_by.get_short_name }}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'hours'|capfirst %}</th>
-      <td>{{ object.hours|hours }}</td>
-    </tr>
+  <dl class="wb-fields">
+    <dt>{% translate 'project'|capfirst %}</dt>
+    <dd>{% link_or_none object.service.project %}</dd>
+    <dt>{% translate 'service'|capfirst %}</dt>
+    <dd>{% link_or_none object.service %}</dd>
+    <dt>{% translate 'created'|capfirst %}</dt>
+    <dd>
+      {{ object.created_at|local_date_format }} {% translate 'by' %}
+      {{ object.created_by.get_short_name }}
+    </dd>
+    <dt>{% translate 'rendered'|capfirst %}</dt>
+    <dd>
+      {{ object.rendered_on|local_date_format }} {% translate 'by' %}
+      {{ object.rendered_by.get_short_name }}
+    </dd>
+    <dt>{% translate 'hours'|capfirst %}</dt>
+    <dd>{{ object.hours|hours }}</dd>
     {% if object.invoiced_hours is not None %}
-      <tr>
-        <th class="text-end">{% translate 'invoiced hours'|capfirst %}</th>
-        <td>{{ object.invoiced_hours|hours }}</td>
-      </tr>
+      <dt>{% translate 'invoiced hours'|capfirst %}</dt>
+      <dd>{{ object.invoiced_hours|hours }}</dd>
     {% endif %}
-    <tr>
-      <th class="text-end">{% translate 'description'|capfirst %}</th>
-      <td>{{ object.description|linebreaksbr }}</td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'invoicing'|capfirst %}</th>
-      <td>
-        {% if object.invoice_service %}
-          {% link_or_none object.invoice_service %}
-        {% elif object.archived_at %}
-          {% blocktranslate with archived_at=object.archived_at|local_date_format trimmed %}
-            Archived at {{ archived_at }}
-          {% endblocktranslate %}
-        {% else %}
-          &ndash;
-        {% endif %}
-      </td>
-    </tr>
-  </table>
+    <dt>{% translate 'description'|capfirst %}</dt>
+    <dd>{{ object.description|linebreaksbr }}</dd>
+    <dt>{% translate 'invoicing'|capfirst %}</dt>
+    <dd>
+      {% if object.invoice_service %}
+        {% link_or_none object.invoice_service %}
+      {% elif object.archived_at %}
+        {% blocktranslate with archived_at=object.archived_at|local_date_format trimmed %}
+          Archived at {{ archived_at }}
+        {% endblocktranslate %}
+      {% else %}
+        &ndash;
+      {% endif %}
+    </dd>
+  </dl>
 {% endblock body %}
 
 {% block footer %}
   <a href="{{ object.urls.update }}" class="btn btn-primary" data-ajaxmodal>{% translate 'Update' %}</a>
-  <a href="{{ object.urls.move }}" class="btn btn-primary" data-ajaxmodal>{% translate 'Move' %}</a>
+  <a href="{{ object.urls.move }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Move' %}</a>
   <a
     href="{{ object.service.project.urls.createhours }}?copy={{ object.pk }}"
-    class="btn btn-primary me-auto"
+    class="btn btn-quiet me-auto"
     data-ajaxmodal
   >
     {% translate 'Copy' %}

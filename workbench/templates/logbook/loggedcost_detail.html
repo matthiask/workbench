@@ -6,78 +6,56 @@
 {% endblock title %}
 
 {% block body %}
-  <table class="table table-striped">
-    <tr>
-      <th class="text-end">{% translate 'project'|capfirst %}</th>
-      <td>{% link_or_none object.service.project %}</td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'service'|capfirst %}</th>
-      <td>{% link_or_none object.service %}</td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'created'|capfirst %}</th>
-      <td>
-        {{ object.created_at|local_date_format }} {% translate 'by' %}
-        {{ object.created_by.get_short_name }}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'rendered'|capfirst %}</th>
-      <td>
-        {{ object.rendered_on|local_date_format }} {% translate 'by' %}
-        {{ object.rendered_by.get_short_name }}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'cost'|capfirst %}</th>
-      <td>
-        {{ object.cost|currency }}
-        {% if object.third_party_costs %}
-          /
-          {% if object.are_expenses %}
-            {% translate 'expenses' %}
-          {% else %}
-            {% translate 'third party costs'|capfirst %}
-          {% endif %}
-          :
-          {{ object.third_party_costs|currency }}
-        {% endif %}
-      </td>
-    </tr>
-    {% if object.are_expenses %}
-      <tr>
-        <th class="text-end">{% translate 'expense report'|capfirst %}</th>
-        <td>{% link_or_none object.expense_report %}</td>
-      </tr>
+  <dl class="wb-fields">
+    <dt>{% translate 'project'|capfirst %}</dt>
+    <dd>{% link_or_none object.service.project %}</dd>
+    <dt>{% translate 'service'|capfirst %}</dt>
+    <dd>{% link_or_none object.service %}</dd>
+    <dt>{% translate 'created'|capfirst %}</dt>
+    <dd>
+      {{ object.created_at|local_date_format }} {% translate 'by' %}
+      {{ object.created_by.get_short_name }}
+    </dd>
+    <dt>{% translate 'rendered'|capfirst %}</dt>
+    <dd>
+      {{ object.rendered_on|local_date_format }} {% translate 'by' %}
+      {{ object.rendered_by.get_short_name }}
+    </dd>
+    <dt>{% translate 'cost'|capfirst %}</dt>
+    <dd>{{ object.cost|currency }}</dd>
+    {% if object.third_party_costs %}
+      <dt>
+        {% if object.are_expenses %}{% translate 'expenses'|capfirst %}{% else %}{% translate 'third party costs'|capfirst %}{% endif %}
+      </dt>
+      <dd>{{ object.third_party_costs|currency }}</dd>
     {% endif %}
-    <tr>
-      <th class="text-end">{% translate 'description'|capfirst %}</th>
-      <td>{{ object.description|linebreaksbr }}</td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'invoicing'|capfirst %}</th>
-      <td>
-        {% if object.invoice_service %}
-          {% link_or_none object.invoice_service %}
-        {% elif object.archived_at %}
-          {% blocktranslate with archived_at=object.archived_at|local_date_format trimmed %}
-            Archived at {{ archived_at }}
-          {% endblocktranslate %}
-        {% else %}
-          &ndash;
-        {% endif %}
-      </td>
-    </tr>
-  </table>
+    {% if object.are_expenses %}
+      <dt>{% translate 'expense report'|capfirst %}</dt>
+      <dd>{% link_or_none object.expense_report %}</dd>
+    {% endif %}
+    <dt>{% translate 'description'|capfirst %}</dt>
+    <dd>{{ object.description|linebreaksbr }}</dd>
+    <dt>{% translate 'invoicing'|capfirst %}</dt>
+    <dd>
+      {% if object.invoice_service %}
+        {% link_or_none object.invoice_service %}
+      {% elif object.archived_at %}
+        {% blocktranslate with archived_at=object.archived_at|local_date_format trimmed %}
+          Archived at {{ archived_at }}
+        {% endblocktranslate %}
+      {% else %}
+        &ndash;
+      {% endif %}
+    </dd>
+  </dl>
 {% endblock body %}
 
 {% block footer %}
-  <a href="{{ object.urls.update }}" class="btn btn-primary me-auto" data-ajaxmodal>{% translate 'Update' %}</a>
-  <a href="{{ object.urls.move }}" class="btn btn-primary me-auto" data-ajaxmodal>{% translate 'Move' %}</a>
+  <a href="{{ object.urls.update }}" class="btn btn-primary" data-ajaxmodal>{% translate 'Update' %}</a>
+  <a href="{{ object.urls.move }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Move' %}</a>
   <a
     href="{{ object.service.project.urls.createcost }}?copy={{ object.pk }}"
-    class="btn btn-primary me-auto"
+    class="btn btn-quiet me-auto"
     data-ajaxmodal
   >
     {% translate 'Copy' %}

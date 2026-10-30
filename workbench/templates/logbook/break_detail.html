@@ -5,23 +5,17 @@
 {% endblock title %}
 
 {% block body %}
-  <table class="table table-striped">
-    <tr>
-      <th class="text-end">{{ object|label:'user' }}</th>
-      <td>{% link_or_none object.user %}</td>
-    </tr>
-    <tr>
-      <th class="text-end">{% translate 'break'|capfirst %}</th>
-      <td>
-        {{ object.starts_at|local_date_format:'H:i' }} –
-        {{ object.ends_at|local_date_format:'H:i' }}
-      </td>
-    </tr>
-    <tr>
-      <th class="text-end">{{ object|label:'description' }}</th>
-      <td>{{ object.description|linebreaksbr|default:'–' }}</td>
-    </tr>
-  </table>
+  <dl class="wb-fields">
+    <dt>{{ object|label:'user' }}</dt>
+    <dd>{% link_or_none object.user %}</dd>
+    <dt>{% translate 'break'|capfirst %}</dt>
+    <dd>
+      {{ object.starts_at|local_date_format:'H:i' }} –
+      {{ object.ends_at|local_date_format:'H:i' }}
+    </dd>
+    <dt>{{ object|label:'description' }}</dt>
+    <dd>{{ object.description|linebreaksbr|default:'–' }}</dd>
+  </dl>
 {% endblock body %}
 
 {% block footer %}
