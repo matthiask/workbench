@@ -296,7 +296,7 @@ Current and upcoming absences of everyone, or of a period:
 ## Reports
 
 The reports require the same features as in the web interface, most of them
-the controlling feature. Key figures as JSON:
+the controlling feature. Key figures:
 
     wb reports key-data
     wb reports key-data --month 2026-09

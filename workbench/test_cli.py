@@ -428,7 +428,10 @@ planned_work:
         self.assertIn("Big deal", result.output)
 
         result = self.wb("reports", "cash-data", "--date", dt.date.today())
-        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Open invoices excl. tax", result.output)
+        self.assertIn("Planned invoicing", result.output)
+        result = self.wb("reports", "cash-data", "--json")
         self.assertIn('"open_invoices"', result.output)
 
     def test_reports(self):
@@ -521,6 +524,10 @@ planned_work:
         self.assertIn(f"{monday().isoformat()},{project.pk},", result.output)
 
         result = self.wb("reports", "key-data", "--month", "2026-01")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Key data 2026-01", result.output)
+        self.assertIn("Deals funnel", result.output)
+        result = self.wb("reports", "key-data", "--month", "2026-01", "--json")
         self.assertIn('"month": "2026-01"', result.output)
         result = self.wb("reports", "hours-per-type", "--period", "nope")
         self.assertEqual(result.exit_code, 1)

@@ -2654,9 +2654,53 @@ def reports():
 
 @reports.command("key-data")
 @click.option("--month", help="Month like 2026-09, defaults to the last month.")
-def key_data(month):
-    """Key data of a month (JSON output)"""
-    _echo_json(_request("GET", "key-data/", params={"month": month} if month else {}))
+@click.option("--json", "as_json", is_flag=True)
+def key_data(month, as_json):
+    """Key data of a month: Gross margin, green hours, deals etc."""
+    data = _request("GET", "key-data/", params={"month": month} if month else {})
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_fields(
+        f"Key data {data['month']}",
+        [
+            ("Gross margin", _amount(data["gross_margin"])),
+            ("Squeeze gross margin", _amount(data["squeeze_gross_margin"])),
+            ("Full-time equivalents", _number(data["full_time_equivalents"], 2)),
+            ("Green hours", _percentage(data["green_hours_percentage"])),
+            ("Open invoices excl. tax", _amount(data["open_invoices_total_excl_tax"])),
+            ("Canceled invoices", _amount(data["canceled_invoices_total_excl_tax"])),
+            ("Accruals", _amount(data["accruals"])),
+        ],
+    )
+    table = _table("Month", "Green hours>", "Canceled invoices>", title="Before")
+    for row in data["previous_months"]:
+        table.add_row(
+            row["month"],
+            _percentage(row["green_hours_percentage"]),
+            _amount(row["canceled_invoices_total_excl_tax"]),
+        )
+    console.print(table)
+    funnel = data["deals_funnel"]
+    table = _table("Deals", "Value>", title="Deals funnel")
+    for label, key in [
+        ("High probability, next 4 weeks", "high_probability_next_4_weeks"),
+        ("High probability, next 12 weeks", "high_probability_next_12_weeks"),
+        ("High probability, later", "high_probability_later"),
+        ("Normal probability", "normal_probability"),
+    ]:
+        table.add_row(label, _amount(funnel[key]))
+    console.print(table)
+    if data["accepted_deals"]:
+        table = _table("Closed on", "Title", "Customer", "Value>", title="Accepted")
+        for deal in data["accepted_deals"]:
+            table.add_row(
+                deal["closed_on"],
+                deal["title"],
+                deal["customer"],
+                _amount(deal["value"]),
+            )
+        console.print(table)
 
 
 @reports.command("cash-data")
@@ -2665,10 +2709,57 @@ def key_data(month):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="Cutoff date, defaults to today.",
 )
-def cash_data(date):
-    """Cash data: Open invoices, planned invoicing, accruals etc."""
+@click.option("--json", "as_json", is_flag=True)
+def cash_data(date, as_json):
+    """Cash data: Open invoices, planned invoicing, accruals etc.
+
+    Planned invoicing, accepted offers and work which hasn't been invoiced
+    are only available for the current week."""
     params = {"date": date.date().isoformat()} if date else {}
-    _echo_json(_request("GET", "cash-data/", params=params))
+    data = _request("GET", "cash-data/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    open_invoices = data["open_invoices"]
+    offers = data["accepted_offers_not_invoiced"] or {}
+    work = data["work_not_invoiced"] or {}
+    _echo_fields(
+        f"Cash data {data['date']} ({data['currency']})",
+        [
+            ("Open invoices excl. tax", _amount(open_invoices["total_excl_tax"])),
+            ("Open invoices incl. tax", _amount(open_invoices["total_incl_tax"])),
+            ("Overdue incl. tax", _amount(open_invoices["overdue_incl_tax"])),
+            ("Accruals", _amount(data["accruals"])),
+            ("Work not invoiced", _amount(work.get("total_excl_tax"))),
+            ("  beyond the offers", _amount(work.get("beyond_offers_excl_tax"))),
+            (
+                "  in planned invoicing",
+                _amount(work.get("in_planned_invoicing_excl_tax")),
+            ),
+            ("Accepted offers not invoiced", _amount(offers.get("total_excl_tax"))),
+            (
+                "  not in planned invoicing (gross margin)",
+                _amount(offers.get("not_in_planned_invoicing_excl_tax")),
+            ),
+            (
+                "Planned invoicing overdue",
+                _amount(data["planned_invoicing_overdue_excl_tax"]),
+            ),
+        ],
+    )
+    if data["planned_invoicing_by_month"]:
+        table = _table("Month", "Gross margin>", title="Planned invoicing")
+        for row in data["planned_invoicing_by_month"]:
+            table.add_row(row["month"], _amount(row["amount_excl_tax"]))
+        console.print(table)
+    table = _table("Week", "Excl. tax>", "Incl. tax>", title="Receivables by due week")
+    for row in data["receivables_by_due_week"]:
+        table.add_row(
+            f"{row['iso_year']}-W{row['iso_week']:02d}",
+            _amount(row["amount_excl_tax"]),
+            _amount(row["amount_incl_tax"]),
+        )
+    console.print(table)
 
 
 @reports.command("working-time")
