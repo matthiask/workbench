@@ -330,12 +330,16 @@ tbody th > a {
   max-width: 10em;
 }
 
+.form-group {
+  margin-bottom: $spacer;
+}
+
+// Filter rows space their fields with a gap, aligned with their buttons
 .form-search .form-group {
   display: flex;
   align-items: center;
   gap: 4px;
-  // Fields come with a bottom margin which would misalign them with buttons
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
 
   > label {
     margin-bottom: 0;
