@@ -100,6 +100,7 @@ def team_planning(request, pk, *, retro=False):
         {
             "object": instance,
             "team": instance,
+            "retro": retro,
             "planning_data": reporting.team_planning(instance, date_range),
         },
     )

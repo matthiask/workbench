@@ -1,39 +1,25 @@
 {% extends "accounts/user_base.html" %}
 
-{% load i18n rspack_assets workbench %}
+{% load i18n workbench %}
 
 {% block title %}
   {% translate 'planning'|capfirst %} - {{ block.super }}
 {% endblock title %}
 
+{% block actions %}
+  <a href="{% url 'planning_plannedwork_create' %}" data-ajaxmodal class="btn btn-primary">
+    {% include 'svg/plus.svg' %}
+    {% translate 'planned work'|capfirst %}
+  </a>
+  {% url 'planning_milestone_create' as milestone_url %}
+  {% include "planning/_new_dropdown.html" with milestone_url=milestone_url %}
+  <a
+    href="{% url 'history' 'planning_plannedwork' 'user_id' object.pk %}"
+    data-ajaxmodal
+    class="btn btn-quiet"
+  >{% translate 'History of planned work' %}</a>
+{% endblock actions %}
+
 {% block inner_content %}
-  <div id="planning-root" class="planning-wrapper"></div>
-  {{ planning_data|json_script:'planning-data' }}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% rspack_assets "planning" %}
-  {% endif %}
-  <div class="row mt-5">
-    <div class="col-12">
-      <a href="{% url 'planning_plannedwork_create' %}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'planned work'|capfirst %}
-      </a>
-      <a href="{% url 'planning_milestone_create' %}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'milestone'|capfirst %}
-      </a>
-      <a href="{% url 'awt_absence_create' %}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'absence'|capfirst %}
-      </a>
-      <a
-        href="{% url 'history' 'planning_plannedwork' 'user_id' object.pk %}"
-        data-ajaxmodal
-        class="btn btn-primary btn-sm"
-      >
-        {% translate 'History of planned work' %}
-      </a>
-    </div>
-  </div>
+  {% include "planning/_planning.html" %}
 {% endblock inner_content %}

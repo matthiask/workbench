@@ -1,9 +1,9 @@
-{% extends "generic/object_detail.html" %}
+{% extends "base.html" %}
 
-{% load i18n rspack_assets workbench %}
+{% load i18n workbench %}
 
 {% block title %}
-  {% translate 'planning'|capfirst %} - {{ block.super }}
+  {% translate 'planning'|capfirst %} - {{ object }} - {{ block.super }}
 {% endblock title %}
 
 {% block uplink %}
@@ -14,34 +14,25 @@
 {% endblock uplink %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-12">
-      <h1>{% translate 'planning'|capfirst %}: {{ object }}</h1>
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{% translate 'planning'|capfirst %}</h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{% translate 'campaign'|capfirst %}</span>
+          <a href="{{ object.get_absolute_url }}">{{ object|h }}</a></span>
+      </div>
     </div>
-  </div>
-  <div id="planning-root" class="planning-wrapper"></div>
-  {{ planning_data|json_script:'planning-data' }}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% rspack_assets "planning" %}
-  {% endif %}
-  <div class="row mt-5">
-    <div class="col-12">
-      <a href="{% url 'planning_plannedwork_create' %}" data-ajaxmodal class="btn btn-primary btn-sm">
+    <div class="wb-page-actions">
+      <a href="{% url 'planning_plannedwork_create' %}" data-ajaxmodal class="btn btn-primary">
         {% include 'svg/plus.svg' %}
         {% translate 'planned work'|capfirst %}
       </a>
-      <a href="{% url 'planning_milestone_create' %}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'milestone'|capfirst %}
-      </a>
-      <a href="{% url 'awt_absence_create' %}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'absence'|capfirst %}
-      </a>
-      <a href="{% url 'projects_campaign_planning_external' object.pk %}" class="btn btn-primary btn-sm">
+      {% url 'planning_milestone_create' as milestone_url %}
+      {% include "planning/_new_dropdown.html" with milestone_url=milestone_url %}
+      <a href="{% url 'projects_campaign_planning_external' object.pk %}" class="btn btn-quiet">
         {% translate 'External planning view' %}
       </a>
     </div>
   </div>
+  {% include "planning/_planning.html" %}
 {% endblock content %}

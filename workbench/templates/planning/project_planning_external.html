@@ -1,6 +1,6 @@
-{% extends "generic/object_detail.html" %}
+{% extends "base.html" %}
 
-{% load i18n rspack_assets workbench %}
+{% load i18n workbench %}
 
 {% block title %}
   {% translate 'planning'|capfirst %} - {{ block.super }}
@@ -14,15 +14,13 @@
 {% endblock uplink %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-12">
-      <h1>{% translate 'planning'|capfirst %}: {{ object }}</h1>
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{% translate 'External planning view' %}</h1>
+      <div class="wb-meta">
+        <span><a href="{{ object.get_absolute_url }}">{{ object|h }}</a></span>
+      </div>
     </div>
   </div>
-  <div id="planning-root" class="planning-wrapper"></div>
-  {{ planning_data|json_script:'planning-data' }}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% rspack_assets "planning" %}
-  {% endif %}
+  {% include "planning/_planning.html" %}
 {% endblock content %}

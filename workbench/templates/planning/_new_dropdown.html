@@ -1,0 +1,27 @@
+{% load i18n %}
+{% comment %}
+  The "New" menu of planning pages, planned work is the primary action
+{% endcomment %}
+<span class="dropdown">
+  <button
+    class="btn btn-quiet dropdown-toggle"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-haspopup="true"
+    aria-expanded="false"
+  >
+    {% include "svg/plus.svg" %}
+    {% translate 'New' %}
+  </button>
+  <div class="dropdown-menu">
+    {% if external_work_url %}
+      <a
+        href="{{ external_work_url }}"
+        class="dropdown-item"
+        data-ajaxmodal
+      >{% translate 'external work'|capfirst %}</a>
+    {% endif %}
+    <a href="{{ milestone_url }}" class="dropdown-item" data-ajaxmodal>{% translate 'milestone'|capfirst %}</a>
+    <a href="{% url 'awt_absence_create' %}" class="dropdown-item" data-ajaxmodal>{% translate 'absence'|capfirst %}</a>
+  </div>
+</span>

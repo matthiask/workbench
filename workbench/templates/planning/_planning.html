@@ -1,0 +1,7 @@
+{% load rspack_assets %}
+<div id="planning-root" class="planning-wrapper"></div>
+{{ planning_data|json_script:'planning-data' }}
+<script src="{% url 'javascript-catalog' %}"></script>
+{% if not TESTING %}
+  {% rspack_assets "planning" %}
+{% endif %}

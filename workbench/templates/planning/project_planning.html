@@ -1,9 +1,9 @@
-{% extends "generic/object_detail.html" %}
+{% extends "base.html" %}
 
-{% load i18n rspack_assets workbench %}
+{% load i18n workbench %}
 
 {% block title %}
-  {% translate 'planning'|capfirst %} - {{ block.super }}
+  {% translate 'planning'|capfirst %} - {{ object }} - {{ block.super }}
 {% endblock title %}
 
 {% block uplink %}
@@ -14,62 +14,59 @@
 {% endblock uplink %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-12">
-      <h1>{% translate 'planning'|capfirst %}: {{ object }}</h1>
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{% translate 'planning'|capfirst %}</h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{% translate 'project'|capfirst %}</span>
+          <a href="{{ object.get_absolute_url }}">{{ object|h }}</a></span>
+      </div>
     </div>
-  </div>
-  <div id="planning-root" class="planning-wrapper"></div>
-  {{ planning_data|json_script:'planning-data' }}
-  <script src="{% url 'javascript-catalog' %}"></script>
-  {% if not TESTING %}
-    {% rspack_assets "planning" %}
-  {% endif %}
-  <div class="row mt-5">
-    <div class="col-12">
-      <a href="{{ object.urls.creatework }}" data-ajaxmodal class="btn btn-primary btn-sm">
+    <div class="wb-page-actions">
+      <a href="{{ object.urls.creatework }}" data-ajaxmodal class="btn btn-primary">
         {% include 'svg/plus.svg' %}
         {% translate 'planned work'|capfirst %}
       </a>
-      <a href="{{ object.urls.createexternalwork }}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'external work'|capfirst %}
-      </a>
-      <a href="{{ object.urls.createmilestone }}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'milestone'|capfirst %}
-      </a>
-      <a href="{% url 'awt_absence_create' %}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% include 'svg/plus.svg' %}
-        {% translate 'absence'|capfirst %}
-      </a>
-      <a href="{% url 'projects_project_planning_import' object.pk %}" class="btn btn-primary btn-sm">
-        {% translate 'Import planning' %}
-      </a>
-      <a href="{{ object.urls.planning_batch_update }}" data-ajaxmodal class="btn btn-primary btn-sm">
-        {% translate 'Batch update' %}
-      </a>
-      <a
-        href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}"
-        data-ajaxmodal
-        class="btn btn-primary btn-sm"
-      >
-        {% translate 'History of planned work' %}
-      </a>
-      <a
-        href="{% url 'history' 'planning_milestone' 'project_id' object.pk %}"
-        data-ajaxmodal
-        class="btn btn-primary btn-sm"
-      >
-        {% translate 'History of milestones' %}
-      </a>
-      <a href="{% url 'projects_project_planning_external' object.pk %}" class="btn btn-primary btn-sm">
-        {% translate 'External planning view' %}
-      </a>
-      <a href="{% url 'projects_project_planning_gantt_xlsx' object.pk %}" class="btn btn-primary btn-sm">
-        {% include 'svg/cloud-download.svg' %}
+      {% include "planning/_new_dropdown.html" with external_work_url=object.urls.createexternalwork milestone_url=object.urls.createmilestone %}
+      <a href="{% url 'projects_project_planning_gantt_xlsx' object.pk %}" class="btn btn-quiet">
+        {% include 'svg/desktop-download.svg' %}
         {% translate 'Download Gantt Chart' %}
       </a>
+      <span class="dropdown">
+        <button
+          type="button"
+          class="btn btn-quiet btn-icon"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="{% translate 'More actions' %}"
+        >
+          {% include 'svg/kebab-horizontal.svg' %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <a href="{% url 'projects_project_planning_import' object.pk %}" class="dropdown-item">
+            {% translate 'Import planning' %}
+          </a>
+          <a href="{{ object.urls.planning_batch_update }}" data-ajaxmodal class="dropdown-item">
+            {% translate 'Batch update' %}
+          </a>
+          <a href="{% url 'projects_project_planning_external' object.pk %}" class="dropdown-item">
+            {% translate 'External planning view' %}
+          </a>
+          <div class="dropdown-divider"></div>
+          <a
+            href="{% url 'history' 'planning_plannedwork' 'project_id' object.pk %}"
+            data-ajaxmodal
+            class="dropdown-item"
+          >{% translate 'History of planned work' %}</a>
+          <a
+            href="{% url 'history' 'planning_milestone' 'project_id' object.pk %}"
+            data-ajaxmodal
+            class="dropdown-item"
+          >{% translate 'History of milestones' %}</a>
+        </div>
+      </span>
     </div>
   </div>
+  {% include "planning/_planning.html" %}
 {% endblock content %}
