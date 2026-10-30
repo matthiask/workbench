@@ -40,13 +40,18 @@ Options which expect short names or teams (`--owned-by`, `--user`, `--team`
 etc.) are completed too; the names are fetched once a day and cached in
 `~/.cache/wb`.
 
-Log in, which opens the browser to authorize `wb`:
+Log in, which opens the browser to authorize `wb`. Choose the access
+explicitly: `--read` only allows looking things up, `--write` also allows
+changes like creating offers or closing deals. Read access is the safer choice
+for tools and agents which only answer questions:
 
-    wb login https://workbench.feinheit.ch
+    wb login https://workbench.feinheit.ch --read
+    wb login https://workbench.feinheit.ch --write
 
 Check it with `wb me`. Access expires after 30 days; `wb` then opens the
-browser again by itself. On computers without a browser, create a token in
-Workbench ("API tokens" in the user menu) and use `wb login URL --token`.
+browser again by itself and asks for the same access. On computers without a
+browser, create a token in Workbench ("API tokens" in the user menu, choose its
+access there) and use `wb login URL --token`.
 
 Logging in to another installation adds it and makes it the current one.
 Switch between them with any unique part of their URL:

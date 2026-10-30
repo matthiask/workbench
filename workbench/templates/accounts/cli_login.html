@@ -21,6 +21,12 @@
           The access expires after {{ days }} days, <code>wb</code> will ask you to authorize it again.
         {% endblocktranslate %}
       </p>
+      <p>
+        {% translate 'access'|capfirst %}: <strong>{{ access.label }}</strong>
+        {% if access == "write" %}
+          ({% translate 'wb can change offers, deals, projects and more in your name.' %})
+        {% endif %}
+      </p>
       <p>{% translate 'Only continue if you just started wb yourself.' %}</p>
       <form method="POST">
         {% csrf_token %}

@@ -163,15 +163,22 @@ def _write_config(config):
             f"[installations.{json.dumps(url)}]",
             f"token = {json.dumps(installation['token'])}",
         ]
+        if access := installation.get("access"):
+            lines.append(f"access = {json.dumps(access)}")
     CONFIG.parent.mkdir(parents=True, exist_ok=True)
     CONFIG.write_text("\n".join(lines) + "\n")
     CONFIG.chmod(0o600)
 
 
-def _save_config(url, token):
-    """Store the token of the installation and make it the current one"""
+def _save_config(url, token, access=None):
+    """Store the token of the installation and make it the current one
+
+    The access is remembered to ask for the same access when the token
+    expires; it is unknown for pasted tokens."""
     config = _read_config()
-    config["installations"][url] = {"token": token}
+    config["installations"][url] = {"token": token} | (
+        {"access": access} if access else {}
+    )
     config["current"] = url
     _write_config(config)
 
@@ -190,16 +197,21 @@ def _config():
     return url, token
 
 
-def _can_login_again():
-    """Expired tokens are replaced through the browser, but only for people
-    sitting in front of a terminal, and only if the token is stored by wb"""
-    return sys.stdin.isatty() and not os.environ.get("WORKBENCH_TOKEN")
+def _can_login_again(url):
+    """The access to ask for again when the token expires, if any
+
+    Expired tokens are replaced through the browser, but only for people
+    sitting in front of a terminal, only if the token is stored by wb and
+    only with the same access as before."""
+    if not sys.stdin.isatty() or os.environ.get("WORKBENCH_TOKEN"):
+        return None
+    return _read_config()["installations"].get(url, {}).get("access")
 
 
 LOGIN_TIMEOUT = 300
 
 
-def _browser_login(url):
+def _browser_login(url, access):
     """Authorize wb in the browser and store the token
 
     Workbench posts the token to a server listening on a local port, the
@@ -234,6 +246,7 @@ def _browser_login(url):
             "port": server.server_address[1],
             "state": state,
             "name": socket.gethostname(),
+            "access": access,
         })
     )
     click.echo(f"Authorize wb in your browser: {login_url}", err=True)
@@ -245,7 +258,7 @@ def _browser_login(url):
             server.handle_request()
     if "token" not in result:
         _terminate("Timed out waiting for the browser.")
-    _save_config(url, result["token"])
+    _save_config(url, result["token"], access)
     click.echo(f"Saved {CONFIG}", err=True)
     return result["token"]
 
@@ -297,9 +310,9 @@ def _request(method, path, *, optional=False, **kwargs):
     sent again."""
     url, token = _config()
     response = _send(method, url, path, token, **kwargs)
-    if response.status_code == 401 and _can_login_again():
+    if response.status_code == 401 and (access := _can_login_again(url)):
         click.secho("Your access has expired.", fg="yellow", err=True)
-        token = _browser_login(url)
+        token = _browser_login(url, access)
         response = _send(method, url, path, token, **kwargs)
     _check_version(response.headers.get("x-workbench-cli-latest"))
     if response.status_code == 401:
@@ -725,20 +738,36 @@ def cli():
     is_flag=True,
     help="Paste a token from the API tokens page instead of using the browser.",
 )
-def login(url, paste_token):
+@click.option(
+    "--read",
+    "access",
+    flag_value="read",
+    help="wb may only read, e.g. for tools which shouldn't change anything.",
+)
+@click.option(
+    "--write",
+    "access",
+    flag_value="write",
+    help="wb may read and write, e.g. create offers and close deals.",
+)
+def login(url, paste_token, access):
     """Authorize wb to access Workbench in your name
 
-    Opens the browser; the URL defaults to the current installation. Logging
-    in to another installation adds it and makes it the current one (see `wb
-    auth`). Use --token on computers without a browser."""
+    Opens the browser; the URL defaults to the current installation. Choose
+    the access explicitly with --read or --write. Logging in to another
+    installation adds it and makes it the current one (see `wb auth`). Use
+    --token on computers without a browser, the token's access is chosen when
+    creating it."""
     if not (url := url or _read_config()["current"]):
-        _terminate("Which Workbench? Run `wb login URL`.")
+        _terminate("Which Workbench? Run `wb login URL --read` or `--write`.")
     url = _url(url)
     if paste_token:
         _save_config(url, click.prompt("API token", hide_input=True).strip())
         click.echo(f"Saved {CONFIG}")
+    elif not access:
+        _terminate("Choose the access: `wb login --read` or `wb login --write`.")
     else:
-        _browser_login(url)
+        _browser_login(url, access)
 
 
 class _CompleteOptions:
@@ -789,8 +818,12 @@ def list_installations():
     config = _read_config()
     if not config["installations"]:
         _terminate("Not configured yet. Run `wb login URL` first.")
-    for url in sorted(config["installations"]):
-        click.echo(f"{'*' if url == config['current'] else ' '} {url}")
+    for url, installation in sorted(config["installations"].items()):
+        access = installation.get("access")
+        click.echo(
+            f"{'*' if url == config['current'] else ' '} {url}"
+            + (f" ({access})" if access else "")
+        )
 
 
 def _complete_installations(ctx, param, incomplete):
@@ -841,6 +874,7 @@ def me(as_json):
             ("Short name", user["short_name"]),
             ("Email", user["email"]),
             ("Workbench", user["url"]),
+            ("Access", "read only" if user["access"] == "read" else "read and write"),
         ],
         url=user["url"],
     )

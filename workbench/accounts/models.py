@@ -498,8 +498,8 @@ def _hash_api_token(secret):
 
 
 class APITokenQuerySet(models.QuerySet):
-    def user_for(self, secret):
-        """The active user the token belongs to, or None"""
+    def for_secret(self, secret):
+        """The valid token of an active user, or None"""
         token = (
             self
             .filter(
@@ -513,7 +513,7 @@ class APITokenQuerySet(models.QuerySet):
         if not token:
             return None
         self.filter(pk=token.pk).update(last_used_at=timezone.now())
-        return token.user
+        return token
 
 
 class APIToken(models.Model):
@@ -523,7 +523,14 @@ class APIToken(models.Model):
         related_name="api_tokens",
         verbose_name=_("user"),
     )
+
+    class Access(models.TextChoices):
+        READ = "read", _("read only")
+        WRITE = "write", _("read and write")
+
     title = models.CharField(_("title"), max_length=100)
+    # No default: People decide which access their tools get
+    access = models.CharField(_("access"), max_length=10, choices=Access.choices)
     key_hash = models.CharField(
         _("key hash"), max_length=64, unique=True, editable=False
     )
@@ -542,7 +549,7 @@ class APIToken(models.Model):
         return self.title
 
     @classmethod
-    def create_for(cls, *, user, title):
+    def create_for(cls, *, user, title, access):
         """Create a token and return it with its secret
 
         Only the hash of the secret is stored, it cannot be shown again. Expired
@@ -550,6 +557,9 @@ class APIToken(models.Model):
         cls.objects.filter(user=user, expires_at__lte=timezone.now()).delete()
         secret = f"wb_{secrets.token_urlsafe(32)}"
         token = cls.objects.create(
-            user=user, title=title, key_hash=_hash_api_token(secret)
+            user=user,
+            title=title,
+            access=cls.Access(access),
+            key_hash=_hash_api_token(secret),
         )
         return token, secret

@@ -1,8 +1,9 @@
 import datetime as dt
 from decimal import Decimal
+from typing import Literal
 
 from django.db.models import Q
-from ninja import Query, Router, Schema
+from ninja import Field, Query, Router, Schema
 from ninja.pagination import paginate
 
 from workbench.accounts.features import FEATURES
@@ -29,6 +30,10 @@ class MeOut(Schema):
     full_name: str
     email: str
     url: str
+    access: Literal["read", "write"] = Field(
+        description="Whether the API token only allows reading; sessions can"
+        " always read and write."
+    )
 
 
 @router.get("/me/", response=MeOut)
@@ -41,6 +46,9 @@ def me(request):
         "full_name": user.get_full_name(),
         "email": user.email,
         "url": request.build_absolute_uri("/"),
+        "access": token.access
+        if (token := getattr(request, "api_token", None))
+        else "write",
     }
 
 

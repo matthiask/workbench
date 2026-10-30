@@ -159,8 +159,12 @@ def api_tokens(request):
             request.user.api_tokens.filter(pk=pk).delete()
             messages.success(request, _("The API token has been deleted."))
             return redirect("accounts_api_tokens")
-        if title := request.POST.get("title", "").strip():
-            _token, secret = APIToken.create_for(user=request.user, title=title[:100])
+        title = request.POST.get("title", "").strip()
+        access = request.POST.get("access")
+        if title and access in APIToken.Access.values:
+            _token, secret = APIToken.create_for(
+                user=request.user, title=title[:100], access=access
+            )
 
     return render(
         request,
@@ -169,6 +173,7 @@ def api_tokens(request):
             "tokens": request.user.api_tokens.all(),
             "secret": secret,
             "days": API_TOKEN_LIFETIME.days,
+            "access_choices": APIToken.Access.choices,
         },
     )
 
@@ -186,11 +191,18 @@ def cli_login(request):
     state = request.GET.get("state", "")
     if not 1024 <= port <= 65535 or not re.fullmatch(r"[\w-]{16,100}", state):
         return HttpResponseBadRequest("Invalid port or state.")
+    # wb has to ask for the access explicitly
+    if (access := request.GET.get("access")) not in APIToken.Access.values:
+        return HttpResponseBadRequest(
+            "Invalid access. Upgrade wb and run wb login --read or --write."
+        )
     name = request.GET.get("name", "")[:50]
 
     if request.method == "POST":
         _token, secret = APIToken.create_for(
-            user=request.user, title=f"wb ({name})" if name else "wb"
+            user=request.user,
+            title=f"wb ({name})" if name else "wb",
+            access=access,
         )
         return render(
             request,
@@ -201,5 +213,9 @@ def cli_login(request):
     return render(
         request,
         "accounts/cli_login.html",
-        {"name": name, "days": API_TOKEN_LIFETIME.days},
+        {
+            "name": name,
+            "days": API_TOKEN_LIFETIME.days,
+            "access": APIToken.Access(access),
+        },
     )

@@ -26,11 +26,21 @@ class UserToken(HttpBearer):
         self.feature = feature
 
     def authenticate(self, request, token):
-        if user := APIToken.objects.user_for(token):
+        if token := APIToken.objects.for_secret(token):
+            user = token.user
             request.user = user
+            request.api_token = token
             # The user middleware only does this for sessions
             activate(user.language)
             set_user_name(user)
+            if token.access == APIToken.Access.READ and request.method not in {
+                "GET",
+                "HEAD",
+                "OPTIONS",
+            }:
+                raise HttpError(
+                    403, _("This API token only allows reading, not changes.")
+                )
             return check_feature(user, self.feature)
         return None
 

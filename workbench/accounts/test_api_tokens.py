@@ -15,7 +15,7 @@ class APITokenTest(TestCase):
         """Personal API tokens authenticate as their active user"""
         project = factories.ProjectFactory.create()
         user = factories.UserFactory.create()
-        token, secret = APIToken.create_for(user=user, title="CLI")
+        token, secret = APIToken.create_for(user=user, title="CLI", access="write")
         self.assertNotIn(secret, token.key_hash)
 
         url = f"/api/projects/{project.pk}/planning/context/"
@@ -52,7 +52,9 @@ class APITokenTest(TestCase):
     def test_bearer_auth_without_csrf(self):
         """Token authenticated requests do not need a CSRF token"""
         project = factories.ProjectFactory.create()
-        _token, secret = APIToken.create_for(user=project.owned_by, title="CLI")
+        _token, secret = APIToken.create_for(
+            user=project.owned_by, title="CLI", access="write"
+        )
 
         client = Client(enforce_csrf_checks=True)
         response = client.post(
@@ -66,7 +68,7 @@ class APITokenTest(TestCase):
     def test_me(self):
         """The authenticated user"""
         user = factories.UserFactory.create(_short_name="ab", _full_name="A B")
-        _token, secret = APIToken.create_for(user=user, title="CLI")
+        _token, secret = APIToken.create_for(user=user, title="CLI", access="write")
 
         self.assertEqual(self.client.get("/api/me/").status_code, 401)
         self.assertEqual(
@@ -79,6 +81,7 @@ class APITokenTest(TestCase):
                 "full_name": "A B",
                 "email": user.email,
                 "url": "http://testserver/",
+                "access": "write",
             },
         )
 
@@ -86,16 +89,21 @@ class APITokenTest(TestCase):
         """Users create and delete their own tokens"""
         user = factories.UserFactory.create()
         other, _secret = APIToken.create_for(
-            user=factories.UserFactory.create(), title="Other"
+            user=factories.UserFactory.create(), title="Other", access="write"
         )
 
         response = self.client.get("/accounts/api-tokens/")
         self.assertEqual(response.status_code, 302)
 
         self.client.force_login(user)
-        response = self.client.post("/accounts/api-tokens/", {"title": "Laptop"})
+        # The access has to be chosen
+        self.client.post("/accounts/api-tokens/", {"title": "Laptop"})
+        self.assertFalse(user.api_tokens.exists())
+        response = self.client.post(
+            "/accounts/api-tokens/", {"title": "Laptop", "access": "read"}
+        )
         token = user.api_tokens.get()
-        self.assertEqual(token.title, "Laptop")
+        self.assertEqual((token.title, token.access), ("Laptop", "read"))
         self.assertContains(response, "wb_")
         self.assertNotContains(response, "Other")
 
@@ -108,7 +116,7 @@ class APITokenTest(TestCase):
     def test_admin(self):
         """Admins can revoke tokens, but not create or change them"""
         token, _secret = APIToken.create_for(
-            user=factories.UserFactory.create(), title="Laptop"
+            user=factories.UserFactory.create(), title="Laptop", access="write"
         )
         self.client.force_login(factories.UserFactory.create(is_admin=True))
 
@@ -137,7 +145,7 @@ class APITokenTest(TestCase):
     def test_expiry(self):
         """Tokens expire, creating a token removes the user's expired tokens"""
         user = factories.UserFactory.create()
-        token, secret = APIToken.create_for(user=user, title="CLI")
+        token, secret = APIToken.create_for(user=user, title="CLI", access="write")
         headers = {"authorization": f"Bearer {secret}"}
         self.assertEqual(self.client.get("/api/me/", headers=headers).status_code, 200)
 
@@ -145,12 +153,41 @@ class APITokenTest(TestCase):
         token.save()
         self.assertEqual(self.client.get("/api/me/", headers=headers).status_code, 401)
 
-        APIToken.create_for(user=user, title="New")
+        APIToken.create_for(user=user, title="New", access="write")
         self.assertEqual(list(user.api_tokens.values_list("title", flat=True)), ["New"])
+
+    def test_read_only(self):
+        """Read only tokens can't change anything, not even in dry runs"""
+        project = factories.ProjectFactory.create()
+        _token, secret = APIToken.create_for(
+            user=project.owned_by, title="CLI", access="read"
+        )
+        headers = {"authorization": f"Bearer {secret}"}
+
+        response = self.client.get("/api/me/", headers=headers)
+        self.assertEqual(response.json()["access"], "read")
+        response = self.client.get(f"/api/projects/{project.pk}/", headers=headers)
+        self.assertEqual(response.status_code, 200)
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/?dry_run=true",
+            {"title": "Changed"},
+            content_type="application/json",
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("only allows reading", response.content.decode())
+
+        _token, secret = APIToken.create_for(
+            user=project.owned_by, title="CLI", access="write"
+        )
+        response = self.client.get(
+            "/api/me/", headers={"authorization": f"Bearer {secret}"}
+        )
+        self.assertEqual(response.json()["access"], "write")
 
     def test_cli_login(self):
         """The CLI is authorized through the browser"""
-        url = "/cli-login/?port=8123&state=abcdefghijklmnop&name=laptop"
+        url = "/cli-login/?port=8123&state=abcdefghijklmnop&name=laptop&access=read"
 
         response = self.client.get(url)
         self.assertRedirects(
@@ -160,8 +197,12 @@ class APITokenTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
         self.assertContains(self.client.get(url), "laptop")
+        self.assertContains(self.client.get(url), "read only")
         for invalid in [
             "/cli-login/",
+            # wb has to ask for an access explicitly
+            "/cli-login/?port=8123&state=abcdefghijklmnop",
+            "/cli-login/?port=8123&state=abcdefghijklmnop&access=all",
             "/cli-login/?port=80&state=abcdefghijklmnop",
             "/cli-login/?port=8123&state=short",
             "/cli-login/?port=8123&state=abcdefghijklmnop%22",
@@ -171,18 +212,18 @@ class APITokenTest(TestCase):
 
         response = self.client.post(url)
         token = user.api_tokens.get()
-        self.assertEqual(token.title, "wb (laptop)")
+        self.assertEqual((token.title, token.access), ("wb (laptop)", "read"))
         self.assertContains(response, 'action="http://127.0.0.1:8123/"')
         self.assertContains(response, 'value="abcdefghijklmnop"')
         secret = (
             response.content.decode().split('name="token" value="')[1].split('"')[0]
         )
-        self.assertEqual(APIToken.objects.user_for(secret), user)
+        self.assertEqual(APIToken.objects.for_secret(secret).user, user)
 
     def test_language(self):
         """Token authenticated requests use the user's language"""
         user = factories.UserFactory.create(language="en")
-        _token, secret = APIToken.create_for(user=user, title="CLI")
+        _token, secret = APIToken.create_for(user=user, title="CLI", access="write")
         response = self.client.post(
             "/api/projects/",
             {"title": "X", "customer": 0},
@@ -197,7 +238,9 @@ class APITokenTest(TestCase):
     def test_audit_user(self):
         """Changes through the API are logged with the token's user"""
         project = factories.ProjectFactory.create()
-        _token, secret = APIToken.create_for(user=project.owned_by, title="CLI")
+        _token, secret = APIToken.create_for(
+            user=project.owned_by, title="CLI", access="write"
+        )
 
         response = self.client.patch(
             f"/api/projects/{project.pk}/",

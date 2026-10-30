@@ -25,6 +25,7 @@
         <thead>
           <tr>
             <th>{% translate 'title' %}</th>
+            <th>{% translate 'access' %}</th>
             <th>{% translate 'created at' %}</th>
             <th>{% translate 'last used at' %}</th>
             <th>{% translate 'expires at' %}</th>
@@ -35,6 +36,7 @@
           {% for token in tokens %}
             <tr>
               <td>{{ token.title }}</td>
+              <td>{{ token.get_access_display }}</td>
               <td>{{ token.created_at|date:'SHORT_DATETIME_FORMAT' }}</td>
               <td>{{ token.last_used_at|date:'SHORT_DATETIME_FORMAT'|default:'-' }}</td>
               <td>{{ token.expires_at|date:'SHORT_DATETIME_FORMAT' }}</td>
@@ -48,7 +50,7 @@
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="5">{% translate 'No API tokens yet.' %}</td></tr>
+            <tr><td colspan="6">{% translate 'No API tokens yet.' %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -63,6 +65,12 @@
           required
           placeholder="{% translate 'title' %}"
         >
+        <select name="access" class="form-select w-auto" required>
+          <option value="">{% translate 'Access' %}</option>
+          {% for value, label in access_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
         <button type="submit" class="btn btn-primary text-nowrap">{% translate 'Create token' %}</button>
       </form>
     </div>

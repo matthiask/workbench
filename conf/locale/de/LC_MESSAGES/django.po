@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 13:46+0100\n"
+"POT-Creation-Date: 2026-10-30 14:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,6 +25,10 @@ msgstr "Feature"
 #, python-brace-format
 msgid "You do not have access to the required feature '{feature}'."
 msgstr "Du hast keinen Zugriff auf das notwendige Feature '{feature}'."
+
+#: workbench/accounts/api_auth.py
+msgid "This API token only allows reading, not changes."
+msgstr "Dieses API-Token erlaubt nur das Lesen, keine Änderungen."
 
 #: workbench/accounts/apps.py workbench/templates/base.html
 msgid "accounts"
@@ -361,6 +365,14 @@ msgstr "erwarteter Stundensatz"
 msgid "specialist fields"
 msgstr "Fachbereiche"
 
+#: workbench/accounts/models.py
+msgid "read only"
+msgstr "nur lesen"
+
+#: workbench/accounts/models.py
+msgid "read and write"
+msgstr "lesen und schreiben"
+
 #: workbench/accounts/models.py workbench/contacts/models.py
 #: workbench/credit_control/reporting.py workbench/deals/models.py
 #: workbench/invoices/models.py workbench/logbook/forms.py
@@ -372,6 +384,11 @@ msgstr "Fachbereiche"
 #: workbench/templates/planning/planning_import.html
 msgid "title"
 msgstr "Titel"
+
+#: workbench/accounts/models.py workbench/templates/accounts/api_tokens.html
+#: workbench/templates/accounts/cli_login.html
+msgid "access"
+msgstr "Zugriff"
 
 #: workbench/accounts/models.py
 msgid "key hash"
@@ -3765,6 +3782,10 @@ msgid "No API tokens yet."
 msgstr "Noch keine API-Tokens."
 
 #: workbench/templates/accounts/api_tokens.html
+msgid "Access"
+msgstr "Zugriff"
+
+#: workbench/templates/accounts/api_tokens.html
 msgid "Create token"
 msgstr "Token erstellen"
 
@@ -3786,6 +3807,10 @@ msgstr "Die Kommandozeile <code>wb</code> möchte in deinem Namen auf Workbench 
 #, python-format
 msgid "The access expires after %(days)s days, <code>wb</code> will ask you to authorize it again."
 msgstr "Der Zugriff läuft nach %(days)s Tagen ab, <code>wb</code> wird dich dann erneut um Autorisierung bitten."
+
+#: workbench/templates/accounts/cli_login.html
+msgid "wb can change offers, deals, projects and more in your name."
+msgstr "wb kann in Deinem Namen Offerten, Deals, Projekte und mehr ändern."
 
 #: workbench/templates/accounts/cli_login.html
 msgid "Only continue if you just started wb yourself."

@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 
 
 # Bump this when the API changes in ways older CLIs cannot handle
-MINIMUM = (0, 9, 0)
+MINIMUM = (0, 10, 0)
 # The version in the repository, users of older versions are told to upgrade
 LATEST = tomllib.loads((settings.BASE_DIR / "cli" / "pyproject.toml").read_text())[
     "project"

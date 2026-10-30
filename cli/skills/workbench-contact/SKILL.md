@@ -8,7 +8,9 @@ description: Add a person (and their organization) to Workbench from unstructure
 The `wb` CLI talks to Workbench (see `wb --help`). If `wb` isn't installed or
 configured, tell the user to run
 `uv tool install "git+https://github.com/matthiask/workbench#subdirectory=cli"`
-and `wb login URL`, which authorizes `wb` in the browser.
+and `wb login URL --write`, which authorizes `wb` in the browser. Writing
+needs `--write`; if `wb` answers that the token only allows reading, ask the
+user to log in with `--write` instead of working around it.
 
 ## 1. Look for existing records
 

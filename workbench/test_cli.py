@@ -80,7 +80,9 @@ class CLITest(TestCase):
 
     def wb(self, *args, user=None, token=None, debug=True):
         if not token:
-            _token, token = APIToken.create_for(user=user or self.user, title="Tests")
+            _token, token = APIToken.create_for(
+                user=user or self.user, title="Tests", access="write"
+            )
         result = CliRunner().invoke(
             wb.cli,
             [str(arg) for arg in args],
@@ -732,17 +734,24 @@ planned_work:
             patch.object(wb, "threading", types.SimpleNamespace(Thread=Thread)),
         ):
             result = CliRunner().invoke(wb.cli, ["login", "http://testserver"])
+            self.assertEqual(result.exit_code, 1)
+            self.assertIn("--read", result.output)
+            result = CliRunner().invoke(
+                wb.cli, ["login", "http://testserver", "--read"]
+            )
         self.assertEqual(result.exit_code, 0, result.output)
 
         config = wb.CONFIG.read_text()
         self.assertIn('current = "http://testserver"', config)
+        # Expired tokens are replaced with the same access
+        self.assertIn('access = "read"', config)
         token = re.search(r'token = "([^"]+)"', config).group(1)
-        self.assertEqual(APIToken.objects.user_for(token), self.user)
+        self.assertEqual(APIToken.objects.for_secret(token).user, self.user)
 
     def test_auth_urls(self):
         """Installations are identified by the scheme and the host only"""
-        _token, old = APIToken.create_for(user=self.user, title="Old")
-        _token, new = APIToken.create_for(user=self.user, title="New")
+        _token, old = APIToken.create_for(user=self.user, title="Old", access="write")
+        _token, new = APIToken.create_for(user=self.user, title="New", access="write")
         # Older versions stored the URL as given
         wb.CONFIG.write_text(f'url = "http://testserver/"\ntoken = "{old}"\n')
 
@@ -800,7 +809,9 @@ planned_work:
 
     def test_completion_values(self):
         """Short names and teams are completed from the API, cached for a day"""
-        _token, secret = APIToken.create_for(user=self.user, title="Tests")
+        _token, secret = APIToken.create_for(
+            user=self.user, title="Tests", access="write"
+        )
         factories.UserFactory.create(_short_name="abc")
         factories.TeamFactory.create(name="Design")
         wb.CONFIG.write_text(
@@ -836,9 +847,11 @@ planned_work:
 
     def test_auth(self):
         """wb is logged in to several installations and switches between them"""
-        _token, first = APIToken.create_for(user=self.user, title="First")
+        _token, first = APIToken.create_for(
+            user=self.user, title="First", access="write"
+        )
         other = factories.UserFactory.create()
-        _token, second = APIToken.create_for(user=other, title="Second")
+        _token, second = APIToken.create_for(user=other, title="Second", access="write")
         # The configuration of older versions
         wb.CONFIG.write_text(f'url = "http://first.example.com"\ntoken = "{first}"\n')
 
