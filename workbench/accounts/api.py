@@ -8,7 +8,7 @@ from ninja.pagination import paginate
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
-from workbench.deals.api import DealOut, deal_out
+from workbench.deals.api import DealOut, deal_out, with_related
 from workbench.deals.models import Deal
 from workbench.invoices.api import InvoiceOut, invoice_out
 from workbench.invoices.models import Invoice
@@ -158,9 +158,7 @@ def overview(request):
         else None,
         "deals": [
             deal_out(deal, request)
-            for deal in Deal.objects.maybe_actionable(user=user).select_related(
-                "customer", "owned_by", "closing_type"
-            )
+            for deal in with_related(Deal.objects.maybe_actionable(user=user))
         ]
         if features[FEATURES.DEALS]
         else None,

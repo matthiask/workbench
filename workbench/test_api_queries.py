@@ -9,7 +9,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.notes.models import Note
 from workbench.offers.models import Offer
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, monday
 
 
 class APIQueriesTest(TestCase):
@@ -168,3 +168,82 @@ class APIQueriesTest(TestCase):
                 project=project, date=in_days(3)
             ),
         )
+
+    def test_details(self):
+        """Details don't run a query per related object either"""
+        self.value_type = factories.ValueTypeFactory.create()
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        offer = factories.OfferFactory.create(project=project)
+        invoice = factories.InvoiceFactory.create(
+            project=project, customer=project.customer, contact=project.contact
+        )
+        deal = factories.DealFactory.create(owned_by=self.user)
+        organization = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(organization=organization)
+
+        def service():
+            factories.ServiceFactory.create(project=project, offer=offer)
+
+        def deal_related():
+            deal.values.create(type=factories.ValueTypeFactory.create(), value=100)
+            deal.contributions.create(user=factories.UserFactory.create())
+            deal.related_offers.add(
+                factories.OfferFactory.create(project=factories.ProjectFactory())
+            )
+
+        def person_related():
+            factories.PersonFactory.create(organization=organization)
+            person.emailaddresses.create(type="work", email="x@example.com")
+            person.phonenumbers.create(type="work", phone_number="+41 44 000 00 00")
+            factories.PostalAddressFactory.create(person=person)
+
+        def planned_work():
+            factories.PlannedWorkFactory.create(
+                project=project,
+                offer=offer,
+                user=factories.UserFactory.create(),
+                weeks=[monday()],
+                milestone=factories.MilestoneFactory.create(
+                    project=project, date=in_days(30)
+                ),
+            )
+            factories.AbsenceFactory.create(starts_on=in_days(5))
+
+        for url, create in [
+            (f"/api/projects/{project.pk}/", service),
+            (f"/api/offers/{offer.pk}/", service),
+            (f"/api/projects/{project.pk}/offers/context/", service),
+            (f"/api/projects/{project.pk}/planning/context/", planned_work),
+            (f"/api/invoices/{invoice.pk}/", service),
+            (f"/api/deals/{deal.pk}/", deal_related),
+            (f"/api/contacts/organizations/{organization.pk}/", person_related),
+            (f"/api/contacts/people/{person.pk}/", person_related),
+        ]:
+            with self.subTest(url=url):
+                self.assert_constant(url, create)
+
+    def test_overview(self):
+        def actionable():
+            project = factories.ProjectFactory.create(owned_by=self.user)
+            factories.ServiceFactory.create(
+                project=project,
+                offer=factories.OfferFactory.create(
+                    project=project, owned_by=self.user
+                ),
+            )
+            factories.InvoiceFactory.create(
+                project=project,
+                customer=project.customer,
+                contact=project.contact,
+                owned_by=self.user,
+            )
+            deal = factories.DealFactory.create(owned_by=self.user)
+            deal.values.create(type=self.value_type, value=100)
+            deal.contributions.create(user=factories.UserFactory.create())
+            deal.related_offers.add(factories.OfferFactory.create(project=project))
+            factories.PlannedWorkFactory.create(
+                project=project, user=self.user, weeks=[monday()]
+            )
+
+        self.value_type = factories.ValueTypeFactory.create()
+        self.assert_constant("/api/me/overview/", actionable)

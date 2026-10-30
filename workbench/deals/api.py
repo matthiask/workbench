@@ -98,6 +98,13 @@ def deal_out(deal, request):
     }
 
 
+def with_related(deals):
+    """Fetches what ``deal_out()`` needs"""
+    return deals.select_related(
+        "customer", "owned_by", "closing_type"
+    ).prefetch_related("values__type", "contributors", "related_offers__project")
+
+
 class DealFilter(DateRangeFilter):
     q: str = ""
     status: Literal["open", "accepted", "declined"] | None = None
@@ -111,9 +118,7 @@ def deal_list(request, filters: Query[DealFilter]):
     """Deals, open deals with the earliest expected decision first; the
     period filters the decision date (when the deal was closed, or is
     expected to be decided if it is still open)"""
-    deals = Deal.objects.select_related(
-        "customer", "owned_by", "closing_type"
-    ).prefetch_related("values__type", "contributors", "related_offers__project")
+    deals = with_related(Deal.objects.all())
     if filters.status:
         deals = deals.filter(status=STATUSES[filters.status])
     if filters.customer:
@@ -334,7 +339,7 @@ def deal_history_api(request, filters: Query[StatsFilter]):
 def deal_detail(request, deal_id: int):
     return deal_out(
         get_object_or_404(
-            Deal.objects.select_related("customer", "owned_by", "closing_type"),
+            with_related(Deal.objects.all()),
             pk=deal_id,
         ),
         request,
