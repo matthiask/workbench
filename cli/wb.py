@@ -3,6 +3,7 @@ import datetime as dt
 import json
 import os
 import platform
+import re
 import secrets
 import shlex
 import socket
@@ -1835,6 +1836,108 @@ def _echo_deal(data):
     for text in (data["description"], data["closing_notice"]):
         if text:
             console.print(text)
+
+
+@cli.group()
+def timestamps():
+    """Start and stop tasks, log the hours in Workbench"""
+
+
+def _time(value):
+    """Hours and minutes of an ISO 8601 timestamp in Workbench's time zone"""
+    return dt.datetime.fromisoformat(value).strftime("%H:%M") if value else "?"
+
+
+def _create_timestamp(type_, args, as_json):
+    """The first argument may be a time (13:30) or minutes relative to now
+    (-5, +15), the others are notes"""
+    data = {"type": type_}
+    if args and re.fullmatch(r"[0-9]{1,2}:[0-9]{2}", args[0]):
+        data["time"] = args[0]
+        args = args[1:]
+    elif args and re.fullmatch(r"[-+][0-9]+", args[0]):
+        data["minutes"] = int(args[0])
+        args = args[1:]
+    data["notes"] = " ".join(args)
+    timestamp = _request("POST", "timestamps/", json=data)
+    if as_json:
+        _echo_json(timestamp)
+        return
+    console.print(
+        f"{timestamp['type'].capitalize()} at {_time(timestamp['created_at'])}"
+        + (f": {timestamp['notes']}" if timestamp["notes"] else "")
+    )
+
+
+_TIMESTAMP_HELP = """
+
+    \b
+    wb timestamps {0}                   # Now
+    wb timestamps {0} -5 Notes          # 5 minutes ago, with notes
+    wb timestamps {0} 13:30             # At 13:30
+    wb timestamps {0} +15               # In 15 minutes"""
+
+
+@timestamps.command(
+    context_settings={"ignore_unknown_options": True},
+    help="Start a task" + _TIMESTAMP_HELP.format("start"),
+)
+@click.argument("args", nargs=-1)
+@click.option("--json", "as_json", is_flag=True)
+def start(args, as_json):
+    _create_timestamp("start", args, as_json)
+
+
+@timestamps.command(
+    context_settings={"ignore_unknown_options": True},
+    help="Stop a task" + _TIMESTAMP_HELP.format("stop"),
+)
+@click.argument("args", nargs=-1)
+@click.option("--json", "as_json", is_flag=True)
+def stop(args, as_json):
+    _create_timestamp("stop", args, as_json)
+
+
+@timestamps.command("list")
+@click.option(
+    "--day", type=click.DateTime(formats=["%Y-%m-%d"]), help="Defaults to today."
+)
+@click.option("--json", "as_json", is_flag=True)
+def list_timestamps(day, as_json):
+    """The day's timestamps, logged hours and breaks
+
+    Unlogged slices link to the form for logging their hours."""
+    params = {"day": day.date().isoformat()} if day else {}
+    data = _request("GET", "timestamps/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table(
+        "From",
+        "Until",
+        "Hours>",
+        "Description",
+        "Project",
+        "",
+        title=_link(f"Timestamps {data['day']}", data["url"]),
+        show_footer=True,
+    )
+    for slice in data["slices"]:
+        project = slice["project"]
+        table.add_row(
+            _time(slice["starts_at"]),
+            _time(slice["ends_at"]),
+            slice["hours"] or "",
+            slice["description"] + (f" {slice['comment']}" if slice["comment"] else ""),
+            _link(project["code"], project["url"]) if project else "",
+            _link("Log hours", slice["log_hours_url"])
+            if slice["log_hours_url"]
+            else "",
+            style=None if slice["is_logged"] else "bold",
+        )
+    table.columns[1].footer = "Logged"
+    table.columns[2].footer = data["logged_hours"]
+    console.print(table)
 
 
 @cli.group()

@@ -226,6 +226,21 @@ Searching them works in the CLI:
     wb costs search --project 1234
     wb costs search --expenses --rendered-by mk
 
+## Timestamps
+
+`wb timestamps start` and `wb timestamps stop` replace the `tst` command of
+workbench-tst. Both take an optional time (`13:30`) or minutes relative to now
+(`-5`, `+15`) followed by notes:
+
+    wb timestamps start
+    wb timestamps stop -5 Wireframes review
+    wb timestamps list
+    wb timestamps list --day 2026-10-29
+
+`wb timestamps list` shows the day's slices; the unlogged ones link to the
+form for logging their hours in Workbench. If you miss `tst`, add
+`alias tst="wb timestamps"` to your shell's configuration.
+
 ## Absences
 
 Current and upcoming absences of everyone, or of a period:

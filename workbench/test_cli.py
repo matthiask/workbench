@@ -21,6 +21,7 @@ from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
 from workbench.contacts.models import Person
 from workbench.offers.models import Offer
+from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days, monday
 
 
@@ -360,6 +361,23 @@ planned_work:
         result = self.wb("me", token="wb_nope")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("wb login", result.output)
+
+    def test_timestamps(self):
+        """Tasks are started and stopped like with the old tst command"""
+        result = self.wb("timestamps", "start")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Start at", result.output)
+        result = self.wb("timestamps", "stop", "-5", "Wireframes", "review")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(": Wireframes review", result.output)
+        timestamp = Timestamp.objects.filter(user=self.user).first()
+        self.assertEqual(timestamp.notes, "Wireframes review")
+        self.assertEqual(timestamp.type, Timestamp.STOP)
+
+        result = self.wb("timestamps", "list")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Wireframes review", result.output)
+        self.assertIn("Log hours", result.output)
 
     def test_bug_reports(self):
         """Crashes and server errors write a bug report people can send"""
