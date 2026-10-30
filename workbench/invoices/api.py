@@ -2,9 +2,12 @@ import datetime as dt
 from decimal import Decimal
 from typing import Literal
 
+from django.db import transaction
 from django.db.models import F
 from django.shortcuts import get_object_or_404
-from ninja import Query, Router, Schema
+from django.utils.translation import gettext as _
+from ninja import Field, Query, Router, Schema
+from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
@@ -127,17 +130,24 @@ class Reminders(Schema):
     invoices: list[ReminderInvoiceOut]
 
 
+def _overdue():
+    return Invoice.objects.overdue().select_related(
+        "customer", "contact__organization", "owned_by", "project"
+    )
+
+
 # The web interface's reminders aren't restricted either
 @router.get("/invoices/reminders/", response=list[Reminders], auth=user_auth())
 def reminders(request):
     """Invoices overdue for more than 15 days whose reminders haven't been
     postponed, per customer and contact; contacts reminded longest ago
     first"""
-    invoices = (
-        Invoice.objects
-        .overdue()
-        .select_related("customer", "contact__organization", "owned_by", "project")
-        .order_by(F("last_reminded_on").asc(nulls_first=True), "invoiced_on")
+    return _reminders(_overdue(), request)
+
+
+def _reminders(invoices, request):
+    invoices = invoices.order_by(
+        F("last_reminded_on").asc(nulls_first=True), "invoiced_on"
     )
     today = dt.date.today()
     nested = {}
@@ -164,6 +174,33 @@ def reminders(request):
             }
         )
     return list(nested.values())
+
+
+class Reminded(Schema):
+    invoices: list[int] = Field(
+        min_length=1, description="IDs of overdue invoices from the reminders."
+    )
+
+
+@router.post("/invoices/reminders/", response=list[Reminders], auth=user_auth())
+def mark_reminded(request, data: Reminded, *, dry_run: bool = False):
+    """Mark invoices as reminded today like in the web interface, e.g. after
+    sending a dunning letter; returns these invoices with their reminders"""
+    invoices = _overdue().filter(id__in=data.invoices)
+    if unknown := sorted(set(data.invoices) - {invoice.id for invoice in invoices}):
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "invoices"],
+                "msg": _("These invoices aren't overdue: %s")
+                % ", ".join(map(str, unknown)),
+            }
+        ])
+    with transaction.atomic():
+        invoices.update(last_reminded_on=dt.date.today())
+        result = _reminders(_overdue().filter(id__in=data.invoices), request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
 
 
 @router.get("/invoices/{invoice_id}/", response=InvoiceOut)

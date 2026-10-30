@@ -212,6 +212,7 @@ Overdue invoices to remind customers of, per customer and contact, like the
 reminders in the web interface (without postponed reminders):
 
     wb invoices reminders
+    wb invoices mark-reminded 5678 5679    # e.g. after sending a dunning letter
 
 The planned invoicing (gross margin, without third party costs):
 

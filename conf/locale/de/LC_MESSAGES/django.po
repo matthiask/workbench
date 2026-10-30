@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 13:43+0100\n"
+"POT-Creation-Date: 2026-10-30 13:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1837,6 +1837,11 @@ msgstr "%(object)s löschen"
 #, python-format
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
+
+#: workbench/invoices/api.py
+#, python-format
+msgid "These invoices aren't overdue: %s"
+msgstr "Diese Rechnungen sind nicht überfällig: %s"
 
 #: workbench/invoices/forms.py
 msgid "Due"

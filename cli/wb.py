@@ -1822,11 +1822,15 @@ def invoice_reminders(as_json):
     data = _request("GET", "invoices/reminders/")
     if as_json:
         _echo_json(data)
-        return
-    if not data:
+    elif data:
+        _echo_reminders(data)
+    else:
         console.print("No overdue invoices.")
-        return
+
+
+def _echo_reminders(data):
     table = _table(
+        "ID>",
         "Code",
         "Title",
         "Invoiced on",
@@ -1838,6 +1842,7 @@ def invoice_reminders(as_json):
     for group in data:
         contact = group["contact"]
         table.add_row(
+            "",
             Text.assemble(
                 _link(group["customer"]["name"], group["customer"]["url"]),
                 " / ",
@@ -1856,6 +1861,7 @@ def invoice_reminders(as_json):
         )
         for invoice in group["invoices"]:
             table.add_row(
+                _link(invoice["id"], invoice["url"]),
                 _link(invoice["code"], invoice["url"]),
                 invoice["title"],
                 invoice["invoiced_on"],
@@ -1865,6 +1871,27 @@ def invoice_reminders(as_json):
                 invoice["total_excl_tax"],
             )
     console.print(table)
+
+
+@invoices.command("mark-reminded")
+@click.argument("invoice_ids", type=int, nargs=-1, required=True)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def mark_reminded(invoice_ids, dry_run, as_json):
+    """Mark overdue invoices as reminded today, e.g. after sending a dunning
+    letter"""
+    data = _request(
+        "POST",
+        "invoices/reminders/",
+        params={"dry_run": _bool(dry_run)},
+        json={"invoices": list(invoice_ids)},
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_reminders(data)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
 
 
 @cli.group()

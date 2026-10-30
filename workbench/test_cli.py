@@ -529,6 +529,11 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Kick-off", result.output)
         self.assertIn("40 days", result.output)
+        overdue = Invoice.objects.get(title="Kick-off")
+        result = self.wb("invoices", "mark-reminded", overdue.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        overdue.refresh_from_db()
+        self.assertEqual(overdue.last_reminded_on, dt.date.today())
 
         factories.YearFactory.create(working_time_model=self.user.working_time_model)
         factories.EmploymentFactory.create(
