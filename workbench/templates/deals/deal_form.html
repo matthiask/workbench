@@ -1,45 +1,15 @@
 {% extends "generic/object_form.html" %}
-
-{% load django_bootstrap5 fineforms i18n workbench %}
-
-{% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-      <h1>
-        {% if object %}
-          <a href="{{ object.get_absolute_url }}">{{ title }}</a>
-        {% else %}
-          {{ title }}
-        {% endif %}
-      </h1>
-
-      <form
-        method="POST"
-        action="{{ request.get_full_path }}"
-        {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}
-      >
-        {% csrf_token %}
-        {% include 'fineforms/warnings.html' %}
-        {% ff_errors form %}
-        {% ff_fields form exclude=form.contribution_select_fields %}
-
-        <strong>{% translate 'driving force'|capfirst %}</strong>
-        <div class="contribution-selects">
-          {% ff_fields form fields=form.contribution_select_fields %}
-        </div>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-            {% if object.get_absolute_url %}
-              <a
-                href="{{ object.get_absolute_url }}"
-                class="btn float-end btn-outline-danger"
-              >{% translate 'Cancel' %}</a>
-            {% endif %}
-          </div>
-        </div>
-      </form>
+{% load fineforms i18n %}
+{% block fields %}
+  <section class="card mb-3">
+    <div class="card-body">
+      {% ff_fields form exclude=form.contribution_select_fields %}
     </div>
-  </div>
-{% endblock content %}
+  </section>
+  <section class="card mb-3">
+    <div class="card-header">{% translate 'driving force'|capfirst %}</div>
+    <div class="card-body contribution-selects">
+      {% ff_fields form fields=form.contribution_select_fields %}
+    </div>
+  </section>
+{% endblock fields %}

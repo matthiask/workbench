@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 fineforms i18n workbench %}
+{% comment %}
+  Page layout of forms: the heading in the page header, the fields in a card
+  (override the fields block for formsets), the save button below.
+{% endcomment %}
 {% block title %}
   {{ title }} -
   {% if object %}{{ object }} -{% endif %}
@@ -7,44 +11,55 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-      <h1>
-        {% if object %}
-          <a href="{{ object.get_absolute_url }}">{{ title }}</a>
-        {% else %}
-          {{ title }}
-        {% endif %}
-      </h1>
-      {% if form and form.pre_form %}
-        <form method="GET" action="{{ request.get_full_path }}">
-          {% ff_fields form %}
-          <button type="submit" class="btn btn-primary">{% translate 'continue' %}</button>
-        </form>
-      {% else %}
-        <form
-          method="POST"
-          action="{{ request.get_full_path }}"
-          {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}
-        >
-          {% csrf_token %}
-          {% include 'fineforms/warnings.html' %}
-          {% ff_errors form %}
-          {% ff_fields form %}
-          {% for formset in form.formsets.values %}{{ formset }}{% endfor %}
-          <div class="row">
-            <div class="col-sm-12">
-              <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-              {% if object.get_absolute_url %}
-                <a
-                  href="{{ object.get_absolute_url }}"
-                  class="btn float-end btn-outline-danger"
-                >{% translate 'Cancel' %}</a>
-              {% endif %}
-            </div>
-          </div>
-        </form>
-      {% endif %}
+  <div class="wb-form-page {% block form_width %}{% endblock %}">
+    <div class="wb-page-header">
+      <div class="min-w-0">
+        <h1 class="mb-0">
+          {% block heading %}
+            {% if object %}
+              <a href="{{ object.get_absolute_url }}">{{ title }}</a>
+            {% else %}
+              {{ title }}
+            {% endif %}
+          {% endblock heading %}
+        </h1>
+        {% block meta %}{% endblock %}
+      </div>
     </div>
+    {% if form and form.pre_form %}
+      <form method="GET" action="{{ request.get_full_path }}">
+        <section class="card mb-3">
+          <div class="card-body">{% ff_fields form %}</div>
+        </section>
+        <div class="wb-form-actions">
+          <button type="submit" class="btn btn-primary">{% translate 'continue' %}</button>
+        </div>
+      </form>
+    {% else %}
+      <form
+        method="POST"
+        action="{{ request.get_full_path }}"
+        {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}
+        {% block form_attrs %}{% endblock %}
+      >
+        {% csrf_token %}
+        {% include 'fineforms/warnings.html' %}
+        {% ff_errors form %}
+        {% block fields %}
+          <section class="card mb-3">
+            <div class="card-body">
+              {% ff_fields form %}
+              {% for formset in form.formsets.values %}{{ formset }}{% endfor %}
+            </div>
+          </section>
+        {% endblock fields %}
+        <div class="wb-form-actions">
+          <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
+          {% if object.get_absolute_url %}
+            <a href="{{ object.get_absolute_url }}" class="btn btn-quiet">{% translate 'Cancel' %}</a>
+          {% endif %}
+        </div>
+      </form>
+    {% endif %}
   </div>
 {% endblock content %}

@@ -1,5 +1,5 @@
 {% extends "generic/object_form.html" %}
-{% load django_bootstrap5 fineforms formset i18n workbench %}
+{% load fineforms formset i18n workbench %}
 {% block title %}
   {% translate 'projected gross margin'|capfirst %} - {{ block.super }}
 {% endblock title %}
@@ -11,47 +11,43 @@
   </a>
 {% endblock uplink %}
 
-{% block content %}
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <h1>{{ object|h }}</h1>
-      <h2>{% translate 'Update projected gross margin' %}</h2>
-      <form method="POST" action="." class="form-horizontal">
-        {% csrf_token %}
-        {% include 'fineforms/warnings.html' %}
-        {% ff_errors form %}
-        {% ff_fields form %}
-        {% if form.formsets %}
-          {% formset form.formsets.projected_invoices "projected_invoices" %}
-          <div id="{{ form_id }}" class="card bg-light mb-3">
-            <div class="card-body">
-              {{ form.id }}
-              {% ff_errors form %}
-              <div class="row">
-                <div class="col-3">{% ff_field form.invoiced_on %}</div>
-                <div class="col-3">{% ff_field form.gross_margin %}</div>
-                <div class="col-6">{% ff_field form.description %}</div>
-              </div>
-              {% ff_fields form exclude='invoiced_on,gross_margin,description' %}
-            </div>
-          </div>
-          {% endformset %}
-          <a href="#" class="btn btn-primary" onclick="return addInlineForm('projected_invoices')">
-            {% include 'svg/plus.svg' %}
-          </a>
-        {% endif %}
-        <div class="row mt-5">
-          <div class="col-sm-12">
-            <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-            {% if object.get_absolute_url %}
-              <a
-                href="{{ object.get_absolute_url }}"
-                class="btn float-end btn-outline-danger"
-              >{% translate 'cancel' %}</a>
-            {% endif %}
-          </div>
-        </div>
-      </form>
-    </div>
+{% block form_width %}wb-form-page-wide{% endblock %}
+
+{% block heading %}{% translate 'Update projected gross margin' %}{% endblock %}
+
+{% block meta %}
+  <div class="wb-meta mt-1">
+    <span><span class="wb-meta-label">{% translate 'project'|capfirst %}</span>
+      <a href="{{ object.get_absolute_url }}">{{ object|h }}</a></span>
   </div>
-{% endblock content %}
+{% endblock meta %}
+
+{% block fields %}
+  {% if form.fields %}
+    <section class="card mb-3">
+      <div class="card-body">{% ff_fields form %}</div>
+    </section>
+  {% endif %}
+  {% if form.formsets %}
+    <section class="card mb-3">
+      <div class="card-body">
+        {% formset form.formsets.projected_invoices "projected_invoices" %}
+        <div id="{{ form_id }}" class="wb-subform">
+          {{ form.id }}
+          {% ff_errors form %}
+          <div class="row">
+            <div class="col-3">{% ff_field form.invoiced_on %}</div>
+            <div class="col-3">{% ff_field form.gross_margin %}</div>
+            <div class="col-6">{% ff_field form.description %}</div>
+          </div>
+          {% ff_fields form exclude='invoiced_on,gross_margin,description' %}
+        </div>
+        {% endformset %}
+        <a href="#" class="btn btn-quiet btn-sm" onclick="return addInlineForm('projected_invoices')">
+          {% include 'svg/plus.svg' %}
+          {% translate 'projected gross margin' %}
+        </a>
+      </div>
+    </section>
+  {% endif %}
+{% endblock fields %}
