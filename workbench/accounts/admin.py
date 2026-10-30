@@ -16,25 +16,36 @@ class FeaturesWidget(forms.TextInput):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        current = set((value or "").split(","))
+        current = (
+            set(value or ())
+            if isinstance(value, list)
+            else set((value or "").split(","))
+        )
 
-        def checkbox(feature, **kwargs):
-            ret = {"value": feature, **kwargs}
-            value = settings.FEATURES.get(feature, F.NEVER)
-            if value == F.ALWAYS:
-                ret["attrs"] = "checked disabled"
-            elif value == F.NEVER:
-                ret["attrs"] = "disabled"
-                ret["style"] = "opacity:0.5;"
-            elif feature in current:
-                ret["attrs"] = "checked"
-            return ret
+        def feature(feature):
+            return {
+                "value": feature.value,
+                "checked": feature.value in current,
+                **LABELS[feature],
+            }
 
-        features = ((f, settings.FEATURES.get(f, F.NEVER)) for f in FEATURES)
-        ordering = {F.ALWAYS: 1, F.USER: 2, F.NEVER: 3}
-        context["widget"]["features"] = [
-            checkbox(feature.value, **LABELS[feature])
-            for feature, value in sorted(features, key=lambda row: ordering[row[1]])
+        # Only features enabled per user can be chosen, the others are listed
+        # to explain what is available in this installation
+        groups = {F.USER: [], F.ALWAYS: [], F.NEVER: []}
+        for f in FEATURES:
+            groups[settings.FEATURES.get(f, F.NEVER)].append(feature(f))
+        context["widget"]["groups"] = [
+            {
+                "title": title,
+                "setting": setting.name.lower(),
+                "features": sorted(groups[setting], key=lambda f: str(f["label"])),
+            }
+            for setting, title in [
+                (F.USER, _("Enabled per user")),
+                (F.ALWAYS, _("Enabled for everyone")),
+                (F.NEVER, _("Not available")),
+            ]
+            if groups[setting]
         ]
         return context
 

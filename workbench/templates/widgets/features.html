@@ -1,9 +1,71 @@
-<div style="float: left">
-  {% for feature in widget.features %}
-    <label style="float:none;width:auto;{{ feature.style }}">
-      <input type="checkbox" name="{{ widget.name }}" value="{{ feature.value }}" {{ feature.attrs }}>
-      {{ feature.label }}
-      {% if feature.help_text %}<small>{{ feature.help_text }}</small>{% endif %}
-    </label>
+<style>
+  .wb-features {
+    flex: 1;
+    min-width: 0;
+  }
+  .wb-features section {
+    margin: 0 0 1rem;
+  }
+  .wb-features h4 {
+    margin: 0 0 0.25rem;
+    padding: 0;
+    font-weight: 600;
+    font-size: inherit;
+  }
+  .wb-features label {
+    display: grid !important;
+    grid-template-columns: auto 1fr;
+    width: auto !important;
+    padding: 0.35rem 0;
+    float: none !important;
+    gap: 0 0.5rem;
+    border-bottom: 1px solid var(--hairline-color);
+    font-weight: normal !important;
+    cursor: pointer;
+  }
+  .wb-features label input {
+    margin-top: 0.2rem;
+  }
+  .wb-features small {
+    grid-column: 2;
+    color: var(--body-quiet-color);
+  }
+  .wb-features .wb-features-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+  .wb-features .wb-features-compact span[title] {
+    cursor: help;
+  }
+  .wb-features-never {
+    opacity: 0.6;
+  }
+</style>
+<div class="wb-features">
+  {% for group in widget.groups %}
+    <section class="wb-features-{{ group.setting }}">
+      <h4>{{ group.title }}</h4>
+      {% if group.setting == 'user' %}
+        {% for feature in group.features %}
+          <label>
+            <input
+              type="checkbox"
+              name="{{ widget.name }}"
+              value="{{ feature.value }}"
+              {% if feature.checked %}checked{% endif %}
+            >
+            <span>{{ feature.label }}</span>
+            {% if feature.help_text %}<small>{{ feature.help_text }}</small>{% endif %}
+          </label>
+        {% endfor %}
+      {% else %}
+        <div class="wb-features-compact">
+          {% for feature in group.features %}
+            <span {% if feature.help_text %}title="{{ feature.help_text }}"{% endif %}>{{ feature.label }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </section>
   {% endfor %}
 </div>

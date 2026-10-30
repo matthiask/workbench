@@ -194,16 +194,11 @@ class AccountsTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(f"/admin/accounts/user/{user.pk}/change/")
-        self.assertContains(
-            response,
-            '<input type="checkbox" name="_features" value="BOOKKEEPING" checked disabled>',
-            html=True,
-        )
-        self.assertContains(
-            response,
-            '<input type="checkbox" name="_features" value="BREAKS_NAG" disabled>',
-            html=True,
-        )
+        # Features enabled for everyone or not available are only listed
+        self.assertNotContains(response, 'value="BOOKKEEPING"')
+        self.assertNotContains(response, 'value="BREAKS_NAG"')
+        self.assertContains(response, "Enabled for everyone")
+        self.assertContains(response, "Not available")
         self.assertContains(
             response,
             '<input type="checkbox" name="_features" value="CAMPAIGNS">',
