@@ -485,15 +485,21 @@ class OfferPatch(Schema):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     description: str | None = None
     postal_address: str | None = None
+    discount: float | None = Field(
+        default=None, ge=0, description="Amount excl. tax, null removes it."
+    )
 
 
 @router.patch("/offers/{offer_id}/", response=OfferOut)
 def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: bool = False):
-    """Change the title, the description or the postal address of an offer
-    in preparation; fields which aren't given are left alone"""
+    """Change the title, the description, the postal address or the discount
+    of an offer in preparation; fields which aren't given are left alone"""
     offer = _changeable_offer(offer_id)
     for field, value in data.model_dump(exclude_unset=True).items():
-        setattr(offer, field, value or "")
+        if field == "discount":
+            offer.discount = _decimal(value or 0, "0.00")
+        else:
+            setattr(offer, field, value or "")
     errors = []
     full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
     if errors:

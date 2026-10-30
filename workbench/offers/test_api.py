@@ -325,6 +325,11 @@ class OfferServicesAPITest(TestCase):
         response = self.send("patch", data={"title": ""})
         self.assertEqual(response.status_code, 422)
 
+        response = self.send("patch", data={"discount": 500})
+        self.assertEqual(response.json()["total_excl_tax"], "2500.00")
+        response = self.send("patch", data={"discount": None})
+        self.assertEqual(response.json()["total_excl_tax"], "3000.00")
+
     def test_add(self):
         """Services are added at the end or after another service"""
         service = {"title": "Design", "service_type": "production", "hours": 5}

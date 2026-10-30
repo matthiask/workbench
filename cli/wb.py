@@ -1558,17 +1558,25 @@ def _text(value):
 @click.argument("offer_id", type=int)
 @click.option("--title")
 @click.option("--description", help="The text, or - to read it from stdin.")
+@click.option(
+    "--discount", type=float, help="Amount excl. tax, 0 removes the discount."
+)
 @click.option("--dry-run", is_flag=True, help="Validate and show totals only.")
 @click.option("--json", "as_json", is_flag=True)
-def update_offer(offer_id, title, description, dry_run, as_json):
-    """Change the title or the description of an offer in preparation"""
+def update_offer(offer_id, title, description, discount, dry_run, as_json):
+    """Change the title, the description or the discount of an offer in
+    preparation"""
     data = {
         key: value
-        for key, value in [("title", title), ("description", _text(description))]
+        for key, value in [
+            ("title", title),
+            ("description", _text(description)),
+            ("discount", discount),
+        ]
         if value is not None
     }
     if not data:
-        _terminate("Nothing to change, pass --title or --description.")
+        _terminate("Nothing to change, pass --title, --description or --discount.")
     data = _request(
         "PATCH",
         f"offers/{offer_id}/",

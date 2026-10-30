@@ -199,6 +199,7 @@ totals, `--dry-run` without saving anything:
     wb offers search relaunch --status offered
     wb offers show 5678
     wb offers update 5678 --title "Relaunch 2027" --description - < text.txt
+    wb offers update 5678 --discount 500 --dry-run
     wb offers services add 5678 --title "Newsletter" --service-type "Programmierung & IT" --hours 12 --after 901 --dry-run
     wb offers services add 5678 service.yaml
     wb offers services update 5678 902 --hours 20 --description "Incl. testing"
