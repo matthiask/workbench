@@ -17,8 +17,14 @@ from workbench.awt.reporting import (
     annual_working_time,
     working_time_by_week,
 )
-from workbench.reporting.api import jsonable
-from workbench.tools.api import DateRangeFilter, Serialized, date_range
+from workbench.tools.api import (
+    DateRangeFilter,
+    Days,
+    Hours,
+    Percentage,
+    Serialized,
+    date_range,
+)
 
 
 router = Router(tags=["absences"])
@@ -90,29 +96,71 @@ MONTHLY_DAYS = {
     "public_holiday_days": "holiday_public",
     "company_holiday_days": "holiday_company",
 }
-TOTALS = [
-    "percentage",
-    "target",
-    "hours",
-    "absences_time",
-    "working_time",
-    "running_sum",
-    "available_vacation_days",
-    "absence_vacation",
-    "vacation_days_correction",
-    "vacation_days_credit",
-    "balance",
-    "balance_days",
-    "absence_sickness",
-    "absence_paid",
-    "absence_school",
-    "absence_correction",
-    "holiday_public",
-    "holiday_company",
-]
 
 
-@router.get("/reports/working-time/")
+class WorkingTimeMonth(Schema):
+    month: str
+    percentage: Percentage
+    target: Hours
+    hours: Hours
+    absences_time: Hours
+    working_time: Hours
+    balance: Hours
+    running_balance: Hours
+    vacation_days: Days
+    sickness_days: Days
+    paid_days: Days
+    school_days: Days
+    correction_days: Days
+    public_holiday_days: Days
+    company_holiday_days: Days
+
+
+class WorkingTimeTotals(Schema):
+    percentage: Percentage
+    target: Hours
+    hours: Hours
+    absences_time: Hours
+    working_time: Hours
+    running_sum: Hours
+    available_vacation_days: Days
+    absence_vacation: Days
+    vacation_days_correction: Days
+    vacation_days_credit: Days
+    balance: Hours
+    balance_days: Days
+    absence_sickness: Days
+    absence_paid: Days
+    absence_school: Days
+    absence_correction: Days
+    holiday_public: Days
+    holiday_company: Days
+
+
+class WorkingTimeWeek(Schema):
+    week: dt.date
+    target: Hours
+    hours: Hours
+    absences: Hours
+    delta: Hours
+    running_delta: Hours
+
+
+class UserWorkingTime(Schema):
+    user: str
+    working_time_per_day: Hours
+    months: list[WorkingTimeMonth]
+    totals: WorkingTimeTotals
+    weeks: list[WorkingTimeWeek] | None
+
+
+class WorkingTime(Schema):
+    year: int
+    warnings: list[str]
+    users: list[UserWorkingTime]
+
+
+@router.get("/reports/working-time/", response=WorkingTime)
 def working_time(request, filters: Query[WorkingTimeFilter]):
     """Annual working time of the authenticated user, of the user with the
     given short name, or of ``all`` users employed during the year (requires
@@ -171,14 +219,14 @@ def working_time(request, filters: Query[WorkingTimeFilter]):
                 | {key: months[field][i] for key, field in MONTHLY_DAYS.items()}
                 for i, month in enumerate(months["months"])
             ],
-            "totals": {key: row["totals"][key] for key in TOTALS},
+            "totals": row["totals"],
             "weeks": working_time_by_week(year, user=row["user"])
             if filters.weekly
             else None,
         }
 
-    return jsonable({
+    return {
         "year": year,
         "warnings": [str(warning) for warning in warnings],
         "users": [_user(row) for row in statistics["statistics"]],
-    })
+    }

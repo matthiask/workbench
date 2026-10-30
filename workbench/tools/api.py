@@ -1,5 +1,7 @@
 import datetime as dt
 import re
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Annotated
 
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -7,6 +9,7 @@ from django.utils.translation import gettext as _
 from ninja import Schema
 from ninja.errors import ValidationError as NinjaValidationError
 from ninja.pagination import LimitOffsetPagination
+from pydantic import PlainSerializer
 
 from workbench.accounts.models import Team, User
 from workbench.tools.validation import monday
@@ -207,3 +210,21 @@ class TotalsPagination(LimitOffsetPagination):
             super().paginate_queryset(queryset, pagination, request, **params)
             | queryset.totals
         )
+
+
+def _rounded(places):
+    exponent = Decimal(1).scaleb(-places)
+    return Annotated[
+        Decimal,
+        PlainSerializer(
+            lambda value: value.quantize(exponent, rounding=ROUND_HALF_UP),
+            return_type=Decimal,
+        ),
+    ]
+
+
+# Computed values in reports, rounded like the values in the database
+Amount = _rounded(2)
+Hours = _rounded(1)
+Days = _rounded(2)
+Percentage = _rounded(1)

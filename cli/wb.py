@@ -599,16 +599,25 @@ def _period_params(period, since, until, *, users=(), team=None):
     return {key: value for key, value in params.items() if value}
 
 
+def _number(value, places):
+    """Format decimals (strings in the API) and numbers"""
+    return f"{float(value):.{places}f}" if value is not None else ""
+
+
 def _amount(value):
-    return f"{value:.2f}" if value is not None else ""
+    return _number(value, 2)
 
 
 def _hours(value):
-    return f"{value:.1f}" if value is not None else ""
+    return _number(value, 1)
+
+
+def _days(value):
+    return _number(value, 1)
 
 
 def _percentage(value):
-    return f"{value:.0f}%" if value is not None else ""
+    return f"{_number(value, 0)}%" if value is not None else ""
 
 
 def _echo_period(data):
@@ -1363,7 +1372,7 @@ def _echo_planning_csv(data):
             work["user"],
             work["service_type"] or "",
             work["is_provisional"],
-            f"{work['hours_per_week']:.2f}",
+            work["hours_per_week"],
         ])
 
 
@@ -2123,7 +2132,11 @@ def deal_stats(period, since, until, users, team, as_json):
     accepted = data["accepted"]
     console.print(
         f"Accepted: {accepted['count']} deals, {_amount(accepted['sum'])}"
-        + (f" (target {_amount(accepted['target'])})" if accepted["target"] else "")
+        + (
+            f" (target {_amount(accepted['target'])})"
+            if float(accepted["target"])
+            else ""
+        )
     )
     if accepted["deals"]:
         table = _table("Value type", "Accepted>", "Target>", "Median age>")
@@ -2554,8 +2567,8 @@ def working_time(year, user, all_, weekly, as_json):
                 _hours(month["working_time"]),
                 _hours(month["balance"]),
                 _hours(month["running_balance"]),
-                f"{month['vacation_days']:.1f}",
-                f"{month['sickness_days']:.1f}",
+                _days(month["vacation_days"]),
+                _days(month["sickness_days"]),
             )
         table.columns[0].footer = "Total"
         table.columns[1].footer = _percentage(totals["percentage"])
@@ -2564,16 +2577,16 @@ def working_time(year, user, all_, weekly, as_json):
         table.columns[4].footer = _hours(totals["absences_time"])
         table.columns[5].footer = _hours(totals["working_time"])
         table.columns[6].footer = _hours(totals["running_sum"])
-        table.columns[8].footer = f"{totals['absence_vacation']:.1f}"
-        table.columns[9].footer = f"{totals['absence_sickness']:.1f}"
+        table.columns[8].footer = _days(totals["absence_vacation"])
+        table.columns[9].footer = _days(totals["absence_sickness"])
         console.print(table)
         console.print(
-            f"Vacation days: {totals['available_vacation_days']:.1f} available,"
-            f" {totals['vacation_days_credit']:.1f} left"
+            f"Vacation days: {_days(totals['available_vacation_days'])} available,"
+            f" {_days(totals['vacation_days_credit'])} left"
         )
         console.print(
             f"Balance incl. vacation days left: {_hours(totals['balance'])}h"
-            f" ({totals['balance_days']:.2f} days)",
+            f" ({totals['balance_days']} days)",
             style="bold",
         )
         console.print()
@@ -2591,7 +2604,7 @@ def projected_gross_margin(as_json):
     for month, value in data["monthly"].items():
         table.add_row(month, _amount(value))
     table.columns[0].footer = "Total"
-    table.columns[1].footer = _amount(sum(data["monthly"].values()))
+    table.columns[1].footer = _amount(sum(map(float, data["monthly"].values())))
     console.print(table)
     table = _table("Code", "Title", "Owner", "Projected>", "Invoiced>", "Not invoiced>")
     for row in data["projects"]:
@@ -2954,7 +2967,7 @@ def logging_report(period, since, until, as_json):
             str(row["logged_hours"]["count"]),
             _hours(row["logged_hours"]["sum"]),
             _hours(row["logged_hours"]["avg"]),
-            f"{row['mean_logging_delay_hours']:.0f}h",
+            f"{_number(row['mean_logging_delay_hours'], 0)}h",
             row["logging"],
             f"{len(breaks['days'])}/{breaks['of']} days",
             style="red" if breaks["warning"] else None,

@@ -82,10 +82,10 @@ class WorkingTimeAPITest(TestCase):
         self.assertIsNone(row["weeks"])
         march = row["months"][2]
         self.assertEqual(march["month"], "2026-03")
-        self.assertEqual(march["hours"], 6)
-        self.assertEqual(march["vacation_days"], 2)
-        self.assertEqual(march["absences_time"], 16)
-        self.assertEqual(march["public_holiday_days"], 1)
+        self.assertEqual(march["hours"], "6.0")
+        self.assertEqual(march["vacation_days"], "2.00")
+        self.assertEqual(march["absences_time"], "16.0")
+        self.assertEqual(march["public_holiday_days"], "1.00")
 
         data = self.client.get("/api/reports/working-time/", {"weekly": True}).json()
         week = data["users"][0]["weeks"][-1]
@@ -94,10 +94,10 @@ class WorkingTimeAPITest(TestCase):
             week,
             {
                 "week": "2026-03-02",
-                "target": 8,
-                "hours": 6,
-                "absences": 8,
-                "delta": 6,
+                "target": "8.0",
+                "hours": "6.0",
+                "absences": "8.0",
+                "delta": "6.0",
                 "running_delta": week["running_delta"],
             },
         )

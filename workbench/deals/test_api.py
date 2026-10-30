@@ -73,16 +73,16 @@ class DealsAPITest(TestCase):
         self.client.force_login(user)
 
         data = self.client.get("/api/deals/stats/").json()
-        self.assertEqual(data["accepted"]["sum"], 5000)
+        self.assertEqual(data["accepted"]["sum"], "5000.00")
         self.assertEqual(
-            data["accepted"]["by_user"], [{"user": "ab", "count": 1, "sum": 5000}]
+            data["accepted"]["by_user"], [{"user": "ab", "count": 1, "sum": "5000.00"}]
         )
         self.assertEqual(data["accepted"]["by_value_type"][0]["type"], "Design")
         self.assertEqual(data["accepted"]["deals"][0]["id"], accepted.pk)
         self.assertEqual(data["declined"]["deals"][0]["id"], declined.pk)
         self.assertEqual(
             data["declined"]["by_closing_type"],
-            {"Too expensive": {"count": 1, "sum": 0}},
+            {"Too expensive": {"count": 1, "sum": "0.00"}},
         )
 
         data = self.client.get("/api/deals/stats/", {"user": "ab"}).json()

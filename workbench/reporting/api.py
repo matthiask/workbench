@@ -11,11 +11,11 @@ from ninja.security import HttpBearer
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.contacts.api import organization_out
-from workbench.invoices.api import invoice_out
+from workbench.contacts.api import OrganizationOut, organization_out
+from workbench.invoices.api import InvoiceOut, invoice_out
 from workbench.logbook.reporting import logbook_stats
 from workbench.planning.reporting import planning_vs_logbook
-from workbench.projects.api import project_summary
+from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.reporting import hours_per_customer, hours_per_type
 from workbench.reporting import (
     key_data as key_data_module,
@@ -32,7 +32,11 @@ from workbench.reporting.views import (
     ProjectBudgetStatisticsForm,
 )
 from workbench.tools.api import (
+    Amount,
     DateRangeFilter,
+    Days,
+    Hours,
+    Percentage,
     UsersFilter,
     date_range,
     filter_users,
@@ -125,12 +129,30 @@ def _month(month):
     return f"{month[0]}-{month[1]:02d}"
 
 
-@router.get("/reports/projected-gross-margin/", auth=CONTROLLING)
+class ProjectedProject(Schema):
+    project: ProjectSummary
+    owned_by: str
+    projected_total: Amount
+    gross_margin: Amount
+    not_invoiced: Amount
+    monthly: dict[str, Amount]
+
+
+class ProjectedGrossMargin(Schema):
+    monthly: dict[str, Amount]
+    projects: list[ProjectedProject]
+
+
+@router.get(
+    "/reports/projected-gross-margin/",
+    response=ProjectedGrossMargin,
+    auth=CONTROLLING,
+)
 def projected_gross_margin(request):
     """Planned invoicing of open projects which hasn't been invoiced yet, by
     month (gross margin, third party costs are not included)"""
     data = key_data_module.projected_gross_margin()
-    return jsonable({
+    return {
         "monthly": {
             _month(month): value
             for month, value in sorted(data["monthly_overall"].items())
@@ -149,7 +171,7 @@ def projected_gross_margin(request):
             }
             for row in sorted(data["projects"], key=lambda row: -row["delta"])
         ],
-    })
+    }
 
 
 class BudgetFilter(Schema):
@@ -165,7 +187,42 @@ class BudgetFilter(Schema):
     ) = None
 
 
-@router.get("/reports/budget/", auth=CONTROLLING)
+class BudgetFigures(Schema):
+    logbook: Amount
+    cost: Amount
+    effort_cost: Amount
+    effort_hours_with_rate_undefined: Hours
+    third_party_costs: Amount
+    sold: Amount
+    discount: Amount
+    invoiced: Amount
+    hours: Hours
+    service_hours: Hours
+    projected_gross_margin: Amount
+    projected_gross_margin_on_cutoff_date: Amount
+
+
+class BudgetProject(BudgetFigures):
+    project: ProjectSummary
+    owned_by: str
+    closed_on: dt.date | None
+    delta: Amount
+
+
+class BudgetOverall(BudgetFigures):
+    delta_positive: Amount
+    delta_negative: Amount
+    delta_beyond_offer: Amount
+    delta_planned: Amount
+
+
+class Budget(Schema):
+    date: dt.date
+    overall: BudgetOverall
+    projects: list[BudgetProject]
+
+
+@router.get("/reports/budget/", response=Budget, auth=CONTROLLING)
 def budget(request, filters: Query[BudgetFilter]):
     """Project budget statistics: Logged effort and costs compared to what has
     been offered and invoiced, per open project on the cutoff ``date`` (today
@@ -193,26 +250,49 @@ def budget(request, filters: Query[BudgetFilter]):
     statistics = project_budget_statistics.project_budget_statistics(
         form.queryset(), cutoff_date=form.cleaned_data.get("cutoff_date")
     )
-    return jsonable({
+    return {
         "date": statistics["cutoff_date"],
         "overall": statistics["overall"],
         "projects": [
-            {
+            row
+            | {
                 "project": project_summary(row["project"], request),
                 "owned_by": _user(row["project"].owned_by),
                 "closed_on": row["project"].closed_on,
             }
-            | {key: value for key, value in row.items() if key != "project"}
             for row in statistics["statistics"]
         ],
-    })
+    }
 
 
 class ThirdPartyCostsFilter(Schema):
     this_year: bool = False
 
 
-@router.get("/reports/third-party-costs/", auth=CONTROLLING)
+class LoggedThirdPartyCosts(Schema):
+    past: Amount
+    future: Amount
+
+
+class ThirdPartyCostsProject(Schema):
+    project: ProjectSummary
+    owned_by: str
+    offered: Amount
+    logged: LoggedThirdPartyCosts
+    invoiced: Amount
+    delta: Amount
+
+
+class ThirdPartyCosts(Schema):
+    total_not_invoiced: Amount
+    total_invoiced_too_much: Amount
+    total_offered: Amount
+    total_logged: LoggedThirdPartyCosts
+    total_invoiced: Amount
+    projects: list[ThirdPartyCostsProject]
+
+
+@router.get("/reports/third-party-costs/", response=ThirdPartyCosts, auth=CONTROLLING)
 def third_party_costs_api(request, filters: Query[ThirdPartyCostsFilter]):
     """Third party costs logged and invoiced per open project (or also closed
     during the current year); ``delta`` is positive for costs which haven't
@@ -221,7 +301,7 @@ def third_party_costs_api(request, filters: Query[ThirdPartyCostsFilter]):
         PlayingBankForm, request, {"s": "this-year" if filters.this_year else ""}
     )
     statistics = third_party_costs.playing_bank(projects=form.queryset())
-    return jsonable({
+    return {
         "total_not_invoiced": statistics["total_plus"],
         "total_invoiced_too_much": statistics["total_minus"],
         "total_offered": statistics["total_offered"],
@@ -238,26 +318,38 @@ def third_party_costs_api(request, filters: Query[ThirdPartyCostsFilter]):
             }
             for row in sorted(statistics["projects"], key=lambda row: -row["delta"])
         ],
-    })
+    }
 
 
 class CutoffFilter(Schema):
     date: dt.date | None = None
 
 
-@router.get("/reports/open-items/", auth=CONTROLLING)
+class OpenItemsWeek(Schema):
+    week: dt.date
+    total_excl_tax: Amount
+    total: Amount
+
+
+class OpenItems(Schema):
+    date: dt.date
+    total_excl_tax: Amount
+    total: Amount
+    weeks: list[OpenItemsWeek]
+    invoices: list[InvoiceOut]
+
+
+@router.get("/reports/open-items/", response=OpenItems, auth=CONTROLLING)
 def open_items(request, filters: Query[CutoffFilter]):
     """Invoices which have been sent but not paid on the cutoff ``date`` (today
     by default), with totals per week of their due date"""
     form = _form(OpenItemsForm, request, {"cutoff_date": filters.date})
     data = form.open_items_list()
-    return jsonable({
+    return {
         "date": form.cleaned_data["cutoff_date"],
         "total_excl_tax": data["total_excl_tax"],
         "total": data["total"],
         "weeks": [{"week": week} | totals for week, totals in data["weeks"]],
-    }) | {
-        # Like the invoices API
         "invoices": [invoice_out(invoice, request) for invoice in data["list"]],
     }
 
@@ -266,17 +358,34 @@ class PeriodFilter(DateRangeFilter, UsersFilter):
     pass
 
 
+class Period(Schema):
+    since: dt.date
+    until: dt.date
+
+
 def _this_week():
     return [monday(), monday() + dt.timedelta(days=6)]
 
 
+class CustomerHours(Schema):
+    customer: OrganizationOut
+    total_hours: Hours
+    users: dict[str, Hours]
+
+
+class HoursPerCustomer(Period):
+    total_hours: Hours
+    users: dict[str, Hours]
+    customers: list[CustomerHours]
+
+
 # Not restricted in the web interface either
-@router.get("/reports/hours-per-customer/", auth=user_auth())
+@router.get("/reports/hours-per-customer/", response=HoursPerCustomer, auth=user_auth())
 def hours_per_customer_api(request, filters: Query[PeriodFilter]):
     """Logged hours per customer and user, this week by default"""
     period = date_range(filters, default=_this_week())
     stats = hours_per_customer(period, users=filter_users(filters))
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "total_hours": stats["total_hours"],
@@ -291,16 +400,39 @@ def hours_per_customer_api(request, filters: Query[PeriodFilter]):
             }
             for row in stats["organizations"]
         ],
-    })
+    }
 
 
-@router.get("/reports/hours-per-type/", auth=CONTROLLING)
+class TypeHours(Schema):
+    type: str
+    hours: Hours
+    expected_percentage: Percentage
+    reached_percentage: Percentage
+
+
+class HoursSplit(Schema):
+    total: Hours
+    external: Hours
+    internal: Hours
+
+
+class UserTypeHours(HoursSplit):
+    user: str
+    types: list[TypeHours]
+
+
+class HoursPerType(Period):
+    total: HoursSplit
+    users: list[UserTypeHours]
+
+
+@router.get("/reports/hours-per-type/", response=HoursPerType, auth=CONTROLLING)
 def hours_per_type_api(request, filters: Query[PeriodFilter]):
     """Logged hours per user, external and per internal type, with the
     expected and reached percentages, this week by default"""
     period = date_range(filters, default=_this_week())
     stats = hours_per_type(period, users=filter_users(filters))
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "total": stats["total"],
@@ -322,25 +454,69 @@ def hours_per_type_api(request, filters: Query[PeriodFilter]):
             }
             for row in stats["users"]
         ],
-    })
+    }
 
 
-@router.get("/reports/green-hours/", auth=CONTROLLING)
+class GreenHoursRow(Schema):
+    profitable: Hours
+    overdrawn: Hours
+    maintenance: Hours
+    internal: Hours
+    total: Hours
+    percentage: Percentage
+    external_percentage: Percentage
+
+
+class UserGreenHours(GreenHoursRow):
+    user: str
+
+
+class GreenHours(Period):
+    total: GreenHoursRow | None
+    users: list[UserGreenHours]
+
+
+@router.get("/reports/green-hours/", response=GreenHours, auth=CONTROLLING)
 def green_hours_api(request, filters: Query[PeriodFilter]):
     """Logged hours per user: profitable (within the budget), overdrawn
     (beyond the budget), maintenance and internal, this week by default"""
     period = date_range(filters, default=_this_week())
     rows = green_hours(period, users=filter_users(filters))
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "total": next((rec for user, rec in rows if user == 0), None),
         "users": [{"user": _user(user)} | rec for user, rec in rows if user != 0],
-    })
+    }
+
+
+class PlanningWeek(Schema):
+    week: dt.date
+    planned: Hours | None
+    logged: Hours | None
+
+
+class CustomerPlanning(Schema):
+    customer: OrganizationOut
+    planned: Hours
+    logged: Hours
+    diff: Hours
+    allocation: Percentage | None
+    weeks: list[PlanningWeek]
+
+
+class PlanningVsLogbook(Period):
+    planned: Hours
+    logged: Hours
+    diff: Hours
+    logged_percentage: Percentage | None
+    customers: list[CustomerPlanning]
 
 
 # Not restricted in the web interface either
-@router.get("/reports/planning-vs-logbook/", auth=user_auth())
+@router.get(
+    "/reports/planning-vs-logbook/", response=PlanningVsLogbook, auth=user_auth()
+)
 def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
     """Planned and logged hours per customer and week, this week by default.
     ``allocation`` is the customer's share of the logged hours relative to its
@@ -353,7 +529,7 @@ def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
     def _week(week):
         return week.date() if isinstance(week, dt.datetime) else week
 
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "planned": stats["planned"],
@@ -379,10 +555,41 @@ def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
             }
             for row in stats["per_customer"]
         ],
-    })
+    }
 
 
-@router.get("/reports/logging/", auth=CONTROLLING)
+class LoggedHoursStats(Schema):
+    count: int
+    sum: Hours
+    avg: Hours | None
+
+
+class InsufficientBreaksTotal(Schema):
+    days_count: int
+    of: int
+
+
+class InsufficientBreaks(Schema):
+    days: list[dt.date]
+    of: int
+    warning: bool
+
+
+class UserLogging(Schema):
+    user: str
+    logged_hours: LoggedHoursStats
+    mean_logging_delay_hours: Hours
+    logging: str
+    insufficient_breaks: InsufficientBreaks
+
+
+class Logging(Period):
+    logged_hours: LoggedHoursStats
+    insufficient_breaks: InsufficientBreaksTotal
+    users: list[UserLogging]
+
+
+@router.get("/reports/logging/", response=Logging, auth=CONTROLLING)
 def logging_api(request, filters: Query[DateRangeFilter]):
     """How and when users log their hours, this week by default. The delay is
     the average time in hours between noon of the day the work was done and
@@ -390,7 +597,7 @@ def logging_api(request, filters: Query[DateRangeFilter]):
     hours worked."""
     period = date_range(filters, default=_this_week())
     stats = logbook_stats(period)
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "logged_hours": stats["logged_hours_stats"],
@@ -409,10 +616,91 @@ def logging_api(request, filters: Query[DateRangeFilter]):
             }
             for row in sorted(stats["users"], key=lambda row: row["user"])
         ],
-    })
+    }
 
 
-@router.get("/reports/squeeze/", auth=user_auth(feature=FEATURES.PRODUCTIVITY))
+class SqueezeContribution(Schema):
+    hours: Hours
+    gross_margin: Amount
+    rate: Amount
+    hours_rate_unknown: Hours
+
+
+class SqueezeUserProject(SqueezeContribution):
+    project: ProjectSummary
+
+
+class SqueezeFigures(Schema):
+    employment_percentage: Percentage
+    absence_days: Days
+    gross_margin: Amount
+    hours_in_range: Hours
+    rate: Amount
+    internal_hours: Hours
+    external_hours: Hours
+    total_hours: Hours
+    external_percentage: Percentage
+    invoiced_per_external_hour: Amount
+    expected_gross_margin: Amount
+    delta: Amount
+
+
+class SqueezeUser(SqueezeFigures):
+    user: str
+    specialist_field: str | None
+    profitable_percentage: Percentage
+    expected_hourly_rate: Amount
+    hours_rate_unknown: Hours
+    projects: list[SqueezeUserProject]
+
+
+class SqueezeProject(Schema):
+    project: ProjectSummary
+    offered: Amount
+    projected: Amount
+    invoiced: Amount
+    gross_margin: Amount
+    hours_offered: Hours
+    hours_logged: Hours
+    hours: Hours
+    rate: Amount
+    hours_in_range: Hours
+    gross_margin_in_range: Amount
+    hours_rate_unknown: Hours
+    users: dict[str, SqueezeContribution]
+
+
+class SqueezeCustomer(Schema):
+    customer: OrganizationOut
+    gross_margin: Amount
+    hours_in_range: Hours
+    rate: Amount
+
+
+class SqueezeField(Schema):
+    name: str
+    users: str
+    gross_margin: Amount
+    hours_in_range: Hours
+    rate: Amount
+    external_percentage: Percentage
+
+
+class Squeeze(Period):
+    may_be_incomplete: bool
+    default_hourly_rate: Amount
+    totals: SqueezeFigures
+    users: list[SqueezeUser]
+    projects: list[SqueezeProject]
+    customers: list[SqueezeCustomer]
+    specialist_fields: list[SqueezeField]
+
+
+@router.get(
+    "/reports/squeeze/",
+    response=Squeeze,
+    auth=user_auth(feature=FEATURES.PRODUCTIVITY),
+)
 def squeeze_api(request, filters: Query[DateRangeFilter]):
     """Gross margin per user and project, the last month by default. Projects'
     gross margins are split between users by hours weighted with the hourly
@@ -420,37 +708,7 @@ def squeeze_api(request, filters: Query[DateRangeFilter]):
     following month."""
     period = date_range(filters, default=last_month_range())
     data = squeeze.squeeze_data(period)
-    user_keys = [
-        "employment_percentage",
-        "gross_margin",
-        "hours_in_range",
-        "rate",
-        "internal_hours",
-        "external_hours",
-        "total_hours",
-        "external_percentage",
-        "profitable_percentage",
-        "expected_hourly_rate",
-        "expected_gross_margin",
-        "delta",
-        "absence_days",
-        "hours_rate_unknown",
-    ]
-    project_keys = [
-        "offered",
-        "projected",
-        "invoiced",
-        "gross_margin",
-        "hours_offered",
-        "hours_logged",
-        "hours",
-        "rate",
-        "hours_in_range",
-        "gross_margin_in_range",
-        "hours_rate_unknown",
-    ]
-    contribution_keys = ["hours", "gross_margin", "rate", "hours_rate_unknown"]
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         # Like the web interface's warning
@@ -459,36 +717,29 @@ def squeeze_api(request, filters: Query[DateRangeFilter]):
         "default_hourly_rate": data["default_hourly_rate"],
         "totals": data["totals"],
         "users": [
-            {"user": _user(row["user"]), "specialist_field": row["specialist_field"]}
-            | {key: row[key] for key in user_keys}
+            row
             | {
+                "user": _user(row["user"]),
                 "projects": [
-                    {"project": project_summary(project, request)}
-                    | {key: contrib[key] for key in contribution_keys}
+                    contrib | {"project": project_summary(project, request)}
                     for project, contrib in row["by_project"].items()
-                ]
+                ],
             }
             for row in data["users"]
         ],
         "projects": [
-            {"project": project_summary(row["project"], request)}
-            | {key: row[key] for key in project_keys}
+            row
             | {
+                "project": project_summary(row["project"], request),
                 "users": {
-                    _user(user): {key: contrib[key] for key in contribution_keys}
-                    for user, contrib in row["by_user"].items()
-                }
+                    _user(user): contrib for user, contrib in row["by_user"].items()
+                },
             }
             for row in data["projects"]
         ],
         "customers": [
-            {
-                "customer": organization_out(row["organization"], request),
-                "gross_margin": row["gross_margin"],
-                "hours_in_range": row["hours_in_range"],
-                "rate": row["rate"],
-            }
+            row | {"customer": organization_out(row["organization"], request)}
             for row in data["organizations"]
         ],
         "specialist_fields": data["fields"],
-    })
+    }

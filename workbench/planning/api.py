@@ -14,12 +14,12 @@ from workbench.offers.models import Offer
 from workbench.planning.models import ExternalWork, Milestone, PlannedWork
 from workbench.planning.reporting import Planning
 from workbench.planning.schemas import PlanningImport, planning_import_schema
-from workbench.projects.api import project_summary
+from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
-from workbench.reporting.api import jsonable
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     DateRangeFilter,
+    Hours,
     UsersFilter,
     date_range,
     filter_users,
@@ -394,7 +394,71 @@ def _mondays(date_from, date_until):
         week += dt.timedelta(days=7)
 
 
-@router.get("/planning/export/")
+class ExportedOffer(Schema):
+    id: int
+    code: str
+    title: str
+
+
+class ExportedPlannedWork(Schema):
+    id: int
+    url: str
+    project: ProjectSummary
+    offer: ExportedOffer | None
+    milestone: str | None
+    user: str
+    title: str
+    service_type: str | None
+    is_provisional: bool
+    planned_hours: Hours
+    hours_per_week: Hours
+    hours_in_period: Hours
+    weeks: list[dt.date]
+
+
+class ExportedMilestone(Schema):
+    id: int
+    url: str
+    project: ProjectSummary
+    title: str
+    date: dt.date
+    phase_starts_on: dt.date | None
+    estimated_total_hours: Hours
+
+
+class ExportedExternalWork(Schema):
+    id: int
+    url: str
+    project: ProjectSummary
+    title: str
+    provided_by: str
+    service_type: str | None
+    milestone: str | None
+    weeks: list[dt.date]
+
+
+class ExportedWeek(Schema):
+    week: dt.date
+    planned: Hours
+    provisional: Hours
+
+
+class Capacity(Schema):
+    user: str
+    weeks: dict[str, Hours]
+
+
+class PlanningExport(Schema):
+    since: dt.date | None
+    until: dt.date | None
+    weeks: list[ExportedWeek]
+    planned_work: list[ExportedPlannedWork]
+    milestones: list[ExportedMilestone]
+    external_work: list[ExportedExternalWork]
+    capacity: list[Capacity] | None
+
+
+@router.get("/planning/export/", response=PlanningExport)
 def planning_export(request, filters: Query[PlanningExportFilter]):
     """Planned work, milestones and external work, optionally of a project, a
     campaign, users or a team
@@ -494,7 +558,7 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
                 for user, row in zip(active, rows, strict=True)
             ]
 
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "weeks": [{"week": week} | hours for week, hours in by_week.items()],
@@ -525,4 +589,4 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
             for ew in sorted(external_work, key=lambda ew: (min(ew.weeks), ew.pk))
         ],
         "capacity": capacity,
-    })
+    }

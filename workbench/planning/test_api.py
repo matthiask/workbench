@@ -246,8 +246,8 @@ class PlanningAPITest(TestCase):
         self.assertEqual(data["since"], week.isoformat())
         self.assertEqual(len(data["weeks"]), 12)
         self.assertEqual([w["id"] for w in data["planned_work"]], [work.id])
-        self.assertEqual(data["planned_work"][0]["hours_per_week"], 10)
-        self.assertEqual(data["weeks"][0]["planned"], 10)
+        self.assertEqual(data["planned_work"][0]["hours_per_week"], "10.0")
+        self.assertEqual(data["weeks"][0]["planned"], "10.0")
         self.assertEqual([m["id"] for m in data["milestones"]], [milestone.id])
         self.assertIsNone(data["capacity"])
 
@@ -255,7 +255,7 @@ class PlanningAPITest(TestCase):
         data = self.client.get("/api/planning/export/", {"project": project.pk}).json()
         self.assertEqual([w["id"] for w in data["planned_work"]], [work.id, later.id])
         self.assertEqual(len(data["weeks"]), 21)
-        self.assertEqual(data["weeks"][-1]["provisional"], 5)
+        self.assertEqual(data["weeks"][-1]["provisional"], "5.0")
         data = self.client.get(
             "/api/planning/export/", {"campaign": project.campaign_id}
         )
@@ -271,7 +271,7 @@ class PlanningAPITest(TestCase):
             },
         ).json()
         self.assertEqual(len(data["weeks"]), 1)
-        self.assertEqual(data["planned_work"][0]["hours_in_period"], 10)
+        self.assertEqual(data["planned_work"][0]["hours_in_period"], "10.0")
         [capacity] = data["capacity"]
         self.assertEqual(capacity["user"], "ab")
         self.assertEqual(list(capacity["weeks"]), [week.isoformat()])

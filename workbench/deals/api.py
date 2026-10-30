@@ -21,8 +21,8 @@ from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm
 from workbench.deals.models import AttributeGroup, Deal, ValueType
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
-from workbench.reporting.api import jsonable
 from workbench.tools.api import (
+    Amount,
     DateRangeFilter,
     Serialized,
     UsersFilter,
@@ -151,7 +151,85 @@ def _deal_summary(deal, request):
     }
 
 
-@router.get("/deals/stats/")
+class DealSummary(Schema):
+    id: int
+    code: str
+    url: str
+    title: str
+    customer: OrganizationOut
+    owned_by: str
+    value: Amount
+    closed_on: dt.date | None
+
+
+class DeclinedDeal(DealSummary):
+    closing_type: str
+    closing_notice: str
+
+
+class AcceptedByUser(Schema):
+    user: str
+    count: int
+    sum: Amount
+
+
+class AcceptedByValueType(Schema):
+    type: str
+    sum: Amount
+    target: Amount | None
+    median_age_days: int | None
+
+
+class AcceptedByMonth(Schema):
+    month: str
+    sum: Amount
+    values: dict[str, Amount]
+
+
+class AcceptedDeals(Schema):
+    count: int
+    sum: Amount
+    target: Amount
+    median_age_days: int | None
+    by_user: list[AcceptedByUser]
+    by_value_type: list[AcceptedByValueType]
+    by_month: list[AcceptedByMonth]
+    deals: list[DealSummary]
+
+
+class ClosingTypeTotal(Schema):
+    count: int
+    sum: Amount
+
+
+class DeclinedDeals(Schema):
+    count: int
+    sum: Amount
+    by_closing_type: dict[str, ClosingTypeTotal]
+    deals: list[DeclinedDeal]
+
+
+class DealStats(Schema):
+    since: dt.date
+    until: dt.date
+    accepted: AcceptedDeals
+    declined: DeclinedDeals
+
+
+class DealChange(Schema):
+    created_at: dt.datetime
+    user: str
+    deal: DealSummary | None
+    changes: list[str]
+
+
+class DealHistory(Schema):
+    since: dt.date
+    until: dt.date
+    changes: list[DealChange]
+
+
+@router.get("/deals/stats/", response=DealStats)
 def deal_stats(request, filters: Query[StatsFilter]):
     """Deals accepted and declined in the period (this week by default), with
     accepted deals per user (split by contributions), month and value type,
@@ -172,7 +250,7 @@ def deal_stats(request, filters: Query[StatsFilter]):
         row["count"] += 1
         row["sum"] += deal.value
 
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "accepted": {
@@ -222,10 +300,10 @@ def deal_stats(request, filters: Query[StatsFilter]):
                 for deal in declined
             ],
         },
-    })
+    }
 
 
-@router.get("/deals/history/")
+@router.get("/deals/history/", response=DealHistory)
 def deal_history_api(request, filters: Query[StatsFilter]):
     """Changes of deals in the period (this week by default), oldest first;
     users filter who made the changes"""
@@ -234,7 +312,7 @@ def deal_history_api(request, filters: Query[StatsFilter]):
     deals = Deal.objects.select_related("customer", "owned_by").in_bulk({
         int(change.version.row_data["id"]) for change in changes
     })
-    return jsonable({
+    return {
         "since": period[0],
         "until": period[1],
         "changes": [
@@ -248,7 +326,7 @@ def deal_history_api(request, filters: Query[StatsFilter]):
             }
             for change in changes
         ],
-    })
+    }
 
 
 @router.get("/deals/{deal_id}/", response=DealOut)

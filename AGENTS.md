@@ -73,7 +73,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   for reports and searches, and `UsersFilter` with `filter_users()` for
   reports. Cutoff dates are called `date`. Reports live at
   `/api/reports/<name>/` with the names of `wb reports`, except key data and
-  cash data which integrations use.
+  cash data which integrations use. Responses have schemas and decimals are
+  strings everywhere (`Amount`, `Hours`, `Days` and `Percentage` in
+  `workbench/tools/api.py` round computed values), except key data and cash
+  data which use `jsonable()` for the integrations.
   Search endpoints use ninja's `@paginate` (limit and offset, 100 per page,
   at most 10000; responses are `{items, count}`) and return a `Serialized`
   queryset from `workbench/tools/api.py` so that only the page is serialized,
