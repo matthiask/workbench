@@ -334,6 +334,12 @@ tbody th > a {
   display: flex;
   align-items: center;
   gap: 4px;
+  // Fields come with a bottom margin which would misalign them with buttons
+  margin-bottom: 0 !important;
+
+  > label {
+    margin-bottom: 0;
+  }
 }
 
 .form-search label:empty {
