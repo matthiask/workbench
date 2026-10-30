@@ -303,7 +303,9 @@ def squeeze_data(date_range):  # noqa: C901
     # margin. Offered amounts and hours only count for open projects.
     gross_margins = gross_margin_components(projects.keys())
     hours = hours_components(projects.keys())
-    for project_id, project in Project.objects.in_bulk(projects.keys()).items():
+    for project_id, project in (
+        Project.objects.select_related("customer").in_bulk(projects.keys()).items()
+    ):
         projects[project_id]["project"] = project
         projects[project_id] |= gross_margins[project_id] | hours[project_id]
         if project.closed_on is not None:

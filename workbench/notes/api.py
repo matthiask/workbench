@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
@@ -121,7 +122,17 @@ def note_list(request, filters: Query[NoteFilter]):
         notes = notes.search(filters.q)
     notes = filter_date_range(notes, filters, "created_at__date")
     return Serialized(
-        notes.prefetch_related("content_object").order_by("-created_at", "-pk"),
+        notes.prefetch_related(
+            # Their names include their owner, invoice codes the project's
+            GenericPrefetch(
+                "content_object",
+                [
+                    Deal.objects.select_related("owned_by"),
+                    Invoice.objects.select_related("owned_by", "project"),
+                    RecurringInvoice.objects.select_related("owned_by"),
+                ],
+            )
+        ).order_by("-created_at", "-pk"),
         lambda note: note_out(note, request, types=types),
     )
 
