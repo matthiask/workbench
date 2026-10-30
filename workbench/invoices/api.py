@@ -15,7 +15,7 @@ from workbench.contacts.api import (
     organization_out,
     person_summary,
 )
-from workbench.invoices.models import Invoice, ProjectedInvoice
+from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.tools.api import DateRangeFilter, Serialized, filter_date_range
 from workbench.tools.formats import Z2
@@ -212,4 +212,63 @@ def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter
     return Serialized(
         projected.order_by("invoiced_on", "pk"),
         lambda row: _projected_invoice_out(row, request),
+    )
+
+
+class RecurringInvoiceOut(Schema):
+    id: int
+    url: str
+    title: str
+    description: str
+    customer: OrganizationOut
+    owned_by: str
+    periodicity: str
+    starts_on: dt.date
+    ends_on: dt.date | None
+    next_period_starts_on: dt.date | None
+    total_excl_tax: Decimal
+    total: Decimal
+    third_party_costs: Decimal
+
+
+class RecurringInvoiceFilter(Schema):
+    q: str = ""
+    customer: int | None = None
+    owned_by: str | None = None
+    status: Literal["open", "closed", "all"] = "open"
+
+
+@router.get("/recurring-invoices/", response=list[RecurringInvoiceOut])
+@paginate
+def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
+    """Recurring invoices by customer, open ones by default (those whose
+    auto-renewal hasn't been canceled before today)"""
+    invoices = RecurringInvoice.objects.select_related("customer", "owned_by")
+    if filters.status == "open":
+        invoices = invoices.open()
+    elif filters.status == "closed":
+        invoices = invoices.closed()
+    if filters.customer:
+        invoices = invoices.filter(customer=filters.customer)
+    if filters.owned_by:
+        invoices = invoices.filter(owned_by___short_name__iexact=filters.owned_by)
+    if filters.q:
+        invoices = invoices.search(filters.q)
+    return Serialized(
+        invoices.order_by("customer__name", "title", "pk"),
+        lambda invoice: {
+            "id": invoice.id,
+            "url": request.build_absolute_uri(invoice.get_absolute_url()),
+            "title": invoice.title,
+            "description": invoice.description,
+            "customer": organization_out(invoice.customer, request),
+            "owned_by": invoice.owned_by.get_short_name(),
+            "periodicity": invoice.get_periodicity_display(),
+            "starts_on": invoice.starts_on,
+            "ends_on": invoice.ends_on,
+            "next_period_starts_on": invoice.next_period_starts_on,
+            "total_excl_tax": invoice.total_excl_tax,
+            "total": invoice.total,
+            "third_party_costs": invoice.third_party_costs,
+        },
     )

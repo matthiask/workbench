@@ -6,7 +6,7 @@ from ninja import Query, Router, Schema
 from ninja.pagination import paginate
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import User
+from workbench.accounts.models import Team, User
 from workbench.deals.api import DealOut, deal_out
 from workbench.deals.models import Deal
 from workbench.invoices.api import InvoiceOut, invoice_out
@@ -157,3 +157,37 @@ def overview(request):
         if features[FEATURES.DEALS]
         else None,
     }
+
+
+class TeamOut(Schema):
+    id: int
+    url: str
+    name: str
+    members: list[str]
+
+
+class TeamFilter(Schema):
+    q: str = ""
+
+
+@router.get("/teams/", response=list[TeamOut])
+@paginate
+def team_list(request, filters: Query[TeamFilter]):
+    """Teams with the short names of their active members, e.g. for the
+    ``team`` filter of reports"""
+    teams = Team.objects.prefetch_related("members").order_by("name", "pk")
+    if filters.q:
+        teams = teams.filter(name__icontains=filters.q)
+    return Serialized(
+        teams,
+        lambda team: {
+            "id": team.id,
+            "url": request.build_absolute_uri(team.get_absolute_url()),
+            "name": team.name,
+            "members": sorted(
+                member.get_short_name()
+                for member in team.members.all()
+                if member.is_active
+            ),
+        },
+    )

@@ -846,6 +846,36 @@ def search_users(query, include_inactive, limit, offset, as_json):
 
 
 @cli.group()
+def teams():
+    """Find teams and their members, e.g. for the --team option"""
+
+
+@teams.command("search")
+@click.argument("query", nargs=-1)
+@_page_options
+@click.option("--json", "as_json", is_flag=True)
+def search_teams(query, limit, offset, as_json):
+    """Search teams by name"""
+    data = _request(
+        "GET",
+        "teams/",
+        params={"q": " ".join(query)} | _page_params(limit, offset),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table("ID>", "Name", "Members")
+    for team in data["items"]:
+        table.add_row(
+            _link(team["id"], team["url"]),
+            _link(team["name"], team["url"]),
+            ", ".join(team["members"]),
+        )
+    console.print(table)
+    _echo_more(data, offset, "teams")
+
+
+@cli.group()
 def projects():
     """Find and create projects"""
 
@@ -2176,6 +2206,63 @@ def search_costs(
     table.columns[5].footer = data["total_third_party_costs"]
     console.print(table)
     _echo_more(data, offset, "entries", note="The totals include all of them.")
+
+
+@cli.group("recurring-invoices")
+def recurring_invoices():
+    """Look at recurring invoices, requires the controlling feature"""
+
+
+@recurring_invoices.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option("--owned-by", help="Short name.")
+@click.option(
+    "--status",
+    type=click.Choice(["open", "closed", "all"]),
+    default="open",
+    help="Open ones are those which still renew, the default.",
+)
+@_page_options
+@click.option("--json", "as_json", is_flag=True)
+def search_recurring_invoices(
+    query, customer, owned_by, status, limit, offset, as_json
+):
+    """Search recurring invoices, by customer"""
+    params = {"q": " ".join(query), "status": status}
+    if customer:
+        params["customer"] = customer
+    if owned_by:
+        params["owned_by"] = owned_by
+    data = _request(
+        "GET", "recurring-invoices/", params=params | _page_params(limit, offset)
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table(
+        "ID>",
+        "Title",
+        "Customer",
+        "Owned by",
+        "Periodicity",
+        "Next period",
+        "Ends on",
+        "Total excl. tax>",
+    )
+    for invoice in data["items"]:
+        table.add_row(
+            _link(invoice["id"], invoice["url"]),
+            _link(invoice["title"], invoice["url"]),
+            _link(invoice["customer"]["name"], invoice["customer"]["url"]),
+            invoice["owned_by"],
+            invoice["periodicity"],
+            invoice["next_period_starts_on"] or invoice["starts_on"],
+            invoice["ends_on"] or "",
+            invoice["total_excl_tax"],
+        )
+    console.print(table)
+    _echo_more(data, offset, "recurring invoices")
 
 
 @cli.group("projected-invoices")

@@ -65,3 +65,19 @@ class OverviewAPITest(TestCase):
         self.assertEqual(len(data), 2)
         data = self.client.get("/api/users/?q=HM+example").json()["items"]
         self.assertEqual([u["id"] for u in data], [user.pk])
+
+    def test_teams(self):
+        """Teams with their active members"""
+        user = factories.UserFactory.create(_short_name="hm")
+        team = factories.TeamFactory.create(name="Design")
+        team.members.add(
+            user, factories.UserFactory.create(_short_name="old", is_active=False)
+        )
+        factories.TeamFactory.create(name="Backend")
+        self.client.force_login(user)
+
+        data = self.client.get("/api/teams/?q=des").json()
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(data["items"][0]["name"], "Design")
+        self.assertEqual(data["items"][0]["members"], ["hm"])
+        self.assertEqual(self.client.get("/api/teams/").json()["count"], 2)

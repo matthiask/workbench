@@ -174,3 +174,29 @@ class InvoicesAPITest(TestCase):
         self.assertIsNone(row["last_reminded_on"])
 
         self.assertEqual(self.client.get("/api/invoices/").status_code, 403)
+
+    def test_recurring_invoices(self):
+        """Recurring invoices which still renew by default"""
+        user = factories.UserFactory.create(_short_name="ab")
+        hosting = factories.RecurringInvoiceFactory.create(
+            title="Hosting", owned_by=user, subtotal=1200
+        )
+        ended = factories.RecurringInvoiceFactory.create(
+            title="Support", starts_on=in_days(-400), ends_on=in_days(-10)
+        )
+        self.client.force_login(user)
+
+        def ids(query=""):
+            data = self.client.get(f"/api/recurring-invoices/{query}").json()
+            return [row["id"] for row in data["items"]]
+
+        self.assertEqual(ids(), [hosting.pk])
+        self.assertEqual(ids("?status=closed"), [ended.pk])
+        self.assertEqual(set(ids("?status=all")), {hosting.pk, ended.pk})
+        self.assertEqual(ids("?status=all&owned_by=AB"), [hosting.pk])
+        self.assertEqual(ids(f"?status=all&customer={ended.customer_id}"), [ended.pk])
+        self.assertEqual(ids("?q=hosting"), [hosting.pk])
+
+        data = self.client.get("/api/recurring-invoices/").json()["items"][0]
+        self.assertEqual(data["periodicity"], "yearly")
+        self.assertEqual(data["owned_by"], "ab")

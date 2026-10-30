@@ -66,6 +66,12 @@ inactive users.
     wb users search
     wb users search hans --all
 
+`wb teams search` lists teams with the short names of their members, e.g. for
+the `--team` option of reports:
+
+    wb teams search
+    wb teams search design
+
 ## Creating projects
 
 Find the customer and the contact, then create the project. Projects are
@@ -211,6 +217,12 @@ The planned invoicing (gross margin, without third party costs):
 
     wb projected-invoices search --project 1234
     wb projected-invoices search --since 2026-11-01 --until 2026-12-31
+
+Recurring invoices, those which still renew by default (`--status closed` or
+`all` for the others):
+
+    wb recurring-invoices search hosting
+    wb recurring-invoices search --customer 345 --status all
 
 ## Deals
 

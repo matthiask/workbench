@@ -27,6 +27,7 @@ class APIFeaturesTest(TestCase):
             ("get", f"/api/projects/stats/?ids={project.pk}"),
             ("get", "/api/projected-invoices/"),
             ("get", "/api/invoices/"),
+            ("get", "/api/recurring-invoices/"),
             ("get", f"/api/invoices/{invoice.pk}/"),
             ("get", "/api/key-data/"),
             ("get", "/api/cash-data/"),

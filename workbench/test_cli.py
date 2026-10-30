@@ -491,6 +491,15 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(deal.code, result.output)
 
+        factories.RecurringInvoiceFactory.create(title="Hosting 2027")
+        result = self.wb("recurring-invoices", "search", "hosting")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Hosting 2027", result.output)
+        factories.TeamFactory.create(name="Design").members.add(self.user)
+        result = self.wb("teams", "search")
+        self.assertIn("Design", result.output)
+        self.assertIn("ab", result.output)
+
         result = self.wb("invoices", "reminders")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Kick-off", result.output)
