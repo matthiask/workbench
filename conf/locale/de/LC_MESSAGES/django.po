@@ -531,7 +531,7 @@ msgstr "Alle Stati"
 #: workbench/templates/awt/absence_list.html
 #: workbench/templates/awt/year_detail.html
 msgid "Unconfirmed"
-msgstr "Unbestätigt"
+msgstr "Nicht bestätigt"
 
 #: workbench/awt/forms.py
 msgid "Enter hours"
@@ -5555,7 +5555,7 @@ msgstr "Provisorische geplante Arbeiten in näherer Zukunft"
 
 #: workbench/views.py
 msgid "Unconfirmed paid leave"
-msgstr "Unbestätigter bezahlter Urlaub"
+msgstr "Bezahlter Urlaub zu bestätigen"
 
 #: workbench/views.py
 msgid "Old projects"

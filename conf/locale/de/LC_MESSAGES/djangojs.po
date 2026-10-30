@@ -19,7 +19,7 @@ msgstr ""
 
 #: absences/absences.js conf/strings.js
 msgid "Unconfirmed"
-msgstr "Unbestätigt"
+msgstr "Nicht bestätigt"
 
 #: absences/absences.js conf/strings.js timer/breakActivity.js
 msgid "Description"
