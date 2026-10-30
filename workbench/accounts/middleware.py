@@ -6,18 +6,19 @@ from django.urls import reverse
 from django.utils.translation import activate, gettext as _
 
 
-def set_user_name(username):
+def set_user_name(user):
+    """The user the audit log records for changes, a user or a name"""
+    if not isinstance(user, str):
+        user = "user-%d-%s" % (user.id, user.get_short_name())
     connections["default"].cursor().execute(
-        "SET SESSION application_name TO %s", [username]
+        "SET SESSION application_name TO %s", [user]
     )
 
 
 def user_middleware(get_response):
     def middleware(request):
         if request.user.is_authenticated:
-            set_user_name(
-                "user-%d-%s" % (request.user.id, request.user.get_short_name())
-            )
+            set_user_name(request.user)
             activate(request.user.language)
             return get_response(request)
 

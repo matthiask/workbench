@@ -4,6 +4,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.models import APIToken
+from workbench.audit.models import LoggedAction
 
 
 class APITokenTest(TestCase):
@@ -192,3 +193,24 @@ class APITokenTest(TestCase):
             response.json()["detail"][0]["msg"],
             "Select a valid choice. That choice is not one of the available choices.",
         )
+
+    def test_audit_user(self):
+        """Changes through the API are logged with the token's user"""
+        project = factories.ProjectFactory.create()
+        _token, secret = APIToken.create_for(user=project.owned_by, title="CLI")
+
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/",
+            {"title": "Changed"},
+            content_type="application/json",
+            headers={"authorization": f"Bearer {secret}"},
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        # Changes of a test happen in the same transaction
+        action = (
+            LoggedAction.objects
+            .for_model(project)
+            .with_data(id=project.id)
+            .latest("event_id")
+        )
+        self.assertEqual(action.user_id, project.owned_by.id, action.user_name)

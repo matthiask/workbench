@@ -3,6 +3,7 @@ from ninja.errors import HttpError
 from ninja.security import HttpBearer, SessionAuth
 
 from workbench.accounts.features import LABELS
+from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import APIToken
 
 
@@ -29,6 +30,7 @@ class UserToken(HttpBearer):
             request.user = user
             # The user middleware only does this for sessions
             activate(user.language)
+            set_user_name(user)
             return check_feature(user, self.feature)
         return None
 
