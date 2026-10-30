@@ -76,6 +76,12 @@ People and organizations whose names exist already are rejected unless you
 pass `--allow-duplicates`; email addresses which are in use are always
 rejected.
 
+Add email addresses, phone numbers and postal addresses to existing people
+with a file of the same structure; existing details are never changed or
+removed:
+
+    wb people add-details 345 details.yaml --dry-run
+
 The customer is the contact's organization unless you pass `--customer`.
 `--type` is `order` (default), `maintenance` or `internal`, `--owned-by` takes a
 short name and defaults to you.

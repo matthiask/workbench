@@ -20,8 +20,10 @@ address and their organization:
     wb people show <person_id>
     wb organizations show <organization_id>
 
-- If the person exists already, stop and show them to the user. Updating
-  people isn't supported by the CLI; that happens in Workbench.
+- If the person exists already, compare their details with the data. New
+  email addresses, phone numbers or postal addresses can be added (see
+  below); anything else (name, salutation, organization, outdated details)
+  is changed in Workbench, tell the user.
 - If the organization exists, use its ID (`organization`). If several match,
   ask which one. Only use `new_organization` when there's none.
 
@@ -82,3 +84,15 @@ Only after the user explicitly approves:
     wb people create <scratchpad>/person.yaml
 
 Report the person's URL so they can be checked in Workbench.
+
+## Adding details to existing people
+
+Write only the new details to `<scratchpad>/details.yaml`, using the
+`email_addresses`, `phone_numbers` and `postal_addresses` of the schema, show
+them to the user and validate them:
+
+    wb people add-details <person_id> <scratchpad>/details.yaml --dry-run
+
+Existing details are never changed or removed. After the user's approval:
+
+    wb people add-details <person_id> <scratchpad>/details.yaml

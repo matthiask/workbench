@@ -759,6 +759,31 @@ def create_person(file, dry_run, allow_duplicates, as_json):
         console.print("Dry run, nothing has been saved.")
 
 
+@people.command("add-details")
+@click.argument("person_id", type=int)
+@click.argument("file", type=click.File("r"))
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def add_person_details(person_id, file, dry_run, as_json):
+    """Add email addresses, phone numbers and postal addresses to a person
+
+    The YAML or JSON file contains email_addresses, phone_numbers and
+    postal_addresses like for `wb people create`. Existing details are never
+    changed or removed."""
+    data = _request(
+        "POST",
+        f"contacts/people/{person_id}/details/",
+        params={"dry_run": _bool(dry_run)},
+        json=_load(file),
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    _echo_person(data)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
+
+
 def _echo_person(data):
     organization = data["organization"] or {}
     _echo_fields(

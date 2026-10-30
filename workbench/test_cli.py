@@ -18,6 +18,7 @@ from rich.console import Console
 from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
+from workbench.contacts.models import Person
 from workbench.offers.models import Offer
 from workbench.tools.validation import in_days, monday
 
@@ -177,6 +178,12 @@ email_addresses:
         result = self.wb("people", "create", person, "--allow-duplicates")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("email_addresses.0.email: ", result.output)
+
+        created = Person.objects.get()
+        details = self.file("phone_numbers:\n  - phone_number: 044 123 45 67\n")
+        result = self.wb("people", "add-details", created.pk, details)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("+41441234567", result.output)
 
     def test_offers(self):
         """Offers are created and replaced from YAML files"""
