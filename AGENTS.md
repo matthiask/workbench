@@ -162,7 +162,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   dropdown for related objects, a kebab `btn-icon` menu for rare or
   destructive actions; no button bars at the bottom). Key figures are
   `.wb-stats` tiles, label/value pairs `dl.wb-fields`, related lists
-  `list-group-flush` in cards. Styles live in
+  `list-group-flush` in cards. List pages override the `rows` block of
+  `generic/object_list.html` with `.wb-row` items. Reports extend
+  `reporting/report.html` (blocks `heading`, `actions`, `filters`,
+  `report`) and put tables in `section.card.wb-table-card`, without zebra
+  stripes; totals rows get `.wb-total-row`. Styles live in
   `workbench/static/workbench/main.scss` and must work in light and dark
   mode (`data-bs-theme`).
 - Charts are server-side SVG, not chart.js: `bar_chart()` in
