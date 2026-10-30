@@ -7,34 +7,38 @@
 {% endblock title %}
 
 {% block body %}
-  <table class="table table-sm bg-light">
-    <tr>
-      <th>{% translate 'user'|capfirst %}</th>
-      <th class="text-end">{% translate 'hours'|capfirst %}</th>
-      <th class="text-end">{% translate 'Undefined rate' %}</th>
-      <th class="text-end">{% translate 'Net cost' %}</th>
-      <th class="text-end">{% translate 'Productivity costs' %}</th>
-    </tr>
-    {% for row in stats.by_user %}
+  <table class="table table-sm table-hover mb-0 wb-compact-table">
+    <thead>
       <tr>
-        <td title="{{ row.user.email }}">{{ row.user }}</td>
-        <td class="text-end">{{ row.hours|hours }}</td>
-        <td class="text-end">{{ row.hours_with_rate_undefined|hours }}</td>
-        <td class="text-end">{{ row.costs|currency }}</td>
-        <td class="text-end">{{ row.costs_with_green_hours_target|currency }}</td>
+        <th>{% translate 'user'|capfirst %}</th>
+        <th class="text-end">{% translate 'hours'|capfirst %}</th>
+        <th class="text-end">{% translate 'Undefined rate' %}</th>
+        <th class="text-end">{% translate 'Net cost' %}</th>
+        <th class="text-end">{% translate 'Productivity costs' %}</th>
       </tr>
-    {% endfor %}
-    <tr>
-      <th>{% translate 'total'|capfirst %}</th>
-      <th class="text-end">{{ stats.hours|hours }}</th>
-      <th class="text-end">{{ stats.hours_with_rate_undefined|hours }}</th>
-      <th class="text-end">{{ stats.costs|currency }}</th>
-      <th class="text-end">{{ stats.costs_with_green_hours_target|currency }}</th>
-    </tr>
-    <tr>
-      <td>{% translate 'third party costs'|capfirst %}</td>
-      <td colspan="3"></td>
-      <td class="text-end">{{ stats.third_party_costs|currency }}</td>
-    </tr>
+      <tr class="wb-total-row">
+        <th>{% translate 'total'|capfirst %}</th>
+        <th class="text-end">{{ stats.hours|hours }}</th>
+        <th class="text-end">{{ stats.hours_with_rate_undefined|hours }}</th>
+        <th class="text-end">{{ stats.costs|currency }}</th>
+        <th class="text-end">{{ stats.costs_with_green_hours_target|currency }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in stats.by_user %}
+        <tr>
+          <td title="{{ row.user.email }}">{{ row.user }}</td>
+          <td class="text-end">{{ row.hours|hours }}</td>
+          <td class="text-end">{{ row.hours_with_rate_undefined|hours }}</td>
+          <td class="text-end">{{ row.costs|currency }}</td>
+          <td class="text-end">{{ row.costs_with_green_hours_target|currency }}</td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td>{% translate 'third party costs'|capfirst %}</td>
+        <td colspan="3"></td>
+        <td class="text-end">{{ stats.third_party_costs|currency }}</td>
+      </tr>
+    </tbody>
   </table>
 {% endblock body %}

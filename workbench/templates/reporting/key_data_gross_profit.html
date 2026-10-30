@@ -7,27 +7,29 @@
 {% endblock title %}
 
 {% block body %}
-  <table class="table table-sm bg-light">
-    <tr>
-      <th class="w-100">{% translate 'invoice'|capfirst %}</th>
-      <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
-      <th class="text-nowrap">{% translate 'invoiced on'|capfirst %}</th>
-      <th class="text-nowrap text-end">{% translate 'total'|capfirst %}</th>
-      <th class="text-nowrap text-end">{% translate 'total excl. tax'|capfirst %}</th>
-    </tr>
-    {% for invoice in invoices %}
+  <table class="table table-sm table-hover mb-0 wb-compact-table">
+    <thead>
       <tr>
-        <td>
-          <a href="{{ invoice.get_absolute_url }}">
-            {{ invoice|h }}
-            {{ invoice.status_badge }}
-          </a>
-        </td>
-        <td>{{ invoice.get_type_display }}</td>
-        <td>{{ invoice.invoiced_on|local_date_format }}</td>
-        <td class="text-end">{{ invoice.total|currency }}</td>
-        <td class="text-end">{{ invoice.total_excl_tax|currency }}</td>
+        <th class="w-100">{% translate 'invoice'|capfirst %}</th>
+        <th class="text-nowrap">{% translate 'type'|capfirst %}</th>
+        <th class="text-nowrap">{% translate 'invoiced on'|capfirst %}</th>
+        <th class="text-nowrap text-end">{% translate 'total'|capfirst %}</th>
+        <th class="text-nowrap text-end">{% translate 'total excl. tax'|capfirst %}</th>
       </tr>
-    {% endfor %}
+    </thead>
+    <tbody>
+      {% for invoice in invoices %}
+        <tr>
+          <td>
+            <a href="{{ invoice.get_absolute_url }}">{{ invoice|h }}</a>
+            {{ invoice.status_badge }}
+          </td>
+          <td>{{ invoice.get_type_display }}</td>
+          <td>{{ invoice.invoiced_on|local_date_format }}</td>
+          <td class="text-end">{{ invoice.total|currency }}</td>
+          <td class="text-end">{{ invoice.total_excl_tax|currency }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
   </table>
 {% endblock body %}

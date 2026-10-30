@@ -9,26 +9,30 @@
 {% block body %}
   {% for row in stats.by_user %}
     {% if row.user_id == request.GET.user %}
-      <table class="table table-sm bg-light">
-        <tr>
-          <th>{% translate 'deal' %}</th>
-          <th></th>
-          <th>{% translate 'Award of contract' %}</th>
-          <th class="text-end">{% translate 'value' %}</th>
-          <th class="text-end">{% translate 'contribution' %}</th>
-        </tr>
-        {% for deal, contribution in row.deals.items %}
+      <table class="table table-sm table-hover mb-0 wb-compact-table">
+        <thead>
           <tr>
-            <td>{% link_or_none deal with_badge=True %}</td>
-            <td>{{ deal.contact.name_with_organization|default:deal.customer }}</td>
-            <td>
-              {{ deal.closing_type }}
-              {% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}
-            </td>
-            <td class="text-end">{{ deal.value|currency }}</td>
-            <td class="text-end">{{ contribution|currency }}</td>
+            <th>{% translate 'deal'|capfirst %}</th>
+            <th></th>
+            <th>{% translate 'Award of contract' %}</th>
+            <th class="text-end">{% translate 'value'|capfirst %}</th>
+            <th class="text-end">{% translate 'contribution'|capfirst %}</th>
           </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+          {% for deal, contribution in row.deals.items %}
+            <tr>
+              <td>{% link_or_none deal with_badge=True %}</td>
+              <td>{{ deal.contact.name_with_organization|default:deal.customer }}</td>
+              <td>
+                {{ deal.closing_type }}
+                {% if deal.closing_notice %}: {{ deal.closing_notice }}{% endif %}
+              </td>
+              <td class="text-end">{{ deal.value|currency }}</td>
+              <td class="text-end">{{ contribution|currency }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
       </table>
     {% endif %}
   {% endfor %}
