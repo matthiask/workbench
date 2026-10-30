@@ -3,31 +3,37 @@
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-sm-12">
-      <div class="d-print-none">
-        <h1>{% translate 'annual working time' %}</h1>
-        <ul class="nav nav-tabs my-3">
-          {% for y in years %}
-            <li class="nav-item">
-              <a
-                class="
-                  nav-link
-                  {% if y == year %}
-                  active
-                  {% endif %}
-                "
-                href="{% querystring year=y %}"
-              >{{ y }}</a>
-            </li>
-          {% endfor %}
+      <div class="wb-page-header d-print-none">
+        <h1 class="mb-0">{% translate 'annual working time'|capfirst %}</h1>
+        <div class="wb-page-actions">
+          <span class="dropdown">
+            <button
+              class="btn btn-quiet dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              {% include "svg/calendar.svg" %}
+              {{ year }}
+            </button>
+            <div class="dropdown-menu dropdown-menu-end wb-scroll-menu">
+              {% for y in years %}
+                <a class="dropdown-item {% if y == year %}active{% endif %}" href="{% querystring year=y %}">{{ y }}</a>
+              {% endfor %}
+            </div>
+          </span>
           {% if request.user.features.CONTROLLING %}
-            <li class="nav-item ms-auto">
-              <a class="nav-link" href="{% querystring user='active' %}">{% translate 'active users' %}</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% querystring export='pdf' %}">PDF</a>
-            </li>
+            <a
+              class="btn btn-quiet {% if request.GET.user == 'active' %}active{% endif %}"
+              href="{% querystring user='active' %}"
+            >{% translate 'active users' %}</a>
+            <a class="btn btn-quiet" href="{% querystring export='pdf' %}">
+              {% include 'svg/file-pdf.svg' %}
+              PDF
+            </a>
           {% endif %}
-        </ul>
+        </div>
       </div>
       {% if request.user.features.CONTROLLING and request.GET.user == 'active' %}
         <h2 class="mt-5">{% translate 'facts' %}</h2>

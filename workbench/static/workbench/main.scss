@@ -1405,3 +1405,8 @@ a.wb-row-title:hover {
     margin-top: 0.2rem;
   }
 }
+
+.wb-scroll-menu {
+  max-height: 20rem;
+  overflow-y: auto;
+}
