@@ -7,7 +7,7 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
-from workbench.awt.models import Holiday
+from workbench.awt.models import Absence, Holiday
 
 
 class AbsencesAPITest(TestCase):
@@ -117,3 +117,55 @@ class WorkingTimeAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
         response = self.client.get("/api/reports/working-time/", {"all": True})
         self.assertEqual(response.status_code, 403)
+
+
+class AbsenceCreateAPITest(TestCase):
+    def tearDown(self):
+        deactivate_all()
+
+    def test_create(self):
+        """Absences are created like in the web interface"""
+        user = factories.UserFactory.create(_short_name="ab")
+        self.client.force_login(user)
+        absence = {
+            "starts_on": dt.date.today().isoformat(),
+            "days": 1,
+            "reason": "vacation",
+            "description": "Holidays",
+        }
+
+        response = self.client.post(
+            "/api/absences/?dry_run=true", absence, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertFalse(Absence.objects.exists())
+
+        response = self.client.post(
+            "/api/absences/", absence, content_type="application/json"
+        )
+        self.assertEqual(response.json()["user"], "ab")
+        self.assertEqual(Absence.objects.get().user, user)
+
+        # Warnings of the web interface are errors
+        far = dt.date.today() + dt.timedelta(days=400)
+        response = self.client.post(
+            "/api/absences/",
+            absence | {"starts_on": far.isoformat()},
+            content_type="application/json",
+        )
+        self.assertIn("Impressive planning skills", response.content.decode())
+        self.assertEqual(response.status_code, 422)
+
+        response = self.client.post(
+            "/api/absences/",
+            absence | {"ends_on": "2000-01-01"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        response = self.client.post(
+            "/api/absences/",
+            absence | {"user": "nobody"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)

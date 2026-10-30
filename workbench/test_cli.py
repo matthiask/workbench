@@ -382,6 +382,23 @@ planned_work:
             user=self.user, starts_on=in_days(7), description="Holidays"
         )
         factories.AbsenceFactory.create(starts_on=in_days(-7), description="Past")
+        result = self.wb(
+            "absences",
+            "create",
+            "--starts-on",
+            in_days(14),
+            "--days",
+            2,
+            "--reason",
+            "vacation",
+            "--description",
+            "Skiing",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Skiing", result.output)
+        self.assertIn("Dry run", result.output)
+
         result = self.wb("absences", "search")
         self.assertIn("Holidays", result.output)
         self.assertNotIn("Past", result.output)

@@ -2,15 +2,17 @@ import datetime as dt
 from decimal import Decimal
 from typing import Literal
 
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from ninja import Query, Router, Schema
+from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import check_feature
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.awt.forms import AbsenceForm
 from workbench.awt.models import Absence
 from workbench.awt.reporting import (
     active_users,
@@ -24,6 +26,7 @@ from workbench.tools.api import (
     Percentage,
     Serialized,
     date_range,
+    raise_form_errors,
 )
 
 
@@ -31,8 +34,8 @@ router = Router(tags=["absences"])
 
 
 class AbsenceOut(Schema):
-    id: int
-    url: str
+    id: int | None
+    url: str | None
     user: str
     starts_on: dt.date
     ends_on: dt.date | None
@@ -67,17 +70,71 @@ def absence_list(request, filters: Query[AbsenceFilter]):
         absences = absences.filter(starts_on__lte=until)
     return Serialized(
         absences.order_by("starts_on", "pk"),
-        lambda absence: {
-            "id": absence.id,
-            "url": request.build_absolute_uri(absence.get_absolute_url()),
-            "user": absence.user.get_short_name(),
-            "starts_on": absence.starts_on,
-            "ends_on": absence.ends_on,
-            "days": absence.days,
-            "reason": absence.get_reason_display(),
-            "description": absence.description,
-        },
+        lambda absence: _absence_out(absence, request),
     )
+
+
+def _absence_out(absence, request):
+    return {
+        "id": absence.id,
+        "url": request.build_absolute_uri(absence.get_absolute_url()),
+        "user": absence.user.get_short_name(),
+        "starts_on": absence.starts_on,
+        "ends_on": absence.ends_on,
+        "days": absence.days,
+        "reason": absence.get_reason_display(),
+        "description": absence.description,
+    }
+
+
+class AbsenceIn(Schema):
+    user: str | None = Field(
+        default=None, description="Short name, defaults to the authenticated user."
+    )
+    starts_on: dt.date
+    ends_on: dt.date | None = Field(
+        default=None, description="In the same year, empty for a single day."
+    )
+    days: Decimal = Field(gt=0, description="Working days, e.g. 0.5.")
+    reason: Literal["vacation", "sickness", "paid", "school", "other", "correction"]
+    description: str = Field(min_length=1)
+
+
+@router.post("/absences/", response=AbsenceOut)
+def absence_create(request, data: AbsenceIn, *, dry_run: bool = False):
+    """Create an absence, validated like in the web interface
+
+    Warnings of the web interface are errors here; nothing is saved if
+    anything is invalid or with ``dry_run``."""
+    user = request.user
+    if data.user is not None:
+        user = User.objects.filter(_short_name__iexact=data.user).first()
+        if not user:
+            raise ValidationError([
+                {"loc": ["body", "data", "user"], "msg": _("Unknown user.")}
+            ])
+    form = AbsenceForm(
+        {
+            "user": user.pk,
+            "starts_on": data.starts_on,
+            "ends_on": data.ends_on or "",
+            "days": data.days,
+            "reason": data.reason,
+            "description": data.description,
+        },
+        request=request,
+        # The web interface shows the form in a modal
+        prefix=None,
+    )
+    if not form.is_valid():
+        raise_form_errors(form)
+    with transaction.atomic():
+        absence = form.save()
+        result = _absence_out(absence, request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "url": None}
+    return result
 
 
 class WorkingTimeFilter(Schema):

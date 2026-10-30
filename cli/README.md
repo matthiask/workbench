@@ -341,6 +341,11 @@ Current and upcoming absences of everyone, or of a period:
     wb absences search
     wb absences search --user mk --reason vacation --since 2026-01-01
 
+Create absences like in Workbench, your own by default:
+
+    wb absences create --starts-on 2026-12-21 --ends-on 2026-12-31 --days 5 \
+        --reason vacation --description "Christmas holidays" --dry-run
+
 ## Reports
 
 The reports require the same features as in the web interface, most of them
