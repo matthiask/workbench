@@ -134,6 +134,31 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 1)
         self.assertIn("No contact selected.\n", result.output)
 
+    def test_people(self):
+        """People are created from YAML files"""
+        person = self.file(
+            """\
+given_name: Hans
+family_name: Muster
+salutation: Lieber Hans
+new_organization: Espoir AG
+email_addresses:
+  - email: hans@espoir.ch
+"""
+        )
+        result = self.wb("people", "create", person, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("hans@espoir.ch", result.output)
+        self.assertIn("Dry run", result.output)
+
+        result = self.wb("people", "create", person)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Espoir AG", result.output)
+
+        result = self.wb("people", "create", person, "--allow-duplicates")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("email_addresses.0.email: ", result.output)
+
     def test_offers(self):
         """Offers are created and replaced from YAML files"""
         factories.service_types()

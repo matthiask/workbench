@@ -707,7 +707,7 @@ def show_organization(organization_id, as_json):
 
 @cli.group()
 def people():
-    """Look at people, search them with `wb contacts search`"""
+    """Look at and add people, search them with `wb contacts search`"""
 
 
 @people.command("show")
@@ -716,9 +716,50 @@ def people():
 def show_person(person_id, as_json):
     """Show a person and their contact details"""
     data = _request("GET", f"contacts/people/{person_id}/")
+    _echo_json(data) if as_json else _echo_person(data)
+
+
+@people.command("context")
+def people_context():
+    """Print the schema of a person to create
+
+    Feed this to an LLM together with an email signature, a business card
+    or whatever you've got."""
+    _echo_json(_request("GET", "contacts/people/context/"))
+
+
+@people.command("create")
+@click.argument("file", type=click.File("r"))
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option(
+    "--allow-duplicates",
+    is_flag=True,
+    help="Create the person (and the organization) even if the name exists already.",
+)
+@click.option("--json", "as_json", is_flag=True)
+def create_person(file, dry_run, allow_duplicates, as_json):
+    """Create a person with their contact details from a YAML or JSON file
+
+    Search for the person and their organization with `wb contacts search`
+    first. Email addresses which are already in use are always rejected."""
+    data = _request(
+        "POST",
+        "contacts/people/",
+        params={
+            "dry_run": _bool(dry_run),
+            "allow_duplicates": _bool(allow_duplicates),
+        },
+        json=_load(file),
+    )
     if as_json:
         _echo_json(data)
         return
+    _echo_person(data)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
+
+
+def _echo_person(data):
     organization = data["organization"] or {}
     _echo_fields(
         data["full_name"] + (" (archived)" if data["is_archived"] else ""),

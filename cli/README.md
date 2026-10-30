@@ -46,6 +46,36 @@ warning, the CLI fails and you have to use the web interface.
 search results, e.g. the people of an organization or the email addresses of a
 person.
 
+People are created from YAML (or JSON) files, e.g. written by an LLM from an
+email signature (`wb people context` prints the schema). Pass `organization`
+with the ID of an existing organization or `new_organization` with a name to
+create one:
+
+```yaml
+given_name: Hans
+family_name: Muster
+address: Herr
+salutation: Lieber Hans
+new_organization: Espoir AG
+email_addresses:
+  - email: hans@espoir.ch
+phone_numbers:
+  - type: mobile
+    phone_number: 079 123 45 67
+postal_addresses:
+  - street: Bahnhofstrasse
+    house_number: "1"
+    postal_code: "8001"
+    city: Zürich
+```
+
+    wb people create person.yaml --dry-run
+    wb people create person.yaml
+
+People and organizations whose names exist already are rejected unless you
+pass `--allow-duplicates`; email addresses which are in use are always
+rejected.
+
 The customer is the contact's organization unless you pass `--customer`.
 `--type` is `order` (default), `maintenance` or `internal`, `--owned-by` takes a
 short name and defaults to you.
@@ -193,12 +223,15 @@ name.
 
 `--csv` writes one row per project, service and person with the logged hours.
 
-## Claude Code skill
+## Claude Code skills
 
 `skills/workbench-offer/` contains a [Claude Code](https://claude.com/claude-code)
 skill which turns a specification into an offer using `wb`: it finds the
 project, fetches the context, drafts the offer, reviews it with you, validates
-it with `--dry-run` and only creates it after your approval. Link it into your
-personal skills to use it in any directory:
+it with `--dry-run` and only creates it after your approval.
+`skills/workbench-contact/` adds people from email signatures, business cards
+and the like, after looking for existing records. Link them into your personal
+skills to use them in any directory:
 
     ln -sfn "$PWD/cli/skills/workbench-offer" ~/.claude/skills/workbench-offer
+    ln -sfn "$PWD/cli/skills/workbench-contact" ~/.claude/skills/workbench-contact
