@@ -1,3 +1,4 @@
+import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
 
@@ -11,6 +12,7 @@ from workbench import generic
 from workbench.invoices.models import Service as InvoiceService
 from workbench.logbook.forms import LogbookBatchForm
 from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
+from workbench.projects.charts import projected_vs_invoiced_chart
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.squeeze import project_gross_margin
@@ -20,6 +22,48 @@ from workbench.tools.formats import Z2, local_date_format
 
 
 PROJECTED_INVOICE_LEEWAY = Decimal(1000)
+
+
+def _add_months(day, months):
+    month = day.month - 1 + months
+    return day.replace(year=day.year + month // 12, month=month % 12 + 1, day=1)
+
+
+def projected_invoices_timeline(projected_invoices, *, today=None):
+    """Projected invoices from last month up to two months ahead one by one,
+    earlier ones summed up and later ones summed up per quarter"""
+    this_month = (today or dt.date.today()).replace(day=1)
+    since, until = _add_months(this_month, -1), _add_months(this_month, 3)
+
+    rows = []
+    groups = {}
+
+    def add_to_group(key, label, pi):
+        if key not in groups:
+            groups[key] = {"label": label, "gross_margin": Z2, "count": 0}
+            rows.append(groups[key])
+        groups[key]["gross_margin"] += pi.gross_margin
+        groups[key]["count"] += 1
+
+    for pi in sorted(projected_invoices, key=lambda pi: pi.invoiced_on):
+        if pi.invoiced_on < since:
+            add_to_group(
+                "earlier",
+                _("until %s") % local_date_format(since - dt.timedelta(days=1)),
+                pi,
+            )
+        elif pi.invoiced_on < until:
+            rows.append({
+                "label": local_date_format(pi.invoiced_on),
+                "gross_margin": pi.gross_margin,
+                "count": 1,
+                "description": pi.description,
+            })
+        else:
+            quarter = (pi.invoiced_on.month - 1) // 3 + 1
+            year = pi.invoiced_on.year
+            add_to_group((year, quarter), f"Q{quarter} {year}", pi)
+    return rows
 
 
 class ProjectDetailView(generic.DetailView):
@@ -73,6 +117,9 @@ class ProjectDetailView(generic.DetailView):
 
         return super().get_context_data(
             squeeze=squeeze,
+            projected_invoices_timeline=projected_invoices_timeline(
+                self.object.projected_invoices.all()
+            ),
             projected_invoices_total=projected_invoices_total,
             projected_warning=projected_warning,
             services_gross_margin=services_gross_margin,
@@ -82,6 +129,16 @@ class ProjectDetailView(generic.DetailView):
             - squeeze["offered"],
             gs=grouped_services,
             **kwargs,
+        )
+
+
+class ProjectProjectedInvoicesView(generic.DetailView):
+    model = Project
+    template_name_suffix = "_projected_invoices_list"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            chart=projected_vs_invoiced_chart(self.object), **kwargs
         )
 
 

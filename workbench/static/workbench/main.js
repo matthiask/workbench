@@ -1,4 +1,5 @@
 import * as bootstrap from "bootstrap"
+import "@fontsource-variable/inter"
 import "./main.scss"
 
 window.bootstrap = bootstrap
@@ -819,3 +820,9 @@ function initCelebration() {
 
   setTimeout(() => el.remove(), 3000)
 }
+
+// Clamped descriptions expand when clicked
+document.addEventListener("click", (e) => {
+  const clamp = e.target.closest("[data-clamp]")
+  if (clamp && !e.target.closest("a")) clamp.classList.add("is-expanded")
+})

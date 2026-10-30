@@ -7,8 +7,11 @@ from django.test.utils import override_settings
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.contacts.models import Organization
+from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
+from workbench.projects.charts import projected_vs_invoiced_chart
 from workbench.projects.models import InternalType, Project, Service
+from workbench.projects.views import projected_invoices_timeline
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -776,3 +779,83 @@ class ProjectsTest(TestCase):
             },
         )
         self.assertRedirects(response, project.urls["detail"])
+
+
+class ProjectedInvoicesTimelineTest(TestCase):
+    def test_timeline(self):
+        """Projected invoices around today are listed one by one, earlier ones
+        are summed up and later ones are summed up per quarter"""
+        project = factories.ProjectFactory.create()
+        for day, gross_margin in [
+            ("2026-06-30", 100),
+            ("2026-08-31", 200),
+            ("2026-09-30", 300),  # Last month: shown
+            ("2026-10-15", 400),
+            ("2026-12-31", 500),
+            ("2027-01-31", 600),  # Later: per quarter
+            ("2027-03-31", 700),
+            ("2027-04-30", 800),
+        ]:
+            factories.ProjectedInvoiceFactory.create(
+                project=project,
+                invoiced_on=dt.date.fromisoformat(day),
+                gross_margin=gross_margin,
+            )
+
+        rows = projected_invoices_timeline(
+            project.projected_invoices.all(), today=dt.date(2026, 10, 30)
+        )
+        self.assertEqual(
+            [(row["label"], row["gross_margin"], row["count"]) for row in rows],
+            [
+                ("until 31.08.2026", 300, 2),
+                ("30.09.2026", 300, 1),
+                ("15.10.2026", 400, 1),
+                ("31.12.2026", 500, 1),
+                ("Q1 2027", 1300, 2),
+                ("Q2 2027", 800, 1),
+            ],
+        )
+
+    def test_projected_vs_invoiced(self):
+        """The chart compares cumulative projected and invoiced gross margin"""
+        project = factories.ProjectFactory.create()
+        for day, gross_margin in [("2026-01-31", 1000), ("2026-03-31", 500)]:
+            factories.ProjectedInvoiceFactory.create(
+                project=project,
+                invoiced_on=dt.date.fromisoformat(day),
+                gross_margin=gross_margin,
+            )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            invoiced_on=dt.date(2026, 2, 10),
+            subtotal=1200,
+            third_party_costs=200,
+            status=Invoice.SENT,
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            invoiced_on=dt.date(2026, 2, 20),
+            subtotal=999,
+            status=Invoice.IN_PREPARATION,
+        )
+
+        chart = projected_vs_invoiced_chart(project, today=dt.date(2026, 4, 15))
+        self.assertEqual(
+            [point["total"] for point in chart["projected"]["points"]], [1000, 1500]
+        )
+        self.assertEqual(
+            [point["total"] for point in chart["invoiced"]["points"]], [1000]
+        )
+        self.assertTrue(chart["projected"]["path"].startswith("M"))
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(
+            project.urls["projected_invoices_list"],
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "<svg")

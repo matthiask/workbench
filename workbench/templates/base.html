@@ -2,7 +2,7 @@
 {% load django_bootstrap5 i18n mark_current static workbench %}
 {% block body %}
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-lg bg-dark sticky-top" data-bs-theme="dark">
+  <nav class="navbar navbar-expand-lg sticky-top wb-navbar">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">{{ WORKBENCH.TITLE }}</a>
 
@@ -293,7 +293,7 @@
   <div class="container-fluid flex-grow-1" role="main">
     {% block uplink %}
       {% if view.model.urls.list and view.model.urls.list != request.path %}
-        <a href="{{ view.model.urls.list }}" class="btn btn-primary btn-sm uplink">
+        <a href="{{ view.model.urls.list }}" class="btn btn-quiet btn-sm uplink">
           {% include 'svg/chevron-left.svg' %}
           {{ view.meta.verbose_name_plural|capfirst }}
         </a>

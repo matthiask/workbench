@@ -1,0 +1,114 @@
+{% extends 'modal.html' %}
+{% load i18n workbench %}
+{% block size %}modal-lg{% endblock %}
+
+{% block title %}
+  {% translate 'projected gross margin'|capfirst %}
+{% endblock title %}
+
+{% block body %}
+  {% if chart %}
+    <figure class="wb-chart">
+      <div class="wb-chart-legend">
+        <span><span class="wb-chart-key wb-chart-projected"></span>{% translate 'Projected invoices' %}</span>
+        <span><span class="wb-chart-key wb-chart-invoiced"></span>{% translate 'invoiced'|capfirst %}</span>
+      </div>
+      <svg
+        viewBox="0 0 {{ chart.width }} {{ chart.height }}"
+        role="img"
+        aria-label="{% translate 'Projected invoices' %} / {% translate 'invoiced'|capfirst %}"
+      >
+        {% for tick in chart.y_ticks %}
+          <line
+            class="wb-chart-grid"
+            x1="{{ chart.left }}"
+            x2="{{ chart.right }}"
+            y1="{{ tick.y }}"
+            y2="{{ tick.y }}"
+          />
+          <text
+            class="wb-chart-axis"
+            x="{{ chart.left|add:-8 }}"
+            y="{{ tick.y }}"
+            text-anchor="end"
+            dominant-baseline="middle"
+          >
+            {{ tick.label }}
+          </text>
+        {% endfor %}
+        {% for tick in chart.x_ticks %}
+          <text class="wb-chart-axis" x="{{ tick.x }}" y="{{ chart.bottom|add:18 }}">{{ tick.label }}</text>
+        {% endfor %}
+        {% if chart.today_x %}
+          <line
+            class="wb-chart-today"
+            x1="{{ chart.today_x }}"
+            x2="{{ chart.today_x }}"
+            y1="0"
+            y2="{{ chart.bottom }}"
+          />
+        {% endif %}
+        <path class="wb-chart-line wb-chart-projected" d="{{ chart.projected.path }}" />
+        <path class="wb-chart-line wb-chart-invoiced" d="{{ chart.invoiced.path }}" />
+        {% for point in chart.projected.points %}
+          <circle class="wb-chart-point wb-chart-projected" cx="{{ point.x }}" cy="{{ point.y }}" r="4">
+            <title>{{ point.title }}</title>
+          </circle>
+        {% endfor %}
+        {% for point in chart.invoiced.points %}
+          <circle class="wb-chart-point wb-chart-invoiced" cx="{{ point.x }}" cy="{{ point.y }}" r="4">
+            <title>{{ point.title }}</title>
+          </circle>
+        {% endfor %}
+        <circle
+          class="wb-chart-key-point wb-chart-projected"
+          cx="{{ chart.label_x }}"
+          cy="{{ chart.projected.end_y }}"
+          r="3"
+        />
+        <text
+          class="wb-chart-label"
+          x="{{ chart.label_x|add:8 }}"
+          y="{{ chart.projected.end_y }}"
+          dominant-baseline="middle"
+        >
+          {{ chart.projected.end }}
+        </text>
+        <circle
+          class="wb-chart-key-point wb-chart-invoiced"
+          cx="{{ chart.label_x }}"
+          cy="{{ chart.invoiced.end_y }}"
+          r="3"
+        />
+        <text
+          class="wb-chart-label"
+          x="{{ chart.label_x|add:8 }}"
+          y="{{ chart.invoiced.end_y }}"
+          dominant-baseline="middle"
+        >
+          {{ chart.invoiced.end }}
+        </text>
+      </svg>
+      <figcaption class="wb-stat-note">
+        {% translate 'Cumulative gross margin, invoices without third party costs.' %}
+      </figcaption>
+    </figure>
+  {% endif %}
+  <table class="table table-sm wb-compact-table">
+    {% for pi in object.projected_invoices.all %}
+      <tr>
+        <td class="text-nowrap">{{ pi.invoiced_on|local_date_format }}</td>
+        <td class="text-end text-nowrap">{{ pi.gross_margin|currency }}</td>
+        <td class="text-secondary">{{ pi.description }}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td class="text-secondary">&ndash;</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock body %}
+
+{% block footer %}
+  <a href="{{ object.urls.projected_invoices }}" class="btn btn-primary">{% translate 'Update' %}</a>
+{% endblock footer %}

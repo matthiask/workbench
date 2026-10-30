@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 16:16+0100\n"
+"POT-Creation-Date: 2026-10-30 16:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -170,6 +170,7 @@ msgstr "Zugriff auf nutzer:innenspezifische Produktivitätsberichte inkl. Auftei
 #: workbench/templates/base.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_projected_invoices_form.html
+#: workbench/templates/projects/project_projected_invoices_list.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/templates/reporting/projected_gross_margin.html
@@ -1274,6 +1275,7 @@ msgstr "Valuta"
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data_gross_profit.html
@@ -3447,6 +3449,11 @@ msgstr "Budgetwarnung"
 msgid "Reassign logbook entries of %(instance)s"
 msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 
+#: workbench/projects/views.py
+#, python-format
+msgid "until %s"
+msgstr "bis %s"
+
 #: workbench/projects/views.py workbench/templates/base.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/shortcuts.html
@@ -3890,6 +3897,7 @@ msgstr "Anmelden"
 #: workbench/templates/planning/plannedwork_detail.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_projected_invoices_list.html
 msgid "Update"
 msgstr "Bearbeiten"
 
@@ -4490,6 +4498,7 @@ msgstr "verkauft"
 
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_projected_invoices_list.html
 #: workbench/templates/reporting/playing_bank.html
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "invoiced"
@@ -4509,35 +4518,58 @@ msgid "Logged hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
+msgid "New"
+msgstr "Neu"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Cost"
 msgstr "Kosten"
 
 #: workbench/templates/projects/project_detail.html
-#, python-format
-msgid "Budget alert at %(amount)s"
-msgstr "Budgetwarnung ab %(amount)s"
+msgid "Services from logbook"
+msgstr "Leistungen aus dem Logbuch"
 
 #: workbench/templates/projects/project_detail.html
-#, python-format
-msgid "sent on %(sent_on)s"
-msgstr "versendet am %(sent_on)s"
+msgid "Services from offer"
+msgstr "Leistungen aus Offerte"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_profitability.html
+msgid "Profitability"
+msgstr "Rentabilität"
+
+#: workbench/templates/projects/project_detail.html
+msgid "More actions"
+msgstr "Weitere Aktionen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Project offers"
+msgstr "Projektofferten"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Show"
+msgstr "Anzeigen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Download with signature line"
+msgstr "Herunterladen mit Unterschriftszeile"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Renumber offers"
+msgstr "Offerten neu nummerieren"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Budget retainment"
 msgstr "Zurückbehaltung von Budget"
 
 #: workbench/templates/projects/project_detail.html
-#, python-format
-msgid "incl. %(discount)s discount"
-msgstr "inkl. %(discount)s Rabatt"
-
-#: workbench/templates/projects/project_detail.html
 msgid "freed"
 msgstr "freigegeben"
 
 #: workbench/templates/projects/project_detail.html
-msgid "retained"
-msgstr "zurückbehalten"
+#, python-format
+msgid "incl. %(discount)s discount"
+msgstr "inkl. %(discount)s Rabatt"
 
 #: workbench/templates/projects/project_detail.html
 msgid "accepted offer total"
@@ -4551,6 +4583,20 @@ msgstr "berücksichtigt Rabatt von %(discount)s"
 #: workbench/templates/projects/project_detail.html
 msgid "Total invoiced excl. tax"
 msgstr "Total verrechnet exkl. MwSt"
+
+#: workbench/templates/projects/project_detail.html
+#, python-format
+msgid "Budget alert at %(amount)s"
+msgstr "Budgetwarnung ab %(amount)s"
+
+#: workbench/templates/projects/project_detail.html
+#, python-format
+msgid "sent on %(sent_on)s"
+msgstr "versendet am %(sent_on)s"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Show all"
+msgstr "Alle anzeigen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "No projected invoices have been entered"
@@ -4588,31 +4634,6 @@ msgid "Projected invoice total isn't large enough to cover logged work"
 msgstr "Das Total der geplanten Rechnungen ist nicht hoch genug, um die erfassten Leistungen abzudecken"
 
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_profitability.html
-msgid "Profitability"
-msgstr "Rentabilität"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Project offers"
-msgstr "Projektofferten"
-
-#: workbench/templates/projects/project_detail.html
-msgid "offers PDF"
-msgstr "Offerten-PDF"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Show"
-msgstr "Anzeigen"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Download with signature line"
-msgstr "Herunterladen mit Unterschriftszeile"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Renumber offers"
-msgstr "Offerten neu nummerieren"
-
-#: workbench/templates/projects/project_detail.html
 msgid "Related deals"
 msgstr "Verbundene Geschäfte"
 
@@ -4623,6 +4644,10 @@ msgstr "Arbeit planen"
 #: workbench/templates/projects/project_detail.html
 msgid "Pricing"
 msgstr "Kalkulation"
+
+#: workbench/templates/projects/project_detail.html
+msgid "optional"
+msgstr "optional"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Sort"
@@ -4645,10 +4670,6 @@ msgid "Assign service type"
 msgstr "Leistungstyp zuweisen"
 
 #: workbench/templates/projects/project_detail.html
-msgid "optional"
-msgstr "optional"
-
-#: workbench/templates/projects/project_detail.html
 msgid "No services yet."
 msgstr "Noch keine Leistungen."
 
@@ -4664,14 +4685,6 @@ msgstr "reserviert, noch kein Zielprojekt"
 msgid "moved from"
 msgstr "verschoben von"
 
-#: workbench/templates/projects/project_detail.html
-msgid "Services from logbook"
-msgstr "Leistungen aus dem Logbuch"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Services from offer"
-msgstr "Leistungen aus Offerte"
-
 #: workbench/templates/projects/project_profitability.html
 #: workbench/templates/reporting/key_data.html
 #: workbench/templates/reporting/squeeze.html
@@ -4683,6 +4696,7 @@ msgid "not used for closed projects"
 msgstr "bei geschlossenen Projekten nicht verwendet"
 
 #: workbench/templates/projects/project_profitability.html
+#: workbench/templates/projects/project_projected_invoices_list.html
 msgid "Projected invoices"
 msgstr "Geplante Rechnungen"
 
@@ -4755,6 +4769,10 @@ msgstr "Der Ansatz für akzeptierte Offerten verwendet nur deren Betrag und dere
 #: workbench/templates/projects/project_projected_invoices_form.html
 msgid "Update projected gross margin"
 msgstr "Geplanten Umsatz bearbeiten"
+
+#: workbench/templates/projects/project_projected_invoices_list.html
+msgid "Cumulative gross margin, invoices without third party costs."
+msgstr "Kumulierter Umsatz, Rechnungen ohne Fremdkosten."
 
 #: workbench/templates/projects/project_statistics.html
 msgid "Scheduled"
@@ -5456,6 +5474,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "retained"
+#~ msgstr "zurückbehalten"
+
+#~ msgid "offers PDF"
+#~ msgstr "Offerten-PDF"
 
 #~ msgid "projected"
 #~ msgstr "Geplant"

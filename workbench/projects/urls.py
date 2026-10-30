@@ -4,7 +4,7 @@ from django.urls import include, path
 from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
-from workbench.accounts.features import controlling_only
+from workbench.accounts.features import FEATURES, controlling_only, feature_required
 from workbench.accounts.views import pin
 from workbench.invoices.forms import CreateProjectInvoiceForm
 from workbench.invoices.models import Invoice
@@ -39,6 +39,7 @@ from workbench.projects.views import (
     OffersRenumberView,
     ProjectDetailView,
     ProjectProfitabilityView,
+    ProjectProjectedInvoicesView,
     assign_service_type,
     cost_by_month_and_service_xlsx,
     logbook_batch_update,
@@ -231,6 +232,13 @@ urlpatterns = [
             template_name_suffix="_projected_invoices_form",
         ),
         name="projects_project_projected_invoices",
+    ),
+    path(
+        "<int:pk>/projected-gross-margin/list/",
+        feature_required(FEATURES.PROJECTED_GROSS_MARGIN)(
+            ProjectProjectedInvoicesView.as_view()
+        ),
+        name="projects_project_projected_invoices_list",
     ),
     path(
         "<int:pk>/logbook-batch-update-hours/",

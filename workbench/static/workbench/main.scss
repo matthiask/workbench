@@ -1,24 +1,196 @@
 $spacer: 0.5rem;
 
-$font-size-base: 0.93755rem;
-$h1-font-size: $font-size-base * 2.1;
-$h2-font-size: $font-size-base * 1.8;
-$h3-font-size: $font-size-base * 1.6;
-$h4-font-size: $font-size-base * 1.4;
-$h5-font-size: $font-size-base * 1.2;
+// Neutral, calm and brand-agnostic: Workbench is used by different companies
+$primary: #4257c8;
+$success: #2f9e6b;
+$info: #3b8fd9;
+$warning: #e8590c;
+$danger: #d63a3a;
+
+$body-bg: #f4f5f7;
+$body-color: #1d2127;
+$body-bg-dark: #111318;
+$body-color-dark: #dfe2e7;
+$border-color: #e1e4e9;
+$border-color-dark: #2b2f37;
+$secondary-color: rgba(29, 33, 39, 0.62);
+
+$font-family-sans-serif:
+  "Inter Variable",
+  system-ui,
+  -apple-system,
+  "Segoe UI",
+  sans-serif;
+$font-size-base: 0.9rem;
+$line-height-base: 1.55;
+$headings-font-weight: 600;
+$h1-font-size: $font-size-base * 1.65;
+$h2-font-size: $font-size-base * 1.4;
+$h3-font-size: $font-size-base * 1.25;
+$h4-font-size: $font-size-base * 1.125;
+$h5-font-size: $font-size-base * 1.05;
 $h6-font-size: $font-size-base;
 
-$card-spacer-y: 0.5rem;
-$card-spacer-x: 0.5rem;
+$link-decoration: none;
+
+$border-radius: 0.5rem;
+$border-radius-sm: 0.375rem;
+$border-radius-lg: 0.75rem;
+
+$btn-font-weight: 500;
+$badge-font-weight: 500;
+$badge-padding-y: 0.3em;
+$badge-padding-x: 0.6em;
+$badge-border-radius: 999px;
+
+$card-spacer-y: 0.75rem;
+$card-spacer-x: 1rem;
+$card-cap-padding-y: 0.6rem;
+$card-cap-bg: transparent;
+$card-border-color: var(--bs-border-color);
 
 $list-group-item-padding-y: 0.5rem;
-$list-group-item-padding-x: 0.5rem;
+$list-group-item-padding-x: 1rem;
 
-$font-family-sans-serif: system-ui;
+$table-cell-padding-y-sm: 0.35rem;
+$table-border-color: var(--bs-border-color);
 
-$warning: #f07800;
+$dropdown-border-color: var(--bs-border-color);
+$dropdown-box-shadow: 0 8px 24px rgba(15, 20, 30, 0.12);
+$dropdown-link-active-bg: $primary;
+
+$navbar-padding-y: 0.375rem;
 
 @import "~bootstrap/scss/bootstrap";
+
+// Surfaces lie on the slightly darker page background
+:root,
+[data-bs-theme="light"] {
+  --wb-surface: #fff;
+  --wb-surface-muted: #f8f9fa;
+  --wb-shadow:
+    0 1px 2px rgba(15, 20, 30, 0.04), 0 1px 3px rgba(15, 20, 30, 0.04);
+}
+
+[data-bs-theme="dark"] {
+  --wb-surface: #1a1d23;
+  --wb-surface-muted: #20242b;
+  --wb-shadow: none;
+  --bs-secondary-color: rgba(223, 226, 231, 0.6);
+  --bs-link-color: #8c9cf0;
+  --bs-link-color-rgb: 140, 156, 240;
+  --bs-link-hover-color: #aab6f5;
+  --bs-link-hover-color-rgb: 170, 182, 245;
+}
+
+body {
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.01em;
+}
+
+// Titles are links all over the place, they should read like titles
+:is(h1, h2, h3, h4, h5, h6) > a:not(.btn) {
+  color: inherit;
+
+  &:hover {
+    color: var(--bs-link-hover-color);
+  }
+}
+
+// Codes like 2026-0123 are secondary information
+a > small:first-child {
+  color: var(--bs-secondary-color);
+}
+
+.card,
+.list-group {
+  --bs-card-bg: var(--wb-surface);
+  --bs-list-group-bg: var(--wb-surface);
+  box-shadow: var(--wb-shadow);
+}
+
+.card .table {
+  --bs-table-bg: transparent;
+}
+
+.card-header {
+  font-weight: 600;
+}
+
+.wb-navbar {
+  background: var(--wb-surface);
+  border-bottom: 1px solid var(--bs-border-color);
+
+  .navbar-brand {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .nav-link {
+    border-radius: var(--bs-border-radius-sm);
+    padding-inline: 0.6rem !important;
+    color: var(--bs-secondary-color);
+
+    &:hover,
+    &.active {
+      color: var(--bs-body-color);
+      background: var(--bs-tertiary-bg);
+    }
+  }
+}
+
+.badge {
+  letter-spacing: 0.01em;
+}
+
+// Soft badges: coloured, but not shouting
+@each $color in primary, secondary, success, info, warning, danger {
+  .badge.text-bg-#{$color} {
+    color: var(--bs-#{$color}-text-emphasis) !important;
+    background-color: var(--bs-#{$color}-bg-subtle) !important;
+  }
+}
+
+.badge.text-bg-light {
+  color: var(--bs-secondary-color) !important;
+  background-color: transparent !important;
+  box-shadow: inset 0 0 0 1px var(--bs-border-color);
+}
+
+// History links and pins are everywhere, they shouldn't draw attention
+.tiny-icons {
+  color: var(--bs-secondary-color);
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.pin[data-pinned="false"] {
+  opacity: 0.35;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.btn {
+  --bs-btn-box-shadow: none;
+}
+
+.btn-sm {
+  --bs-btn-border-radius: var(--bs-border-radius-sm);
+}
 
 body {
   overflow-y: scroll;
@@ -392,10 +564,6 @@ a:hover {
   text-decoration: underline;
 }
 
-[data-bs-theme="dark"] .navbar {
-  background-color: #0d0d0d !important;
-}
-
 @media (max-width: 991.98px) {
   .navbar-collapse {
     max-height: calc(100svh - 3.5rem);
@@ -550,5 +718,445 @@ a:hover {
 
   .hours-ring-fill {
     transition: none;
+  }
+}
+
+// Quiet buttons for secondary actions, solid buttons are for the main action
+.btn-quiet {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-bg: var(--wb-surface);
+  --bs-btn-border-color: var(--bs-border-color);
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-bg: var(--bs-tertiary-bg);
+  --bs-btn-hover-border-color: var(--bs-border-color);
+  --bs-btn-active-color: var(--bs-body-color);
+  --bs-btn-active-bg: var(--bs-secondary-bg);
+  --bs-btn-active-border-color: var(--bs-border-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  svg {
+    width: 0.9em;
+    height: 0.9em;
+    fill: currentColor;
+  }
+}
+
+.btn-icon {
+  padding-inline: 0.45rem;
+
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.wb-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.wb-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.wb-title-badge {
+  vertical-align: middle;
+
+  .badge {
+    font-size: 0.75rem;
+  }
+}
+
+.wb-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+}
+
+.wb-meta-label {
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+}
+
+.wb-description {
+  max-width: 70ch;
+  color: var(--bs-secondary-color);
+}
+
+.wb-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.75rem;
+
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wb-stat {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: var(--wb-surface);
+  box-shadow: var(--wb-shadow);
+
+  .progress-line {
+    height: 4px;
+    margin-top: 0.5rem;
+  }
+}
+
+.wb-stat-label {
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+}
+
+.wb-stat-value {
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.wb-stat-of {
+  color: var(--bs-secondary-color);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.wb-stat-note {
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+}
+
+.wb-compact-table {
+  font-variant-numeric: tabular-nums;
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+
+  td:first-child {
+    padding-left: 1rem;
+  }
+
+  td:last-child {
+    padding-right: 1rem;
+  }
+}
+
+.wb-truncate {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-offer {
+  overflow: visible;
+}
+
+.wb-offer-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  background: var(--wb-surface-muted);
+  border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
+
+  > :first-child {
+    flex: 1 1 20rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+  }
+}
+
+.wb-offer-title {
+  display: inline;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.wb-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.wb-offer-completed,
+.wb-offer-declined,
+.wb-offer-retainer {
+  .wb-offer-header {
+    border-bottom: 0;
+  }
+
+  .wb-offer-title,
+  .wb-figures {
+    opacity: 0.7;
+  }
+}
+
+.wb-offer-declined .wb-offer-title {
+  text-decoration: line-through;
+}
+
+.wb-offer-description {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+}
+
+.wb-figures {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.wb-figure {
+  display: block;
+  width: 9rem;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+
+  &:hover {
+    color: var(--bs-link-hover-color);
+    text-decoration: none;
+  }
+
+  .progress-line {
+    height: 4px;
+    margin-top: 0.25rem;
+  }
+}
+
+.wb-figure-note {
+  display: block;
+  color: var(--bs-secondary-color);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.wb-row-actions {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  width: 9rem;
+}
+
+.wb-service {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.25rem 1.5rem;
+
+  .wb-service-main {
+    flex: 1 1 20rem;
+    min-width: 0;
+  }
+
+  .wb-row-actions {
+    opacity: 0.55;
+    transition: opacity 0.15s;
+  }
+
+  &:hover .wb-row-actions,
+  .wb-row-actions:focus-within {
+    opacity: 1;
+  }
+
+  .wb-grabber,
+  .tiny-icons {
+    visibility: hidden;
+  }
+
+  .wb-grabber {
+    cursor: move;
+  }
+
+  &:hover .wb-grabber,
+  &:hover .tiny-icons {
+    visibility: visible;
+  }
+}
+
+.wb-service-title {
+  font-weight: 500;
+
+  .pin {
+    padding: 0;
+    opacity: 0.6;
+  }
+}
+
+.wb-service-description {
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+}
+
+.wb-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  cursor: pointer;
+
+  &.is-expanded {
+    display: block;
+    cursor: auto;
+  }
+}
+
+.wb-invoice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 10rem 8rem;
+  align-items: center;
+  gap: 1rem;
+  color: inherit;
+}
+
+@media (max-width: 767.98px) {
+  .wb-figures {
+    gap: 1rem;
+  }
+
+  .wb-figure {
+    width: auto;
+    text-align: left;
+  }
+
+  .wb-invoice {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .wb-row-actions {
+    width: auto;
+  }
+}
+
+// Charts are plain SVG, the colours are validated for both themes
+.wb-chart {
+  --wb-chart-projected: #2a78d6;
+  --wb-chart-invoiced: #eb6834;
+  margin: 0 0 1rem;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+[data-bs-theme="dark"] .wb-chart {
+  --wb-chart-projected: #3987e5;
+  --wb-chart-invoiced: #d95926;
+}
+
+.wb-chart-legend {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.wb-chart-key {
+  display: inline-block;
+  width: 1.25rem;
+  height: 0;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+  border-top: 2px solid var(--wb-chart-projected);
+
+  &.wb-chart-projected {
+    border-top-style: dashed;
+  }
+
+  &.wb-chart-invoiced {
+    border-top-color: var(--wb-chart-invoiced);
+  }
+}
+
+.wb-chart-grid {
+  stroke: var(--bs-border-color);
+  stroke-width: 1;
+}
+
+.wb-chart-today {
+  stroke: var(--bs-secondary-color);
+  stroke-dasharray: 2 3;
+}
+
+.wb-chart-axis,
+.wb-chart-label {
+  fill: var(--bs-secondary-color);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-chart-label {
+  fill: var(--bs-body-color);
+  font-weight: 600;
+}
+
+.wb-chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+
+  &.wb-chart-projected {
+    stroke: var(--wb-chart-projected);
+    stroke-dasharray: 5 4;
+  }
+
+  &.wb-chart-invoiced {
+    stroke: var(--wb-chart-invoiced);
+  }
+}
+
+.wb-chart-key-point {
+  &.wb-chart-projected {
+    fill: var(--wb-chart-projected);
+  }
+
+  &.wb-chart-invoiced {
+    fill: var(--wb-chart-invoiced);
+  }
+}
+
+.wb-chart-point {
+  stroke: var(--bs-modal-bg, var(--wb-surface));
+  stroke-width: 2;
+
+  &.wb-chart-projected {
+    fill: var(--wb-chart-projected);
+  }
+
+  &.wb-chart-invoiced {
+    fill: var(--wb-chart-invoiced);
+  }
+
+  &:hover {
+    r: 6;
   }
 }
