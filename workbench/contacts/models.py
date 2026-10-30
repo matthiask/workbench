@@ -193,6 +193,15 @@ class Person(Model):
             return f"{self.organization} / {self.full_name}"
         return self.full_name
 
+    def recent_projects(self):
+        return self.project_set.select_related("owned_by")[:10]
+
+    def recent_deals(self):
+        return self.deal_set.select_related("owned_by").order_by("-pk")[:10]
+
+    def recent_invoices(self):
+        return self.invoice_set.select_related("owned_by")[:10]
+
     def save(self, *args, **kwargs):
         if self.pk:
             self._fts = " ".join(

@@ -322,6 +322,24 @@ class ContactsTest(TestCase):
             self.assertNotContains(response, "Recent invoices")
             self.assertNotContains(response, "Recent offers")
 
+    def test_person_detail(self):
+        """The person detail page lists the projects, deals and invoices the
+        person is the contact of"""
+        project = factories.ProjectFactory.create(title="Relaunch")
+        person = project.contact
+        factories.DealFactory.create(contact=person, title="Pitch")
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.get(person.urls["detail"])
+        self.assertContains(response, "Relaunch")
+        self.assertContains(response, "Pitch")
+        self.assertContains(response, "Recent invoices")
+
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
+            response = self.client.get(person.urls["detail"])
+            self.assertContains(response, "Relaunch")
+            self.assertNotContains(response, "Recent invoices")
+
     def test_vcard_export(self):
         """Persons' details can be exported as a vCard or mailed to iOS users"""
         person = factories.PersonFactory.create()

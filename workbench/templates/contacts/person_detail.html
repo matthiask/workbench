@@ -1,79 +1,193 @@
 {% extends "generic/object_detail.html" %}
 {% load i18n workbench %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-sm-12">
-      <h1>{{ person.full_name }} {% history_link person %}</h1>
-      {% if person.organization %}
-        <h2>{% link_or_none person.organization %}</h2>
-      {% endif %}
-    </div>
-    <div class="col-lg-4">
-      {% for phone in person.phonenumbers.all %}
-        <strong>{{ phone.type|capfirst }}:</strong>
-        <br>
-        <a href="tel:{{ phone.phone_number }}">{{ phone.pretty_number }}</a>
-        <br>
-      {% endfor %}
-      {% for email in person.emailaddresses.all %}
-        <strong>{{ email.type|capfirst }}:</strong>
-        <br>
-        <a href="mailto:{{ email.email }}">{{ email.email }}</a>
-        <br>
-      {% endfor %}
-    </div>
-    <div class="col-lg-4">
-      {% for address in person.postaladdresses.all %}
-        <strong>{{ address.type|capfirst }}:</strong>
-        <br>
-        {{ address.postal_address|linebreaksbr }}
-        {% if address.get_maps_url %}
-          <br>
-          <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer">{% translate 'Maps' %}</a>
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">
+        {{ person.full_name }}
+        {% history_link person %}
+        {% if person.is_archived %}
+          <span class="wb-title-badge"><span
+              class="badge text-bg-secondary"
+            >{{ person|label:'is_archived' }}</span></span>
         {% endif %}
-        <br>
-      {% endfor %}
+      </h1>
+      <div class="wb-meta">
+        {% if person.organization %}
+          <span>{% link_or_none person.organization %}</span>
+        {% endif %}
+        {% for group in person.groups.all %}
+          <a href="{% url 'contacts_person_list' %}?g={{ group.id }}" class="badge text-bg-light">{{ group }}</a>
+        {% endfor %}
+      </div>
     </div>
-    <div class="col-lg-4">
-      <strong>{{ person|label:'primary_contact' }}</strong>
-      <br>
-      {{ person.primary_contact }}
-      <br>
-      <strong>{{ person|label:'date_of_birth' }}</strong>
-      <br>
-      {{ person.date_of_birth|local_date_format|default:'&ndash;' }}
-      <br>
-      <strong>{{ person|label:'notes' }}</strong>
-      <br>
-      {{ person.notes|urlize|linebreaksbr|default:'&ndash;' }}
-      <br>
-      <strong>{{ person|label:'groups' }}</strong>
-      <br>
-      {% for group in person.groups.all %}
-        <a href="{% url 'contacts_person_list' %}?g={{ group.id }}">{{ group }}</a>
-        <br>
-      {% empty %}&ndash;
-      {% endfor %}
+    <div class="wb-page-actions">
+      <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
+      <a href="{{ object.urls.vcard }}" class="btn btn-quiet">
+        {% include 'svg/desktop-download.svg' %}
+        vCard
+      </a>
+      <span class="dropdown">
+        <button
+          class="btn btn-quiet dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          {% include "svg/plus.svg" %}
+          {% translate 'New' %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <a href="{% url 'projects_project_create' %}?contact={{ object.pk }}" class="dropdown-item">
+            {% translate 'project'|capfirst %}
+          </a>
+          <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="dropdown-item">
+            {% translate 'invoice'|capfirst %}
+          </a>
+          {% if request.user.features.DEALS %}
+            <a href="{% url 'deals_deal_create' %}?contact={{ object.pk }}" class="dropdown-item">
+              {% translate 'deal'|capfirst %}
+            </a>
+          {% endif %}
+        </div>
+      </span>
+      <span class="dropdown">
+        <button
+          type="button"
+          class="btn btn-quiet btn-icon"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="{% translate 'More actions' %}"
+        >
+          {% include 'svg/kebab-horizontal.svg' %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
+        </div>
+      </span>
     </div>
   </div>
-  <a href="{% url 'projects_project_create' %}?contact={{ object.pk }}" class="btn btn-primary">
-    {% include "svg/plus.svg" %}
-    {% translate 'project'|capfirst %}
-  </a>
-  <a href="{% url 'invoices_invoice_create' %}?contact={{ object.pk }}" class="btn btn-primary">
-    {% include "svg/plus.svg" %}
-    {% translate 'invoice'|capfirst %}
-  </a>
-  {% if request.user.features.DEALS %}
-    <a href="{% url 'deals_deal_create' %}?contact={{ object.pk }}" class="btn btn-primary">
-      {% include "svg/plus.svg" %}
-      {% translate 'deal'|capfirst %}
-    </a>
-  {% endif %}
-  <a href="{{ object.urls.vcard }}" class="btn btn-primary">
-    {% include 'svg/desktop-download.svg' %}
-    vCard
-  </a>
-  <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-  <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">{% translate 'Delete' %}</a>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-4">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'contact'|capfirst %}</div>
+        <div class="card-body">
+          {% with phones=person.phonenumbers.all emails=person.emailaddresses.all %}
+            <dl class="wb-fields">
+              {% for phone in phones %}
+                <dt>{{ phone.type|capfirst }}</dt>
+                <dd><a href="tel:{{ phone.phone_number }}">{{ phone.pretty_number }}</a></dd>
+              {% endfor %}
+              {% for email in emails %}
+                <dt>{{ email.type|capfirst }}</dt>
+                <dd><a href="mailto:{{ email.email }}">{{ email.email }}</a></dd>
+              {% endfor %}
+            </dl>
+            {% if not phones and not emails %}<span class="text-secondary">&ndash;</span>{% endif %}
+          {% endwith %}
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-4">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'postal addresses'|capfirst %}</div>
+        <div class="card-body">
+          <dl class="wb-fields">
+            {% for address in person.postaladdresses.all %}
+              <dt>{{ address.type|capfirst }}</dt>
+              <dd>
+                {{ address.postal_address|linebreaksbr }}
+                {% if address.get_maps_url %}
+                  <br>
+                  <a href="{{ address.get_maps_url }}" target="_blank" rel="noopener noreferrer" class="small">
+                    {% translate 'Maps' %}
+                  </a>
+                {% endif %}
+              </dd>
+            {% empty %}
+              <span class="text-secondary">&ndash;</span>
+            {% endfor %}
+          </dl>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-4">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'Details' %}</div>
+        <div class="card-body">
+          <dl class="wb-fields">
+            <dt>{{ person|label:'primary_contact' }}</dt>
+            <dd>{{ person.primary_contact }}</dd>
+            <dt>{{ person|label:'date_of_birth' }}</dt>
+            <dd>{{ person.date_of_birth|local_date_format|default:'&ndash;' }}</dd>
+            {% if person.notes %}
+              <dt>{{ person|label:'notes' }}</dt>
+              <dd>{{ person.notes|urlizetrunc:60|linebreaksbr }}</dd>
+            {% endif %}
+          </dl>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    {% with projects=person.recent_projects %}
+      <div class="col-lg-4">
+        <section class="card">
+          <div class="card-header">{% translate 'Recent projects' %}</div>
+          <div class="list-group list-group-flush">
+            {% for project in projects %}
+              <a class="list-group-item list-group-item-action" href="{{ project.get_absolute_url }}">
+                {{ project|h }}
+                {{ project.status_badge }}
+              </a>
+            {% empty %}
+              <div class="list-group-item text-secondary">&ndash;</div>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+    {% endwith %}
+    {% if request.user.features.DEALS %}
+      {% with deals=person.recent_deals %}
+        <div class="col-lg-4">
+          <section class="card">
+            <div class="card-header">{% translate 'Recent deals' %}</div>
+            <div class="list-group list-group-flush">
+              {% for deal in deals %}
+                <a class="list-group-item list-group-item-action" href="{{ deal.get_absolute_url }}">
+                  {{ deal|h }}
+                  {{ deal.status_badge }}
+                </a>
+              {% empty %}
+                <div class="list-group-item text-secondary">&ndash;</div>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
+      {% endwith %}
+    {% endif %}
+    {% if request.user.features.CONTROLLING %}
+      {% with invoices=person.recent_invoices %}
+        <div class="col-lg-4">
+          <section class="card">
+            <div class="card-header">{% translate 'Recent invoices' %}</div>
+            <div class="list-group list-group-flush">
+              {% for invoice in invoices %}
+                <a class="list-group-item list-group-item-action" href="{{ invoice.get_absolute_url }}">
+                  {{ invoice|h }}
+                  {{ invoice.status_badge }}
+                </a>
+              {% empty %}
+                <div class="list-group-item text-secondary">&ndash;</div>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
+      {% endwith %}
+    {% endif %}
+  </div>
 {% endblock content %}

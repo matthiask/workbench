@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 16:33+0100\n"
+"POT-Creation-Date: 2026-10-30 16:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1155,7 +1155,8 @@ msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 msgid "postal address"
 msgstr "Postadresse"
 
-#: workbench/contacts/models.py workbench/templates/contacts/person_form.html
+#: workbench/contacts/models.py workbench/templates/contacts/person_detail.html
+#: workbench/templates/contacts/person_form.html
 msgid "postal addresses"
 msgstr "Postadressen"
 
@@ -1622,7 +1623,7 @@ msgid "customer"
 msgstr "Kundschaft"
 
 #: workbench/deals/models.py workbench/invoices/models.py
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/templates/contacts/person_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/projects/project_detail.html
@@ -3482,7 +3483,6 @@ msgstr "Offerte oder Leistungsgruppe"
 #: workbench/projects/views.py workbench/templates/accounts/user_base.html
 #: workbench/templates/accounts/user_statistics.html
 #: workbench/templates/base.html
-#: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/campaign_statistics.html
 #: workbench/templates/projects/project_detail.html
@@ -4135,10 +4135,16 @@ msgid "took a break"
 msgstr "Habe eine Pause gemacht"
 
 #: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/planning/plannedwork_detail.html
-msgid "yes,no"
-msgstr "ja,nein"
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/projects/project_detail.html
+msgid "New"
+msgstr "Neu"
+
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/projects/project_detail.html
+msgid "More actions"
+msgstr "Weitere Aktionen"
 
 #: workbench/templates/contacts/organization_detail.html
 msgid "Delete or substitute"
@@ -4156,10 +4162,24 @@ msgid "Gross margin / hour"
 msgstr "Umsatz bereinigt / Stunde"
 
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/reporting/labor_costs.html
+msgid "Details"
+msgstr "Details"
+
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/planning/plannedwork_detail.html
+msgid "yes,no"
+msgstr "ja,nein"
+
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
 msgid "Recent projects"
 msgstr "Letzte Projekte"
 
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
 msgid "Recent invoices"
 msgstr "Letzte Rechnungen"
 
@@ -4170,6 +4190,10 @@ msgstr "Letzte Offerten"
 #: workbench/templates/contacts/person_detail.html
 msgid "Maps"
 msgstr "Maps"
+
+#: workbench/templates/contacts/person_detail.html
+msgid "Recent deals"
+msgstr "Letzte Geschäfte"
 
 #: workbench/templates/contacts/person_form.html
 #: workbench/templates/offers/offer_pricing.html
@@ -4518,10 +4542,6 @@ msgid "Logged hours per hourly rate"
 msgstr "Erfasste Stunden pro Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
-msgid "New"
-msgstr "Neu"
-
-#: workbench/templates/projects/project_detail.html
 msgid "Cost"
 msgstr "Kosten"
 
@@ -4537,10 +4557,6 @@ msgstr "Leistungen aus Offerte"
 #: workbench/templates/projects/project_profitability.html
 msgid "Profitability"
 msgstr "Rentabilität"
-
-#: workbench/templates/projects/project_detail.html
-msgid "More actions"
-msgstr "Weitere Aktionen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Project offers"
@@ -4904,10 +4920,6 @@ msgstr "Ertrag"
 #: workbench/templates/reporting/labor_costs.html
 msgid "No cost center defined"
 msgstr "Keine Kostenstelle definiert"
-
-#: workbench/templates/reporting/labor_costs.html
-msgid "Details"
-msgstr "Details"
 
 #: workbench/templates/reporting/logging.html
 msgid "Point in time of logging"

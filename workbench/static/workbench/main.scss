@@ -122,6 +122,19 @@ a > small:first-child {
   --bs-table-bg: transparent;
 }
 
+.list-group-item-action {
+  --bs-list-group-action-color: var(--bs-body-color);
+}
+
+.card-header a.text-reset:hover {
+  color: var(--bs-link-hover-color) !important;
+}
+
+.wb-scroll-list {
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
 .card-header {
   font-weight: 600;
 }
@@ -802,6 +815,10 @@ a:hover {
 
   @media (min-width: 992px) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    &.wb-stats-5 {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
   }
 }
 
@@ -1158,5 +1175,25 @@ a:hover {
 
   &:hover {
     r: 6;
+  }
+}
+
+// Label and value pairs in detail cards
+.wb-fields {
+  display: grid;
+  grid-template-columns: minmax(6rem, max-content) minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  margin: 0;
+
+  dt {
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+    font-weight: 400;
+    padding-top: 0.1rem;
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
   }
 }
