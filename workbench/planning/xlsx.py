@@ -83,139 +83,136 @@ class PlanningXLSXDocument:
             cell.font = Font(bold=True)
             cell.alignment = Alignment(horizontal="center")
 
+        def work_row(row, work_data):
+            work_info = work_data["work"]
+            offer_info = work_info["offer"] or {}
+
+            # Determine status
+            if work_info["is_provisional"]:
+                status = _("Provisional")
+            elif offer_info.get("is_accepted"):
+                status = _("Accepted")
+            elif offer_info.get("is_declined"):
+                status = _("Declined")
+            else:
+                status = _("Open")
+
+            # Get service type info
+            service_type_id = work_info.get("service_type_id")
+            service_type_info = service_types.get(service_type_id, {})
+            service_type_title = service_type_info.get("title", "")
+            service_type_color = service_type_info.get(
+                "color", "#3498db"
+            )  # Default blue
+
+            # Remove # from color if present
+            service_type_color = service_type_color.removeprefix("#")
+
+            # Write basic info
+            ws.cell(row=row, column=1, value=_("Planned Work"))
+            ws.cell(row=row, column=2, value=work_info["title"])
+            ws.cell(row=row, column=3, value=work_info["user"])
+            ws.cell(row=row, column=4, value=service_type_title)
+            ws.cell(row=row, column=5, value=hours(work_info["planned_hours"]))
+            ws.cell(row=row, column=6, value=work_info["range"])
+            ws.cell(row=row, column=7, value=work_info["range"])
+            ws.cell(row=row, column=8, value=status)
+
+            # Add colored bars for planned work weeks
+            for col_idx, week_hours in enumerate(work_data["hours_per_week"]):
+                col = week_start_col + col_idx
+                if week_hours:
+                    cell = ws.cell(row=row, column=col, value=hours(week_hours))
+                    # Create colored background based on service type
+                    cell.fill = PatternFill(
+                        start_color=service_type_color,
+                        end_color=service_type_color,
+                        fill_type="solid",
+                    )
+                    cell.alignment = Alignment(horizontal="center")
+                    cell.font = Font(
+                        color="FFFFFF"
+                        if self._is_dark_color(service_type_color)
+                        else "000000"
+                    )
+
+        def external_row(row, ext_work):
+            # Write basic info
+            ws.cell(row=row, column=1, value=_("External Work"))
+            ws.cell(row=row, column=2, value=ext_work["title"])
+            ws.cell(row=row, column=3, value=ext_work["provided_by"])
+            ws.cell(row=row, column=4, value="")
+            ws.cell(row=row, column=5, value="")
+            ws.cell(row=row, column=6, value=ext_work["range"])
+            ws.cell(row=row, column=7, value=ext_work["range"])
+            ws.cell(row=row, column=8, value=_("External"))
+
+            # Add external work markers
+            for col_idx, week_flag in enumerate(ext_work["by_week"]):
+                col = week_start_col + col_idx
+                if week_flag:
+                    cell = ws.cell(row=row, column=col, value="●")
+                    cell.fill = PatternFill(
+                        start_color="808080",
+                        end_color="808080",
+                        fill_type="solid",
+                    )  # Gray
+                    cell.alignment = Alignment(horizontal="center")
+                    cell.font = Font(color="FFFFFF")
+
         # Process project data
         current_row = 2
 
         for project_data in planning_data["projects_offers"]:
             project_info = project_data["project"]
 
-            # Add milestones first
-            milestones = project_info.get("milestones")
-            if milestones:
-                for milestone in milestones:
-                    # Write basic info
-                    ws.cell(row=current_row, column=1, value=_("Milestone"))
-                    ws.cell(row=current_row, column=2, value=milestone["title"])
-                    ws.cell(row=current_row, column=3, value="")
-                    ws.cell(row=current_row, column=4, value="")
-                    ws.cell(
-                        row=current_row,
-                        column=5,
-                        value=hours(milestone["hours"]) if milestone["hours"] else "",
-                    )
-                    ws.cell(row=current_row, column=6, value=milestone["dow"])
-                    ws.cell(row=current_row, column=7, value=milestone["dow"])
-                    ws.cell(row=current_row, column=8, value=_("Milestone"))
+            # Add milestones first, each followed by its work
+            for milestone in project_info.get("milestones") or []:
+                # Write basic info
+                ws.cell(row=current_row, column=1, value=_("Milestone"))
+                ws.cell(row=current_row, column=2, value=milestone["title"])
+                ws.cell(row=current_row, column=3, value="")
+                ws.cell(row=current_row, column=4, value="")
+                ws.cell(
+                    row=current_row,
+                    column=5,
+                    value=hours(milestone["hours"]) if milestone["hours"] else "",
+                )
+                ws.cell(row=current_row, column=6, value=milestone["dow"])
+                ws.cell(row=current_row, column=7, value=milestone["dow"])
+                ws.cell(row=current_row, column=8, value=_("Milestone"))
 
-                    # Add milestone markers (diamonds) in week columns
-                    for col_idx, week_flag in enumerate(milestone["graphical_weeks"]):
-                        col = week_start_col + col_idx
-                        if week_flag:
-                            cell = ws.cell(row=current_row, column=col, value="◆")
-                            cell.fill = PatternFill(
-                                start_color="FFA500",
-                                end_color="FFA500",
-                                fill_type="solid",
-                            )  # Orange
-                            cell.alignment = Alignment(horizontal="center")
+                # Add milestone markers (diamonds) in week columns
+                for col_idx, week_flag in enumerate(milestone["graphical_weeks"]):
+                    col = week_start_col + col_idx
+                    if week_flag:
+                        cell = ws.cell(row=current_row, column=col, value="◆")
+                        cell.fill = PatternFill(
+                            start_color="FFA500",
+                            end_color="FFA500",
+                            fill_type="solid",
+                        )  # Orange
+                        cell.alignment = Alignment(horizontal="center")
 
+                current_row += 1
+
+                for work_data in milestone["work_list"]:
+                    work_row(current_row, work_data)
+                    current_row += 1
+                for ext_work in milestone["external_work"]:
+                    external_row(current_row, ext_work)
                     current_row += 1
 
             # Add planned work
-            if project_data.get("offers"):
-                for offer_data in project_data["offers"]:
-                    offer_info = offer_data["offer"]
-
-                    for work_data in offer_data["work_list"]:
-                        work_info = work_data["work"]
-
-                        # Determine status
-                        if work_info["is_provisional"]:
-                            status = _("Provisional")
-                        elif offer_info.get("is_accepted"):
-                            status = _("Accepted")
-                        elif offer_info.get("is_declined"):
-                            status = _("Declined")
-                        else:
-                            status = _("Open")
-
-                        # Get service type info
-                        service_type_id = work_info.get("service_type_id")
-                        service_type_info = service_types.get(service_type_id, {})
-                        service_type_title = service_type_info.get("title", "")
-                        service_type_color = service_type_info.get(
-                            "color", "#3498db"
-                        )  # Default blue
-
-                        # Remove # from color if present
-                        service_type_color = service_type_color.removeprefix("#")
-
-                        # Write basic info
-                        ws.cell(row=current_row, column=1, value=_("Planned Work"))
-                        ws.cell(row=current_row, column=2, value=work_info["title"])
-                        ws.cell(row=current_row, column=3, value=work_info["user"])
-                        ws.cell(row=current_row, column=4, value=service_type_title)
-                        ws.cell(
-                            row=current_row,
-                            column=5,
-                            value=hours(work_info["planned_hours"]),
-                        )
-                        ws.cell(row=current_row, column=6, value=work_info["range"])
-                        ws.cell(row=current_row, column=7, value=work_info["range"])
-                        ws.cell(row=current_row, column=8, value=status)
-
-                        # Add colored bars for planned work weeks
-                        for col_idx, week_hours in enumerate(
-                            work_data["hours_per_week"]
-                        ):
-                            col = week_start_col + col_idx
-                            if week_hours:
-                                cell = ws.cell(
-                                    row=current_row, column=col, value=hours(week_hours)
-                                )
-                                # Create colored background based on service type
-                                cell.fill = PatternFill(
-                                    start_color=service_type_color,
-                                    end_color=service_type_color,
-                                    fill_type="solid",
-                                )
-                                cell.alignment = Alignment(horizontal="center")
-                                cell.font = Font(
-                                    color="FFFFFF"
-                                    if self._is_dark_color(service_type_color)
-                                    else "000000"
-                                )
-
-                        current_row += 1
+            for offer_data in project_data.get("offers") or []:
+                for work_data in offer_data["work_list"]:
+                    work_row(current_row, work_data)
+                    current_row += 1
 
             # Add external work
-            external_work = project_data.get("external_work")
-            if external_work:
-                for ext_work in external_work:
-                    # Write basic info
-                    ws.cell(row=current_row, column=1, value=_("External Work"))
-                    ws.cell(row=current_row, column=2, value=ext_work["title"])
-                    ws.cell(row=current_row, column=3, value=ext_work["provided_by"])
-                    ws.cell(row=current_row, column=4, value="")
-                    ws.cell(row=current_row, column=5, value="")
-                    ws.cell(row=current_row, column=6, value=ext_work["range"])
-                    ws.cell(row=current_row, column=7, value=ext_work["range"])
-                    ws.cell(row=current_row, column=8, value=_("External"))
-
-                    # Add external work markers
-                    for col_idx, week_flag in enumerate(ext_work["by_week"]):
-                        col = week_start_col + col_idx
-                        if week_flag:
-                            cell = ws.cell(row=current_row, column=col, value="●")
-                            cell.fill = PatternFill(
-                                start_color="808080",
-                                end_color="808080",
-                                fill_type="solid",
-                            )  # Gray
-                            cell.alignment = Alignment(horizontal="center")
-                            cell.font = Font(color="FFFFFF")
-
-                    current_row += 1
+            for ext_work in project_data.get("external_work") or []:
+                external_row(current_row, ext_work)
+                current_row += 1
 
         # Auto-adjust column widths
         for column in ws.columns:
@@ -244,9 +241,8 @@ class PlanningXLSXDocument:
 
         # Calculate summary data
         total_planned_hours = sum(
-            offer_data["offer"]["planned_hours"]
+            project_data["project"]["planned_hours"]
             for project_data in planning_data["projects_offers"]
-            for offer_data in project_data.get("offers", [])
         )
 
         total_milestones = sum(
@@ -256,6 +252,10 @@ class PlanningXLSXDocument:
 
         total_external_work = sum(
             len(project_data.get("external_work") or [])
+            + sum(
+                len(milestone["external_work"])
+                for milestone in project_data["project"].get("milestones") or []
+            )
             for project_data in planning_data["projects_offers"]
         )
 

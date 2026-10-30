@@ -101,12 +101,18 @@
   &.is-milestone {
     background-color: transparent;
   }
+  &.is-milestone-title {
+    background-color: transparent;
+    font-weight: 500;
+  }
   &.is-external {
     background-color: transparent;
   }
   &.is-offer {
     background-color: var(--stripe2);
-
+  }
+  &.is-offer,
+  &.is-pw {
     &.is-not-accepted a {
       color: rgba(220, 140, 20, 1);
     }
@@ -120,7 +126,8 @@
 }
 
 [data-bs-theme="dark"] .planning--title {
-  &.is-offer {
+  &.is-offer,
+  &.is-pw {
     &.is-not-accepted a {
       color: rgba(255, 180, 80, 1);
     }

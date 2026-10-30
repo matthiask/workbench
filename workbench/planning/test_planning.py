@@ -1,15 +1,18 @@
 import datetime as dt
 from decimal import Decimal
+from io import BytesIO
 
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from django.utils.translation import deactivate_all
+from openpyxl import load_workbook
 
 from workbench import factories
 from workbench.accounts.models import User
 from workbench.planning import reporting
 from workbench.planning.forms import MilestoneForm, PlannedWorkSearchForm
-from workbench.planning.models import PlannedWork
+from workbench.planning.models import ExternalWork, PlannedWork
 from workbench.tools.validation import in_days, monday
 
 
@@ -92,14 +95,76 @@ class PlanningTest(TestCase):
 
         report = reporting.project_planning(milestone.project)
         (project,) = report["projects_offers"]
+        (ms,) = project["project"]["milestones"]
+        (offer,) = project["offers"]
         colors = {
             entry["work"]["id"]: entry["work"]["color"]
-            for offer in project["offers"]
-            for entry in offer["work_list"]
+            for entry in ms["work_list"] + offer["work_list"]
         }
         self.assertEqual(colors[pw.id], "#123456")
         self.assertEqual(colors[other.id], "")
         self.assertEqual(project["project"]["milestones"][0]["color"], "#123456")
+
+    def test_work_below_milestones(self):
+        """Work belonging to a milestone is shown below it, the rest is
+        grouped by offer"""
+        milestone = factories.MilestoneFactory.create(date=in_days(10))
+        project = milestone.project
+        offer = factories.OfferFactory.create(project=project)
+        pw = factories.PlannedWorkFactory.create(
+            project=project,
+            offer=offer,
+            milestone=milestone,
+            weeks=[monday()],
+            planned_hours=10,
+        )
+        other = factories.PlannedWorkFactory.create(
+            project=project,
+            offer=offer,
+            user=pw.user,
+            weeks=[monday() + dt.timedelta(days=7)],
+            planned_hours=5,
+        )
+        ew = ExternalWork.objects.create(
+            project=project,
+            milestone=milestone,
+            provided_by=factories.OrganizationFactory.create(),
+            created_by=pw.user,
+            title="Printing",
+            weeks=[monday()],
+        )
+
+        (record,) = reporting.project_planning(project)["projects_offers"]
+        (ms,) = record["project"]["milestones"]
+        self.assertEqual([wl["work"]["id"] for wl in ms["work_list"]], [pw.id])
+        self.assertEqual([e["id"] for e in ms["external_work"]], [ew.id])
+        self.assertEqual(ms["work_list"][0]["work"]["offer"]["title"], offer.title)
+        self.assertIn("absences", ms["work_list"][0])
+
+        (offer_record,) = record["offers"]
+        self.assertEqual(
+            [wl["work"]["id"] for wl in offer_record["work_list"]], [other.id]
+        )
+        self.assertEqual(offer_record["offer"]["planned_hours"], 5)
+        self.assertEqual(record["project"]["planned_hours"], 15)
+        self.assertIsNone(record["external_work"])
+
+        # The Gantt chart lists the work below its milestone as well
+        self.client.force_login(pw.user)
+        response = self.client.get(
+            reverse("projects_project_planning_gantt_xlsx", kwargs={"pk": project.pk})
+        )
+        ws = load_workbook(BytesIO(response.content))["Gantt Chart"]
+        self.assertEqual(
+            [row[1] for row in ws.iter_rows(min_row=2, max_col=2, values_only=True)],
+            [milestone.title, pw.title, ew.title, other.title],
+        )
+
+        # Offers without work outside milestones aren't shown
+        other.delete()
+        (record,) = reporting.project_planning(project)["projects_offers"]
+        self.assertIsNone(record["offers"])
+        self.assertEqual(record["project"]["planned_hours"], 10)
 
     def test_milestone_color_choices(self):
         """Milestone colors are chosen from swatches, not typed as hex codes"""
@@ -367,12 +432,17 @@ class PlanningTest(TestCase):
         pw = factories.PlannedWorkFactory.create(
             project=offer.project, offer=offer, milestone=milestone, weeks=[monday()]
         )
+        factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, weeks=[monday()]
+        )
         deal = factories.DealFactory.create(decision_expected_on=in_days(-3))
         deal.related_offers.add(offer)
 
         def decision(**kwargs):
             report = reporting.project_planning(pw.project, **kwargs)
             (project,) = report["projects_offers"]
+            if not project["offers"]:
+                return None
             (row,) = project["offers"]
             return row["offer"].get("decision_overdue")
 

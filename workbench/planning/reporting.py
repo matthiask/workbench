@@ -37,6 +37,13 @@ def _period(weeks, min, max):
     return [start, end]
 
 
+def _sorted_work(work_list):
+    return sorted(
+        work_list,
+        key=lambda row: (row["work"]["date_from"], row["work"]["date_until"]),
+    )
+
+
 class Planning:
     def __init__(self, *, external_view=False, weeks, users=None, projects=None):
         self.weeks = weeks
@@ -110,6 +117,14 @@ class Planning:
                     ),
                     "service_type_id": pw.service_type_id,
                     "color": pw.milestone.color if pw.milestone else "",
+                    "milestone_id": pw.milestone_id,
+                    "offer": {
+                        "title": pw.offer.title,
+                        "is_accepted": pw.offer.is_accepted,
+                        "is_declined": pw.offer.is_declined,
+                    }
+                    if pw.offer
+                    else None,
                     "is_provisional": pw.is_provisional,
                     "tooltip": ", ".join(
                         filter(
@@ -154,6 +169,7 @@ class Planning:
                     ),
                     "service_type_id": ew.service_type_id,
                     "color": ew.milestone.color if ew.milestone else "",
+                    "milestone_id": ew.milestone_id,
                     "tooltip": str(ew.service_type) if ew.service_type else None,
                     "by_week": [1 if w in ew.weeks else 0 for w in self.weeks],
                 })
@@ -341,14 +357,7 @@ order by ph.date
             "decision_overdue": date < dt.date.today(),
         }
 
-    def _offer_record(self, offer, work_list):
-        date_from = min(pw["work"]["date_from"] for pw in work_list)
-        date_until = max(pw["work"]["date_until"] for pw in work_list)
-        hours = sum(pw["work"]["planned_hours"] for pw in work_list)
-
-        if not work_list:
-            return None
-
+    def _add_work_absences(self, work_list):
         for wl in work_list:
             wl.update({
                 "absences": [  # noqa: B035
@@ -357,6 +366,16 @@ order by ph.date
                 ]
                 for user in self._work_ids_users[wl["work"]["id"]]
             })
+
+    def _offer_record(self, offer, work_list):
+        if not work_list:
+            return None
+
+        date_from = min(pw["work"]["date_from"] for pw in work_list)
+        date_until = max(pw["work"]["date_until"] for pw in work_list)
+        hours = sum(pw["work"]["planned_hours"] for pw in work_list)
+
+        self._add_work_absences(work_list)
 
         return {
             "offer": {
@@ -383,46 +402,61 @@ order by ph.date
                     else {}
                 ),
             },
-            "work_list": sorted(
-                work_list,
-                key=lambda row: (row["work"]["date_from"], row["work"]["date_until"]),
-            ),
+            "work_list": _sorted_work(work_list),
         }
 
     def _project_record(self, project, offers):
-        offers = (
-            sorted(
-                filter(
-                    None,
-                    starmap(self._offer_record, sorted(offers.items())),
-                ),
-                key=lambda row: (
-                    row["offer"]["date_from"],
-                    row["offer"]["date_until"],
-                    -row["offer"]["planned_hours"],
-                ),
-            )
-            if offers
-            else None
-        )
+        all_work = [wl for work_list in offers.values() for wl in work_list]
+        date_from = min((wl["work"]["date_from"] for wl in all_work), default=None)
+        date_until = max((wl["work"]["date_until"] for wl in all_work), default=None)
+        hours = sum(wl["work"]["planned_hours"] for wl in all_work)
 
-        date_from = min(rec["offer"]["date_from"] for rec in offers) if offers else None
-        date_until = (
-            max(rec["offer"]["date_until"] for rec in offers) if offers else None
-        )
-        hours = sum(rec["offer"]["planned_hours"] for rec in offers) if offers else 0
+        # Work belonging to a milestone is shown below the milestone, the
+        # rest is grouped by offer
+        milestones = {m["id"]: m for m in self._milestones[project].values() if m}
+        by_milestone = defaultdict(list)
+        for wl in all_work:
+            if wl["work"]["milestone_id"] in milestones:
+                by_milestone[wl["work"]["milestone_id"]].append(wl)
+        offers = {
+            offer: [
+                wl for wl in work_list if wl["work"]["milestone_id"] not in milestones
+            ]
+            for offer, work_list in offers.items()
+        }
 
-        milestones = sorted(
-            self._milestones[project].values(),
-            key=lambda v: v["weeks"].index(1) if 1 in v["weeks"] else 0,
+        offers = sorted(
+            filter(None, starmap(self._offer_record, sorted(offers.items()))),
+            key=lambda row: (
+                row["offer"]["date_from"],
+                row["offer"]["date_until"],
+                -row["offer"]["planned_hours"],
+            ),
         )
 
         external_work = sorted(
             self._projects_external_work[project],
             key=lambda v: v["by_week"].index(1) if 1 in v["by_week"] else 0,
         )
+        external_by_milestone = defaultdict(list)
+        for ew in external_work:
+            if ew["milestone_id"] in milestones:
+                external_by_milestone[ew["milestone_id"]].append(ew)
+        external_work = [
+            ew for ew in external_work if ew["milestone_id"] not in milestones
+        ]
 
-        if not (offers or any(milestones) or any(external_work)):
+        for id, milestone in milestones.items():
+            self._add_work_absences(by_milestone[id])
+            milestone["work_list"] = _sorted_work(by_milestone[id])
+            milestone["external_work"] = external_by_milestone[id]
+
+        milestones = sorted(
+            milestones.values(),
+            key=lambda v: v["weeks"].index(1) if 1 in v["weeks"] else 0,
+        )
+
+        if not (all_work or milestones or self._projects_external_work[project]):
             return None
 
         return {
@@ -446,13 +480,13 @@ order by ph.date
                 "worked_hours": [
                     self._worked_hours[project.id][week] for week in self.weeks
                 ],
-                "milestones": milestones if any(milestones) else None,
+                "milestones": milestones or None,
             },
             "by_week": [
                 self._by_project_and_week[project][week] for week in self.weeks
             ],
-            "external_work": external_work if any(external_work) else None,
-            "offers": offers,
+            "external_work": external_work or None,
+            "offers": offers or None,
         }
 
     def capacity(self):

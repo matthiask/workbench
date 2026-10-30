@@ -2,7 +2,6 @@ import "./style.scss"
 
 import React, {
   createContext,
-  Fragment,
   useContext,
   useLayoutEffect,
   useRef,
@@ -525,84 +524,89 @@ const Milestones = ({ project }) => {
       <Cell row={row} column={1} className="planning--title is-milestone ps-3">
         {gettext("milestones")}
       </Cell>
-      {project.milestones.map((m, i) => {
-        const row = ctx.next()
+      {project.milestones.map((m) => (
+        <Milestone key={m.id} m={m} />
+      ))}
+    </>
+  )
+}
 
-        const isEven = (1 + i) % 2 === 0
-
-        return (
-          <Fragment key={i}>
-            {isEven ? (
-              <div
-                style={{ gridRow: row, gridColumn: "1 / -1" }}
-                className="planning--stripe3"
-              />
-            ) : null}
-            <Cell
-              row={row}
-              column={1}
-              className={"planning--title is-pw planning--small ps-5"}
-            >
-              <a href={m.url} data-ajaxmodal>
-                {m.title}
-              </a>
-            </Cell>
-            <Cell
-              row={row}
-              column={3}
-              className={"planning--small text-center is-pr"}
-              style={{ whiteSpace: "nowrap" }}
-            >
-              {m.range}
-            </Cell>
-            {m.hours > 0 && (
-              <Cell
-                row={row}
-                column={4}
-                className={"planning--small text-end is-pr"}
-              >
-                {`${fixed(m.hours, 0)}h`}
-              </Cell>
-            )}
-            {m.weeks &&
-              findContiguousWeekRanges(m.weeks).map((range, idx) => (
-                <Cell
-                  key={idx}
-                  row={row}
-                  column={FIRST_DATA_COLUMN + range.start}
-                  colspan={`span ${range.length}`}
-                  className={"planning--range planning--small is-milestone"}
-                  style={milestoneColorStyle(m.color)}
-                  tag="a"
-                  href={m.url}
-                  data-ajaxmodal
-                  title={`${m.title} (${m.dow})`}
-                />
-              ))}
-            {m.graphical_weeks &&
-              findContiguousWeekRanges(m.graphical_weeks).map((range, idx) => (
-                <Cell
-                  key={idx}
-                  row={row}
-                  column={FIRST_DATA_COLUMN + range.start}
-                  colspan={`span ${range.length}`}
-                  className={
-                    "planning--range planning--small is-milestone-graphic"
-                  }
-                  style={{
-                    left: weekdayBackgroundPosition(m.weekday),
-                  }}
-                  tag="a"
-                  href={m.url}
-                  data-ajaxmodal
-                  title={`${m.title} (${m.dow})`}
-                >
-                  <span className="planning--milestone-date">{m.date}</span>
-                </Cell>
-              ))}
-          </Fragment>
-        )
-      })}
+// A component of its own so that the rows of its work follow the milestone
+const Milestone = ({ m }) => {
+  const ctx = useContext(RowContext)
+  const row = ctx.next()
+  return (
+    <>
+      <div
+        style={{ gridRow: row, gridColumn: "1 / -1" }}
+        className="planning--milestones"
+      />
+      <Cell
+        row={row}
+        column={1}
+        className={"planning--title is-milestone-title ps-4"}
+      >
+        <a href={m.url} data-ajaxmodal>
+          {m.title}
+        </a>
+      </Cell>
+      <Cell
+        row={row}
+        column={3}
+        className={"planning--small text-center is-pr"}
+        style={{ whiteSpace: "nowrap" }}
+      >
+        {m.range}
+      </Cell>
+      {m.hours > 0 && (
+        <Cell row={row} column={4} className={"planning--small text-end is-pr"}>
+          {`${fixed(m.hours, 0)}h`}
+        </Cell>
+      )}
+      {m.weeks &&
+        findContiguousWeekRanges(m.weeks).map((range, idx) => (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + range.start}
+            colspan={`span ${range.length}`}
+            className={"planning--range planning--small is-milestone"}
+            style={milestoneColorStyle(m.color)}
+            tag="a"
+            href={m.url}
+            data-ajaxmodal
+            title={`${m.title} (${m.dow})`}
+          />
+        ))}
+      {m.graphical_weeks &&
+        findContiguousWeekRanges(m.graphical_weeks).map((range, idx) => (
+          <Cell
+            key={idx}
+            row={row}
+            column={FIRST_DATA_COLUMN + range.start}
+            colspan={`span ${range.length}`}
+            className={"planning--range planning--small is-milestone-graphic"}
+            style={{
+              left: weekdayBackgroundPosition(m.weekday),
+            }}
+            tag="a"
+            href={m.url}
+            data-ajaxmodal
+            title={`${m.title} (${m.dow})`}
+          >
+            <span className="planning--milestone-date">{m.date}</span>
+          </Cell>
+        ))}
+      {m.work_list?.map((work, idx) => (
+        <Work key={work.work.id} {...work} isEven={(1 + idx) % 2 === 0} />
+      ))}
+      {m.external_work?.map((work, idx) => (
+        <ExternalWork
+          key={work.id}
+          idx={(m.work_list?.length || 0) + idx}
+          work={work}
+        />
+      ))}
     </>
   )
 }
@@ -671,6 +675,14 @@ function Offer({ offer, external_view, work_list }) {
   )
 }
 
+// Work shows whether its offer has been accepted, also below milestones
+const offerClassName = (offer) =>
+  offer?.is_declined
+    ? "is-declined"
+    : offer && !offer.is_accepted
+      ? "is-not-accepted"
+      : ""
+
 function Work({ work, hours_per_week, absences, isEven }) {
   const ctx = useContext(RowContext)
   const row = ctx.next()
@@ -688,9 +700,13 @@ function Work({ work, hours_per_week, absences, isEven }) {
         column={1}
         className={`planning--title is-pw ${
           work.is_provisional ? "is-provisional" : ""
-        } planning--small ps-5`}
+        } ${offerClassName(work.offer)} planning--small ps-5`}
       >
-        <a href={work.url} data-ajaxmodal>
+        <a
+          href={work.url}
+          data-ajaxmodal
+          title={work.offer ? work.offer.title : undefined}
+        >
           {work.title}
         </a>
       </Cell>
