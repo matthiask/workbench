@@ -707,6 +707,36 @@ def me(as_json):
 
 
 @cli.group()
+def users():
+    """Find users and their short names"""
+
+
+@users.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--all", "include_inactive", is_flag=True, help="Include inactive.")
+@click.option("--json", "as_json", is_flag=True)
+def search_users(query, include_inactive, as_json):
+    """Search users by name, short name or email address, active users by
+    default"""
+    params = {"q": " ".join(query), "include_inactive": _bool(include_inactive)}
+    data = _request("GET", "users/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table("ID>", "Short name", "Name", "Email", "Teams")
+    for user in data:
+        table.add_row(
+            _link(user["id"], user["url"]),
+            user["short_name"],
+            _link(user["full_name"], user["url"])
+            + ("" if user["is_active"] else " (inactive)"),
+            user["email"],
+            ", ".join(user["teams"]),
+        )
+    console.print(table)
+
+
+@cli.group()
 def projects():
     """Find and create projects"""
 

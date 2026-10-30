@@ -46,6 +46,15 @@ used.
 the offers, invoices and deals which may need action (the latter depending on
 your features).
 
+## Users
+
+`wb users search` finds users by name, short name or email address, e.g. for
+the short names which filters like `--owned-by` expect. `--all` includes
+inactive users.
+
+    wb users search
+    wb users search hans --all
+
 ## Creating projects
 
 Find the customer and the contact, then create the project. Projects are

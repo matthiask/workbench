@@ -129,6 +129,10 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertIn(self.user.get_full_name(), result.output)
 
+        result = self.wb("users", "search", self.user._short_name)
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn(self.user.get_full_name(), result.output)
+
         result = self.wb("projects", "search", "relaunch")
         self.assertIn(project.code, result.output)
         result = self.wb("projects", "show", project.pk)

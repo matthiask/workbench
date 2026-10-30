@@ -34,3 +34,32 @@ class OverviewAPITest(TestCase):
             data = self.client.get("/api/me/overview/").json()
             self.assertEqual(len(data["offers"]), 1)
             self.assertIsNone(data["deals"])
+
+    def test_users(self):
+        """Users can be searched, active users by default"""
+        user = factories.UserFactory.create(
+            _full_name="Hans Muster", _short_name="hm", email="hans@example.com"
+        )
+        factories.TeamFactory.create(name="Design").members.add(user)
+        factories.UserFactory.create(_full_name="Hans Alt", is_active=False)
+        self.client.force_login(user)
+
+        data = self.client.get("/api/users/?q=hans").json()
+        self.assertEqual(
+            data,
+            [
+                {
+                    "id": user.pk,
+                    "url": f"http://testserver{user.get_absolute_url()}",
+                    "short_name": "hm",
+                    "full_name": "Hans Muster",
+                    "email": "hans@example.com",
+                    "is_active": True,
+                    "teams": ["Design"],
+                }
+            ],
+        )
+        data = self.client.get("/api/users/?q=hans&include_inactive=true").json()
+        self.assertEqual(len(data), 2)
+        data = self.client.get("/api/users/?q=HM+example").json()
+        self.assertEqual([u["id"] for u in data], [user.pk])

@@ -1,9 +1,11 @@
 import datetime as dt
 from decimal import Decimal
 
+from django.db.models import Q
 from ninja import Router, Schema
 
 from workbench.accounts.features import FEATURES
+from workbench.accounts.models import User
 from workbench.deals.api import DealOut, deal_out
 from workbench.deals.models import Deal
 from workbench.invoices.api import InvoiceOut, invoice_out
@@ -38,6 +40,43 @@ def me(request):
         "email": user.email,
         "url": request.build_absolute_uri("/"),
     }
+
+
+class UserOut(Schema):
+    id: int
+    url: str
+    short_name: str
+    full_name: str
+    email: str
+    is_active: bool
+    teams: list[str]
+
+
+@router.get("/users/", response=list[UserOut])
+def user_list(request, q: str = "", *, include_inactive: bool = False):
+    """Search users by name, short name or email address, e.g. for the short
+    names which identify them in other APIs"""
+    users = User.objects.prefetch_related("teams")
+    if not include_inactive:
+        users = users.filter(is_active=True)
+    for term in q.split():
+        users = users.filter(
+            Q(_full_name__icontains=term)
+            | Q(_short_name__icontains=term)
+            | Q(email__icontains=term)
+        )
+    return [
+        {
+            "id": user.id,
+            "url": request.build_absolute_uri(user.get_absolute_url()),
+            "short_name": user.get_short_name(),
+            "full_name": user.get_full_name(),
+            "email": user.email,
+            "is_active": user.is_active,
+            "teams": [team.name for team in user.teams.all()],
+        }
+        for user in users
+    ]
 
 
 class PlannedWorkThisWeek(Schema):
