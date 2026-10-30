@@ -6,59 +6,78 @@
   {% translate 'Import planning' %} - {{ object }} - {{ block.super }}
 {% endblock title %}
 
+{% block uplink %}
+  <a href="{% url 'projects_project_planning' object.pk %}" class="btn btn-quiet btn-sm uplink">
+    {% include 'svg/chevron-left.svg' %}
+    {% translate 'planning'|capfirst %}
+  </a>
+{% endblock uplink %}
+
 {% block content %}
-  <div class="row">
-    <div class="col-12">
-      <a href="{% url 'projects_project_planning' object.pk %}" class="btn btn-primary btn-sm">
-        {% include 'svg/chevron-left.svg' %}
-        {% translate 'planning'|capfirst %}
-      </a>
-      <h1>{% translate 'Import planning' %}: {{ object }}</h1>
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{% translate 'Import planning' %}</h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{% translate 'project'|capfirst %}</span>
+          <a href="{{ object.get_absolute_url }}">{{ object }}</a></span>
+      </div>
     </div>
   </div>
-  <div class="row mt-3">
+  <div class="row g-3">
     <div class="col-lg-6">
-      <h2 class="h4">1. {% translate 'Prompt' %}</h2>
-      <p>
-        {% blocktranslate trimmed %}
-          Copy the prompt, add your own requirements, for example fixed dates and who should do what, and let an AI tool
-          create a plan. The prompt contains the offers, people, absences and the existing planning of the project.
-        {% endblocktranslate %}
-      </p>
-      <textarea id="planning-prompt" class="form-control font-monospace" rows="16" readonly>{{ prompt }}</textarea>
-      <button type="button" id="planning-copy" class="btn btn-primary btn-sm mt-2">
-        {% translate 'Copy prompt' %}
-      </button>
+      <section class="card h-100">
+        <div class="card-header">1. {% translate 'Prompt' %}</div>
+        <div class="card-body">
+          <p class="text-secondary">
+            {% blocktranslate trimmed %}
+              Copy the prompt, add your own requirements, for example fixed dates and who should do what, and let an AI
+              tool create a plan. The prompt contains the offers, people, absences and the existing planning of the
+              project.
+            {% endblocktranslate %}
+          </p>
+          <textarea id="planning-prompt" class="form-control font-monospace" rows="16" readonly>{{ prompt }}</textarea>
+          <div class="wb-form-actions mt-2 mb-0">
+            <button type="button" id="planning-copy" class="btn btn-quiet">
+              {% include 'svg/clippy.svg' %}
+              {% translate 'Copy prompt' %}
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
     <div class="col-lg-6">
-      <h2 class="h4">2. {% translate 'Plan' %}</h2>
-      <p>
-        {% blocktranslate trimmed %}
-          Paste the JSON answer here and check it. Nothing is saved before you import it. The import only adds
-          milestones and planned work.
-        {% endblocktranslate %}
-      </p>
-      {% csrf_token %}
-      <textarea id="planning-json" class="form-control font-monospace" rows="16"></textarea>
-      <button type="button" id="planning-check" class="btn btn-primary btn-sm mt-2">
-        {% translate 'Check' %}
-      </button>
-      <button type="button" id="planning-import" class="btn btn-success btn-sm mt-2" disabled>
-        {% translate 'Import' %}
-      </button>
+      <section class="card h-100">
+        <div class="card-header">2. {% translate 'Plan' %}</div>
+        <div class="card-body">
+          <p class="text-secondary">
+            {% blocktranslate trimmed %}
+              Paste the JSON answer here and check it. Nothing is saved before you import it. The import only adds
+              milestones and planned work.
+            {% endblocktranslate %}
+          </p>
+          {% csrf_token %}
+          <textarea id="planning-json" class="form-control font-monospace" rows="16"></textarea>
+          <div class="wb-form-actions mt-2 mb-0">
+            <button type="button" id="planning-check" class="btn btn-quiet">{% translate 'Check' %}</button>
+            <button type="button" id="planning-import" class="btn btn-primary" disabled>
+              {% translate 'Import' %}
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
-  <div class="row mt-4">
-    <div class="col-12">
-      <div id="planning-errors" class="alert alert-danger" hidden>
-        <ul class="mb-0"></ul>
-      </div>
-      <div id="planning-warnings" class="alert alert-warning" hidden>
-        <ul class="mb-0"></ul>
-      </div>
-      <div id="planning-preview" hidden>
-        <h2 class="h4">{% translate 'milestones'|capfirst %}</h2>
-        <table class="table table-sm table-striped" id="planning-preview-milestones">
+  <div class="mt-3">
+    <div id="planning-errors" class="alert alert-danger" hidden>
+      <ul class="mb-0"></ul>
+    </div>
+    <div id="planning-warnings" class="alert alert-warning" hidden>
+      <ul class="mb-0"></ul>
+    </div>
+    <div id="planning-preview" hidden>
+      <section class="card mb-3 wb-table-card">
+        <div class="card-header">{% translate 'milestones'|capfirst %}</div>
+        <table class="table table-sm table-hover mb-0" id="planning-preview-milestones">
           <thead>
             <tr>
               <th>{% translate 'title'|capfirst %}</th>
@@ -69,8 +88,10 @@
           </thead>
           <tbody></tbody>
         </table>
-        <h2 class="h4">{% translate 'planned work'|capfirst %}</h2>
-        <table class="table table-sm table-striped" id="planning-preview-work">
+      </section>
+      <section class="card mb-3 wb-table-card">
+        <div class="card-header">{% translate 'planned work'|capfirst %}</div>
+        <table class="table table-sm table-hover mb-0" id="planning-preview-work">
           <thead>
             <tr>
               <th>{% translate 'title'|capfirst %}</th>
@@ -85,7 +106,7 @@
           </thead>
           <tbody></tbody>
         </table>
-      </div>
+      </section>
     </div>
   </div>
   {{ api_urls|json_script:'planning-import-urls' }}
