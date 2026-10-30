@@ -18,7 +18,14 @@ from urllib.parse import parse_qs, urlencode, urljoin, urlsplit
 import click
 import requests
 import yaml
-from click.shell_completion import CompletionItem, get_completion_class
+from click.shell_completion import (
+    BashComplete,
+    CompletionItem,
+    FishComplete,
+    ZshComplete,
+    add_completion_class,
+    get_completion_class,
+)
 from rich import box
 from rich.console import Console
 from rich.style import Style
@@ -459,6 +466,26 @@ def login(url, paste_token):
         _browser_login(url)
 
 
+class _CompleteOptions:
+    """Offer the options when there's nothing else to complete, Click only
+    does this when a dash has been typed"""
+
+    def get_completions(self, args, incomplete):
+        completions = super().get_completions(args, incomplete)
+        # After an option its value may be expected, e.g. an ID
+        if not (completions or incomplete or (args and args[-1].startswith("-"))):
+            completions = super().get_completions(args, "-")
+        return completions
+
+
+for _shell, _class in [
+    ("bash", BashComplete),
+    ("zsh", ZshComplete),
+    ("fish", FishComplete),
+]:
+    add_completion_class(type(_class.__name__, (_CompleteOptions, _class), {}), _shell)
+
+
 @cli.command()
 @click.argument("shell", type=click.Choice(["bash", "zsh", "fish"]))
 def completion(shell):
@@ -492,10 +519,13 @@ def list_installations():
 
 
 def _complete_installations(ctx, param, incomplete):
+    # Host names only: bash splits words at the colon of https://
     return [
-        CompletionItem(url)
-        for url in sorted(_read_config()["installations"])
-        if incomplete in url
+        CompletionItem(host)
+        for host in sorted(
+            urlsplit(url).netloc for url in _read_config()["installations"]
+        )
+        if incomplete in host
     ]
 
 

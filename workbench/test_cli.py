@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import wb
-from click.shell_completion import ShellComplete
+from click.shell_completion import get_completion_class
 from click.testing import CliRunner
 from django.test import Client, TestCase
 from django.test.utils import override_settings
@@ -439,11 +439,20 @@ planned_work:
         )
 
         def complete(args, incomplete):
-            complete = ShellComplete(wb.cli, {}, "wb", "_WB_COMPLETE")
+            complete = get_completion_class("bash")(wb.cli, {}, "wb", "_WB_COMPLETE")
             return [item.value for item in complete.get_completions(args, incomplete)]
 
         self.assertIn("switch", complete(["auth"], ""))
-        self.assertEqual(complete(["auth", "switch"], "org"), ["https://b.example.org"])
+        # Host names only: bash splits words at the colon of https://
+        self.assertEqual(
+            complete(["auth", "switch"], ""), ["a.example.com", "b.example.org"]
+        )
+        self.assertEqual(complete(["auth", "switch"], "org"), ["b.example.org"])
+        # Options are offered when there's nothing else to complete
+        self.assertIn("--status", complete(["deals", "search"], ""))
+        self.assertIn("--status", complete(["deals", "search", "relaunch"], ""))
+        # but not where a value is expected
+        self.assertEqual(complete(["deals", "search", "--customer"], ""), [])
         self.assertEqual(complete(["deals", "search", "--status"], "o"), ["open"])
 
     def test_auth(self):
