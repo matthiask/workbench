@@ -27,10 +27,10 @@ def _time(value):
     return dt.datetime.fromisoformat(value).strftime("%H:%M") if value else "?"
 
 
-def _create_timestamp(type_, args, as_json):
+def _create_timestamp(type_, args, as_json, *, project, service):
     """The first argument may be a time (13:30) or minutes relative to now
     (-5, +15), the others are notes"""
-    data = {"type": type_}
+    data = {"type": type_, "project": project, "service": service}
     if args and re.fullmatch(r"[0-9]{1,2}:[0-9]{2}", args[0]):
         data["time"] = args[0]
         args = args[1:]
@@ -52,6 +52,8 @@ def _echo_timestamp(timestamp, prefix=""):
         f" at {_time(timestamp['created_at'])}"
         + (f", {timestamp['notes']}" if timestamp["notes"] else "")
     )
+    if project := timestamp["project"]:
+        text += f" [{link(project['code'], project['url'])} {project['title']}]"
     if (slice := timestamp["slice"]) and slice["hours"] and slice["ends_at"]:
         text += f" ({slice['hours']}h since {_time(slice['starts_at'])})"
     console.print(text)
@@ -63,7 +65,20 @@ _TIMESTAMP_HELP = """
     wb timestamps {0}                   # Now
     wb timestamps {0} -5 Notes          # 5 minutes ago, with notes
     wb timestamps {0} 13:30             # At 13:30
-    wb timestamps {0} +15               # In 15 minutes"""
+    wb timestamps {0} +15               # In 15 minutes
+    wb timestamps {0} -p profond        # Pre-fill the logbook form
+
+    -p/--project is a project ID or a part of the code, title or customer of one
+    of your pinned projects."""
+
+
+def _project_options(fn):
+    fn = click.option("--service", type=int, help="Service ID, also sets the project.")(
+        fn
+    )
+    return click.option(
+        "-p", "--project", help="Project ID or name of a pinned project."
+    )(fn)
 
 
 @timestamps.command(
@@ -71,9 +86,10 @@ _TIMESTAMP_HELP = """
     help="Start a task" + _TIMESTAMP_HELP.format("start"),
 )
 @click.argument("args", nargs=-1)
+@_project_options
 @click.option("--json", "as_json", is_flag=True)
-def start(args, as_json):
-    _create_timestamp("start", args, as_json)
+def start(args, project, service, as_json):
+    _create_timestamp("start", args, as_json, project=project, service=service)
 
 
 @timestamps.command(
@@ -81,9 +97,10 @@ def start(args, as_json):
     help="Stop a task" + _TIMESTAMP_HELP.format("stop"),
 )
 @click.argument("args", nargs=-1)
+@_project_options
 @click.option("--json", "as_json", is_flag=True)
-def stop(args, as_json):
-    _create_timestamp("stop", args, as_json)
+def stop(args, project, service, as_json):
+    _create_timestamp("stop", args, as_json, project=project, service=service)
 
 
 @timestamps.command("list")

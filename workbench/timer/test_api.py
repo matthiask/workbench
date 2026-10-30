@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 from time_machine import travel
@@ -36,6 +38,82 @@ class TimestampsAPITest(TestCase):
 
         self.assertEqual(create(type="split").status_code, 422)
         self.assertEqual(create(type="stop", time="13:30", minutes=5).status_code, 422)
+
+    @travel("2026-10-30T12:00:00+01:00", tick=False)
+    def test_project_and_service(self):
+        """Timestamps remember the project and the service, the slice's link
+        opens the project's logbook form with the service"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        service = factories.ServiceFactory.create()
+        project = service.project
+
+        def create(**data):
+            return self.client.post(
+                "/api/timestamps/", data, content_type="application/json"
+            )
+
+        data = create(type="start", project=project.pk).json()
+        self.assertEqual(data["project"]["id"], project.pk)
+        self.assertIsNone(data["service_id"])
+        # The stop has no project, the merged slice keeps the start's
+        data = create(type="stop", minutes=30, notes="Wireframes").json()
+        self.assertEqual(data["slice"]["project"]["id"], project.pk)
+        self.assertEqual(
+            data["slice"]["log_hours_url"].split("?")[0],
+            f"http://testserver{project.urls['createhours']}",
+        )
+        self.assertNotIn("service=", data["slice"]["log_hours_url"])
+
+        # The project is taken from the service
+        create(type="start", minutes=30)
+        data = create(type="stop", minutes=60, service=service.pk).json()
+        self.assertEqual(data["project"]["id"], project.pk)
+        self.assertEqual(data["service_id"], service.pk)
+        self.assertIn(f"service={service.pk}", data["slice"]["log_hours_url"])
+
+        other = factories.ProjectFactory.create()
+        response = create(type="start", project=other.pk, service=service.pk)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(create(type="start", project=0).status_code, 422)
+
+    def test_pinned_project_by_name(self):
+        """Pinned projects can be passed as a part of their code, title or
+        customer"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        profond = factories.ProjectFactory.create(
+            title="Website", customer=factories.OrganizationFactory(name="Profond")
+        )
+        forum = factories.ProjectFactory.create(title="Forum relaunch")
+        factories.ProjectFactory.create(title="Profond intranet")  # Not pinned
+        closed = factories.ProjectFactory.create(
+            title="Forum archive", closed_on=dt.date(2026, 1, 1)
+        )
+        user.pinned_projects.add(profond, forum, closed)
+
+        def project(value):
+            response = self.client.post(
+                "/api/timestamps/",
+                {"type": "start", "project": value},
+                content_type="application/json",
+            )
+            return (
+                response.json()["project"]["id"]
+                if response.status_code == 200
+                else response
+            )
+
+        self.assertEqual(project("profond"), profond.pk)
+        self.assertEqual(project("FORUM"), forum.pk)
+        self.assertEqual(project(profond.code), profond.pk)
+        self.assertEqual(project(str(forum.pk)), forum.pk)
+        self.assertContains(
+            project("o"), "Several pinned projects match", status_code=422
+        )
+        self.assertContains(
+            project("intranet"), "No pinned project matches", status_code=422
+        )
 
     @travel("2026-10-30T12:00:00+01:00", tick=False)
     def test_list(self):

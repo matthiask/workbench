@@ -13,6 +13,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.logbook.models import Break, LoggedHours
+from workbench.projects.models import Project, Service
 from workbench.tools.formats import Z1, local_date_format
 
 
@@ -60,10 +61,17 @@ class Slice(UserDict):
         else:  # No timestamp ID and no associated log -- it's a detected slice!
             params.append(("detected_ends_at", self["ends_at"]))
 
+        url = reverse("logbook_loggedhours_create")
+        # Skip selecting the project if the timestamp already knows it
+        if (project := self.get("project")) and not project.is_logbook_locked:
+            url = project.urls["createhours"]
+            if service := self.get("service"):
+                params.append(("service", service.id))
+
         # Keep zero too (see elapsed_hours above)
         query = urlencode([pair for pair in params if pair[1] or pair[1] == 0])
 
-        return "{}?{}".format(reverse("logbook_loggedhours_create"), query)
+        return f"{url}?{query}"
 
     @property
     def break_create_url(self):
@@ -134,7 +142,10 @@ class TimestampQuerySet(models.QuerySet):
         day = day or dt.date.today()
         entries = list(
             self.filter(user=user, created_at__date=day).select_related(
-                "logged_hours__service__project__owned_by", "logged_break"
+                "logged_hours__service__project__owned_by",
+                "logged_break",
+                "project__owned_by",
+                "service",
             )
         )
         known_logged_hours = {entry.logged_hours for entry in entries}
@@ -182,7 +193,8 @@ class TimestampQuerySet(models.QuerySet):
                 is_start=entry.type == entry.START,
                 project=entry.logged_hours.service.project
                 if entry.logged_hours
-                else None,
+                else entry.project,
+                service=None if entry.logged_hours else entry.service,
             )
 
             if entry.logged_break:
@@ -218,6 +230,13 @@ class TimestampQuerySet(models.QuerySet):
                 and not slice["is_start"]
             ):
                 if not slice.has_associated_log:
+                    # The stop's project and service win, the start's are
+                    # kept if the stop has none
+                    if slice["project"]:
+                        previous.update({
+                            "project": slice["project"],
+                            "service": slice["service"],
+                        })
                     previous.update({
                         "timestamp_id": slice["timestamp_id"],
                         "logged_hours": slice["logged_hours"],
@@ -285,6 +304,21 @@ class Timestamp(models.Model):
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     type = models.CharField(_("type"), max_length=10, choices=TYPE_CHOICES)
     notes = models.CharField(_("notes"), max_length=500, blank=True)
+    # Pre-fill the logbook form
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("project"),
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("service"),
+    )
     logged_hours = models.OneToOneField(
         LoggedHours,
         on_delete=models.SET_NULL,

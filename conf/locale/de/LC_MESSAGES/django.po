@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 16:11+0100\n"
+"POT-Creation-Date: 2026-10-30 16:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1910,7 +1910,7 @@ msgstr "%s Rechnungen in der Auswahl, das sind zu viele."
 #: workbench/templates/reporting/playing_bank.html
 #: workbench/templates/reporting/project_budget_statistics.html
 #: workbench/templates/reporting/projected_gross_margin.html
-#: workbench/tools/xlsx.py
+#: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "project"
 msgstr "Projekt"
 
@@ -2355,7 +2355,8 @@ msgstr "Konnte das PDF nicht generieren: {}"
 #: workbench/projects/views.py workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_detail.html workbench/tools/xlsx.py
+#: workbench/templates/projects/project_detail.html workbench/timer/models.py
+#: workbench/tools/xlsx.py
 msgid "service"
 msgstr "Leistung"
 
@@ -5215,6 +5216,28 @@ msgstr "Tiefe Wahrscheinlichkeit"
 #: workbench/templatetags/workbench.py
 msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
+
+#: workbench/timer/api.py
+msgid "This project doesn't exist."
+msgstr "Dieses Projekt existiert nicht."
+
+#: workbench/timer/api.py
+#, python-format
+msgid "Several pinned projects match %(text)r: %(projects)s"
+msgstr "Mehrere gepinnte Projekte passen zu %(text)r: %(projects)s"
+
+#: workbench/timer/api.py
+#, python-format
+msgid "No pinned project matches %r. Pin it or use the project's ID."
+msgstr "Kein gepinntes Projekt passt zu %r. Pinne es oder verwende die ID des Projekts."
+
+#: workbench/timer/api.py
+msgid "This service doesn't exist."
+msgstr "Diese Leistung existiert nicht."
+
+#: workbench/timer/api.py
+msgid "This service belongs to a different project."
+msgstr "Diese Leistung gehört zu einem anderen Projekt."
 
 #: workbench/timer/api.py
 msgid "Pass either time or minutes."

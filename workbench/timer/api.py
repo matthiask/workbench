@@ -13,6 +13,7 @@ from ninja.errors import HttpError, ValidationError
 
 from workbench.logbook.models import LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
+from workbench.projects.models import Project, Service
 from workbench.reporting.utils import sum_of
 from workbench.timer.models import Slice, Timestamp
 from workbench.tools.formats import Z1
@@ -82,6 +83,16 @@ class TimestampIn(Schema):
         description="Minutes relative to now instead of now, e.g. -5 for five"
         " minutes ago.",
     )
+    project: int | str | None = Field(
+        default=None,
+        description="Pre-fills the logbook form of the slice. An ID or a part of"
+        " the code, title or customer of one of your pinned projects.",
+    )
+    service: int | None = Field(
+        default=None,
+        description="Pre-fills the logbook form of the slice, the project"
+        " defaults to the service's.",
+    )
 
 
 class TimestampOut(Schema):
@@ -90,6 +101,8 @@ class TimestampOut(Schema):
     type: str
     created_at: dt.datetime
     notes: str
+    project: ProjectSummary | None
+    service_id: int | None
     slice: SliceOut | None
 
 
@@ -102,8 +115,58 @@ def _timestamp_out(timestamp, request, *, with_slice=True):
         "type": timestamp.type,
         "created_at": localtime(timestamp.created_at),
         "notes": timestamp.notes,
+        "project": project_summary(timestamp.project, request)
+        if timestamp.project
+        else None,
+        "service_id": timestamp.service_id,
         "slice": _slice_out(slice, request, codes=codes) if slice else None,
     }
+
+
+def _error(field, msg):
+    return ValidationError([{"loc": ["body", "data", field], "msg": msg}])
+
+
+def _project(user, value):
+    """The project with this ID, or the open pinned project matching the text"""
+    if isinstance(value, int) or value.isdigit():
+        if project := Project.objects.filter(pk=value).first():
+            return project
+        raise _error("project", _("This project doesn't exist."))
+    projects = [
+        project
+        for project in user.pinned_projects
+        .open()
+        .select_related("customer", "owned_by")
+        .order_by("pk")
+        if value.casefold()
+        in f"{project.code} {project.title} {project.customer.name}".casefold()
+    ]
+    if len(projects) == 1:
+        return projects[0]
+    if projects:
+        raise _error(
+            "project",
+            _("Several pinned projects match %(text)r: %(projects)s")
+            % {"text": value, "projects": "; ".join(str(p) for p in projects)},
+        )
+    raise _error(
+        "project",
+        _("No pinned project matches %r. Pin it or use the project's ID.") % value,
+    )
+
+
+def _project_and_service(user, data):
+    project = _project(user, data.project) if data.project is not None else None
+    service = None
+    if data.service is not None:
+        service = Service.objects.select_related("project").filter(pk=data.service)
+        if not (service := service.first()):
+            raise _error("service", _("This service doesn't exist."))
+        if project and project != service.project:
+            raise _error("service", _("This service belongs to a different project."))
+        project = service.project
+    return project, service
 
 
 @router.post("/timestamps/", response=TimestampOut)
@@ -116,13 +179,19 @@ def timestamp_create(request, data: TimestampIn):
         raise ValidationError([
             {"loc": ["body", "data"], "msg": _("Pass either time or minutes.")}
         ])
+    project, service = _project_and_service(request.user, data)
     created_at = timezone.now()
     if data.time is not None:
         created_at = make_aware(dt.datetime.combine(localdate(), data.time))
     elif data.minutes is not None:
         created_at += dt.timedelta(minutes=data.minutes)
     timestamp = Timestamp.objects.create(
-        user=request.user, type=data.type, notes=data.notes, created_at=created_at
+        user=request.user,
+        type=data.type,
+        notes=data.notes,
+        created_at=created_at,
+        project=project,
+        service=service,
     )
     return _timestamp_out(timestamp, request)
 

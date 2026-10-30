@@ -105,6 +105,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   in preparation: create, replace, update and add, update, delete and reorder
   single services, all with the rules of `_apply_service()`. Service types only suggest the effort type
   and the hourly rate, both can be set freely.
+- Timestamps may have a project and a service which pre-fill the logbook form
+  of their slice (`wb ts start -p profond`). The API accepts a project ID or a
+  part of the code, title or customer of one of the user's open pinned
+  projects (`_project()` in `workbench/timer/api.py`).
 - Short names (`User._short_name`) are unique when case folding, unless blank.
   APIs identify people by their short name and match it case-insensitively.
 - The planning import prompt is pasted into external LLMs. Keep personal data

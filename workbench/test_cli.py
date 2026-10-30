@@ -715,6 +715,15 @@ planned_work:
         result = self.wb("--help")
         self.assertIn("Aliases:\n  ts  timestamps", result.output)
 
+        project = factories.ProjectFactory.create()
+        result = self.wb("ts", "stop", "-p", str(project.pk), "+5", "Review")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("T2: stop at", result.output)
+        self.assertIn(project.code, result.output)
+        timestamp = Timestamp.objects.filter(user=self.user).first()
+        self.assertEqual(timestamp.project, project)
+        self.assertEqual(timestamp.notes, "Review")
+
     def test_bug_reports(self):
         """Crashes and server errors write a bug report people can send"""
         person = factories.PersonFactory.create()
