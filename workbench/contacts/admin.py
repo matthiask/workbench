@@ -44,4 +44,6 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ReadWriteModelAdmin):
-    pass
+    list_display = ["title", "is_archived"]
+    list_editable = ["is_archived"]
+    list_filter = ["is_archived"]

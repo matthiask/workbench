@@ -19,6 +19,14 @@ from workbench.tools.validation import raise_if_errors
 @model_urls
 class Group(Model):
     title = models.CharField(_("title"), max_length=100)
+    is_archived = models.BooleanField(
+        _("is archived"),
+        default=False,
+        help_text=_(
+            "Contacts only in archived groups are archived automatically"
+            " after five years without use."
+        ),
+    )
 
     class Meta:
         ordering = ("title",)

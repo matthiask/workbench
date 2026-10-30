@@ -182,6 +182,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   reasons and descriptions only with it, and `clear_sickness_descriptions()`
   (fairy tasks) clears descriptions and history after two years.
   Descriptions of absences are optional.
+- Contacts unused for five years are archived (`archive_unused_contacts()` in
+  `workbench/contacts/tasks.py`, fairy tasks). Reverse relations are
+  discovered with `_meta.get_fields()`; `_recent()` says which related
+  objects count as recent use, contacts referenced by models missing there
+  are always kept (a test lists all relations). Membership in groups which
+  aren't archived keeps contacts, so do edits in the audit log.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Page layout (see `projects/project_detail.html` and the contacts detail

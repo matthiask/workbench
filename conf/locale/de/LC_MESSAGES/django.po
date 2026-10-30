@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 22:04+0100\n"
+"POT-Creation-Date: 2026-10-30 22:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1009,6 +1009,14 @@ msgstr "Wähle eine der folgenden Adressen:"
 msgid "The postal address should probably be at least three lines long."
 msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
 
+#: workbench/contacts/models.py workbench/deals/models.py
+msgid "is archived"
+msgstr "ist archiviert"
+
+#: workbench/contacts/models.py
+msgid "Contacts only in archived groups are archived automatically after five years without use."
+msgstr "Kontakte, die nur in archivierten Gruppen sind, werden nach fünf Jahren ohne Verwendung automatisch archiviert."
+
 #: workbench/contacts/models.py
 msgid "group"
 msgstr "Gruppe"
@@ -1016,10 +1024,6 @@ msgstr "Gruppe"
 #: workbench/contacts/models.py
 msgid "groups"
 msgstr "Gruppen"
-
-#: workbench/contacts/models.py workbench/deals/models.py
-msgid "is archived"
-msgstr "ist archiviert"
 
 #: workbench/contacts/models.py
 msgid "It is preferrable to archive records instead of deleting them."

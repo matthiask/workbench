@@ -9,6 +9,7 @@ from workbench.awt.tasks import (
     annual_working_time_warnings_mails,
     clear_sickness_descriptions,
 )
+from workbench.contacts.tasks import archive_unused_contacts
 from workbench.invoices.tasks import (
     create_recurring_invoices_and_notify,
     send_unsent_projected_invoices_reminders,
@@ -35,4 +36,5 @@ class Command(BaseCommand):
         tuesday_autodunning()
         prune_audit()
         clear_sickness_descriptions()
+        archive_unused_contacts()
         work_anniversaries_notice()

@@ -4,10 +4,13 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.audit.models import LoggedAction
+from workbench.contacts import tasks
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
 from workbench.tools.testing import messages
@@ -467,3 +470,57 @@ Other street 42
             name="Test", is_archived=True
         )
         self.assertEqual(str(organization), "Test (archived)")
+
+
+class ArchiveContactsTest(TestCase):
+    def test_unused_contacts(self):
+        """Contacts unused for five years and only in archived groups are
+        archived"""
+        cutoff = timezone.now() + dt.timedelta(days=1)  # Every change is older
+        organization = factories.OrganizationFactory.create()
+        unused = factories.PersonFactory.create(organization=organization)
+        in_group = factories.PersonFactory.create(organization=organization)
+        group = Group.objects.create(title="Newsletter 2015")
+        in_group.groups.add(group)
+        contact = factories.ProjectFactory.create().contact
+        user = factories.UserFactory.create()
+        user.person = factories.PersonFactory.create()
+        user.save()
+
+        def unused_people():
+            return set(tasks.unused_people(cutoff))
+
+        self.assertEqual(unused_people(), {unused})
+        self.assertEqual(set(tasks.unused_organizations(cutoff)), set())
+        self.assertNotIn(contact, unused_people())
+
+        group.is_archived = True
+        group.save()
+        self.assertEqual(unused_people(), {unused, in_group})
+
+        # Recent changes keep contacts
+        self.assertEqual(
+            set(tasks.unused_people(timezone.now() - dt.timedelta(days=1))), set()
+        )
+
+        # The audit log shows the contacts as changed long ago
+        LoggedAction.objects.update(
+            created_at=timezone.now() - dt.timedelta(days=6 * 365)
+        )
+        tasks.archive_unused_contacts()
+        unused.refresh_from_db()
+        organization.refresh_from_db()
+        self.assertTrue(unused.is_archived)
+        # Organizations whose people are all archived are archived too
+        self.assertTrue(organization.is_archived)
+        self.assertFalse(Person.objects.get(pk=contact.pk).is_archived)
+        self.assertFalse(Person.objects.get(pk=user.person.pk).is_archived)
+
+    def test_all_relations_known(self):
+        """New relations to contacts keep them active until it's decided
+        which of their objects count as recent use"""
+        recent = tasks._recent(timezone.now())
+        for model in [Person, Organization]:
+            for field in tasks._reverse_relations(model):
+                with self.subTest(model=model, field=field):
+                    self.assertIn(field.related_model, recent)
