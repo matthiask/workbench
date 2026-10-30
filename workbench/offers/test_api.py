@@ -1,3 +1,4 @@
+import datetime as dt
 from decimal import Decimal
 
 from django.test import TestCase
@@ -74,13 +75,12 @@ class OffersAPITest(TestCase):
         self.assertEqual(data["code"], project.code)
         self.assertEqual(data["url"], f"http://testserver{project.get_absolute_url()}")
 
-        data = self.client.get(f"/api/projects/{project.pk}/offers/").json()
+        data = self.client.get(f"/api/offers/?project={project.pk}").json()["items"]
         self.assertEqual([o["code"] for o in data], [offer.code])
         self.assertEqual(data[0]["services"][0]["title"], "Design")
         self.assertEqual(data[0]["url"], f"http://testserver{offer.get_absolute_url()}")
 
         self.assertEqual(self.client.get("/api/projects/0/").status_code, 404)
-        self.assertEqual(self.client.get("/api/projects/0/offers/").status_code, 404)
 
     def test_create(self):
         """Creating adds an offer in preparation with its services"""
@@ -256,3 +256,8 @@ class OffersAPITest(TestCase):
             ids(f"?customer={relaunch.project.customer_id}"), [relaunch.pk]
         )
         self.assertEqual(self.client.get("/api/offers/?status=nope").status_code, 422)
+
+        relaunch.offered_on = dt.date(2026, 9, 10)
+        relaunch.save()
+        self.assertEqual(ids("?period=2026-09"), [relaunch.pk])
+        self.assertEqual(ids("?until=2026-08-31"), [])

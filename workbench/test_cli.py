@@ -283,6 +283,10 @@ planned_work:
         )
         self.assertIn("Wireframes", result.output)
         self.assertIn("3.0", result.output)
+        result = self.wb("hours", "search", "--period", "this-month")
+        self.assertIn("Wireframes", result.output)
+        result = self.wb("hours", "search", "--period", "last-year")
+        self.assertNotIn("Wireframes", result.output)
 
         factories.AbsenceFactory.create(
             user=self.user, starts_on=in_days(7), description="Holidays"
@@ -392,7 +396,7 @@ planned_work:
             (["green-hours", "--period", f"{dt.date.today():%Y-%m}"], "3.0"),
             (["planning-vs-logbook"], project.customer.name),
             (["logging"], "ab"),
-            (["squeeze", "--from", in_days(-7), "--until", dt.date.today()], "ab"),
+            (["squeeze", "--since", in_days(-7), "--until", dt.date.today()], "ab"),
         ]:
             with self.subTest(args=args):
                 result = self.wb("reports", *args)

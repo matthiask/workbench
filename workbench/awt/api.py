@@ -18,7 +18,7 @@ from workbench.awt.reporting import (
     working_time_by_week,
 )
 from workbench.reporting.api import jsonable
-from workbench.tools.api import Serialized
+from workbench.tools.api import DateRangeFilter, Serialized, date_range
 
 
 router = Router(tags=["absences"])
@@ -35,32 +35,30 @@ class AbsenceOut(Schema):
     description: str
 
 
-class AbsenceFilter(Schema):
+class AbsenceFilter(DateRangeFilter):
     user: str | None = None
     reason: (
         Literal["vacation", "sickness", "paid", "school", "other", "correction"] | None
     ) = None
-    since: dt.date | None = None
-    until: dt.date | None = None
 
 
 @router.get("/absences/", response=list[AbsenceOut])
 @paginate
 def absence_list(request, filters: Query[AbsenceFilter]):
-    """Absences overlapping the period from ``since`` until ``until``, oldest
+    """Absences overlapping the period (or from ``since`` until ``until``), oldest
     first"""
     absences = Absence.objects.select_related("user")
     if filters.user:
         absences = absences.filter(user___short_name__iexact=filters.user)
     if filters.reason:
         absences = absences.filter(reason=filters.reason)
-    if filters.since:
+    since, until = date_range(filters)
+    if since:
         absences = absences.filter(
-            Q(ends_on__gte=filters.since)
-            | Q(ends_on__isnull=True, starts_on__gte=filters.since)
+            Q(ends_on__gte=since) | Q(ends_on__isnull=True, starts_on__gte=since)
         )
-    if filters.until:
-        absences = absences.filter(starts_on__lte=filters.until)
+    if until:
+        absences = absences.filter(starts_on__lte=until)
     return Serialized(
         absences.order_by("starts_on", "pk"),
         lambda absence: {
@@ -79,6 +77,7 @@ def absence_list(request, filters: Query[AbsenceFilter]):
 class WorkingTimeFilter(Schema):
     year: int | None = None
     user: str | None = None
+    all: bool = False
     weekly: bool = False
 
 
@@ -113,17 +112,17 @@ TOTALS = [
 ]
 
 
-@router.get("/working-time/")
+@router.get("/reports/working-time/")
 def working_time(request, filters: Query[WorkingTimeFilter]):
     """Annual working time of the authenticated user, of the user with the
-    given short name, or of all ``active`` users (requires the controlling
-    feature), like in the web interface
+    given short name, or of ``all`` users employed during the year (requires
+    the controlling feature), like in the web interface
 
     Hours are per month: The target, logged hours, absences and their sum
     (working time) and the balance. The total balance includes the vacation
     days credit. ``weekly`` adds the hours per week until the current one."""
     year = filters.year or dt.date.today().year
-    if filters.user == "active":
+    if filters.all:
         check_feature(request.user, FEATURES.CONTROLLING)
         users = list(active_users(year))
     elif filters.user:

@@ -44,6 +44,8 @@ class NotesAPITest(TestCase):
             ids(f"?deal={deal.pk}&invoice={invoice.pk}"), [on_invoice.pk, on_deal.pk]
         )
         self.assertEqual(ids("?created_by=AB"), [on_deal.pk])
+        self.assertEqual(ids("?period=this-month"), [on_invoice.pk, on_deal.pk])
+        self.assertEqual(ids("?period=last-year"), [])
 
         data = self.client.get(f"/api/notes/?deal={deal.pk}").json()["items"][0]
         self.assertEqual(data["created_by"], "ab")

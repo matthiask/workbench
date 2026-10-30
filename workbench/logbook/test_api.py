@@ -59,8 +59,8 @@ class LogbookAPITest(TestCase):
         service.save()
         self.assertEqual(ids(f"?offer={offer.pk}"), [mine.pk])
         self.assertEqual(ids("?rendered_by=AB"), [mine.pk])
-        self.assertEqual(ids("?rendered_since=2026-09-15"), [mine.pk])
-        self.assertEqual(ids("?rendered_until=2026-09-15"), [other.pk])
+        self.assertEqual(ids("?since=2026-09-15"), [mine.pk])
+        self.assertEqual(ids("?until=2026-09-15"), [other.pk])
 
     def test_costs(self):
         """Logged costs can be filtered, the totals include all matches"""

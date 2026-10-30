@@ -61,11 +61,11 @@ OFFSETS = {"last": -1, "this": 0, "next": 1}
 class DateRangeFilter(Schema):
     """``period`` is a year (2026), a month (2026-09), a quarter (2026-Q3) or
     relative like last-week, this-month, next-quarter or last-year;
-    ``date_from`` and ``date_until`` override its start and end"""
+    ``since`` and ``until`` override its start and end"""
 
     period: str | None = None
-    date_from: dt.date | None = None
-    date_until: dt.date | None = None
+    since: dt.date | None = None
+    until: dt.date | None = None
 
 
 def _months(first, count):
@@ -117,19 +117,30 @@ def _period(value):
     return [dt.date(year, 1, 1), dt.date(year, 12, 31)]
 
 
-def date_range(filters, *, default):
-    """The date range of a ``DateRangeFilter``, ``default`` without filters"""
-    date_from, date_until = _period(filters.period) if filters.period else default
-    date_from = filters.date_from or date_from
-    date_until = filters.date_until or date_until
-    if date_from > date_until:
+def date_range(filters, *, default=(None, None)):
+    """The date range of a ``DateRangeFilter``, ``default`` without filters;
+    the start or the end is ``None`` if open"""
+    since, until = _period(filters.period) if filters.period else default
+    since = filters.since or since
+    until = filters.until or until
+    if since and until and since > until:
         raise NinjaValidationError([
             {
-                "loc": ["query", "filters", "date_until"],
+                "loc": ["query", "filters", "until"],
                 "msg": _("The end of the period must not be before its start."),
             }
         ])
-    return [date_from, date_until]
+    return [since, until]
+
+
+def filter_date_range(queryset, filters, field):
+    """Filter the queryset by the ``DateRangeFilter``'s range of ``field``"""
+    since, until = date_range(filters)
+    if since:
+        queryset = queryset.filter(**{f"{field}__gte": since})
+    if until:
+        queryset = queryset.filter(**{f"{field}__lte": until})
+    return queryset
 
 
 class UsersFilter(Schema):

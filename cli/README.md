@@ -10,6 +10,12 @@ Searches show 100 results by default and tell you when there are more.
 `wb invoices search --open --limit 50 --offset 50`. With `--json` the results
 are in `items` and `count` is the number of all matches.
 
+Searches and reports of a period take `--period`: a year (`2026`), a month
+(`2026-09`), a quarter (`2026-Q3`) or relative to today (`last-week`,
+`this-month`, `next-quarter`, `last-year` etc.). `--since` and `--until`
+override its start and end, or are used on their own. Cutoff dates are given
+with `--date`.
+
 The `wb` program talks to the Workbench JSON API. Install it with
 [uv](https://docs.astral.sh/uv/):
 
@@ -205,12 +211,12 @@ list of the choices:
     wb deals create --title "Relaunch" --contact 345 --probability normal \
         --value Design=5000 --attribute Source=Referral --dry-run
 
-Deals accepted and declined in a period (this week by default, periods work
-like for the reports), and who changed which deals:
+Deals accepted and declined in a period (this week by default), and who
+changed which deals:
 
     wb deals stats --period 2026-Q3
     wb deals stats --period 2026 --user mk
-    wb deals history --from 2026-10-01
+    wb deals history --since 2026-10-01
 
 ## Notes
 
@@ -239,6 +245,7 @@ Searching them works in the CLI:
 
     wb hours search --project 1234
     wb hours search --rendered-by mk --since 2026-10-01
+    wb hours search --project 1234 --period last-month
     wb hours search wireframes --customer 345
     wb costs search --project 1234
     wb costs search --expenses --rendered-by mk
@@ -287,16 +294,13 @@ Controlling, as tables or with `--json`:
     wb reports third-party-costs
     wb reports open-items --date 2026-09-30
 
-Hours of a period, this week by default. Periods are years (`2026`), months
-(`2026-09`), quarters (`2026-Q3`) or relative to today (`last-week`,
-`this-month`, `next-quarter`, `last-year` etc.), `--from` and `--until`
-override their start and end. `--user` (repeatable) and `--team` filter the
-users:
+Hours of a period, this week by default. `--user` (repeatable) and `--team`
+filter the users:
 
     wb reports hours-per-customer --period 2026-Q3
     wb reports hours-per-customer --period last-month
     wb reports hours-per-type --period 2026-09 --team Design
-    wb reports green-hours --from 2026-09-01 --until 2026-09-15
+    wb reports green-hours --since 2026-09-01 --until 2026-09-15
     wb reports planning-vs-logbook --user mk
     wb reports logging --period 2026-09
 
@@ -307,7 +311,7 @@ controlling feature:
     wb reports working-time
     wb reports working-time --weekly
     wb reports working-time --year 2025 --user mk
-    wb reports working-time --user active
+    wb reports working-time --all
 
 Gross margin per user and project of the last month by default, requires the
 productivity feature:
@@ -328,14 +332,14 @@ Importing only adds milestones and planned work, it never changes or removes
 existing entries.
 
 Export the planning of a project or a campaign, or of users or a team (the
-next twelve weeks by default, periods work like for the reports) with their
+next twelve weeks by default) with their
 capacity per week. `--csv` writes one row per planned work and week, for
 spreadsheets:
 
     wb planning export --project 1234
     wb planning export --campaign 56 --csv > campaign.csv
     wb planning export --team Design --period 2026-Q4
-    wb planning export --user mk --from 2026-11-02 --until 2026-11-29
+    wb planning export --user mk --since 2026-11-02 --until 2026-11-29
 
 ## Project statistics
 

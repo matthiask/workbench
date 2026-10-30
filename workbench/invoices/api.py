@@ -17,8 +17,7 @@ from workbench.contacts.api import (
 )
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.projects.api import ProjectSummary, project_summary
-from workbench.projects.models import Project
-from workbench.tools.api import Serialized
+from workbench.tools.api import DateRangeFilter, Serialized, filter_date_range
 from workbench.tools.formats import Z2
 
 
@@ -79,20 +78,19 @@ def invoice_out(invoice, request):
     }
 
 
-class InvoiceFilter(Schema):
+class InvoiceFilter(DateRangeFilter):
     q: str = ""
     project: int | None = None
     customer: int | None = None
     status: Literal["in_preparation", "sent", "paid", "canceled"] | None = None
     open: bool = False
     overdue: bool = False
-    invoiced_since: dt.date | None = None
 
 
 @router.get("/invoices/", response=list[InvoiceOut])
 @paginate
 def invoice_list(request, filters: Query[InvoiceFilter]):
-    """Invoices, newest first
+    """Invoices, newest first; the period filters the invoice date
 
     ``open`` are invoices in preparation or sent, ``overdue`` invoices sent and
     due for more than 15 days (as for reminders)."""
@@ -107,8 +105,7 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
         invoices = invoices.open()
     if filters.overdue:
         invoices = invoices.overdue()
-    if filters.invoiced_since:
-        invoices = invoices.filter(invoiced_on__gte=filters.invoiced_since)
+    invoices = filter_date_range(invoices, filters, "invoiced_on")
     if filters.q:
         invoices = invoices.search(filters.q)
     return Serialized(
@@ -196,41 +193,22 @@ def _projected_invoice_out(projected_invoice, request):
     }
 
 
-@router.get(
-    "/projects/{project_id}/projected-invoices/", response=list[ProjectedInvoiceOut]
-)
-def projected_invoice_list(request, project_id: int):
-    """Planned invoicing of the project (gross margin, third party costs are
-    not included)"""
-    project = get_object_or_404(Project, pk=project_id)
-    return [
-        _projected_invoice_out(row, request)
-        for row in ProjectedInvoice.objects.filter(project=project).select_related(
-            "project"
-        )
-    ]
-
-
-class ProjectedInvoiceFilter(Schema):
+class ProjectedInvoiceFilter(DateRangeFilter):
     project: int | None = None
     customer: int | None = None
-    invoiced_since: dt.date | None = None
-    invoiced_until: dt.date | None = None
 
 
 @router.get("/projected-invoices/", response=list[ProjectedInvoiceOut])
 @paginate
 def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter]):
-    """Planned invoicing of all projects, oldest first"""
+    """Planned invoicing (gross margin, third party costs are not included),
+    oldest first; the period filters the planned invoice date"""
     projected = ProjectedInvoice.objects.select_related("project")
     if filters.project:
         projected = projected.filter(project=filters.project)
     if filters.customer:
         projected = projected.filter(project__customer=filters.customer)
-    if filters.invoiced_since:
-        projected = projected.filter(invoiced_on__gte=filters.invoiced_since)
-    if filters.invoiced_until:
-        projected = projected.filter(invoiced_on__lte=filters.invoiced_until)
+    projected = filter_date_range(projected, filters, "invoiced_on")
     return Serialized(
         projected.order_by("invoiced_on", "pk"),
         lambda row: _projected_invoice_out(row, request),

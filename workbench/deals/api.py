@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Literal
 
 from django.db import transaction
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.html import strip_tags
@@ -26,6 +27,7 @@ from workbench.tools.api import (
     Serialized,
     UsersFilter,
     date_range,
+    filter_date_range,
     filter_users,
     raise_form_errors,
 )
@@ -95,7 +97,7 @@ def deal_out(deal, request):
     }
 
 
-class DealFilter(Schema):
+class DealFilter(DateRangeFilter):
     q: str = ""
     status: Literal["open", "accepted", "declined"] | None = None
     customer: int | None = None
@@ -105,7 +107,9 @@ class DealFilter(Schema):
 @router.get("/deals/", response=list[DealOut])
 @paginate
 def deal_list(request, filters: Query[DealFilter]):
-    """Deals, open deals with the earliest expected decision first"""
+    """Deals, open deals with the earliest expected decision first; the
+    period filters the decision date (when the deal was closed, or is
+    expected to be decided if it is still open)"""
     deals = Deal.objects.select_related(
         "customer", "owned_by", "closing_type"
     ).prefetch_related("values__type", "contributors", "related_offers__project")
@@ -117,6 +121,11 @@ def deal_list(request, filters: Query[DealFilter]):
         deals = deals.filter(owned_by___short_name__iexact=filters.owned_by)
     if filters.q:
         deals = deals.search(filters.q)
+    deals = filter_date_range(
+        deals.annotate(decision_on=Coalesce("closed_on", "decision_expected_on")),
+        filters,
+        "decision_on",
+    )
     deals = deals.order_by("status", "decision_expected_on", "-pk")
     return Serialized(deals, lambda deal: deal_out(deal, request))
 
@@ -164,8 +173,8 @@ def deal_stats(request, filters: Query[StatsFilter]):
         row["sum"] += deal.value
 
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "accepted": {
             "count": accepted["count"],
             "sum": accepted["sum"],
@@ -226,8 +235,8 @@ def deal_history_api(request, filters: Query[StatsFilter]):
         int(change.version.row_data["id"]) for change in changes
     })
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "changes": [
             {
                 "created_at": timezone.localtime(change.created_at),

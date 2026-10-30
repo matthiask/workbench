@@ -22,28 +22,20 @@ class ReportsAPITest(TestCase):
 
     def test_periods(self):
         """Periods are years, months or quarters, the dates override them"""
-        url = "/api/hours-per-customer/"
+        url = "/api/reports/hours-per-customer/"
         data = self.get(url, period="2026-Q3")
-        self.assertEqual(
-            (data["date_from"], data["date_until"]), ("2026-07-01", "2026-09-30")
-        )
+        self.assertEqual((data["since"], data["until"]), ("2026-07-01", "2026-09-30"))
         data = self.get(url, period="2026-2")
-        self.assertEqual(
-            (data["date_from"], data["date_until"]), ("2026-02-01", "2026-02-28")
-        )
-        data = self.get(url, period="2026", date_until="2026-03-31")
-        self.assertEqual(
-            (data["date_from"], data["date_until"]), ("2026-01-01", "2026-03-31")
-        )
+        self.assertEqual((data["since"], data["until"]), ("2026-02-01", "2026-02-28"))
+        data = self.get(url, period="2026", until="2026-03-31")
+        self.assertEqual((data["since"], data["until"]), ("2026-01-01", "2026-03-31"))
         data = self.get(url)
-        self.assertEqual(data["date_from"], monday().isoformat())
+        self.assertEqual(data["since"], monday().isoformat())
 
         for period in ["2026-13", "2026-Q5", "last month", "2026-00"]:
             response = self.client.get(url, {"period": period})
             self.assertEqual(response.status_code, 422)
-        response = self.client.get(
-            url, {"period": "2026-09", "date_from": "2026-10-01"}
-        )
+        response = self.client.get(url, {"period": "2026-09", "since": "2026-10-01"})
         self.assertEqual(response.status_code, 422)
 
     @travel("2026-02-11 12:00")
@@ -61,14 +53,16 @@ class ReportsAPITest(TestCase):
             ("last-year", ("2025-01-01", "2025-12-31")),
         ]:
             with self.subTest(period=period):
-                data = self.get("/api/hours-per-customer/", period=period)
-                self.assertEqual((data["date_from"], data["date_until"]), expected)
+                data = self.get("/api/reports/hours-per-customer/", period=period)
+                self.assertEqual((data["since"], data["until"]), expected)
 
         data = self.get(
-            "/api/hours-per-customer/", period="last-month", date_from="2026-01-15"
+            "/api/reports/hours-per-customer/", period="last-month", since="2026-01-15"
         )
-        self.assertEqual(data["date_from"], "2026-01-15")
-        response = self.client.get("/api/hours-per-customer/", {"period": "last-day"})
+        self.assertEqual(data["since"], "2026-01-15")
+        response = self.client.get(
+            "/api/reports/hours-per-customer/", {"period": "last-day"}
+        )
         self.assertEqual(response.status_code, 422)
 
     def test_users(self):
@@ -80,7 +74,7 @@ class ReportsAPITest(TestCase):
                 service=service, rendered_by=user, hours=2
             )
 
-        url = "/api/hours-per-customer/"
+        url = "/api/reports/hours-per-customer/"
         self.assertEqual(self.get(url)["total_hours"], 4)
         data = self.get(url, user="AB")
         self.assertEqual(data["total_hours"], 2)
@@ -109,29 +103,29 @@ class ReportsAPITest(TestCase):
             weeks=[monday()],
         )
 
-        data = self.get("/api/hours-per-customer/")
+        data = self.get("/api/reports/hours-per-customer/")
         [customer] = data["customers"]
         self.assertEqual(customer["customer"]["id"], service.project.customer_id)
         self.assertEqual(customer["users"], {"ab": 3})
 
-        data = self.get("/api/hours-per-type/")
+        data = self.get("/api/reports/hours-per-type/")
         [user] = data["users"]
         self.assertEqual(user["user"], "ab")
         self.assertEqual(user["external"], 3)
         self.assertEqual(user["types"][0]["reached_percentage"], 100)
 
-        data = self.get("/api/green-hours/")
+        data = self.get("/api/reports/green-hours/")
         self.assertEqual(data["users"][0]["user"], "ab")
         self.assertEqual(data["users"][0]["overdrawn"], 3)
         self.assertEqual(data["total"]["total"], 3)
 
-        data = self.get("/api/planning-vs-logbook/", user="ab")
+        data = self.get("/api/reports/planning-vs-logbook/", user="ab")
         self.assertEqual(data["planned"], 10)
         self.assertEqual(data["logged"], 3)
         [customer] = data["customers"]
         self.assertEqual(customer["weeks"][0]["week"], monday().isoformat())
 
-        data = self.get("/api/logging/")
+        data = self.get("/api/reports/logging/")
         [user] = data["users"]
         self.assertEqual(user["logged_hours"]["sum"], 3)
         self.assertIsInstance(user["logging"], str)
@@ -158,7 +152,7 @@ class ReportsAPITest(TestCase):
             project=project, invoiced_on=in_days(30), gross_margin=1000
         )
 
-        data = self.get("/api/project-budget-statistics/")
+        data = self.get("/api/reports/budget/")
         [row] = data["projects"]
         self.assertEqual(row["project"]["id"], project.id)
         self.assertEqual(row["owned_by"], "ab")
@@ -166,30 +160,28 @@ class ReportsAPITest(TestCase):
         self.assertEqual(row["delta"], 450)
         self.assertEqual(data["overall"]["delta_positive"], 450)
         self.assertEqual(
-            self.get("/api/project-budget-statistics/", owned_by="AB")["projects"],
+            self.get("/api/reports/budget/", owned_by="AB")["projects"],
             data["projects"],
         )
         self.assertEqual(
-            self.get("/api/project-budget-statistics/", internal=True)["projects"], []
+            self.get("/api/reports/budget/", internal=True)["projects"], []
         )
-        response = self.client.get(
-            "/api/project-budget-statistics/", {"owned_by": "xy"}
-        )
+        response = self.client.get("/api/reports/budget/", {"owned_by": "xy"})
         self.assertEqual(response.status_code, 422)
         self.assertIn("owned_by", response.content.decode())
 
-        data = self.get("/api/third-party-costs/")
+        data = self.get("/api/reports/third-party-costs/")
         [row] = data["projects"]
         self.assertEqual(row["logged"], {"past": 120, "future": 0})
         self.assertEqual(data["total_not_invoiced"], 120)
 
-        data = self.get("/api/open-items/")
+        data = self.get("/api/reports/open-items/")
         self.assertEqual(data["total_excl_tax"], 200)
         self.assertEqual(data["invoices"][0]["project"]["id"], project.id)
-        data = self.get("/api/open-items/", cutoff_date=in_days(-50).isoformat())
+        data = self.get("/api/reports/open-items/", date=in_days(-50).isoformat())
         self.assertEqual(data["invoices"], [])
 
-        data = self.get("/api/projected-gross-margin/")
+        data = self.get("/api/reports/projected-gross-margin/")
         month = f"{in_days(30):%Y-%m}"
         # The invoice's gross margin (200 - 120) uses up the projection
         self.assertEqual(data["monthly"], {month: 920})
@@ -217,7 +209,7 @@ class ReportsAPITest(TestCase):
             rendered_on=dt.date(2026, 9, 10),
             hours=5,
         )
-        data = self.get("/api/squeeze/", period="2026-09")
+        data = self.get("/api/reports/squeeze/", period="2026-09")
         [user] = data["users"]
         self.assertEqual(user["user"], "ab")
         self.assertEqual(user["hours_in_range"], 5)
@@ -234,18 +226,21 @@ class ReportsAPITest(TestCase):
     def test_features(self):
         """The reports require the same features as in the web interface"""
         for url in [
-            "/api/projected-gross-margin/",
-            "/api/project-budget-statistics/",
-            "/api/third-party-costs/",
-            "/api/open-items/",
-            "/api/hours-per-type/",
-            "/api/green-hours/",
-            "/api/logging/",
-            "/api/squeeze/",
+            "/api/reports/projected-gross-margin/",
+            "/api/reports/budget/",
+            "/api/reports/third-party-costs/",
+            "/api/reports/open-items/",
+            "/api/reports/hours-per-type/",
+            "/api/reports/green-hours/",
+            "/api/reports/logging/",
+            "/api/reports/squeeze/",
         ]:
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 403)
-        for url in ["/api/hours-per-customer/", "/api/planning-vs-logbook/"]:
+        for url in [
+            "/api/reports/hours-per-customer/",
+            "/api/reports/planning-vs-logbook/",
+        ]:
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
 
@@ -256,5 +251,5 @@ class ReportsAPITest(TestCase):
         auth = {"Authorization": "Bearer secret"}
         response = self.client.get("/api/key-data/", headers=auth)
         self.assertEqual(response.status_code, 200)
-        response = self.client.get("/api/project-budget-statistics/", headers=auth)
+        response = self.client.get("/api/reports/budget/", headers=auth)
         self.assertEqual(response.status_code, 401)

@@ -16,7 +16,12 @@ from workbench.offers.models import Offer
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.api import Serialized, full_clean
+from workbench.tools.api import (
+    DateRangeFilter,
+    Serialized,
+    filter_date_range,
+    full_clean,
+)
 
 
 # Same as in the web interface
@@ -152,15 +157,6 @@ def _project_offers(project, request):
     ]
 
 
-@router.get("/projects/{project_id}/offers/", response=list[OfferOut])
-def offer_list(request, project_id: int):
-    """All offers of the project with their services"""
-    return _project_offers(
-        get_object_or_404(Project.objects.select_related("customer"), pk=project_id),
-        request,
-    )
-
-
 @router.get("/projects/{project_id}/offers/context/", response=OfferContext)
 def offer_context(request, project_id: int):
     """Everything needed to write an offer, and the schema of the offer"""
@@ -187,7 +183,7 @@ OFFER_STATUSES = {
 }
 
 
-class OfferFilter(Schema):
+class OfferFilter(DateRangeFilter):
     q: str = ""
     status: (
         Literal["in_preparation", "service_group", "offered", "accepted", "declined"]
@@ -201,7 +197,7 @@ class OfferFilter(Schema):
 @router.get("/offers/", response=list[OfferOut])
 @paginate
 def offer_list_search(request, filters: Query[OfferFilter]):
-    """Search offers, newest first"""
+    """Search offers, newest first; the period filters the offer date"""
     offers = (
         Offer.objects
         .select_related("project")
@@ -218,6 +214,7 @@ def offer_list_search(request, filters: Query[OfferFilter]):
         offers = offers.filter(owned_by___short_name__iexact=filters.owned_by)
     if filters.q:
         offers = offers.search(filters.q)
+    offers = filter_date_range(offers, filters, "offered_on")
     return Serialized(
         offers, lambda offer: offer_out(offer, list(offer.services.all()), request)
     )

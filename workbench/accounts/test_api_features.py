@@ -19,14 +19,12 @@ class APIFeaturesTest(TestCase):
         self.client.force_login(project.owned_by)
 
         for method, url in [
-            ("get", f"/api/projects/{project.pk}/offers/"),
             ("get", f"/api/projects/{project.pk}/offers/context/"),
             ("post", f"/api/projects/{project.pk}/offers/"),
             ("get", "/api/offers/"),
             ("get", f"/api/offers/{offer.pk}/"),
             ("put", f"/api/offers/{offer.pk}/"),
             ("get", f"/api/projects/stats/?ids={project.pk}"),
-            ("get", f"/api/projects/{project.pk}/projected-invoices/"),
             ("get", "/api/projected-invoices/"),
             ("get", "/api/invoices/"),
             ("get", f"/api/invoices/{invoice.pk}/"),

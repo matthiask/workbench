@@ -554,7 +554,8 @@ def _echo_more(data, offset, what="results", *, note=""):
 
 
 def _period_options(default):
-    """Options for the period of a report, ``default`` is its description"""
+    """Options for the period of a report or a search, ``default`` describes
+    it"""
 
     def decorator(fn):
         for option in reversed([
@@ -565,14 +566,13 @@ def _period_options(default):
                 f" {default}.",
             ),
             click.option(
-                "--from",
-                "date_from",
+                "--since",
                 type=click.DateTime(formats=["%Y-%m-%d"]),
                 help="Start of the period, overrides the period's start.",
             ),
             click.option(
                 "--until",
-                "date_until",
+                "until",
                 type=click.DateTime(formats=["%Y-%m-%d"]),
                 help="End of the period, overrides the period's end.",
             ),
@@ -590,12 +590,12 @@ def _users_options(fn):
     )(fn)
 
 
-def _period_params(period, date_from, date_until, *, users=(), team=None):
+def _period_params(period, since, until, *, users=(), team=None):
     params = {"period": period, "user": list(users), "team": team}
-    if date_from:
-        params["date_from"] = date_from.date().isoformat()
-    if date_until:
-        params["date_until"] = date_until.date().isoformat()
+    if since:
+        params["since"] = since.date().isoformat()
+    if until:
+        params["until"] = until.date().isoformat()
     return {key: value for key, value in params.items() if value}
 
 
@@ -612,7 +612,7 @@ def _percentage(value):
 
 
 def _echo_period(data):
-    console.print(f"{data['date_from']} – {data['date_until']}", style="bold")
+    console.print(f"{data['since']} – {data['until']}", style="bold")
 
 
 @click.group(cls=_Group)
@@ -879,7 +879,10 @@ def show_project(project_id, as_json):
     """Show a project and its offers"""
     project = _request("GET", f"projects/{project_id}/")
     # Offers require the controlling feature
-    offers = _request("GET", f"projects/{project_id}/offers/", optional=True)
+    offers = _request(
+        "GET", "offers/", params={"project": project_id, "limit": 1000}, optional=True
+    )
+    offers = offers["items"] if offers else None
     if as_json:
         _echo_json(project | {"offers": offers})
         return
@@ -1211,9 +1214,22 @@ def context(project_id):
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.")
+@_period_options("filters the offer date")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_offers(query, status, project, customer, owned_by, limit, offset, as_json):
+def search_offers(
+    query,
+    status,
+    project,
+    customer,
+    owned_by,
+    period,
+    since,
+    until,
+    limit,
+    offset,
+    as_json,
+):
     """Search offers, newest first"""
     params = {"q": " ".join(query)}
     if status:
@@ -1224,6 +1240,7 @@ def search_offers(query, status, project, customer, owned_by, limit, offset, as_
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
+    params |= _period_params(period, since, until)
     data = _request("GET", "offers/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
@@ -1289,18 +1306,18 @@ def planning():
 @click.option("--csv", "as_csv", is_flag=True, help="One row per work and week.")
 @click.option("--json", "as_json", is_flag=True)
 def planning_export(
-    project, campaign, period, date_from, date_until, users, team, as_csv, as_json
+    project, campaign, period, since, until, users, team, as_csv, as_json
 ):
     """Export planned work, milestones and the capacity per week
 
     The capacity (hours not planned yet, less absences and holidays) is shown
     when filtering by users or a team."""
-    params = _period_params(period, date_from, date_until, users=users, team=team)
+    params = _period_params(period, since, until, users=users, team=team)
     if project:
         params["project"] = project
     if campaign:
         params["campaign"] = campaign
-    data = _request("GET", "planning/", params=params)
+    data = _request("GET", "planning/export/", params=params)
     if as_json:
         _echo_json(data)
     elif as_csv:
@@ -1351,7 +1368,7 @@ def _echo_planning_csv(data):
 
 
 def _echo_planning(data):
-    if not data["date_from"]:
+    if not data["since"]:
         console.print("Nothing planned yet.")
         return
     _echo_period(data)
@@ -1504,13 +1521,22 @@ def invoices():
 )
 @click.option("--open", "open_", is_flag=True, help="In preparation or sent.")
 @click.option("--overdue", is_flag=True, help="Due for more than 15 days.")
-@click.option(
-    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced since."
-)
+@_period_options("filters the invoice date")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_invoices(
-    query, project, customer, status, open_, overdue, since, limit, offset, as_json
+    query,
+    project,
+    customer,
+    status,
+    open_,
+    overdue,
+    period,
+    since,
+    until,
+    limit,
+    offset,
+    as_json,
 ):
     """Search invoices, newest first"""
     params = {"q": " ".join(query), "open": _bool(open_), "overdue": _bool(overdue)}
@@ -1520,8 +1546,7 @@ def search_invoices(
         params["customer"] = customer
     if status:
         params["status"] = status
-    if since:
-        params["invoiced_since"] = since.date().isoformat()
+    params |= _period_params(period, since, until)
     data = _request("GET", "invoices/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
@@ -1652,10 +1677,21 @@ def _echo_notes(notes):
 @click.option("--invoice", type=int, help="Invoice ID.")
 @click.option("--recurring-invoice", type=int, help="Recurring invoice ID.")
 @click.option("--created-by", help="Short name.")
+@_period_options("filters the creation date")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_notes(
-    query, deal, invoice, recurring_invoice, created_by, limit, offset, as_json
+    query,
+    deal,
+    invoice,
+    recurring_invoice,
+    created_by,
+    period,
+    since,
+    until,
+    limit,
+    offset,
+    as_json,
 ):
     """Search notes, all of them or those of some objects, newest first"""
     params = {"q": " ".join(query)}
@@ -1667,6 +1703,7 @@ def search_notes(
     ]:
         if value:
             params[key] = value
+    params |= _period_params(period, since, until)
     data = _request("GET", "notes/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
@@ -1772,12 +1809,7 @@ def hours():
 @click.option("--offer", type=int, help="Offer ID.")
 @click.option("--service", type=int, help="Service ID.")
 @click.option("--rendered-by", help="Short name.")
-@click.option(
-    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered since."
-)
-@click.option(
-    "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered until."
-)
+@_period_options("filters the date the work was done")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_hours(
@@ -1787,6 +1819,7 @@ def search_hours(
     offer,
     service,
     rendered_by,
+    period,
     since,
     until,
     limit,
@@ -1804,10 +1837,7 @@ def search_hours(
     ]:
         if value:
             params[key] = value
-    if since:
-        params["rendered_since"] = since.date().isoformat()
-    if until:
-        params["rendered_until"] = until.date().isoformat()
+    params |= _period_params(period, since, until)
     data = _request(
         "GET", "logbook/hours/", params=params | _page_params(limit, offset)
     )
@@ -1856,27 +1886,18 @@ def absences():
         "correction",
     ]),
 )
-@click.option(
-    "--since",
-    type=click.DateTime(formats=["%Y-%m-%d"]),
-    help="Absences ending on or after this date, defaults to today.",
-)
-@click.option(
-    "--until",
-    type=click.DateTime(formats=["%Y-%m-%d"]),
-    help="Absences starting on or before this date.",
-)
+@_period_options("absences overlapping it, current and upcoming ones by default")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_absences(user, reason, since, until, limit, offset, as_json):
+def search_absences(user, reason, period, since, until, limit, offset, as_json):
     """Search absences, current and upcoming ones by default"""
-    params = {"since": (since.date() if since else dt.date.today()).isoformat()}
+    params = _period_params(period, since, until) or {
+        "since": dt.date.today().isoformat()
+    }
     if user:
         params["user"] = user
     if reason:
         params["reason"] = reason
-    if until:
-        params["until"] = until.date().isoformat()
     data = _request("GET", "absences/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
@@ -1908,12 +1929,7 @@ def costs():
 @click.option("--service", type=int, help="Service ID.")
 @click.option("--rendered-by", help="Short name.")
 @click.option("--expenses", is_flag=True, help="Paid from someone's own pocket.")
-@click.option(
-    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered since."
-)
-@click.option(
-    "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Rendered until."
-)
+@_period_options("filters the date the work was done")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_costs(
@@ -1924,6 +1940,7 @@ def search_costs(
     service,
     rendered_by,
     expenses,
+    period,
     since,
     until,
     limit,
@@ -1941,10 +1958,7 @@ def search_costs(
     ]:
         if value:
             params[key] = value
-    if since:
-        params["rendered_since"] = since.date().isoformat()
-    if until:
-        params["rendered_until"] = until.date().isoformat()
+    params |= _period_params(period, since, until)
     data = _request(
         "GET", "logbook/costs/", params=params | _page_params(limit, offset)
     )
@@ -1986,25 +2000,18 @@ def projected_invoices():
 @projected_invoices.command("search")
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option(
-    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced since."
-)
-@click.option(
-    "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced until."
-)
+@_period_options("filters the planned invoice date")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_projected_invoices(project, customer, since, until, limit, offset, as_json):
+def search_projected_invoices(
+    project, customer, period, since, until, limit, offset, as_json
+):
     """Search the planned invoicing (gross margin), oldest first"""
-    params = {}
+    params = _period_params(period, since, until)
     if project:
         params["project"] = project
     if customer:
         params["customer"] = customer
-    if since:
-        params["invoiced_since"] = since.date().isoformat()
-    if until:
-        params["invoiced_until"] = until.date().isoformat()
     data = _request(
         "GET", "projected-invoices/", params=params | _page_params(limit, offset)
     )
@@ -2035,15 +2042,19 @@ def deals():
 )
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.")
+@_period_options("filters the decision date (closed or expected)")
 @_page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_deals(query, status, customer, owned_by, limit, offset, as_json):
+def search_deals(
+    query, status, customer, owned_by, period, since, until, limit, offset, as_json
+):
     """Search deals, open deals by default"""
     params = {"q": " ".join(query), "status": status}
     if customer:
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
+    params |= _period_params(period, since, until)
     data = _request("GET", "deals/", params=params | _page_params(limit, offset))
     if as_json:
         _echo_json(data)
@@ -2095,7 +2106,7 @@ def _key_values(values, option):
 @_period_options("defaults to this week")
 @_users_options
 @click.option("--json", "as_json", is_flag=True)
-def deal_stats(period, date_from, date_until, users, team, as_json):
+def deal_stats(period, since, until, users, team, as_json):
     """Deals accepted and declined in a period
 
     Users filter the deals' owners; accepted deals are split between users
@@ -2103,7 +2114,7 @@ def deal_stats(period, date_from, date_until, users, team, as_json):
     data = _request(
         "GET",
         "deals/stats/",
-        params=_period_params(period, date_from, date_until, users=users, team=team),
+        params=_period_params(period, since, until, users=users, team=team),
     )
     if as_json:
         _echo_json(data)
@@ -2170,12 +2181,12 @@ def deal_stats(period, date_from, date_until, users, team, as_json):
 @_period_options("defaults to this week")
 @_users_options
 @click.option("--json", "as_json", is_flag=True)
-def deal_history(period, date_from, date_until, users, team, as_json):
+def deal_history(period, since, until, users, team, as_json):
     """Changes of deals in a period, users filter who made them"""
     data = _request(
         "GET",
         "deals/history/",
-        params=_period_params(period, date_from, date_until, users=users, team=team),
+        params=_period_params(period, since, until, users=users, team=team),
     )
     if as_json:
         _echo_json(data)
@@ -2472,22 +2483,29 @@ def cash_data(date):
 
 @reports.command("working-time")
 @click.option("--year", type=int, help="Defaults to the current year.")
+@click.option("--user", help="Short name, defaults to you.")
 @click.option(
-    "--user",
-    help="Short name, or 'active' for all active users (requires the"
-    " controlling feature). Defaults to you.",
+    "--all",
+    "all_",
+    is_flag=True,
+    help="Everyone employed during the year, requires the controlling feature.",
 )
 @click.option("--weekly", is_flag=True, help="Show the hours per week.")
 @click.option("--json", "as_json", is_flag=True)
-def working_time(year, user, weekly, as_json):
+def working_time(year, user, all_, weekly, as_json):
     """Annual working time: Target, logged hours, absences and balance
 
     The balance per week compares the working time to a target based on the
     working time per day, the employment and the holidays."""
-    params = {"year": year, "user": user, "weekly": _bool(weekly) if weekly else None}
+    params = {
+        "year": year,
+        "user": user,
+        "all": _bool(all_) if all_ else None,
+        "weekly": _bool(weekly) if weekly else None,
+    }
     data = _request(
         "GET",
-        "working-time/",
+        "reports/working-time/",
         params={key: value for key, value in params.items() if value},
     )
     if as_json:
@@ -2565,7 +2583,7 @@ def working_time(year, user, weekly, as_json):
 @click.option("--json", "as_json", is_flag=True)
 def projected_gross_margin(as_json):
     """Planned invoicing of open projects which hasn't been invoiced yet"""
-    data = _request("GET", "projected-gross-margin/")
+    data = _request("GET", "reports/projected-gross-margin/")
     if as_json:
         _echo_json(data)
         return
@@ -2591,9 +2609,9 @@ def projected_gross_margin(as_json):
 
 @reports.command("budget")
 @click.option(
-    "--cutoff-date",
+    "--date",
     type=click.DateTime(formats=["%Y-%m-%d"]),
-    help="Defaults to today.",
+    help="Cutoff date, defaults to today.",
 )
 @click.option("--owned-by", help="Short name, or 'inactive' for inactive users.")
 @click.option("--internal", is_flag=True, help="Internal projects only.")
@@ -2609,7 +2627,7 @@ def projected_gross_margin(as_json):
     ]),
 )
 @click.option("--json", "as_json", is_flag=True)
-def budget(cutoff_date, owned_by, internal, closed, filter_, as_json):
+def budget(date, owned_by, internal, closed, filter_, as_json):
     """Project budget statistics: Logged work compared to offers and invoices
 
     Delta is the logbook minus the invoiced amount, positive for work which
@@ -2617,14 +2635,14 @@ def budget(cutoff_date, owned_by, internal, closed, filter_, as_json):
     params = {
         "owned_by": owned_by,
         "internal": _bool(internal) if internal else None,
-        "closed_during_the_last_year": _bool(closed) if closed else None,
-        "s": filter_,
+        "closed": _bool(closed) if closed else None,
+        "filter": filter_,
     }
-    if cutoff_date:
-        params["cutoff_date"] = cutoff_date.date().isoformat()
+    if date:
+        params["date"] = date.date().isoformat()
     data = _request(
         "GET",
-        "project-budget-statistics/",
+        "reports/budget/",
         params={key: value for key, value in params.items() if value},
     )
     if as_json:
@@ -2688,7 +2706,7 @@ def third_party_costs(this_year, as_json):
     Delta is positive for costs which haven't been invoiced yet."""
     data = _request(
         "GET",
-        "third-party-costs/",
+        "reports/third-party-costs/",
         params={"this_year": _bool(this_year)} if this_year else {},
     )
     if as_json:
@@ -2740,8 +2758,8 @@ def open_items(date, as_json):
     """Invoices sent but not paid on the cutoff date"""
     data = _request(
         "GET",
-        "open-items/",
-        params={"cutoff_date": date.date().isoformat()} if date else {},
+        "reports/open-items/",
+        params={"date": date.date().isoformat()} if date else {},
     )
     if as_json:
         _echo_json(data)
@@ -2763,12 +2781,12 @@ def open_items(date, as_json):
 @_period_options("defaults to this week")
 @_users_options
 @click.option("--json", "as_json", is_flag=True)
-def hours_per_customer(period, date_from, date_until, users, team, as_json):
+def hours_per_customer(period, since, until, users, team, as_json):
     """Logged hours per customer and user"""
     data = _request(
         "GET",
-        "hours-per-customer/",
-        params=_period_params(period, date_from, date_until, users=users, team=team),
+        "reports/hours-per-customer/",
+        params=_period_params(period, since, until, users=users, team=team),
     )
     if as_json:
         _echo_json(data)
@@ -2794,14 +2812,14 @@ def hours_per_customer(period, date_from, date_until, users, team, as_json):
 @_period_options("defaults to this week")
 @_users_options
 @click.option("--json", "as_json", is_flag=True)
-def hours_per_type(period, date_from, date_until, users, team, as_json):
+def hours_per_type(period, since, until, users, team, as_json):
     """Logged hours per user, external and per internal type
 
     Shows the percentage reached and expected (in parentheses)."""
     data = _request(
         "GET",
-        "hours-per-type/",
-        params=_period_params(period, date_from, date_until, users=users, team=team),
+        "reports/hours-per-type/",
+        params=_period_params(period, since, until, users=users, team=team),
     )
     if as_json:
         _echo_json(data)
@@ -2828,14 +2846,14 @@ def hours_per_type(period, date_from, date_until, users, team, as_json):
 @_period_options("defaults to this week")
 @_users_options
 @click.option("--json", "as_json", is_flag=True)
-def green_hours(period, date_from, date_until, users, team, as_json):
+def green_hours(period, since, until, users, team, as_json):
     """Profitable, overdrawn, maintenance and internal hours per user
 
     Green hours are profitable and maintenance hours."""
     data = _request(
         "GET",
-        "green-hours/",
-        params=_period_params(period, date_from, date_until, users=users, team=team),
+        "reports/green-hours/",
+        params=_period_params(period, since, until, users=users, team=team),
     )
     if as_json:
         _echo_json(data)
@@ -2875,15 +2893,15 @@ def green_hours(period, date_from, date_until, users, team, as_json):
 @_period_options("defaults to this week")
 @_users_options
 @click.option("--json", "as_json", is_flag=True)
-def planning_vs_logbook(period, date_from, date_until, users, team, as_json):
+def planning_vs_logbook(period, since, until, users, team, as_json):
     """Planned and logged hours per customer
 
     The allocation is the customer's share of the logged hours relative to
     its share of the planned hours."""
     data = _request(
         "GET",
-        "planning-vs-logbook/",
-        params=_period_params(period, date_from, date_until, users=users, team=team),
+        "reports/planning-vs-logbook/",
+        params=_period_params(period, since, until, users=users, team=team),
     )
     if as_json:
         _echo_json(data)
@@ -2911,10 +2929,10 @@ def planning_vs_logbook(period, date_from, date_until, users, team, as_json):
 @reports.command("logging")
 @_period_options("defaults to this week")
 @click.option("--json", "as_json", is_flag=True)
-def logging_report(period, date_from, date_until, as_json):
+def logging_report(period, since, until, as_json):
     """How and when users log their hours, and insufficient breaks"""
     data = _request(
-        "GET", "logging/", params=_period_params(period, date_from, date_until)
+        "GET", "reports/logging/", params=_period_params(period, since, until)
     )
     if as_json:
         _echo_json(data)
@@ -2947,14 +2965,14 @@ def logging_report(period, date_from, date_until, as_json):
 @reports.command("squeeze")
 @_period_options("defaults to the last month")
 @click.option("--json", "as_json", is_flag=True)
-def squeeze(period, date_from, date_until, as_json):
+def squeeze(period, since, until, as_json):
     """Gross margin per user and project, requires the productivity feature
 
     Projects' gross margins are split between users by hours weighted with
     the hourly rate. The delta compares the gross margin to the expected
     gross margin."""
     data = _request(
-        "GET", "squeeze/", params=_period_params(period, date_from, date_until)
+        "GET", "reports/squeeze/", params=_period_params(period, since, until)
     )
     if as_json:
         _echo_json(data)

@@ -50,7 +50,7 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(ids("?open=true"), {sent.pk, draft.pk})
         self.assertEqual(ids("?overdue=true"), {sent.pk})
         self.assertEqual(ids("?status=paid"), {paid.pk})
-        self.assertEqual(ids("?invoiced_since=2026-01-01"), {sent.pk})
+        self.assertEqual(ids("?since=2026-01-01"), {sent.pk})
         self.assertEqual(ids(f"?q={paid.code}"), {paid.pk})
         self.assertEqual(self.client.get("/api/invoices/?status=nope").status_code, 422)
 
@@ -74,7 +74,8 @@ class InvoicesAPITest(TestCase):
         )
         self.client.force_login(project.owned_by)
 
-        data = self.client.get(f"/api/projects/{project.pk}/projected-invoices/").json()
+        data = self.client.get(f"/api/projected-invoices/?project={project.pk}")
+        data = data.json()["items"]
         self.assertEqual(
             data,
             [
@@ -123,11 +124,11 @@ class InvoicesAPITest(TestCase):
             [(sooner.project.code, "2000.00")],
         )
         self.assertEqual(
-            rows(f"?invoiced_since={in_days(45).isoformat()}"),
+            rows(f"?since={in_days(45).isoformat()}"),
             [(later.project.code, "1000.00")],
         )
         self.assertEqual(
-            rows(f"?invoiced_until={in_days(45).isoformat()}"),
+            rows(f"?until={in_days(45).isoformat()}"),
             [(sooner.project.code, "2000.00")],
         )
 

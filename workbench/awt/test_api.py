@@ -75,7 +75,7 @@ class WorkingTimeAPITest(TestCase):
         )
         self.client.force_login(user)
 
-        data = self.client.get("/api/working-time/").json()
+        data = self.client.get("/api/reports/working-time/").json()
         self.assertEqual(data["year"], 2026)
         [row] = data["users"]
         self.assertEqual(row["user"], "ab")
@@ -87,7 +87,7 @@ class WorkingTimeAPITest(TestCase):
         self.assertEqual(march["absences_time"], 16)
         self.assertEqual(march["public_holiday_days"], 1)
 
-        data = self.client.get("/api/working-time/", {"weekly": True}).json()
+        data = self.client.get("/api/reports/working-time/", {"weekly": True}).json()
         week = data["users"][0]["weeks"][-1]
         # Monday is a holiday, Thursday is still in the future
         self.assertEqual(
@@ -111,9 +111,9 @@ class WorkingTimeAPITest(TestCase):
         factories.UserFactory.create(_short_name="cd")
         self.client.force_login(user)
 
-        response = self.client.get("/api/working-time/", {"user": "CD"})
+        response = self.client.get("/api/reports/working-time/", {"user": "CD"})
         self.assertEqual(response.status_code, 200)
-        response = self.client.get("/api/working-time/", {"user": "xy"})
+        response = self.client.get("/api/reports/working-time/", {"user": "xy"})
         self.assertEqual(response.status_code, 422)
-        response = self.client.get("/api/working-time/", {"user": "active"})
+        response = self.client.get("/api/reports/working-time/", {"all": True})
         self.assertEqual(response.status_code, 403)

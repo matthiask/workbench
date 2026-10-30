@@ -394,7 +394,7 @@ def _mondays(date_from, date_until):
         week += dt.timedelta(days=7)
 
 
-@router.get("/planning/")
+@router.get("/planning/export/")
 def planning_export(request, filters: Query[PlanningExportFilter]):
     """Planned work, milestones and external work, optionally of a project, a
     campaign, users or a team
@@ -422,8 +422,8 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
 
     if (
         filters.period
-        or filters.date_from
-        or filters.date_until
+        or filters.since
+        or filters.until
         or (filters.project is None and filters.campaign is None)
     ):
         period = date_range(
@@ -495,8 +495,8 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
             ]
 
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "weeks": [{"week": week} | hours for week, hours in by_week.items()],
         "planned_work": planned_work,
         "milestones": [

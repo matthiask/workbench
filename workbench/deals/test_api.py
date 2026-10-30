@@ -43,6 +43,11 @@ class DealsAPITest(TestCase):
         self.assertEqual(ids("?owned_by=AB"), [deal.pk])
         self.assertEqual(ids(f"?customer={declined.customer_id}"), [declined.pk])
         self.assertEqual(ids("?q=relaunch"), [deal.pk])
+        # Open deals by their expected decision, closed deals by closing date
+        declined.closed_on = dt.date(2026, 11, 15)
+        declined.save()
+        self.assertEqual(ids("?period=2026-11"), [declined.pk])
+        self.assertEqual(ids("?since=2026-11-20"), [deal.pk])
 
         data = self.client.get(f"/api/deals/{deal.pk}/").json()
         self.assertEqual(data["code"], deal.code)

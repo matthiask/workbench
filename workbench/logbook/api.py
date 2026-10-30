@@ -8,7 +8,12 @@ from ninja.pagination import paginate
 
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
-from workbench.tools.api import Serialized, TotalsPagination
+from workbench.tools.api import (
+    DateRangeFilter,
+    Serialized,
+    TotalsPagination,
+    filter_date_range,
+)
 from workbench.tools.formats import Z1, Z2
 
 
@@ -35,15 +40,13 @@ class LoggedHoursPagination(TotalsPagination):
         total_hours: Decimal
 
 
-class LoggedHoursFilter(Schema):
+class LoggedHoursFilter(DateRangeFilter):
     q: str = ""
     project: int | None = None
     customer: int | None = None
     offer: int | None = None
     service: int | None = None
     rendered_by: str | None = None
-    rendered_since: dt.date | None = None
-    rendered_until: dt.date | None = None
 
 
 def _filter(queryset, filters):
@@ -57,10 +60,7 @@ def _filter(queryset, filters):
         queryset = queryset.filter(service=filters.service)
     if filters.rendered_by:
         queryset = queryset.filter(rendered_by___short_name__iexact=filters.rendered_by)
-    if filters.rendered_since:
-        queryset = queryset.filter(rendered_on__gte=filters.rendered_since)
-    if filters.rendered_until:
-        queryset = queryset.filter(rendered_on__lte=filters.rendered_until)
+    queryset = filter_date_range(queryset, filters, "rendered_on")
     if filters.q:
         queryset = queryset.search(filters.q)
     return queryset

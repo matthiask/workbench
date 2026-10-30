@@ -102,12 +102,21 @@ def _user(user):
     return user.get_short_name()
 
 
+# The web interface's form fields and their names in the API
+FORM_FIELDS = {
+    "cutoff_date": ["date"],
+    "s": ["filter"],
+    "closed_during_the_last_year": ["closed"],
+}
+
+
 def _form(form_class, request, data):
+    """Validate the filters with the web interface's form"""
     form = form_class({k: v for k, v in data.items() if v is not None}, request=request)
     if not form.is_valid():
         raise ValidationError([
             {"loc": ["query", "filters", *error["loc"][2:]], "msg": error["msg"]}
-            for error in form_errors(form)
+            for error in form_errors(form, fields=FORM_FIELDS)
         ])
     return form
 
@@ -116,7 +125,7 @@ def _month(month):
     return f"{month[0]}-{month[1]:02d}"
 
 
-@router.get("/projected-gross-margin/", auth=CONTROLLING)
+@router.get("/reports/projected-gross-margin/", auth=CONTROLLING)
 def projected_gross_margin(request):
     """Planned invoicing of open projects which hasn't been invoiced yet, by
     month (gross margin, third party costs are not included)"""
@@ -144,11 +153,11 @@ def projected_gross_margin(request):
 
 
 class BudgetFilter(Schema):
-    cutoff_date: dt.date | None = None
+    date: dt.date | None = None
     owned_by: str | None = None
     internal: bool = False
-    closed_during_the_last_year: bool = False
-    s: (
+    closed: bool = False
+    filter: (
         Literal[
             "no-invoices", "maintenance", "old-projects", "no-projected-gross-margin"
         ]
@@ -156,12 +165,14 @@ class BudgetFilter(Schema):
     ) = None
 
 
-@router.get("/project-budget-statistics/", auth=CONTROLLING)
-def project_budget_statistics_api(request, filters: Query[BudgetFilter]):
-    """Logged effort and costs compared to what has been offered and invoiced,
-    per project. ``owned_by`` is a short name, or ``inactive`` for projects of
-    inactive users. ``delta`` is the logbook minus the invoiced amount: work
-    which hasn't been invoiced yet if positive, accruals if negative."""
+@router.get("/reports/budget/", auth=CONTROLLING)
+def budget(request, filters: Query[BudgetFilter]):
+    """Project budget statistics: Logged effort and costs compared to what has
+    been offered and invoiced, per open project on the cutoff ``date`` (today
+    by default), or per project ``closed`` during the last year. ``owned_by``
+    is a short name, or ``inactive`` for projects of inactive users.
+    ``delta`` is the logbook minus the invoiced amount: work which hasn't been
+    invoiced yet if positive, accruals if negative."""
     owned_by = None
     if filters.owned_by == "inactive":
         owned_by = 0
@@ -172,18 +183,18 @@ def project_budget_statistics_api(request, filters: Query[BudgetFilter]):
         ProjectBudgetStatisticsForm,
         request,
         {
-            "cutoff_date": filters.cutoff_date,
+            "cutoff_date": filters.date,
             "owned_by": owned_by,
             "internal": filters.internal or None,
-            "closed_during_the_last_year": filters.closed_during_the_last_year or None,
-            "s": filters.s,
+            "closed_during_the_last_year": filters.closed or None,
+            "s": filters.filter,
         },
     )
     statistics = project_budget_statistics.project_budget_statistics(
         form.queryset(), cutoff_date=form.cleaned_data.get("cutoff_date")
     )
     return jsonable({
-        "cutoff_date": statistics["cutoff_date"],
+        "date": statistics["cutoff_date"],
         "overall": statistics["overall"],
         "projects": [
             {
@@ -201,7 +212,7 @@ class ThirdPartyCostsFilter(Schema):
     this_year: bool = False
 
 
-@router.get("/third-party-costs/", auth=CONTROLLING)
+@router.get("/reports/third-party-costs/", auth=CONTROLLING)
 def third_party_costs_api(request, filters: Query[ThirdPartyCostsFilter]):
     """Third party costs logged and invoiced per open project (or also closed
     during the current year); ``delta`` is positive for costs which haven't
@@ -230,14 +241,18 @@ def third_party_costs_api(request, filters: Query[ThirdPartyCostsFilter]):
     })
 
 
-@router.get("/open-items/", auth=CONTROLLING)
-def open_items(request, cutoff_date: dt.date | None = None):
-    """Invoices which have been sent but not paid on the cutoff date (today by
-    default), with totals per week of their due date"""
-    form = _form(OpenItemsForm, request, {"cutoff_date": cutoff_date})
+class CutoffFilter(Schema):
+    date: dt.date | None = None
+
+
+@router.get("/reports/open-items/", auth=CONTROLLING)
+def open_items(request, filters: Query[CutoffFilter]):
+    """Invoices which have been sent but not paid on the cutoff ``date`` (today
+    by default), with totals per week of their due date"""
+    form = _form(OpenItemsForm, request, {"cutoff_date": filters.date})
     data = form.open_items_list()
     return jsonable({
-        "cutoff_date": form.cleaned_data["cutoff_date"],
+        "date": form.cleaned_data["cutoff_date"],
         "total_excl_tax": data["total_excl_tax"],
         "total": data["total"],
         "weeks": [{"week": week} | totals for week, totals in data["weeks"]],
@@ -256,14 +271,14 @@ def _this_week():
 
 
 # Not restricted in the web interface either
-@router.get("/hours-per-customer/", auth=user_auth())
+@router.get("/reports/hours-per-customer/", auth=user_auth())
 def hours_per_customer_api(request, filters: Query[PeriodFilter]):
     """Logged hours per customer and user, this week by default"""
     period = date_range(filters, default=_this_week())
     stats = hours_per_customer(period, users=filter_users(filters))
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "total_hours": stats["total_hours"],
         "users": {_user(user): hours for user, hours in stats["user_hours"]},
         "customers": [
@@ -279,15 +294,15 @@ def hours_per_customer_api(request, filters: Query[PeriodFilter]):
     })
 
 
-@router.get("/hours-per-type/", auth=CONTROLLING)
+@router.get("/reports/hours-per-type/", auth=CONTROLLING)
 def hours_per_type_api(request, filters: Query[PeriodFilter]):
     """Logged hours per user, external and per internal type, with the
     expected and reached percentages, this week by default"""
     period = date_range(filters, default=_this_week())
     stats = hours_per_type(period, users=filter_users(filters))
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "total": stats["total"],
         "users": [
             {
@@ -310,22 +325,22 @@ def hours_per_type_api(request, filters: Query[PeriodFilter]):
     })
 
 
-@router.get("/green-hours/", auth=CONTROLLING)
+@router.get("/reports/green-hours/", auth=CONTROLLING)
 def green_hours_api(request, filters: Query[PeriodFilter]):
     """Logged hours per user: profitable (within the budget), overdrawn
     (beyond the budget), maintenance and internal, this week by default"""
     period = date_range(filters, default=_this_week())
     rows = green_hours(period, users=filter_users(filters))
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "total": next((rec for user, rec in rows if user == 0), None),
         "users": [{"user": _user(user)} | rec for user, rec in rows if user != 0],
     })
 
 
 # Not restricted in the web interface either
-@router.get("/planning-vs-logbook/", auth=user_auth())
+@router.get("/reports/planning-vs-logbook/", auth=user_auth())
 def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
     """Planned and logged hours per customer and week, this week by default.
     ``allocation`` is the customer's share of the logged hours relative to its
@@ -339,8 +354,8 @@ def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
         return week.date() if isinstance(week, dt.datetime) else week
 
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "planned": stats["planned"],
         "logged": stats["logged"],
         "diff": stats["diff"],
@@ -367,7 +382,7 @@ def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
     })
 
 
-@router.get("/logging/", auth=CONTROLLING)
+@router.get("/reports/logging/", auth=CONTROLLING)
 def logging_api(request, filters: Query[DateRangeFilter]):
     """How and when users log their hours, this week by default. The delay is
     the average time in hours between noon of the day the work was done and
@@ -376,8 +391,8 @@ def logging_api(request, filters: Query[DateRangeFilter]):
     period = date_range(filters, default=_this_week())
     stats = logbook_stats(period)
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         "logged_hours": stats["logged_hours_stats"],
         "insufficient_breaks": stats["insufficient_breaks"],
         "users": [
@@ -397,7 +412,7 @@ def logging_api(request, filters: Query[DateRangeFilter]):
     })
 
 
-@router.get("/squeeze/", auth=user_auth(feature=FEATURES.PRODUCTIVITY))
+@router.get("/reports/squeeze/", auth=user_auth(feature=FEATURES.PRODUCTIVITY))
 def squeeze_api(request, filters: Query[DateRangeFilter]):
     """Gross margin per user and project, the last month by default. Projects'
     gross margins are split between users by hours weighted with the hourly
@@ -436,8 +451,8 @@ def squeeze_api(request, filters: Query[DateRangeFilter]):
     ]
     contribution_keys = ["hours", "gross_margin", "rate", "hours_rate_unknown"]
     return jsonable({
-        "date_from": period[0],
-        "date_until": period[1],
+        "since": period[0],
+        "until": period[1],
         # Like the web interface's warning
         "may_be_incomplete": dt.date.today()
         < (period[1].replace(day=1) + dt.timedelta(days=32)).replace(day=9),

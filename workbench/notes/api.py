@@ -13,7 +13,12 @@ from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
-from workbench.tools.api import Serialized, form_errors
+from workbench.tools.api import (
+    DateRangeFilter,
+    Serialized,
+    filter_date_range,
+    form_errors,
+)
 
 
 router = Router(tags=["notes"])
@@ -80,7 +85,7 @@ def _visible(types):
     return q
 
 
-class NoteFilter(Schema):
+class NoteFilter(DateRangeFilter):
     q: str = ""
     deal: int | None = None
     invoice: int | None = None
@@ -91,7 +96,8 @@ class NoteFilter(Schema):
 @router.get("/notes/", response=list[NoteOut])
 @paginate
 def note_list(request, filters: Query[NoteFilter]):
-    """Notes on deals and invoices, newest first
+    """Notes on deals and invoices, newest first; the period filters the
+    creation date
 
     Notes on objects which require features the user hasn't got and notes of
     deleted objects are left out."""
@@ -113,6 +119,7 @@ def note_list(request, filters: Query[NoteFilter]):
         notes = notes.filter(created_by___short_name__iexact=filters.created_by)
     if filters.q:
         notes = notes.search(filters.q)
+    notes = filter_date_range(notes, filters, "created_at__date")
     return Serialized(
         notes.prefetch_related("content_object").order_by("-created_at", "-pk"),
         lambda note: note_out(note, request, types=types),

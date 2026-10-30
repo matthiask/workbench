@@ -242,8 +242,8 @@ class PlanningAPITest(TestCase):
         )
         self.client.force_login(user)
 
-        data = self.client.get("/api/planning/").json()
-        self.assertEqual(data["date_from"], week.isoformat())
+        data = self.client.get("/api/planning/export/").json()
+        self.assertEqual(data["since"], week.isoformat())
         self.assertEqual(len(data["weeks"]), 12)
         self.assertEqual([w["id"] for w in data["planned_work"]], [work.id])
         self.assertEqual(data["planned_work"][0]["hours_per_week"], 10)
@@ -252,20 +252,22 @@ class PlanningAPITest(TestCase):
         self.assertIsNone(data["capacity"])
 
         # A project's whole planning
-        data = self.client.get("/api/planning/", {"project": project.pk}).json()
+        data = self.client.get("/api/planning/export/", {"project": project.pk}).json()
         self.assertEqual([w["id"] for w in data["planned_work"]], [work.id, later.id])
         self.assertEqual(len(data["weeks"]), 21)
         self.assertEqual(data["weeks"][-1]["provisional"], 5)
-        data = self.client.get("/api/planning/", {"campaign": project.campaign_id})
+        data = self.client.get(
+            "/api/planning/export/", {"campaign": project.campaign_id}
+        )
         self.assertEqual(len(data.json()["planned_work"]), 2)
 
         # Capacity of users, the period overrides the project's
         data = self.client.get(
-            "/api/planning/",
+            "/api/planning/export/",
             {
                 "user": "ab",
-                "date_from": week.isoformat(),
-                "date_until": week.isoformat(),
+                "since": week.isoformat(),
+                "until": week.isoformat(),
             },
         ).json()
         self.assertEqual(len(data["weeks"]), 1)
@@ -274,6 +276,6 @@ class PlanningAPITest(TestCase):
         self.assertEqual(capacity["user"], "ab")
         self.assertEqual(list(capacity["weeks"]), [week.isoformat()])
 
-        data = self.client.get("/api/planning/", {"project": 0}).json()
-        self.assertEqual(data["date_from"], None)
+        data = self.client.get("/api/planning/export/", {"project": 0}).json()
+        self.assertEqual(data["since"], None)
         self.assertEqual(data["planned_work"], [])

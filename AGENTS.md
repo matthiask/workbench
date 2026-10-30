@@ -68,8 +68,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   show` and `wb people show` show them. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Shared validation helpers for the APIs are in
-  `workbench/tools/api.py`, also `DateRangeFilter` with `date_range()` (periods
-  like `2026-Q3` or `last-month`) and `UsersFilter` with `filter_users()` for reports.
+  `workbench/tools/api.py`, also `DateRangeFilter` (`period` like `2026-Q3` or
+  `last-month`, `since`, `until`) with `date_range()` and `filter_date_range()`
+  for reports and searches, and `UsersFilter` with `filter_users()` for
+  reports. Cutoff dates are called `date`. Reports live at
+  `/api/reports/<name>/` with the names of `wb reports`, except key data and
+  cash data which integrations use.
   Search endpoints use ninja's `@paginate` (limit and offset, 100 per page,
   at most 10000; responses are `{items, count}`) and return a `Serialized`
   queryset from `workbench/tools/api.py` so that only the page is serialized,
