@@ -3,149 +3,103 @@
 {% block title %}{{ object }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-12">
-      <h1>{{ object|h }} {% history_link object %}</h1>
-      <table class="table">
-        {% for name, value in object|field_value_pairs %}
-          <tr>
-            <th class="text-end">{{ name }}</th>
-            <td>{% link_or_none value %}</td>
-          </tr>
-        {% endfor %}
-        <tr>
-          <th class="text-end">{% translate 'projects'|capfirst %}</th>
-          <td>
-            {% if request.user.features.CONTROLLING %}
-              {% with statistics=object.statistics %}
-                <table class="table table-sm table-hover">
-                  <thead class="sticky">
-                    <tr>
-                      <th>{% translate 'project'|capfirst %}</th>
-                      <th class="text-end" title="{% translate 'Offered and accepted' %}">
-                        {% translate 'sold'|capfirst %}
-                      </th>
-                      <th class="text-end">{% translate 'logbook'|capfirst %}</th>
-                      <th class="text-end">{% translate 'third party costs'|capfirst %}</th>
-                      <th class="text-end">{% translate 'invoiced'|capfirst %}</th>
-                      <th class="text-end">{% translate 'Not archived' %}</th>
-                      <th class="text-end">&Delta;</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th></th>
-                      <th class="text-end">{{ statistics.overall.sold|currency }}</th>
-                      <th class="text-end">
-                        {{ statistics.overall.logbook|currency }}
-                        {% bar statistics.overall.logbook statistics.overall.sold %}
-                      </th>
-                      <th class="text-end">{{ statistics.overall.third_party_costs|currency }}</th>
-                      <th class="text-end">{{ statistics.overall.invoiced|currency }}</th>
-                      <th class="text-end text-nowrap">
-                        {{ statistics.overall.hours|hours }} / {{ statistics.overall.service_hours|hours }}
-                        {% bar statistics.overall.hours statistics.overall.service_hours %}
-                      </th>
-                      <th class="text-end">
-                        {{ statistics.overall.delta_positive|currency:True }}
-                        <br>
-                        {{ statistics.overall.delta_negative|currency:True }}
-                      </th>
-                    </tr>
-                    {% for project in statistics.statistics %}
-                      <tr>
-                        <td>{% link_or_none project.project with_badge=True %}</td>
-                        <td
-                          class="
-                            text-end
-                            {% if not project.sold %}
-                            text-black-30
-                            {% endif %}
-                          "
-                        >
-                          {{ project.sold|currency }}
-                        </td>
-                        <td
-                          class="
-                            text-end text-nowrap
-                            {% if not project.logbook and not project.effort_hours_with_rate_undefined %}
-                            text-black-30
-                            {% endif %}
-                          "
-                        >
-                          {{ project.logbook|currency }}
-                          {% if project.effort_hours_with_rate_undefined %}
-                            <span class="text-warning" title="{% translate 'undefined rate' %}">
-                              (+{{ project.effort_hours_with_rate_undefined|hours }})
-                            </span>
-                          {% endif %}
-                          {% bar project.logbook project.sold %}
-                        </td>
-                        <td
-                          class="
-                            text-end
-                            {% if not project.third_party_costs %}
-                            text-black-30
-                            {% endif %}
-                          "
-                        >
-                          {{ project.third_party_costs|currency }}
-                        </td>
-                        <td
-                          class="
-                            text-end
-                            {% if not project.invoiced %}
-                            text-black-30
-                            {% endif %}
-                          "
-                        >
-                          {{ project.invoiced|currency }}
-                        </td>
-                        <td class="text-end text-nowrap">
-                          {{ project.hours|hours }} /
-                          {{ project.service_hours|hours }}
-                          {% bar project.hours project.service_hours %}
-                        </td>
-                        <td class="text-end {% if not project.delta %}text-black-30{% endif %}">
-                          {{ project.delta|currency:True }}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              {% endwith %}
-              <strong>{% translate 'Gross margin / hour' %}:</strong>
-              {{ object.statistics.overall.gross_margin_per_hour|currency }}
-            {% else %}
-              {% for project in object.projects.all %}
-                {% link_or_none project with_badge=True %}
-              {% endfor %}
-            {% endif %}
-          </td>
-        </tr>
-      </table>
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{{ object|h }} {% history_link object %}</h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{% translate 'contact person'|capfirst %}</span>
+          {% link_or_none object.owned_by %}</span>
+        <span><span class="wb-meta-label">{% translate 'customer'|capfirst %}</span>
+          {% link_or_none object.customer %}</span>
+      </div>
+    </div>
+    <div class="wb-page-actions">
       <a href="{% url 'projects_project_create' %}?campaign={{ object.pk }}" class="btn btn-primary">
         {% include "svg/plus.svg" %}
         {% translate 'project'|capfirst %}
       </a>
-      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="btn btn-primary">{% translate 'Copy' %}</a>
-      <a href="{{ object.urls.statistics }}" class="btn btn-primary" data-ajaxmodal>{% translate 'Statistics' %}</a>
-      <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
-        {% translate 'logged hours'|capfirst %}
-      </a>
-      <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}" class="btn btn-primary">
-        {% translate 'logged cost'|capfirst %}
-      </a>
+      <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
       {% if request.user.features.PLANNING %}
-        <a href="{{ object.urls.planning }}" class="btn btn-primary">
-          {% include 'svg/project.svg' %}
-          {% translate 'planning'|capfirst %}
-        </a>
+        <a href="{{ object.urls.planning }}" class="btn btn-quiet">{% translate 'planning'|capfirst %}</a>
       {% endif %}
-      <a href="{{ object.urls.delete }}" class="btn btn-outline-danger float-end">
-        {% translate 'Delete' %}
-      </a>
+      <a href="{{ object.urls.statistics }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Statistics' %}</a>
+      <span class="dropdown">
+        <button
+          type="button"
+          class="btn btn-quiet btn-icon"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="{% translate 'More actions' %}"
+        >
+          {% include 'svg/kebab-horizontal.svg' %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <a href="{% url 'logbook_loggedhours_list' %}?campaign={{ object.pk }}" class="dropdown-item">
+            {% translate 'logged hours'|capfirst %}
+          </a>
+          <a href="{% url 'logbook_loggedcost_list' %}?campaign={{ object.pk }}" class="dropdown-item">
+            {% translate 'logged cost'|capfirst %}
+          </a>
+          <a href="{{ object.urls.create }}?copy={{ object.pk }}" class="dropdown-item">{% translate 'Copy' %}</a>
+          <div class="dropdown-divider"></div>
+          <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
+        </div>
+      </span>
     </div>
   </div>
+
+  {% if object.description %}
+    <p class="wb-description">{{ object.description|linebreaksbr|urlizetrunc:60 }}</p>
+  {% endif %}
+
+  {% if request.user.features.CONTROLLING %}
+    {% with statistics=object.statistics %}
+      <div class="wb-stats wb-stats-5 mb-3">
+        <div class="wb-stat">
+          <div class="wb-stat-label" title="{% translate 'Offered and accepted' %}">
+            {% translate 'sold'|capfirst %}
+          </div>
+          <div class="wb-stat-value">{{ statistics.overall.sold|currency }}</div>
+        </div>
+        <div class="wb-stat">
+          <div class="wb-stat-label">{% translate 'logbook'|capfirst %}</div>
+          <div class="wb-stat-value">{{ statistics.overall.logbook|currency }}</div>
+        </div>
+        <div class="wb-stat">
+          <div class="wb-stat-label">{% translate 'invoiced'|capfirst %}</div>
+          <div class="wb-stat-value">{{ statistics.overall.invoiced|currency }}</div>
+        </div>
+        <div class="wb-stat">
+          <div class="wb-stat-label">{% translate 'service hours'|capfirst %}</div>
+          <div class="wb-stat-value">
+            {{ statistics.overall.hours|hours }}
+            <span class="wb-stat-of">/ {{ statistics.overall.service_hours|hours }}</span>
+          </div>
+          {% bar statistics.overall.hours statistics.overall.service_hours %}
+        </div>
+        <div class="wb-stat">
+          <div class="wb-stat-label">{% translate 'Gross margin / hour' %}</div>
+          <div class="wb-stat-value">
+            {% if statistics.overall.gross_margin_per_hour is not None %}{{ statistics.overall.gross_margin_per_hour|currency }}{% else %}&ndash;{% endif %}
+          </div>
+        </div>
+      </div>
+      {% include "reporting/_budget_statistics_table.html" %}
+    {% endwith %}
+  {% else %}
+    <section class="card">
+      <div class="card-header">{% translate 'projects'|capfirst %}</div>
+      <div class="list-group list-group-flush">
+        {% for project in object.projects.all %}
+          <a href="{{ project.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+            <div class="wb-row-title">{{ project|h }}</div>
+            <div class="wb-row-aside">{{ project.status_badge }}</div>
+          </a>
+        {% empty %}
+          <div class="list-group-item text-secondary">&ndash;</div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 {% endblock content %}

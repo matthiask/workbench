@@ -1391,3 +1391,17 @@ a.wb-row-title:hover {
   margin-top: 1rem;
   font-size: 0.875rem;
 }
+
+// Totals above the rows of a table
+.wb-total-row > td {
+  background: var(--wb-surface-muted);
+  font-weight: 600;
+}
+
+.wb-budget-table {
+  font-variant-numeric: tabular-nums;
+
+  .progress-line {
+    margin-top: 0.2rem;
+  }
+}
