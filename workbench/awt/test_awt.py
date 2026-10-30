@@ -840,19 +840,19 @@ class AWTTest(TestCase):
         """Descriptions of old sickness absences are cleared, their history too"""
         kwargs = {"user": factories.UserFactory.create(), "days": 1}
         old = Absence.objects.create(
-            starts_on=in_days(-800),
+            starts_on=in_days(-1200),
             reason=Absence.SICKNESS,
             description="Flu",
             **kwargs,
         )
         recent = Absence.objects.create(
-            starts_on=in_days(-400),
+            starts_on=in_days(-800),
             reason=Absence.SICKNESS,
             description="Cold",
             **kwargs,
         )
         vacation = Absence.objects.create(
-            starts_on=in_days(-800),
+            starts_on=in_days(-1200),
             reason=Absence.VACATION,
             description="Beach",
             **kwargs,

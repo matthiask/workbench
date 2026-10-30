@@ -180,7 +180,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   contains neither. Planning and its mails use `public_text()`. The annual
   working time report of others requires the feature, the history shows
   reasons and descriptions only with it, and `clear_sickness_descriptions()`
-  (fairy tasks) clears descriptions and history after two years.
+  (fairy tasks) clears descriptions and history after three years, like
+  the audit log pruning of absences.
   Descriptions of absences are optional. Paid leave counts right away but
   needs a confirmation by someone with `WORKING_TIME_CORRECTION`
   (`Absence.needs_confirmation`, `update_confirmation()` in the form,

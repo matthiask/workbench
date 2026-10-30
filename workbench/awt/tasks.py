@@ -109,7 +109,7 @@ def clear_sickness_descriptions():
     once the year is closed. The history of these absences contains them too
     (also the update clearing them), it is removed as well."""
     absences = Absence.objects.filter(
-        reason=Absence.SICKNESS, starts_on__lt=in_days(-2 * 366)
+        reason=Absence.SICKNESS, starts_on__lt=in_days(-3 * 366)
     ).exclude(description="")
     ids = [str(pk) for pk in absences.values_list("id", flat=True)]
     if not ids:
