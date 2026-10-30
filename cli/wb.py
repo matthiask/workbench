@@ -2237,6 +2237,97 @@ def cash_data(date):
     _echo_json(_request("GET", "cash-data/", params=params))
 
 
+@reports.command("working-time")
+@click.option("--year", type=int, help="Defaults to the current year.")
+@click.option(
+    "--user",
+    help="Short name, or 'active' for all active users (requires the"
+    " controlling feature). Defaults to you.",
+)
+@click.option("--weekly", is_flag=True, help="Show the hours per week.")
+@click.option("--json", "as_json", is_flag=True)
+def working_time(year, user, weekly, as_json):
+    """Annual working time: Target, logged hours, absences and balance
+
+    The balance per week compares the working time to a target based on the
+    working time per day, the employment and the holidays."""
+    params = {"year": year, "user": user, "weekly": _bool(weekly) if weekly else None}
+    data = _request(
+        "GET",
+        "working-time/",
+        params={key: value for key, value in params.items() if value},
+    )
+    if as_json:
+        _echo_json(data)
+        return
+    for warning in data["warnings"]:
+        click.secho(warning, fg="yellow", err=True)
+    for row in data["users"]:
+        console.print(f"{row['user']} {data['year']}", style="bold")
+        totals = row["totals"]
+        if weekly:
+            table = _table(
+                "Week", "Target>", "Logged>", "Absences>", "Balance>", "Running>"
+            )
+            for week in row["weeks"]:
+                table.add_row(
+                    week["week"],
+                    _hours(week["target"]),
+                    _hours(week["hours"]),
+                    _hours(week["absences"]),
+                    _hours(week["delta"]),
+                    _hours(week["running_delta"]),
+                )
+            console.print(table)
+            continue
+        table = _table(
+            "Month",
+            "Employment>",
+            "Target>",
+            "Logged>",
+            "Absences>",
+            "Working time>",
+            "Balance>",
+            "Running>",
+            "Vacation days>",
+            "Sick days>",
+            show_footer=True,
+        )
+        for month in row["months"]:
+            table.add_row(
+                month["month"],
+                _percentage(month["percentage"]),
+                _hours(month["target"]),
+                _hours(month["hours"]),
+                _hours(month["absences_time"]),
+                _hours(month["working_time"]),
+                _hours(month["balance"]),
+                _hours(month["running_balance"]),
+                f"{month['vacation_days']:.1f}",
+                f"{month['sickness_days']:.1f}",
+            )
+        table.columns[0].footer = "Total"
+        table.columns[1].footer = _percentage(totals["percentage"])
+        table.columns[2].footer = _hours(totals["target"])
+        table.columns[3].footer = _hours(totals["hours"])
+        table.columns[4].footer = _hours(totals["absences_time"])
+        table.columns[5].footer = _hours(totals["working_time"])
+        table.columns[6].footer = _hours(totals["running_sum"])
+        table.columns[8].footer = f"{totals['absence_vacation']:.1f}"
+        table.columns[9].footer = f"{totals['absence_sickness']:.1f}"
+        console.print(table)
+        console.print(
+            f"Vacation days: {totals['available_vacation_days']:.1f} available,"
+            f" {totals['vacation_days_credit']:.1f} left"
+        )
+        console.print(
+            f"Balance incl. vacation days left: {_hours(totals['balance'])}h"
+            f" ({totals['balance_days']:.2f} days)",
+            style="bold",
+        )
+        console.print()
+
+
 @reports.command("projected-gross-margin")
 @click.option("--json", "as_json", is_flag=True)
 def projected_gross_margin(as_json):

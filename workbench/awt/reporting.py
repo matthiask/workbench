@@ -18,7 +18,7 @@ from workbench.awt.models import (
 from workbench.awt.utils import days_per_month, monthly_days
 from workbench.logbook.models import LoggedHours
 from workbench.tools.formats import Z1, Z2
-from workbench.tools.validation import last_month_range, month_range
+from workbench.tools.validation import last_month_range, monday, month_range
 
 
 class Months(UserDict):
@@ -440,6 +440,77 @@ def annual_working_time(year, *, users):  # noqa: C901
         "has_public_holidays": has_public_holidays,
         "has_company_holidays": has_company_holidays,
     }
+
+
+def working_time_by_week(year, *, user):
+    """Target, logged hours and absences per week (starting on Monday) of the
+    year until the current week
+
+    The target is the working time per day times the employment percentage
+    on weekdays, less holidays. Absences count like in the annual working
+    time, spread evenly over the weekdays they span."""
+    wtm_year = Year.objects.filter(
+        year=year, working_time_model=user.working_time_model_id
+    ).first()
+    if not wtm_year or wtm_year.working_time_per_day <= 0:
+        return []
+    per_day = wtm_year.working_time_per_day
+    first, last = dt.date(year, 1, 1), min(dt.date(year, 12, 31), dt.date.today())
+    if first > last:
+        return []
+
+    def weekdays(date_from, date_until):
+        day = date_from
+        while day <= date_until:
+            if day.weekday() < 5:
+                yield day
+            day += dt.timedelta(days=1)
+
+    holidays = defaultdict(lambda: Z1)
+    for holiday in holidays_of_year(year, user.working_time_model_id):
+        holidays[holiday.date] += holiday.fraction
+    employments = list(
+        Employment.objects.filter(user=user, date_from__lte=last, date_until__gte=first)
+    )
+
+    weeks = defaultdict(lambda: {"target": Z1, "hours": Z1, "absences": Z1})
+    for employment in employments:
+        for day in weekdays(
+            max(first, employment.date_from), min(last, employment.date_until)
+        ):
+            weeks[monday(day)]["target"] += (
+                per_day
+                * employment.percentage
+                / 100
+                * (1 - min(holidays.get(day, Z1), 1))
+            )
+
+    for row in (
+        LoggedHours.objects
+        .filter(rendered_by=user, rendered_on__range=[first, last])
+        .order_by()
+        .values("rendered_on")
+        .annotate(Sum("hours"))
+    ):
+        weeks[monday(row["rendered_on"])]["hours"] += row["hours__sum"]
+
+    for absence in Absence.objects.filter(
+        user=user, starts_on__year=year, is_working_time=True
+    ):
+        days = list(
+            weekdays(absence.starts_on, absence.ends_on or absence.starts_on)
+        ) or [absence.starts_on]
+        for day in days:
+            if day <= last:
+                weeks[monday(day)]["absences"] += absence.days / len(days) * per_day
+
+    running = Z1
+    result = []
+    for week, row in sorted(weeks.items()):
+        delta = row["hours"] + row["absences"] - row["target"]
+        running += delta
+        result.append({"week": week} | row | {"delta": delta, "running_delta": running})
+    return result
 
 
 def annual_working_time_warnings():

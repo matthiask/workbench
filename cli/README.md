@@ -292,6 +292,15 @@ start and end. `--user` (repeatable) and `--team` filter the users:
     wb reports planning-vs-logbook --user mk
     wb reports logging --period 2026-09
 
+Annual working time per month, or per week until the current one. Your own
+by default, someone else's by short name, or of all active users with the
+controlling feature:
+
+    wb reports working-time
+    wb reports working-time --weekly
+    wb reports working-time --year 2025 --user mk
+    wb reports working-time --user active
+
 Gross margin per user and project of the last month by default, requires the
 productivity feature:
 

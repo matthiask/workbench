@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 11:57+0100\n"
+"POT-Creation-Date: 2026-10-30 12:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -458,6 +458,20 @@ msgstr "Tage"
 msgid "When public or company holidays are configured for this year, the corresponding month values must be increased by the number of holiday days (the import_holidays management command does this automatically)."
 msgstr "Wenn für dieses Jahr gesetzliche oder betriebliche Feiertage konfiguriert sind, müssen die entsprechenden Monatswerte um die Anzahl Feiertage erhöht werden (der import_holidays-Befehl erledigt dies automatisch)."
 
+#: workbench/awt/api.py
+msgid "Unknown user."
+msgstr "Unbekannte:r Benutzer:in."
+
+#: workbench/awt/api.py workbench/awt/views.py
+#, python-format
+msgid "The annual working time %(year)s of the working time model %(working_time_model)s is not configured correctly: The working time per day is zero."
+msgstr "Die Jahresarbeitszeit %(year)s des Arbeitszeitmodells %(working_time_model)s ist nicht korrekt konfiguriert: Die Arbeitszeit pro Tag ist null."
+
+#: workbench/awt/api.py workbench/awt/views.py
+#, python-format
+msgid "No annual working time defined for user %(user)s with working time model %(working_time_model)s."
+msgstr "Keine Jahresarbeitszeit definiert für Nutzer:in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
+
 #: workbench/awt/apps.py workbench/awt/pdf.py
 #: workbench/templates/awt/year_detail.html workbench/templates/base.html
 msgid "annual working time"
@@ -884,16 +898,6 @@ msgstr "Ferientage"
 #, python-format
 msgid "Generated on %(day)s"
 msgstr "Generiert am %(day)s"
-
-#: workbench/awt/views.py
-#, python-format
-msgid "The annual working time %(year)s of the working time model %(working_time_model)s is not configured correctly: The working time per day is zero."
-msgstr "Die Jahresarbeitszeit %(year)s des Arbeitszeitmodells %(working_time_model)s ist nicht korrekt konfiguriert: Die Arbeitszeit pro Tag ist null."
-
-#: workbench/awt/views.py
-#, python-format
-msgid "No annual working time defined for user %(user)s with working time model %(working_time_model)s."
-msgstr "Keine Jahresarbeitszeit definiert für Nutzer:in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
 
 #: workbench/awt/views.py
 msgid "Filter invalid, no absences available."

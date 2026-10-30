@@ -406,6 +406,17 @@ planned_work:
         self.assertIn("Kick-off", result.output)
         self.assertIn("40 days", result.output)
 
+        factories.YearFactory.create(working_time_model=self.user.working_time_model)
+        factories.EmploymentFactory.create(
+            user=self.user, date_from=dt.date.today().replace(month=1, day=1)
+        )
+        result = self.wb("reports", "working-time")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Balance incl. vacation days left", result.output)
+        result = self.wb("reports", "working-time", "--weekly")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(monday().isoformat(), result.output)
+
         result = self.wb("reports", "key-data", "--month", "2026-01")
         self.assertIn('"month": "2026-01"', result.output)
         result = self.wb("reports", "hours-per-type", "--period", "nope")
