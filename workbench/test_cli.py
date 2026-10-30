@@ -156,7 +156,7 @@ services:
         created = Offer.objects.get()
         self.assertIn(created.code, result.output)
 
-        result = self.wb("offers", "list", project.pk)
+        result = self.wb("offers", "search", "--project", project.pk)
         self.assertIn(created.code, result.output)
 
         result = self.wb("offers", "search", "relaunch", "--status", "in_preparation")
@@ -197,15 +197,22 @@ planned_work:
         factories.InvoiceFactory.create(
             project=project, customer=project.customer, title="Kick-off"
         )
+        factories.ProjectedInvoiceFactory.create(
+            project=project, description="Planning"
+        )
         factories.DealFactory.create(owned_by=self.user, title="Big deal")
 
         result = self.wb("projects", "stats", project.pk, "--csv")
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(result.output.startswith("project_id,project,"))
 
-        self.assertIn("Kick-off", self.wb("invoices", "list").output)
-        self.assertIn("Kick-off", self.wb("projects", "invoicing", project.pk).output)
-        self.assertIn("Big deal", self.wb("deals", "list").output)
+        self.assertIn("Kick-off", self.wb("invoices", "search", "kick").output)
+        self.assertIn(
+            "Kick-off", self.wb("invoices", "search", "--project", project.pk).output
+        )
+        result = self.wb("projected-invoices", "search", "--project", project.pk)
+        self.assertIn("Planning", result.output)
+        self.assertIn("Big deal", self.wb("deals", "search").output)
 
         result = self.wb("me")
         self.assertIn(project.code, result.output)
@@ -225,7 +232,7 @@ planned_work:
         self.assertEqual(result.exit_code, 0)
         self.assertNotIn("Phase 1", result.output)
 
-        result = self.wb("offers", "list", project.pk)
+        result = self.wb("offers", "search")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("403", result.output)
 

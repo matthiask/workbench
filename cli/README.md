@@ -1,7 +1,9 @@
 # Workbench CLI
 
 Commands follow the pattern `wb <noun> <verb>`, e.g. `wb projects search` or
-`wb offers create`. `wb --help` and `wb <noun> --help` list them all.
+`wb offers create`. `wb --help` and `wb <noun> --help` list them all. `search`
+takes optional search terms and filters such as `--project`, `--customer` or
+`--owned-by`; `show` takes an ID.
 
 The `wb` program talks to the Workbench JSON API. Install it with
 [uv](https://docs.astral.sh/uv/):
@@ -49,6 +51,7 @@ short name and defaults to you.
 Find the project:
 
     wb projects search relaunch
+    wb projects search --customer 345 --owned-by mk --all
     wb projects show 1234
 
 Print everything needed to write the offer: the project, its existing offers,
@@ -89,7 +92,7 @@ created in preparation; review and send them in Workbench.
 Offers in preparation can be replaced as long as no hours or costs have been
 logged on their services:
 
-    wb offers list 1234
+    wb offers search --project 1234
     wb offers search relaunch --status offered
     wb offers show 5678
     wb offers replace 5678 offer.yaml --dry-run
@@ -101,18 +104,23 @@ All commands which output data accept `--json`.
 
 Invoices are read-only in the CLI:
 
-    wb invoices list --open
-    wb invoices list --overdue
-    wb invoices list --project 1234 --since 2026-01-01
+    wb invoices search --open
+    wb invoices search --overdue
+    wb invoices search --project 1234 --since 2026-01-01
+    wb invoices search hosting --customer 345
     wb invoices show 5678
-    wb projects invoicing 1234   # Planned invoicing and invoices of a project
+
+The planned invoicing (gross margin, without third party costs):
+
+    wb projected-invoices search --project 1234
+    wb projected-invoices search --since 2026-11-01 --until 2026-12-31
 
 ## Deals
 
 Deals are read-only in the CLI and require the deals feature:
 
-    wb deals list                     # Open deals
-    wb deals list --status accepted relaunch
+    wb deals search                     # Open deals
+    wb deals search --status accepted relaunch
     wb deals show 1234
 
 ## Reports

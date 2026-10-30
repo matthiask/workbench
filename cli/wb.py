@@ -494,20 +494,23 @@ def me(as_json):
 
 @cli.group()
 def projects():
-    """Find projects"""
+    """Find and create projects"""
 
 
 @projects.command()
 @click.argument("query", nargs=-1)
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option("--owned-by", help="Short name.")
 @click.option("--all", "include_closed", is_flag=True, help="Include closed projects.")
 @click.option("--json", "as_json", is_flag=True)
-def search(query, include_closed, as_json):
-    """Search projects"""
-    data = _request(
-        "GET",
-        "projects/",
-        params={"q": " ".join(query), "include_closed": _bool(include_closed)},
-    )
+def search(query, customer, owned_by, include_closed, as_json):
+    """Search projects, open projects by default"""
+    params = {"q": " ".join(query), "include_closed": _bool(include_closed)}
+    if customer:
+        params["customer"] = customer
+    if owned_by:
+        params["owned_by"] = owned_by
+    data = _request("GET", "projects/", params=params)
     if as_json:
         _echo_json(data)
         return
@@ -637,25 +640,6 @@ def create_project(
         console.print("Dry run, nothing has been saved.")
 
 
-@projects.command()
-@click.argument("project_id", type=int)
-@click.option("--json", "as_json", is_flag=True)
-def invoicing(project_id, as_json):
-    """Show the planned invoicing and the invoices of a project"""
-    projected = _request("GET", f"projects/{project_id}/projected-invoices/")
-    invoices = _request("GET", "invoices/", params={"project": project_id})
-    if as_json:
-        _echo_json({"projected_invoices": projected, "invoices": invoices})
-        return
-    table = _table(
-        "Invoiced on", "Gross margin>", "Description", title="Planned invoicing"
-    )
-    for row in projected:
-        table.add_row(row["invoiced_on"], row["gross_margin"], row["description"])
-    console.print(table)
-    _echo_invoice_list(invoices)
-
-
 @cli.group()
 def contacts():
     """Find organizations and people"""
@@ -719,25 +703,22 @@ def context(project_id):
         "declined",
     ]),
 )
+@click.option("--project", type=int, help="Project ID.")
+@click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.")
 @click.option("--json", "as_json", is_flag=True)
-def search_offers(query, status, owned_by, as_json):
+def search_offers(query, status, project, customer, owned_by, as_json):
     """Search offers, newest first"""
     params = {"q": " ".join(query)}
     if status:
         params["status"] = status
+    if project:
+        params["project"] = project
+    if customer:
+        params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
     data = _request("GET", "offers/", params=params)
-    _echo_json(data) if as_json else _echo_offer_list(data)
-
-
-@offers.command("list")
-@click.argument("project_id", type=int)
-@click.option("--json", "as_json", is_flag=True)
-def list_offers(project_id, as_json):
-    """List the offers of a project"""
-    data = _request("GET", f"projects/{project_id}/offers/")
     _echo_json(data) if as_json else _echo_offer_list(data)
 
 
@@ -854,7 +835,8 @@ def invoices():
     """Look at invoices"""
 
 
-@invoices.command("list")
+@invoices.command("search")
+@click.argument("query", nargs=-1)
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option(
@@ -866,9 +848,9 @@ def invoices():
     "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced since."
 )
 @click.option("--json", "as_json", is_flag=True)
-def list_invoices(project, customer, status, open_, overdue, since, as_json):
-    """List invoices, newest first"""
-    params = {"open": _bool(open_), "overdue": _bool(overdue)}
+def search_invoices(query, project, customer, status, open_, overdue, since, as_json):
+    """Search invoices, newest first"""
+    params = {"q": " ".join(query), "open": _bool(open_), "overdue": _bool(overdue)}
     if project:
         params["project"] = project
     if customer:
@@ -919,12 +901,50 @@ def show_invoice(invoice_id, as_json):
         console.print(data["description"])
 
 
+@cli.group("projected-invoices")
+def projected_invoices():
+    """Look at the planned invoicing"""
+
+
+@projected_invoices.command("search")
+@click.option("--project", type=int, help="Project ID.")
+@click.option("--customer", type=int, help="Organization ID.")
+@click.option(
+    "--since", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced since."
+)
+@click.option(
+    "--until", type=click.DateTime(formats=["%Y-%m-%d"]), help="Invoiced until."
+)
+@click.option("--json", "as_json", is_flag=True)
+def search_projected_invoices(project, customer, since, until, as_json):
+    """Search the planned invoicing (gross margin), oldest first"""
+    params = {}
+    if project:
+        params["project"] = project
+    if customer:
+        params["customer"] = customer
+    if since:
+        params["invoiced_since"] = since.date().isoformat()
+    if until:
+        params["invoiced_until"] = until.date().isoformat()
+    data = _request("GET", "projected-invoices/", params=params)
+    if as_json:
+        _echo_json(data)
+        return
+    table = _table("Project", "Invoiced on", "Gross margin>", "Description")
+    for row in data:
+        table.add_row(
+            row["project"], row["invoiced_on"], row["gross_margin"], row["description"]
+        )
+    console.print(table)
+
+
 @cli.group()
 def deals():
     """Look at the sales pipeline"""
 
 
-@deals.command("list")
+@deals.command("search")
 @click.argument("query", nargs=-1)
 @click.option(
     "--status", type=click.Choice(["open", "accepted", "declined"]), default="open"
@@ -932,8 +952,8 @@ def deals():
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.")
 @click.option("--json", "as_json", is_flag=True)
-def list_deals(query, status, customer, owned_by, as_json):
-    """List deals, open deals by default"""
+def search_deals(query, status, customer, owned_by, as_json):
+    """Search deals, open deals by default"""
     params = {"q": " ".join(query), "status": status}
     if customer:
         params["customer"] = customer
