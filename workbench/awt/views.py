@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from django.contrib import messages
 from django.db.models.functions import Coalesce
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
@@ -167,4 +167,6 @@ def confirm_absence(request, pk):
     absence.confirm(request.user)
     absence.save()
     messages.success(request, _("The absence has been confirmed."))
+    if request.is_ajax():
+        return HttpResponse(status=202)  # Accepted, reloads the page
     return redirect(absence.urls["list"] + "?s=unconfirmed")

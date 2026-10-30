@@ -909,7 +909,11 @@ class AWTTest(TestCase):
         self.client.force_login(hr)
         response = self.client.get("/")
         self.assertContains(response, "Unconfirmed paid leave")
-        self.client.post(absence.urls["confirm"])
+        # Confirmed in the modal, the page behind it reloads
+        response = self.client.post(
+            absence.urls["confirm"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(response.status_code, 202)
         absence.refresh_from_db()
         self.assertFalse(absence.needs_confirmation)
         self.assertEqual(absence.confirmed_by, hr)
