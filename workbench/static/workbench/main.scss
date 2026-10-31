@@ -1458,6 +1458,11 @@ a.wb-row-title:hover {
   --bs-table-bg: transparent;
   overflow: visible;
 
+  // Wide tables scroll within the card instead of widening the page
+  &.table-responsive {
+    overflow-x: auto;
+  }
+
   > .table,
   > .table-responsive > .table {
     font-variant-numeric: tabular-nums;
