@@ -46,18 +46,8 @@
 {% endblock actions %}
 
 {% block report %}
-  {% if request.user.features.PERSONNEL_ADMINISTRATION and request.GET.user == 'active' %}
-    <div class="wb-stats mb-4">
-      <div class="wb-stat">
-        <div class="wb-stat-label">{% translate 'vacation days available'|capfirst %}</div>
-        <div class="wb-stat-value">{{ overall.available_vacation_days|days }}</div>
-      </div>
-      <div class="wb-stat">
-        <div class="wb-stat-label">
-          {% translate 'vacation days taken'|capfirst %} ({% translate 'corrected' %})
-        </div>
-        <div class="wb-stat-value">{{ overall.absence_vacation|days }}</div>
-      </div>
+  {% if overview %}
+    <div class="wb-stats wb-stats-5 mb-3">
       <div class="wb-stat">
         <div class="wb-stat-label">{% translate 'sickness days'|capfirst %}</div>
         <div class="wb-stat-value">{{ overall.absence_sickness|days }}</div>
@@ -82,18 +72,105 @@
         <div class="wb-stat-value">{{ overall.absence_correction|days }}</div>
       </div>
       <div class="wb-stat">
-        <div class="wb-stat-label">{% translate 'net work hours'|capfirst %}</div>
-        <div class="wb-stat-value">{{ overall.running_sum|hours:True }}</div>
-      </div>
-      <div class="wb-stat">
-        <div class="wb-stat-label">{% translate 'vacation days credit'|capfirst %}</div>
-        <div class="wb-stat-value">{{ overall.vacation_days_credit|days }}</div>
-      </div>
-      <div class="wb-stat">
-        <div class="wb-stat-label">{% translate 'balance'|capfirst %}</div>
-        <div class="wb-stat-value">{{ overall.balance|hours:True }}</div>
+        <div class="wb-stat-label">{% translate 'vacation days taken'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.vacation_days_taken|days }}</div>
       </div>
     </div>
+    <section class="card mb-3 wb-table-card">
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0 wb-compact-table" data-sortable>
+          <thead>
+            <tr>
+              <th data-sort-initial="asc">{% translate 'user'|capfirst %}</th>
+              <th class="text-end" data-sort-default="desc">{% translate 'pensum'|capfirst %}</th>
+              <th class="text-end" data-sort-default="desc" data-sort-abs>
+                {% translate 'Balance' %}
+                {% if as_of %}<small
+                    class="fw-normal text-body-secondary"
+                  >{{ as_of|local_date_format }}</small>{% endif %}
+              </th>
+              <th data-no-sort>{% translate 'Trend' %}</th>
+              <th class="text-end" data-sort-default="desc">{% translate 'Vacation days left' %}</th>
+              <th class="text-end" data-sort-default="desc">{% translate 'planned'|capfirst %}</th>
+              <th class="text-end" data-sort-default="desc">{% translate 'sickness days'|capfirst %}</th>
+              <th data-no-sort>{% translate 'notes'|capfirst %}</th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr class="wb-total-row">
+              <th>{% translate 'total'|capfirst %}</th>
+              <td></td>
+              <th class="text-end">{{ overall.balance_as_of|hours:True }}</th>
+              <td></td>
+              <th class="text-end">{{ overall.vacation_days_left|days }}</th>
+              <th class="text-end">{{ overall.vacation_days_planned|days }}</th>
+              <th class="text-end">{{ overall.absence_sickness|days }}</th>
+              <td></td>
+            </tr>
+          </tfoot>
+          {% for rows in overview.values %}
+            <tbody {% if forloop.last %}class="text-body-secondary"{% endif %}>
+              {% for row in rows %}
+                <tr>
+                  <td><a href="{% querystring user=row.user.pk %}">{{ row.user }}</a></td>
+                  <td class="text-end" data-sort-value="{{ row.totals.percentage|stringformat:'.2f' }}">
+                    {{ row.totals.percentage|stringformat:'.0f' }}%
+                  </td>
+                  <td class="text-end text-nowrap" data-sort-value="{{ row.totals.balance_as_of|stringformat:'.2f' }}">
+                    {% if row.totals.balance_as_of is not None %}
+                      {{ row.totals.balance_as_of|hours:True }}
+                      {% if row.balance_beyond_limit %}<span class="badge text-bg-light fw-normal"
+                        >&gt;40h</span>{% endif %}
+                    {% else %}
+                      &ndash;
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if row.trend %}
+                      <svg
+                        class="wb-sparkline"
+                        width="{{ row.trend.width }}"
+                        height="{{ row.trend.height }}"
+                        viewBox="0 0 {{ row.trend.width }} {{ row.trend.height }}"
+                        aria-hidden="true"
+                      >
+                        <line
+                          class="wb-sparkline-zero"
+                          x1="0"
+                          x2="{{ row.trend.width }}"
+                          y1="{{ row.trend.zero }}"
+                          y2="{{ row.trend.zero }}"
+                        />
+                        <polyline points="{{ row.trend.points }}" />
+                      </svg>
+                    {% endif %}
+                  </td>
+                  <td class="text-end" data-sort-value="{{ row.totals.vacation_days_left|stringformat:'.2f' }}">
+                    {{ row.totals.vacation_days_left|days }}
+                  </td>
+                  <td class="text-end" data-sort-value="{{ row.totals.vacation_days_planned|stringformat:'.2f' }}">
+                    {{ row.totals.vacation_days_planned|days }}
+                  </td>
+                  <td class="text-end" data-sort-value="{{ row.totals.absence_sickness|stringformat:'.2f' }}">
+                    {{ row.totals.absence_sickness|days }}
+                  </td>
+                  <td>
+                    {% if not row.user.is_active %}
+                      <span class="badge text-bg-light fw-normal">{% translate 'inactive' %}</span>
+                    {% elif not row.vacation_planning.fine %}
+                      <span class="badge text-bg-warning fw-normal">{% translate 'Vacation planning!' %}</span>
+                    {% endif %}
+                    {% if row.unconfirmed %}
+                      <span class="badge text-bg-warning fw-normal">{% translate 'Unconfirmed' %}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          {% endfor %}
+        </table>
+      </div>
+    </section>
   {% endif %}
   {% for wtm_id, data in wtm_holiday_data.items %}
     {% if data.has_public_holidays %}
@@ -272,7 +349,7 @@
                 <table class="table table-sm mb-0 wb-compact-table">
                   {% for absence in data.all_absences %}
                     <tr {% if not absence.is_working_time %}class="text-body-secondary"{% endif %}>
-                      <td class="text-nowrap">{{ absence.pretty_period }}</td>
+                      <td>{{ absence.pretty_period }}</td>
                       <td>
                         {% with reason=absence|absence_reason:request.user description=absence|absence_description:request.user %}
                           <a href="{{ absence.get_absolute_url }}" data-ajaxmodal>{{ reason|capfirst }}</a>
@@ -296,7 +373,7 @@
         </div>
 
         {% if data.show_employments %}
-          <section class="card mb-3 wb-table-card">
+          <section class="card mb-3 wb-table-card table-responsive">
             <table class="table table-sm mb-0 wb-compact-table">
               <tr class="wb-table-heading">
                 <th>

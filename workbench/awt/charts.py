@@ -141,3 +141,25 @@ def vacation_meter(totals):
         "excess": percent(excess),
         "excess_days": excess,
     }
+
+
+def sparkline(values, *, width=96, height=24):
+    """A polyline of the values, with the zero line, for small trend charts"""
+    values = [float(value) for value in values]
+    if len(values) < 2:
+        return None
+    top, bottom = max(*values, 0.0), min(*values, 0.0)
+    span = (top - bottom) or 1.0
+
+    def y(value):
+        return 1 + (height - 2) * (top - value) / span
+
+    step = width / (len(values) - 1)
+    return {
+        "width": width,
+        "height": height,
+        "points": " ".join(
+            f"{index * step:.1f},{y(value):.1f}" for index, value in enumerate(values)
+        ),
+        "zero": f"{y(0):.1f}",
+    }

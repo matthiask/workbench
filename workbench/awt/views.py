@@ -15,6 +15,7 @@ from workbench.accounts.models import User
 from workbench.awt.charts import (
     BALANCE_LIMIT,
     balance_chart,
+    sparkline,
     vacation_meter,
     working_time_chart,
 )
@@ -38,9 +39,11 @@ def annual_working_time_view(request):
 
     user = request.GET.get("user")
     users = None
+    overview_requested = False
     # The report contains sickness absences, which are health data
     if request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
         if user == "active":
+            overview_requested = True
             users = active_users(year)
         elif user:
             users = User.objects.filter(id=user)
@@ -81,7 +84,10 @@ def annual_working_time_view(request):
         "awt/year_detail.html",
         {
             "overall": statistics["overall"],
-            "statistics": [
+            "overview": overview(statistics) if overview_requested else None,
+            "statistics": []
+            if overview_requested
+            else [
                 person_report(row, year=year, as_of=statistics["as_of"])
                 for row in statistics["statistics"]
             ],
@@ -104,6 +110,31 @@ def annual_working_time_view(request):
             "has_company_holidays": statistics["has_company_holidays"],
         },
     )
+
+
+def overview(statistics):
+    """One row per person, active people first"""
+    as_of = statistics["as_of"]
+    rows = [
+        {
+            "user": row["user"],
+            "totals": row["totals"],
+            "balance_beyond_limit": row["totals"]["balance_as_of"] is not None
+            and abs(row["totals"]["balance_as_of"]) > BALANCE_LIMIT,
+            "trend": sparkline(row["running_sums"][: as_of.month]) if as_of else None,
+            "vacation_planning": row["vacation_planning"],
+            "unconfirmed": any(
+                absence.needs_confirmation
+                for absences in row["absences"].values()
+                for absence in absences
+            ),
+        }
+        for row in statistics["statistics"]
+    ]
+    return {
+        "active": [row for row in rows if row["user"].is_active],
+        "inactive": [row for row in rows if not row["user"].is_active],
+    }
 
 
 def person_report(row, *, year, as_of):

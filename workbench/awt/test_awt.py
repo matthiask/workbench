@@ -368,6 +368,9 @@ class AWTTest(TestCase):
         response = self.client.get(url + "?user=active")
         self.assertContains(response, str(user))
         self.assertNotContains(response, str(inactive))
+        # The overview has one row per person, not their reports
+        self.assertContains(response, "data-sortable")
+        self.assertNotContains(response, "wb-vacation-meter")
 
         response = self.client.get(url + "?user=" + str(inactive.pk))
         self.assertContains(response, str(inactive))

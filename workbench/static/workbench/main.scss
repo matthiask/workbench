@@ -1664,3 +1664,19 @@ details.card > summary.card-header {
 details.card:not([open]) > summary.card-header {
   border-bottom: 0;
 }
+
+.wb-sparkline {
+  display: block;
+  overflow: visible;
+
+  polyline {
+    fill: none;
+    stroke: var(--bs-primary);
+    stroke-width: 1.5;
+  }
+}
+
+.wb-sparkline-zero {
+  stroke: var(--bs-border-color);
+  stroke-width: 1;
+}
