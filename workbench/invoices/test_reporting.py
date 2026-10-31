@@ -33,6 +33,10 @@ class ReportingTest(TestCase):
         self.assertEqual(messages(response), ["Form was invalid."])
         response = self.client.get("/report/open-items-list/")
         self.assertContains(response, '<div class="wb-stat-value">300.00</div>')
+        # Nothing overdue, all due in the week in 15 days
+        [overdue, *weeks] = response.context["chart"]["columns"]
+        self.assertEqual(overdue["title"], "overdue\noverdue: 0.00")
+        self.assertIn("due: 300.00", weeks[-1]["title"])
 
         response = self.client.get(
             f"/report/open-items-list/?cutoff_date={in_days(-1).isoformat()}"
@@ -43,6 +47,17 @@ class ReportingTest(TestCase):
             self.client.get("/report/open-items-list/?export=xlsx").status_code, 200
         )
         # print(response, response.content.decode("utf-8"))
+
+        factories.InvoiceFactory.create(
+            invoiced_on=in_days(-40),
+            due_on=in_days(-1),
+            subtotal=20,
+            status=factories.Invoice.SENT,
+        )
+        response = self.client.get("/report/open-items-list/")
+        self.assertIn(
+            "overdue: 20.00", response.context["chart"]["columns"][0]["title"]
+        )
 
         # Hit the key data view to cover some branches and verify that it does not crash
         self.assertEqual(self.client.get("/report/key-data/").status_code, 200)

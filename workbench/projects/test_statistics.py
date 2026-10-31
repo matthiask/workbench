@@ -56,10 +56,22 @@ class StatisticsTest(TestCase):
         user = factories.UserFactory.create()
         self.client.force_login(user)
 
-        factories.ProjectFactory.create()
+        project = factories.ProjectFactory.create()
 
         response = self.client.get("/report/projected-gross-margin/")
         self.assertContains(response, "Projected gross margin")
+        self.assertIsNone(response.context["chart"])
+
+        factories.ProjectedInvoiceFactory.create(
+            project=project, invoiced_on=in_days(-40), gross_margin=300
+        )
+        factories.ProjectedInvoiceFactory.create(
+            project=project, invoiced_on=in_days(40), gross_margin=1000
+        )
+        response = self.client.get("/report/projected-gross-margin/")
+        [past, *_months, future] = response.context["chart"]["columns"]
+        self.assertIn("overdue: 300.00", past["title"])
+        self.assertIn("projected gross margin: 1’000.00", future["title"])
 
     def test_not_archived_hours_grouped_services_green_hours_hpc(self):
         """Test a scenario"""

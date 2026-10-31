@@ -399,6 +399,32 @@ class DealsTest(TestCase):
             1,
         )
 
+    @travel("2026-10-31 12:00")
+    def test_accepted_deals_chart(self):
+        """Accepted deals per month and value type, with the target"""
+        deal = factories.DealFactory.create(
+            status=Deal.ACCEPTED, closed_on=dt.date(2026, 9, 15)
+        )
+        vt = factories.ValueTypeFactory.create(weekly_target=70)
+        deal.values.create(type=vt, value=400)
+        deal.save()
+        self.client.force_login(deal.owned_by)
+
+        def chart(date_from, date_until):
+            return self.client.get(
+                f"/report/accepted-deals/?date_from={date_from}&date_until={date_until}"
+            ).context["chart"]
+
+        # A week across the end of a month, a single month
+        self.assertIsNone(chart("2026-10-26", "2026-11-01"))
+        self.assertIsNone(chart("2026-09-01", "2026-09-30"))
+
+        [_august, september, october] = chart("2026-08-01", "2026-10-15")["columns"]
+        self.assertIn(f"{vt}: 400.00", september["title"])
+        # 10 per day, October is cut off by the date range
+        self.assertIn("Target: 300.00", september["title"])
+        self.assertIn("Target: 150.00", october["title"])
+
     def test_deal_reporting(self):
         """Deal reporting: Accepted and declined deals, history of deals"""
         deal = factories.DealFactory.create(
@@ -417,6 +443,8 @@ class DealsTest(TestCase):
             "/report/accepted-deals/?date_from=2020-01-01&date_until=2099-01-01"
         )
         self.assertContains(response, "Accepted deals")
+        # Too many months for a chart
+        self.assertIsNone(response.context["chart"])
 
         stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)])
         self.assertEqual(

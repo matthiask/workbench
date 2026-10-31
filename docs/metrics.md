@@ -244,6 +244,8 @@ Projects: all open projects (internal not excluded) with at least one ProjectedI
 
 Sorting (web): by the list of monthly values descending (i.e. by the earliest month's amount first). API: by delta descending.
 
+Chart (web, `_projected_gross_margin_chart`): `monthly_overall` per month; months before the current month (projections not invoiced in time) as "überfällig".
+
 ---
 
 ### Open items list (Offene-Posten-Liste)
@@ -254,6 +256,7 @@ Answers: which invoices were sent but not paid on the cutoff date (Stichtag, def
 - List: invoices outstanding on the cutoff date (status SENT/PAID now, invoiced_on ≤ cutoff, closed_on > cutoff or empty), ordered by invoiced_on. Columns: Rechnung, Verrechnet am, Total exkl. MwSt (`total_excl_tax`), Total (`total`, incl. tax).
 - Tiles "Total exkl. MwSt" / "Total": Σ total_excl_tax / Σ total of the list.
 - "Fällig in Kalenderwoche": per Monday of the week of `due_on` (missing due_on → current week via `monday(None)`), Σ total_excl_tax and Σ total.
+- Chart (web, `_open_items_chart`): "überfällig" = Σ total_excl_tax of invoices with `due_on` before the cutoff date as one bar, then Σ total_excl_tax per week of `due_on` from the cutoff date's week on (weeks without invoices shown as empty).
 - Note: invoices canceled after the cutoff date are missing for past cutoff dates (status is current).
 
 ---
@@ -860,6 +863,8 @@ Deals: status ACCEPTED, `closed_on` in [Datum von, Datum bis] (default this week
 | Total row (users) | Anzahl = number of deals; Wert = Σ Deal.value (deals with several or no contributors count once). |
 | Deal list | Each deal's value; total row = `stats.sum`. |
 | Modal per user | Deal, contact/customer, Projektvergabe (closing type + notice), Wert, Beitrag (the user's share). |
+
+Chart (web, `_accepted_deals_chart`): the month × value type cells as stacked bars for every month of the period, and the target per month = Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
 
 API additionally: declined `count`, `sum` (Σ Deal.value) and per closing type.
 

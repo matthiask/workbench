@@ -25,6 +25,16 @@
     </div>
   </div>
 
+  {% if chart %}
+    <section class="card mb-3">
+      <div class="card-header">{% translate 'Due per week, excl. tax' %}</div>
+      <div class="card-body">
+        {% translate 'Due per week, excl. tax' as label %}
+        {% include "charts/bar_chart.html" with chart=chart label=label %}
+      </div>
+    </section>
+  {% endif %}
+
   <div class="row g-3">
     <div class="col-xl-8">
       <section class="card wb-table-card">

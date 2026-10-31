@@ -18,6 +18,7 @@ from workbench.accounts.reporting import (
     birthdays,
     work_anniversaries,
 )
+from workbench.deals.reporting import accepted_deals
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost
 from workbench.logbook.reporting import logbook_stats
@@ -89,10 +90,49 @@ def open_items_list(request, form):
             )
         )
 
+    open_items = form.open_items_list()
     return render(
         request,
         "reporting/open_items_list.html",
-        {"form": form, "open_items_list": form.open_items_list()},
+        {
+            "form": form,
+            "open_items_list": open_items,
+            "chart": _open_items_chart(
+                list(open_items["list"]), cutoff=form.cleaned_data["cutoff_date"]
+            ),
+        },
+    )
+
+
+def _open_items_chart(invoices, *, cutoff):
+    """Everything overdue on the cutoff date as one bar, then the amounts
+    due per week"""
+    if not invoices:
+        return None
+    overdue = sum((i.total_excl_tax for i in invoices if i.due_on < cutoff), Z2)
+    due = defaultdict(lambda: Z2)
+    for invoice in invoices:
+        if invoice.due_on >= cutoff:
+            due[monday(invoice.due_on)] += invoice.total_excl_tax
+    labels, values = [_("overdue")], [None]
+    week = monday(cutoff)
+    while due and week <= max(due):
+        labels.append(f"KW{week:%V}")
+        values.append(due.get(week, Z2))
+        week += dt.timedelta(days=7)
+    return bar_chart(
+        labels,
+        bars=[
+            {
+                "label": _("overdue"),
+                "values": [overdue] + [None] * (len(labels) - 1),
+                "color": "wb-series-2",
+            },
+            {"label": _("due"), "values": values, "color": "wb-series-1"},
+        ],
+        fmt=currency,
+        axis_fmt=_amount,
+        height=220,
     )
 
 
@@ -160,7 +200,42 @@ def projected_gross_margin(request):
             ),
             "months": [dt.date(m[0], m[1], 1) for m in all_months],
             "monthly_overall": [pi["monthly_overall"].get(m) for m in all_months],
+            "chart": _projected_gross_margin_chart(all_months, pi["monthly_overall"]),
         },
+    )
+
+
+def _projected_gross_margin_chart(months, monthly):
+    """Projected gross margin per month, projections of past months which
+    haven't been invoiced in time separately"""
+    if not months:
+        return None
+    today = dt.date.today()
+    current = (today.year, today.month)
+
+    def values(*, past):
+        return [
+            monthly.get(month, Z2) if (month < current) == past else None
+            for month in months
+        ]
+
+    return bar_chart(
+        [local_date_format(dt.date(*month, 1), fmt="M y") for month in months],
+        bars=[
+            {
+                "label": _("overdue"),
+                "values": values(past=True),
+                "color": "wb-series-2",
+            },
+            {
+                "label": _("projected gross margin"),
+                "values": values(past=False),
+                "color": "wb-series-1",
+            },
+        ],
+        fmt=currency,
+        axis_fmt=_amount,
+        height=220,
     )
 
 
@@ -567,6 +642,77 @@ def date_range_filter_view(request, form, *, template_name, stats_fn):
                 form.cleaned_data["date_until"],
             ]),
         },
+    )
+
+
+@filter_form(DateRangeFilterForm)
+def accepted_deals_view(request, form):
+    date_range = [form.cleaned_data["date_from"], form.cleaned_data["date_until"]]
+    stats = accepted_deals(date_range)
+    return render(
+        request,
+        "reporting/accepted_deals.html",
+        {
+            "form": form,
+            "stats": stats,
+            "chart": _accepted_deals_chart(stats, date_range),
+        },
+    )
+
+
+def _accepted_deals_chart(stats, date_range):
+    """Accepted deals per month and value type, and the target of the days
+    of each month within the date range"""
+    months = []
+    month = date_range[0].replace(day=1)
+    while month <= date_range[1]:
+        months.append(month)
+        month = (month + dt.timedelta(days=32)).replace(day=1)
+    # Monthly bars of a week or a single month say nothing, and the targets
+    # of months cut off by the date range look strange.
+    complete = [
+        month
+        for month in months
+        if month >= date_range[0] and month_range(month)[1] <= date_range[1]
+    ]
+    if len(complete) < 2 or len(months) > 36:
+        return None
+
+    values = {
+        row["month"]: {value["type"]: value["value"] for value in row["values"]}
+        for row in stats["by_month_and_valuetype"]
+    }
+    weekly_target = sum(
+        (type.weekly_target or 0 for type in stats["valuetypes"]), Decimal(0)
+    )
+
+    def target(month):
+        first = max(month, date_range[0])
+        last = min(month_range(month)[1], date_range[1])
+        return weekly_target * ((last - first).days + 1) / 7
+
+    return bar_chart(
+        [local_date_format(month, fmt="M y") for month in months],
+        bars=[
+            {
+                "label": str(type),
+                "values": [values.get(month, {}).get(type, Z2) for month in months],
+                "color": f"wb-series-{index}",
+            }
+            for index, type in enumerate(stats["valuetypes"], 1)
+        ],
+        lines=[
+            {
+                "label": capfirst(_("target")),
+                "values": [target(month) for month in months],
+                "color": "wb-series-muted",
+                "dashed": True,
+            }
+        ]
+        if weekly_target
+        else [],
+        fmt=currency,
+        axis_fmt=_amount,
     )
 
 

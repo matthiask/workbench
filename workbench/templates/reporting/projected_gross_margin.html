@@ -8,6 +8,15 @@
 {% block heading %}{% translate 'projected gross margin'|capfirst %}{% endblock %}
 
 {% block report %}
+  {% if chart %}
+    <section class="card mb-3">
+      <div class="card-header">{% translate 'Per month' %}</div>
+      <div class="card-body">
+        {% translate 'projected gross margin' as label %}
+        {% include "charts/bar_chart.html" with chart=chart label=label %}
+      </div>
+    </section>
+  {% endif %}
   <section class="card mb-3 wb-table-card table-responsive">
     <table class="table table-sm table-hover mb-0 wb-compact-table wb-month-columns">
       <thead>

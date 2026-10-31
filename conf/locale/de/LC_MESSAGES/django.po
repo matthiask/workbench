@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 13:41+0100\n"
+"POT-Creation-Date: 2026-10-31 14:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3790,6 +3790,14 @@ msgstr "dieses Jahr"
 msgid "last year"
 msgstr "letztes Jahr"
 
+#: workbench/reporting/views.py
+msgid "overdue"
+msgstr "überfällig"
+
+#: workbench/reporting/views.py
+msgid "due"
+msgstr "fällig"
+
 #: workbench/reporting/views.py workbench/templates/reporting/green_hours.html
 #: workbench/templates/reporting/key_data.html
 msgid "profitable"
@@ -3828,6 +3836,11 @@ msgstr "Datum von"
 #: workbench/reporting/views.py
 msgid "Date until"
 msgstr "Datum bis"
+
+#: workbench/reporting/views.py
+#: workbench/templates/reporting/accepted_deals.html
+msgid "target"
+msgstr "Ziel"
 
 #: workbench/reporting/views.py
 #, python-format
@@ -5028,13 +5041,14 @@ msgid "Logged"
 msgstr "Erfasst"
 
 #: workbench/templates/reporting/accepted_deals.html
+#: workbench/templates/reporting/projected_gross_margin.html
+msgid "Per month"
+msgstr "Pro Monat"
+
+#: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/key_data.html
 msgid "month"
 msgstr "Monat"
-
-#: workbench/templates/reporting/accepted_deals.html
-msgid "target"
-msgstr "Ziel"
 
 #: workbench/templates/reporting/accepted_deals.html
 msgid "median age"
@@ -5163,6 +5177,10 @@ msgstr "Durchschnitt"
 #: workbench/templates/reporting/logging.html
 msgid "Days with insufficient breaks"
 msgstr "Tage mit zuwenig Pausenzeit"
+
+#: workbench/templates/reporting/open_items_list.html
+msgid "Due per week, excl. tax"
+msgstr "Fällig pro Woche, exkl. MwSt."
 
 #: workbench/templates/reporting/open_items_list.html
 msgid "Due in calendar week"

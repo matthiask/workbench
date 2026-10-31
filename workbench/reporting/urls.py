@@ -12,6 +12,7 @@ from workbench.planning.reporting import planning_vs_logbook
 from workbench.projects.reporting import hours_per_customer, hours_per_type
 from workbench.reporting.green_hours import green_hours
 from workbench.reporting.views import (
+    accepted_deals_view,
     birthdays_view,
     date_range_and_users_filter_view,
     date_range_filter_view,
@@ -93,8 +94,7 @@ urlpatterns = [
     ),
     path(
         "accepted-deals/",
-        deals_only(date_range_filter_view),
-        {"template_name": "reporting/accepted_deals.html", "stats_fn": accepted_deals},
+        deals_only(accepted_deals_view),
         name="report_accepted_deals",
     ),
     path(
