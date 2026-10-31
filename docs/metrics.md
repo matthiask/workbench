@@ -494,7 +494,7 @@ Everyone who logged hours in the period (also only on internal projects).
 | Anstellungsverhältnis % | average of `employment_percentages()[user][month]` over the months of the period, weighted with the days of each month in the period; monthly values pro-rate partial-month employments by calendar days (`workbench/awt/reporting.py:employment_percentages`) |
 | Abwesenheitstage | Σ absence days in the period (see below) |
 | Stunden | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
-| Ansatz | `gross_margin / hours_in_range` (so internal hours dilute it) |
+| Ansatz | `gross_margin / hours_in_range`: the overall rate of the person, internal hours included on purpose (not only the rate on profitable projects) |
 | Umsatz bereinigt | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Stunden, Verrechnete Stunden, Ohne Stundensatz, Umsatz bereinigt, Ansatz) |
 | Extern % | `100 × external_hours / total_hours` (external = hours on non-internal projects, `workbench/projects/reporting.py:hours_per_type`) |
 | Richtwert extern % | `profitable_percentage = 100 − Σ InternalTypeUser.percentage` (per-user override, else the internal type's default percentage) |
@@ -517,7 +517,7 @@ without external hours.
 
 Σ over the users of the field: Stunden (`hours_in_range`), Umsatz bereinigt,
 Ansatz = Σ margin / Σ hours, Extern % = `100 × Σ external / Σ total hours`.
-Users without a field are grouped as "<unbekannt>".
+Users without a field are grouped as "unbekannt".
 
 #### Organizations ("Organisationen"), sorted by rate desc
 
@@ -895,10 +895,6 @@ describe the current behaviour, including these. Remove an entry when it is
 fixed or decided to be intended. Entries marked *(checked)* were confirmed
 against the code or the database; the others were found by reading the code
 and not checked a second time.
-
-Profitability:
-
-- The users' "Stunden" and "Ansatz" in squeeze include internal hours.
 
 Financial overview and budgets:
 
