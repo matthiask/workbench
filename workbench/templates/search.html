@@ -45,12 +45,3 @@
     {% endfor %}
   </div>
 {% endblock content %}
-
-{% block js %}
-  {{ block.super }}
-  <script>
-    $(function() {
-      $('form[role=search] input').focus();
-    });
-  </script>
-{% endblock js %}

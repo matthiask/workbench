@@ -103,11 +103,10 @@
     </section>
   </div>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        if (!/Mac/.test(navigator.platform)) {
-          var el = $("[data-shortcuts]")
-          el.html(el.html().replace(/Ctrl-/g, "Alt-"))
-        }
-    })
+    if (!/Mac/.test(navigator.platform)) {
+      for (const kbd of document.querySelectorAll("[data-shortcuts] kbd")) {
+        kbd.textContent = kbd.textContent.replace(/Ctrl-/g, "Alt-")
+      }
+    }
   </script>
 {% endblock content %}

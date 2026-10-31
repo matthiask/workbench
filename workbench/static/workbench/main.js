@@ -5,7 +5,6 @@ import "./main.scss"
 
 window.bootstrap = bootstrap
 
-/* global $ */
 function _sel(sel) {
   return document.querySelector(sel)
 }
@@ -106,192 +105,406 @@ function doSubmit(el) {
   el.closest("form").requestSubmit()
 }
 
-$(() => {
-  const gettext = window.gettext || ((t) => t)
+// Delegated event listener, the handler receives the matching element
+function on(type, selector, handler) {
+  document.addEventListener(type, (e) => {
+    const el = e.target.closest?.(selector)
+    if (el) handler(e, el)
+  })
+}
 
-  // AJAX modals
-  const dismissModals = () => {
-    // LOL, dismiss.
-    $(".modal, .modal-backdrop").remove()
-    $(document.body).removeClass("modal-open").removeAttr("style")
+function setValue(el, value, { change = false } = {}) {
+  if (!el) return
+  el.value = value
+  if (change) el.dispatchEvent(new Event("change", { bubbles: true }))
+}
+
+function isoDate(date) {
+  const pad = (num) => `${num}`.padStart(2, "0")
+  return `${date.getFullYear()}-${pad(1 + date.getMonth())}-${pad(date.getDate())}`
+}
+
+function debounce(func, wait) {
+  let timeout
+  return (...args) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
   }
+}
 
-  const initModal = (data) => {
-    dismissModals()
+const gettext = (t) => (window.gettext || ((t) => t))(t)
 
-    const div = document.createElement("div")
-    div.innerHTML = data
-    const el = div.querySelector(".modal")
-    if (el) {
-      document.body.append(div)
-      const modal = new bootstrap.Modal(el, {
-        backdrop: div.querySelector("form[method=post]") ? "static" : true,
-      })
-      el.addEventListener("hide.bs.modal", () => {
-        div.remove()
-      })
-      modal.show()
+// AJAX modals
+function dismissModals() {
+  for (const el of document.querySelectorAll(".modal, .modal-backdrop")) {
+    el.remove()
+  }
+  document.body.classList.remove("modal-open")
+  document.body.removeAttribute("style")
+}
 
-      setTimeout(() => {
-        // Force a focus on first autofocus element
-        for (const input of el.querySelectorAll("[autofocus]")) {
+function initModal(html) {
+  dismissModals()
+
+  const div = document.createElement("div")
+  div.innerHTML = html
+  const el = div.querySelector(".modal")
+  if (el) {
+    document.body.append(div)
+    const modal = new bootstrap.Modal(el, {
+      backdrop: div.querySelector("form[method=post]") ? "static" : true,
+    })
+    el.addEventListener("hide.bs.modal", () => {
+      div.remove()
+    })
+    modal.show()
+
+    setTimeout(() => {
+      // Force a focus on first autofocus element
+      for (const input of el.querySelectorAll("[autofocus]")) {
+        input.focus()
+        return
+      }
+
+      // Else find first input or select field which isn't a child of a
+      // hidden element.
+      for (const input of el.querySelectorAll(
+        ":is(input, select):not([type=hidden])",
+      )) {
+        if (!input.closest(".d-none")) {
           input.focus()
           return
         }
-
-        // Else find first input or select field which isn't a child of a
-        // hidden element.
-        for (const input of el.querySelectorAll(
-          ":is(input, select):not([type=hidden])",
-        )) {
-          if (!input.closest(".d-none")) {
-            input.focus()
-            return
-          }
-        }
-      }, 100)
-    }
-
-    initWidgets()
+      }
+    }, 100)
   }
 
-  window.initModal = initModal
-  window.openModalFromUrl = (url) => {
-    fetch(url, {
-      credentials: "include",
-      headers: { "x-requested-with": "XMLHttpRequest" },
+  initWidgets()
+}
+
+// The views answer differently to requests made by JavaScript (request.is_ajax())
+const AJAX_HEADERS = { "x-requested-with": "XMLHttpRequest" }
+
+window.initModal = initModal
+window.openModalFromUrl = (url) => {
+  fetch(url, { credentials: "include", headers: AJAX_HEADERS })
+    .then((response) => response.text())
+    .then((html) => {
+      initModal(html)
     })
-      .then((response) => response.text())
-      .then((html) => {
-        initModal(html)
+    .catch((e) => {
+      console.error(e)
+      alert(gettext("Unable to open the form"))
+    })
+}
+
+on("click", "[data-ajaxmodal]", (e, el) => {
+  e.preventDefault()
+  window.openModalFromUrl(el.href)
+})
+
+on("submit", ".modal-dialog form", async (e, form) => {
+  e.preventDefault()
+  const action = form.action
+  try {
+    if (form.method.toLowerCase() !== "post") {
+      const params = new URLSearchParams(new FormData(form))
+      const response = await fetch(`${action}?${params}`, {
+        headers: AJAX_HEADERS,
       })
-      .catch((e) => {
-        console.error(e)
-        alert(gettext("Unable to open the form"))
-      })
-  }
-
-  document.body.addEventListener("click", (e) => {
-    const el = e.target.closest("[data-ajaxmodal]")
-    if (el) {
-      e.preventDefault()
-      window.openModalFromUrl(el.href)
-    }
-  })
-
-  $(document.body).on("submit", ".modal-dialog form", function (_event) {
-    if (this.method.toLowerCase() === "post") {
-      const action = this.action
-      const data = $(this).serialize()
-      this.parentNode.removeChild(this)
-      $.post(action, data, (data, _status, jqXHR) => {
-        // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
-        if (
-          jqXHR.status === 201 ||
-          jqXHR.status === 202 ||
-          jqXHR.status === 204
-        ) {
-          $(document).trigger("modalform", [jqXHR.status, action])
-          dismissModals()
-          window.location.reload()
-        } else if (jqXHR.status === 299) {
-          dismissModals()
-
-          window.location.href = data.redirect
-          const to = new URL(data.redirect, window.location.href)
-          if (to.pathname === window.location.pathname) {
-            // Alternative: window.hashchange -> window.location.reload()
-            window.location.reload()
-          }
-        } else {
-          initModal(data)
-        }
-      })
-    } else {
-      $.get(
-        `${this.action}?${$(this).serialize()}`,
-        (
-          data /*,
-        status,
-        jqXHR
-        */,
-        ) => {
-          initModal(data)
-        },
-      )
-    }
-    return false
-  })
-
-  // Autosubmit forms
-  function autosubmit(e) {
-    const form = e.target.form
-    if (form.method !== "get") {
-      doSubmit(form)
+      initModal(await response.text())
       return
     }
 
-    const fd = new FormData(form)
-    let params = new URLSearchParams()
-    for (const part of fd) {
-      if (part[1]) params.append(part[0], part[1])
+    const body = new FormData(form)
+    // Don't submit twice
+    form.remove()
+    const response = await fetch(action, {
+      method: "POST",
+      body,
+      headers: AJAX_HEADERS,
+    })
+    // 201 CREATED, 202 ACCEPTED or 204 NO CONTENT
+    if ([201, 202, 204].includes(response.status)) {
+      document.dispatchEvent(
+        new CustomEvent("modalform", {
+          detail: { status: response.status, action },
+        }),
+      )
+      dismissModals()
+      window.location.reload()
+    } else if (response.status === 299) {
+      dismissModals()
+      const { redirect } = await response.json()
+      window.location.href = redirect
+      const to = new URL(redirect, window.location.href)
+      if (to.pathname === window.location.pathname) {
+        // Alternative: window.hashchange -> window.location.reload()
+        window.location.reload()
+      }
+    } else if (response.ok) {
+      initModal(await response.text())
+    } else {
+      throw new Error(`${response.status} ${response.statusText}`)
     }
-    params.sort()
-    params = params.toString()
-    window.location.href = params ? `?${params}` : "."
+  } catch (err) {
+    console.error(err)
+    alert(gettext("Unable to submit the form"))
   }
-  $(document.body).on(
-    "change",
-    "form[data-autosubmit] select, form[data-autosubmit] input:not([type=date])",
-    autosubmit,
-  )
+})
 
-  function debounce(func, wait, immediate) {
-    // 'private' variable for instance
-    // The returned function will be able to reference this due to closure.
-    // Each call to the returned function will share this common timer.
-    let timeout
-
-    // Calling debounce returns a new anonymous function
-    return function (...args) {
-      // Should the function be called now? If immediate is true
-      //   and not already in a timeout then the answer is: Yes
-      const callNow = immediate && !timeout
-
-      // This is the basic debounce behaviour where you can call this
-      //   function several times, but it will only execute once
-      //   [before or after imposing a delay].
-      //   Each time the returned function is called, the timer starts over.
-      clearTimeout(timeout)
-
-      // Set the new timeout
-      timeout = setTimeout(() => {
-        // Inside the timeout function, clear the timeout variable
-        // which will let the next execution run when in 'immediate' mode
-        timeout = null
-
-        // Check if the function already ran with the immediate flag
-        if (!immediate) {
-          // Call the original function with apply
-          // apply lets you define the 'this' object as well as the arguments
-          //    (both captured before setTimeout)
-          func.apply(this, args)
-        }
-      }, wait)
-
-      // Immediate mode and no wait timer? Execute the function..
-      if (callNow) func.apply(this, args)
-    }
+// Autosubmit forms
+function autosubmit(_e, el) {
+  const form = el.form
+  if (form.method !== "get") {
+    doSubmit(form)
+    return
   }
 
-  $(document.body).on(
-    "change",
-    "form[data-autosubmit] input[type=date]",
-    debounce(autosubmit, 1000),
-  )
+  const fd = new FormData(form)
+  let params = new URLSearchParams()
+  for (const part of fd) {
+    if (part[1]) params.append(part[0], part[1])
+  }
+  params.sort()
+  params = params.toString()
+  window.location.href = params ? `?${params}` : "."
+}
+on(
+  "change",
+  "form[data-autosubmit] select, form[data-autosubmit] input:not([type=date])",
+  autosubmit,
+)
+on(
+  "change",
+  "form[data-autosubmit] input[type=date]",
+  debounce(autosubmit, 1000),
+)
 
-  // Search form restoration
-  $(".form-search").each(() => {
+// Search form restoration
+function localStorageKeyFor(href) {
+  return `search-${href}`
+}
+
+function restoreSearch(href) {
+  return href + (window.localStorage.getItem(localStorageKeyFor(href)) || "")
+}
+
+// Restore the search params when going through the main menu...
+on("click", ".navbar a", (e, el) => {
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
+  const href = el.getAttribute("href")
+  if (!href) return
+
+  e.preventDefault()
+  window.location.href = restoreSearch(href)
+})
+
+on("click", "h1, [data-reset-filter]", () => {
+  window.localStorage.removeItem(localStorageKeyFor(window.location.pathname))
+})
+
+// Hotkeys
+document.addEventListener("keydown", (e) => {
+  if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
+    return
+  }
+
+  const focus = (sel) => {
+    const el = _sel(sel)
+    el?.focus()
+    el?.select()
+  }
+
+  if (e.keyCode === 70) {
+    // f
+    focus(".form-search input[name=q]")
+  } else if (e.keyCode === 72) {
+    // h
+    window.location.href = "/"
+  } else if (e.keyCode === 67 && e.shiftKey) {
+    // Shift-c
+    window.openModalFromUrl("/contacts/people/select/")
+  } else if (e.keyCode === 67) {
+    // c
+    window.location.href = restoreSearch("/contacts/people/")
+  } else if (e.keyCode === 80 && e.shiftKey) {
+    // Shift-p
+    window.openModalFromUrl("/projects/select/")
+  } else if (e.keyCode === 80) {
+    // p
+    window.location.href = restoreSearch("/projects/")
+  } else if (e.keyCode === 79) {
+    // o
+    window.location.href = restoreSearch("/projects/offers/")
+  } else if (e.keyCode === 82) {
+    // r
+    window.location.href = restoreSearch("/invoices/")
+  } else if (e.keyCode === 84) {
+    // t
+    window.location.href = restoreSearch("/timestamps/")
+  } else if (e.keyCode === 68) {
+    // d
+    window.location.href = restoreSearch("/deals/")
+  } else if (e.keyCode === 76) {
+    // l
+    const el = _sel("[data-createhours]")
+    if (e.shiftKey || !el) {
+      window.openModalFromUrl("/logbook/hours/create/")
+    } else {
+      window.openModalFromUrl(el.href)
+    }
+  } else if (e.keyCode === 75) {
+    // k
+    const el = _sel("[data-createcost]")
+    if (e.shiftKey || !el) {
+      window.openModalFromUrl("/logbook/costs/create/")
+    } else {
+      window.openModalFromUrl(el.href)
+    }
+  } else if (e.keyCode === 66 && e.shiftKey) {
+    // Shift-b
+    window.location.href = "/logbook/breaks/"
+  } else if (e.keyCode === 66) {
+    // b
+    window.openModalFromUrl("/logbook/breaks/create/")
+  } else if (e.keyCode === 81) {
+    // q
+    focus(".navbar input[type=search]")
+  } else if (e.keyCode === 13) {
+    doSubmit(e.target)
+  } else if (e.keyCode >= 48 && e.keyCode <= 57) {
+    const el = _sel(`[data-number-shortcut="${(e.keyCode - 38) % 10}"]`)
+    if (!el) return
+    e.preventDefault()
+    if ("ajaxmodal" in el.dataset) {
+      window.openModalFromUrl(el.href)
+    } else {
+      window.location.href = el.href
+    }
+  } else {
+    window.console?.log(e, e.keyCode)
+    return
+  }
+
+  e.preventDefault()
+  e.stopPropagation()
+})
+
+// Some special cases...
+on("click", "[data-hours-button]", (_e, el) => {
+  el.blur()
+  const value = prompt(el.dataset.hoursButton)
+  if (Number.parseFloat(value)) {
+    const days = _sel("#id_modal-days")
+    setValue(days, (Number.parseFloat(value) / 8).toFixed(2))
+    days?.focus()
+  }
+})
+
+on("click", "[data-multiply-cost]", (e, el) => {
+  e.preventDefault()
+  const factor = Number.parseFloat(el.dataset.multiplyCost)
+  const tpc = Number.parseFloat(_sel("#id_modal-third_party_costs")?.value)
+  const cost = _sel("#id_modal-cost")
+
+  if (tpc && factor) {
+    setValue(cost, (factor * tpc).toFixed(2))
+    cost.focus()
+  }
+})
+
+on("click", "[data-field-value]", (e, el) => {
+  e.preventDefault()
+  for (const field of el
+    .closest(".form-group")
+    .querySelectorAll("input, textarea, select")) {
+    setValue(field, el.dataset.fieldValue, { change: true })
+  }
+})
+
+on("click", "[data-set-period]", (e, el) => {
+  e.preventDefault()
+  const value = el.dataset.setPeriod.split(":")
+  // An empty start keeps the current one, e.g. for "until today"
+  if (value[0]) setValue(_sel("#id_date_from"), value[0])
+  setValue(_sel("#id_date_until"), value[1], { change: true })
+})
+
+on("click", "[data-select-receivers]", (e, el) => {
+  e.preventDefault()
+  const arr = el.dataset.selectReceivers.split(",")
+  for (const input of el
+    .closest(".widget--checkboxselectmultiple")
+    .querySelectorAll("input")) {
+    input.checked = arr.includes(input.value)
+  }
+})
+
+// "Select all" checkboxes in the group labels of checkbox lists, e.g. the
+// services of offers and invoices
+on("change", "[data-toggle-following]", (_e, el) => {
+  let sibling = el.closest(".form-text").nextElementSibling
+  while (sibling && !sibling.matches(".form-text")) {
+    for (const input of sibling.querySelectorAll("input")) {
+      input.checked = el.checked
+    }
+    sibling = sibling.nextElementSibling
+  }
+})
+
+on("click", "[data-pin]", (_e, el) => {
+  const url = el.dataset.pin
+  fetch(`${url}?pinned=${el.dataset.pinned === "true" ? "" : "pinned"}`)
+    .then((r) => r.json())
+    .then((data) => {
+      el.dataset.pinned = data.pinned
+    })
+})
+
+on("click", "[data-clear]", (_e, el) => {
+  for (const field of document.querySelectorAll(el.dataset.clear)) {
+    setValue(field, "", { change: true })
+  }
+})
+
+on("click", "[data-convert]", async () => {
+  const params = new URLSearchParams()
+  params.append("day", _sel("#id_modal-rendered_on").value)
+  params.append("currency", _sel("#id_modal-expense_currency").value)
+  params.append("cost", _sel("#id_modal-expense_cost").value)
+
+  const data = await (await fetch(`/expenses/convert/?${params}`)).json()
+  if (data.error) {
+    alert(data.error)
+  } else {
+    setValue(_sel("#id_modal-third_party_costs"), data.cost)
+  }
+})
+
+on("click", "[data-new-service]", (e, el) => {
+  e.preventDefault()
+  el.classList.add("invisible")
+
+  // Reset the service dropdown and emit a change event for the progress
+  // bar update.
+  setValue(_sel("#id_modal-service"), "", { change: true })
+
+  // Show the new-service fields and focus the first input element.
+  const container = _sel("#new-service")
+  container.classList.remove("d-none")
+  container.querySelector("input").focus()
+})
+
+on("click", "[data-foreign-currency]", (e, el) => {
+  e.preventDefault()
+  el.classList.add("invisible")
+  _sel("#foreign-currency").classList.remove("d-none")
+  _sel("#id_modal-are_expenses").checked = true
+})
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (_sel(".form-search")) {
     let params = new URLSearchParams(window.location.search.slice(1))
     // Also see workbench/generic.py
     ;["disposition", "error", "export", "page"].forEach((key) => {
@@ -300,255 +513,49 @@ $(() => {
     params = params.toString()
     const key = `search-${window.location.pathname}`
     window.localStorage.setItem(key, params ? `?${params}` : "")
-  })
-
-  function localStorageKeyFor(href) {
-    return `search-${href}`
   }
 
-  function restoreSearch(href) {
-    return href + (window.localStorage.getItem(localStorageKeyFor(href)) || "")
-  }
-
-  // Restore the search params when going through the main menu...
-  $(".navbar").on("click", "a", function (e) {
-    const orig = e.originalEvent
-    if (orig.altKey || orig.ctrlKey || orig.metakey || orig.shiftKey) return
-
-    e.preventDefault()
-    window.location.href = restoreSearch(this.getAttribute("href"))
-  })
-
-  $("h1, [data-reset-filter]").on("click", () => {
-    window.localStorage.removeItem(localStorageKeyFor(window.location.pathname))
-  })
-
-  // Hotkeys
-  $(document.body).on("keydown", (e) => {
-    if (/Mac/.test(navigator.platform) ? !e.ctrlKey : !e.altKey) {
-      return
-    }
-
-    if (e.keyCode === 70) {
-      // f
-      $(".form-search input[name=q]").focus().select()
-    } else if (e.keyCode === 72) {
-      // h
-      window.location.href = "/"
-    } else if (e.keyCode === 67 && e.shiftKey) {
-      // Shift-c
-      window.openModalFromUrl("/contacts/people/select/")
-    } else if (e.keyCode === 67) {
-      // c
-      window.location.href = restoreSearch("/contacts/people/")
-    } else if (e.keyCode === 80 && e.shiftKey) {
-      // Shift-p
-      window.openModalFromUrl("/projects/select/")
-    } else if (e.keyCode === 80) {
-      // p
-      window.location.href = restoreSearch("/projects/")
-    } else if (e.keyCode === 79) {
-      // o
-      window.location.href = restoreSearch("/projects/offers/")
-    } else if (e.keyCode === 82) {
-      // r
-      window.location.href = restoreSearch("/invoices/")
-    } else if (e.keyCode === 84) {
-      // t
-      window.location.href = restoreSearch("/timestamps/")
-    } else if (e.keyCode === 68) {
-      // d
-      window.location.href = restoreSearch("/deals/")
-    } else if (e.keyCode === 76) {
-      // l
-      const el = _sel("[data-createhours]")
-      if (e.shiftKey || !el) {
-        window.openModalFromUrl("/logbook/hours/create/")
-      } else {
-        window.openModalFromUrl(el.href)
-      }
-    } else if (e.keyCode === 75) {
-      // k
-      const el = _sel("[data-createcost]")
-      if (e.shiftKey || !el) {
-        window.openModalFromUrl("/logbook/costs/create/")
-      } else {
-        window.openModalFromUrl(el.href)
-      }
-    } else if (e.keyCode === 66 && e.shiftKey) {
-      // Shift-b
-      window.location.href = "/logbook/breaks/"
-    } else if (e.keyCode === 66) {
-      // b
-      window.openModalFromUrl("/logbook/breaks/create/")
-    } else if (e.keyCode === 81) {
-      // q
-      $(".navbar input[type=search]").focus().select()
-    } else if (e.keyCode === 13) {
-      doSubmit(e.target)
-    } else if (e.keyCode >= 48 && e.keyCode <= 57) {
-      const el = _sel(`[data-number-shortcut="${(e.keyCode - 38) % 10}"]`)
-      if (!el) return
-      e.preventDefault()
-      if ("ajaxmodal" in el.dataset) {
-        window.openModalFromUrl(el.href)
-      } else {
-        window.location.href = el.href
-      }
-    } else {
-      window.console?.log(e, e.keyCode)
-      return
-    }
-
-    return false
-  })
-
-  // Widgets
   initWidgets()
   initSortableLists()
   initSortableTables()
   initCelebration()
-
-  // Some special cases...
-  $(document.body).on("click", "[data-hours-button]", function () {
-    this.blur()
-    const value = prompt(this.dataset.hoursButton)
-    if (Number.parseFloat(value)) {
-      $("#id_modal-days")
-        .val((Number.parseFloat(value) / 8).toFixed(2))
-        .focus()
-    }
-  })
-
-  $(document.body).on("click", "[data-multiply-cost]", function (e) {
-    e.preventDefault()
-    const factor = Number.parseFloat(this.dataset.multiplyCost)
-    const tpc = Number.parseFloat($("#id_modal-third_party_costs").val())
-    const cost = $("#id_modal-cost")
-
-    if (tpc && factor) {
-      cost.val((factor * tpc).toFixed(2)).focus()
-    }
-  })
-
-  $(document.body).on("click", "[data-field-value]", function (e) {
-    e.preventDefault()
-    const field = $(this).closest(".form-group").find("input, textarea, select")
-    field.val(this.dataset.fieldValue)
-    field.trigger("change")
-  })
-
-  $(document.body).on("click", "[data-set-period]", function (e) {
-    e.preventDefault()
-    const value = this.dataset.setPeriod.split(":")
-    // An empty start keeps the current one, e.g. for "until today"
-    if (value[0]) $("#id_date_from").val(value[0])
-    $("#id_date_until").val(value[1]).trigger("change")
-  })
-
-  $(document.body).on("click", "[data-select-receivers]", function (e) {
-    e.preventDefault()
-    const arr = this.dataset.selectReceivers.split(",")
-    const inputs = Array.from(
-      this.closest(".widget--checkboxselectmultiple").querySelectorAll("input"),
-    )
-    inputs.forEach((el) => {
-      el.checked = arr.includes(el.value)
-    })
-  })
-
-  $(document.body).on("click", "[data-pin]", (e) => {
-    const url = e.target.dataset.pin
-    fetch(`${url}?pinned=${e.target.dataset.pinned === "true" ? "" : "pinned"}`)
-      .then((r) => r.json())
-      .then((data) => (e.target.dataset.pinned = data.pinned))
-  })
-
-  document.body.addEventListener("click", (e) => {
-    let el = e.target.closest("[data-new-service]")
-    if (el) {
-      e.preventDefault()
-      el.classList.add("invisible")
-
-      // Reset the service dropdown and emit a change event for the progress
-      // bar update.
-      const select = _sel("#id_modal-service")
-      select.value = ""
-      select.dispatchEvent(new InputEvent("change", { bubbles: true }))
-
-      // Show the new-service fields and focus the first input element.
-      const container = _sel("#new-service")
-      container.classList.remove("d-none")
-      container.querySelector("input").focus()
-    }
-
-    el = e.target.closest("[data-foreign-currency]")
-    if (el) {
-      e.preventDefault()
-      el.classList.add("invisible")
-      _sel("#foreign-currency").classList.remove("d-none")
-      _sel("#id_modal-are_expenses").checked = true
-    }
-  })
 })
 
 function initWidgets() {
-  function addZero(num) {
-    return num < 10 ? `0${num}` : `${num}`
+  const follow = (from, to, update) => {
+    const fromEl = _sel(from)
+    const toEl = _sel(to)
+    if (fromEl && toEl) {
+      fromEl.addEventListener("change", () => update(fromEl, toEl))
+    }
   }
 
-  const invoicedOn = $("#id_invoiced_on")
-  const dueOn = $("#id_due_on")
-  if (invoicedOn.length && dueOn.length) {
-    invoicedOn.on("change", (_event) => {
-      const due = new Date(
-        new Date(invoicedOn.val()).getTime() + 14 * 86400 * 1000,
-      )
-      dueOn.val(
-        `${addZero(due.getFullYear())}-${addZero(1 + due.getMonth())}-${addZero(
-          due.getDate(),
-        )}`,
-      )
-    })
-  }
+  const daysLater = (value, days) =>
+    isoDate(new Date(new Date(value).getTime() + days * 86400 * 1000))
 
-  const startsOn = $("#id_modal-starts_on")
-  const endsOn = $("#id_modal-ends_on")
-  if (startsOn.length && endsOn.length) {
-    startsOn.on("change", () => {
-      if (!endsOn.val()) endsOn.val(startsOn.val())
-    })
-  }
+  follow("#id_invoiced_on", "#id_due_on", (invoicedOn, dueOn) => {
+    dueOn.value = daysLater(invoicedOn.value, 14)
+  })
+  follow("#id_modal-starts_on", "#id_modal-ends_on", (startsOn, endsOn) => {
+    if (!endsOn.value) endsOn.value = startsOn.value
+  })
+  follow("#id_offered_on", "#id_valid_until", (offeredOn, validUntil) => {
+    validUntil.value = daysLater(offeredOn.value, 59)
+  })
 
-  const offeredOn = $("#id_offered_on")
-  const validUntil = $("#id_valid_until")
-  if (offeredOn.length && validUntil.length) {
-    offeredOn.on("change", (_event) => {
-      const day = new Date(
-        new Date(offeredOn.val()).getTime() + 59 * 86400 * 1000,
-      )
-      validUntil.val(
-        `${addZero(day.getFullYear())}-${addZero(1 + day.getMonth())}-${addZero(
-          day.getDate(),
-        )}`,
-      )
-    })
-  }
-
-  $("[data-autofill]:not(.initialized)").each(function () {
-    const self = $(this)
-    const data = self.data("autofill")
-    const sel = self.find("select")
-
-    self.addClass("initialized")
-    sel.on("change", function () {
-      if (data[`${this.value}`]) {
-        $.each(data[`${this.value}`], (key, value) => {
-          self.find(`[name$='${key}']`).val(value)
-        })
+  for (const el of document.querySelectorAll(
+    "[data-autofill]:not(.initialized)",
+  )) {
+    el.classList.add("initialized")
+    const data = JSON.parse(el.dataset.autofill)
+    el.querySelector("select").addEventListener("change", (e) => {
+      for (const [key, value] of Object.entries(data[e.target.value] || {})) {
+        for (const field of el.querySelectorAll(`[name$='${key}']`)) {
+          setValue(field, value ?? "")
+        }
       }
     })
-  })
+  }
 
   for (const el of document.querySelectorAll(
     "[data-autocomplete-id]:not(.initialized)",
@@ -557,31 +564,7 @@ function initWidgets() {
     initAutocomplete(el)
   }
 
-  $(document.body).on("click", "[data-clear]", function () {
-    $(this.dataset.clear).val("").trigger("change")
-  })
-
-  $(document.body).on("click", "[data-convert]", () => {
-    const params = new URLSearchParams()
-    params.append("day", $("#id_modal-rendered_on").val())
-    params.append("currency", $("#id_modal-expense_currency").val())
-    params.append("cost", $("#id_modal-expense_cost").val())
-    console.log(params)
-    console.log(params.toString())
-
-    $.getJSON(`/expenses/convert/?${params.toString()}`, (data) => {
-      if (data.error) {
-        alert(data.error)
-      } else {
-        $("#id_modal-third_party_costs").val(data.cost)
-      }
-    })
-  })
-
-  $("[data-offer-form]").each(function () {
-    const form = this
-    // const form = $(this)
-    //
+  for (const form of document.querySelectorAll("[data-offer-form]")) {
     const read = (sel, root = document) =>
       Number.parseFloat(root.querySelector(sel).value) || 0
     const write = (sel, value, root = document) =>
@@ -610,14 +593,14 @@ function initWidgets() {
 
     recalculate()
     form.addEventListener("change", recalculate)
-  })
+  }
 
   // Some browsers when set to some languages do not accept decimal values with
   // the point but require a comma (which is annoying). Make all number fields
   // use the en-US locale to work around this misbehavior.
-  $('input[type="number"]').each(function () {
-    this.setAttribute("lang", "en-US")
-  })
+  for (const el of document.querySelectorAll('input[type="number"]')) {
+    el.setAttribute("lang", "en-US")
+  }
 
   // The logged hours form has a nice progress bar showing the percentage for each service
   for (const el of document.querySelectorAll("[data-service-progress]")) {
@@ -651,33 +634,24 @@ function initWidgets() {
   }
 }
 
-window.addInlineForm = function addInlineForm(slug, onComplete) {
-  const totalForms = $(`#id_${slug}-TOTAL_FORMS`)
-  const newId = Number.parseInt(totalForms.val(), 10) || 0
+// Adds a form to a formset, see workbench/templatetags/formset.py
+window.addInlineForm = function addInlineForm(slug) {
+  const totalForms = document.getElementById(`id_${slug}-TOTAL_FORMS`)
+  const newId = Number.parseInt(totalForms.value, 10) || 0
+  totalForms.value = newId + 1
 
-  totalForms.val(newId + 1)
-  const empty = $(`#${slug}-empty`)
-  const attributes = ["id", "name", "for"]
-  const form = $(empty.html())
+  const empty = document.getElementById(`${slug}-empty`)
+  const template = document.createElement("template")
+  template.innerHTML = empty.innerHTML.replaceAll("__prefix__", newId)
+  const form = template.content.firstElementChild
+  form.id = `${slug}-${newId}`
 
-  form.removeClass("empty").attr("id", `${slug}-${newId}`)
-
-  for (const attr of attributes) {
-    form.find(`*[${attr}*=__prefix__]`).each(function () {
-      const el = $(this)
-      el.attr(attr, el.attr(attr).replace(/__prefix__/, newId))
-    })
-  }
-
-  // insert the form after the last sibling with the same tagName
-  // cannot use siblings() here, because the empty element may be the
-  // only one (if no objects exist until now)
-  form
-    .insertAfter(empty.parent().children(`[id|=${slug}]:last`))
-    .hide()
-    .fadeIn()
-
-  if (onComplete) onComplete(form)
+  // Insert the form after the last form (or the template if there are none)
+  const forms = [...empty.parentElement.children].filter(
+    (el) => el.id === slug || el.id.startsWith(`${slug}-`),
+  )
+  forms.at(-1).after(form)
+  initWidgets()
 
   return false
 }

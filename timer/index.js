@@ -35,7 +35,7 @@ function addModalActivityListener(store) {
     }
   })
 
-  window.jQuery(document).on("modalform", () => {
+  document.addEventListener("modalform", () => {
     const { activities, modalActivity } = store.getState()
     if (modalActivity) {
       store.dispatch({

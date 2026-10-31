@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 05:30+0100\n"
+"POT-Creation-Date: 2026-10-31 09:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -266,6 +266,10 @@ msgstr "Konnte Formular nicht öffnen"
 #, javascript-format
 msgid "Unable to save the planned work: %s"
 msgstr "Die geplante Arbeit konnte nicht gespeichert werden: %s"
+
+#: conf/strings.js workbench/static/workbench/main.js
+msgid "Unable to submit the form"
+msgstr "Konnte Formular nicht abschicken"
 
 #: conf/strings.js timer/actions.js
 msgid "Unable to submit the logbook entry"

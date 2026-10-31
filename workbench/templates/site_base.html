@@ -22,7 +22,6 @@
         document.documentElement.setAttribute('data-bs-theme', getActiveTheme());
       })();
     </script>
-    <script src="{% static 'workbench/lib/jquery.min.js' %}"></script>
 
     {% if not TESTING %}{% rspack_assets 'main' %}{% endif %}
     <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
