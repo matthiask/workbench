@@ -344,10 +344,12 @@ urlpatterns = [
     # Budget transfers
     path(
         "<int:pk>/createbudgettransfer/",
-        generic.CreateRelatedView.as_view(
-            model=BudgetTransfer,
-            form_class=BudgetTransferForm,
-            related_model=Project,
+        controlling_only(
+            generic.CreateRelatedView.as_view(
+                model=BudgetTransfer,
+                form_class=BudgetTransferForm,
+                related_model=Project,
+            )
         ),
         name="projects_project_createbudgettransfer",
     ),
@@ -358,13 +360,19 @@ urlpatterns = [
     ),
     path(
         "budget-transfer/<int:pk>/update/",
-        generic.UpdateView.as_view(model=BudgetTransfer, form_class=BudgetTransferForm),
+        controlling_only(
+            generic.UpdateView.as_view(
+                model=BudgetTransfer, form_class=BudgetTransferForm
+            )
+        ),
         name="projects_budgettransfer_update",
     ),
     path(
         "budget-transfer/<int:pk>/delete/",
-        generic.DeleteView.as_view(
-            model=BudgetTransfer, template_name="modal_confirm_delete.html"
+        controlling_only(
+            generic.DeleteView.as_view(
+                model=BudgetTransfer, template_name="modal_confirm_delete.html"
+            )
         ),
         name="projects_budgettransfer_delete",
     ),

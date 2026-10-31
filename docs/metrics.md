@@ -363,7 +363,7 @@ Caveats: Budget retainer offers hold budget, real services are added later ("ser
 
 ### Budget transfers (Budgetverschiebung)
 
-- Created from the project's "New" dropdown (`projects_project_createbudgettransfer`), edited/deleted via `projects_budgettransfer_update/delete`. The link requires `CONTROLLING`, the views themselves don't check it (like creating offers and services). Fields: von Projekt, auf Projekt (optional), title, amount, notes. No date.
+- Created from the project's "New" dropdown (`projects_project_createbudgettransfer`), edited/deleted via `projects_budgettransfer_update/delete`. Requires `CONTROLLING` (the form shows the project's gross margin). Fields: von Projekt, auf Projekt (optional), title, amount, notes. No date.
 - Answers: which share of a project's invoiced budget is worked off on (or reserved for) another project.
 
 Formula (`workbench/projects/models.py:BudgetTransferQuerySet.adjustments`): per transfer, `from_project −= amount` immediately; `to_project += amount` only if set (otherwise "reserved", money has left but arrived nowhere).
@@ -902,10 +902,6 @@ Financial overview and budgets:
 - Totals of accepted deals add up per-person counts and shares: deals with
   several contributors count several times, deals without contributors are
   missing from the value.
-- The XLSX export of the budget statistics has one column without header.
-- The budget transfer form shows the project's gross margin as the
-  available amount. The link is only offered with `CONTROLLING`, but the view
-  doesn't check the feature, unlike the profitability modal.
 
 Time and people:
 

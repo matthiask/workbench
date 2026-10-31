@@ -3,9 +3,11 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.projects.models import BudgetTransfer
 from workbench.reporting.project_budget_statistics import project_budget_statistics
@@ -276,3 +278,25 @@ class BudgetTransferTest(TestCase):
             headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
+    def test_requires_controlling(self):
+        """The form shows the gross margin of the project, like the
+        profitability modal it requires the controlling feature"""
+        project = factories.ProjectFactory.create()
+        transfer = BudgetTransfer.objects.create(
+            from_project=project,
+            title="Reserved",
+            amount=100,
+            created_by=project.owned_by,
+        )
+        self.client.force_login(project.owned_by)
+        for url in [
+            project.urls["createbudgettransfer"],
+            transfer.urls["update"],
+            transfer.urls["delete"],
+        ]:
+            with self.subTest(url=url):
+                self.assertRedirects(
+                    self.client.get(url), "/", fetch_redirect_response=False
+                )
