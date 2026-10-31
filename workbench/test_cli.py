@@ -756,7 +756,7 @@ planned_work:
         )
         result = self.wb("reports", "working-time")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Balance incl. vacation days left", result.output)
+        self.assertIn("planned,", result.output)
         result = self.wb("reports", "working-time", "--weekly")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(monday().isoformat(), result.output)

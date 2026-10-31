@@ -197,6 +197,10 @@ class WorkingTimeTotals(Schema):
     absence_correction: Days
     holiday_public: Days
     holiday_company: Days
+    balance_as_of: Hours | None
+    vacation_days_taken: Days
+    vacation_days_planned: Days
+    vacation_days_left: Days
 
 
 class WorkingTimeWeek(Schema):
@@ -211,6 +215,7 @@ class WorkingTimeWeek(Schema):
 class UserWorkingTime(Schema):
     user: str
     working_time_per_day: Hours
+    as_of: dt.date | None
     months: list[WorkingTimeMonth]
     totals: WorkingTimeTotals
     weeks: list[WorkingTimeWeek] | None
@@ -230,8 +235,11 @@ def working_time(request, filters: Query[WorkingTimeFilter]):
     since the report contains sickness absences (health data).
 
     Hours are per month: The target, logged hours, absences and their sum
-    (working time) and the balance. The total balance includes the vacation
-    days credit. ``weekly`` adds the hours per week until the current one."""
+    (working time) and the balance. ``balance_as_of`` is the running balance
+    at the end of the last completed month (``as_of``), the vacation days are
+    split into taken (until today), planned and left. The total ``balance``
+    includes the vacation days credit. ``weekly`` adds the hours per week
+    until the current one."""
     year = filters.year or dt.date.today().year
     if filters.all:
         check_feature(request.user, FEATURES.PERSONNEL_ADMINISTRATION)
@@ -271,6 +279,7 @@ def working_time(request, filters: Query[WorkingTimeFilter]):
         return {
             "user": row["user"].get_short_name(),
             "working_time_per_day": months["year"].working_time_per_day,
+            "as_of": row["as_of"],
             "months": [
                 {
                     "month": f"{month:%Y-%m}",

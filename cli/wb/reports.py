@@ -255,13 +255,15 @@ def working_time(year, user, all_, weekly, as_csv, as_json):
         console.print(table)
         console.print(
             f"Vacation days: {format_days(totals['available_vacation_days'])} available,"
-            f" {format_days(totals['vacation_days_credit'])} left"
+            f" {format_days(totals['vacation_days_taken'])} taken,"
+            f" {format_days(totals['vacation_days_planned'])} planned,"
+            f" {format_days(totals['vacation_days_left'])} left"
         )
-        console.print(
-            f"Balance incl. vacation days left: {format_hours(totals['balance'])}h"
-            f" ({totals['balance_days']} days)",
-            style="bold",
-        )
+        if row["as_of"]:
+            console.print(
+                f"Balance on {row['as_of']}: {format_hours(totals['balance_as_of'])}h",
+                style="bold",
+            )
         console.print()
 
 

@@ -690,6 +690,13 @@ Productivity in the sense of the `PRODUCTIVITY` feature ("Produktivität") is th
 | Guthaben an Ferientagen | `remaining` after all vacation, if > 0. The display is rounded **up** to 0.01. |
 | Bilanz | `Σ monthly balances + wtpd × vacation days credit`. "balance_days" = `Bilanz / wtpd`, rounded up to 0.01. |
 
+As of figures (`balance_cutoff`, `vacation_days_taken_and_planned`); hours and vacation days are separate, unused vacation days can't be converted into hours:
+
+- `as_of` = the end of the last completed month for the current year, December 31 for past years, none for future years and in January.
+- `balance_as_of` = the running balance at the end of the month of `as_of` (hours logged in advance in later months don't count).
+- `vacation_days_taken` = `Σ days` of vacation absences ending today or earlier, `vacation_days_planned` those starting after today. A vacation spanning today is split by weekdays (by calendar days if it has none). Rounded to 0.01.
+- `vacation_days_left` = available vacation days (after the override) − taken − planned, may be negative. Rounded to 0.01.
+
 Overall tiles at the top (sums over all users shown): Verfügbare Ferientage, Bezogene Ferientage (korrigiert) = `Σ absence_vacation + Σ vacation_days_correction` (the correction is zero or negative), Krankheitstage, plus "Geschätzte X Tage pro 100% und Jahr" = `Σ sickness days / (Σ working time / 250 / 8)` (hard-coded 250 days × 8 h), Bezahlter Urlaub, Schulbesuch, Arbeitszeit-Korrektur, Stundensaldo, Guthaben an Ferientagen and Bilanz.
 
 Vacation planning warning ("Ferienplanung!", `vacation_planning_warnings`, only for active users). It fires if `Σ planned vacation days / available days < 0.5` ("Weniger als die Hälfte…"), or if no vacation absence lasts at least 14 calendar days (`ends_on − starts_on ≥ 13`). The second check is only made if vacation entitlement exists in more than 6 months.

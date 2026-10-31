@@ -153,6 +153,51 @@ def holiday_days_by_month(holidays, date_from, date_until):
     return result
 
 
+def weekdays(date_from, date_until):
+    day = date_from
+    while day <= date_until:
+        if day.weekday() < 5:
+            yield day
+        day += dt.timedelta(days=1)
+
+
+def balance_cutoff(year, *, today=None):
+    """The last day of the last completed month of the year, or ``None``
+
+    The balance of the current month isn't final as long as hours may still
+    be logged, so the report states it at the end of the last month."""
+    today = today or dt.date.today()
+    if year < today.year:
+        return dt.date(year, 12, 31)
+    if year == today.year and today.month > 1:
+        return dt.date(year, today.month, 1) - dt.timedelta(days=1)
+    return None
+
+
+def vacation_days_taken_and_planned(absences, *, today=None):
+    """Vacation days up to and including today, and after today
+
+    A vacation spanning today is split by weekdays."""
+    today = today or dt.date.today()
+    taken = planned = Z1
+    for absence in absences:
+        ends_on = absence.ends_on or absence.starts_on
+        if ends_on <= today:
+            taken += absence.days
+        elif absence.starts_on > today:
+            planned += absence.days
+        else:
+            days = list(weekdays(absence.starts_on, ends_on)) or [
+                absence.starts_on + dt.timedelta(days=i)
+                for i in range((ends_on - absence.starts_on).days + 1)
+            ]
+            past = sum(1 for day in days if day <= today)
+            part = absence.days * past / len(days)
+            taken += part
+            planned += absence.days - part
+    return taken, planned
+
+
 def annual_working_time(year, *, users):  # noqa: C901
     absences = defaultdict(
         lambda: {
@@ -336,11 +381,15 @@ def annual_working_time(year, *, users):  # noqa: C901
             sums[i] = wt[i] - data["target"][i]
         return sums
 
+    as_of = balance_cutoff(year)
     statistics = []
     for user in months.users_with_wtm:
         month_data = months[user.id]
         wtm_id = month_data["year"].working_time_model_id
         sums = monthly_sums(month_data)
+        vacation_taken, vacation_planned = vacation_days_taken_and_planned(
+            absences[user.id]["absence_vacation"]
+        )
         at = absences_time(month_data)
         wt = working_time(month_data)
         balance = (
@@ -358,6 +407,7 @@ def annual_working_time(year, *, users):  # noqa: C901
                 "absences_time": at,
                 "monthly_sums": sums,
                 "running_sums": [sum(sums[:i], Z1) for i in range(1, 13)],
+                "as_of": as_of,
                 "holiday_list": holiday_list_by_wtm.get(wtm_id, []),
                 "has_public_holidays": any(month_data["holiday_public"]),
                 "has_company_holidays": any(month_data["holiday_company"]),
@@ -391,6 +441,16 @@ def annual_working_time(year, *, users):  # noqa: C901
                     "absences_time": sum(at),
                     "working_time": sum(wt),
                     "running_sum": sum(sums).quantize(Z1),
+                    # Hours and vacation days are separate figures, unused
+                    # vacation days cannot be converted into hours.
+                    "balance_as_of": sum(sums[: as_of.month], Z1) if as_of else None,
+                    "vacation_days_taken": vacation_taken.quantize(Z2),
+                    "vacation_days_planned": vacation_planned.quantize(Z2),
+                    "vacation_days_left": (
+                        available_vacation_days[user.id]
+                        - vacation_taken
+                        - vacation_planned
+                    ).quantize(Z2),
                 },
             })
         )
@@ -413,8 +473,14 @@ def annual_working_time(year, *, users):  # noqa: C901
             "running_sum",
             "balance",
             "working_time",
+            "vacation_days_taken",
+            "vacation_days_planned",
+            "vacation_days_left",
         ]
     }
+    overall["balance_as_of"] = (
+        sum((s["totals"]["balance_as_of"] for s in statistics), Z1) if as_of else None
+    )
     # The correction is zero or negative
     overall["absence_vacation"] += overall["vacation_days_correction"]
     overall["sickness_by_fte"] = (
@@ -438,6 +504,7 @@ def annual_working_time(year, *, users):  # noqa: C901
     has_company_holidays = any(s["has_company_holidays"] for s in statistics)
     return {
         "months": months,
+        "as_of": as_of,
         "overall": overall,
         "statistics": statistics,
         "holidays_by_wtm": holidays_by_wtm,
@@ -463,13 +530,6 @@ def working_time_by_week(year, *, user):
     first, last = dt.date(year, 1, 1), min(dt.date(year, 12, 31), dt.date.today())
     if first > last:
         return []
-
-    def weekdays(date_from, date_until):
-        day = date_from
-        while day <= date_until:
-            if day.weekday() < 5:
-                yield day
-            day += dt.timedelta(days=1)
 
     holidays = defaultdict(lambda: Z1)
     for holiday in holidays_of_year(year, user.working_time_model_id):

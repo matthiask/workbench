@@ -86,6 +86,11 @@ class WorkingTimeAPITest(TestCase):
         self.assertEqual(march["vacation_days"], "2.00")
         self.assertEqual(march["absences_time"], "16.0")
         self.assertEqual(march["public_holiday_days"], "1.00")
+        self.assertEqual(row["as_of"], "2026-02-28")
+        self.assertEqual(
+            row["totals"]["balance_as_of"], row["months"][1]["running_balance"]
+        )
+        self.assertEqual(row["totals"]["vacation_days_planned"], "1.00")
 
         data = self.client.get("/api/reports/working-time/", {"weekly": True}).json()
         week = data["users"][0]["weeks"][-1]

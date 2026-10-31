@@ -17,6 +17,7 @@ from workbench.awt.reporting import (
     active_users,
     annual_working_time,
     annual_working_time_warnings,
+    balance_cutoff,
 )
 from workbench.awt.tasks import (
     annual_working_time_warnings_mails,
@@ -164,6 +165,47 @@ class AWTTest(TestCase):
         response = self.client.get("/report/annual-working-time/?export=pdf&year=2018")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
+
+    @travel("2026-05-13 12:00")
+    def test_as_of(self):
+        """Balance at the end of the last month, vacation taken and planned"""
+        user = factories.UserFactory.create()
+        factories.YearFactory.create(
+            year=2026, working_time_model=user.working_time_model
+        )
+        factories.EmploymentFactory.create(user=user, date_from=dt.date(2026, 1, 1))
+        for starts_on, ends_on, days in [
+            (dt.date(2026, 2, 2), dt.date(2026, 2, 6), 5),
+            # Wednesday is today: three days taken, two planned
+            (dt.date(2026, 5, 11), dt.date(2026, 5, 15), 5),
+            (dt.date(2026, 8, 3), dt.date(2026, 8, 14), 10),
+        ]:
+            factories.AbsenceFactory.create(
+                user=user, starts_on=starts_on, ends_on=ends_on, days=days
+            )
+        factories.LoggedHoursFactory.create(
+            rendered_by=user, rendered_on=dt.date(2026, 5, 4), hours=8
+        )
+
+        awt = annual_working_time(2026, users=[user])
+        self.assertEqual(awt["as_of"], dt.date(2026, 4, 30))
+        [row] = awt["statistics"]
+        totals = row["totals"]
+        # Logged hours of May don't count yet
+        self.assertEqual(totals["balance_as_of"], row["running_sums"][3])
+        self.assertEqual(totals["balance_as_of"], (5 - 4 * 30) * 8)
+        self.assertEqual(totals["vacation_days_taken"], 8)
+        self.assertEqual(totals["vacation_days_planned"], 12)
+        self.assertEqual(totals["vacation_days_left"], 5)
+        self.assertEqual(awt["overall"]["vacation_days_left"], 5)
+
+    def test_balance_cutoff(self):
+        """The balance is stated at the end of the last completed month"""
+        today = dt.date(2026, 5, 13)
+        self.assertEqual(balance_cutoff(2026, today=today), dt.date(2026, 4, 30))
+        self.assertEqual(balance_cutoff(2025, today=today), dt.date(2025, 12, 31))
+        self.assertIsNone(balance_cutoff(2027, today=today))
+        self.assertIsNone(balance_cutoff(2026, today=dt.date(2026, 1, 20)))
 
     def test_admin_list(self):
         """The admin changelist of years contains the calculated sum of working days"""
