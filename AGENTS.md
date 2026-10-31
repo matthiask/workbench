@@ -112,8 +112,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `project_summary()` in `workbench/projects/api.py`) so the CLI can link
   them.
   Bump the version in `cli/pyproject.toml` when changing the CLI: the server
-  reads it and tells users of older versions to upgrade. Raise `MINIMUM` in
-  `workbench/cli_version.py` when older versions don't work anymore.
+  reads it and tells users of older versions to upgrade; the CLI warns when
+  the server's version is older than its own (not deployed yet). Raise
+  `MINIMUM` in `workbench/cli_version.py` when older versions don't work
+  anymore.
   `workbench/test_cli.py` runs the real CLI commands against the API (requests
   go through Django's test client); add a test there for new commands. The CLI
   is installed with the project's dev dependencies, not in the container.

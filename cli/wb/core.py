@@ -300,11 +300,23 @@ def _parse_version(version):
 
 @cache
 def _check_version(latest):
-    """Tell the user about a newer version, once"""
-    if latest and _parse_version(latest) > _parse_version(VERSION):
+    """Tell the user about a newer version, or that the Workbench is older
+    than the CLI and may not support everything yet, once
+
+    ``latest`` is the version of the CLI in the Workbench's checkout."""
+    if not latest:
+        return
+    if _parse_version(latest) > _parse_version(VERSION):
         click.secho(
             f"wb {latest} is available (you have {VERSION}):"
             " uv tool upgrade workbench-cli",
+            fg="yellow",
+            err=True,
+        )
+    elif _parse_version(latest) < _parse_version(VERSION):
+        click.secho(
+            f"This Workbench is older than your wb ({latest} < {VERSION}),"
+            " some commands may fail until it is updated.",
             fg="yellow",
             err=True,
         )

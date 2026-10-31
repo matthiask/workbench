@@ -880,6 +880,12 @@ planned_work:
         self.assertEqual(result.exit_code, 0)
         self.assertIn("wb 99.0.0 is available", result.output)
 
+        wb.core._check_version.cache_clear()
+        with patch.object(cli_version, "LATEST", "0.0.1"):
+            result = self.wb("me")
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("This Workbench is older than your wb", result.output)
+
         with patch.object(cli_version, "MINIMUM", (99, 0, 0)):
             result = self.wb("me")
         self.assertEqual(result.exit_code, 1)
