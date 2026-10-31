@@ -137,7 +137,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     # discounts). Planned invoicing comes first because it may cover
     # additional work which has been agreed. Mixing logbook values with gross
     # margin is only an approximation.
-    gross_margins = gross_margin_components(projects)
+    gross_margins = gross_margin_components(projects, invoiced_until=cutoff_date)
 
     def planned(s):
         projected = s["projected_gross_margin"]

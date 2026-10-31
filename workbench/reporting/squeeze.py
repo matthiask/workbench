@@ -55,14 +55,21 @@ def relevant_hours(hours_offered, hours_logged, hours_logged_budgeted):
     )
 
 
-def third_party_costs_components(projects):
+def third_party_costs_components(projects, *, until=None):
     """Third party costs on invoices and logged third party costs per project
-    as two ``{project_id: amount}`` dicts.
+    as two ``{project_id: amount}`` dicts, optionally only those invoiced or
+    logged ``until`` a date.
 
     Final invoices contain the third party costs of down payments again, but
     down payments (e.g. of recurring invoices) may also be the only invoices,
     so the larger of both counts."""
     invoices = Invoice.objects.invoiced().filter(project__in=projects)
+    logged_costs = LoggedCost.objects.filter(
+        service__project__in=projects, third_party_costs__isnull=False
+    )
+    if until:
+        invoices = invoices.filter(invoiced_on__lte=until)
+        logged_costs = logged_costs.filter(rendered_on__lte=until)
     down_payments = sum_by(
         invoices.filter(type=Invoice.DOWN_PAYMENT),
         key="project",
@@ -80,17 +87,11 @@ def third_party_costs_components(projects):
             for project in {*down_payments, *others}
         },
     )
-    logged = sum_by(
-        LoggedCost.objects.filter(
-            service__project__in=projects, third_party_costs__isnull=False
-        ),
-        key="service__project",
-        field="third_party_costs",
-    )
+    logged = sum_by(logged_costs, key="service__project", field="third_party_costs")
     return invoiced, logged
 
 
-def third_party_costs(projects):
+def third_party_costs(projects, *, until=None):
     """Third party costs per project as ``{project_id: amount}``.
 
     Logged costs are the actual costs, invoices know what has been passed on
@@ -98,7 +99,7 @@ def third_party_costs(projects):
     may be logged after a services invoice has been created from the offer, so
     adding up both would count many costs twice. Using the larger of the two
     still subtracts logged costs which haven't been invoiced yet."""
-    invoiced, logged = third_party_costs_components(projects)
+    invoiced, logged = third_party_costs_components(projects, until=until)
     return defaultdict(
         lambda: Z2,
         {
@@ -108,9 +109,12 @@ def third_party_costs(projects):
     )
 
 
-def gross_margin_components(projects):
+def gross_margin_components(projects, *, invoiced_until=None):
     """Offered, projected and invoiced gross margin per project as
     ``{project_id: {"offered": ..., "projected": ..., "invoiced": ...}}``.
+
+    ``invoiced_until`` limits invoices and third party costs to a cutoff
+    date. Offers and projections aren't versioned, they are always today's.
 
     Projections are only taken into account for open projects. Third party
     costs are deducted from offers and invoices."""
@@ -123,10 +127,11 @@ def gross_margin_components(projects):
         key="project",
         field="gross_margin",
     )
-    invoiced = sum_by(
-        Invoice.objects.invoiced().filter(project__in=projects), key="project"
-    )
-    invoiced_costs = third_party_costs(projects)
+    invoices = Invoice.objects.invoiced().filter(project__in=projects)
+    if invoiced_until:
+        invoices = invoices.filter(invoiced_on__lte=invoiced_until)
+    invoiced = sum_by(invoices, key="project")
+    invoiced_costs = third_party_costs(projects, until=invoiced_until)
     return defaultdict(
         lambda: {"offered": Z2, "projected": Z2, "invoiced": Z2},
         {

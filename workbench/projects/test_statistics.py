@@ -284,6 +284,35 @@ class StatisticsTest(TestCase):
         self.assertEqual(overall["delta_planned"], 300)
         self.assertEqual(overall["delta_beyond_offer"], 0)
 
+    def test_project_budget_statistics_planned_on_cutoff_date(self):
+        """Invoices after the cutoff date don't use up the planned invoicing
+        of work which hadn't been invoiced on the cutoff date"""
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(
+            project=project, effort_type="Any", effort_rate=100
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, hours=10, rendered_on=in_days(-30)
+        )
+        factories.ProjectedInvoiceFactory.create(
+            project=project, gross_margin=Decimal(1000), invoiced_on=in_days(-20)
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            invoiced_on=in_days(-10),
+            subtotal=1000,
+            status=Invoice.SENT,
+        )
+
+        overall = project_budget_statistics.project_budget_statistics(
+            [project], cutoff_date=in_days(-15)
+        )["overall"]
+        self.assertEqual(overall["delta_positive"], 1000)
+        self.assertEqual(overall["delta_planned"], 1000)
+
     def create_projects(self):
         p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)
         p_maintenance = factories.ProjectFactory.create(type=Project.MAINTENANCE)

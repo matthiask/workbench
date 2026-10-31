@@ -85,7 +85,7 @@ Contents:
 | Helper | Computes |
 |---|---|
 | `third_party_costs(projects)` | per project max(invoiced, Σ `LoggedCost.third_party_costs`), all time, with invoiced = max(Σ `Invoice.third_party_costs` of invoiced down payment invoices, Σ of the other invoiced invoices). Logged costs can't be linked to fixed amount invoices, so adding both would count them twice; final invoices repeat the third party costs of down payments, which may also be the only invoices (recurring invoices). `third_party_costs_components()` returns invoiced and logged separately. |
-| `gross_margin_components(projects)` | `offered` = total − third party costs of the accepted offers per project (retainer or other offers, see `accepted_offers_by_project()`); `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time. |
+| `gross_margin_components(projects, invoiced_until=None)` | `offered` = total − third party costs of the accepted offers per project (retainer or other offers, see `accepted_offers_by_project()`); `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time, or invoices and third party costs up to `invoiced_until` (the budget statistics' cutoff date). |
 | `hours_components(projects)` | `hours_offered` = Σ `service_hours` of budgeted services; `hours_logged` = Σ `hours`; `hours_logged_budgeted` = Σ `hours` on budgeted services. |
 | `relevant_hours(offered, logged, logged_budgeted)` | max(offered, logged_budgeted) + (logged − logged_budgeted): hours on unbudgeted services are added on top, so rates rather underestimate. |
 | `BudgetTransfer.objects.adjustments(projects)` | per project Σ transfers in − Σ transfers out. A transfer without target project leaves the source immediately and arrives nowhere. Only money moves, hours stay. |
@@ -321,10 +321,12 @@ Sorted by `delta` descending (closed-filter: by `closed_on` descending).
 | verkauft, Logbuch, Verrechnet, Rabatt, Fremdkosten, hours, … | same keys | plain sum of the per-project values |
 | Nicht verrechnete Arbeit | `delta_positive` | Σ `delta` of projects with `delta > 0` |
 | Abgrenzungen | `delta_negative` | Σ `delta` of projects with `delta < 0` (negative number) |
-| davon geplant (tooltip "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)") | `delta_planned` | Σ over projects with `delta > 0` of `planned = min(delta, P, max(P − I, 0))`, `P` = `projected_gross_margin` (all projections, open projects only), `I` = invoiced gross margin from `gross_margin_components()["invoiced"]` = all SENT/PAID invoices **without cutoff** − `max(third party costs on invoices, logged third party costs)` (`workbench/reporting/squeeze.py:third_party_costs`). |
+| davon geplant (tooltip "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)") | `delta_planned` | Σ over projects with `delta > 0` of `planned = min(delta, P, max(P − I, 0))`, `P` = `projected_gross_margin` (all projections, open projects only), `I` = invoiced gross margin from `gross_margin_components()["invoiced"]` = SENT/PAID invoices with `invoiced_on <= cutoff` − `max(third party costs on those invoices, logged third party costs with rendered_on <= cutoff)` (`gross_margin_components(invoiced_until=cutoff)`) (`workbench/reporting/squeeze.py:third_party_costs`). |
 | davon über Offerte (tooltip "Mehr erfasst als offeriert und verrechnet, z.B. Stunden über der Offerte und Rabatte") | `delta_beyond_offer` | Σ over projects with `delta > 0` **and `sold != 0`** of `min(max(logbook − max(sold, invoiced), 0), delta − planned)`: the rest not covered by planned invoicing which was logged beyond the offers. Projects without any sold amount contribute nothing. |
 
 The two "davon" figures don't overlap: planned invoicing comes first because it may cover additional work which has been agreed, "über Offerte" is taken from the rest. Together they are at most `delta_positive`.
+
+With a past cutoff date the totals (Logbuch, Verrechnet, delta, accruals) are as of the cutoff date, but "verkauft" and the splits "davon geplant" and "davon über Offerte" use today's offers, projections and budget transfers: they aren't versioned. The cash data API therefore leaves these splits out for past dates.
 
 **Worked example** (one open project, cutoff today):
 - Accepted offer: subtotal 10,500, discount 500 → total 10,000. Budget transfer in from another project: +1,000. → **verkauft 11,000**, Rabatt −500.
@@ -907,8 +909,6 @@ and not checked a second time.
 
 Financial overview and budgets:
 
-- "davon geplant" and the projected gross margin ignore the cutoff date;
-  offers and budget transfers are never limited by it either.
 - "Rabatt" in the budget statistics counts offers which aren't declined,
   "verkauft" only accepted ones.
 - The deals funnel of the key data API is always as of today.
