@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 09:47+0100\n"
+"POT-Creation-Date: 2026-10-31 13:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -508,6 +508,62 @@ msgstr "Keine Jahresarbeitszeit definiert für Nutzer:in %(user)s mit Arbeitszei
 msgid "annual working time"
 msgstr "Jahresarbeitszeit"
 
+#: workbench/awt/charts.py
+msgid "Balance per week"
+msgstr "Saldo pro Woche"
+
+#: workbench/awt/charts.py
+msgid "Balance per week (current month)"
+msgstr "Saldo pro Woche (laufender Monat)"
+
+#: workbench/awt/charts.py workbench/templates/awt/year_detail.html
+msgid "Running balance"
+msgstr "Stundensaldo fortlaufend"
+
+#: workbench/awt/charts.py
+#, python-format
+msgid "Limit (%s)"
+msgstr "Grenze (%s)"
+
+#: workbench/awt/charts.py workbench/awt/models.py
+msgid "vacation"
+msgstr "Ferien"
+
+#: workbench/awt/charts.py workbench/awt/models.py
+msgid "sickness"
+msgstr "Krankheit"
+
+#: workbench/awt/charts.py workbench/awt/pdf.py
+#: workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
+msgid "Paid leave"
+msgstr "Bezahlter Urlaub"
+
+#: workbench/awt/charts.py workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
+msgid "School attendance of apprentices"
+msgstr "Schulbesuch durch Auszubildende"
+
+#: workbench/awt/charts.py workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
+msgid "Working time correction"
+msgstr "Arbeitszeit-Korrektur"
+
+#: workbench/awt/charts.py workbench/awt/pdf.py workbench/logbook/models.py
+#: workbench/reporting/squeeze.py workbench/templates/awt/_year_details.html
+#: workbench/templates/base.html
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/projects/campaign_detail.html workbench/timer/models.py
+msgid "logged hours"
+msgstr "Erfasste Stunden"
+
+#: workbench/awt/charts.py workbench/awt/pdf.py
+#: workbench/templates/awt/_year_details.html
+msgid "target time"
+msgstr "Sollstunden"
+
 #: workbench/awt/forms.py workbench/contacts/forms.py
 #: workbench/credit_control/forms.py workbench/deals/forms.py
 #: workbench/invoices/forms.py workbench/logbook/forms.py
@@ -698,30 +754,12 @@ msgid "Employments cannot end before they began."
 msgstr "Anstellungsverhältnisse können nicht vor ihrem Beginn zu Ende gehen."
 
 #: workbench/awt/models.py
-msgid "vacation"
-msgstr "Ferien"
-
-#: workbench/awt/models.py
-msgid "sickness"
-msgstr "Krankheit"
-
-#: workbench/awt/models.py
 msgid "paid leave (e.g. civilian service, maternity etc.)"
 msgstr "Bezahlter Urlaub (zB Zivildienst, Elternurlaub, Zügeln etc.)"
 
-#: workbench/awt/models.py workbench/awt/pdf.py
-#: workbench/templates/awt/year_detail.html
-msgid "School attendance of apprentices"
-msgstr "Schulbesuch durch Auszubildende"
-
-#: workbench/awt/models.py workbench/templates/awt/year_detail.html
+#: workbench/awt/models.py
 msgid "other reasons (no working time)"
 msgstr "Andere Gründe (keine Arbeitszeit)"
-
-#: workbench/awt/models.py workbench/awt/pdf.py
-#: workbench/templates/awt/year_detail.html
-msgid "Working time correction"
-msgstr "Arbeitszeit-Korrektur"
 
 #: workbench/awt/models.py workbench/invoices/models.py
 msgid "starts on"
@@ -766,13 +804,12 @@ msgstr "bestätigt von"
 #: workbench/awt/models.py workbench/awt/views.py workbench/planning/updates.py
 #: workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
-#: workbench/templates/awt/year_detail.html
 #: workbench/templates/planning/_new_dropdown.html
 msgid "absence"
 msgstr "Abwesenheit"
 
 #: workbench/awt/models.py workbench/management/commands/workload.py
-#: workbench/templates/base.html
+#: workbench/templates/awt/year_detail.html workbench/templates/base.html
 msgid "absences"
 msgstr "Abwesenheiten"
 
@@ -851,6 +888,7 @@ msgid "type"
 msgstr "Typ"
 
 #: workbench/awt/models.py workbench/awt/pdf.py
+#: workbench/templates/awt/_year_details.html
 #: workbench/templates/awt/year_detail.html
 msgid "vacation days override"
 msgstr "Manuell definierte Ferientage"
@@ -859,24 +897,27 @@ msgstr "Manuell definierte Ferientage"
 msgid "vacation days overrides"
 msgstr "Manuell definierte Ferientage"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 msgid "running net work hours"
 msgstr "Stundensaldo fortlaufend"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
 msgid "public holiday days"
 msgstr "Gesetzliche Feiertage"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
 msgid "company holiday days"
 msgstr "Betriebsferien"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
 msgid "vacation days credit"
 msgstr "Guthaben an Ferientagen"
 
 #: workbench/awt/pdf.py workbench/reporting/squeeze.py
-#: workbench/templates/awt/year_detail.html
+#: workbench/templates/awt/_year_details.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/hours_per_type.html
 #: workbench/templates/reporting/projected_gross_margin.html
@@ -884,68 +925,56 @@ msgstr "Guthaben an Ferientagen"
 msgid "Total"
 msgstr "Total"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 msgid "target days for full time employment"
 msgstr "Soll-Arbeitstage bei 100%"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 msgid "pensum"
 msgstr "Pensum"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
 msgid "vacation days available"
 msgstr "Verfügbare Ferientage"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
-msgid "target time"
-msgstr "Sollstunden"
-
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
 msgid "vacation days taken"
 msgstr "Bezogene Ferientage"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
 msgid "sickness days"
 msgstr "Krankheitstage"
-
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
-msgid "Paid leave"
-msgstr "Bezahlter Urlaub"
 
 #: workbench/awt/pdf.py
 msgid "School attendance"
 msgstr "Schulbesuch"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 msgid "vacation days correction"
 msgstr "Korrektur anrechenbarer Ferientage"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 msgid "countable absence hours"
 msgstr "Anrechenbare Abwesenheitsstunden"
 
-#: workbench/awt/pdf.py workbench/logbook/models.py
-#: workbench/reporting/squeeze.py workbench/templates/awt/year_detail.html
-#: workbench/templates/base.html
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/projects/campaign_detail.html workbench/timer/models.py
-msgid "logged hours"
-msgstr "Erfasste Stunden"
-
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 #: workbench/templates/base.html
 msgid "working time"
 msgstr "Arbeitszeit"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 msgid "net work hours per month"
 msgstr "Stundensaldo pro Monat"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
+#: workbench/templates/awt/year_detail.html
 msgid "balance"
 msgstr "Bilanz"
 
-#: workbench/awt/pdf.py workbench/templates/awt/year_detail.html
+#: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
 msgid "Monthly sums may not be exact: absences spanning month boundaries are split by calendar days, not by working days. The annual total is correct."
 msgstr "Monatssummen können leicht ungenau sein: Abwesenheiten über Monatsgrenzen werden nach Kalendertagen statt nach Arbeitstagen aufgeteilt. Die Jahressumme ist korrekt."
 
@@ -4022,6 +4051,11 @@ msgstr "Stunden pro Kundschaft"
 msgid "Work anniversaries notice"
 msgstr "Hinweis auf Jubiläum"
 
+#: workbench/templates/awt/_year_details.html
+#, python-format
+msgid "calculated with %(hours)s per day"
+msgstr "berechnet mit %(hours)s pro Tag"
+
 #: workbench/templates/awt/absence_calendar.html
 #: workbench/templates/generic/object_list.html
 #: workbench/templates/reporting/project_budget_statistics.html
@@ -4067,6 +4101,10 @@ msgstr ""
 "Der Saldo des letzten Monats war %(monthly_sum)s.\n"
 
 #: workbench/templates/awt/year_detail.html
+msgid "New absence"
+msgstr "Neue Abwesenheit"
+
+#: workbench/templates/awt/year_detail.html
 msgid "active users"
 msgstr "Aktive Nutzer:innen"
 
@@ -4086,9 +4124,51 @@ msgid "Close"
 msgstr "Schliessen"
 
 #: workbench/templates/awt/year_detail.html
+msgid "Balance"
+msgstr "Stundensaldo"
+
+#: workbench/templates/awt/year_detail.html
+msgid "No completed month yet."
+msgstr "Noch kein abgeschlossener Monat."
+
+#: workbench/templates/awt/year_detail.html
+msgid "more than 40h"
+msgstr "mehr als 40h"
+
+#: workbench/templates/awt/year_detail.html
 #, python-format
-msgid "calculated with %(hours)s per day"
-msgstr "berechnet mit %(hours)s pro Tag"
+msgid "on %(date)s, %(days)s"
+msgstr "am %(date)s, %(days)s"
+
+#: workbench/templates/awt/year_detail.html
+msgid "Vacation days left"
+msgstr "Verbleibende Ferientage"
+
+#: workbench/templates/awt/year_detail.html
+#, python-format
+msgid "%(taken)s taken, %(planned)s planned of %(available)s"
+msgstr "%(taken)s bezogen, %(planned)s geplant von %(available)s"
+
+#: workbench/templates/awt/year_detail.html
+msgid "Working time per month"
+msgstr "Arbeitszeit pro Monat"
+
+#: workbench/templates/awt/year_detail.html
+msgid "taken"
+msgstr "bezogen"
+
+#: workbench/templates/awt/year_detail.html
+msgid "planned"
+msgstr "geplant"
+
+#: workbench/templates/awt/year_detail.html
+msgid "left"
+msgstr "verbleibend"
+
+#: workbench/templates/awt/year_detail.html
+#, python-format
+msgid "More vacation than available: %(days)s don't count as working time."
+msgstr "Mehr Ferien als verfügbar: %(days)s zählen nicht als Arbeitszeit."
 
 #: workbench/templates/awt/year_detail.html
 msgid "Vacation planning!"
@@ -4103,13 +4183,18 @@ msgid "Plan at least one vacation with a duration of two weeks, please."
 msgstr "Bitte mindestens einmal zwei Wochen Ferien am Stück einplanen."
 
 #: workbench/templates/awt/year_detail.html
-#, python-format
-msgid "from %(date)s"
-msgstr "Ab %(date)s"
+msgid "No absences."
+msgstr "Keine Abwesenheiten."
 
 #: workbench/templates/awt/year_detail.html
-msgid "Only shown for completeness."
-msgstr "Nur der Vollständigkeit halber aufgeführt."
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/deals/deal_detail.html
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/reporting/labor_costs.html
+msgid "Details"
+msgstr "Details"
 
 #: workbench/templates/base.html
 msgid "reports"
@@ -4297,15 +4382,6 @@ msgstr "Umsatz"
 #: workbench/templates/projects/campaign_detail.html
 msgid "Gross margin / hour"
 msgstr "Umsatz bereinigt / Stunde"
-
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/contacts/person_detail.html
-#: workbench/templates/deals/deal_detail.html
-#: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/invoices/recurringinvoice_detail.html
-#: workbench/templates/reporting/labor_costs.html
-msgid "Details"
-msgstr "Details"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
@@ -5646,6 +5722,13 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "from %(date)s"
+#~ msgstr "Ab %(date)s"
+
+#~ msgid "Only shown for completeness."
+#~ msgstr "Nur der Vollständigkeit halber aufgeführt."
 
 #~ msgid "This user may add and change absences of type Working time correction."
 #~ msgstr "Diese Nutzer:in hat die Erlaubnis zur Bearbeitung von «Arbeitszeit-Korrektur»-Absenzen."

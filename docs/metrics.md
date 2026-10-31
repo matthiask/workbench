@@ -697,6 +697,8 @@ As of figures (`balance_cutoff`, `vacation_days_taken_and_planned`); hours and v
 - `vacation_days_taken` = `Σ days` of vacation absences ending today or earlier, `vacation_days_planned` those starting after today. A vacation spanning today is split by weekdays (by calendar days if it has none). Rounded to 0.01.
 - `vacation_days_left` = available vacation days (after the override) − taken − planned, may be negative. Rounded to 0.01.
 
+The web report of a person (`workbench/awt/charts.py`) shows these as tiles, the running balance per week (`working_time_by_week`, weeks after `as_of` lighter) with dashed lines at ±40 h (`BALANCE_LIMIT`, the limit of the contracts, only a hint), and per month the logged hours and countable absence hours by reason (vacation less the vacation days correction) against the target time. The monthly table above is in the collapsed "Details" section, the PDF is unchanged.
+
 Overall tiles at the top (sums over all users shown): Verfügbare Ferientage, Bezogene Ferientage (korrigiert) = `Σ absence_vacation + Σ vacation_days_correction` (the correction is zero or negative), Krankheitstage, plus "Geschätzte X Tage pro 100% und Jahr" = `Σ sickness days / (Σ working time / 250 / 8)` (hard-coded 250 days × 8 h), Bezahlter Urlaub, Schulbesuch, Arbeitszeit-Korrektur, Stundensaldo, Guthaben an Ferientagen and Bilanz.
 
 Vacation planning warning ("Ferienplanung!", `vacation_planning_warnings`, only for active users). It fires if `Σ planned vacation days / available days < 0.5` ("Weniger als die Hälfte…"), or if no vacation absence lasts at least 14 calendar days (`ends_on − starts_on ≥ 13`). The second check is only made if vacation entitlement exists in more than 6 months.

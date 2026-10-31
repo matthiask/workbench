@@ -12,10 +12,20 @@ from django.views.decorators.http import require_POST
 
 from workbench.accounts.features import FEATURES, feature_required
 from workbench.accounts.models import User
+from workbench.awt.charts import (
+    BALANCE_LIMIT,
+    balance_chart,
+    vacation_meter,
+    working_time_chart,
+)
 from workbench.awt.forms import CalendarFilterForm
 from workbench.awt.models import HIDDEN_REASON, Absence, Year
 from workbench.awt.pdf import annual_working_time_pdf
-from workbench.awt.reporting import active_users, annual_working_time
+from workbench.awt.reporting import (
+    active_users,
+    annual_working_time,
+    working_time_by_week,
+)
 from workbench.tools.validation import filter_form, monday
 
 
@@ -71,7 +81,11 @@ def annual_working_time_view(request):
         "awt/year_detail.html",
         {
             "overall": statistics["overall"],
-            "statistics": statistics["statistics"],
+            "statistics": [
+                person_report(row, year=year, as_of=statistics["as_of"])
+                for row in statistics["statistics"]
+            ],
+            "as_of": statistics["as_of"],
             "wtm_holiday_data": statistics["holidays_by_wtm"],
             "object": year,
             "year": year,
@@ -90,6 +104,32 @@ def annual_working_time_view(request):
             "has_company_holidays": statistics["has_company_holidays"],
         },
     )
+
+
+def person_report(row, *, year, as_of):
+    """Key figures, charts and the absences of one person's report"""
+    totals = row["totals"]
+    balance = totals["balance_as_of"]
+    return row | {
+        "balance_beyond_limit": balance is not None and abs(balance) > BALANCE_LIMIT,
+        "balance_as_of_days": balance / row["months"]["year"].working_time_per_day
+        if balance is not None
+        else None,
+        "balance_chart": balance_chart(
+            working_time_by_week(year, user=row["user"]), as_of=as_of
+        ),
+        "working_time_chart": working_time_chart(row),
+        "vacation_meter": vacation_meter(totals),
+        "all_absences": sorted(
+            [
+                *(a for absences in row["absences"].values() for a in absences),
+                *row["other_absences"],
+            ],
+            key=lambda absence: (absence.starts_on, absence.pk),
+        ),
+        "show_employments": len(row["months"]["employments"]) > 1
+        or any(e.percentage != 100 for e in row["months"]["employments"]),
+    }
 
 
 @filter_form(CalendarFilterForm)

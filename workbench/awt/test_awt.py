@@ -207,6 +207,27 @@ class AWTTest(TestCase):
         self.assertIsNone(balance_cutoff(2027, today=today))
         self.assertIsNone(balance_cutoff(2026, today=dt.date(2026, 1, 20)))
 
+    def test_vacation_meter(self):
+        """Taken and planned vacation fill the bar, the excess is shown on top"""
+        from workbench.awt.charts import vacation_meter
+
+        def meter(available, taken, planned):
+            return vacation_meter({
+                "available_vacation_days": Decimal(available),
+                "vacation_days_taken": Decimal(taken),
+                "vacation_days_planned": Decimal(planned),
+            })
+
+        self.assertEqual(
+            meter(20, 5, 5),
+            {"taken": "25.00", "planned": "25.00", "excess": "0.00", "excess_days": 0},
+        )
+        self.assertEqual(
+            meter(20, 15, 10),
+            {"taken": "60.00", "planned": "20.00", "excess": "20.00", "excess_days": 5},
+        )
+        self.assertIsNone(meter(0, 0, 0))
+
     def test_admin_list(self):
         """The admin changelist of years contains the calculated sum of working days"""
         user = factories.UserFactory.create(is_admin=True)

@@ -1642,3 +1642,25 @@ kbd {
   max-height: 20rem;
   overflow-y: auto;
 }
+
+// Annual working time: taken, planned and excess vacation days
+.wb-vacation-meter {
+  height: 0.75rem;
+}
+
+.wb-meter-key {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-right: 0.4rem;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+details.card > summary.card-header {
+  cursor: pointer;
+}
+
+details.card:not([open]) > summary.card-header {
+  border-bottom: 0;
+}

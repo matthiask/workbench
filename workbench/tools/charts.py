@@ -40,7 +40,8 @@ def bar_chart(
 
     ``bars`` and ``lines`` are lists of dicts with a ``label``, ``values``
     (one per category, ``None`` leaves out a point of a line) and a CSS
-    ``color`` class, lines optionally ``dashed``. ``fmt`` formats values for
+    ``color`` class, lines optionally ``dashed``. Series with an empty label
+    are left out of the legend and the tooltips. ``fmt`` formats values for
     the tooltips and ``axis_fmt`` (``fmt`` by default) for the axis."""
     axis_fmt = axis_fmt or fmt
     labels = list(labels)
@@ -136,6 +137,8 @@ def bar_chart(
                 "kind": "dashed" if series.get("dashed") else "line",
             }
             for series in lines
+            # Series without a label (e.g. a second limit) aren't repeated
+            if series["label"]
         ],
         "bars": bar_series,
         "lines": line_series,
@@ -157,7 +160,7 @@ def bar_chart(
                     *(
                         f"{series['label']}: {fmt(Decimal(str(values[id(series)][index])))}"
                         for series in (*bars, *lines)
-                        if values[id(series)][index] is not None
+                        if values[id(series)][index] is not None and series["label"]
                     ),
                 ]),
             }

@@ -1,448 +1,301 @@
-{% extends "generic/object_detail.html" %}
+{% extends "reporting/report.html" %}
 {% load absences i18n workbench %}
-{% block content %}
-  <div class="row justify-content-center">
-    <div class="col-sm-12">
-      <div class="wb-page-header d-print-none">
-        <h1 class="mb-0">{% translate 'annual working time'|capfirst %}</h1>
-        <div class="wb-page-actions">
-          <span class="dropdown">
-            <button
-              class="btn btn-quiet dropdown-toggle"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              {% include "svg/calendar.svg" %}
-              {{ year }}
-            </button>
-            <div class="dropdown-menu dropdown-menu-end wb-scroll-menu">
-              {% for y in years %}
-                <a class="dropdown-item {% if y == year %}active{% endif %}" href="{% querystring year=y %}">{{ y }}</a>
-              {% endfor %}
+{% block title %}
+  {% translate 'annual working time'|capfirst %} {{ year }} - {{ block.super }}
+{% endblock title %}
+
+{% block heading %}
+  {% translate 'annual working time'|capfirst %} {{ year }}
+{% endblock heading %}
+
+{% block actions %}
+  {% if statistics|length == 1 %}
+    <a
+      class="btn btn-quiet"
+      href="{% url 'awt_absence_create' %}?user={{ statistics.0.user.pk }}"
+      data-ajaxmodal
+    >{% include "svg/plus.svg" %} {% translate 'New absence' %}</a>
+  {% endif %}
+  <span class="dropdown">
+    <button
+      class="btn btn-quiet dropdown-toggle"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      {% include "svg/calendar.svg" %}
+      {{ year }}
+    </button>
+    <div class="dropdown-menu dropdown-menu-end wb-scroll-menu">
+      {% for y in years %}
+        <a class="dropdown-item {% if y == year %}active{% endif %}" href="{% querystring year=y %}">{{ y }}</a>
+      {% endfor %}
+    </div>
+  </span>
+  {% if request.user.features.PERSONNEL_ADMINISTRATION %}
+    <a
+      class="btn btn-quiet {% if request.GET.user == 'active' %}active{% endif %}"
+      href="{% querystring user='active' %}"
+    >{% translate 'active users' %}</a>
+  {% endif %}
+  <a class="btn btn-quiet" href="{% querystring export='pdf' %}">
+    {% include 'svg/file-pdf.svg' %}
+    PDF
+  </a>
+{% endblock actions %}
+
+{% block report %}
+  {% if request.user.features.PERSONNEL_ADMINISTRATION and request.GET.user == 'active' %}
+    <div class="wb-stats mb-4">
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'vacation days available'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.available_vacation_days|days }}</div>
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">
+          {% translate 'vacation days taken'|capfirst %} ({% translate 'corrected' %})
+        </div>
+        <div class="wb-stat-value">{{ overall.absence_vacation|days }}</div>
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'sickness days'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.absence_sickness|days }}</div>
+        {% if overall.sickness_by_fte %}
+          <div class="wb-stat-note">
+            {% blocktranslate with sickness_by_fte=overall.sickness_by_fte|stringformat:'.1f' trimmed %}
+              Estimated {{ sickness_by_fte }} days per full time equivalent per year
+            {% endblocktranslate %}
+          </div>
+        {% endif %}
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'Paid leave'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.absence_paid|days }}</div>
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'School attendance of apprentices'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.absence_school|days }}</div>
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'Working time correction'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.absence_correction|days }}</div>
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'net work hours'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.running_sum|hours:True }}</div>
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'vacation days credit'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.vacation_days_credit|days }}</div>
+      </div>
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'balance'|capfirst %}</div>
+        <div class="wb-stat-value">{{ overall.balance|hours:True }}</div>
+      </div>
+    </div>
+  {% endif %}
+  {% for wtm_id, data in wtm_holiday_data.items %}
+    {% if data.has_public_holidays %}
+      <div class="modal fade" id="holiday-public-modal-{{ wtm_id }}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{% translate 'public holiday days' %} {{ year }}</h5>
             </div>
-          </span>
-          {% if request.user.features.PERSONNEL_ADMINISTRATION %}
-            <a
-              class="btn btn-quiet {% if request.GET.user == 'active' %}active{% endif %}"
-              href="{% querystring user='active' %}"
-            >{% translate 'active users' %}</a>
-          {% endif %}
-          <a class="btn btn-quiet" href="{% querystring export='pdf' %}">
-            {% include 'svg/file-pdf.svg' %}
-            PDF
-          </a>
+            <div class="modal-body">
+              <table class="table table-sm">
+                {% for h in data.holiday_list %}{% if h.kind == "public" %}
+                    <tr>
+                      <td>{{ h.date|local_date_format }}</td>
+                      <td>{{ h.display_name }}</td>
+                      <td class="text-end">{{ h.fraction|days }}</td>
+                    </tr>
+                  {% endif %}{% endfor %}
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                {% translate 'Close' %}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      {% if request.user.features.PERSONNEL_ADMINISTRATION and request.GET.user == 'active' %}
-        <div class="wb-stats mb-4">
-          <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'vacation days available'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.available_vacation_days|days }}</div>
-          </div>
-          <div class="wb-stat">
-            <div class="wb-stat-label">
-              {% translate 'vacation days taken'|capfirst %} ({% translate 'corrected' %})
+    {% endif %}
+    {% if data.has_company_holidays %}
+      <div class="modal fade" id="holiday-company-modal-{{ wtm_id }}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{% translate 'company holiday days' %} {{ year }}</h5>
             </div>
-            <div class="wb-stat-value">{{ overall.absence_vacation|days }}</div>
+            <div class="modal-body">
+              <table class="table table-sm">
+                {% for h in data.holiday_list %}{% if h.kind == "company" %}
+                    <tr>
+                      <td>{{ h.date|local_date_format }}</td>
+                      <td>{{ h.display_name }}</td>
+                      <td class="text-end">{{ h.fraction|days }}</td>
+                    </tr>
+                  {% endif %}{% endfor %}
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                {% translate 'Close' %}
+              </button>
+            </div>
           </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+  {% for data in statistics %}
+    {% with user=data.user totals=data.totals %}
+      <section class="wb-awt-person mb-5">
+        {% if statistics|length > 1 or user != request.user %}
+          <h2 class="h4 mb-3"><a href="{% querystring user=user.pk %}">{{ user }}</a></h2>
+        {% endif %}
+        <div class="wb-stats mb-3">
           <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'sickness days'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.absence_sickness|days }}</div>
-            {% if overall.sickness_by_fte %}
+            <div class="wb-stat-label">{% translate 'Balance' %}</div>
+            {% if totals.balance_as_of is None %}
+              <div class="wb-stat-value">&ndash;</div>
+              <div class="wb-stat-note">{% translate 'No completed month yet.' %}</div>
+            {% else %}
+              <div class="wb-stat-value">
+                {{ totals.balance_as_of|hours:True }}
+                {% if data.balance_beyond_limit %}
+                  <span class="badge text-bg-light fw-normal">{% translate 'more than 40h' %}</span>
+                {% endif %}
+              </div>
               <div class="wb-stat-note">
-                {% blocktranslate with sickness_by_fte=overall.sickness_by_fte|stringformat:'.1f' trimmed %}
-                  Estimated {{ sickness_by_fte }} days per full time equivalent per year
+                {% blocktranslate with date=as_of|local_date_format days=data.balance_as_of_days|days:True trimmed %}
+                  on {{ date }}, {{ days }}
                 {% endblocktranslate %}
               </div>
             {% endif %}
           </div>
           <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'Paid leave'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.absence_paid|days }}</div>
+            <div class="wb-stat-label">{% translate 'Vacation days left' %}</div>
+            <div class="wb-stat-value">{{ totals.vacation_days_left|days }}</div>
+            <div class="wb-stat-note">
+              {% blocktranslate with taken=totals.vacation_days_taken|days planned=totals.vacation_days_planned|days available=totals.available_vacation_days|days trimmed %}
+                {{ taken }} taken, {{ planned }} planned of {{ available }}
+              {% endblocktranslate %}
+            </div>
           </div>
           <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'School attendance of apprentices'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.absence_school|days }}</div>
-          </div>
-          <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'Working time correction'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.absence_correction|days }}</div>
-          </div>
-          <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'net work hours'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.running_sum|hours:True }}</div>
-          </div>
-          <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'vacation days credit'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.vacation_days_credit|days }}</div>
-          </div>
-          <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'balance'|capfirst %}</div>
-            <div class="wb-stat-value">{{ overall.balance|hours:True }}</div>
+            <div class="wb-stat-label">{% translate 'sickness days'|capfirst %}</div>
+            <div class="wb-stat-value">{{ totals.absence_sickness|days }}</div>
           </div>
         </div>
-      {% endif %}
-      {% for wtm_id, data in wtm_holiday_data.items %}
-        {% if data.has_public_holidays %}
-          <div class="modal fade" id="holiday-public-modal-{{ wtm_id }}">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">{% translate 'public holiday days' %} {{ year }}</h5>
-                </div>
-                <div class="modal-body">
-                  <table class="table table-sm">
-                    {% for h in data.holiday_list %}{% if h.kind == "public" %}
-                        <tr>
-                          <td>{{ h.date|local_date_format }}</td>
-                          <td>{{ h.display_name }}</td>
-                          <td class="text-end">{{ h.fraction|days }}</td>
-                        </tr>
-                      {% endif %}{% endfor %}
-                  </table>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {% translate 'Close' %}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-        {% if data.has_company_holidays %}
-          <div class="modal fade" id="holiday-company-modal-{{ wtm_id }}">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">{% translate 'company holiday days' %} {{ year }}</h5>
-                </div>
-                <div class="modal-body">
-                  <table class="table table-sm">
-                    {% for h in data.holiday_list %}{% if h.kind == "company" %}
-                        <tr>
-                          <td>{{ h.date|local_date_format }}</td>
-                          <td>{{ h.display_name }}</td>
-                          <td class="text-end">{{ h.fraction|days }}</td>
-                        </tr>
-                      {% endif %}{% endfor %}
-                  </table>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {% translate 'Close' %}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      {% endfor %}
-      {% for data in statistics %}
-        {% with user=data.user stats=data.months totals=data.totals monthly_sums=data.monthly_sums running_sums=data.running_sums %}
-          <section class="card mb-3 mt-5 wb-table-card">
-            <div class="card-header">
-              <h2 class="h4 mb-0"><a href="{% querystring user=user.pk %}">{{ user }}</a></h2>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-sm mb-0 wb-compact-table wb-awt-table">
-                <tr class="wb-table-heading">
-                  <th>{{ year.year }}</th>
-                  {% for month in stats.months %}<th>{{ month|date:'M' }}</th>{% endfor %}
-                  <th class="text-end">{% translate 'Total' %}</th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'target days for full time employment' %}
-                    <small>
-                      ({{ stats.year }} {% history_link stats.year %})
-                    </small>
-                  </th>
-                  {% for value in stats.target_days %}
-                    <td class="text-end {% if not value %}text-black-30{% endif %}">
-                      {{ value|days }}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.target_days|days }}
-                  </th>
-                </tr>
-                {% if data.has_public_holidays %}
-                  <tr>
-                    <th class="text-nowrap">
-                      <a
-                        href="#"
-                        data-bs-toggle="modal"
-                        data-bs-target="#holiday-public-modal-{{ stats.year.working_time_model_id }}"
-                      >{% translate 'public holiday days' %}</a>
-                    </th>
-                    {% for value in stats.holiday_public %}
-                      <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
-                    {% endfor %}
-                    <th class="text-end">{{ totals.holiday_public|days }}</th>
-                  </tr>
-                {% endif %}
-                {% if data.has_company_holidays %}
-                  <tr>
-                    <th class="text-nowrap">
-                      <a
-                        href="#"
-                        data-bs-toggle="modal"
-                        data-bs-target="#holiday-company-modal-{{ stats.year.working_time_model_id }}"
-                      >{% translate 'company holiday days' %}</a>
-                    </th>
-                    {% for value in stats.holiday_company %}
-                      <td class="text-end {% if not value %}text-black-30{% endif %}">{{ value|days }}</td>
-                    {% endfor %}
-                    <th class="text-end">{{ totals.holiday_company|days }}</th>
-                  </tr>
-                {% endif %}
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'pensum' %}
-                  </th>
-                  {% for value in stats.percentage %}
-                    <td class="text-end {% if not value %}text-black-30{% endif %}">
-                      {{ value|stringformat:'.0f' }}%
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.percentage|stringformat:'.0f' }}%
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'vacation days available' %}
-                  </th>
-                  {% for value in stats.available_vacation_days %}
-                    <td class="text-end {% if not value %}text-black-30{% endif %}">
-                      {% if value is None %}
-                        &ndash;
-                      {% else %}
-                        {{ value|days }}
-                      {% endif %}
-                    </td>
-                  {% endfor %}
-                  <th
-                    class="
-                      text-end
-                      {% if totals.vacation_days_override %}
-                      text-black-30
-                      {% endif %}
-                    "
-                  >
-                    {{ totals.calculated_vacation_days|days }}
-                  </th>
-                </tr>
-                {% if totals.vacation_days_override %}
-                  <tr>
-                    <th class="text-nowrap">
-                      {% translate 'vacation days override'|capfirst %}
-                    </th>
-                    <td colspan="12" class="text-end">
-                      {{ totals.vacation_days_override.notes }}
-                      ({{ totals.vacation_days_override.pretty_days }})
-                    </td>
-                    <th class="text-end">
-                      {{ totals.available_vacation_days|days }}
-                    </th>
-                  </tr>
-                {% endif %}
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'target time' %}
-                    <small>
-                      (
-                      {% blocktranslate with hours=stats.year.working_time_per_day|hours trimmed %}
-                        calculated with {{ hours }} per day
-                      {% endblocktranslate %}
-                      )
-                    </small>
-                  </th>
-                  {% for value in stats.target %}
-                    <td class="text-end {% if not value %}text-black-30{% endif %}">
-                      {{ value|hours }}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.target|hours }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'vacation days taken' %}
-                  </th>
-                  {% for value in stats.absence_vacation %}
-                    <td class="text-start {% if not value %}text-black-30{% endif %}">
-                      {{ value|days }}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.absence_vacation|days }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'sickness days' %}
-                  </th>
-                  {% for value in stats.absence_sickness %}
-                    <td class="text-start {% if not value %}text-black-30{% endif %}">
-                      {{ value|days }}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.absence_sickness|days }}
-                  </th>
-                </tr>
-                {% if totals.absence_paid %}
-                  <tr>
-                    <th class="text-nowrap">
-                      {% translate 'Paid leave' %}
-                    </th>
-                    {% for value in stats.absence_paid %}
-                      <td class="text-start {% if not value %}text-black-30{% endif %}">
-                        {{ value|days }}
-                      </td>
-                    {% endfor %}
-                    <th class="text-end">
-                      {{ totals.absence_paid|days }}
-                    </th>
-                  </tr>
-                {% endif %}
-                {% if totals.absence_school %}
-                  <tr>
-                    <th class="text-nowrap">
-                      {% translate 'School attendance of apprentices' %}
-                    </th>
-                    {% for value in stats.absence_school %}
-                      <td class="text-start {% if not value %}text-black-30{% endif %}">
-                        {{ value|days }}
-                      </td>
-                    {% endfor %}
-                    <th class="text-end">
-                      {{ totals.absence_school|days }}
-                    </th>
-                  </tr>
-                {% endif %}
-                {% if totals.absence_correction %}
-                  <tr>
-                    <th class="text-nowrap">
-                      {% translate 'Working time correction' %}
-                    </th>
-                    {% for value in stats.absence_correction %}
-                      <td class="text-start {% if not value %}text-black-30{% endif %}">
-                        {{ value|days }}
-                      </td>
-                    {% endfor %}
-                    <th class="text-end">
-                      {{ totals.absence_correction|days }}
-                    </th>
-                  </tr>
-                {% endif %}
-                {% if totals.vacation_days_correction %}
-                  <tr>
-                    <th class="text-nowrap">
-                      {% translate 'vacation days correction' %}
-                    </th>
-                    {% for value in stats.vacation_days_correction %}
-                      <td class="text-start {% if not value %}text-black-30{% endif %}">
-                        {{ value|days }}
-                      </td>
-                    {% endfor %}
-                    <th class="text-end">
-                      {{ totals.vacation_days_correction|days }}
-                    </th>
-                  </tr>
-                {% endif %}
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'countable absence hours' %}
-                  </th>
-                  {% for value in data.absences_time %}
-                    <td class="text-end {% if not value %}text-black-30{% endif %}">
-                      {{ value|hours }}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.absences_time|hours }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'logged hours' %}
-                  </th>
-                  {% for value in stats.hours %}
-                    <td class="text-end {% if not value %}text-black-30{% endif %}">
-                      {{ value|hours }}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.hours|hours }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'working time' %}
-                  </th>
-                  {% for value in data.working_time %}
-                    <td class="text-end {% if not value %}text-black-30{% endif %}">
-                      {{ value|hours }}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.working_time|hours }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'net work hours per month' %}
-                  </th>
-                  {% for value in monthly_sums %}
-                    <td class="text-end">
-                      {% if value is not None %}{{ value|hours }}{% endif %}
-                    </td>
-                  {% endfor %}
-                  <th></th>
-                </tr>
-                <tr>
-                  <th class="text-nowrap">
-                    {% translate 'running net work hours' %}
-                  </th>
-                  {% for value in running_sums %}
-                    <td class="text-end">
-                      {% if value is not None %}{{ value|hours }}{% endif %}
-                    </td>
-                  {% endfor %}
-                  <th class="text-end">
-                    {{ totals.running_sum|hours }}
-                  </th>
-                </tr>
-                {% if totals.vacation_days_credit %}
-                  <tr>
-                    <th class="text-nowrap">
-                      {% translate 'vacation days credit' %}
-                    </th>
-                    <th colspan="13" class="text-end">
-                      {{ totals.vacation_days_credit|days }}
-                    </th>
-                  </tr>
-                {% endif %}
-                <tr class="wb-total-row">
-                  <th class="text-nowrap">
-                    {% translate 'balance' %}
-                  </th>
-                  <th colspan="13" class="text-end">
-                    {{ totals.balance|hours }}
-                  </th>
-                </tr>
-              </table>
-            </div>
-            <div class="card-footer wb-stat-note">
-              {% translate 'Monthly sums may not be exact: absences spanning month boundaries are split by calendar days, not by working days. The annual total is correct.' %}
+
+        {% if data.balance_chart %}
+          <section class="card mb-3">
+            <div class="card-header">{% translate 'Running balance' %}</div>
+            <div class="card-body">
+              {% translate 'Running balance' as label %}
+              {% include "charts/bar_chart.html" with chart=data.balance_chart label=label %}
             </div>
           </section>
+        {% endif %}
+        <section class="card mb-3">
+          <div class="card-header">{% translate 'Working time per month' %}</div>
+          <div class="card-body">
+            {% translate 'Working time per month' as label %}
+            {% include "charts/bar_chart.html" with chart=data.working_time_chart label=label %}
+          </div>
+        </section>
+
+        <div class="row g-3 mb-3">
+          <div class="col-lg-5">
+            <section class="card h-100">
+              <div class="card-header">{% translate 'vacation days'|capfirst %}</div>
+              <div class="card-body">
+                {% with meter=data.vacation_meter %}
+                  {% if meter %}
+                    <div class="progress-stacked wb-vacation-meter mb-2">
+                      <div class="progress" role="progressbar" style="width: {{ meter.taken }}%">
+                        <div class="progress-bar bg-primary"></div>
+                      </div>
+                      <div class="progress" role="progressbar" style="width: {{ meter.planned }}%">
+                        <div class="progress-bar bg-primary bg-opacity-50"></div>
+                      </div>
+                      <div class="progress" role="progressbar" style="width: {{ meter.excess }}%">
+                        <div class="progress-bar bg-warning"></div>
+                      </div>
+                    </div>
+                    <div class="wb-chart-legend">
+                      <span><span class="wb-meter-key bg-primary"></span>{% translate 'taken' %}
+                        {{ totals.vacation_days_taken|days }}</span>
+                      <span><span class="wb-meter-key bg-primary bg-opacity-50"></span>{% translate 'planned' %}
+                        {{ totals.vacation_days_planned|days }}</span>
+                      <span><span class="wb-meter-key bg-body-secondary"></span>{% translate 'left' %}
+                        {{ totals.vacation_days_left|days }}</span>
+                    </div>
+                    {% if totals.vacation_days_correction %}
+                      <div class="text-warning-emphasis small">
+                        {% blocktranslate with days=totals.vacation_days_correction|days trimmed %}
+                          More vacation than available: {{ days }} don't count as working time.
+                        {% endblocktranslate %}
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+                {% if totals.vacation_days_override %}
+                  <div class="wb-stat-note">
+                    {% translate 'vacation days override'|capfirst %}:
+                    {{ totals.vacation_days_override.pretty_days }}
+                    {% if totals.vacation_days_override.notes %}({{ totals.vacation_days_override.notes }}){% endif %}
+                  </div>
+                {% endif %}
+                {% if not data.vacation_planning.fine %}
+                  <div class="alert alert-warning mt-3 mb-0" role="alert">
+                    <h4 class="alert-heading h6">{% translate 'Vacation planning!' %}</h4>
+                    {% if data.vacation_planning.ratio < 0.5 %}
+                      {% translate 'Less than half of all vacation days planned.' %}<br>
+                    {% endif %}
+                    {% if not data.vacation_planning.two_weeks %}
+                      {% translate 'Plan at least one vacation with a duration of two weeks, please.' %}<br>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            </section>
+          </div>
+          <div class="col-lg-7">
+            <section class="card h-100 wb-table-card">
+              <div class="card-header">{% translate 'absences'|capfirst %}</div>
+              {% if data.all_absences %}
+                <table class="table table-sm mb-0 wb-compact-table">
+                  {% for absence in data.all_absences %}
+                    <tr {% if not absence.is_working_time %}class="text-body-secondary"{% endif %}>
+                      <td class="text-nowrap">{{ absence.pretty_period }}</td>
+                      <td>
+                        {% with reason=absence|absence_reason:request.user description=absence|absence_description:request.user %}
+                          <a href="{{ absence.get_absolute_url }}" data-ajaxmodal>{{ reason|capfirst }}</a>
+                          {% if description and description|lower != reason|lower %}
+                            <span class="text-body-secondary">{{ description }}</span>
+                          {% endif %}
+                        {% endwith %}
+                        {% if absence.needs_confirmation %}
+                          <span class="badge text-bg-warning">{% translate 'Unconfirmed' %}</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end text-nowrap">{{ absence.days|days }}</td>
+                    </tr>
+                  {% endfor %}
+                </table>
+              {% else %}
+                <div class="card-body text-body-secondary">{% translate 'No absences.' %}</div>
+              {% endif %}
+            </section>
+          </div>
+        </div>
+
+        {% if data.show_employments %}
           <section class="card mb-3 wb-table-card">
             <table class="table table-sm mb-0 wb-compact-table">
               <tr class="wb-table-heading">
@@ -477,210 +330,13 @@
               {% endfor %}
             </table>
           </section>
-          <div class="row g-3">
-            <div class="col-md-4 col-12">
-              <section class="card mb-3 wb-table-card">
-                <table class="table table-sm mb-0 wb-compact-table">
-                  <tr class="wb-table-heading">
-                    <th colspan="3">
-                      <div class="d-flex w-100 justify-content-between align-items-center">
-                        {% translate 'vacation days' %}
-                        <a
-                          href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=vacation"
-                          data-ajaxmodal
-                          class="btn btn-quiet btn-sm btn-icon"
-                          title="{% translate 'absence'|capfirst %}"
-                        >{% include "svg/plus.svg" %}</a>
-                      </div>
-                    </th>
-                  </tr>
-                  {% for absence in data.absences.absence_vacation %}
-                    <tr>
-                      <td>
-                        {{ absence.pretty_period }}
-                      </td>
-                      <td>
-                        {{ absence.days|days }}
-                      </td>
-                      <td>
-                        <a
-                          href="{{ absence.get_absolute_url }}"
-                          data-ajaxmodal
-                        >{{ absence|absence_title:request.user }}</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </table>
-              </section>
-              {% if not data.vacation_planning.fine %}
-                <div class="alert alert-warning" role="alert">
-                  <h4 class="alert-heading">{% translate 'Vacation planning!' %}</h4>
-                  {% if data.vacation_planning.ratio < 0.5 %}
-                    {% translate 'Less than half of all vacation days planned.' %}<br>
-                  {% endif %}
-                  {% if not data.vacation_planning.two_weeks %}
-                    {% translate 'Plan at least one vacation with a duration of two weeks, please.' %}<br>
-                  {% endif %}
-                </div>
-              {% endif %}
-            </div>
-            <div class="col-md-4 col-12">
-              <section class="card mb-3 wb-table-card">
-                <table class="table table-sm mb-0 wb-compact-table">
-                  <tr class="wb-table-heading">
-                    <th colspan="3">
-                      <div class="d-flex w-100 justify-content-between align-items-center">
-                        {% translate 'sickness days' %}
-                        <a
-                          href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=sickness"
-                          data-ajaxmodal
-                          class="btn btn-quiet btn-sm btn-icon"
-                          title="{% translate 'absence'|capfirst %}"
-                        >{% include "svg/plus.svg" %}</a>
-                      </div>
-                    </th>
-                  </tr>
-                  {% for absence in data.absences.absence_sickness %}
-                    <tr>
-                      <td>
-                        {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
-                          from {{ date }}
-                        {% endblocktranslate %}
-                      </td>
-                      <td>
-                        {{ absence.days|days }}
-                      </td>
-                      <td>
-                        <a
-                          href="{{ absence.get_absolute_url }}"
-                          data-ajaxmodal
-                        >{{ absence|absence_title:request.user }}</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </table>
-              </section>
-            </div>
-            <div class="col-md-4 col-12">
-              <section class="card mb-3 wb-table-card">
-                <table class="table table-sm mb-0 wb-compact-table">
-                  <tr class="wb-table-heading">
-                    <th colspan="3">
-                      <div class="d-flex w-100 justify-content-between align-items-center">
-                        {% translate 'Paid leave' %}
-                        <a
-                          href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=paid"
-                          data-ajaxmodal
-                          class="btn btn-quiet btn-sm btn-icon"
-                          title="{% translate 'absence'|capfirst %}"
-                        >{% include "svg/plus.svg" %}</a>
-                      </div>
-                    </th>
-                  </tr>
-                  {% for absence in data.absences.absence_paid %}
-                    <tr>
-                      <td>
-                        {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
-                          from {{ date }}
-                        {% endblocktranslate %}
-                      </td>
-                      <td>
-                        {{ absence.days|days }}
-                      </td>
-                      <td>
-                        <a
-                          href="{{ absence.get_absolute_url }}"
-                          data-ajaxmodal
-                        >{{ absence|absence_title:request.user }}</a>
-                        {% if absence.needs_confirmation %}
-                          <span class="badge text-bg-warning">{% translate 'Unconfirmed' %}</span>
-                        {% endif %}
-                      </td>
-                    </tr>
-                  {% endfor %}
-                  <tr class="wb-table-heading">
-                    <th colspan="3">
-                      <div class="d-flex w-100 justify-content-between align-items-center">
-                        {% translate 'School attendance of apprentices' %}
-                        <a
-                          href="{% url 'awt_absence_create' %}?user={{ data.user.pk }}&amp;reason=school"
-                          data-ajaxmodal
-                          class="btn btn-quiet btn-sm btn-icon"
-                          title="{% translate 'absence'|capfirst %}"
-                        >{% include "svg/plus.svg" %}</a>
-                      </div>
-                    </th>
-                  </tr>
-                  {% for absence in data.absences.absence_school %}
-                    <tr>
-                      <td>
-                        {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
-                          from {{ date }}
-                        {% endblocktranslate %}
-                      </td>
-                      <td>
-                        {{ absence.days|days }}
-                      </td>
-                      <td>
-                        <a
-                          href="{{ absence.get_absolute_url }}"
-                          data-ajaxmodal
-                        >{{ absence|absence_title:request.user }}</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                  <tr class="wb-table-heading">
-                    <th colspan="3">
-                      {% translate 'Working time correction' %}
-                    </th>
-                  </tr>
-                  {% for absence in data.absences.absence_correction %}
-                    <tr>
-                      <td>
-                        {% blocktranslate with date=absence.starts_on|local_date_format trimmed %}
-                          from {{ date }}
-                        {% endblocktranslate %}
-                      </td>
-                      <td>
-                        {{ absence.days|days }}
-                      </td>
-                      <td>
-                        <a
-                          href="{{ absence.get_absolute_url }}"
-                          data-ajaxmodal
-                        >{{ absence|absence_title:request.user }}</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
+        {% endif %}
 
-                  <tr class="wb-table-heading">
-                    <th colspan="3">
-                      {% translate 'other reasons (no working time)' %}
-                      <small>{% translate 'Only shown for completeness.' %}</small>
-                    </th>
-                  </tr>
-                  {% for absence in data.other_absences %}
-                    <tr>
-                      <td>
-                        {{ absence.pretty_period }}
-                      </td>
-                      <td>
-                        {{ absence.days|days }}
-                      </td>
-                      <td>
-                        <a
-                          href="{{ absence.get_absolute_url }}"
-                          data-ajaxmodal
-                        >{{ absence|absence_title:request.user }}</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </table>
-              </section>
-            </div>
-          </div>
-        {% endwith %}
-      {% endfor %}
-    </div>
-  </div>
-{% endblock content %}
+        <details class="card wb-table-card">
+          <summary class="card-header">{% translate 'Details' %}</summary>
+          {% include "awt/_year_details.html" %}
+        </details>
+      </section>
+    {% endwith %}
+  {% endfor %}
+{% endblock report %}
