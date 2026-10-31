@@ -1711,3 +1711,41 @@ details.card:not([open]) > summary.card-header {
   stroke: var(--bs-border-color);
   stroke-width: 1;
 }
+
+// Small screens, after the rules they override
+@media (max-width: 767.98px) {
+  // Asides and actions move below the text instead of squeezing it
+  .wb-row {
+    flex-wrap: wrap;
+  }
+
+  .wb-row-main {
+    flex-basis: 10rem;
+  }
+
+  .wb-row-aside {
+    flex-shrink: 1;
+    min-width: 0;
+    margin-left: auto;
+
+    .badge {
+      white-space: normal;
+    }
+  }
+
+  // Long labels wrap instead of squeezing the values
+  .wb-fields {
+    grid-template-columns: fit-content(40%) minmax(0, 1fr);
+  }
+
+  // Wide tables scroll within their card instead of widening the page
+  .wb-table-card,
+  .card:has(> .table) {
+    overflow-x: auto;
+
+    // Sticky would be relative to the card now
+    .table .sticky {
+      position: static;
+    }
+  }
+}
