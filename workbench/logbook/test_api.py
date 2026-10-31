@@ -43,6 +43,14 @@ class LogbookAPITest(TestCase):
         self.assertEqual([row["id"] for row in data["items"]], [other.pk])
         self.assertEqual(data["count"], 2)
         self.assertEqual(data["total_hours"], "3.5")
+        # Entries with invoiced hours, for sanity checks
+        mine.invoiced_hours = 3
+        mine.save()
+        data = self.client.get("/api/logbook/hours/?invoiced_hours=true").json()
+        self.assertEqual([row["id"] for row in data["items"]], [mine.pk])
+        self.assertEqual(data["items"][0]["invoiced_hours"], "3.0")
+        self.assertEqual(data["total_hours"], "2.0")
+
         response = self.client.get("/api/logbook/hours/?limit=10001")
         self.assertEqual(response.status_code, 422)
         response = self.client.get("/api/logbook/hours/?offset=-1")

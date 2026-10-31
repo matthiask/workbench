@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 14:05+0100\n"
+"POT-Creation-Date: 2026-10-31 18:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2273,7 +2273,7 @@ msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
 #: workbench/invoices/models.py workbench/projects/forms.py
-#: workbench/templates/base.html workbench/templates/start.html
+#: workbench/templates/_hours_rings.html workbench/templates/start.html
 #: workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
@@ -2526,6 +2526,10 @@ msgstr "Keine Offerte"
 msgid "Not archived"
 msgstr "Nicht archiviert"
 
+#: workbench/logbook/forms.py
+msgid "With invoiced hours"
+msgstr "Mit verrechneten Stunden"
+
 #: workbench/logbook/forms.py workbench/planning/xlsx.py
 #: workbench/projects/reporting.py
 msgid "External"
@@ -2641,6 +2645,7 @@ msgid "rendered by"
 msgstr "Erbracht von"
 
 #: workbench/logbook/models.py workbench/reporting/squeeze.py
+#: workbench/templates/logbook/_loggedhours_row.html
 #: workbench/templates/logbook/loggedhours_detail.html
 msgid "invoiced hours"
 msgstr "Verrechnete Stunden"
@@ -3771,7 +3776,7 @@ msgstr "Richtwert mit {}/h"
 msgid "relevant gross margin"
 msgstr "relevanter Umsatz"
 
-#: workbench/reporting/utils.py workbench/templates/base.html
+#: workbench/reporting/utils.py workbench/templates/_hours_rings.html
 #: workbench/templates/start.html workbench/templates/timestamps.html
 msgid "this week"
 msgstr "diese Woche"
@@ -4815,6 +4820,13 @@ msgstr "Herunterladen mit Unterschriftszeile"
 #: workbench/templates/projects/project_detail.html
 msgid "Renumber offers"
 msgstr "Offerten neu nummerieren"
+
+#: workbench/templates/projects/project_detail.html
+#, python-format
+msgid "%(entries)s entry with invoiced hours"
+msgid_plural "%(entries)s entries with invoiced hours"
+msgstr[0] "%(entries)s Eintrag mit verrechneten Stunden"
+msgstr[1] "%(entries)s Einträge mit verrechneten Stunden"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Not accepted yet"

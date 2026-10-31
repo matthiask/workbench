@@ -400,6 +400,18 @@ planned_work:
         self.assertIn("Wireframes", result.output)
         result = self.wb("hours", "search", "--period", "last-year")
         self.assertNotIn("Wireframes", result.output)
+        result = self.wb("hours", "search", "--invoiced-hours")
+        self.assertNotIn("Wireframes", result.output)
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            hours=1,
+            invoiced_hours=2,
+            description="Sketches",
+        )
+        result = self.wb("hours", "search", "--invoiced-hours")
+        self.assertIn("Sketches", result.output)
+        self.assertIn("1.0 → 2.0", result.output)
+        self.assertNotIn("Wireframes", result.output)
 
         factories.LoggedCostFactory.create(
             service=factories.ServiceFactory.create(project=project),

@@ -38,6 +38,9 @@ def hours(ctx):
 @click.option("--offer", type=int, help="Offer ID.")
 @click.option("--service", type=int, help="Service ID.")
 @click.option("--rendered-by", help="Short name.", shell_complete=complete_short_names)
+@click.option(
+    "--invoiced-hours", is_flag=True, help="Only entries with invoiced hours."
+)
 @period_options("filters the date the work was done")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -49,6 +52,7 @@ def search_hours(
     offer,
     service,
     rendered_by,
+    invoiced_hours,
     period,
     since,
     until,
@@ -57,8 +61,11 @@ def search_hours(
     as_csv,
     as_json,
 ):
-    """Search logged hours, newest first"""
-    params = {"q": " ".join(query)}
+    """Search logged hours, newest first
+
+    Invoiced hours (what the work is worth if that is more than the time
+    spent) are shown after an arrow."""
+    params = {"q": " ".join(query), "invoiced_hours": format_bool(invoiced_hours)}
     for key, value in [
         ("project", project),
         ("customer", customer),
@@ -92,7 +99,9 @@ def search_hours(
             row["rendered_by"],
             link(row["project"]["code"], row["project"]["url"]),
             row["service"],
-            row["hours"],
+            row["hours"]
+            if row["invoiced_hours"] is None
+            else f"{row['hours']} → {row['invoiced_hours']}",
             row["description"],
         )
     table.columns[0].footer = "Total"

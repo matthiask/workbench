@@ -53,6 +53,12 @@ class LoggedHoursFilter(DateRangeFilter):
     rendered_by: str | None = None
 
 
+class LoggedHoursListFilter(LoggedHoursFilter):
+    invoiced_hours: bool = Field(
+        default=False, description="Only entries with invoiced hours, for sanity checks"
+    )
+
+
 def _filter(queryset, filters):
     if filters.project:
         queryset = queryset.filter(service__project=filters.project)
@@ -85,9 +91,11 @@ def _entry_out(entry, request):
 
 @router.get("/logbook/hours/", response=list[LoggedHoursOut])
 @paginate(LoggedHoursPagination)
-def logged_hours_list(request, filters: Query[LoggedHoursFilter]):
+def logged_hours_list(request, filters: Query[LoggedHoursListFilter]):
     """Logged hours, newest first; the total includes all matching entries"""
     hours = _filter(LoggedHours.objects.all(), filters)
+    if filters.invoiced_hours:
+        hours = hours.filter(invoiced_hours__isnull=False)
     return Serialized(
         hours.select_related("rendered_by", "service__project").order_by(
             "-rendered_on", "-created_at", "-pk"

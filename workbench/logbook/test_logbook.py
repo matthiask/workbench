@@ -551,6 +551,34 @@ class LogbookTest(TestCase):
         code("not_archived=1")
         code("export=xlsx")
 
+    def test_invoiced_hours_sanity_check(self):
+        """Entries with invoiced hours are linked from the project and listed"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        factories.LoggedHoursFactory.create(
+            service=service, hours=1, description="Plain entry"
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, hours=2, invoiced_hours=3, description="Worth more"
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["detail"])
+        self.assertContains(response, "1 entry with invoiced hours")
+        self.assertContains(response, "(+1.0h)")
+        url = f"/logbook/hours/?project={project.pk}&invoiced_hours=1"
+        self.assertContains(response, url.replace("&", "&amp;"))
+
+        response = self.client.get(url)
+        self.assertContains(response, "Worth more")
+        self.assertContains(response, "3.0h</span>")
+        self.assertNotContains(response, "Plain entry")
+        self.assertContains(response, "With invoiced hours")
+
+        factories.LoggedHoursFactory.create(service=service, invoiced_hours=0)
+        response = self.client.get(project.urls["detail"])
+        self.assertContains(response, "2 entries with invoiced hours")
+
     def test_logged_cost_list(self):
         """Filter form smoke test"""
         cost = factories.LoggedCostFactory.create()

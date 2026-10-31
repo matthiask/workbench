@@ -147,6 +147,17 @@
             <span class="wb-stat-of">/ {{ gs.service_hours|hours }}</span>
           </div>
           {% bar gs.logged_hours gs.service_hours %}
+          {% if gs.invoiced_hours_entries %}
+            <div class="wb-stat-note">
+              <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}&amp;invoiced_hours=1">
+                {% blocktranslate count entries=gs.invoiced_hours_entries trimmed %}
+                  {{ entries }} entry with invoiced hours
+                {% plural %}
+                  {{ entries }} entries with invoiced hours
+                {% endblocktranslate %}</a>
+              ({% if gs.invoiced_hours_difference >= 0 %}+{% endif %}{{ gs.invoiced_hours_difference|hours }})
+            </div>
+          {% endif %}
         </div>
         {% if gs.logged_cost or gs.service_cost %}
           <div class="wb-stat">

@@ -109,6 +109,9 @@ class LoggedHoursSearchForm(Form):
     internal_type = forms.IntegerField(
         required=False, widget=forms.HiddenInput, label=""
     )
+    invoiced_hours = forms.BooleanField(
+        required=False, widget=forms.HiddenInput, label=""
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -175,6 +178,12 @@ class LoggedHoursSearchForm(Form):
                 querystring(self.request.GET, not_archived=""),
             ))
             queryset = queryset.filter(archived_at__isnull=True)
+        if data.get("invoiced_hours"):
+            self.hidden_filters.append((
+                _("With invoiced hours"),
+                querystring(self.request.GET, invoiced_hours=""),
+            ))
+            queryset = queryset.filter(invoiced_hours__isnull=False)
         if data.get("internal_type") == -1:
             self.hidden_filters.append((
                 _("External"),

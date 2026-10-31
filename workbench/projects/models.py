@@ -6,7 +6,7 @@ from functools import total_ordering
 from admin_ordering.models import OrderableModel
 from django.contrib import messages
 from django.db import models
-from django.db.models import F, Prefetch, Q, Sum
+from django.db.models import Count, F, Prefetch, Q, Sum
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -486,16 +486,27 @@ class Project(Model):
         invoiced_hours_per_service = defaultdict(lambda: Z1)
         logged_hours_per_user = defaultdict(lambda: Z1)
         logged_hours_per_effort_rate = defaultdict(lambda: Z1)
+        # Entries with invoiced hours, for sanity checks
+        invoiced_hours_entries = 0
+        invoiced_hours_difference = Z1
 
         for row in (
             LoggedHours.objects
             .order_by()
             .filter(service__project=self)
             .values("service", "rendered_by")
-            .annotate(Sum("hours"), invoiced_hours=Sum(INVOICED_HOURS))
+            .annotate(
+                Sum("hours"),
+                invoiced_hours_sum=Sum(INVOICED_HOURS),
+                invoiced_hours_entries=Count(
+                    "id", filter=Q(invoiced_hours__isnull=False)
+                ),
+            )
         ):
             logged_hours_per_user[row["rendered_by"]] += row["hours__sum"]
-            invoiced_hours_per_service[row["service"]] += row["invoiced_hours"]
+            invoiced_hours_entries += row["invoiced_hours_entries"]
+            invoiced_hours_difference += row["invoiced_hours_sum"] - row["hours__sum"]
+            invoiced_hours_per_service[row["service"]] += row["invoiced_hours_sum"]
             logged_hours_per_service_and_user[row["service"]][row["rendered_by"]] = row[
                 "hours__sum"
             ]
@@ -598,6 +609,8 @@ class Project(Model):
                 if item[1]["services"] or item[0] is not None
             ),
             "logged_hours": logged_hours[self],
+            "invoiced_hours_entries": invoiced_hours_entries,
+            "invoiced_hours_difference": invoiced_hours_difference,
             "logged_hours_per_user": sorted(
                 ((users[user], hours) for user, hours in logged_hours_per_user.items()),
                 key=lambda row: row[1],

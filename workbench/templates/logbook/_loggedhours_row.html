@@ -15,7 +15,13 @@
     </div>
   </div>
   <div class="wb-row-aside">
-    <span class="wb-row-amount">{{ hours.hours|hours }}</span>
+    <span class="wb-row-amount">
+      {{ hours.hours|hours }}
+      {% if hours.invoiced_hours is not None %}
+        <span class="wb-row-meta d-inline" title="{% translate 'invoiced hours'|capfirst %}">&rarr;
+          {{ hours.invoiced_hours|hours }}</span>
+      {% endif %}
+    </span>
     <span class="wb-row-meta">{{ hours.rendered_by.get_short_name }} &middot;
       {{ hours.created_at|date:'H:i' }}</span>
   </div>
