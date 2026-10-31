@@ -189,3 +189,10 @@ class SqueezeTest(TestCase):
 
         invoice(Invoice.FIXED, 600)
         self.assertEqual(project_gross_margin(project)["invoiced"], 1400)
+
+    def test_unknown_specialist_field(self):
+        """People without a specialist field are grouped in the language of
+        the request"""
+        factories.LoggedHoursFactory.create()
+        data = squeeze_data((in_days(-1), in_days(1)))
+        self.assertEqual([f["name"] for f in data["fields"]], ["<unknown>"])

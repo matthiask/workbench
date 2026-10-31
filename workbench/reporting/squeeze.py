@@ -552,7 +552,7 @@ def squeeze_data(date_range):  # noqa: C901
         }
     )
     for ud in user_list:
-        field = ud["specialist_field"] or "<unbekannt>"
+        field = ud["specialist_field"] or _("<unknown>")
         fields_dict[field]["gross_margin"] += ud["gross_margin"]
         fields_dict[field]["hours_in_range"] += ud["hours_in_range"]
         fields_dict[field]["external_hours"] += ud["external_hours"]

@@ -474,7 +474,7 @@ Everyone who logged hours in the period (also only on internal projects).
 | UI label (de) | Computation |
 |---|---|
 | Mitarbeiter:in | user |
-| Fachbereich | `specialist_field.name`, else "<unbekannt>" |
+| Fachbereich | `specialist_field.name`, else "<unbekannt>" (translated) |
 | Anstellungsverhältnis % | average of `employment_percentages()[user][month]` over the months of the period, weighted with the days of each month in the period; monthly values pro-rate partial-month employments by calendar days (`workbench/awt/reporting.py:employment_percentages`) |
 | Abwesenheitstage | Σ absence days in the period (see below) |
 | Stunden | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
