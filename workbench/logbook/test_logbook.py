@@ -30,6 +30,16 @@ class LogbookTest(TestCase):
         project = service.project
         self.client.force_login(project.owned_by)
 
+        # Tab goes from the hours to the description
+        response = self.client.get(
+            project.urls["createhours"],
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, 'name="modal-invoiced_hours"')
+        self.assertRegex(
+            response.content.decode(), r'<input[^>]*tabindex="-1"[^>]*invoiced_hours'
+        )
+
         def send(url=project.urls["createhours"], **kwargs):
             data = {
                 "modal-rendered_by": project.owned_by_id,
