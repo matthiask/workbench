@@ -139,7 +139,7 @@ One row per month (`key_data.py:gross_margin_by_month`); a month is **left out**
 | Column (DE) | Computation |
 |---|---|
 | Umsatz ("Gross profit") | Σ Invoice.total_excl_tax of invoiced invoices (SENT/PAID) with `invoiced_on` in the month. All types (incl. down payments, credits), all projects incl. internal and invoices without project. `key_data.py:gross_profit_by_month`. Modal lists these invoices. |
-| Fremdkosten | Negative: −(Σ LoggedCost.third_party_costs with `rendered_on` in the month, third_party_costs not null, `invoice_service` empty) − (Σ Invoice.third_party_costs of invoiced invoices with `invoiced_on` in the month, type ≠ down payment, third_party_costs ≠ 0). `key_data.py:third_party_costs_by_month`. Modal lists both. |
+| Fremdkosten | Negative. Per project, the deduction up to a month is max(Σ `Invoice.third_party_costs` of invoiced invoices except down payments with `invoiced_on` up to the month, Σ `LoggedCost.third_party_costs` with `rendered_on` up to the month), all time; each month gets the increase. Like squeeze, the larger of invoiced and logged costs counts, so costs on fixed amount invoices which can't be linked to logged costs don't count twice. Down payment invoices are left out because the final invoice contains their third party costs again. `key_data.py:third_party_costs_by_month`. The modal lists the logged costs and invoices of the month. |
 | Abgrenzungen (muted value) | Accruals at month end: stored `Accruals.accruals` whose `cutoff_date` falls in the month; for the current month computed live with cutoff today. Value = `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff)` (internal projects included). `key_data.py:accruals_by_month`, `reporting/models.py:AccrualsQuerySet.accruals` |
 | (delta column, unlabelled) | Accrual of this month − accrual of the previous existing record (any earlier month; the first record is compared to 0). Months without a record: delta 0. |
 | Umsatz bereinigt ("Gross margin") | Umsatz + Fremdkosten (negative) + accrual delta. |
@@ -881,12 +881,8 @@ Profitability:
 
 Financial overview and budgets:
 
-- *(checked)* Key data deducts both logged third party costs not linked to
-  an invoice and the third party costs entered on invoices
-  (`key_data.py:third_party_costs_by_month`). Logged costs can't be linked to
-  fixed amount invoices, so a cost entered on both counts twice; squeeze
-  takes the larger of the two instead. Down payment invoices are left out
-  here but not in squeeze and "Bank spielen".
+- Down payment invoices' third party costs are left out of key data (the
+  final invoice repeats them) but not out of squeeze and "Bank spielen".
 - "davon geplant" and the projected gross margin ignore the cutoff date;
   offers and budget transfers are never limited by it either.
 - "Rabatt" in the budget statistics counts offers which aren't declined,

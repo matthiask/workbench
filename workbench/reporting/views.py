@@ -127,11 +127,7 @@ def key_data_third_party_costs(request, date_range):
         {
             "date_range": date_range,
             "third_party_costs": LoggedCost.objects
-            .filter(
-                rendered_on__range=date_range,
-                third_party_costs__isnull=False,
-                invoice_service__isnull=True,
-            )
+            .filter(rendered_on__range=date_range, third_party_costs__isnull=False)
             .order_by("rendered_on", "id")
             .select_related("service"),
             "invoices": Invoice.objects

@@ -7,6 +7,12 @@
 {% endblock title %}
 
 {% block body %}
+  <p class="text-body-secondary">
+    {% blocktranslate trimmed %}
+      Per project, the larger of the third party costs on invoices and the logged third party costs is deducted, so the
+      same costs don't count twice. The month gets what has been added since the month before.
+    {% endblocktranslate %}
+  </p>
   {% if third_party_costs %}
     <table class="table table-sm table-hover mb-0 wb-compact-table">
       <thead>

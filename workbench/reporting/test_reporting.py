@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.test import RequestFactory, TestCase
 
 from workbench import factories
+from workbench.invoices.models import Invoice
 from workbench.projects.models import Project
 from workbench.reporting import key_data
 from workbench.reporting.labor_costs import labor_costs_by_cost_center
@@ -95,3 +96,41 @@ class ReportingTest(TestCase):
             Project.objects.filter(pk=project.pk)
         )["projects"]
         self.assertEqual(data["monthly"], {(2026, 1): 500, (2026, 3): 300})
+
+    def test_third_party_costs_by_month_are_deducted_once(self):
+        """A project's third party costs are deducted once: the larger of
+        those on invoices and the logged ones, like in squeeze"""
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(project=project)
+        factories.LoggedCostFactory.create(
+            service=service,
+            cost=600,
+            third_party_costs=600,
+            rendered_on=dt.date(2026, 3, 10),
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1000,
+            third_party_costs=600,
+            status=Invoice.SENT,
+            invoiced_on=dt.date(2026, 4, 1),
+            due_on=dt.date(2026, 4, 30),
+        )
+        factories.LoggedCostFactory.create(
+            service=service,
+            cost=100,
+            third_party_costs=100,
+            rendered_on=dt.date(2026, 5, 10),
+        )
+
+        costs = key_data.third_party_costs_by_month([
+            dt.date(2026, 1, 1),
+            dt.date(2026, 12, 31),
+        ])
+        self.assertEqual(
+            {month: total for month, total in costs.items() if total},
+            {(2026, 3): -600, (2026, 5): -100},
+        )

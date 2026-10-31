@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 05:30+0100\n"
+"POT-Creation-Date: 2026-10-31 05:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5028,6 +5028,10 @@ msgstr "Hochrechnung"
 #: workbench/templates/reporting/key_data.html
 msgid "Hours distribution"
 msgstr "Stundenverteilung"
+
+#: workbench/templates/reporting/key_data_third_party_costs.html
+msgid "Per project, the larger of the third party costs on invoices and the logged third party costs is deducted, so the same costs don't count twice. The month gets what has been added since the month before."
+msgstr "Pro Projekt wird der grössere Wert aus den Fremdkosten auf Rechnungen und den erfassten Fremdkosten abgezogen, damit dieselben Kosten nicht doppelt zählen. Der Monat erhält, was seit dem Vormonat dazugekommen ist."
 
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
