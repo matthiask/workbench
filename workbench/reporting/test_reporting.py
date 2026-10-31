@@ -4,6 +4,8 @@ from decimal import Decimal
 from django.test import RequestFactory, TestCase
 
 from workbench import factories
+from workbench.projects.models import Project
+from workbench.reporting import key_data
 from workbench.reporting.labor_costs import labor_costs_by_cost_center
 from workbench.reporting.models import Accruals
 from workbench.reporting.views import DateRangeAndTeamFilterForm
@@ -78,3 +80,18 @@ class ReportingTest(TestCase):
         form = DateRangeAndTeamFilterForm({"team": -user2.id}, request=req)
         self.assertTrue(form.is_valid())
         self.assertEqual(set(form.users()), {user2})
+
+    def test_projected_gross_margin_skips_empty_projections(self):
+        """Projections of zero don't keep the open amount from older ones"""
+        project = factories.ProjectFactory.create()
+        for month, gross_margin in [(1, 500), (2, 0), (3, 300)]:
+            factories.ProjectedInvoiceFactory.create(
+                project=project,
+                invoiced_on=dt.date(2026, month, 15),
+                gross_margin=gross_margin,
+            )
+
+        (data,) = key_data.projected_gross_margin(
+            Project.objects.filter(pk=project.pk)
+        )["projects"]
+        self.assertEqual(data["monthly"], {(2026, 1): 500, (2026, 3): 300})

@@ -156,13 +156,17 @@ def projected_gross_margin(projects=None):
         )
         delta = data["delta"]
         for pi in projected:
-            month = (pi.invoiced_on.year, pi.invoiced_on.month)
-            if (d := min(delta, pi.gross_margin)) > 0:
-                monthly[month] += d
-                monthly_overall[month] += d
-            else:
+            if delta <= 0:
                 break
-            delta -= pi.gross_margin
+            # Projections of zero or less (e.g. credits) are already part of
+            # the delta and have nothing to allocate
+            if pi.gross_margin <= 0:
+                continue
+            month = (pi.invoiced_on.year, pi.invoiced_on.month)
+            d = min(delta, pi.gross_margin)
+            monthly[month] += d
+            monthly_overall[month] += d
+            delta -= d
         data["monthly"] = dict(monthly)
         return data
 

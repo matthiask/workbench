@@ -99,7 +99,8 @@ not yet invoiced of a project (`workbench/reporting/key_data.py:projected_gross_
 is Σ projections − invoiced gross margin, if positive. It is put on the
 projections newest first, each at most its own amount, i.e. invoiced gross
 margin uses up the oldest projections first. Projections not invoiced in
-time stay in their original month.
+time stay in their original month. Projections of zero or less (e.g. credits)
+are part of the sum but get nothing allocated.
 
 ### Project budget statistics delta
 
@@ -896,8 +897,6 @@ Financial overview and budgets:
 - `accepted_offers_not_invoiced` in the cash data API includes budget
   retainer offers, "verkauft" in the budget statistics doesn't. The cash data
   API always reports the currency as "CHF".
-- A projection with a gross margin of 0 or less stops the allocation of the
-  projected gross margin not yet invoiced to older projections.
 - The deals funnel of the key data API is always as of today.
 - Totals of accepted deals add up per-person counts and shares: deals with
   several contributors count several times, deals without contributors are
