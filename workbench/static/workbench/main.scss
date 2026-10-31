@@ -1183,6 +1183,8 @@ a:hover {
 .wb-chart-key.wb-chart-key-bar {
   width: 0.7rem;
   height: 0.7rem;
+  // The line keys' border of .wb-chart-key doesn't belong on squares
+  border-top: 0;
   border-radius: 2px;
   background: var(--wb-series);
 }
