@@ -18,7 +18,10 @@
           <th class="text-end">{% translate 'Productivity costs' %}</th>
           <th class="text-end">{% translate 'third party costs'|capfirst %}</th>
           <th class="text-end">{% translate 'cost'|capfirst %}</th>
-          <th class="text-end" title="{% translate 'Hours times max(hourly rate, hourly labor cost)' %}">
+          <th
+            class="text-end"
+            title="{% translate 'The larger of invoiced hours times hourly rate and hours times hourly labor cost' %}"
+          >
             {% translate 'Revenue' %}
           </th>
           <th></th>

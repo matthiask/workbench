@@ -28,26 +28,24 @@ where %s
 group by p.id, hourly_labor_costs, green_hours_target, lh.rendered_by_id
 """
 
+# Logged work is worth its invoiced hours at the effort rate, but at least
+# what it cost
 REVENUE_SQL = """
-with sq as (
-    select
-        p.id,
-        greatest(
-            coalesce(hourly_labor_costs, 0),
-            coalesce(ps.effort_rate, 0)
-        ) as min_effort_rate,
-        sum(lh.hours) as hours
-    from logbook_loggedhours lh
-    left join projects_service ps on lh.service_id=ps.id
-    left join projects_project p on ps.project_id=p.id
-    left outer join lateral (select * from awt_employment) as costs on
-    lh.rendered_by_id=costs.user_id
-    and lh.rendered_on >= costs.date_from
-    and lh.rendered_on <= costs.date_until
-    where %s
-    group by p.id, min_effort_rate
-)
-select id, sum(min_effort_rate * hours) from sq group by id
+select
+    p.id,
+    sum(greatest(
+        coalesce(hourly_labor_costs, 0) * lh.hours,
+        coalesce(ps.effort_rate, 0) * coalesce(lh.invoiced_hours, lh.hours)
+    ))
+from logbook_loggedhours lh
+left join projects_service ps on lh.service_id=ps.id
+left join projects_project p on ps.project_id=p.id
+left outer join lateral (select * from awt_employment) as costs on
+lh.rendered_by_id=costs.user_id
+and lh.rendered_on >= costs.date_from
+and lh.rendered_on <= costs.date_until
+where %s
+group by p.id
 """
 
 USER_KEYS = [

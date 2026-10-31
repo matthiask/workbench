@@ -595,6 +595,7 @@ def labor_costs_view(request, form):
             "reporting/labor_costs_by_user.html",
             {
                 "stats": labor_costs.labor_costs_by_user(date_range, project=project),
+                "date_range": date_range,
             },
         )
     if cost_center := request.GET.get("cost_center"):
@@ -605,13 +606,17 @@ def labor_costs_view(request, form):
                 "stats": labor_costs.labor_costs_by_user(
                     date_range, cost_center=cost_center
                 ),
+                "date_range": date_range,
             },
         )
     if request.GET.get("users"):
         return render(
             request,
             "reporting/labor_costs_by_user.html",
-            {"stats": labor_costs.labor_costs_by_user(date_range)},
+            {
+                "stats": labor_costs.labor_costs_by_user(date_range),
+                "date_range": date_range,
+            },
         )
 
     return render(

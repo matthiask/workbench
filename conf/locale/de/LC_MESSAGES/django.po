@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 05:34+0100\n"
+"POT-Creation-Date: 2026-10-31 05:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5050,8 +5050,8 @@ msgid "Productivity costs"
 msgstr "Rentabilitätskosten"
 
 #: workbench/templates/reporting/labor_costs.html
-msgid "Hours times max(hourly rate, hourly labor cost)"
-msgstr "Stunden mal max(Stundensatz, Personalaufwand)"
+msgid "The larger of invoiced hours times hourly rate and hours times hourly labor cost"
+msgstr "Der grössere Wert aus verrechneten Stunden mal Stundensatz und Stunden mal Personalaufwand"
 
 #: workbench/templates/reporting/labor_costs.html
 msgid "Revenue"

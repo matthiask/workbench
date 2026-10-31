@@ -611,15 +611,14 @@ or both empty). Uses `hours`, not `invoiced_hours`. Raw SQL in
 | Rentabilitätskosten | Σ `hours × HLC × 100 / GHT` (labor cost grossed up for the share of productive "green" hours) |
 | Fremdkosten | Σ `LoggedCost.third_party_costs` (not NULL) with `rendered_on` in the period |
 | Kosten | `Rentabilitätskosten + Fremdkosten` (template `addf`) |
-| Ertrag (tooltip "Stunden mal max(Stundensatz, Personalaufwand)") | Σ `hours × max(COALESCE(HLC,0), COALESCE(service.effort_rate,0))` + Σ `LoggedCost.cost` with `rendered_on` in the period |
+| Ertrag | Σ per entry max(`hours × HLC`, `INVOICED_HOURS × service.effort_rate`) (missing values count as 0) + Σ `LoggedCost.cost` with `rendered_on` in the period |
 
 User modal ("Personalaufwand"): per user Stunden, Ohne Stundensatz, Nettopreis,
 Rentabilitätskosten for the selected project / cost center / everything, plus
 a Fremdkosten row and a total row.
 
-Caveats: none in code comments. Hours without HLC add to Stunden but not to
-costs; Ertrag values hours at the labor cost if that exceeds the effort rate
-(so work at 0.00/h still counts at cost).
+Caveats: hours without HLC add to Stunden but not to costs; Ertrag values
+work at least at its labor cost (so work at 0.00/h still counts at cost).
 
 Code: `workbench/reporting/labor_costs.py:_labor_costs_by_project_id`,
 `:labor_costs_by_cost_center`, `:labor_costs_by_user`;
@@ -873,8 +872,6 @@ and not checked a second time.
 Profitability:
 
 - The users' "Stunden" and "Ansatz" in squeeze include internal hours.
-- Labor costs value "Ertrag" with `hours`, not `INVOICED_HOURS`; the per user
-  modal shows no month in its title.
 - `specs/squeeze-gross-margin.md` is outdated in §1.1 (third party costs are
   now the larger of invoiced and logged) and §1.3 (0.00 rates are weighted
   with `BASE_HOURLY_RATE`).

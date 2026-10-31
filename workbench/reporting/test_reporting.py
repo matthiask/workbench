@@ -189,3 +189,30 @@ class ReportingTest(TestCase):
         (row,) = playing_bank(Project.objects.all())["projects"]
         self.assertEqual(row["invoiced"], 600)
         self.assertEqual(row["offered"], 500)
+
+    def test_labor_costs_revenue_and_title(self):
+        """The revenue values logged work with the invoiced hours, labor
+        costs with the time spent; the modals name the period"""
+        user = factories.EmploymentFactory.create(
+            date_from=dt.date(2020, 1, 1), hourly_labor_costs=100, green_hours_target=75
+        ).user
+        service = factories.ServiceFactory.create(effort_rate=150, effort_type="Any")
+        factories.LoggedHoursFactory.create(
+            service=service,
+            rendered_by=user,
+            rendered_on=dt.date(2026, 3, 10),
+            hours=1,
+            invoiced_hours=2,
+        )
+
+        lc = labor_costs_by_cost_center([dt.date(2026, 3, 1), dt.date(2026, 3, 31)])
+        (row,) = lc["cost_centers"][0]["projects"]
+        self.assertEqual(row["costs"], 100)
+        self.assertEqual(row["revenue"], 300)
+
+        self.client.force_login(user)
+        response = self.client.get(
+            "/report/labor-costs/?users=all&date_from=2026-03-01&date_until=2026-03-31",
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "March 2026")
