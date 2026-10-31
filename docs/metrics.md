@@ -665,7 +665,7 @@ Productivity in the sense of the `PRODUCTIVITY` feature ("Produktivität") is th
 | Figure (German label) | Computation |
 |---|---|
 | Soll-Arbeitstage bei 100% | `Year.<month>`, shown as is |
-| Gesetzliche Feiertage / Betriebsferien | `Σ fraction` of the WTM's holidays of that kind on weekdays (Mon–Fri) **within the employment period** (`holiday_days_by_month`). Not scaled by pct. |
+| Gesetzliche Feiertage / Betriebsferien | `Σ fraction` of the WTM's holidays of that kind on weekdays (Mon–Fri) **within the employment period** (`holiday_days_by_month`), at most one day per date (several holidays on the same day count once). Not scaled by pct. |
 | Pensum | `Σ 100 × pct × partial`. The total column is the 12-month average. |
 | Verfügbare Ferientage | `Σ vacation_weeks × 5 / 12 × pct × partial`. The total is replaced or adjusted by the override ("Manuell definierte Ferientage"). |
 | Sollstunden | `Σ (Year.month × partial − (public + company holiday days in the employment)) × pct × wtpd`. Holidays are not scaled by `partial` because they are already restricted to the employment. |
@@ -679,7 +679,7 @@ Productivity in the sense of the `PRODUCTIVITY` feature ("Produktivität") is th
 | Guthaben an Ferientagen | `remaining` after all vacation, if > 0. The display is rounded **up** to 0.01. |
 | Bilanz | `Σ monthly balances + wtpd × vacation days credit`. "balance_days" = `Bilanz / wtpd`, rounded up to 0.01. |
 
-Overall tiles at the top (sums over all users shown): Verfügbare Ferientage, Bezogene Ferientage (korrigiert) = `Σ absence_vacation − Σ vacation_days_correction` (see [Known inconsistencies](#known-inconsistencies) for the sign), Krankheitstage, plus "Geschätzte X Tage pro 100% und Jahr" = `Σ sickness days / (Σ working time / 250 / 8)` (hard-coded 250 days × 8 h), Bezahlter Urlaub, Schulbesuch, Arbeitszeit-Korrektur, Stundensaldo, Guthaben an Ferientagen and Bilanz.
+Overall tiles at the top (sums over all users shown): Verfügbare Ferientage, Bezogene Ferientage (korrigiert) = `Σ absence_vacation + Σ vacation_days_correction` (the correction is zero or negative), Krankheitstage, plus "Geschätzte X Tage pro 100% und Jahr" = `Σ sickness days / (Σ working time / 250 / 8)` (hard-coded 250 days × 8 h), Bezahlter Urlaub, Schulbesuch, Arbeitszeit-Korrektur, Stundensaldo, Guthaben an Ferientagen and Bilanz.
 
 Vacation planning warning ("Ferienplanung!", `vacation_planning_warnings`, only for active users). It fires if `Σ planned vacation days / available days < 0.5` ("Weniger als die Hälfte…"), or if no vacation absence lasts at least 14 calendar days (`ends_on − starts_on ≥ 13`). The second check is only made if vacation entitlement exists in more than 6 months.
 
@@ -919,11 +919,6 @@ Time and people:
   Monday of a week (`date_from <= week < date_until`): an employment
   starting after Monday gives no capacity that week, one ending during the
   week gives the full week.
-- "Bezogene Ferientage (korrigiert)" in the annual working time subtracts a
-  correction which is zero or negative, i.e. adds excess vacation.
-- The monthly annual working time doesn't cap holidays at one per day (a
-  public and a company holiday on the same day count twice), the weekly view
-  does.
 - Green hours count projects without budgeted services as profitable, and
   budgets include offers which aren't accepted yet.
 - "Erwartet" in the user statistics ignores holidays and absences.

@@ -933,3 +933,40 @@ class AWTTest(TestCase):
         self.assertEqual(response.status_code, 202)
         absence.refresh_from_db()
         self.assertTrue(absence.needs_confirmation)
+
+    def test_vacation_days_taken_corrected(self):
+        """Vacation beyond the available days doesn't count as taken"""
+        year = factories.YearFactory.create(year=2018)
+        user = factories.UserFactory.create(working_time_model=year.working_time_model)
+        Employment.objects.create(
+            user=user, date_from=dt.date(2018, 1, 1), percentage=100, vacation_weeks=5
+        )
+        user.absences.create(starts_on=dt.date(2018, 4, 2), days=30, reason="vacation")
+
+        data = annual_working_time(2018, users=[user])
+        self.assertAlmostEqual(
+            data["statistics"][0]["totals"]["vacation_days_correction"], -5
+        )
+        self.assertAlmostEqual(data["overall"]["absence_vacation"], 25)
+
+    def test_holidays_on_the_same_day(self):
+        """A public and a company holiday on the same day count once"""
+        year = factories.YearFactory.create(year=2018)
+        user = factories.UserFactory.create(working_time_model=year.working_time_model)
+        Employment.objects.create(
+            user=user, date_from=dt.date(2018, 1, 1), percentage=100, vacation_weeks=5
+        )
+        for kind in [Holiday.Kind.PUBLIC, Holiday.Kind.COMPANY]:
+            Holiday.objects.create(
+                working_time_model=year.working_time_model,
+                date=dt.date(2018, 1, 2),
+                name=kind,
+                fraction=Decimal(1),
+                kind=kind,
+            )
+
+        awt = annual_working_time(2018, users=[user])["statistics"][0]
+        self.assertAlmostEqual(
+            awt["totals"]["holiday_public"] + awt["totals"]["holiday_company"], 1
+        )
+        self.assertAlmostEqual(awt["totals"]["target"], (360 - 1) * 8)

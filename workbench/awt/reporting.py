@@ -142,10 +142,14 @@ def holiday_days_by_month(holidays, date_from, date_until):
     they neither reduce the target time nor show up in the report.
     """
     result = {Holiday.Kind.PUBLIC: [Z1] * 12, Holiday.Kind.COMPANY: [Z1] * 12}
+    # A day is free at most once, even with several holidays on the same date
+    per_day = defaultdict(lambda: Z1)
     for h in holidays:
         if h.date.weekday() >= 5 or not (date_from <= h.date <= date_until):
             continue
-        result[h.kind][h.date.month - 1] += h.fraction
+        fraction = min(h.fraction, 1 - per_day[h.date])
+        per_day[h.date] += fraction
+        result[h.kind][h.date.month - 1] += fraction
     return result
 
 
@@ -411,7 +415,8 @@ def annual_working_time(year, *, users):  # noqa: C901
             "working_time",
         ]
     }
-    overall["absence_vacation"] -= overall["vacation_days_correction"]
+    # The correction is zero or negative
+    overall["absence_vacation"] += overall["vacation_days_correction"]
     overall["sickness_by_fte"] = (
         overall["absence_sickness"] / (overall["working_time"] / 250 / 8)
         if overall["working_time"]
