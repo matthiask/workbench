@@ -20,7 +20,6 @@ from workbench.awt.models import Absence
 from workbench.awt.reporting import employment_percentages
 from workbench.awt.utils import monthly_days
 from workbench.invoices.models import Invoice, ProjectedInvoice
-from workbench.invoices.utils import recurring
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import (
@@ -389,13 +388,15 @@ def squeeze_data(date_range):  # noqa: C901
     all_users = sorted(users.keys())
     ep = employment_percentages()
 
+    # Monthly percentages weighted with the days of the month in the period
+    period_months = list(monthly_days(*date_range))
+    period_days = sum(days for month, days in period_months)
+
     def average_percentage(user):
-        percentages = []
-        for month in recurring(date_range[0], "monthly"):
-            if month > date_range[1]:
-                break
-            percentages.append(ep[user].get(month, Z0))
-        return sum(percentages, Z0) / len(percentages)
+        return (
+            sum((ep[user].get(month, Z0) * days for month, days in period_months), Z0)
+            / period_days
+        )
 
     hpt = hours_per_type(date_range, users=users.keys())
     hptu = {row["user"]: row for row in hpt["users"]}
@@ -405,7 +406,7 @@ def squeeze_data(date_range):  # noqa: C901
         user_internal_types[m2m.user_id][m2m.internal_type] = m2m
     types = list(InternalType.objects.all())
 
-    absence_days_per_user = defaultdict(lambda: Decimal(1))
+    absence_days_per_user = defaultdict(lambda: Z0)
     for absence in Absence.objects.filter(
         Q(ends_on__isnull=True, starts_on__range=date_range)
         | (
@@ -424,13 +425,15 @@ def squeeze_data(date_range):  # noqa: C901
             days__gt=0,
         ),
     ).select_related("user"):
-        months = list(
-            monthly_days(absence.starts_on, absence.ends_on or absence.starts_on)
+        # Spread the absence's days over its calendar days, count those in
+        # the period
+        ends_on = absence.ends_on or absence.starts_on
+        overlap = (
+            min(ends_on, date_range[1]) - max(absence.starts_on, date_range[0])
+        ).days + 1
+        absence_days_per_user[absence.user] += (
+            absence.days * overlap / ((ends_on - absence.starts_on).days + 1)
         )
-        absence_day_per_period_day = absence.days / sum(m[1] for m in months)
-        for month, days in months:
-            if date_range[0] <= month <= date_range[1]:
-                absence_days_per_user[absence.user] += days * absence_day_per_period_day
 
     # Build user dicts
     user_list = []

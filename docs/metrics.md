@@ -474,8 +474,8 @@ Everyone who logged hours in the period (also only on internal projects).
 |---|---|
 | Mitarbeiter:in | user |
 | Fachbereich | `specialist_field.name`, else "<unbekannt>" |
-| Anstellungsverhältnis % | average of `employment_percentages()[user][month]` over the months yielded by `recurring(date_from, "monthly")` up to `date_until`; monthly values pro-rate partial-month employments by calendar days (`workbench/awt/reporting.py:employment_percentages`) |
-| Abwesenheitstage | `1 +` Σ absence days in the period (see below; the start value is 1, see [Known inconsistencies](#known-inconsistencies)) |
+| Anstellungsverhältnis % | average of `employment_percentages()[user][month]` over the months of the period, weighted with the days of each month in the period; monthly values pro-rate partial-month employments by calendar days (`workbench/awt/reporting.py:employment_percentages`) |
+| Abwesenheitstage | Σ absence days in the period (see below) |
 | Stunden | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
 | Ansatz | `gross_margin / hours_in_range` (so internal hours dilute it) |
 | Umsatz bereinigt | Σ the person's attributed period margins over all projects; links to the per-project modal |
@@ -490,8 +490,7 @@ Everyone who logged hours in the period (also only on internal projects).
 Absence days: absences overlapping the period (or without `ends_on` starting in
 it) with reason vacation, paid, school, or correction with `days > 0`
 (sickness and other are **not** deducted). Each absence's `days` is spread
-evenly over its calendar days (`monthly_days`), and the days of every month
-whose **first day** lies within the period are counted.
+evenly over its calendar days, and those within the period are counted.
 
 API/XLSX only: `invoiced_per_external_hour = gross_margin / hours_in_range /
 (1 − internal_hours / total_hours)` (≈ gross margin per external hour), 0
@@ -872,14 +871,6 @@ and not checked a second time.
 
 Profitability:
 
-- *(checked)* Squeeze starts every person's absence days at 1
-  (`squeeze.py:squeeze_data`, `defaultdict(lambda: Decimal(1))`), so the
-  expected gross margin is always one working day too low.
-- *(checked)* Squeeze looks up employment percentages per month starting at
-  the first day of the period (`recurring(date_from, "monthly")`). For a
-  period starting in the middle of a month no month matches, the employment
-  percentage becomes 0 and so does the expected gross margin. Absence days
-  are also only counted for months whose first day is within the period.
 - The users' "Stunden" and "Ansatz" in squeeze include internal hours.
 - Labor costs value "Ertrag" with `hours`, not `INVOICED_HOURS`; the per user
   modal shows no month in its title.

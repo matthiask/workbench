@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.test import TestCase
 from django.utils.translation import deactivate_all
 
@@ -133,3 +135,34 @@ class SqueezeTest(TestCase):
         cost.third_party_costs = 800
         cost.save()
         self.assertEqual(project_gross_margin(project)["invoiced"], 200)
+
+    def test_expected_gross_margin_of_partial_months(self):
+        """Periods may start in the middle of a month: The employment counts
+        with its percentage and absences only with their days in the period"""
+        user = factories.UserFactory.create()
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2020, 1, 1), percentage=80
+        )
+        # Three days, two of them in the period
+        factories.AbsenceFactory.create(
+            user=user,
+            starts_on=dt.date(2026, 10, 14),
+            ends_on=dt.date(2026, 10, 16),
+            days=3,
+        )
+        factories.AbsenceFactory.create(
+            user=user, starts_on=dt.date(2026, 11, 2), ends_on=None, days=1
+        )
+        factories.LoggedHoursFactory.create(
+            rendered_by=user, rendered_on=dt.date(2026, 10, 20)
+        )
+
+        data = squeeze_data((dt.date(2026, 10, 15), dt.date(2026, 11, 14)))
+        (row,) = data["users"]
+        self.assertAlmostEqual(row["employment_percentage"], 80)
+        self.assertAlmostEqual(row["absence_days"], 3)
+
+        # No absences, no absence days
+        data = squeeze_data((dt.date(2026, 10, 18), dt.date(2026, 10, 31)))
+        (row,) = data["users"]
+        self.assertAlmostEqual(row["absence_days"], 0)
