@@ -307,3 +307,33 @@ $z-index: (
     rgba(255, 255, 255, 0.35) 8px
   );
 }
+
+// Small screens: The calendar scrolls within its card instead of widening
+// the page, the names stay sticky on the left but the scale doesn't on top
+@media (max-width: 767.98px) {
+  .absences-wrapper {
+    --name-column-width: 7rem;
+
+    width: auto;
+    overflow-x: auto;
+  }
+
+  .absences__scale {
+    top: 0;
+  }
+
+  // Cover the padding of the wrapper left of the sticky names
+  .absences__person {
+    left: -1rem;
+    box-shadow: -1rem 0 0 $white;
+  }
+
+  [data-bs-theme="dark"] .absences__person {
+    box-shadow: -1rem 0 0 #1a1a1a;
+  }
+
+  .absences-legend {
+    max-width: none;
+    margin-left: 0;
+  }
+}

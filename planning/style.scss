@@ -477,3 +477,25 @@ body.planning-dragging {
   margin: 0;
   box-shadow: var(--wb-shadow);
 }
+
+// Small screens: The grid scrolls within its card instead of widening the
+// page, the titles stay sticky on the left but the header doesn't on top
+@media (max-width: 767.98px) {
+  .planning-wrapper {
+    --title-column-width: 12rem;
+
+    width: auto;
+    overflow-x: auto;
+  }
+
+  .planning--sticky-header {
+    top: 0;
+  }
+
+  // Cover the padding of the wrapper left of the sticky titles
+  .planning--row-label,
+  .planning--title {
+    left: -1rem;
+    box-shadow: -1rem 0 0 var(--wb-surface);
+  }
+}
