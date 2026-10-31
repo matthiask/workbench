@@ -119,8 +119,9 @@ def effort_cost_by_project(logged_hours):
 
 
 def accepted_offers_by_project(projects):
-    """The total excl. tax and the third party costs of the accepted offers
-    per project as ``{project_id: {"total": ..., "third_party_costs": ...}}``
+    """The total excl. tax, the discount and the third party costs of the
+    accepted offers per project as ``{project_id: {"total": ...,
+    "discount": ..., "third_party_costs": ...}}``
 
     Budget retainer offers hold the budget of services which are added later
     without offers of their own. If a project has both, the larger of the
@@ -132,18 +133,19 @@ def accepted_offers_by_project(projects):
     from workbench.projects.models import Service
 
     def side():
-        return {"total": Z2, "third_party_costs": Z2}
+        return {"total": Z2, "discount": Z2, "third_party_costs": Z2}
 
     sides = defaultdict(lambda: {True: side(), False: side()})
     offers = Offer.objects.accepted().filter(project__in=projects)
-    for project, retainer, total in (
+    for project, retainer, total, discount in (
         offers
         .order_by()
         .values("project", "is_budget_retainer")
-        .annotate(s=Sum("total_excl_tax"))
-        .values_list("project", "is_budget_retainer", "s")
+        .annotate(s=Sum("total_excl_tax"), d=Sum("discount"))
+        .values_list("project", "is_budget_retainer", "s", "d")
     ):
         sides[project][retainer]["total"] += total
+        sides[project][retainer]["discount"] += discount
     for project, retainer, costs in (
         Service.objects
         .filter(offer__in=offers, third_party_costs__isnull=False)

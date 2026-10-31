@@ -37,9 +37,12 @@ class UtilsTest(TestCase):
 
         project = factories.ProjectFactory.create()
 
-        def offer(total, *, retainer, third_party_costs=None):
+        def offer(total, *, retainer, third_party_costs=None, status=Offer.ACCEPTED):
             offer = factories.OfferFactory.create(
-                project=project, status=Offer.ACCEPTED, is_budget_retainer=retainer
+                project=project,
+                status=status,
+                is_budget_retainer=retainer,
+                discount=10,
             )
             factories.ServiceFactory.create(
                 project=project,
@@ -57,22 +60,25 @@ class UtilsTest(TestCase):
 
         self.assertEqual(
             accepted_offers_by_project([project.id])[project.id],
-            {"total": 1000, "third_party_costs": 100},
+            {"total": 990, "discount": 10, "third_party_costs": 100},
         )
         self.assertEqual(
-            gross_margin_components([project.id])[project.id]["offered"], 900
+            gross_margin_components([project.id])[project.id]["offered"], 890
         )
+        # Offers which aren't accepted yet don't count, also not their discount
+        offer(5000, retainer=False, status=Offer.OFFERED)
         [row] = project_budget_statistics([project])["statistics"]
-        self.assertEqual(row["sold"], 1000)
+        self.assertEqual(row["sold"], 990)
+        self.assertEqual(row["discount"], -10)
 
         # Other accepted offers add up to more than the retainer
         offer(800, retainer=False)
         self.assertEqual(
             accepted_offers_by_project([project.id])[project.id],
-            {"total": 1100, "third_party_costs": 50},
+            {"total": 1080, "discount": 20, "third_party_costs": 50},
         )
         regular.delete()
         self.assertEqual(
-            accepted_offers_by_project([project.id])[project.id]["total"], 1000
+            accepted_offers_by_project([project.id])[project.id]["total"], 990
         )
         self.assertEqual(accepted_offers_by_project([])[project.id]["total"], 0)

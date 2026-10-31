@@ -7,7 +7,6 @@ from django.utils import timezone
 
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
-from workbench.offers.models import Offer
 from workbench.projects.models import BudgetTransfer, Service
 from workbench.reporting.squeeze import gross_margin_components
 from workbench.reporting.utils import (
@@ -46,13 +45,6 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     )
 
     accepted = accepted_offers_by_project(projects)
-    discount_per_project = sum_by(
-        Offer.objects.not_declined().filter(
-            project__in=projects, is_budget_retainer=False
-        ),
-        key="project",
-        field="discount",
-    )
     invoiced_per_project = sum_by(
         Invoice.objects.invoiced().filter(
             project__in=projects, invoiced_on__lte=cutoff_date
@@ -96,7 +88,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
             ],
             "third_party_costs": third_party_costs_per_project[project.id],
             "sold": accepted[project.id]["total"] + budget_adjustments[project.id],
-            "discount": Z2 - discount_per_project[project.id],
+            "discount": Z2 - accepted[project.id]["discount"],
             "invoiced": invoiced_per_project[project.id],
             "hours": effort[project.id]["hours"],
             "service_hours": service_hours[project.id],

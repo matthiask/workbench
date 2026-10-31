@@ -66,7 +66,7 @@ Contents:
   zurück") are only used for budgeting; their services don't count as budget,
   the actual services are created later, usually without offers of their own.
 - **Accepted offers per project** (`accepted_offers_by_project()` in
-  `workbench/reporting/utils.py`): Σ `total_excl_tax` and Σ
+  `workbench/reporting/utils.py`): Σ `total_excl_tax`, Σ `discount` and Σ
   `Service.third_party_costs` of either the accepted budget retainer offers or
   the other accepted offers, whichever total is larger. Never both: released
   work could be counted twice, undercounting is better. Used by "verkauft",
@@ -300,7 +300,7 @@ Sorting: web by delta ascending; API by delta descending.
 | Label (DE) | Key | Formula |
 |---|---|---|
 | verkauft (tooltip "Offeriert und akzeptiert") | `sold` | total of the accepted offers per project (`accepted_offers_by_project()`: the accepted budget retainer offers or the other accepted offers, whichever is larger; discount already deducted; optional services not in total) **+ net budget transfers** (`BudgetTransfer.objects.adjustments`). No cutoff date filter on offers or transfers. |
-| Rabatt (report only) | `discount` | −Σ `Offer.discount` of offers **not declined** (incl. in preparation/offered) and not budget retainers. Shown as a negative number. No cutoff. |
+| Rabatt (report only) | `discount` | −Σ `Offer.discount` of the same accepted offers as "verkauft" (`accepted_offers_by_project()`). Shown as a negative number. No cutoff. |
 | Logbuch | `logbook` | `cost` + `effort_cost` (see building blocks), entries with `rendered_on <= cutoff`. |
 | (hidden in table, API/XLSX) | `cost` | Σ `LoggedCost.cost`, `rendered_on <= cutoff` |
 | (hidden, API) | `effort_cost` | Σ `effort_rate × INVOICED_HOURS`, `rendered_on <= cutoff`, rate NULL skipped |
@@ -906,11 +906,6 @@ describe the current behaviour, including these. Remove an entry when it is
 fixed or decided to be intended. Entries marked *(checked)* were confirmed
 against the code or the database; the others were found by reading the code
 and not checked a second time.
-
-Financial overview and budgets:
-
-- "Rabatt" in the budget statistics counts offers which aren't declined,
-  "verkauft" only accepted ones.
 
 Time and people:
 
