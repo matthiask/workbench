@@ -144,6 +144,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `workbench/planning/api.py`), and absences have no reason.
 - Offered amounts and offered hours only count for open projects; for closed
   projects the invoiced amount and the logged hours are ground truth.
+- `docs/metrics.md` documents how every report and key figure is computed.
+  Update it in the same commit when you change a computation, and remove
+  entries from its "Known inconsistencies" when you fix them.
 - `project_gross_margin(project)` in `workbench/reporting/squeeze.py` computes single-project profitability (gross margin, rate, offered/projected/invoiced breakdown). Use this instead of duplicating squeeze logic.
 - Profitability estimates (rates, gross margins) should rather underestimate
   than overestimate. When in doubt, count hours and leave out money.
