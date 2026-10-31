@@ -38,9 +38,12 @@ function initDarkMode() {
   }
 
   const updateThemeButton = (mode) => {
-    const button = _sel("[data-theme-toggle]")
-    if (!button) return
+    for (const button of document.querySelectorAll("[data-theme-toggle]")) {
+      updateThemeIcon(button, mode)
+    }
+  }
 
+  const updateThemeIcon = (button, mode) => {
     const icon = button.querySelector("svg")
     if (!icon) return
 

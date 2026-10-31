@@ -1,0 +1,14 @@
+{% load i18n workbench %}{% with user_hours=request.user.hours %}
+  <a
+    class="nav-link hours-rings"
+    href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}"
+    title="{% translate 'today' %}: {{ user_hours.today|hours }}{% if user_hours.today_target %} / {{ user_hours.today_target|hours }}{% endif %}, {% translate 'this week' %}: {{ user_hours.week|hours }}{% if user_hours.week_target %} / {{ user_hours.week_target|hours }}{% endif %}"
+  >
+    {% if show_today %}
+      {% hours_ring user_hours.today user_hours.today_target "today" %}
+      {{ user_hours.today|hours }}
+    {% endif %}
+    {% hours_ring user_hours.week user_hours.week_target "week" %}
+    {{ user_hours.week|hours }}
+  </a>
+{% endwith %}

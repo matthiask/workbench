@@ -157,6 +157,28 @@ a > small:first-child {
     letter-spacing: -0.01em;
   }
 
+  // Hours and theme stay visible next to the toggler on small screens
+  .wb-navbar-quick {
+    gap: 0.25rem;
+    margin-right: 0.5rem;
+
+    .nav-link {
+      padding-block: 0.5rem;
+    }
+  }
+
+  // Center the icons themselves, not their baselines
+  .hours-rings,
+  [data-theme-toggle] {
+    display: flex;
+    gap: 0.3em;
+    align-items: center;
+  }
+
+  .hours-ring {
+    vertical-align: 0;
+  }
+
   .nav-link {
     border-radius: var(--bs-border-radius-sm);
     padding-inline: 0.6rem !important;
