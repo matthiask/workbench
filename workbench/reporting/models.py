@@ -15,7 +15,7 @@ class AccrualsQuerySet(models.QuerySet):
             project_budget_statistics,
         )
 
-        projects = Project.objects.open(on=cutoff_date)
+        projects = Project.objects.open(on=cutoff_date).external()
         statistics = project_budget_statistics(projects, cutoff_date=cutoff_date)
         return statistics["overall"]["delta_negative"]
 

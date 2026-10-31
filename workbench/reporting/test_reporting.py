@@ -19,6 +19,22 @@ class ReportingTest(TestCase):
         self.assertEqual(obj.accruals, Decimal("0.00"))
         self.assertEqual(str(obj), obj.cutoff_date.strftime("%d.%m.%Y"))
 
+    def test_accruals_leave_out_internal_projects(self):
+        """Accruals are based on projects and leave out internal ones, like
+        the cash data API"""
+        for type in [Project.ORDER, Project.INTERNAL]:
+            project = factories.ProjectFactory.create(type=type)
+            factories.InvoiceFactory.create(
+                project=project,
+                customer=project.customer,
+                contact=project.contact,
+                type=Invoice.FIXED,
+                subtotal=100,
+                status=Invoice.SENT,
+                due_on=dt.date.today(),
+            )
+        self.assertEqual(Accruals.objects.accruals(dt.date.today()), -100)
+
     def test_labor_costs(self):
         """The labor costs report does a few things"""
         user1 = factories.EmploymentFactory.create().user

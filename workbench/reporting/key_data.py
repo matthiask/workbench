@@ -73,17 +73,18 @@ def third_party_costs_by_month(date_range):
 
 
 def accruals_by_month(date_range):
-    accruals = {(0, 0): {"accrual": Z2, "delta": None}}
+    accruals = {}
     for accrual in Accruals.objects.order_by("cutoff_date"):
         accruals[(accrual.cutoff_date.year, accrual.cutoff_date.month)] = {
             "accrual": accrual.accruals,
-            "delta": None,
+            # The first accruals aren't a change
+            "delta": Z2,
         }
 
     today = dt.date.today()
     accruals[(today.year, today.month)] = {
         "accrual": Accruals.objects.accruals(cutoff_date=today),
-        "delta": None,
+        "delta": Z2,
     }
 
     dates = sorted(accruals)
@@ -93,8 +94,7 @@ def accruals_by_month(date_range):
     return {
         month: accrual
         for month, accrual in accruals.items()
-        if month != (0, 0)
-        and date_range[0] <= dt.date(month[0], month[1], 1) <= date_range[1]
+        if date_range[0] <= dt.date(month[0], month[1], 1) <= date_range[1]
     }
 
 

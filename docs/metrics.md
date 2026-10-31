@@ -140,8 +140,8 @@ One row per month (`key_data.py:gross_margin_by_month`); a month is **left out**
 |---|---|
 | Umsatz ("Gross profit") | Σ Invoice.total_excl_tax of invoiced invoices (SENT/PAID) with `invoiced_on` in the month. All types (incl. down payments, credits), all projects incl. internal and invoices without project. `key_data.py:gross_profit_by_month`. Modal lists these invoices. |
 | Fremdkosten | Negative. Per project, the deduction up to a month is max(Σ `Invoice.third_party_costs` of invoiced invoices except down payments with `invoiced_on` up to the month, Σ `LoggedCost.third_party_costs` with `rendered_on` up to the month), all time; each month gets the increase. Like squeeze, the larger of invoiced and logged costs counts, so costs on fixed amount invoices which can't be linked to logged costs don't count twice. Down payment invoices are left out because the final invoice contains their third party costs again. `key_data.py:third_party_costs_by_month`. The modal lists the logged costs and invoices of the month. |
-| Abgrenzungen (muted value) | Accruals at month end: stored `Accruals.accruals` whose `cutoff_date` falls in the month; for the current month computed live with cutoff today. Value = `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff)` (internal projects included). `key_data.py:accruals_by_month`, `reporting/models.py:AccrualsQuerySet.accruals` |
-| (delta column, unlabelled) | Accrual of this month − accrual of the previous existing record (any earlier month; the first record is compared to 0). Months without a record: delta 0. |
+| Abgrenzungen (muted value) | Accruals at month end: stored `Accruals.accruals` whose `cutoff_date` falls in the month; for the current month computed live with cutoff today. Value = `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff).external()`. `key_data.py:accruals_by_month`, `reporting/models.py:AccrualsQuerySet.accruals` |
+| (delta column, unlabelled) | Accrual of this month − accrual of the previous existing record (any earlier month; the first record has no change). Months without a record: delta 0. |
 | Umsatz bereinigt ("Gross margin") | Umsatz + Fremdkosten (negative) + accrual delta. |
 | Geplant ("Projected", links to projected gross margin report) | `projected_gross_margin()["monthly_overall"]` for the month: projected gross margin not yet invoiced of all open projects (internal not excluded). Only shown if non-zero. |
 | FTE | Σ over all `Employment` rows of percentage/100 × (employment days in month / days in month). `workbench/awt/reporting.py:full_time_equivalents_by_month` |
@@ -186,7 +186,7 @@ Answers: the key figures of one month for integrations.
 | `previous_months[3]` | For each of the 3 preceding months: `green_hours_percentage`, `canceled_invoices_total_excl_tax`. |
 | `open_invoices_total_excl_tax` | Σ total_excl_tax of invoices outstanding on the last day of the month (current status: later canceled ones excluded). |
 | `canceled_invoices_total_excl_tax` | Σ total_excl_tax of invoices with status `CANCELED` and `closed_on` in the month. |
-| `accruals` | Stored `Accruals` with `cutoff_date` = last day of month, else computed live (`delta_negative`, internal projects included, with today's data). |
+| `accruals` | Stored `Accruals` with `cutoff_date` = last day of month, else computed live (`delta_negative` of external projects, with today's data). |
 | `full_time_equivalents` | FTE of the month (see above). |
 | `squeeze_gross_margin` | `squeeze_data(month)["totals"]["gross_margin"]` (see squeeze documentation). |
 | `deals_funnel` | Open deals as of **today** (not the requested month), Σ Deal.value: `high_probability_next_4_weeks` (HIGH, decision_expected_on − today ≤ 28 days, overdue included), `_next_12_weeks` (≤ 84 days), `_later` (later or no date), `normal_probability` (NORMAL). LOW/UNKNOWN left out. `key_data_api.py:deals_funnel`, `templatetags/workbench.py:deal_group` |
@@ -324,7 +324,7 @@ The two "davon" figures don't overlap: planned invoicing comes first because it 
 - Budget transfers: "Budget which was invoiced on one project but is worked off on another (or reserved for that) belongs to the project which does the work." Only money moves; hours stay where they were logged.
 - Figures use the logbook value at effort rates, i.e. revenue-like, not cost/gross margin; third party costs are neither deducted from `logbook` nor from `invoiced`.
 
-**Accruals snapshots** (`workbench/reporting/models.py:AccrualsQuerySet.accruals`): `delta_negative` of `Project.objects.open(on=cutoff)` (internal projects **included**) on each month end; `create_accruals_for_last_month()` (fairy tasks) recomputes the last ~24 month ends.
+**Accruals snapshots** (`workbench/reporting/models.py:AccrualsQuerySet.accruals`): `delta_negative` of `Project.objects.open(on=cutoff).external()` on each month end; `create_accruals_for_last_month()` (fairy tasks) recomputes the last ~24 month ends.
 
 **Campaign page** (`Campaign.statistics`): same function over all projects of the campaign (open and closed, internal included, cutoff today), plus `gross_margin_per_hour` = Σ invoiced gross margin (`gross_margin_components`) / Σ `hours`.
 
@@ -887,9 +887,6 @@ Financial overview and budgets:
   offers and budget transfers are never limited by it either.
 - "Rabatt" in the budget statistics counts offers which aren't declined,
   "verkauft" only accepted ones.
-- Accruals stored for key data include internal projects, the cash data API
-  leaves them out, so the same date can give two values. The first stored
-  accruals record counts entirely as the change of its month.
 - `accepted_offers_not_invoiced` in the cash data API includes budget
   retainer offers, "verkauft" in the budget statistics doesn't.
 - The deals funnel of the key data API is always as of today.
