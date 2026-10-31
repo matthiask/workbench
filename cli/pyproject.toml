@@ -6,7 +6,7 @@ requires = [
 
 [project]
 name = "workbench-cli"
-version = "0.15.0"
+version = "0.15.1"
 description = "Workbench CLI"
 readme = "README.md"
 authors = [

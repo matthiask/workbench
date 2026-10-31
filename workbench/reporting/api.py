@@ -624,6 +624,7 @@ def logging_api(request, filters: Query[DateRangeFilter]):
 
 class SqueezeContribution(Schema):
     hours: Hours
+    invoiced_hours: Hours
     gross_margin: Amount
     rate: Amount
     hours_rate_unknown: Hours
@@ -651,6 +652,7 @@ class SqueezeFigures(Schema):
 class SqueezeUser(SqueezeFigures):
     user: str
     specialist_field: str | None
+    invoiced_hours_in_range: Hours
     profitable_percentage: Percentage
     expected_hourly_rate: Amount
     hours_rate_unknown: Hours
@@ -668,6 +670,7 @@ class SqueezeProject(Schema):
     hours: Hours
     rate: Amount
     hours_in_range: Hours
+    invoiced_hours_in_range: Hours
     gross_margin_in_range: Amount
     hours_rate_unknown: Hours
     users: dict[str, SqueezeContribution]
@@ -706,8 +709,8 @@ class Squeeze(Period):
 )
 def squeeze_api(request, filters: Query[DateRangeFilter]):
     """Gross margin per user and project, the last month by default. Projects'
-    gross margins are split between users by hours weighted with the hourly
-    rate. Invoices of a period may be incomplete until the 9th of the
+    gross margins are split between users by the value of their work (invoiced
+    hours times the hourly rate), rates use the hours spent. Invoices of a period may be incomplete until the 9th of the
     following month."""
     period = date_range(filters, default=last_month_range())
     data = squeeze.squeeze_data(period)

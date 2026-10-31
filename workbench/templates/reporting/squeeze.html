@@ -46,6 +46,7 @@
                     <tr>
                       <th>{% translate 'User' %}</th>
                       <th class="text-end">{% translate 'Hours' %}</th>
+                      <th class="text-end">{% translate 'Invoiced hours' %}</th>
                       <th class="text-end">{% translate 'Without rate' %}</th>
                       <th class="text-end">{% translate 'Gross margin' %}</th>
                       <th class="text-end">{% translate 'Rate' %}</th>
@@ -56,6 +57,7 @@
                       <tr>
                         <td>{{ user }}</td>
                         <td class="text-end">{{ contrib.hours|hours }}</td>
+                        <td class="text-end">{{ contrib.invoiced_hours|hours }}</td>
                         <td class="text-end">
                           {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
                         </td>
@@ -70,6 +72,7 @@
                     <tr class="wb-total-row">
                       <th>{% translate 'Total' %}</th>
                       <th class="text-end">{{ p.hours_in_range|hours }}</th>
+                      <th class="text-end">{{ p.invoiced_hours_in_range|hours }}</th>
                       <th class="text-end">
                         {% if p.hours_rate_unknown %}{{ p.hours_rate_unknown|hours }}{% endif %}
                       </th>
@@ -193,6 +196,7 @@
                     <tr>
                       <th>{% translate 'Project' %}</th>
                       <th class="text-end">{% translate 'Hours' %}</th>
+                      <th class="text-end">{% translate 'Invoiced hours' %}</th>
                       <th class="text-end">{% translate 'Without rate' %}</th>
                       <th class="text-end">{% translate 'Gross margin' %}</th>
                       <th class="text-end">{% translate 'Rate' %}</th>
@@ -203,6 +207,7 @@
                       <tr>
                         <td>{% link_or_none project with_badge=True %}</td>
                         <td class="text-end">{{ contrib.hours|hours }}</td>
+                        <td class="text-end">{{ contrib.invoiced_hours|hours }}</td>
                         <td class="text-end">
                           {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
                         </td>
@@ -217,6 +222,7 @@
                     <tr class="wb-total-row">
                       <th>{% translate 'Total' %}</th>
                       <th class="text-end">{{ ud.hours_in_range|hours }}</th>
+                      <th class="text-end">{{ ud.invoiced_hours_in_range|hours }}</th>
                       <th class="text-end">
                         {% if ud.hours_rate_unknown %}{{ ud.hours_rate_unknown|hours }}{% endif %}
                       </th>

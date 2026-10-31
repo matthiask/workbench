@@ -27,7 +27,8 @@ Contents:
 ### Hours and the value of logged work
 
 - **Time** always uses `LoggedHours.hours` (utilization, productivity,
-  planning, squeeze's hours, budgets in hours).
+  planning, squeeze's hours and rates, budgets in hours). Squeeze splits a
+  project's gross margin between people by the value of their work though.
 - **Value** of logged hours uses `INVOICED_HOURS = Coalesce(invoiced_hours,
   hours)` (`workbench/logbook/models.py`): `invoiced_hours` is optional and
   says what the work is worth if that is more than the time spent.
@@ -422,7 +423,7 @@ gross margin 0). Gross margin and hours of these projects are **all-time**.
 Per project (`squeeze_data`):
 
 ```
-weight(row)          = hours × COALESCE(NULLIF(service.effort_rate, 0.00), 150)
+weight(row)          = INVOICED_HOURS × COALESCE(NULLIF(service.effort_rate, 0.00), 150)
 hours_in_range_total = Σ hours logged on the project in the period (all people)
 period_margin        = hours_in_range_total / hours × gross_margin          (0 if hours == 0)
 person's margin      = Σ weight(person, period) / Σ weight(all, period) × period_margin
@@ -430,9 +431,12 @@ person's rate        = person's margin / person's hours on the project
 hours_rate_unknown   = person's period hours on services with effort_rate NULL or 0
 ```
 
-The total attributed per project equals the hours-only slice; the rate
-weighting only shifts it between people. Since the slice is proportional to
-hours, the project's period rate always equals its all-time rate.
+The total attributed per project equals the hours-only slice; the weighting
+with the value of the work (invoiced hours times the rate) only shifts it
+between people. Since the slice is proportional to hours, the project's period
+rate always equals its all-time rate. Someone whose work is worth more than
+the time spent (`invoiced_hours > hours`) gets a larger share and so a higher
+rate per hour spent, at the expense of the others on the project.
 
 **Worked example.** Project, open, gross margin 60'000, relevant hours 400 →
 rate 150/h. In the period Anna logs 20h on a service at 200/h (weight 4'000),
@@ -458,14 +462,16 @@ Anna: `4'000 / 7'000 × 6'000 = 3'428.57` (171.43/h); Ben: `3'000 / 7'000 ×
 | Total row | Σ period hours, Σ period gross margin |
 
 Per-project modal ("Aufschlüsselung nach Person"): header Umsatz bereinigt /
-Stunden (= relevant hours) / Ansatz; per person Stunden, Ohne Stundensatz
+Stunden (= relevant hours) / Ansatz; per person Stunden, Verrechnete Stunden
+(`INVOICED_HOURS` in the period), Ohne Stundensatz
 (`hours_rate_unknown`), Umsatz bereinigt (person margin), Ansatz (person
 rate, red < 150); footer shows period totals and the project rate. Note "Stunden
 ohne Stundensatz: Standard von 150/h angewendet" if any.
 
 XLSX additionally: offered hours (only open projects), logged hours (all
-time), period rate (`gross_margin_in_range / hours_in_range`), hours at default
-rate, and per user hours / gross margin / rate / hours at default rate.
+time), period invoiced hours, period rate (`gross_margin_in_range /
+hours_in_range`), hours at default rate, and per user hours / invoiced hours /
+gross margin / rate / hours at default rate.
 
 #### Users table ("Mitarbeiter:innen"), sorted by Delta desc
 
@@ -479,7 +485,7 @@ Everyone who logged hours in the period (also only on internal projects).
 | Abwesenheitstage | Σ absence days in the period (see below) |
 | Stunden | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
 | Ansatz | `gross_margin / hours_in_range` (so internal hours dilute it) |
-| Umsatz bereinigt | Σ the person's attributed period margins over all projects; links to the per-project modal |
+| Umsatz bereinigt | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Stunden, Verrechnete Stunden, Ohne Stundensatz, Umsatz bereinigt, Ansatz) |
 | Extern % | `100 × external_hours / total_hours` (external = hours on non-internal projects, `workbench/projects/reporting.py:hours_per_type`) |
 | Richtwert extern % | `profitable_percentage = 100 − Σ InternalTypeUser.percentage` (per-user override, else the internal type's default percentage) |
 | Δ ext. % | `Extern % − Richtwert extern %`, red if < 0 |

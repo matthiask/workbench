@@ -702,8 +702,8 @@ def logging_report(period, since, until, as_csv, as_json):
 def squeeze(period, since, until, as_csv, as_json):
     """Gross margin per user and project, requires the productivity feature
 
-    Projects' gross margins are split between users by hours weighted with
-    the hourly rate. The delta compares the gross margin to the expected
+    Projects' gross margins are split between users by the value of their
+    work (invoiced hours times the hourly rate). The delta compares the gross margin to the expected
     gross margin."""
     data = request(
         "GET", "reports/squeeze/", params=period_params(period, since, until)

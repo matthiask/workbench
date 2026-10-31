@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 05:41+0100\n"
+"POT-Creation-Date: 2026-10-31 09:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2611,7 +2611,7 @@ msgstr "Zu Leistung verschieben"
 msgid "rendered by"
 msgstr "Erbracht von"
 
-#: workbench/logbook/models.py
+#: workbench/logbook/models.py workbench/reporting/squeeze.py
 #: workbench/templates/logbook/loggedhours_detail.html
 msgid "invoiced hours"
 msgstr "Verrechnete Stunden"
@@ -3616,6 +3616,10 @@ msgstr "Einfrierdatum"
 msgid "freeze dates"
 msgstr "Einfrierdaten"
 
+#: workbench/reporting/squeeze.py workbench/templates/reporting/squeeze.html
+msgid "<unknown>"
+msgstr "<unbekannt>"
+
 #: workbench/reporting/squeeze.py
 msgid "offered (only open projects)"
 msgstr "Offeriert (nur offene Projekte)"
@@ -3647,6 +3651,10 @@ msgstr "Ansatz"
 #: workbench/reporting/squeeze.py
 msgid "period hours"
 msgstr "Stunden im Zeitraum"
+
+#: workbench/reporting/squeeze.py
+msgid "period invoiced hours"
+msgstr "Verrechnete Stunden im Zeitraum"
 
 #: workbench/reporting/squeeze.py
 msgid "period gross margin"
@@ -3719,10 +3727,6 @@ msgstr "Richtwert mit {}/h"
 #: workbench/reporting/squeeze.py
 msgid "relevant gross margin"
 msgstr "relevanter Umsatz"
-
-#: workbench/reporting/squeeze.py workbench/templates/reporting/squeeze.html
-msgid "<unknown>"
-msgstr "<unbekannt>"
 
 #: workbench/reporting/utils.py workbench/templates/base.html
 #: workbench/templates/start.html workbench/templates/timestamps.html
@@ -5168,6 +5172,10 @@ msgid "Squeeze"
 msgstr "Squeeze"
 
 #: workbench/templates/reporting/squeeze.html
+msgid "Invoiced hours"
+msgstr "Verrechnete Stunden"
+
+#: workbench/templates/reporting/squeeze.html
 msgid "Without rate"
 msgstr "Ohne Stundensatz"
 
@@ -5392,20 +5400,6 @@ msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
 
 #: workbench/timer/api.py
-msgid "This project doesn't exist."
-msgstr "Dieses Projekt existiert nicht."
-
-#: workbench/timer/api.py
-#, python-format
-msgid "Several pinned projects match %(text)r: %(projects)s"
-msgstr "Mehrere gepinnte Projekte passen zu %(text)r: %(projects)s"
-
-#: workbench/timer/api.py
-#, python-format
-msgid "No pinned project matches %r. Pin it or use the project's ID."
-msgstr "Kein gepinntes Projekt passt zu %r. Pinne es oder verwende die ID des Projekts."
-
-#: workbench/timer/api.py
 msgid "This service doesn't exist."
 msgstr "Diese Leistung existiert nicht."
 
@@ -5424,6 +5418,20 @@ msgstr "Heute gibt es keine Zeitmarken."
 #: workbench/timer/api.py
 msgid "Use a code like T1 or an ID."
 msgstr "Einen Code wie T1 oder eine ID verwenden."
+
+#: workbench/timer/models.py
+msgid "This project doesn't exist."
+msgstr "Dieses Projekt existiert nicht."
+
+#: workbench/timer/models.py
+#, python-format
+msgid "Several pinned projects match %(text)r: %(projects)s"
+msgstr "Mehrere gepinnte Projekte passen zu %(text)r: %(projects)s"
+
+#: workbench/timer/models.py
+#, python-format
+msgid "No pinned project matches %r. Pin it or use the project's ID."
+msgstr "Kein gepinntes Projekt passt zu %r. Pinne es oder verwende die ID des Projekts."
 
 #: workbench/timer/models.py
 msgid "Stop"
