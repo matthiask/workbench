@@ -1740,7 +1740,8 @@ details.card:not([open]) > summary.card-header {
 
   // Wide tables scroll within their card instead of widening the page
   .wb-table-card,
-  .card:has(> .table) {
+  .card:has(> .table),
+  .modal-body:has(> .table) {
     overflow-x: auto;
 
     // Sticky would be relative to the card now
