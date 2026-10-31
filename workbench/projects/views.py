@@ -9,10 +9,11 @@ from django.utils.translation import gettext as _
 from xlsxdocument import XLSXDocument
 
 from workbench import generic
+from workbench.accounts.features import FEATURES
 from workbench.invoices.models import Service as InvoiceService
 from workbench.logbook.forms import LogbookBatchForm
 from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
-from workbench.projects.charts import projected_vs_invoiced_chart
+from workbench.projects.charts import budget_chart, projected_vs_invoiced_chart
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.squeeze import project_gross_margin
@@ -117,6 +118,9 @@ class ProjectDetailView(generic.DetailView):
 
         return super().get_context_data(
             squeeze=squeeze,
+            budget_chart=budget_chart(self.object)
+            if self.request.user.features[FEATURES.CONTROLLING]
+            else None,
             projected_invoices_timeline=projected_invoices_timeline(
                 self.object.projected_invoices.all()
             ),

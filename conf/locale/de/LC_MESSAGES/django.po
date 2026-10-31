@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 14:01+0100\n"
+"POT-Creation-Date: 2026-10-31 14:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2478,7 +2478,7 @@ msgid "cost"
 msgstr "Kosten"
 
 #: workbench/invoices/views.py workbench/logbook/apps.py
-#: workbench/templates/base.html
+#: workbench/projects/charts.py workbench/templates/base.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/_budget_statistics_table.html
@@ -3272,6 +3272,20 @@ msgstr "Wähle Projekte mit ids, open oder closed_since aus."
 #: workbench/templates/shortcuts.html workbench/tools/xlsx.py
 msgid "projects"
 msgstr "Projekte"
+
+#: workbench/projects/charts.py
+#: workbench/templates/projects/campaign_detail.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_projected_invoices_list.html
+#: workbench/templates/reporting/_budget_statistics_table.html
+#: workbench/templates/reporting/playing_bank.html
+#: workbench/templates/reporting/project_budget_statistics.html
+msgid "invoiced"
+msgstr "Verrechnet"
+
+#: workbench/projects/charts.py
+msgid "accepted offers"
+msgstr "akzeptierte Offerten"
 
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
@@ -4761,15 +4775,6 @@ msgstr "Offeriert und akzeptiert"
 msgid "sold"
 msgstr "verkauft"
 
-#: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_projected_invoices_list.html
-#: workbench/templates/reporting/_budget_statistics_table.html
-#: workbench/templates/reporting/playing_bank.html
-#: workbench/templates/reporting/project_budget_statistics.html
-msgid "invoiced"
-msgstr "Verrechnet"
-
 #: workbench/templates/projects/campaign_statistics.html
 #: workbench/templates/projects/project_statistics.html
 msgid "Logged hours per hourly rate"
@@ -4850,6 +4855,10 @@ msgstr "Budgetwarnung ab %(amount)s"
 #, python-format
 msgid "sent on %(sent_on)s"
 msgstr "versendet am %(sent_on)s"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Logbook, invoiced and accepted offers"
+msgstr "Logbuch, verrechnet und akzeptierte Offerten"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Show all"

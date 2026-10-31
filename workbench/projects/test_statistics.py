@@ -52,6 +52,56 @@ class StatisticsTest(TestCase):
         code("internal=on")
         code("export=xlsx")
 
+    def test_budget_chart(self):
+        """The project page shows the cumulative logbook value, the invoiced
+        total and the accepted offers per week"""
+        from django.utils.translation import activate, deactivate_all
+
+        from workbench.projects.charts import budget_chart
+
+        activate("en")
+        self.addCleanup(deactivate_all)
+        project = factories.ProjectFactory.create()
+        self.assertIsNone(budget_chart(project))
+
+        offer = factories.OfferFactory.create(
+            project=project, status=factories.Offer.ACCEPTED, closed_on=in_days(-14)
+        )
+        service = factories.ServiceFactory.create(
+            project=project, offer=offer, effort_rate=100, effort_hours=10
+        )
+        offer.save()
+        factories.LoggedHoursFactory.create(
+            service=service, rendered_on=in_days(-14), hours=2
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, rendered_on=in_days(-7), hours=3, invoiced_hours=4
+        )
+        factories.LoggedCostFactory.create(service=service, cost=50)
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            status=factories.Invoice.SENT,
+            subtotal=300,
+        )
+
+        chart = budget_chart(project)
+        self.assertEqual(
+            [item["label"] for item in chart["legend"]],
+            ["logbook", "invoiced", "accepted offers"],
+        )
+        first, *_weeks, last = chart["columns"]
+        self.assertIn("logbook: 200.00", first["title"])
+        self.assertIn("accepted offers: 1’000.00", first["title"])
+        # Invoiced hours, not the time spent, and the logged costs
+        self.assertIn("logbook: 650.00", last["title"])
+        self.assertIn("invoiced: 300.00", last["title"])
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.get_absolute_url())
+        self.assertContains(response, "Logbook, invoiced and accepted offers")
+
     def test_projected_gross_margin_view(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)

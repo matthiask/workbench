@@ -254,6 +254,15 @@
           {% endif %}
         </div>
       {% endif %}
+      {% if budget_chart %}
+        <section class="card mt-3">
+          <div class="card-header">{% translate 'Logbook, invoiced and accepted offers' %}</div>
+          <div class="card-body">
+            {% translate 'Logbook, invoiced and accepted offers' as label %}
+            {% include "charts/bar_chart.html" with chart=budget_chart label=label %}
+          </div>
+        </section>
+      {% endif %}
     </div>
 
     {% if request.user.features.PROJECTED_GROSS_MARGIN %}

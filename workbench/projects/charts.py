@@ -117,3 +117,103 @@ def projected_vs_invoiced_chart(project, *, today=None):
         ],
         "today_x": f"{x(today):.1f}" if first <= today <= last else None,
     }
+
+
+def budget_chart(project, *, today=None):
+    """Cumulative logbook value (logged costs and invoiced hours times the
+    effort rate) and invoiced total compared to the accepted offers, per
+    week, or per month for projects longer than half a year
+
+    ``None`` if nothing has been logged yet."""
+    # Avoid circular imports
+    from django.db.models import Sum
+    from django.utils.translation import gettext as _
+
+    from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
+    from workbench.tools.charts import bar_chart
+    from workbench.tools.validation import monday
+
+    today = today or dt.date.today()
+    logged = [
+        (day, rate * hours)
+        for day, rate, hours in LoggedHours.objects
+        .filter(service__project=project, service__effort_rate__isnull=False)
+        .order_by()
+        .values("rendered_on", "service__effort_rate")
+        .annotate(invoiced=Sum(INVOICED_HOURS))
+        .values_list("rendered_on", "service__effort_rate", "invoiced")
+    ] + list(
+        LoggedCost.objects
+        .filter(service__project=project)
+        .order_by()
+        .values("rendered_on")
+        .annotate(Sum("cost"))
+        .values_list("rendered_on", "cost__sum")
+    )
+    if not any(amount for _day, amount in logged):
+        return None
+    invoiced = [
+        (invoice.invoiced_on, invoice.total_excl_tax)
+        for invoice in Invoice.objects.invoiced().filter(project=project)
+    ]
+    offers = [
+        (
+            offer.closed_on or offer.offered_on or project.created_at.date(),
+            offer.total_excl_tax,
+        )
+        for offer in project.offers.all()
+        if offer.is_accepted
+    ]
+
+    days = [day for day, _amount in (*logged, *invoiced, *offers)]
+    first = min(days)
+    last = max(min(project.closed_on or today, today), *days)
+    if (last - first).days <= 26 * 7:
+        periods, period = [], monday(first)
+        while period <= last:
+            periods.append(period)
+            period += dt.timedelta(days=7)
+        labels = [f"KW{period:%V}" for period in periods]
+
+        def key(day):
+            return monday(day)
+
+    else:
+        periods = list(_months_between(first, last))
+        labels = [local_date_format(period, fmt="M y") for period in periods]
+
+        def key(day):
+            return day.replace(day=1)
+
+    def cumulative(entries):
+        per_period = {}
+        for day, amount in entries:
+            per_period[key(day)] = per_period.get(key(day), Z2) + (amount or Z2)
+        return list(accumulate(per_period.get(period, Z2) for period in periods))
+
+    lines = [
+        {
+            "label": _("logbook"),
+            "values": cumulative(logged),
+            "color": "wb-series-1",
+        },
+        {
+            "label": _("invoiced"),
+            "values": cumulative(invoiced),
+            "color": "wb-series-3",
+        },
+    ]
+    if offers:
+        lines.append({
+            "label": _("accepted offers"),
+            "values": cumulative(offers),
+            "color": "wb-series-muted",
+            "dashed": True,
+        })
+    return bar_chart(
+        labels,
+        lines=lines,
+        fmt=currency,
+        axis_fmt=lambda value: f"{value:,.0f}".replace(",", "’"),
+        height=220,
+    )

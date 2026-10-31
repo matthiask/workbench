@@ -369,6 +369,8 @@ Per offer (service list): `service_hours`, `logged_hours`, `service_cost` (Σ `S
 
 Caveats: Budget retainer offers hold budget, real services are added later ("services have to be created later when rendering actual work", `Offer.is_budget_retainer` help text); retainment is the part of the retainer not yet released into services. (Unclear: whether released services are expected to sit on accepted offers; the report's `sold` excludes retainer offers, so a retainer project only shows "sold" for later accepted non-retainer offers.)
 
+Chart (CONTROLLING, `workbench/projects/charts.py:budget_chart`): cumulative per week (per month if the project spans more than 26 weeks) from the first logged entry, invoice or accepted offer until today or the closing date: logbook value (Σ `LoggedCost.cost` + Σ `effort_rate × INVOICED_HOURS`, hours without effort rate not valued, like the tiles), invoiced (Σ `total_excl_tax` of invoiced invoices by `invoiced_on`) and accepted offers (Σ `total_excl_tax` by `closed_on`, else `offered_on`). Not shown if nothing valued has been logged.
+
 ---
 
 ### Budget transfers (Budgetverschiebung)
