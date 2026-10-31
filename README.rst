@@ -110,3 +110,10 @@ for examples.
 
 You should set up a cronjob which runs ``./manage.py fairy_tasks`` daily. This
 is a requirement for the recurring invoices functionality and other things.
+
+Favicon
+=======
+
+The rainbow rocket (``workbench/static/workbench/lib/favicon.png``) has been
+designed by Sophie for Workbench. Keep it, even if the interface's colors
+change.
