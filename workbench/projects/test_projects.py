@@ -189,6 +189,22 @@ class ProjectsTest(TestCase):
         gs = project.grouped_services
         self.assertEqual(gs["total_service_hours_rate_undefined"], 5)
 
+    def test_clearable_date_fields(self):
+        """Optional date fields can be cleared with a button"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.urls["update"])
+        self.assertContains(response, 'data-clear="#id_closed_on"')
+
+        absence = project.owned_by.absences.create(
+            starts_on=dt.date.today(), days=1, reason="vacation"
+        )
+        response = self.client.get(
+            absence.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertContains(response, 'data-clear="#id_modal-ends_on"')
+        self.assertNotContains(response, 'data-clear="#id_modal-starts_on"')
+
     def test_autofill(self):
         """Required autofilling attributes for service types are available"""
         project = factories.ProjectFactory.create()

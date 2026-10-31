@@ -5367,6 +5367,10 @@ msgstr "Wirklich löschen?"
 msgid "Split"
 msgstr "Aufteilen"
 
+#: workbench/templates/widgets/clearable_date.html
+msgid "Clear"
+msgstr "Leeren"
+
 #: workbench/templatetags/workbench.py workbench/tools/history.py
 msgid "yes"
 msgstr "ja"

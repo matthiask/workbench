@@ -138,6 +138,13 @@ class DateInput(forms.TextInput):
     input_type = "date"
 
 
+class ClearableDateInput(DateInput):
+    """Date input with a button which clears it, emptying date inputs is
+    cumbersome in some browsers"""
+
+    template_name = "widgets/clearable_date.html"
+
+
 class Form(WarningsForm, forms.Form):
     required_css_class = "required"
     error_css_class = "is-invalid"
@@ -189,7 +196,7 @@ class ModelForm(WarningsForm, forms.ModelForm):
 
         for name, field in self.fields.items():
             if isinstance(field, forms.DateField):
-                field.widget = DateInput()
+                field.widget = DateInput() if field.required else ClearableDateInput()
 
             elif name in self.user_fields:
                 field.choices = User.objects.active_choices(

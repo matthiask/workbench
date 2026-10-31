@@ -1,0 +1,12 @@
+{% load i18n %}
+<div class="input-group">
+  {% include "django/forms/widgets/input.html" %}
+  <button
+    type="button"
+    class="btn btn-primary"
+    title="{% translate 'Clear' %}"
+    data-clear="#{{ widget.attrs.id }}"
+  >
+    &times;
+  </button>
+</div>
