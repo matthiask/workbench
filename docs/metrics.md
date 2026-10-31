@@ -833,12 +833,12 @@ Deals: status ACCEPTED, `closed_on` in [Datum von, Datum bis] (default this week
 | Month × value type cells | Σ Value.value per value type, by month of `closed_on`. Columns: value types occurring in the deals plus all value types with a `weekly_target`. |
 | Month "Total" | Σ of the month's values. |
 | Total row per type | Σ over months; pie = sum vs. target. |
-| Total row, overall cell | `stats.sum` = Σ of per-user contribution shares (see below), not Σ of values. |
+| Total row, overall cell | `stats.sum` = Σ Deal.value of the deals. |
 | Ziel (n Wochen) | Per type: weekly_target × (days in period)/7; overall: Σ weekly_targets of the shown types × days/7. |
 | Median-Alter | Days between `created_at` date and `closed_on`; one entry per Value row; upper median (`sorted[len//2]`). Overall median over all entries. |
-| Per user: Wert | Σ over deals the user contributed to of Deal.value × contribution weight / Σ weights of that deal. |
+| Per user: Wert | Σ over deals the user contributed to of Deal.value × contribution weight / Σ weights of that deal (0 if the weights add up to 0). |
 | Per user: Anzahl | Number of deals the user contributed to. |
-| Total row (users) | Anzahl = Σ of per-user counts; Wert = Σ of per-user values. |
+| Total row (users) | Anzahl = number of deals; Wert = Σ Deal.value (deals with several or no contributors count once). |
 | Deal list | Each deal's value; total row = `stats.sum`. |
 | Modal per user | Deal, contact/customer, Projektvergabe (closing type + notice), Wert, Beitrag (the user's share). |
 
@@ -888,9 +888,6 @@ Financial overview and budgets:
 - `accepted_offers_not_invoiced` in the cash data API includes budget
   retainer offers, "verkauft" in the budget statistics doesn't.
 - The deals funnel of the key data API is always as of today.
-- Totals of accepted deals add up per-person counts and shares: deals with
-  several contributors count several times, deals without contributors are
-  missing from the value.
 
 Time and people:
 

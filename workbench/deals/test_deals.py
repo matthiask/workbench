@@ -433,6 +433,19 @@ class DealsTest(TestCase):
         stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)], users=[])
         self.assertEqual(stats["sum"], Decimal(0))
 
+        # Several contributors and none at all, the totals count deals
+        deal.contributions.create(user=factories.UserFactory.create())
+        deal.contributions.create(user=factories.UserFactory.create())
+        other = factories.DealFactory.create(
+            status=Deal.ACCEPTED, closed_on=dt.date.today()
+        )
+        other.values.create(type=vt1, value=100)
+        other.save()
+        stats = accepted_deals([dt.date(2020, 1, 1), dt.date(2099, 1, 1)])
+        self.assertEqual(len(stats["by_user"]), 3)
+        self.assertEqual(stats["count"], 2)
+        self.assertEqual(stats["sum"], Decimal(700))
+
         response = self.client.get("/report/declined-deals/")
         self.assertContains(response, "Declined deals")
 

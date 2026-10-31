@@ -38,7 +38,7 @@ def accepted_deals(date_range, *, users=None):
         contributions = deal.contributions.all()
         weight = sum((c.weight for c in contributions), 0)
         for c in contributions:
-            by_user[c.user][deal] = deal.value * c.weight / weight
+            by_user[c.user][deal] = deal.value * c.weight / weight if weight else Z2
 
         month = deal.closed_on.replace(day=1)
         for value in deal.values.all():
@@ -104,8 +104,9 @@ def accepted_deals(date_range, *, users=None):
             for type in valuetypes
         ],
         "valuetypes": valuetypes,
-        "sum": sum(row["sum"] for row in deals),
-        "count": sum(row["count"] for row in deals),
+        # Deals may have several or no contributors
+        "sum": sum((deal.value for deal in queryset), Z2),
+        "count": len(queryset),
         "target": sum(type.weekly_target or 0 for type in valuetypes)
         * date_range_length
         / 7,
