@@ -3,9 +3,9 @@ from collections import defaultdict
 
 from django.db.models import BooleanField, ExpressionWrapper, Q, Sum
 
-from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost
 from workbench.projects.models import Project, Service
+from workbench.reporting.squeeze import third_party_costs_components
 from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z2
 
@@ -29,18 +29,13 @@ def playing_bank(projects):
             row["third_party_costs__sum"]
         )
 
-    invoiced = sum_by(
-        Invoice.objects
-        .invoiced()
-        .filter(project__isnull=False)
-        .exclude(third_party_costs=0),
-        key="project",
-        field="third_party_costs",
-    )
+    # Down payments and final invoices count once
+    invoiced, _logged = third_party_costs_components(projects)
     offered = sum_by(
-        Service.objects.filter(third_party_costs__isnull=False).exclude(
-            third_party_costs=0
-        ),
+        Service.objects
+        .budgeted()
+        .filter(third_party_costs__isnull=False)
+        .exclude(third_party_costs=0),
         key="project",
         field="third_party_costs",
     )
@@ -60,7 +55,9 @@ def playing_bank(projects):
             "invoiced": invoiced[project.id],
         })
         for project in projects.filter(
-            id__in=offered.keys() | logged.keys() | invoiced.keys()
+            id__in=offered.keys()
+            | logged.keys()
+            | {project for project, amount in invoiced.items() if amount}
         )
     ]
 

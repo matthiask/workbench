@@ -132,7 +132,6 @@ def key_data_third_party_costs(request, date_range):
             .select_related("service"),
             "invoices": Invoice.objects
             .invoiced()
-            .filter(~Q(type=Invoice.DOWN_PAYMENT))
             .filter(Q(invoiced_on__range=date_range), ~Q(third_party_costs=Z2))
             .order_by("invoiced_on", "id")
             .select_related("project", "owned_by"),

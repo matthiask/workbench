@@ -76,7 +76,7 @@ Contents:
 
 | Helper | Computes |
 |---|---|
-| `third_party_costs(projects)` | per project max(Σ `Invoice.third_party_costs` of invoiced invoices, Σ `LoggedCost.third_party_costs`), all time. Logged costs can't be linked to fixed amount invoices, so adding both would count them twice. |
+| `third_party_costs(projects)` | per project max(invoiced, Σ `LoggedCost.third_party_costs`), all time, with invoiced = max(Σ `Invoice.third_party_costs` of invoiced down payment invoices, Σ of the other invoiced invoices). Logged costs can't be linked to fixed amount invoices, so adding both would count them twice; final invoices repeat the third party costs of down payments, which may also be the only invoices (recurring invoices). `third_party_costs_components()` returns invoiced and logged separately. |
 | `gross_margin_components(projects)` | `offered` = Σ `total_excl_tax` of accepted offers − Σ `Service.third_party_costs` of their services; `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time. |
 | `hours_components(projects)` | `hours_offered` = Σ `service_hours` of budgeted services; `hours_logged` = Σ `hours`; `hours_logged_budgeted` = Σ `hours` on budgeted services. |
 | `relevant_hours(offered, logged, logged_budgeted)` | max(offered, logged_budgeted) + (logged − logged_budgeted): hours on unbudgeted services are added on top, so rates rather underestimate. |
@@ -139,7 +139,7 @@ One row per month (`key_data.py:gross_margin_by_month`); a month is **left out**
 | Column (DE) | Computation |
 |---|---|
 | Umsatz ("Gross profit") | Σ Invoice.total_excl_tax of invoiced invoices (SENT/PAID) with `invoiced_on` in the month. All types (incl. down payments, credits), all projects incl. internal and invoices without project. `key_data.py:gross_profit_by_month`. Modal lists these invoices. |
-| Fremdkosten | Negative. Per project, the deduction up to a month is max(Σ `Invoice.third_party_costs` of invoiced invoices except down payments with `invoiced_on` up to the month, Σ `LoggedCost.third_party_costs` with `rendered_on` up to the month), all time; each month gets the increase. Like squeeze, the larger of invoiced and logged costs counts, so costs on fixed amount invoices which can't be linked to logged costs don't count twice. Down payment invoices are left out because the final invoice contains their third party costs again. `key_data.py:third_party_costs_by_month`. The modal lists the logged costs and invoices of the month. |
+| Fremdkosten | Negative. Per project, the deduction up to a month is max(Σ third party costs of invoiced down payment invoices, Σ of the other invoiced invoices, Σ `LoggedCost.third_party_costs`), each sum over `invoiced_on` / `rendered_on` up to the month, all time; each month gets the increase. Same rule as `third_party_costs()` in squeeze. `key_data.py:third_party_costs_by_month`. The modal lists the logged costs and invoices of the month. |
 | Abgrenzungen (muted value) | Accruals at month end: stored `Accruals.accruals` whose `cutoff_date` falls in the month; for the current month computed live with cutoff today. Value = `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff).external()`. `key_data.py:accruals_by_month`, `reporting/models.py:AccrualsQuerySet.accruals` |
 | (delta column, unlabelled) | Accrual of this month − accrual of the previous existing record (any earlier month; the first record has no change). Months without a record: delta 0. |
 | Umsatz bereinigt ("Gross margin") | Umsatz + Fremdkosten (negative) + accrual delta. |
@@ -261,10 +261,10 @@ Project filter: "Offen" (default: open projects) or "Immer noch offen oder gesch
 
 | Column (DE) | Computation |
 |---|---|
-| Offeriert | Σ Service.third_party_costs (≠ 0) of **all** services of the project (no offer status / optional filter). |
+| Offeriert | Σ Service.third_party_costs (≠ 0) of budgeted services. |
 | Erfasst (Vergangenheit) | Σ LoggedCost.third_party_costs (≠ 0) with rendered_on ≤ today (linked to invoice services or not). |
 | Erfasst (Zukunft) | Same with rendered_on > today. |
-| Verrechnet | Σ Invoice.third_party_costs (≠ 0) of invoiced invoices (SENT/PAID) with a project; all types incl. down payments. |
+| Verrechnet | Invoiced third party costs from `third_party_costs_components()`: the larger of those on down payment invoices and on the other invoices. |
 | Delta | (Erfasst past + future) − Verrechnet; positive = not yet passed on. |
 | Header totals | Σ of each column; Delta header shows Σ negative deltas (API `total_invoiced_too_much`) and Σ positive deltas (`total_not_invoiced`). |
 
@@ -881,8 +881,6 @@ Profitability:
 
 Financial overview and budgets:
 
-- Down payment invoices' third party costs are left out of key data (the
-  final invoice repeats them) but not out of squeeze and "Bank spielen".
 - "davon geplant" and the projected gross margin ignore the cutoff date;
   offers and budget transfers are never limited by it either.
 - "Rabatt" in the budget statistics counts offers which aren't declined,

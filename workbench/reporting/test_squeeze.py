@@ -166,3 +166,26 @@ class SqueezeTest(TestCase):
         data = squeeze_data((dt.date(2026, 10, 18), dt.date(2026, 10, 31)))
         (row,) = data["users"]
         self.assertAlmostEqual(row["absence_days"], 0)
+
+    def test_third_party_costs_of_down_payments(self):
+        """Final invoices repeat the third party costs of down payments,
+        down payments of recurring invoices may be the only ones"""
+        project = factories.ProjectFactory.create()
+
+        def invoice(type, third_party_costs):
+            factories.InvoiceFactory.create(
+                project=project,
+                customer=project.customer,
+                contact=project.contact,
+                type=type,
+                subtotal=1000,
+                third_party_costs=third_party_costs,
+                status=Invoice.SENT,
+                due_on=in_days(15),
+            )
+
+        invoice(Invoice.DOWN_PAYMENT, 600)
+        self.assertEqual(project_gross_margin(project)["invoiced"], 400)
+
+        invoice(Invoice.FIXED, 600)
+        self.assertEqual(project_gross_margin(project)["invoiced"], 1400)

@@ -30,12 +30,14 @@ def third_party_costs_by_month(date_range):
     Like ``third_party_costs()`` in squeeze a project's third party costs are
     deducted once: the larger of those on invoices and the logged ones.
     Logged costs can't be linked to fixed amount invoices, so adding up both
-    would count them twice. Per project the deduction up to a month is the
-    larger of both sums up to that month, each month gets the increase.
-    Down payment invoices are left out, the final invoice contains their
-    third party costs again.
+    would count them twice. Final invoices contain the third party costs of
+    down payments again, so of those the larger counts as well. Per project
+    the deduction up to a month uses the sums up to that month, each month
+    gets the increase.
     """
-    by_project = defaultdict(lambda: defaultdict(lambda: {"inv": Z2, "log": Z2}))
+    by_project = defaultdict(
+        lambda: defaultdict(lambda: {"dp": Z2, "inv": Z2, "log": Z2})
+    )
     for project, year, month, total in (
         LoggedCost.objects
         .filter(rendered_on__lte=date_range[1], third_party_costs__isnull=False)
@@ -46,29 +48,31 @@ def third_party_costs_by_month(date_range):
         .values_list("service__project", "year", "month", "s")
     ):
         by_project[project][year, month]["log"] += total
-    for project, year, month, total in (
+    for project, type, year, month, total in (
         Invoice.objects
         .invoiced()
-        .filter(~Q(type=Invoice.DOWN_PAYMENT), ~Q(third_party_costs=Z2))
-        .filter(invoiced_on__lte=date_range[1])
+        .filter(~Q(third_party_costs=Z2), invoiced_on__lte=date_range[1])
         .order_by()
         .annotate(year=ExtractYear("invoiced_on"), month=ExtractMonth("invoiced_on"))
-        .values("project", "year", "month")
+        .values("project", "type", "year", "month")
         .annotate(s=Sum("third_party_costs"))
-        .values_list("project", "year", "month", "s")
+        .values_list("project", "type", "year", "month", "s")
     ):
-        by_project[project][year, month]["inv"] += total
+        key = "dp" if type == Invoice.DOWN_PAYMENT else "inv"
+        by_project[project][year, month][key] += total
 
     first = (date_range[0].year, date_range[0].month)
     costs = defaultdict(lambda: Z2)
     for months in by_project.values():
-        invoiced = logged = deducted = Z2
+        down_payments = invoiced = logged = deducted = Z2
         for month in sorted(months):
+            down_payments += months[month]["dp"]
             invoiced += months[month]["inv"]
             logged += months[month]["log"]
+            total = max(down_payments, invoiced, logged)
             if month >= first:
-                costs[month] -= max(invoiced, logged) - deducted
-            deducted = max(invoiced, logged)
+                costs[month] -= total - deducted
+            deducted = total
     return costs
 
 

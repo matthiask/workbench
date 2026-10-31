@@ -9,6 +9,7 @@ from workbench.projects.models import Project
 from workbench.reporting import key_data
 from workbench.reporting.labor_costs import labor_costs_by_cost_center
 from workbench.reporting.models import Accruals
+from workbench.reporting.third_party_costs import playing_bank
 from workbench.reporting.views import DateRangeAndTeamFilterForm
 
 
@@ -142,11 +143,49 @@ class ReportingTest(TestCase):
             rendered_on=dt.date(2026, 5, 10),
         )
 
+        # Down payments may be the only invoices with third party costs
+        recurring = factories.ProjectFactory.create()
+        factories.InvoiceFactory.create(
+            project=recurring,
+            customer=recurring.customer,
+            contact=recurring.contact,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=1000,
+            third_party_costs=300,
+            status=Invoice.SENT,
+            invoiced_on=dt.date(2026, 6, 1),
+            due_on=dt.date(2026, 6, 30),
+        )
+
         costs = key_data.third_party_costs_by_month([
             dt.date(2026, 1, 1),
             dt.date(2026, 12, 31),
         ])
         self.assertEqual(
             {month: total for month, total in costs.items() if total},
-            {(2026, 3): -600, (2026, 5): -100},
+            {(2026, 3): -600, (2026, 5): -100, (2026, 6): -300},
         )
+
+    def test_playing_bank(self):
+        """Third party costs passed on to customers count down payments and
+        the final invoice once, offered ones only on budgeted services"""
+        project = factories.ProjectFactory.create()
+        for type in [Invoice.DOWN_PAYMENT, Invoice.FIXED]:
+            factories.InvoiceFactory.create(
+                project=project,
+                customer=project.customer,
+                contact=project.contact,
+                type=type,
+                subtotal=1000,
+                third_party_costs=600,
+                status=Invoice.SENT,
+                due_on=dt.date.today(),
+            )
+        factories.ServiceFactory.create(project=project, third_party_costs=500)
+        factories.ServiceFactory.create(
+            project=project, third_party_costs=200, is_optional=True
+        )
+
+        (row,) = playing_bank(Project.objects.all())["projects"]
+        self.assertEqual(row["invoiced"], 600)
+        self.assertEqual(row["offered"], 500)

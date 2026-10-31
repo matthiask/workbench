@@ -57,11 +57,28 @@ def relevant_hours(hours_offered, hours_logged, hours_logged_budgeted):
 
 def third_party_costs_components(projects):
     """Third party costs on invoices and logged third party costs per project
-    as two ``{project_id: amount}`` dicts."""
-    invoiced = sum_by(
-        Invoice.objects.invoiced().filter(project__in=projects),
+    as two ``{project_id: amount}`` dicts.
+
+    Final invoices contain the third party costs of down payments again, but
+    down payments (e.g. of recurring invoices) may also be the only invoices,
+    so the larger of both counts."""
+    invoices = Invoice.objects.invoiced().filter(project__in=projects)
+    down_payments = sum_by(
+        invoices.filter(type=Invoice.DOWN_PAYMENT),
         key="project",
         field="third_party_costs",
+    )
+    others = sum_by(
+        invoices.exclude(type=Invoice.DOWN_PAYMENT),
+        key="project",
+        field="third_party_costs",
+    )
+    invoiced = defaultdict(
+        lambda: Z2,
+        {
+            project: max(down_payments[project], others[project])
+            for project in {*down_payments, *others}
+        },
     )
     logged = sum_by(
         LoggedCost.objects.filter(
