@@ -30,14 +30,17 @@ class LogbookTest(TestCase):
         project = service.project
         self.client.force_login(project.owned_by)
 
-        # Tab goes from the hours to the description
-        response = self.client.get(
+        # Tab goes from the hours to the description, then the invoiced hours
+        html = self.client.get(
             project.urls["createhours"],
             headers={"x-requested-with": "XMLHttpRequest"},
+        ).content.decode()
+        self.assertLess(
+            html.index('name="modal-hours"'), html.index('name="modal-description"')
         )
-        self.assertContains(response, 'name="modal-invoiced_hours"')
-        self.assertRegex(
-            response.content.decode(), r'<input[^>]*tabindex="-1"[^>]*invoiced_hours'
+        self.assertLess(
+            html.index('name="modal-description"'),
+            html.index('name="modal-invoiced_hours"'),
         )
 
         def send(url=project.urls["createhours"], **kwargs):

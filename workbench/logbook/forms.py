@@ -409,8 +409,6 @@ class LoggedHoursForm(ModelForm):
             project=self.project, user=self.request.user
         )
         self.fields["service"].required = False
-        # Rarely used: Tab goes from the hours to the description
-        self.fields["invoiced_hours"].widget.attrs["tabindex"] = "-1"
         if len(self.fields["service"].choices) > 1 and not self.request.POST.get(
             "modal-service_title"
         ):
