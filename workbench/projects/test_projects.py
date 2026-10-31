@@ -177,6 +177,18 @@ class ProjectsTest(TestCase):
             effort_rate=0,
         ).full_clean()
 
+    def test_service_hours_without_rate(self):
+        """Optional services don't count towards the budgeted hours without
+        an effort rate, like towards all other budgeted totals"""
+        project = factories.ProjectFactory.create()
+        factories.ServiceFactory.create(project=project, effort_hours=5)
+        factories.ServiceFactory.create(
+            project=project, effort_hours=3, is_optional=True
+        )
+
+        gs = project.grouped_services
+        self.assertEqual(gs["total_service_hours_rate_undefined"], 5)
+
     def test_autofill(self):
         """Required autofilling attributes for service types are available"""
         project = factories.ProjectFactory.create()

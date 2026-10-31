@@ -576,7 +576,11 @@ class Project(Model):
                 )
             else:
                 total_logged_hours_rate_undefined += row["logged_hours"]
-                if not service.is_declined and not service.is_budget_retainer:
+                if (
+                    not service.is_declined
+                    and not service.is_optional
+                    and not service.is_budget_retainer
+                ):
                     total_service_hours_rate_undefined += service.service_hours
 
             services_by_offer[offers_map.get(service.offer_id)]["services"].append(row)
@@ -614,7 +618,7 @@ class Project(Model):
             "total_service_cost": total_service_cost,
             "total_service_third_party_costs": total_service_third_party_costs,
             "accepted_offers_service_cost": accepted_offers_service_cost,
-            "not_offered_service_cost": total_service_cost
+            "not_accepted_service_cost": total_service_cost
             - accepted_offers_service_cost,
             "total_logged_cost": total_logged_cost,
             "total_service_hours_rate_undefined": total_service_hours_rate_undefined,

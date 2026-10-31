@@ -181,9 +181,9 @@
                 </span>
               {% endif %}
             </div>
-            {% if gs.not_offered_service_cost %}
+            {% if gs.not_accepted_service_cost %}
               <div class="wb-stat-note">
-                {% translate "Not offered yet" %}: {{ gs.not_offered_service_cost|currency }}
+                {% translate "Not accepted yet" %}: {{ gs.not_accepted_service_cost|currency }}
               </div>
             {% endif %}
           </div>

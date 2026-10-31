@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 23:50+0100\n"
+"POT-Creation-Date: 2026-10-31 05:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4714,6 +4714,10 @@ msgstr "Herunterladen mit Unterschriftszeile"
 #: workbench/templates/projects/project_detail.html
 msgid "Renumber offers"
 msgstr "Offerten neu nummerieren"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Not accepted yet"
+msgstr "Noch nicht akzeptiert"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Budget retainment"

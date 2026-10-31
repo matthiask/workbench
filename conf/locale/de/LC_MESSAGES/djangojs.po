@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 23:50+0100\n"
+"POT-Creation-Date: 2026-10-31 05:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,6 +69,16 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
 
+#: conf/strings.js planning/drag.js
+#, javascript-format
+msgid "%s weeks"
+msgstr "%s Wochen"
+
+#: conf/strings.js planning/drag.js
+#, javascript-format
+msgid "%sh per week"
+msgstr "%sh pro Woche"
+
 #: conf/strings.js planning/index.js
 msgid "(closed)"
 msgstr "(geschlossen)"
@@ -80,6 +90,10 @@ msgstr "(abgelehnt)"
 #: conf/strings.js planning/index.js
 msgid "(not accepted yet)"
 msgstr "(noch nicht akzeptiert)"
+
+#: conf/strings.js planning/drag.js
+msgid "1 week"
+msgstr "1 Woche"
 
 #: conf/strings.js planning/index.js
 msgid "Absences and public holidays"
@@ -121,6 +135,16 @@ msgstr "Aufwände"
 #: conf/strings.js planning/index.js
 msgid "is provisional"
 msgstr "ist provisorisch"
+
+#: conf/strings.js planning/drag.js
+#, javascript-format
+msgid "KW %s"
+msgstr "KW %s"
+
+#: conf/strings.js planning/drag.js
+#, javascript-format
+msgid "KW %s–%s"
+msgstr "KW %s–%s"
 
 #: conf/strings.js planning/index.js
 msgid "Logged hours"
@@ -190,6 +214,10 @@ msgstr "Zurücksetzen"
 msgid "Save break"
 msgstr "Pause speichern"
 
+#: conf/strings.js planning/drag.js
+msgid "Saving..."
+msgstr "Speichern..."
+
 #: conf/strings.js timer/activity.js
 msgid "Select or search project..."
 msgstr "Projekt auswählen oder suchen..."
@@ -234,6 +262,11 @@ msgstr "Heute"
 msgid "Unable to open the form"
 msgstr "Konnte Formular nicht öffnen"
 
+#: conf/strings.js planning/drag.js
+#, javascript-format
+msgid "Unable to save the planned work: %s"
+msgstr "Die geplante Arbeit konnte nicht gespeichert werden: %s"
+
 #: conf/strings.js timer/actions.js
 msgid "Unable to submit the logbook entry"
 msgstr "Konnte Logbucheintrag nicht abschicken"
@@ -250,39 +283,6 @@ msgstr "Welches Ergebnis strebst Du an?"
 msgctxt "provisional"
 msgid "prov."
 msgstr "prov."
-
-#: planning/drag.js
-#, javascript-format
-msgid "KW %s"
-msgstr "KW %s"
-
-#: planning/drag.js
-#, javascript-format
-msgid "KW %s–%s"
-msgstr "KW %s–%s"
-
-#: planning/drag.js
-msgid "1 week"
-msgstr "1 Woche"
-
-#: planning/drag.js
-#, javascript-format
-msgid "%s weeks"
-msgstr "%s Wochen"
-
-#: planning/drag.js
-#, javascript-format
-msgid "%sh per week"
-msgstr "%sh pro Woche"
-
-#: planning/drag.js
-msgid "Saving..."
-msgstr "Speichern..."
-
-#: planning/drag.js
-#, javascript-format
-msgid "Unable to save the planned work: %s"
-msgstr "Die geplante Arbeit konnte nicht gespeichert werden: %s"
 
 #~ msgid "Concurrent absences"
 #~ msgstr "Parallele Absenzen"

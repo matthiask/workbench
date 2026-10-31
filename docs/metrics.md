@@ -343,8 +343,8 @@ Source: `Project.grouped_services` (dict, `workbench/projects/models.py:Project.
 | Stunden: "logged / budgeted" | `gs.logged_hours` / `gs.service_hours` | Σ `LoggedHours.hours` over all services of the project / Σ `service_hours` of services that are not declined, not optional, not on a budget retainer offer (same as `budgeted()`). |
 | Kosten: "logged / budgeted" (only if either ≠ 0) | `gs.logged_cost` / `gs.service_cost` | Σ `LoggedCost.cost` / Σ `Service.cost` (fixed cost part only, no effort) of budgeted services. |
 | Erfasste Kosten (+x h ohne Stundensatz) | `gs.total_logged_cost` | Σ `LoggedCost.cost` + Σ `effort_rate × INVOICED_HOURS` per service with a rate; hours on rate-less services shown as `total_logged_hours_rate_undefined`. Same as report "Logbuch" without cutoff. Bar against `total_service_cost`. |
-| Leistungskosten (+x h ohne Stundensatz) | `gs.total_service_cost` | Σ `service_cost` of budgeted services (all offer statuses except declined; incl. services without offer). Rate-less hours: Σ `service_hours` of rate-less services not declined and not retainer (**optional ones included**). |
-| Noch nicht offeriert (note) | `gs.not_offered_service_cost` | `total_service_cost − accepted_offers_service_cost`, where the latter = Σ `service_cost` of budgeted services on ACCEPTED offers. So it covers services without offer **and** services on offers in preparation / offered. |
+| Leistungskosten (+x h ohne Stundensatz) | `gs.total_service_cost` | Σ `service_cost` of budgeted services (all offer statuses except declined; incl. services without offer). Rate-less hours: Σ `service_hours` of rate-less services not declined, not optional and not retainer. |
+| Noch nicht akzeptiert (note) | `gs.not_accepted_service_cost` | `total_service_cost − accepted_offers_service_cost`, where the latter = Σ `service_cost` of budgeted services on ACCEPTED offers. So it covers services without offer **and** services on offers in preparation / offered. |
 | Zurückbehaltung von Budget (only if any offer `is_budget_retainer`) | `gs.budget_retainment` | `budget_retainer_total − total_service_cost`; `budget_retainer_total` = Σ `total_excl_tax` of **accepted** retainer offers. Note: "<retainer total> verkauft, <total_service_cost> freigegeben (inkl. <discount> Rabatt)" with discount = Σ discount of accepted retainer offers. |
 | Akzeptiertes Offertentotal (if no retainer offers) | `gs.accepted_offers_total_excl_tax` | Σ `total_excl_tax` of ACCEPTED offers; note "includes discount of" Σ discount of accepted offers. Budget transfers are **not** included here. |
 | Nicht archiviert | `project.not_archived_total.total` | Σ `LoggedCost.cost` + effort value (`effort_cost_by_project`) of entries with `archived_at IS NULL`; plus rate-less hours. |
@@ -355,7 +355,7 @@ Warning (retainers): if `budget_retainment > 0` and `total_logged_cost > 1.1 × 
 
 Per offer (service list): `service_hours`, `logged_hours`, `service_cost` (Σ `Service.cost`), `logged_cost` (Σ `LoggedCost.cost`) per offer, budgeted services only for the service side.
 
-**Worked example:** services A (20 h × 150 = 3,000, accepted offer), B (10 h × 150 = 1,500, offer still "offered"), C (optional, 5 h, accepted offer). Logged 25 h × 150 + 200 cost = 3,950. → Stunden 25 / 30; Leistungskosten 4,500, Noch nicht offeriert 1,500; Erfasste Kosten 3,950; Akzeptiertes Offertentotal 3,000 (if no discount).
+**Worked example:** services A (20 h × 150 = 3,000, accepted offer), B (10 h × 150 = 1,500, offer still "offered"), C (optional, 5 h, accepted offer). Logged 25 h × 150 + 200 cost = 3,950. → Stunden 25 / 30; Leistungskosten 4,500, Noch nicht akzeptiert 1,500; Erfasste Kosten 3,950; Akzeptiertes Offertentotal 3,000 (if no discount).
 
 Caveats: Budget retainer offers hold budget, real services are added later ("services have to be created later when rendering actual work", `Offer.is_budget_retainer` help text); retainment is the part of the retainer not yet released into services. (Unclear: whether released services are expected to sit on accepted offers; the report's `sold` excludes retainer offers, so a retainer project only shows "sold" for later accepted non-retainer offers.)
 
@@ -902,9 +902,6 @@ Financial overview and budgets:
 - Totals of accepted deals add up per-person counts and shares: deals with
   several contributors count several times, deals without contributors are
   missing from the value.
-- On the project page, "Noch nicht offeriert" also contains services of
-  offers in preparation or offered, and the hours without rate include
-  optional services.
 - The XLSX export of the budget statistics has one column without header.
 - The budget transfer form shows the project's gross margin as the
   available amount. The link is only offered with `CONTROLLING`, but the view
