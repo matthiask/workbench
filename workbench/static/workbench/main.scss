@@ -1635,3 +1635,10 @@ kbd {
     outline-offset: 4px;
   }
 }
+
+// Results of the Autocomplete widget, below its input group
+.wb-autocomplete {
+  inset: 100% 0 auto 0;
+  max-height: 20rem;
+  overflow-y: auto;
+}

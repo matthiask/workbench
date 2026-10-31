@@ -1,4 +1,5 @@
 import * as bootstrap from "bootstrap"
+import Sortable from "sortablejs"
 import "@fontsource-variable/inter"
 import "./main.scss"
 
@@ -404,6 +405,7 @@ $(() => {
 
   // Widgets
   initWidgets()
+  initSortableLists()
   initSortableTables()
   initCelebration()
 
@@ -548,35 +550,12 @@ function initWidgets() {
     })
   })
 
-  $("[data-autocomplete-id]:not(.initialized)").each(function () {
-    const self = $(this)
-    const url = self.data("autocomplete-url")
-    const id = self.data("autocomplete-id")
-    const input = $(`#${id}`)
-
-    self
-      .addClass("initialized")
-      .autocomplete({
-        minLength: 2,
-        source(request, response) {
-          $.get(url, { q: request.term }, (data) => {
-            response(data.results)
-          })
-        },
-        focus(_event, ui) {
-          self.val(ui.item.label)
-          return false
-        },
-        select(_event, ui) {
-          self.val(ui.item.label)
-          input.val(ui.item.value).trigger("change")
-          return false
-        },
-      })
-      .on("focus", function () {
-        this.select()
-      })
-  })
+  for (const el of document.querySelectorAll(
+    "[data-autocomplete-id]:not(.initialized)",
+  )) {
+    el.classList.add("initialized")
+    initAutocomplete(el)
+  }
 
   $(document.body).on("click", "[data-clear]", function () {
     $(this.dataset.clear).val("").trigger("change")
@@ -701,6 +680,138 @@ window.addInlineForm = function addInlineForm(slug, onComplete) {
   if (onComplete) onComplete(form)
 
   return false
+}
+
+// Search field filling a hidden input with the ID of the chosen result, see
+// Autocomplete in workbench/tools/forms.py
+function initAutocomplete(el) {
+  const input = document.getElementById(el.dataset.autocompleteId)
+  const menu = document.createElement("div")
+  menu.className = "dropdown-menu wb-autocomplete"
+  el.after(menu)
+
+  let results = []
+  let active = -1
+  let timeout = null
+  let request = 0
+
+  const close = () => {
+    menu.classList.remove("show")
+    active = -1
+  }
+
+  const highlight = (index) => {
+    active = index
+    menu.querySelectorAll(".dropdown-item").forEach((item, i) => {
+      item.classList.toggle("active", i === active)
+      if (i === active) item.scrollIntoView({ block: "nearest" })
+    })
+  }
+
+  const choose = (index) => {
+    const result = results[index]
+    el.value = result.label
+    input.value = result.value
+    input.dispatchEvent(new Event("change", { bubbles: true }))
+    close()
+  }
+
+  const search = async () => {
+    const term = el.value.trim()
+    const current = ++request
+    if (term.length < 2) {
+      close()
+      return
+    }
+    const url = new URL(el.dataset.autocompleteUrl, window.location.href)
+    url.searchParams.set("q", term)
+    const response = await fetch(url)
+    if (!response.ok || current !== request) return
+    results = (await response.json()).results
+    menu.replaceChildren(
+      ...results.map((result, index) => {
+        const item = document.createElement("button")
+        item.type = "button"
+        item.className = "dropdown-item"
+        item.textContent = result.label
+        // Keep the focus in the input until the click has been handled
+        item.addEventListener("mousedown", (e) => e.preventDefault())
+        item.addEventListener("click", () => choose(index))
+        return item
+      }),
+    )
+    active = -1
+    menu.classList.toggle("show", results.length > 0)
+  }
+
+  el.addEventListener("input", () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(search, 200)
+  })
+  el.addEventListener("focus", () => el.select())
+  el.addEventListener("blur", close)
+  el.addEventListener("keydown", (e) => {
+    if (!menu.classList.contains("show")) return
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault()
+      const step = e.key === "ArrowDown" ? 1 : -1
+      highlight((active + step + results.length) % results.length)
+    } else if (e.key === "Enter" && active >= 0) {
+      e.preventDefault()
+      choose(active)
+    } else if (e.key === "Escape") {
+      // Don't close the modal too
+      e.stopPropagation()
+      close()
+    }
+  })
+}
+
+function initSortableLists() {
+  // The services of an offer on the project page
+  for (const container of document.querySelectorAll(
+    "[data-sortable-container]",
+  )) {
+    Sortable.create(container, {
+      draggable: "[data-sortable-item]",
+      handle: "[data-sortable-grabber]",
+      async onEnd(e) {
+        if (e.oldIndex === e.newIndex) return
+        const body = new FormData()
+        for (const item of container.querySelectorAll("[data-sortable-item]")) {
+          body.append("ids", item.dataset.sortableItem)
+        }
+        const response = await fetch(container.dataset.sortableUrl, {
+          method: "POST",
+          body,
+          headers: {
+            "X-CSRFToken": document.cookie.match(/\bcsrftoken=([^;]+)/)[1],
+          },
+        })
+        if (response.ok) {
+          window.location.reload()
+        } else {
+          alert(`${response.status} ${response.statusText}`)
+        }
+      },
+    })
+  }
+
+  // Number fields which are renumbered in the order they are dragged into
+  for (const form of document.querySelectorAll("[data-renumber]")) {
+    const container = form.querySelector(".widget--numberinput")?.parentElement
+    if (!container) continue
+    Sortable.create(container, {
+      draggable: ".widget--numberinput",
+      onEnd() {
+        container
+          .querySelectorAll(".widget--numberinput input")
+          .forEach((input, index) => {
+            input.value = index + 1
+          })
+      },
+    })
+  }
 }
 
 function initSortableTables() {

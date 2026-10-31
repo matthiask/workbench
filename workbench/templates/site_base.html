@@ -23,8 +23,6 @@
       })();
     </script>
     <script src="{% static 'workbench/lib/jquery.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'workbench/lib/jquery-ui.min.css' %}">
-    <script src="{% static 'workbench/lib/jquery-ui.min.js' %}"></script>
 
     {% if not TESTING %}{% rspack_assets 'main' %}{% endif %}
     <link rel="shortcut icon" href="{% static 'workbench/lib/favicon.png' %}">
