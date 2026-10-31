@@ -483,7 +483,6 @@ if LIVE:  # pragma: no cover
     SECURE_REDIRECT_EXEMPT = [r"^(create-timestamp|list-timestamps)/"]
 else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-    WORKBENCH.TITLE = f"(debug) {WORKBENCH.TITLE}"
 
 # Fine since it's only used for selected views
 CORS_ORIGIN_ALLOW_ALL = True
