@@ -202,7 +202,7 @@ Answers: the key figures of one month for integrations.
 | `accruals` | Stored `Accruals` with `cutoff_date` = last day of month, else computed live (`delta_negative` of external projects, with today's data). |
 | `full_time_equivalents` | FTE of the month (see above). |
 | `squeeze_gross_margin` | `squeeze_data(month)["totals"]["gross_margin"]` (see squeeze documentation). |
-| `deals_funnel` | Open deals as of **today** (not the requested month), Σ Deal.value: `high_probability_next_4_weeks` (HIGH, decision_expected_on − today ≤ 28 days, overdue included), `_next_12_weeks` (≤ 84 days), `_later` (later or no date), `normal_probability` (NORMAL). LOW/UNKNOWN left out. `key_data_api.py:deals_funnel`, `templatetags/workbench.py:deal_group` |
+| `deals_funnel` | Open deals as of **today** (not the requested month, on purpose: the funnel looks ahead from today, and probabilities and expected decision dates aren't versioned), Σ Deal.value: `high_probability_next_4_weeks` (HIGH, decision_expected_on − today ≤ 28 days, overdue included), `_next_12_weeks` (≤ 84 days), `_later` (later or no date), `normal_probability` (NORMAL). LOW/UNKNOWN left out. `key_data_api.py:deals_funnel`, `templatetags/workbench.py:deal_group` |
 | `accepted_deals` | Deals with status ACCEPTED and `closed_on` in the month: id, title, customer name, value, closed_on. |
 | `month`, `generated_at` | Month string, ISO timestamp. |
 
@@ -911,7 +911,6 @@ Financial overview and budgets:
 
 - "Rabatt" in the budget statistics counts offers which aren't declined,
   "verkauft" only accepted ones.
-- The deals funnel of the key data API is always as of today.
 
 Time and people:
 
