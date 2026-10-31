@@ -11,7 +11,7 @@
 {% block report %}
   {% if chart %}
     <section class="card mb-3">
-      <div class="card-header">{% translate 'Per month' %}</div>
+      <div class="card-header">{% translate 'Cumulative' %}</div>
       <div class="card-body">
         {% translate 'Accepted deals' as label %}
         {% include "charts/bar_chart.html" with chart=chart label=label %}

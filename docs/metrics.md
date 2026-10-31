@@ -866,7 +866,7 @@ Deals: status ACCEPTED, `closed_on` in [Datum von, Datum bis] (default this week
 | Deal list | Each deal's value; total row = `stats.sum`. |
 | Modal per user | Deal, contact/customer, Projektvergabe (closing type + notice), Wert, Beitrag (the user's share). |
 
-Chart (web, `_accepted_deals_chart`): the month × value type cells as stacked bars for every month of the period, and the target per month = Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
+Chart (web, `_accepted_deals_chart`): the month × value type cells cumulated from the start of the period as stacked bars for every month, and the cumulated target, per month Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
 
 API additionally: declined `count`, `sum` (Σ Deal.value) and per closing type.
 

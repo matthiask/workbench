@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 14:04+0100\n"
+"POT-Creation-Date: 2026-10-31 14:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5050,9 +5050,8 @@ msgid "Logged"
 msgstr "Erfasst"
 
 #: workbench/templates/reporting/accepted_deals.html
-#: workbench/templates/reporting/projected_gross_margin.html
-msgid "Per month"
-msgstr "Pro Monat"
+msgid "Cumulative"
+msgstr "Kumuliert"
 
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/key_data.html
@@ -5260,6 +5259,10 @@ msgstr "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)"
 #: workbench/templates/reporting/project_budget_statistics.html
 msgid "thereof planned"
 msgstr "davon geplant"
+
+#: workbench/templates/reporting/projected_gross_margin.html
+msgid "Per month"
+msgstr "Pro Monat"
 
 #: workbench/templates/reporting/report.html
 msgid "Set predefined period"

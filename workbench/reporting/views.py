@@ -2,7 +2,7 @@ import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
 from functools import reduce
-from itertools import groupby
+from itertools import accumulate, groupby
 
 from django import forms
 from django.contrib import messages
@@ -661,8 +661,8 @@ def accepted_deals_view(request, form):
 
 
 def _accepted_deals_chart(stats, date_range):
-    """Accepted deals per month and value type, and the target of the days
-    of each month within the date range"""
+    """Accepted deals per value type and the target, cumulated per month
+    from the start of the date range"""
     months = []
     month = date_range[0].replace(day=1)
     while month <= date_range[1]:
@@ -696,7 +696,9 @@ def _accepted_deals_chart(stats, date_range):
         bars=[
             {
                 "label": str(type),
-                "values": [values.get(month, {}).get(type, Z2) for month in months],
+                "values": list(
+                    accumulate(values.get(month, {}).get(type, Z2) for month in months)
+                ),
                 "color": f"wb-series-{index}",
             }
             for index, type in enumerate(stats["valuetypes"], 1)
@@ -704,7 +706,7 @@ def _accepted_deals_chart(stats, date_range):
         lines=[
             {
                 "label": capfirst(_("target")),
-                "values": [target(month) for month in months],
+                "values": list(accumulate(target(month) for month in months)),
                 "color": "wb-series-muted",
                 "dashed": True,
             }

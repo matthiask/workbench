@@ -421,9 +421,10 @@ class DealsTest(TestCase):
 
         [_august, september, october] = chart("2026-08-01", "2026-10-15")["columns"]
         self.assertIn(f"{vt}: 400.00", september["title"])
-        # 10 per day, October is cut off by the date range
-        self.assertIn("Target: 300.00", september["title"])
-        self.assertIn("Target: 150.00", october["title"])
+        # Cumulative, 10 per day, October is cut off by the date range
+        self.assertIn("Target: 610.00", september["title"])
+        self.assertIn("Target: 760.00", october["title"])
+        self.assertIn(f"{vt}: 400.00", october["title"])
 
     def test_deal_reporting(self):
         """Deal reporting: Accepted and declined deals, history of deals"""
