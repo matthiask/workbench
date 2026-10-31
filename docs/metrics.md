@@ -92,7 +92,12 @@ rate         = gross_margin / hours
 ```
 
 Offered amounts and hours only count for open projects; for closed projects
-the invoiced amount and the logged hours are ground truth.
+the invoiced amount and the logged hours are ground truth. Whether a project
+is open is its current state (except for figures with a cutoff date, which
+use `Project.objects.open(on=...)`), so reopening a project or changing its
+closing date changes past periods too, also frozen ones. The project form
+asks for a confirmation when the project has been closed on or before the
+freeze date.
 
 **Projected invoices** (`ProjectedInvoice.gross_margin`) are gross margin:
 invoice total excl. tax minus third party costs. The projected gross margin

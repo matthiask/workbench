@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 09:26+0100\n"
+"POT-Creation-Date: 2026-10-31 09:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3312,11 +3312,6 @@ msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
 
 #: workbench/projects/forms.py
-#, python-brace-format
-msgid "This project has been closed on or before {} and cannot be reopened anymore."
-msgstr "Dieses Projekt wurde am oder vor dem {} geschlossen und kann nicht mehr geöffnet werden."
-
-#: workbench/projects/forms.py
 msgid "Selecting an internal type is required for internal projects."
 msgstr "Bei internen Projekten muss ein interner Typ ausgewählt werden."
 
@@ -3331,6 +3326,11 @@ msgstr "Dieses Projekt hat schon Rechnungen. Der Rechnungskunde wird auch angepa
 #: workbench/projects/forms.py
 msgid "You are adding a flat rate to a project which already has services. Those services' effort types and rates will be overwritten."
 msgstr "Du setzst einen Pauschalsatz bei einem Projekt, welches schon Leistungen hat. Der Aufwandtyp und Stundensatz dieser Leistungen wird überschrieben."
+
+#: workbench/projects/forms.py
+#, python-brace-format
+msgid "This project has been closed on or before {}. Reopening it or changing the closing date changes the statistics of frozen periods."
+msgstr "Dieses Projekt wurde am oder vor dem {} geschlossen. Wenn Du es wieder öffnest oder das Schliessdatum änderst, ändern sich die Statistiken von eingefrorenen Zeiträumen."
 
 #: workbench/projects/forms.py
 #, python-brace-format

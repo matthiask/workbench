@@ -374,19 +374,6 @@ class ProjectForm(ModelForm):
                 in_days(0).isoformat(),
                 _("today"),
             )
-            if (
-                self.instance.closed_on
-                and (freeze := FreezeDate.objects.up_to())
-                and self.instance.closed_on <= freeze
-            ):
-                if self.request.method == "GET":
-                    messages.warning(
-                        self.request,
-                        _(
-                            "This project has been closed on or before {} and cannot be reopened anymore."
-                        ).format(local_date_format(freeze)),
-                    )
-                self.fields["closed_on"].disabled = True
         else:
             self.fields.pop("closed_on")
 
@@ -438,6 +425,21 @@ class ProjectForm(ModelForm):
                     " will be overwritten."
                 ),
                 code="flat-rate-but-already-services",
+            )
+
+        if (
+            set(self.changed_data) & {"closed_on"}
+            and self.instance.closed_on
+            and (freeze := FreezeDate.objects.up_to())
+            and self.instance.closed_on <= freeze
+        ):
+            self.add_warning(
+                _(
+                    "This project has been closed on or before {}. Reopening it"
+                    " or changing the closing date changes the statistics of"
+                    " frozen periods."
+                ).format(local_date_format(freeze)),
+                code="reopen-frozen-project",
             )
 
         if (

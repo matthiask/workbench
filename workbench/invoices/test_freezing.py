@@ -7,6 +7,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.invoices.test_invoices import invoice_to_dict
 from workbench.reporting.models import FreezeDate
+from workbench.tools.forms import WarningsForm
 from workbench.tools.validation import in_days
 
 
@@ -113,11 +114,29 @@ class FreezingTest(TestCase):
         project.closed_on = dt.date(2024, 12, 31)
         project.save()
 
-        response = self.client.get(project.urls["update"])
+        # Reopening a frozen project needs a confirmation
+        data = {
+            "customer": project.customer_id,
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "type": project.type,
+            "closed_on": "",
+        }
+        response = self.client.post(project.urls["update"], data)
         self.assertContains(
             response,
-            "This project has been closed on or before 31.12.2024 and cannot be reopened anymore.",
+            "This project has been closed on or before 31.12.2024. Reopening it"
+            " or changing the closing date changes the statistics of frozen"
+            " periods.",
         )
+        response = self.client.post(
+            project.urls["update"],
+            data | {WarningsForm.ignore_warnings_id: "reopen-frozen-project"},
+        )
+        self.assertRedirects(response, project.urls["detail"])
+        project.refresh_from_db()
+        self.assertIsNone(project.closed_on)
 
     def test_invoice_in_preparation_is_not_freezed(self):
         FreezeDate.objects.create(up_to=dt.date(2024, 12, 31))
