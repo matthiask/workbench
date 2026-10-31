@@ -403,28 +403,30 @@ tbody th > a {
   }
 }
 
-.pie .pie-circle {
-  fill: #325d88;
+// Small pies: a neutral track and the share in the colors of the charts
+.pie {
+  --wb-pie: #eb6834;
+  vertical-align: -0.2em;
+
+  &.good {
+    --wb-pie: #1baf7a;
+  }
 }
 
-[data-bs-theme="dark"] .pie .pie-circle {
-  fill: #5a8ec0;
+[data-bs-theme="dark"] .pie {
+  --wb-pie: #d95926;
+
+  &.good {
+    --wb-pie: #199e70;
+  }
+}
+
+.pie .pie-circle {
+  fill: rgba(127, 127, 127, 0.25);
 }
 
 .pie .pie-arc {
-  fill: #f47c3c;
-}
-
-[data-bs-theme="dark"] .pie .pie-arc {
-  fill: #ff9d6b;
-}
-
-.pie.good .pie-arc {
-  fill: lightgreen;
-}
-
-[data-bs-theme="dark"] .pie.good .pie-arc {
-  fill: #90ee90;
+  fill: var(--wb-pie);
 }
 
 .bg-caveat {
