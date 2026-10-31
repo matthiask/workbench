@@ -23,3 +23,56 @@ class UtilsTest(TestCase):
                 ("2019-01-01", "2019-12-31", "last year"),
             ],
         )
+
+    def test_accepted_offers_with_budget_retainer(self):
+        """Budget retainer offers and other accepted offers aren't added up,
+        the larger of both counts"""
+        from workbench import factories
+        from workbench.offers.models import Offer
+        from workbench.reporting.project_budget_statistics import (
+            project_budget_statistics,
+        )
+        from workbench.reporting.squeeze import gross_margin_components
+        from workbench.reporting.utils import accepted_offers_by_project
+
+        project = factories.ProjectFactory.create()
+
+        def offer(total, *, retainer, third_party_costs=None):
+            offer = factories.OfferFactory.create(
+                project=project, status=Offer.ACCEPTED, is_budget_retainer=retainer
+            )
+            factories.ServiceFactory.create(
+                project=project,
+                offer=offer,
+                cost=total,
+                third_party_costs=third_party_costs,
+            )
+            offer.save()
+            return offer
+
+        offer(1000, retainer=True, third_party_costs=100)
+        # Services without an offer use up the retained budget
+        factories.ServiceFactory.create(project=project, cost=400)
+        regular = offer(300, retainer=False, third_party_costs=50)
+
+        self.assertEqual(
+            accepted_offers_by_project([project.id])[project.id],
+            {"total": 1000, "third_party_costs": 100},
+        )
+        self.assertEqual(
+            gross_margin_components([project.id])[project.id]["offered"], 900
+        )
+        [row] = project_budget_statistics([project])["statistics"]
+        self.assertEqual(row["sold"], 1000)
+
+        # Other accepted offers add up to more than the retainer
+        offer(800, retainer=False)
+        self.assertEqual(
+            accepted_offers_by_project([project.id])[project.id],
+            {"total": 1100, "third_party_costs": 50},
+        )
+        regular.delete()
+        self.assertEqual(
+            accepted_offers_by_project([project.id])[project.id]["total"], 1000
+        )
+        self.assertEqual(accepted_offers_by_project([])[project.id]["total"], 0)

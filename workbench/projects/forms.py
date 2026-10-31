@@ -13,6 +13,7 @@ from workbench.invoices.models import ProjectedInvoice
 from workbench.projects.models import BudgetTransfer, Campaign, Project, Service
 from workbench.reporting.models import FreezeDate
 from workbench.reporting.squeeze import project_gross_margin
+from workbench.reporting.utils import accepted_offers_by_project
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, local_date_format
 from workbench.tools.forms import (
@@ -339,16 +340,11 @@ class ProjectForm(ModelForm):
             f"{budget_alert_at.label} ({settings.WORKBENCH.CURRENCY})"
         )
         if self.instance.pk and (
-            # Same definition as "sold" in project_budget_statistics(): budget
-            # retainers hold budget back instead of allocating it.
-            cost_cap := sum(
-                (
-                    offer.total_excl_tax
-                    for offer in self.instance.offers.accepted()
-                    if not offer.is_budget_retainer
-                ),
-                Z2,
-            )
+            # Same definition as "sold" in project_budget_statistics() (without
+            # budget transfers)
+            cost_cap := accepted_offers_by_project([self.instance.pk])[
+                self.instance.pk
+            ]["total"]
         ):
             budget_alert_at.help_text = format_html(
                 "{} {}",

@@ -30,7 +30,7 @@ from workbench.projects.models import (
     Service,
 )
 from workbench.projects.reporting import hours_per_type
-from workbench.reporting.utils import sum_by, sum_of
+from workbench.reporting.utils import accepted_offers_by_project, sum_by, sum_of
 from workbench.tools.formats import Z0, Z1, Z2, local_date_format
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -114,13 +114,8 @@ def gross_margin_components(projects):
 
     Projections are only taken into account for open projects. Third party
     costs are deducted from offers and invoices."""
-    offers = Offer.objects.accepted().filter(project__in=projects)
-    offered = sum_by(offers, key="project")
-    offered_costs = sum_by(
-        Service.objects.filter(offer__in=offers, third_party_costs__isnull=False),
-        key="project",
-        field="third_party_costs",
-    )
+    accepted = accepted_offers_by_project(projects)
+    offered = {project: row["total"] for project, row in accepted.items()}
     projected = sum_by(
         ProjectedInvoice.objects.filter(
             project__in=projects, project__closed_on__isnull=True
@@ -136,7 +131,8 @@ def gross_margin_components(projects):
         lambda: {"offered": Z2, "projected": Z2, "invoiced": Z2},
         {
             project: {
-                "offered": offered[project] - offered_costs[project],
+                "offered": accepted[project]["total"]
+                - accepted[project]["third_party_costs"],
                 "projected": projected[project],
                 "invoiced": invoiced[project] - invoiced_costs[project],
             }

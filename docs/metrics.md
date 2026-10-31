@@ -64,7 +64,14 @@ Contents:
   retainer. Services of offers in preparation or offered **do** count.
 - **Budget retainer** offers (`Offer.is_budget_retainer`, "behält Budget
   zurück") are only used for budgeting; their services don't count as budget,
-  the actual services are created later.
+  the actual services are created later, usually without offers of their own.
+- **Accepted offers per project** (`accepted_offers_by_project()` in
+  `workbench/reporting/utils.py`): Σ `total_excl_tax` and Σ
+  `Service.third_party_costs` of either the accepted budget retainer offers or
+  the other accepted offers, whichever total is larger. Never both: released
+  work could be counted twice, undercounting is better. Used by "verkauft",
+  the offered gross margin (squeeze, key data, cash data) and the cash data's
+  accepted offers not invoiced.
 - **Open projects**: `closed_on` empty. `open(on=D)`: `closed_on` empty or
   after D, and created by D. `external()` leaves out internal projects.
   Figures based on projects (accruals, planned invoicing, offers) leave out
@@ -78,7 +85,7 @@ Contents:
 | Helper | Computes |
 |---|---|
 | `third_party_costs(projects)` | per project max(invoiced, Σ `LoggedCost.third_party_costs`), all time, with invoiced = max(Σ `Invoice.third_party_costs` of invoiced down payment invoices, Σ of the other invoiced invoices). Logged costs can't be linked to fixed amount invoices, so adding both would count them twice; final invoices repeat the third party costs of down payments, which may also be the only invoices (recurring invoices). `third_party_costs_components()` returns invoiced and logged separately. |
-| `gross_margin_components(projects)` | `offered` = Σ `total_excl_tax` of accepted offers − Σ `Service.third_party_costs` of their services; `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time. |
+| `gross_margin_components(projects)` | `offered` = total − third party costs of the accepted offers per project (retainer or other offers, see `accepted_offers_by_project()`); `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time. |
 | `hours_components(projects)` | `hours_offered` = Σ `service_hours` of budgeted services; `hours_logged` = Σ `hours`; `hours_logged_budgeted` = Σ `hours` on budgeted services. |
 | `relevant_hours(offered, logged, logged_budgeted)` | max(offered, logged_budgeted) + (logged − logged_budgeted): hours on unbudgeted services are added on top, so rates rather underestimate. |
 | `BudgetTransfer.objects.adjustments(projects)` | per project Σ transfers in − Σ transfers out. A transfer without target project leaves the source immediately and arrives nowhere. Only money moves, hours stay. |
@@ -217,7 +224,7 @@ Answers: what money is owed to the agency and what is expected to be invoiced, a
 | `accruals` | `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff).external()` at cutoff (negative; internal projects excluded, always computed live). |
 | `planned_invoicing_by_month[]` | `monthly_overall` of projected gross margin not yet invoiced of open **external** projects, from the month of `date`, at least 7 months, extended to the last month with projections. `amount_excl_tax` is gross margin (third party costs not included). |
 | `planned_invoicing_overdue_excl_tax` | Σ `monthly_overall` of months before the month of `date`. |
-| `accepted_offers_not_invoiced.total_excl_tax` | Revenue: Σ over open external projects of max(Σ accepted Offer.total_excl_tax − Σ invoiced Invoice.total_excl_tax, 0). Budget retainer offers included (`Offer.objects.accepted()`). |
+| `accepted_offers_not_invoiced.total_excl_tax` | Revenue: Σ over open external projects of max(accepted offers total − Σ invoiced Invoice.total_excl_tax, 0). Accepted offers per project as defined above (retainers or other offers, whichever is larger). |
 | `accepted_offers_not_invoiced.not_in_planned_invoicing_excl_tax` | Gross margin: Σ over the same projects of max(max(offered GM − invoiced GM, 0) − projected-not-invoiced delta of the project, 0). |
 | `work_not_invoiced.total_excl_tax` | `delta_positive` (logged costs + effort cost − invoiced, positive projects only) of open external projects at cutoff. |
 | `work_not_invoiced.in_planned_invoicing_excl_tax` | "davon geplant" of the [project budget statistics](#project-budget-statistics-projekt-budgetstatistik). |
@@ -292,7 +299,7 @@ Sorting: web by delta ascending; API by delta descending.
 
 | Label (DE) | Key | Formula |
 |---|---|---|
-| verkauft (tooltip "Offeriert und akzeptiert") | `sold` | Σ `Offer.total_excl_tax` of offers with status ACCEPTED and `is_budget_retainer=False` (discount already deducted; optional services not in total) **+ net budget transfers** (`BudgetTransfer.objects.adjustments`). No cutoff date filter on offers or transfers. |
+| verkauft (tooltip "Offeriert und akzeptiert") | `sold` | total of the accepted offers per project (`accepted_offers_by_project()`: the accepted budget retainer offers or the other accepted offers, whichever is larger; discount already deducted; optional services not in total) **+ net budget transfers** (`BudgetTransfer.objects.adjustments`). No cutoff date filter on offers or transfers. |
 | Rabatt (report only) | `discount` | −Σ `Offer.discount` of offers **not declined** (incl. in preparation/offered) and not budget retainers. Shown as a negative number. No cutoff. |
 | Logbuch | `logbook` | `cost` + `effort_cost` (see building blocks), entries with `rendered_on <= cutoff`. |
 | (hidden in table, API/XLSX) | `cost` | Σ `LoggedCost.cost`, `rendered_on <= cutoff` |
@@ -367,7 +374,7 @@ Per offer (service list): `service_hours`, `logged_hours`, `service_cost` (Σ `S
 
 **Worked example:** services A (20 h × 150 = 3,000, accepted offer), B (10 h × 150 = 1,500, offer still "offered"), C (optional, 5 h, accepted offer). Logged 25 h × 150 + 200 cost = 3,950. → Stunden 25 / 30; Leistungskosten 4,500, Noch nicht akzeptiert 1,500; Erfasste Kosten 3,950; Akzeptiertes Offertentotal 3,000 (if no discount).
 
-Caveats: Budget retainer offers hold budget, real services are added later ("services have to be created later when rendering actual work", `Offer.is_budget_retainer` help text); retainment is the part of the retainer not yet released into services. (Unclear: whether released services are expected to sit on accepted offers; the report's `sold` excludes retainer offers, so a retainer project only shows "sold" for later accepted non-retainer offers.)
+Caveats: Budget retainer offers hold budget, real services are added later ("services have to be created later when rendering actual work", `Offer.is_budget_retainer` help text); retainment is the part of the retainer not yet released into services. Released services are usually services without an offer of their own; if they sit on accepted offers, those are not added to the retainer (see `accepted_offers_by_project()`).
 
 Chart (CONTROLLING, `workbench/projects/charts.py:budget_chart`): cumulative per week (per month if the project spans more than 26 weeks) from the first logged entry, invoice or accepted offer until today or the closing date: logbook value (Σ `LoggedCost.cost` + Σ `effort_rate × INVOICED_HOURS`, hours without effort rate not valued, like the tiles), invoiced (Σ `total_excl_tax` of invoiced invoices by `invoiced_on`) and accepted offers (Σ `total_excl_tax` by `closed_on`, else `offered_on`). Not shown if nothing valued has been logged.
 
@@ -400,7 +407,7 @@ Logic:
 - Trigger: `project_budget_statistics(projects)` with cutoff today; alert if `logbook >= budget_alert_at` (logbook = logged cost + effort value incl. INVOICED_HOURS; rate-less hours not counted).
 - One mail per owner listing project, URL, Logbuch, Warnen ab, Verkauft (= report `sold`, incl. budget transfers). Then `budget_alert_sent_at = now`.
 - Re-armed when `budget_alert_at` changes (`Project.save` clears `budget_alert_sent_at`).
-- Form help text "Cost cap" = Σ `total_excl_tax` of accepted non-retainer offers, with 75/80/90 % shortcuts (`workbench/projects/forms.py`, comment says "Same definition as 'sold'", but transfers are not included).
+- Form help text "Cost cap" = total of the accepted offers per project (`accepted_offers_by_project()`), with 75/80/90 % shortcuts (`workbench/projects/forms.py`); like "verkauft" but without budget transfers.
 
 ## Profitability
 
@@ -461,7 +468,7 @@ Anna: `4'000 / 7'000 × 6'000 = 3'428.57` (171.43/h); Ben: `3'000 / 7'000 ×
 | UI label (de) | Computation |
 |---|---|
 | Projekt | project |
-| Offeriert | `offered` (accepted offers − their service third party costs); 0 for closed projects |
+| Offeriert | `offered` (accepted offers per project − their service third party costs, see `accepted_offers_by_project()`); 0 for closed projects |
 | Geplant *offen* | `projected` = Σ `ProjectedInvoice.gross_margin`, open projects only |
 | Verrechnet | `invoiced` = SENT/PAID invoices `total_excl_tax` − `third_party_costs()` (max of invoice vs. logged third party costs) |
 | Umsatz bereinigt *geschätzt* | `gross_margin` (formula above; incl. budget transfers, floored at 0) |
@@ -902,8 +909,6 @@ Financial overview and budgets:
   offers and budget transfers are never limited by it either.
 - "Rabatt" in the budget statistics counts offers which aren't declined,
   "verkauft" only accepted ones.
-- `accepted_offers_not_invoiced` in the cash data API includes budget
-  retainer offers, "verkauft" in the budget statistics doesn't.
 - The deals funnel of the key data API is always as of today.
 
 Time and people:

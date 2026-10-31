@@ -116,3 +116,47 @@ def effort_cost_by_project(logged_hours):
             projects[project]["cost"] += rate * invoiced_hours
         projects[project]["hours"] += hours
     return projects
+
+
+def accepted_offers_by_project(projects):
+    """The total excl. tax and the third party costs of the accepted offers
+    per project as ``{project_id: {"total": ..., "third_party_costs": ...}}``
+
+    Budget retainer offers hold the budget of services which are added later
+    without offers of their own. If a project has both, the larger of the
+    retainer offers and the other offers counts, the retainer may also have
+    been used up by other accepted offers. Undercounting is better than
+    counting the same work twice."""
+    # Avoid circular imports
+    from workbench.offers.models import Offer
+    from workbench.projects.models import Service
+
+    def side():
+        return {"total": Z2, "third_party_costs": Z2}
+
+    sides = defaultdict(lambda: {True: side(), False: side()})
+    offers = Offer.objects.accepted().filter(project__in=projects)
+    for project, retainer, total in (
+        offers
+        .order_by()
+        .values("project", "is_budget_retainer")
+        .annotate(s=Sum("total_excl_tax"))
+        .values_list("project", "is_budget_retainer", "s")
+    ):
+        sides[project][retainer]["total"] += total
+    for project, retainer, costs in (
+        Service.objects
+        .filter(offer__in=offers, third_party_costs__isnull=False)
+        .order_by()
+        .values("project", "offer__is_budget_retainer")
+        .annotate(s=Sum("third_party_costs"))
+        .values_list("project", "offer__is_budget_retainer", "s")
+    ):
+        sides[project][retainer]["third_party_costs"] += costs
+    return defaultdict(
+        side,
+        {
+            project: max(both[True], both[False], key=lambda side: side["total"])
+            for project, both in sides.items()
+        },
+    )

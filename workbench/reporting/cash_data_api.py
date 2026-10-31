@@ -5,12 +5,11 @@ from django.conf import settings
 from django.utils import timezone
 
 from workbench.invoices.models import Invoice
-from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.reporting.key_data import projected_gross_margin
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import gross_margin_components
-from workbench.reporting.utils import sum_by
+from workbench.reporting.utils import accepted_offers_by_project, sum_by
 from workbench.tools.formats import Z2
 
 
@@ -84,9 +83,10 @@ def accepted_offers_not_invoiced(pgm):
     minus the projected gross margin which hasn't been invoiced yet.
     """
     projects = Project.objects.open().external()
-    offered = sum_by(
-        Offer.objects.accepted().filter(project__in=projects), key="project"
-    )
+    offered = {
+        project: row["total"]
+        for project, row in accepted_offers_by_project(projects).items()
+    }
     invoiced = sum_by(
         Invoice.objects.invoiced().filter(project__in=offered.keys()), key="project"
     )

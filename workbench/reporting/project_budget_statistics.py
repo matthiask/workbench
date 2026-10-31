@@ -10,7 +10,11 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import BudgetTransfer, Service
 from workbench.reporting.squeeze import gross_margin_components
-from workbench.reporting.utils import effort_cost_by_project, sum_by
+from workbench.reporting.utils import (
+    accepted_offers_by_project,
+    effort_cost_by_project,
+    sum_by,
+)
 from workbench.tools.formats import Z1, Z2
 
 
@@ -41,10 +45,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
         default=Z1,
     )
 
-    sold_per_project = sum_by(
-        Offer.objects.accepted().filter(project__in=projects, is_budget_retainer=False),
-        key="project",
-    )
+    accepted = accepted_offers_by_project(projects)
     discount_per_project = sum_by(
         Offer.objects.not_declined().filter(
             project__in=projects, is_budget_retainer=False
@@ -94,7 +95,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
                 "hours_rate_undefined"
             ],
             "third_party_costs": third_party_costs_per_project[project.id],
-            "sold": sold_per_project[project.id] + budget_adjustments[project.id],
+            "sold": accepted[project.id]["total"] + budget_adjustments[project.id],
             "discount": Z2 - discount_per_project[project.id],
             "invoiced": invoiced_per_project[project.id],
             "hours": effort[project.id]["hours"],
