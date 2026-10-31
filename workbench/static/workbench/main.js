@@ -151,13 +151,35 @@ function initModal(html) {
   const el = div.querySelector(".modal")
   if (el) {
     document.body.append(div)
+    const form = div.querySelector("form[method=post]")
     const modal = new bootstrap.Modal(el, {
-      backdrop: div.querySelector("form[method=post]") ? "static" : true,
+      backdrop: form ? "static" : true,
+      // Forms only close on escape as long as nothing has been changed
+      keyboard: !form,
     })
     el.addEventListener("hide.bs.modal", () => {
       div.remove()
     })
     modal.show()
+
+    if (form) {
+      const serialize = () => new URLSearchParams(new FormData(form)).toString()
+      let initial = null
+      el.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape" || e.defaultPrevented) return
+        if (initial === null || serialize() === initial) {
+          modal.hide()
+        } else {
+          // The same hint as Bootstrap's for static backdrops
+          el.classList.add("modal-static")
+          setTimeout(() => el.classList.remove("modal-static"), 300)
+        }
+      })
+      // Widgets may set values while initializing
+      setTimeout(() => {
+        initial = serialize()
+      }, 100)
+    }
 
     setTimeout(() => {
       // Force a focus on first autofocus element
@@ -181,6 +203,12 @@ function initModal(html) {
 
   initWidgets()
 }
+
+// Bootstrap focuses the modal and listens for the escape key on it, which
+// only works if the modal is focusable
+document.addEventListener("show.bs.modal", (e) => {
+  if (!e.target.hasAttribute("tabindex")) e.target.tabIndex = -1
+})
 
 // The views answer differently to requests made by JavaScript (request.is_ajax())
 const AJAX_HEADERS = { "x-requested-with": "XMLHttpRequest" }
