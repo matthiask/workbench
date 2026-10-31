@@ -5,8 +5,15 @@
 Make the logbook and the invoices of a project agree on what has been paid
 for, also when invoicing fixed amounts. Today only services invoices can link
 logged hours and costs, which leads to third party costs being counted twice
-in squeeze (see `specs/squeeze-gross-margin.md`, problem 1) and to work which
-could be invoiced twice.
+(squeeze and key data work around this by taking the larger of the invoiced
+and the logged third party costs per project, see `docs/metrics.md`) and to
+work which could be invoiced twice.
+
+Example ("project A"): a campaign with ~90'000 media budget (ads paid by
+credit card, logged as third party costs) invoiced through *fixed amount*
+invoices with the media budget entered as third party costs, and a few
+thousand for translations and licenses invoiced through a services invoice
+created from the offer before the costs were logged.
 
 ## 1. Today
 
@@ -47,11 +54,11 @@ anything the customer sees:
   the invoice.
 - Nothing is recomputed. Services created from the offer keep the offered
   hours and costs, linking only records where the work was paid. Third party
-  costs stay as they are and can be corrected separately (see the squeeze spec, 2b).
+  costs stay as they are and can be corrected separately.
 - The reverse ("unlink") is only allowed as long as the invoice is in
   preparation, as with deleting invoices today.
 
-For a project like project A in `specs/squeeze-gross-margin.md`: link the media budget costs to the three fixed
+For a project like project A: link the media budget costs to the three fixed
 amount invoices and the translations to the services invoice; afterwards no
 unlinked costs are left and squeeze doesn't need the `max()` heuristic for this
 project. The heuristic stays for older data and for projects where nobody
