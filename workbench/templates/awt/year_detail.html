@@ -346,25 +346,27 @@
             <section class="card h-100 wb-table-card">
               <div class="card-header">{% translate 'absences'|capfirst %}</div>
               {% if data.all_absences %}
-                <table class="table table-sm mb-0 wb-compact-table">
-                  {% for absence in data.all_absences %}
-                    <tr {% if not absence.is_working_time %}class="text-body-secondary"{% endif %}>
-                      <td>{{ absence.pretty_period }}</td>
-                      <td>
-                        {% with reason=absence|absence_reason:request.user description=absence|absence_description:request.user %}
-                          <a href="{{ absence.get_absolute_url }}" data-ajaxmodal>{{ reason|capfirst }}</a>
-                          {% if description and description|lower != reason|lower %}
-                            <span class="text-body-secondary">{{ description }}</span>
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0 wb-compact-table">
+                    {% for absence in data.all_absences %}
+                      <tr {% if not absence.is_working_time %}class="text-body-secondary"{% endif %}>
+                        <td>{{ absence.pretty_period }}</td>
+                        <td>
+                          {% with reason=absence|absence_reason:request.user description=absence|absence_description:request.user %}
+                            <a href="{{ absence.get_absolute_url }}" data-ajaxmodal>{{ reason|capfirst }}</a>
+                            {% if description and description|lower != reason|lower %}
+                              <span class="text-body-secondary">{{ description }}</span>
+                            {% endif %}
+                          {% endwith %}
+                          {% if absence.needs_confirmation %}
+                            <span class="badge text-bg-warning">{% translate 'Unconfirmed' %}</span>
                           {% endif %}
-                        {% endwith %}
-                        {% if absence.needs_confirmation %}
-                          <span class="badge text-bg-warning">{% translate 'Unconfirmed' %}</span>
-                        {% endif %}
-                      </td>
-                      <td class="text-end text-nowrap">{{ absence.days|days }}</td>
-                    </tr>
-                  {% endfor %}
-                </table>
+                        </td>
+                        <td class="text-end text-nowrap">{{ absence.days|days }}</td>
+                      </tr>
+                    {% endfor %}
+                  </table>
+                </div>
               {% else %}
                 <div class="card-body text-body-secondary">{% translate 'No absences.' %}</div>
               {% endif %}
@@ -373,39 +375,41 @@
         </div>
 
         {% if data.show_employments %}
-          <section class="card mb-3 wb-table-card table-responsive">
-            <table class="table table-sm mb-0 wb-compact-table">
-              <tr class="wb-table-heading">
-                <th>
-                  {% translate 'employment' %}
-                </th>
-                <th>
-                  {% translate 'percentage' %}
-                </th>
-                <th>
-                  {% translate 'vacation weeks' %}
-                </th>
-                <th>
-                  {% translate 'notes' %}
-                </th>
-              </tr>
-              {% for employment in data.employments %}
-                <tr>
+          <section class="card mb-3 wb-table-card">
+            <div class="table-responsive">
+              <table class="table table-sm mb-0 wb-compact-table">
+                <tr class="wb-table-heading">
                   <th>
-                    {{ employment }}
+                    {% translate 'employment' %}
                   </th>
-                  <td>
-                    {{ employment.percentage }}%
-                  </td>
-                  <td>
-                    {{ employment.vacation_weeks|stringformat:'.0f' }}
-                  </td>
-                  <td>
-                    {{ employment.notes|default:'&ndash;' }}
-                  </td>
+                  <th>
+                    {% translate 'percentage' %}
+                  </th>
+                  <th>
+                    {% translate 'vacation weeks' %}
+                  </th>
+                  <th>
+                    {% translate 'notes' %}
+                  </th>
                 </tr>
-              {% endfor %}
-            </table>
+                {% for employment in data.employments %}
+                  <tr>
+                    <th>
+                      {{ employment }}
+                    </th>
+                    <td>
+                      {{ employment.percentage }}%
+                    </td>
+                    <td>
+                      {{ employment.vacation_weeks|stringformat:'.0f' }}
+                    </td>
+                    <td>
+                      {{ employment.notes|default:'&ndash;' }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </div>
           </section>
         {% endif %}
 
