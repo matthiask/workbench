@@ -204,7 +204,7 @@ Answers: what money is owed to the agency and what is expected to be invoiced, a
 
 | Field | Computation |
 |---|---|
-| `currency` | Constant `"CHF"`. |
+| `currency` | `settings.WORKBENCH.CURRENCY` |
 | `open_invoices.total_excl_tax` / `total_incl_tax` | Σ total_excl_tax / Σ total of invoices outstanding on cutoff (all invoices incl. internal/no project). |
 | `open_invoices.overdue_incl_tax` | Σ total of those with `due_on < cutoff`. |
 | `receivables_by_due_week[]` | Same invoices grouped by ISO year/week of `due_on` (fallback `invoiced_on`): `amount_excl_tax`, `amount_incl_tax`; empty weeks dropped; past weeks included. |
@@ -895,8 +895,7 @@ Financial overview and budgets:
   leaves them out, so the same date can give two values. The first stored
   accruals record counts entirely as the change of its month.
 - `accepted_offers_not_invoiced` in the cash data API includes budget
-  retainer offers, "verkauft" in the budget statistics doesn't. The cash data
-  API always reports the currency as "CHF".
+  retainer offers, "verkauft" in the budget statistics doesn't.
 - The deals funnel of the key data API is always as of today.
 - Totals of accepted deals add up per-person counts and shares: deals with
   several contributors count several times, deals without contributors are

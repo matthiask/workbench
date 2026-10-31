@@ -1,6 +1,7 @@
 import datetime as dt
 from collections import defaultdict
 
+from django.conf import settings
 from django.utils import timezone
 
 from workbench.invoices.models import Invoice
@@ -123,7 +124,7 @@ def cash_data(date):
     data = {
         "date": date,
         "generated_at": timezone.localtime().isoformat(timespec="seconds"),
-        "currency": "CHF",
+        "currency": settings.WORKBENCH.CURRENCY,
         "open_invoices": open_invoices_totals(invoices, cutoff_date),
         "receivables_by_due_week": receivables_by_due_week(invoices),
         "accruals": statistics["overall"]["delta_negative"],
