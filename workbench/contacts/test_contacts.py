@@ -11,6 +11,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
 from workbench.contacts import tasks
+from workbench.contacts.forms import GroupSearchForm
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
 from workbench.tools.testing import messages
@@ -585,6 +586,28 @@ class GroupsTest(TestCase):
                     content.index('<optgroup label="Archived">'),
                     content.index(">Newsletter 2015</option>"),
                 )
+
+    def test_member_counts(self):
+        """People and organizations are counted independently of each other"""
+        group = Group.objects.create(title="Newsletter")
+        Group.objects.create(title="Empty")
+        for archived in [False, False, True]:
+            factories.PersonFactory.create(is_archived=archived).groups.add(group)
+        for archived in [False, True, True, True]:
+            factories.OrganizationFactory.create(is_archived=archived).groups.add(group)
+
+        form = GroupSearchForm({}, request=RequestFactory().get("/"))
+        self.assertTrue(form.is_valid())
+        counts = {
+            g.title: (
+                g.people_count,
+                g.organizations_count,
+                g.archived_people_count,
+                g.archived_organizations_count,
+            )
+            for g in form.filter(Group.objects.all())
+        }
+        self.assertEqual(counts, {"Newsletter": (2, 1, 1, 3), "Empty": (0, 0, 0, 0)})
 
     def test_archived_members(self):
         """People see that a group contains archived contacts, but not which"""

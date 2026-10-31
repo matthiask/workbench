@@ -4,8 +4,8 @@ from collections import OrderedDict
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Count, Q
-from django.db.models.functions import Lower
+from django.db.models import Count, OuterRef, Q, Subquery
+from django.db.models.functions import Coalesce, Lower
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
@@ -78,21 +78,30 @@ class GroupSearchForm(Form):
             queryset = queryset.filter(is_archived=True)
         elif data.get("s") != "all":
             queryset = queryset.filter(is_archived=False)
-        # Aggregations ignore the default ordering
         return queryset.annotate(
-            people_count=Count(
-                "person", filter=Q(person__is_archived=False), distinct=True
-            ),
-            organizations_count=Count(
-                "organization", filter=Q(organization__is_archived=False), distinct=True
-            ),
-            archived_people_count=Count(
-                "person", filter=Q(person__is_archived=True), distinct=True
-            ),
-            archived_organizations_count=Count(
-                "organization", filter=Q(organization__is_archived=True), distinct=True
-            ),
+            people_count=_member_count(Person, is_archived=False),
+            organizations_count=_member_count(Organization, is_archived=False),
+            archived_people_count=_member_count(Person, is_archived=True),
+            archived_organizations_count=_member_count(Organization, is_archived=True),
         ).order_by(Lower("title"), "pk")
+
+
+def _member_count(model, *, is_archived):
+    """Members of the group, counted in a subquery: joining people and
+    organizations at once multiplies their rows"""
+    through = model.groups.through
+    member = model._meta.model_name
+    return Coalesce(
+        Subquery(
+            through.objects
+            .filter(group=OuterRef("pk"), **{f"{member}__is_archived": is_archived})
+            .order_by()
+            .values("group")
+            .annotate(count=Count("pk"))
+            .values("count")
+        ),
+        0,
+    )
 
 
 @add_prefix("modal")
