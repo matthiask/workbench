@@ -336,3 +336,39 @@ class ShortNameTest(TestCase):
         self.assertEqual(names[newer.pk], "ab-3")
         self.assertEqual(names[inactive.pk], "ab-4")
         self.assertEqual(names[taken.pk], "ab-2")
+
+
+class ExpectedHoursTest(TestCase):
+    def test_expected_hours(self):
+        """The expected hours per week leave out holidays and absences"""
+        from time_machine import travel
+
+        from workbench.accounts.reporting import logged_hours
+        from workbench.awt.models import Holiday
+
+        week = dt.date(2026, 10, 19)
+        user = factories.UserFactory.create()
+        factories.YearFactory.create(
+            year=2026, working_time_model=user.working_time_model
+        )
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2026, 1, 1), percentage=100
+        )
+        Holiday.objects.create(
+            working_time_model=user.working_time_model, date=week, name="Holiday"
+        )
+        factories.AbsenceFactory.create(
+            user=user,
+            starts_on=week + dt.timedelta(days=1),
+            ends_on=week + dt.timedelta(days=2),
+            days=2,
+        )
+
+        with travel("2026-10-31 12:00"):
+            weeks = {
+                row["week"].date(): row["expected_hours"]
+                for row in logged_hours(user)["hours_per_week"]
+            }
+        # 5 days − 1 holiday − 2 vacation days
+        self.assertEqual(weeks[week], 16)
+        self.assertEqual(weeks[week + dt.timedelta(days=7)], 40)

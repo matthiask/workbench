@@ -663,7 +663,7 @@ Code: `workbench/reporting/labor_costs.py:_labor_costs_by_project_id`,
 | Figure | Computation |
 |---|---|
 | Stunden pro Woche (bars per project type: Order/Maintenance/Internal, `Project.TYPE_CHOICES`) | `SUM(hours)` of the user's `LoggedHours` grouped by `date_trunc('week', rendered_on)` and `project.type` |
-| Erwartet (dashed line, both charts) | `working_time_per_day(Year of user's WTM, year of the week's Monday, default 8.0) × 5 × employment.percentage / 100`. The employment is the one covering the Monday (if several match, the last one by `date_from` wins). The line is 0 without an employment. Holidays and absences are **not** subtracted. |
+| Erwartet (dashed line, both charts) | The hours one is expected to log: per week max(target − absences, 0) from `target_and_absences_by_week()` (`workbench/awt/reporting.py`, shared with the weekly working time): target = Σ over the weekdays of each employment of `working_time_per_day` (Year of the user's WTM, 8.0 if not configured) × percentage / 100 × (1 − holiday fraction); absences which count as working time are spread evenly over their weekdays and valued at `working_time_per_day`, like in the annual working time. Unpaid absences (reason `other`) don't reduce it. |
 | Stunden pro Kundschaft | `SUM(hours)` per week and `customer.name` (first line only). The 7 customers with the most hours over the whole period get their own series, and everyone else goes into "Alle anderen". Each label gets `round(100 × customer_hours / all_hours)%`. |
 
 Code: `workbench/accounts/reporting.py:logged_hours`, chart in `workbench/accounts/views.py:ProfileView.get_context_data`.
@@ -908,6 +908,4 @@ fixed or decided to be intended. Entries marked *(checked)* were confirmed
 against the code or the database; the others were found by reading the code
 and not checked a second time.
 
-Time and people:
-
-- "Erwartet" in the user statistics ignores holidays and absences.
+None at the moment.

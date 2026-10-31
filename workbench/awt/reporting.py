@@ -2,7 +2,7 @@ import datetime as dt
 from collections import UserDict, defaultdict
 from decimal import ROUND_UP, Decimal
 
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth
 from django.utils.datastructures import OrderedSet
 
@@ -514,6 +514,60 @@ def annual_working_time(year, *, users):  # noqa: C901
     }
 
 
+def target_and_absences_by_week(user, first, last, *, default_per_day=None):
+    """Target and absence hours per week (Monday) of the weekdays from
+    ``first`` to ``last``
+
+    The target is the working time per day (of the day's year, or
+    ``default_per_day`` if the year isn't configured) times the employment
+    percentage, less holidays. Absences which count as working time are
+    spread evenly over the weekdays they span and valued at the working time
+    per day, like in the annual working time."""
+    per_day = {
+        year.year: year.working_time_per_day
+        for year in Year.objects.filter(
+            working_time_model=user.working_time_model_id,
+            year__range=[first.year, last.year],
+            working_time_per_day__gt=0,
+        )
+    }
+
+    def working_time_per_day(day):
+        return per_day.get(day.year, default_per_day)
+
+    holidays = defaultdict(lambda: Z1)
+    for holiday in Holiday.objects.filter(
+        working_time_model=user.working_time_model_id, date__range=[first, last]
+    ):
+        holidays[holiday.date] += holiday.fraction
+
+    weeks = defaultdict(lambda: {"target": Z1, "absences": Z1})
+    for employment in Employment.objects.filter(
+        user=user, date_from__lte=last, date_until__gte=first
+    ):
+        for day in weekdays(
+            max(first, employment.date_from), min(last, employment.date_until)
+        ):
+            if wtpd := working_time_per_day(day):
+                weeks[monday(day)]["target"] += (
+                    wtpd
+                    * employment.percentage
+                    / 100
+                    * (1 - min(holidays.get(day, Z1), 1))
+                )
+
+    for absence in Absence.objects.filter(
+        user=user, starts_on__lte=last, is_working_time=True
+    ).filter(Q(ends_on__gte=first) | Q(ends_on__isnull=True, starts_on__gte=first)):
+        days = list(
+            weekdays(absence.starts_on, absence.ends_on or absence.starts_on)
+        ) or [absence.starts_on]
+        for day in days:
+            if first <= day <= last and (wtpd := working_time_per_day(day)):
+                weeks[monday(day)]["absences"] += absence.days / len(days) * wtpd
+    return weeks
+
+
 def working_time_by_week(year, *, user):
     """Target, logged hours and absences per week (starting on Monday) of the
     year until the current week
@@ -526,30 +580,12 @@ def working_time_by_week(year, *, user):
     ).first()
     if not wtm_year or wtm_year.working_time_per_day <= 0:
         return []
-    per_day = wtm_year.working_time_per_day
     first, last = dt.date(year, 1, 1), min(dt.date(year, 12, 31), dt.date.today())
     if first > last:
         return []
 
-    holidays = defaultdict(lambda: Z1)
-    for holiday in holidays_of_year(year, user.working_time_model_id):
-        holidays[holiday.date] += holiday.fraction
-    employments = list(
-        Employment.objects.filter(user=user, date_from__lte=last, date_until__gte=first)
-    )
-
-    weeks = defaultdict(lambda: {"target": Z1, "hours": Z1, "absences": Z1})
-    for employment in employments:
-        for day in weekdays(
-            max(first, employment.date_from), min(last, employment.date_until)
-        ):
-            weeks[monday(day)]["target"] += (
-                per_day
-                * employment.percentage
-                / 100
-                * (1 - min(holidays.get(day, Z1), 1))
-            )
-
+    weeks = target_and_absences_by_week(user, first, last)
+    hours = defaultdict(lambda: Z1)
     for row in (
         LoggedHours.objects
         .filter(rendered_by=user, rendered_on__range=[first, last])
@@ -557,21 +593,12 @@ def working_time_by_week(year, *, user):
         .values("rendered_on")
         .annotate(Sum("hours"))
     ):
-        weeks[monday(row["rendered_on"])]["hours"] += row["hours__sum"]
-
-    for absence in Absence.objects.filter(
-        user=user, starts_on__year=year, is_working_time=True
-    ):
-        days = list(
-            weekdays(absence.starts_on, absence.ends_on or absence.starts_on)
-        ) or [absence.starts_on]
-        for day in days:
-            if day <= last:
-                weeks[monday(day)]["absences"] += absence.days / len(days) * per_day
+        hours[monday(row["rendered_on"])] += row["hours__sum"]
 
     running = Z1
     result = []
-    for week, row in sorted(weeks.items()):
+    for week in sorted({*weeks, *hours}):
+        row = weeks[week] | {"hours": hours[week]}
         delta = row["hours"] + row["absences"] - row["target"]
         running += delta
         result.append({"week": week} | row | {"delta": delta, "running_delta": running})
