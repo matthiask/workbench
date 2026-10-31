@@ -233,7 +233,7 @@ class Planning:
     def add_absences(self, queryset):
         for absence in queryset.filter(
             Q(user__in=self._user_ids),
-            Q(starts_on__lte=max(self.weeks)),
+            Q(starts_on__lte=max(self.weeks) + dt.timedelta(days=6)),
             Q(ends_on__isnull=False, ends_on__gte=min(self.weeks))
             | Q(ends_on__isnull=True, starts_on__gte=min(self.weeks)),
         ).select_related("user"):
@@ -286,17 +286,19 @@ left outer join lateral (
         date_from,
         date_until,
         percentage,
-        planning_hours_per_day
+        planning_hours_per_day,
+        accounts_user.working_time_model_id
     from awt_employment
     left join accounts_user on awt_employment.user_id=accounts_user.id
     where user_id = any (%s)
 ) as employment
 on employment.date_from <= ph.date and employment.date_until > ph.date
+    and employment.working_time_model_id = ph.working_time_model_id
 
 where ph.date between %s and %s and user_id is not null
 order by ph.date
             """,
-            [list(ud.keys()), min(self.weeks), max(self.weeks)],
+            [list(ud.keys()), min(self.weeks), max(self.weeks) + dt.timedelta(days=6)],
         ):
             # Skip weekends
             if date.weekday() >= 5:
@@ -564,7 +566,7 @@ left outer join lateral(
                     --
                     case when extract('isodow' from starts_on) >= 6 then '7 days'::interval else '0 days'::interval end
                 ),
-                date_trunc('week', ends_on),
+                date_trunc('week', coalesce(ends_on, starts_on)),
                 '7 days'
               ) as w
             ) as weeks
@@ -593,7 +595,7 @@ left outer join lateral(
       date_trunc('week', date) as ph_week,
       sum(fraction) as ph_days
     from awt_holiday
-    where extract(dow from date) between 1 and 6
+    where extract(isodow from date) between 1 and 5
       and working_time_model_id = employment.working_time_model_id
     group by ph_week
 ) as public_holidays

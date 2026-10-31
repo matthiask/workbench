@@ -10,6 +10,7 @@ from openpyxl import load_workbook
 
 from workbench import factories
 from workbench.accounts.models import User
+from workbench.awt.models import Absence, Holiday
 from workbench.planning import reporting
 from workbench.planning.forms import MilestoneForm, PlannedWorkSearchForm
 from workbench.planning.models import ExternalWork, PlannedWork
@@ -472,3 +473,39 @@ class PlanningTest(TestCase):
         deal.closed_on = dt.date.today()
         deal.save()
         self.assertIsNone(decision())
+
+
+class CapacityTest(TestCase):
+    def test_capacity(self):
+        """Absences without an end date reduce the capacity, holidays on
+        weekends and of other working time models don't"""
+        week = dt.date(2026, 11, 2)
+        user = factories.UserFactory.create(planning_hours_per_day=8)
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2020, 1, 1), percentage=100
+        )
+        factories.AbsenceFactory.create(
+            user=user, starts_on=week + dt.timedelta(days=2), ends_on=None, days=1
+        )
+        Holiday.objects.create(
+            working_time_model=user.working_time_model,
+            date=week + dt.timedelta(days=5),
+            name="Saturday",
+            fraction=Decimal("0.5"),
+        )
+        Holiday.objects.create(
+            working_time_model=factories.WorkingTimeModelFactory.create(),
+            date=week + dt.timedelta(days=1),
+            name="Elsewhere",
+            fraction=1,
+        )
+
+        planning = reporting.Planning(weeks=[week], users=[user])
+        self.assertEqual(planning.capacity()["total"], [32])
+
+        planning.add_public_holidays()
+        self.assertEqual(planning._absences[user], [[]])
+
+        # Absences starting after the last monday are shown as well
+        planning.add_absences(Absence.objects.all())
+        self.assertEqual(len(planning._absences[user][0]), 1)

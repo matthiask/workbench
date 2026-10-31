@@ -807,15 +807,15 @@ capacity = percentage × 5 × planning_hours_per_day / 100
 
 - `planning_hours_per_day` is a per-user field (default 8), separate from the WTM's `working_time_per_day`.
 - Planned work counts whether it is provisional or not and whatever state the project has, distributed evenly over its weeks.
-- Absences of **all** reasons count (including `other`). Their days are not scaled by the percentage (days as entered) and are distributed evenly over the calendar weeks from `date_trunc('week', starts_on)` (moved to the next week if the absence starts on a weekend) to `date_trunc('week', ends_on)`.
-- Holidays: those of the user's WTM in that week with `extract(dow) between 1 and 6` (both kinds), scaled by the percentage.
+- Absences of **all** reasons count (including `other`). Their days are not scaled by the percentage (days as entered) and are distributed evenly over the calendar weeks from `date_trunc('week', starts_on)` (moved to the next week if the absence starts on a weekend) to `date_trunc('week', ends_on)` (`starts_on` if there is no end date).
+- Holidays: those of the user's WTM in that week on weekdays (both kinds), scaled by the percentage.
 - Weeks without an employment yield no capacity row (shown as 0). Partial weeks at the start or end of an employment aren't prorated, because only the Monday is checked.
 - `total` = sum over users per week.
 
 Worked example (made-up): 80%, `planning_hours_per_day` 8. In this week there is a public holiday on Monday (fraction 1), a vacation from Tuesday to Wednesday (`days = 2`, `ends_on` set), and planned work of 30 h spread over 3 weeks.
 `0.8 × 5 × 8 = 32` − `30 / 3 = 10` − `2 × 8 = 16` − `1 × 8 × 0.8 = 6.4` = **−0.4 h** (slightly overbooked).
 
-The display rows "absences" and "by week" in the same planning (`add_absences`, `add_public_holidays`) are computed in Python and differ slightly. Weekend holidays are skipped, single-day absences without `ends_on` are handled, holidays are not filtered by WTM, and absences spanning beyond the shown range put all their hours into the visible weeks.
+The display rows "absences" and "by week" in the same planning (`add_absences`, `add_public_holidays`) are computed in Python and differ slightly: absences spanning beyond the shown range put all their hours into the visible weeks.
 Code: `workbench/planning/reporting.py:Planning.capacity`, `Planning.add_absences`, `Planning.add_public_holidays`, `user_planning`, `team_planning`. API: `workbench/planning/api.py:planning_export`.
 
 ## Deals
@@ -915,13 +915,10 @@ Financial overview and budgets:
 
 Time and people:
 
-- *(checked)* Planning capacity ignores absences without an end date
-  (`date_trunc('week', NULL)` gives no weeks) and counts holidays on
-  Saturdays (`extract(dow) between 1 and 6`).
-- Capacity and the planning display check `employment.date_until > week`,
-  which drops the last day of an employment and weeks where an employment
-  starts after Monday. The holidays shown in the planning aren't filtered by
-  working time model.
+- Capacity and the planning display only look at the employment on the
+  Monday of a week (`date_from <= week < date_until`): an employment
+  starting after Monday gives no capacity that week, one ending during the
+  week gives the full week.
 - "Bezogene Ferientage (korrigiert)" in the annual working time subtracts a
   correction which is zero or negative, i.e. adds excess vacation.
 - The monthly annual working time doesn't cap holidays at one per day (a
