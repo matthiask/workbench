@@ -61,6 +61,9 @@ def annual_working_time_view(request):
         )
 
     if request.GET.get("export") == "pdf":
+        # The messages above say why there's nothing to export
+        if not statistics["statistics"]:
+            return redirect(f".?year={year}")
         return annual_working_time_pdf(statistics)
 
     return render(

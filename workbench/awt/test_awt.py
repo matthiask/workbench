@@ -970,3 +970,10 @@ class AWTTest(TestCase):
             awt["totals"]["holiday_public"] + awt["totals"]["holiday_company"], 1
         )
         self.assertAlmostEqual(awt["totals"]["target"], (360 - 1) * 8)
+
+    def test_pdf_without_configured_year(self):
+        """Exporting the annual working time without data doesn't crash"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.get("/report/annual-working-time/?export=pdf&year=2018")
+        self.assertRedirects(response, "/report/annual-working-time/?year=2018")
