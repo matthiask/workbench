@@ -103,10 +103,25 @@ class WorkingTimeAPITest(TestCase):
         )
         self.assertEqual(data["users"][0]["weeks"][0]["week"], "2025-12-29")
 
-    @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.NEVER})
     def test_permissions(self):
-        """Users see their own and others' annual working time like in the web
-        interface; everyone's requires the controlling feature"""
+        """The annual working time contains sickness absences, which are
+        health data: Others' and everyone's require the personnel
+        administration feature like in the web interface"""
+        user = factories.UserFactory.create(_short_name="ab")
+        factories.UserFactory.create(_short_name="cd")
+        self.client.force_login(user)
+
+        response = self.client.get("/api/reports/working-time/", {"user": "AB"})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get("/api/reports/working-time/", {"user": "CD"})
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get("/api/reports/working-time/", {"all": True})
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.ALWAYS})
+    def test_permissions_personnel_administration(self):
+        """Personnel administration sees everyone's annual working time"""
         user = factories.UserFactory.create()
         factories.UserFactory.create(_short_name="cd")
         self.client.force_login(user)
@@ -116,7 +131,7 @@ class WorkingTimeAPITest(TestCase):
         response = self.client.get("/api/reports/working-time/", {"user": "xy"})
         self.assertEqual(response.status_code, 422)
         response = self.client.get("/api/reports/working-time/", {"all": True})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
 
 class AbsenceCreateAPITest(TestCase):

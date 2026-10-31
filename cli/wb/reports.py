@@ -156,13 +156,17 @@ def cash_data(date, as_json):
 @reports.command("working-time")
 @click.option("--year", type=int, help="Defaults to the current year.")
 @click.option(
-    "--user", help="Short name, defaults to you.", shell_complete=complete_short_names
+    "--user",
+    help="Short name, defaults to you. Others require the personnel"
+    " administration feature.",
+    shell_complete=complete_short_names,
 )
 @click.option(
     "--all",
     "all_",
     is_flag=True,
-    help="Everyone employed during the year, requires the controlling feature.",
+    help="Everyone employed during the year, requires the personnel"
+    " administration feature.",
 )
 @click.option("--weekly", is_flag=True, help="Show the hours per week.")
 @click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")

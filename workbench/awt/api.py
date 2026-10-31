@@ -225,17 +225,21 @@ class WorkingTime(Schema):
 @router.get("/reports/working-time/", response=WorkingTime)
 def working_time(request, filters: Query[WorkingTimeFilter]):
     """Annual working time of the authenticated user, of the user with the
-    given short name, or of ``all`` users employed during the year (requires
-    the controlling feature), like in the web interface
+    given short name, or of ``all`` users employed during the year. Others'
+    require the personnel administration feature like in the web interface,
+    since the report contains sickness absences (health data).
 
     Hours are per month: The target, logged hours, absences and their sum
     (working time) and the balance. The total balance includes the vacation
     days credit. ``weekly`` adds the hours per week until the current one."""
     year = filters.year or dt.date.today().year
     if filters.all:
-        check_feature(request.user, FEATURES.CONTROLLING)
+        check_feature(request.user, FEATURES.PERSONNEL_ADMINISTRATION)
         users = list(active_users(year))
-    elif filters.user:
+    elif (
+        filters.user and filters.user.casefold() != request.user._short_name.casefold()
+    ):
+        check_feature(request.user, FEATURES.PERSONNEL_ADMINISTRATION)
         users = list(User.objects.filter(_short_name__iexact=filters.user))
         if not users:
             raise ValidationError([
