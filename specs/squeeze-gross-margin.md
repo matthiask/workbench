@@ -1,5 +1,14 @@
 # Spec: How squeeze works, and two fixes
 
+> **Status (October 2026):** Both fixes are implemented. Third party costs are
+> the larger of the invoiced and the logged ones (down payments and the other
+> invoices count once), and hours on 0.00/h services are weighted with
+> `BASE_HOURLY_RATE`. Section 1 describes squeeze *before* the fixes; see
+> `docs/metrics.md` for how it works now. Still open from the implementation
+> order: changing services of invoices which aren't in preparation anymore
+> (`Service.allow_update`), and a warning when the third party costs on
+> invoices and in the logbook differ.
+
 ## Goal
 
 Document how squeeze estimates gross margin per project and attributes it to

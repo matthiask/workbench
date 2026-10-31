@@ -872,9 +872,6 @@ and not checked a second time.
 Profitability:
 
 - The users' "Stunden" and "Ansatz" in squeeze include internal hours.
-- `specs/squeeze-gross-margin.md` is outdated in §1.1 (third party costs are
-  now the larger of invoiced and logged) and §1.3 (0.00 rates are weighted
-  with `BASE_HOURLY_RATE`).
 
 Financial overview and budgets:
 
