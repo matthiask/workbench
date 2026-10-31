@@ -747,6 +747,8 @@ Code: `workbench/awt/reporting.py:annual_working_time`, `Months`, `holiday_days_
 Project factor, computed over **all time** rather than the period:
 `budget = Σ service_hours` of non-optional services whose offer is either absent or (not declined **and** not a budget retainer). Offers in preparation or offered count. `logged = Σ hours` of all logged hours on the project. `factor = budget / logged` if that is < 1, else 1. Projects without any qualifying service have a NULL budget, which means factor 1.
 
+This is intended: green hours only say whether the hours fit the planned budget, so projects without budgeted services count as profitable and offers which aren't accepted yet count as budget. Whether the hours are paid for is only known once they are invoiced, which is what squeeze looks at.
+
 | Figure | Computation (hours in the period, per user) |
 |---|---|
 | Profitabel | `factor × hours` on Order projects |
@@ -917,6 +919,4 @@ Time and people:
   Monday of a week (`date_from <= week < date_until`): an employment
   starting after Monday gives no capacity that week, one ending during the
   week gives the full week.
-- Green hours count projects without budgeted services as profitable, and
-  budgets include offers which aren't accepted yet.
 - "Erwartet" in the user statistics ignores holidays and absences.
