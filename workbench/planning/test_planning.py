@@ -509,3 +509,43 @@ class CapacityTest(TestCase):
         # Absences starting after the last monday are shown as well
         planning.add_absences(Absence.objects.all())
         self.assertEqual(len(planning._absences[user][0]), 1)
+
+    def test_capacity_employment_changes_during_the_week(self):
+        """Employments starting or ending during a week count for the days
+        they cover, holidays only within the employment"""
+        week = dt.date(2026, 11, 2)
+        user = factories.UserFactory.create(_full_name="A", planning_hours_per_day=8)
+        # Monday and Tuesday at 50%, the rest of the week at 100%
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2026, 1, 1), percentage=50
+        )
+        factories.EmploymentFactory.create(
+            user=user, date_from=week + dt.timedelta(days=2), percentage=100
+        )
+        # A holiday on the Monday counts with 50%
+        Holiday.objects.create(
+            working_time_model=user.working_time_model,
+            date=week,
+            name="Monday",
+            fraction=1,
+        )
+        newcomer = factories.UserFactory.create(
+            _full_name="B", planning_hours_per_day=8
+        )
+        # Starts on Thursday, a holiday on Tuesday doesn't count
+        factories.EmploymentFactory.create(
+            user=newcomer, date_from=week + dt.timedelta(days=3), percentage=100
+        )
+        Holiday.objects.create(
+            working_time_model=newcomer.working_time_model,
+            date=week + dt.timedelta(days=1),
+            name="Tuesday",
+            fraction=1,
+        )
+
+        planning = reporting.Planning(weeks=[week], users=[user, newcomer])
+        capacity = planning.capacity()
+        # (2 days − 1 holiday) × 50% × 8h + 3 days × 8h = 4h + 24h
+        self.assertEqual(capacity["by_user"][0]["capacity"], [28])
+        # Thursday and Friday
+        self.assertEqual(capacity["by_user"][1]["capacity"], [16])

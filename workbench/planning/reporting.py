@@ -292,7 +292,7 @@ left outer join lateral (
     left join accounts_user on awt_employment.user_id=accounts_user.id
     where user_id = any (%s)
 ) as employment
-on employment.date_from <= ph.date and employment.date_until > ph.date
+on employment.date_from <= ph.date and employment.date_until >= ph.date
     and employment.working_time_model_id = ph.working_time_model_id
 
 where ph.date between %s and %s and user_id is not null
@@ -506,32 +506,49 @@ order by ph.date
 select
     week,
     user_id,
-    coalesce(percentage, 0) * 5 * coalesce(planning_hours_per_day, 0) / 100
+    working_days * coalesce(planning_hours_per_day, 0)
         - coalesce(pw_hours, 0)
         - coalesce(abs_hours, 0)
-        - coalesce(ph_days, 0)
-          * coalesce(planning_hours_per_day, 0)
-          * coalesce(percentage, 0) / 100
         as capacity
 
---
--- Determine the employment percentage and planning_hours_per_day
--- for each user and week
---
 from generate_series(%s::date, %s::date, '7 days') as week
-left outer join lateral (
-    select
-        user_id,
-        date_from,
-        date_until,
-        percentage,
-        planning_hours_per_day,
-        accounts_user.working_time_model_id
+cross join (
+    select id as user_id, planning_hours_per_day, working_time_model_id
+    from accounts_user
+    where id = any (%s)
+) as users
+
+--
+-- The working days of each user and week: the weekdays covered by each
+-- employment (date_until is inclusive) less the holidays on those days,
+-- weighted with the employment's percentage. Employments starting or ending
+-- during the week only count for their days.
+--
+join lateral (
+    select sum(
+        percentage / 100.0 * (
+            (
+                select count(*)
+                from generate_series(
+                    greatest(week, date_from::timestamp),
+                    least(week + interval '4 days', date_until::timestamp),
+                    '1 day'
+                )
+            )
+            - coalesce((
+                select sum(fraction)
+                from awt_holiday
+                where working_time_model_id = users.working_time_model_id
+                  and date between greatest(week::date, date_from)
+                      and least((week + interval '4 days')::date, date_until)
+            ), 0)
+        )
+    ) as working_days
     from awt_employment
-    left join accounts_user on awt_employment.user_id=accounts_user.id
-    where user_id = any (%s)
-) as employment
-on employment.date_from <= week and employment.date_until > week
+    where awt_employment.user_id = users.user_id
+      and date_from <= week + interval '4 days'
+      and date_until >= week
+) as employment on employment.working_days is not null
 
 --
 -- Aggregate planned hours per week, distributing equally the planned_hours
@@ -571,10 +588,7 @@ left outer join lateral(
               ) as w
             ) as weeks
           from awt_absence
-          where user_id = any(%s)
-          and user_id=employment.user_id
-          and employment.date_from <= date_trunc('week', week)
-          and employment.date_until > date_trunc('week', week)
+          where awt_absence.user_id = users.user_id
     )
     --
     -- Calculate the planning hours for each absence and distribute the hours
@@ -590,19 +604,8 @@ left outer join lateral(
 ) as absences
 on week=abs_week and user_id=abs_user_id
 
-left outer join lateral(
-    select
-      date_trunc('week', date) as ph_week,
-      sum(fraction) as ph_days
-    from awt_holiday
-    where extract(isodow from date) between 1 and 5
-      and working_time_model_id = employment.working_time_model_id
-    group by ph_week
-) as public_holidays
-on week=ph_week
-
             """,
-            [min(self.weeks), max(self.weeks), user_ids, user_ids, user_ids],
+            [min(self.weeks), max(self.weeks), user_ids, user_ids],
         ):
             by_user[user][week.date()] = capacity
             total[week.date()] += capacity
