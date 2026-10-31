@@ -6,7 +6,7 @@
     </a>
     / {{ change.pretty_user_name|default:'🧙' }} / {{ change.version.created_at|local_date_format }}
   </h4>
-  <ul>
+  <ul class="wb-history-changes">
     {% for pretty in change.changes %}<li>{{ pretty }}</li>{% endfor %}
   </ul>
 {% empty %}

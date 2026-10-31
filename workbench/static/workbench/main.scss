@@ -1712,6 +1712,11 @@ details.card:not([open]) > summary.card-header {
   stroke-width: 1;
 }
 
+// Changed values may be long lists without spaces, e.g. features
+.wb-history-changes {
+  overflow-wrap: anywhere;
+}
+
 // Small screens, after the rules they override
 @media (max-width: 767.98px) {
   // Asides and actions move below the text instead of squeezing it
