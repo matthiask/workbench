@@ -213,8 +213,8 @@ Answers: what money is owed to the agency and what is expected to be invoiced, a
 | `accepted_offers_not_invoiced.total_excl_tax` | Revenue: Σ over open external projects of max(Σ accepted Offer.total_excl_tax − Σ invoiced Invoice.total_excl_tax, 0). Budget retainer offers included (`Offer.objects.accepted()`). |
 | `accepted_offers_not_invoiced.not_in_planned_invoicing_excl_tax` | Gross margin: Σ over the same projects of max(max(offered GM − invoiced GM, 0) − projected-not-invoiced delta of the project, 0). |
 | `work_not_invoiced.total_excl_tax` | `delta_positive` (logged costs + effort cost − invoiced, positive projects only) of open external projects at cutoff. |
-| `work_not_invoiced.beyond_offers_excl_tax` | Σ over projects with delta > 0 and `sold` ≠ 0 of max(logbook − max(sold, invoiced), 0); logbook = LoggedCost.cost + effort cost; sold = accepted non-retainer offers' total_excl_tax + budget transfer adjustments. |
-| `work_not_invoiced.in_planned_invoicing_excl_tax` | Σ over projects with delta > 0 of min(delta, min(P, max(P − invoiced GM, 0))), P = Σ all ProjectedInvoice.gross_margin of the (open) project. |
+| `work_not_invoiced.in_planned_invoicing_excl_tax` | "davon geplant" of the [project budget statistics](#project-budget-statistics-projekt-budgetstatistik). |
+| `work_not_invoiced.beyond_offers_excl_tax` | "davon über Offerte" of the project budget statistics; doesn't overlap with the planned part. |
 
 Caveats from code: "The split into planned invoicing is an approximation (rates vs. gross margin)"; figures based on projects leave out internal projects, open invoices include all invoices; "Dates in the current week are evaluated at the time of the request so that invoices paid since monday do not show up as open anymore."
 
@@ -304,17 +304,17 @@ Sorted by `delta` descending (closed-filter: by `closed_on` descending).
 | verkauft, Logbuch, Verrechnet, Rabatt, Fremdkosten, hours, … | same keys | plain sum of the per-project values |
 | Nicht verrechnete Arbeit | `delta_positive` | Σ `delta` of projects with `delta > 0` |
 | Abgrenzungen | `delta_negative` | Σ `delta` of projects with `delta < 0` (negative number) |
-| davon über Offerte (tooltip "Mehr erfasst als offeriert und verrechnet, z.B. Stunden über der Offerte und Rabatte") | `delta_beyond_offer` | Σ over projects with `delta > 0` **and `sold != 0`** of `max(logbook − max(sold, invoiced), 0)`. Projects without any sold amount contribute nothing. |
-| davon geplant (tooltip "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)") | `delta_planned` | Σ over projects with `delta > 0` of `min(delta, planned)`, `planned = min(P, max(P − I, 0))`, `P` = `projected_gross_margin` (all projections, open projects only), `I` = invoiced gross margin from `gross_margin_components()["invoiced"]` = all SENT/PAID invoices **without cutoff** − `max(third party costs on invoices, logged third party costs)` (`workbench/reporting/squeeze.py:third_party_costs`). |
+| davon geplant (tooltip "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)") | `delta_planned` | Σ over projects with `delta > 0` of `planned = min(delta, P, max(P − I, 0))`, `P` = `projected_gross_margin` (all projections, open projects only), `I` = invoiced gross margin from `gross_margin_components()["invoiced"]` = all SENT/PAID invoices **without cutoff** − `max(third party costs on invoices, logged third party costs)` (`workbench/reporting/squeeze.py:third_party_costs`). |
+| davon über Offerte (tooltip "Mehr erfasst als offeriert und verrechnet, z.B. Stunden über der Offerte und Rabatte") | `delta_beyond_offer` | Σ over projects with `delta > 0` **and `sold != 0`** of `min(max(logbook − max(sold, invoiced), 0), delta − planned)`: the rest not covered by planned invoicing which was logged beyond the offers. Projects without any sold amount contribute nothing. |
 
-The two "davon" figures are independent splits of `delta_positive`; nothing makes them disjoint (unclear whether they are meant to be additive; the code does not enforce it).
+The two "davon" figures don't overlap: planned invoicing comes first because it may cover additional work which has been agreed, "über Offerte" is taken from the rest. Together they are at most `delta_positive`.
 
 **Worked example** (one open project, cutoff today):
 - Accepted offer: subtotal 10,500, discount 500 → total 10,000. Budget transfer in from another project: +1,000. → **verkauft 11,000**, Rabatt −500.
 - Logged 100 h at effort rate 120 (invoiced_hours empty) = 12,000; 5 h on a service without rate; logged cost 800 with third party costs 600, not yet invoiced. → **Logbuch 12,800 (+5 h)**, Fremdkosten 600.
 - Invoiced (sent): 8,000. → **Δ = 12,800 − 8,000 = +4,800** → counts toward "Nicht verrechnete Arbeit".
-- davon über Offerte = max(12,800 − max(11,000, 8,000), 0) = **1,800**.
 - Projected gross margin 9,000; invoiced GM = 8,000 − max(0, 600) = 7,400; planned = max(9,000 − 7,400, 0) = 1,600 → davon geplant = min(4,800, 1,600) = **1,600**.
+- davon über Offerte = min(max(12,800 − max(11,000, 8,000), 0), 4,800 − 1,600) = **1,800**.
 - If instead 14,000 had been invoiced: Δ = −1,200 → counted in **Abgrenzungen** −1,200, nothing in the "davon" figures.
 
 **Caveats (from code comments/docs):**
@@ -886,9 +886,6 @@ Financial overview and budgets:
   fixed amount invoices, so a cost entered on both counts twice; squeeze
   takes the larger of the two instead. Down payment invoices are left out
   here but not in squeeze and "Bank spielen".
-- *(checked)* "davon über Offerte" and "davon geplant" in the project budget
-  statistics can overlap, so they can't be subtracted from the work not
-  invoiced together.
 - "davon geplant" and the projected gross margin ignore the cutoff date;
   offers and budget transfers are never limited by it either.
 - "Rabatt" in the budget statistics counts offers which aren't declined,

@@ -188,6 +188,40 @@ class StatisticsTest(TestCase):
         self.assertEqual(overall["delta_beyond_offer"], 500)
         self.assertEqual(overall["delta_planned"], 400)
 
+    def test_project_budget_statistics_delta_splits_dont_overlap(self):
+        """Work beyond the offer covered by planned invoicing only counts as
+        planned, e.g. when additional work has been agreed"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        service = factories.ServiceFactory.create(
+            project=project,
+            offer=offer,
+            effort_type="Any",
+            effort_rate=100,
+            effort_hours=10,
+        )
+        offer.save()
+        factories.LoggedHoursFactory.create(service=service, hours=13)
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1000,
+            status=Invoice.SENT,
+            due_on=in_days(15),
+        )
+        factories.ProjectedInvoiceFactory.create(
+            project=project, gross_margin=Decimal(1300)
+        )
+
+        overall = project_budget_statistics.project_budget_statistics([project])[
+            "overall"
+        ]
+        self.assertEqual(overall["delta_positive"], 300)
+        self.assertEqual(overall["delta_planned"], 300)
+        self.assertEqual(overall["delta_beyond_offer"], 0)
+
     def create_projects(self):
         p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)
         p_maintenance = factories.ProjectFactory.create(type=Project.MAINTENANCE)

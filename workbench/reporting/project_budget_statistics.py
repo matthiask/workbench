@@ -129,30 +129,29 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     overall["delta_positive"] = sum(s["delta"] for s in statistics if s["delta"] > 0)
     overall["delta_negative"] = sum(s["delta"] for s in statistics if s["delta"] < 0)
 
-    # Splits of the work which hasn't been invoiced yet: Logged beyond what has
-    # been offered (hours over the offer, discounts), and covered by projected
+    # Splits of the work which hasn't been invoiced yet: Covered by projected
     # gross margin which hasn't been invoiced yet (at most the projections
-    # themselves, as in the planned invoicing per month). The latter mixes
-    # logbook values with gross margin and is only an approximation.
+    # themselves, as in the planned invoicing per month), and of the rest the
+    # part logged beyond what has been offered (hours over the offer,
+    # discounts). Planned invoicing comes first because it may cover
+    # additional work which has been agreed. Mixing logbook values with gross
+    # margin is only an approximation.
     gross_margins = gross_margin_components(projects)
 
     def planned(s):
         projected = s["projected_gross_margin"]
         invoiced = gross_margins[s["project"].id]["invoiced"]
-        return min(projected, max(projected - invoiced, Z2))
+        return min(s["delta"], projected, max(projected - invoiced, Z2))
 
-    overall["delta_beyond_offer"] = sum(
-        (
-            max(s["logbook"] - max(s["sold"], s["invoiced"]), Z2)
-            for s in statistics
-            if s["delta"] > 0 and s["sold"]
-        ),
-        Z2,
-    )
-    overall["delta_planned"] = sum(
-        (min(s["delta"], planned(s)) for s in statistics if s["delta"] > 0),
-        Z2,
-    )
+    def beyond_offer(s):
+        if not s["sold"]:
+            return Z2
+        beyond = max(s["logbook"] - max(s["sold"], s["invoiced"]), Z2)
+        return min(beyond, s["delta"] - planned(s))
+
+    positive = [s for s in statistics if s["delta"] > 0]
+    overall["delta_planned"] = sum((planned(s) for s in positive), Z2)
+    overall["delta_beyond_offer"] = sum((beyond_offer(s) for s in positive), Z2)
 
     return {
         "statistics": sorted(statistics, key=lambda s: s["delta"], reverse=True),
