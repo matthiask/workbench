@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from workbench.accounts.models import User
-from workbench.timer.models import Timestamp
+from workbench.timer.models import Timestamp, timestamp_project
 from workbench.tools.formats import Z1, hours, local_date_format
 from workbench.tools.forms import Form, ModelForm
 from workbench.tools.validation import filter_form, monday
@@ -52,6 +52,7 @@ class TokenUserMixin:
 
 class TimestampForm(TokenUserMixin, ModelForm):
     time = forms.TimeField(required=False)
+    project = forms.CharField(required=False)
 
     class Meta:
         model = Timestamp
@@ -64,6 +65,11 @@ class TimestampForm(TokenUserMixin, ModelForm):
 
     def clean(self):
         data = super().clean()
+        if data.get("project") and data.get("user"):
+            try:
+                data["project"] = timestamp_project(data["user"], data["project"])
+            except forms.ValidationError as exc:
+                self.add_error("project", exc)
         if data.get("time"):
             data["created_at"] = make_aware(
                 dt.datetime.combine(dt.date.today(), data["time"])
@@ -74,6 +80,7 @@ class TimestampForm(TokenUserMixin, ModelForm):
         instance = super().save(commit=False)
         instance.created_at = self.cleaned_data.get("created_at", instance.created_at)
         instance.user = self.cleaned_data["user"]
+        instance.project = self.cleaned_data.get("project") or None
         instance.save()
         return instance
 

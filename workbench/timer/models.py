@@ -5,6 +5,7 @@ from collections import UserDict
 from decimal import ROUND_UP, Decimal
 from urllib.parse import urlencode
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -18,6 +19,33 @@ from workbench.tools.formats import Z1, local_date_format
 
 
 TIMESTAMPS_DETECT_GAP = 120  # seconds
+
+
+def timestamp_project(user, value):
+    """The project with this ID, or the open pinned project matching the text"""
+    if isinstance(value, int) or value.isdigit():
+        if project := Project.objects.filter(pk=value).first():
+            return project
+        raise ValidationError(gettext("This project doesn't exist."))
+    projects = [
+        project
+        for project in user.pinned_projects
+        .open()
+        .select_related("customer", "owned_by")
+        .order_by("pk")
+        if value.casefold()
+        in f"{project.code} {project.title} {project.customer.name}".casefold()
+    ]
+    if len(projects) == 1:
+        return projects[0]
+    if projects:
+        raise ValidationError(
+            gettext("Several pinned projects match %(text)r: %(projects)s")
+            % {"text": value, "projects": "; ".join(str(p) for p in projects)}
+        )
+    raise ValidationError(
+        gettext("No pinned project matches %r. Pin it or use the project's ID.") % value
+    )
 
 
 class Slice(UserDict):

@@ -84,8 +84,18 @@
         color: var(--muted);
       }
 
-      input + input {
-        margin-top: 0.5rem;
+      .fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+
+      .fields [name='notes'] {
+        grid-column: 1 / -1;
+      }
+
+      .fields input {
+        min-width: 0;
       }
 
       .buttons {
@@ -133,6 +143,7 @@
 
         const notes = $("[name=notes]")
         const time = $("[name=time]")
+        const project = $("[name=project]")
 
         let statusTimeout = null
         const setStatus = (success, message = "") => {
@@ -145,7 +156,7 @@
           statusTimeout = setTimeout(() => {
             f.textContent = ""
             f.classList.remove("success")
-          }, 2000)
+          }, success ? 2000 : 6000)
         }
 
         const params = new URLSearchParams(window.location.search)
@@ -170,20 +181,27 @@
             fd.append("type", button.dataset.type)
             fd.append("notes", notes.value)
             fd.append("time", time.value)
+            fd.append("project", project.value)
             fd.append("token", token)
             try {
               const response = await fetch(`${url}`, {
                 method: "POST",
                 body: fd,
               })
-              if (!response.ok) throw Error()
-              const _data = await response.json()
+              const data = await response.json()
+              if (!response.ok) {
+                const errors = JSON.parse(data.errors)
+                throw Error(
+                  Object.values(errors).flat().map(e => e.message).join(" ")
+                )
+              }
 
               notes.value = ""
               time.value = ""
+              project.value = ""
               setStatus(true, "Saved!")
             } catch(err) {
-              setStatus(false, `Error: ${err}`)
+              setStatus(false, `${err}`)
             }
           }
         })
@@ -193,9 +211,10 @@
   <body>
     <main>
       <h1>Timestamps</h1>
-      <div class="notes">
+      <div class="fields">
         <input type="text" name="notes" value="" placeholder="Notes">
         <input type="time" name="time" value="" placeholder="Time">
+        <input type="text" name="project" value="" placeholder="Project">
       </div>
       <div class="buttons">
         <button type="button" data-type="start">Start</button>

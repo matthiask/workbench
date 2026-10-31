@@ -3,6 +3,7 @@ import re
 from decimal import Decimal
 from typing import Literal
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
@@ -13,9 +14,9 @@ from ninja.errors import HttpError, ValidationError
 
 from workbench.logbook.models import LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
-from workbench.projects.models import Project, Service
+from workbench.projects.models import Service
 from workbench.reporting.utils import sum_of
-from workbench.timer.models import Slice, Timestamp
+from workbench.timer.models import Slice, Timestamp, timestamp_project
 from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
 
@@ -128,32 +129,10 @@ def _error(field, msg):
 
 
 def _project(user, value):
-    """The project with this ID, or the open pinned project matching the text"""
-    if isinstance(value, int) or value.isdigit():
-        if project := Project.objects.filter(pk=value).first():
-            return project
-        raise _error("project", _("This project doesn't exist."))
-    projects = [
-        project
-        for project in user.pinned_projects
-        .open()
-        .select_related("customer", "owned_by")
-        .order_by("pk")
-        if value.casefold()
-        in f"{project.code} {project.title} {project.customer.name}".casefold()
-    ]
-    if len(projects) == 1:
-        return projects[0]
-    if projects:
-        raise _error(
-            "project",
-            _("Several pinned projects match %(text)r: %(projects)s")
-            % {"text": value, "projects": "; ".join(str(p) for p in projects)},
-        )
-    raise _error(
-        "project",
-        _("No pinned project matches %r. Pin it or use the project's ID.") % value,
-    )
+    try:
+        return timestamp_project(user, value)
+    except DjangoValidationError as exc:
+        raise _error("project", exc.messages[0]) from exc
 
 
 def _project_and_service(user, data):
