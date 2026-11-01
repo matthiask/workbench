@@ -776,8 +776,11 @@ planned_work:
 
         result = self.wb("reports", "squeeze", "--period", "this-month")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Accepted deals", result.output)
-        self.assertIn("250.00", result.output)
+        self.assertIn("Acquisition", result.output)
+        self.assertIn("Accepted deals  1000.00", result.output)
+        self.assertIn("Per hour        250.00", result.output)
+        # Only the total, no figures per person
+        self.assertEqual(result.output.count("Per hour"), 1)
 
     def test_key_data_and_cash_data(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
