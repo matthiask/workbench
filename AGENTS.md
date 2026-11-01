@@ -162,7 +162,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   hourly rate. The project's share of the period and all rates use `hours`.
   Services without a rate or with a rate of
   0.00 (work paid elsewhere, e.g. by a package price) are weighted with
-  `BASE_HOURLY_RATE`.
+  `BASE_HOURLY_RATE`. Describe it briefly in help texts and docs, without
+  emphasizing the figures per person: they are volatile and need a lot of
+  interpretation and care, also because of different employment profiles.
+  Company-wide totals are fine.
 - Third party costs are deducted once: the larger of those on invoices and
   the logged ones (`third_party_costs()` in `workbench/reporting/squeeze.py`).
   Logged costs can't be linked to fixed amount invoices, so adding up both
