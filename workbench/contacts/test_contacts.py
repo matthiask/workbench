@@ -118,11 +118,14 @@ class ContactsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_person_list_rows(self):
-        """Rows show the organization and the groups"""
+        """Rows show the organization and the active groups"""
         person = factories.PersonFactory.create(
             organization=factories.OrganizationFactory.create(name="Acme Ltd.")
         )
-        person.groups.set([Group.objects.create(title="Newsletter")])
+        person.groups.set([
+            Group.objects.create(title="Newsletter"),
+            Group.objects.create(title="Mailing 2015", is_archived=True),
+        ])
         factories.PersonFactory.create(given_name="Groupless")
 
         self.client.force_login(person.primary_contact)
@@ -130,6 +133,7 @@ class ContactsTest(TestCase):
             response = self.client.get(person.urls["list"])
         self.assertContains(response, "Acme Ltd.")
         self.assertContains(response, ">Newsletter</a>")
+        self.assertNotContains(response, ">Mailing 2015</a>")
 
     def test_organization_list(self):
         """The organization list basically works"""

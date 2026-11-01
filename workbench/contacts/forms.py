@@ -4,7 +4,7 @@ from collections import OrderedDict
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Count, OuterRef, Q, Subquery
+from django.db.models import Count, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import Coalesce, Lower
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
@@ -270,7 +270,9 @@ class PersonSearchForm(Form):
             self
             .apply_renamed(queryset, "g", "groups")
             .select_related("organization", "primary_contact")
-            .prefetch_related("groups")
+            .prefetch_related(
+                Prefetch("groups", queryset=Group.objects.filter(is_archived=False))
+            )
         )
 
     def response(self, request, queryset):
