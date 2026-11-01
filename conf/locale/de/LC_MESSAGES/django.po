@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 20:09+0100\n"
+"POT-Creation-Date: 2026-11-01 20:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1098,6 +1098,14 @@ msgstr "ist archiviert"
 #: workbench/contacts/models.py
 msgid "People only in archived groups are archived automatically after five years without use. Groups don't keep organizations without active people."
 msgstr "Personen, die nur in archivierten Gruppen sind, werden nach fünf Jahren ohne Verwendung automatisch archiviert. Gruppen halten Organisationen ohne aktive Personen nicht aktiv."
+
+#: workbench/contacts/models.py workbench/templates/contacts/group_list.html
+msgid "applies to organizations"
+msgstr "gilt für Organisationen"
+
+#: workbench/contacts/models.py
+msgid "For example industries: people are in the group through their organization, changes on people go to the organization."
+msgstr "Zum Beispiel Branchen: Personen sind über ihre Organisation in der Gruppe, Änderungen bei Personen werden bei der Organisation gespeichert."
 
 #: workbench/contacts/models.py
 msgid "group"

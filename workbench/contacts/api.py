@@ -159,7 +159,7 @@ def person_out(person, request):
         "salutation": person.salutation,
         "notes": person.notes,
         "primary_contact": person.primary_contact.get_short_name(),
-        "groups": [group.title for group in person.groups.all()],
+        "groups": [group.title for group in person.all_groups()],
         "email_addresses": [
             {"type": detail.type, "value": detail.email}
             for detail in person.emailaddresses.all()

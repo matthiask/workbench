@@ -16,7 +16,7 @@
         {% if person.organization %}
           <span>{% link_or_none person.organization %}</span>
         {% endif %}
-        {% for group in person.groups.all %}
+        {% for group in person.all_groups %}
           <a href="{% url 'contacts_person_list' %}?g={{ group.id }}" class="badge text-bg-light">{{ group }}</a>
         {% endfor %}
       </div>

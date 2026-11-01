@@ -129,7 +129,7 @@ class ContactsTest(TestCase):
         factories.PersonFactory.create(given_name="Groupless")
 
         self.client.force_login(person.primary_contact)
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(11):
             response = self.client.get(person.urls["list"])
         self.assertContains(response, "Acme Ltd.")
         self.assertContains(response, ">Newsletter</a>")
@@ -699,3 +699,113 @@ class GroupsTest(TestCase):
         # Asking for all contacts shows them, the note isn't needed then
         response = self.client.get(group.get_absolute_url() + "&s=all")
         self.assertNotContains(response, "archived contact")
+
+
+class OrganizationGroupsTest(TestCase):
+    """Groups which apply to organizations (e.g. industries) are joined by
+    people through their organization"""
+
+    def setUp(self):
+        deactivate_all()
+        self.industry = Group.objects.create(
+            title="Industry", applies_to_organizations=True
+        )
+        self.newsletter = Group.objects.create(title="Newsletter")
+        self.organization = factories.OrganizationFactory.create()
+        self.organization.groups.add(self.industry)
+        self.person = factories.PersonFactory.create(organization=self.organization)
+        self.person.groups.add(self.newsletter)
+
+    def test_flag_moves_memberships(self):
+        """Applying a group to organizations moves the memberships of people
+        with an organization to their organization"""
+        group = Group.objects.create(title="Film")
+        self.person.groups.add(group)
+        alone = factories.PersonFactory.create()
+        alone.groups.add(group)
+
+        self.client.force_login(self.person.primary_contact)
+        response = self.client.post(
+            group.urls["update"],
+            {"modal-title": "Film", "modal-applies_to_organizations": "on"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(set(self.person.groups.all()), {self.newsletter})
+        self.assertEqual(set(self.organization.groups.all()), {self.industry, group})
+        self.assertEqual(set(alone.groups.all()), {group})
+
+    def test_person_form(self):
+        """The person form shows the groups of the organization too, changes
+        to groups which apply to organizations go to the organization"""
+        film = Group.objects.create(title="Film", applies_to_organizations=True)
+        self.client.force_login(self.person.primary_contact)
+        response = self.client.get(self.person.urls["update"])
+        self.assertEqual(
+            set(response.context["form"].initial["groups"]),
+            {self.industry.pk, self.newsletter.pk},
+        )
+
+        response = self.client.post(
+            self.person.urls["update"],
+            person_to_dict(
+                self.person,
+                salutation="Dear John",
+                groups=[film.pk, self.newsletter.pk],
+            ),
+        )
+        self.assertRedirects(response, self.person.urls["detail"])
+        self.assertEqual(set(self.person.groups.all()), {self.newsletter})
+        self.assertEqual(set(self.organization.groups.all()), {film})
+
+    def test_person_without_organization(self):
+        """People without an organization are in such groups themselves"""
+        person = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+        response = self.client.post(
+            person.urls["update"],
+            person_to_dict(person, salutation="Dear John", groups=[self.industry.pk]),
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        self.assertEqual(set(person.groups.all()), {self.industry})
+
+    def test_people_list(self):
+        """The people list finds and shows people through their organization"""
+        self.client.force_login(self.person.primary_contact)
+        response = self.client.get(f"/contacts/people/?g={self.industry.pk}")
+        self.assertEqual(list(response.context["object_list"]), [self.person])
+        self.assertContains(response, ">Industry</a>")
+
+        # Groups which don't apply to organizations don't pass to people
+        self.organization.groups.add(self.newsletter)
+        other = factories.PersonFactory.create(organization=self.organization)
+        response = self.client.get(f"/contacts/people/?g={self.newsletter.pk}")
+        self.assertEqual(list(response.context["object_list"]), [self.person])
+
+        response = self.client.get("/contacts/people/?s=no-group")
+        self.assertEqual(list(response.context["object_list"]), [])
+        self.organization.groups.remove(self.industry)
+        response = self.client.get("/contacts/people/?s=no-group")
+        self.assertEqual(list(response.context["object_list"]), [other])
+
+    def test_member_counts(self):
+        """People are counted through their organization"""
+        factories.PersonFactory.create(organization=self.organization)
+        self.industry.person_set.add(factories.PersonFactory.create())
+        form = GroupSearchForm({}, request=RequestFactory().get("/"))
+        self.assertTrue(form.is_valid())
+        counts = {g.title: g.people_count for g in form.filter(Group.objects.all())}
+        self.assertEqual(counts, {"Industry": 3, "Newsletter": 1})
+
+    def test_detail_and_api(self):
+        """The person's detail page and the API list the organization's groups"""
+        self.client.force_login(self.person.primary_contact)
+        self.assertContains(self.client.get(self.person.urls["detail"]), "Industry")
+        response = self.client.get(f"/api/contacts/people/{self.person.pk}/")
+        self.assertEqual(response.json()["groups"], ["Industry", "Newsletter"])
+
+    def test_archival(self):
+        """Groups which apply to organizations keep their people"""
+        cutoff = timezone.now() + dt.timedelta(days=1)  # Every change is older
+        self.person.groups.clear()
+        self.assertEqual(set(tasks.unused_people(cutoff)), set())

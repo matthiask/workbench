@@ -24,7 +24,7 @@
           {% if person.organization and not person.organization.is_private_person %}
             <a href="{{ person.organization.get_absolute_url }}">{{ person.organization }}</a>
           {% endif %}
-          {% for group in person.groups.all %}
+          {% for group in person.all_groups %}
             <a class="text-secondary" href="{% url 'contacts_person_list' %}?g={{ group.pk }}">{{ group }}</a>
           {% endfor %}
         </div>

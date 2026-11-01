@@ -39,6 +39,9 @@
               </span>
             {% endif %}
           {% endwith %}
+          {% if group.applies_to_organizations %}<span
+              class="badge text-bg-light"
+            >{% translate 'applies to organizations' %}</span>{% endif %}
           {% if group.is_archived %}<span class="badge text-bg-secondary">{% translate 'archived' %}</span>{% endif %}
         </div>
       </div>

@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 import phonenumbers
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
 from django_countries.fields import CountryField
@@ -31,6 +31,15 @@ class Group(Model):
         ),
     )
 
+    applies_to_organizations = models.BooleanField(
+        _("applies to organizations"),
+        default=False,
+        help_text=_(
+            "For example industries: people are in the group through their"
+            " organization, changes on people go to the organization."
+        ),
+    )
+
     class Meta:
         ordering = ("title",)
         verbose_name = _("group")
@@ -38,6 +47,19 @@ class Group(Model):
 
     def __str__(self):
         return self.title
+
+    def move_people_to_organizations(self):
+        """People with an organization are in groups which apply to
+        organizations through their organization"""
+        memberships = Person.groups.through.objects.filter(
+            group=self, person__organization__isnull=False
+        )
+        self.organization_set.add(
+            *Organization.objects.filter(
+                people__in=memberships.values("person")
+            ).distinct()
+        )
+        memberships.delete()
 
     def get_absolute_url(self):
         # Groups are lists of people
@@ -145,6 +167,30 @@ class PersonQuerySet(SearchQuerySet):
     def active(self):
         return self.filter(is_archived=False)
 
+    def in_group(self, group):
+        """People in the group, also through their organization if the group
+        applies to organizations"""
+        return self.filter(in_group_q(group))
+
+    def without_groups(self):
+        """People in no active group, also not through their organization"""
+        return self.exclude(groups__is_archived=False).exclude(
+            organization__in=Organization.objects.filter(
+                groups__is_archived=False, groups__applies_to_organizations=True
+            )
+        )
+
+
+def in_group_q(group):
+    """``group`` may be a group or an expression (e.g. ``OuterRef``)"""
+    return Q(
+        id__in=Person.groups.through.objects.filter(group=group).values("person")
+    ) | Q(
+        organization__in=Organization.groups.through.objects.filter(
+            group=group, group__applies_to_organizations=True
+        ).values("organization")
+    )
+
 
 @model_urls
 class Person(Model):
@@ -201,6 +247,18 @@ class Person(Model):
     @property
     def full_name(self):
         return " ".join(filter(None, (self.given_name, self.family_name)))
+
+    def all_groups(self):
+        """The person's groups and those of their organization which apply to
+        organizations"""
+        groups = {group.pk: group for group in self.groups.all()}
+        if self.organization:
+            groups |= {
+                group.pk: group
+                for group in self.organization.groups.all()
+                if group.applies_to_organizations
+            }
+        return sorted(groups.values(), key=lambda group: group.title.lower())
 
     @property
     def name_with_organization(self):

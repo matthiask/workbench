@@ -221,6 +221,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   are always kept (a test lists all relations). Membership in groups which
   aren't archived keeps people (not organizations: those without active
   people are useless for mailings), so do edits in the audit log.
+- Groups with `applies_to_organizations` (e.g. industries) belong to
+  organizations: people are in them through their organization
+  (`Person.all_groups()`, `Person.objects.in_group()`, `without_groups()`;
+  use these instead of `person.groups`). The person form still offers them
+  but saves them on the organization; only people without an organization
+  are members themselves. Turning the flag on moves existing memberships to
+  the organizations (`Group.move_people_to_organizations()`).
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating or updating

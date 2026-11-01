@@ -4,7 +4,7 @@ from collections import OrderedDict
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Count, OuterRef, Prefetch, Q, Subquery
+from django.db.models import Count, Func, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import Coalesce, Lower
 from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
@@ -20,6 +20,7 @@ from workbench.contacts.models import (
     Person,
     PhoneNumber,
     PostalAddress,
+    in_group_q,
     postal_address_choices,
 )
 from workbench.tools.forms import (
@@ -78,9 +79,9 @@ class GroupSearchForm(Form):
         elif data.get("s") != "all":
             queryset = queryset.filter(is_archived=False)
         return queryset.annotate(
-            people_count=_member_count(Person, is_archived=False),
+            people_count=_people_count(is_archived=False),
             organizations_count=_member_count(Organization, is_archived=False),
-            archived_people_count=_member_count(Person, is_archived=True),
+            archived_people_count=_people_count(is_archived=True),
             archived_organizations_count=_member_count(Organization, is_archived=True),
         ).order_by(Lower("title"), "pk")
 
@@ -103,11 +104,34 @@ def _member_count(model, *, is_archived):
     )
 
 
+def _people_count(*, is_archived):
+    """People in the group, also through their organization"""
+    return Coalesce(
+        Subquery(
+            Person.objects
+            .filter(in_group_q(OuterRef(OuterRef("pk"))), is_archived=is_archived)
+            .order_by()
+            .annotate(count=Func("pk", function="COUNT"))
+            .values("count")
+        ),
+        0,
+    )
+
+
 @add_prefix("modal")
 class GroupForm(ModelForm):
     class Meta:
         model = Group
-        fields = ["title", "is_archived"]
+        fields = ["title", "applies_to_organizations", "is_archived"]
+
+    def save(self, *, commit=True):
+        instance = super().save()
+        if (
+            "applies_to_organizations" in self.changed_data
+            and instance.applies_to_organizations
+        ):
+            instance.move_people_to_organizations()
+        return instance
 
 
 def recent_projects_or_deals(field):
@@ -245,7 +269,7 @@ class PersonSearchForm(Form):
         number is shown"""
         data = self.cleaned_data
         if (group := data.get("g")) and not data.get("s"):
-            return Person.objects.filter(groups=group, is_archived=True).count()
+            return Person.objects.in_group(group).filter(is_archived=True).count()
         return 0
 
     def filter(self, queryset):
@@ -263,16 +287,20 @@ class PersonSearchForm(Form):
         elif data.get("s") == "missing-email":
             queryset = queryset.active().filter(emailaddresses__isnull=True)
         elif data.get("s") == "no-group":
-            queryset = queryset.active().exclude(groups__is_archived=False)
+            queryset = queryset.active().without_groups()
 
+        if group := data.get("g"):
+            queryset = queryset.in_group(group)
         queryset = self.apply_owned_by(queryset, attribute="primary_contact")
-        return (
-            self
-            .apply_renamed(queryset, "g", "groups")
-            .select_related("organization", "primary_contact")
-            .prefetch_related(
-                Prefetch("groups", queryset=Group.objects.filter(is_archived=False))
-            )
+        active_groups = Group.objects.filter(is_archived=False)
+        return queryset.select_related(
+            "organization", "primary_contact"
+        ).prefetch_related(
+            Prefetch("groups", queryset=active_groups),
+            Prefetch(
+                "organization__groups",
+                queryset=active_groups.filter(applies_to_organizations=True),
+            ),
         )
 
     def response(self, request, queryset):
@@ -317,15 +345,14 @@ class OrganizationForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["groups"].queryset = _offered_groups(self.instance)
+        self.fields["groups"].queryset = _offered_groups(
+            self.instance.groups.values("pk") if self.instance.pk else []
+        )
 
 
-def _offered_groups(instance):
+def _offered_groups(current):
     """Archived groups only for contacts already in them"""
-    return Group.objects.filter(
-        Q(is_archived=False)
-        | Q(pk__in=instance.groups.values("pk") if instance.pk else [])
-    )
+    return Group.objects.filter(Q(is_archived=False) | Q(pk__in=current))
 
 
 class OrganizationDeleteForm(ModelForm):
@@ -396,7 +423,14 @@ class PersonForm(ModelForm):
             initial["organization"] = organization
 
         super().__init__(*args, **kwargs)
-        self.fields["groups"].queryset = _offered_groups(self.instance)
+        # Groups which apply to organizations are edited through people too
+        current = (
+            [group.pk for group in self.instance.all_groups()]
+            if self.instance.pk
+            else []
+        )
+        self.initial["groups"] = current
+        self.fields["groups"].queryset = _offered_groups(current)
         kwargs.pop("request")
         self.formsets = (
             OrderedDict((
@@ -460,9 +494,27 @@ class PersonForm(ModelForm):
 
     def save(self, *, commit=True):
         instance = super().save()
+        if instance.organization:
+            self._save_organization_groups(instance)
         for formset in self.formsets.values():
             formset.save()
         return instance
+
+    def _save_organization_groups(self, instance):
+        """Groups which apply to organizations go to the organization. Groups
+        unchecked are only removed from the organization if it is the same
+        as before, the form showed its groups"""
+        groups = self.cleaned_data["groups"]
+        organization_groups = [
+            group for group in groups if group.applies_to_organizations
+        ]
+        if "organization" not in self.changed_data:
+            unchecked = set(self.initial["groups"]) - {group.pk for group in groups}
+            instance.organization.groups.remove(
+                *Group.objects.filter(pk__in=unchecked, applies_to_organizations=True)
+            )
+        instance.organization.groups.add(*organization_groups)
+        instance.groups.remove(*organization_groups)
 
 
 PhoneNumberFormset = inlineformset_factory(
