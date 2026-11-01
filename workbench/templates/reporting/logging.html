@@ -45,6 +45,7 @@
                         <h4 class="modal-title">
                           {% translate "Days with insufficient breaks" %}
                         </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body text-start fw-normal">
                         {% if row.user == request.user %}
@@ -60,7 +61,7 @@
                         {% endif %}
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
                           {% translate 'Close' %}
                         </button>
                       </div>

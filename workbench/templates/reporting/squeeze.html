@@ -27,20 +27,27 @@
           <div class="modal-dialog modal-xl">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title">{{ p.project }}</h5>
+                <h4 class="modal-title">{{ p.project }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <dl class="row small mb-3">
-                  <dt class="col-6">{% translate 'Gross margin' %}</dt>
-                  <dd class="col-6 text-end">{{ p.gross_margin|currency }}</dd>
-                  <dt class="col-6">{% translate 'Hours' %}</dt>
-                  <dd class="col-6 text-end">{{ p.hours|hours }}</dd>
-                  <dt class="col-6">{% translate 'Rate' %}</dt>
-                  <dd class="col-6 text-end {% if p.rate < BASE_HOURLY_RATE %}text-danger{% endif %}">
-                    {{ p.rate|currency }}
-                  </dd>
-                </dl>
-                <p class="text-muted small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
+                <div class="wb-stats mb-3">
+                  <div class="wb-stat">
+                    <div class="wb-stat-label">{% translate 'Gross margin' %}</div>
+                    <div class="wb-stat-value">{{ p.gross_margin|currency }}</div>
+                  </div>
+                  <div class="wb-stat">
+                    <div class="wb-stat-label">{% translate 'Hours' %}</div>
+                    <div class="wb-stat-value">{{ p.hours|hours }}</div>
+                  </div>
+                  <div class="wb-stat">
+                    <div class="wb-stat-label">{% translate 'Rate' %}</div>
+                    <div class="wb-stat-value {% if p.rate < BASE_HOURLY_RATE %}text-danger{% endif %}">
+                      {{ p.rate|currency }}/h
+                    </div>
+                  </div>
+                </div>
+                <p class="text-body-secondary small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
                 <table class="table table-sm">
                   <thead>
                     <tr>
@@ -92,7 +99,7 @@
                 {% endif %}
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
                   {% translate 'Close' %}
                 </button>
               </div>
@@ -187,10 +194,11 @@
           <div class="modal-dialog modal-xl">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title">{{ ud.user }}</h5>
+                <h4 class="modal-title">{{ ud.user }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <p class="text-muted small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
+                <p class="text-body-secondary small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
                 <table class="table table-sm">
                   <thead>
                     <tr>
@@ -239,7 +247,7 @@
                 {% endif %}
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
                   {% translate 'Close' %}
                 </button>
               </div>

@@ -8,23 +8,7 @@
 
 {% block body %}
   {% with gs=object.grouped_services %}
-    <dl class="wb-fields mb-4">
-      <dt>{% translate 'Logged hours per hourly rate' %}</dt>
-      <dd>
-        {% for rate, hours in gs.logged_hours_per_effort_rate %}
-          <div {% if rate is None %}class="text-warning"{% endif %}>
-            {{ hours|hours }}
-            <span class="text-body-secondary">
-              {% if rate is None %}
-                {% translate 'undefined rate' %}
-              {% else %}
-                {{ rate|currency }}/h
-              {% endif %}
-            </span>
-          </div>
-        {% endfor %}
-      </dd>
-    </dl>
+    {% include 'projects/_logged_hours_per_rate.html' with logged_hours_per_effort_rate=gs.logged_hours_per_effort_rate %}
 
     <div class="table-responsive">
       <table class="table table-sm">

@@ -1,25 +1,10 @@
 {% extends 'modal.html' %}
 {% load django_bootstrap5 i18n workbench %}
-{% block size %}modal-xl{% endblock %}
 
 {% block title %}
   {% translate 'Statistics' %}
 {% endblock title %}
 
 {% block body %}
-  <h2>{% translate 'Logged hours per hourly rate' %}</h2>
-  <table>
-    {% for rate, hours in object.logged_hours_per_effort_rate %}
-      <tr {% if rate is None %}class="text-warning"{% endif %}>
-        <td class="text-end">{{ hours|hours }} &nbsp;</td>
-        <td>
-          {% if rate is None %}
-            {% translate 'undefined rate' %}
-          {% else %}
-            {{ rate|currency }}/h
-          {% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
+  {% include 'projects/_logged_hours_per_rate.html' with logged_hours_per_effort_rate=object.logged_hours_per_effort_rate %}
 {% endblock body %}

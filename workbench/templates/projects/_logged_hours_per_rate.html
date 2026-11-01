@@ -1,0 +1,20 @@
+{% load i18n workbench %}
+<dl class="wb-fields mb-4">
+  <dt>{% translate 'Logged hours per hourly rate' %}</dt>
+  <dd>
+    {% for rate, hours in logged_hours_per_effort_rate %}
+      <div {% if rate is None %}class="text-warning"{% endif %}>
+        {{ hours|hours }}
+        <span class="text-body-secondary">
+          {% if rate is None %}
+            {% translate 'undefined rate' %}
+          {% else %}
+            {{ rate|currency }}/h
+          {% endif %}
+        </span>
+      </div>
+    {% empty %}
+      &ndash;
+    {% endfor %}
+  </dd>
+</dl>
