@@ -550,8 +550,9 @@ without outreach hours last (by deals desc). The info button explains the
 columns; the rate links to a modal per person with the outreach projects
 (hours) and the deals (value, share). The total row sums the rows, deals
 without contributions are left out. Deal values are revenue, not gross
-margin, and deals are often won long after the outreach, so the ratio only
-means something over longer periods.
+margin, outreach also contains work which serves acquisition only
+indirectly (e.g. company communications), and deals are often won long
+after the outreach, so the ratio only means something over longer periods.
 
 #### Caveats from the code
 

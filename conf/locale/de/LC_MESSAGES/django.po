@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 15:17+0100\n"
+"POT-Creation-Date: 2026-11-01 15:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5513,6 +5513,10 @@ msgstr "Pro Stunde"
 #: workbench/templates/reporting/squeeze.html
 msgid "Accepted deals divided by outreach hours."
 msgstr "Gewonnene Geschäfte geteilt durch die Stunden Akquise."
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Outreach also contains work which serves acquisition only indirectly, e.g. company communications."
+msgstr "Akquise enthält auch Arbeit, welche der Akquise nur indirekt dient, z.B. die Unternehmenskommunikation."
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Deals are often won long after the outreach, and outreach also helps deals of others. The figures only mean something over longer periods, e.g. a year, and need interpretation."
