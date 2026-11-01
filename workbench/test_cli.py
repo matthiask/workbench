@@ -776,7 +776,7 @@ planned_work:
 
         result = self.wb("reports", "squeeze", "--period", "this-month")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Acquisition", result.output)
+        self.assertIn("Outreach", result.output)
         self.assertIn("Accepted deals  1000.00", result.output)
         self.assertIn("Per hour        250.00", result.output)
         # Only the total, no figures per person

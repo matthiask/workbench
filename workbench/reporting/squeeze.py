@@ -936,7 +936,7 @@ def build_xlsx(data):
     xlsx.add_sheet(_("organizations"))
     xlsx.table(None, header + organizations_table)
     if acquisition["internal_types"]:
-        xlsx.add_sheet(_("acquisition"))
+        xlsx.add_sheet(_("outreach"))
         xlsx.table(None, header + acquisition_table)
 
     return xlsx

@@ -762,7 +762,7 @@ def squeeze(period, since, until, as_csv, as_json):
     if acquisition["internal_types"]:
         totals = acquisition["totals"]
         echo_fields(
-            "Acquisition",
+            "Outreach",
             [
                 ("Outreach hours", format_hours(totals["hours"])),
                 ("Accepted deals", format_amount(totals["deals"])),

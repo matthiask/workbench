@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 15:22+0100\n"
+"POT-Creation-Date: 2026-11-01 15:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3832,7 +3832,7 @@ msgid "per hour"
 msgstr "pro Stunde"
 
 #: workbench/reporting/squeeze.py
-msgid "acquisition"
+msgid "outreach"
 msgstr "Outreach"
 
 #: workbench/reporting/utils.py workbench/templates/_hours_rings.html
@@ -5490,7 +5490,7 @@ msgid "Organization"
 msgstr "Organisation"
 
 #: workbench/templates/reporting/squeeze.html
-msgid "Acquisition"
+msgid "Outreach"
 msgstr "Outreach"
 
 #: workbench/templates/reporting/squeeze.html
@@ -5925,6 +5925,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "acquisition"
+#~ msgstr "Outreach"
+
+#~ msgid "Acquisition"
+#~ msgstr "Outreach"
 
 #~ msgid "All contributors"
 #~ msgstr "Alle Beitragenden"

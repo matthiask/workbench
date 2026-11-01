@@ -537,7 +537,7 @@ Per `project.customer`: Σ of the person contributions (margin, period hours) of
 its projects; Ansatz = margin / hours. Internal projects count with their
 (usually 0) margin under the own organization.
 
-#### Acquisition ("Outreach"), sorted by deals per hour desc
+#### Outreach, sorted by deals per hour desc
 
 Only shown if internal types are marked `is_outreach`. Per person: Stunden
 Outreach = Σ `hours` (not hours for invoicing) logged in the period on projects
