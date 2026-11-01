@@ -587,6 +587,22 @@ class GroupsTest(TestCase):
                     content.index(">Newsletter 2015</option>"),
                 )
 
+    def test_no_group_filter(self):
+        """The no group filter lists active people without an active group"""
+        self.client.force_login(factories.UserFactory.create())
+        archived = Group.objects.create(title="Newsletter 2015", is_archived=True)
+        grouped = factories.PersonFactory.create(given_name="Grouped")
+        grouped.groups.set([Group.objects.create(title="Team")])
+        factories.PersonFactory.create(given_name="Groupless")
+        factories.PersonFactory.create(given_name="Formerly").groups.set([archived])
+        factories.PersonFactory.create(given_name="Gone", is_archived=True)
+
+        response = self.client.get("/contacts/people/?s=no-group")
+        self.assertNotContains(response, "Grouped Nachname")
+        self.assertContains(response, "Groupless Nachname")
+        self.assertContains(response, "Formerly Nachname")
+        self.assertNotContains(response, "Gone Nachname")
+
     def test_member_counts(self):
         """People and organizations are counted independently of each other"""
         group = Group.objects.create(title="Newsletter")

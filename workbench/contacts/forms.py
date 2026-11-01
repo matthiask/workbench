@@ -170,6 +170,7 @@ class PersonSearchForm(Form):
                         "missing-email",
                         _("Missing email address"),
                     ),
+                    ("no-group", _("No group")),
                 ],
             ),
         ],
@@ -232,6 +233,8 @@ class PersonSearchForm(Form):
             )
         elif data.get("s") == "missing-email":
             queryset = queryset.active().filter(emailaddresses__isnull=True)
+        elif data.get("s") == "no-group":
+            queryset = queryset.active().exclude(groups__is_archived=False)
 
         if added_since := data.get("added_since"):
             from workbench.audit.models import LoggedAction
