@@ -75,7 +75,12 @@ class DealsTest(TestCase):
                 response = self.client.get(f"/deals/{query}")
                 self.assertContains(response, deal.title)
                 self.assertNotContains(response, other.title)
-        self.assertContains(self.client.get("/deals/"), "All contributors")
+        inactive = factories.DealFactory.create(
+            title="Handed over", owned_by=factories.UserFactory.create(is_active=False)
+        )
+        response = self.client.get("/deals/?contributor=0")
+        self.assertContains(response, inactive.title)
+        self.assertNotContains(response, deal.title)
 
     def test_detail(self):
         """Deals detail view"""

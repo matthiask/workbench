@@ -59,12 +59,8 @@ class DealSearchForm(Form):
         widget=Autocomplete(model=Organization),
         label="",
     )
-    owned_by = forms.TypedChoiceField(
-        coerce=int,
-        required=False,
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="",
-    )
+    # Contact persons contribute too, "inactive users" are the contact
+    # persons who left
     contributor = forms.TypedChoiceField(
         coerce=int,
         required=False,
@@ -74,14 +70,9 @@ class DealSearchForm(Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owned_by"].choices = User.objects.choices(
+        self.fields["contributor"].choices = User.objects.choices(
             collapse_inactive=True, myself=True
         )
-        self.fields["contributor"].choices = [
-            ("", _("All contributors")),
-            (-1, _("My contributions")),
-            *User.objects.choices(collapse_inactive=False)[1:],
-        ]
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -99,8 +90,10 @@ class DealSearchForm(Form):
                 "-closed_on", "-pk"
             )
         queryset = self.apply_renamed(queryset, "org", "customer")
-        queryset = self.apply_owned_by(queryset)
-        if contributor := self.cleaned_data.get("contributor"):
+        contributor = self.cleaned_data.get("contributor")
+        if contributor == 0:
+            queryset = queryset.filter(owned_by__is_active=False)
+        elif contributor:
             user = self.request.user if contributor == -1 else contributor
             queryset = queryset.filter(
                 id__in=Contribution.objects.filter(user=user).values("deal")
