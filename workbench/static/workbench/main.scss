@@ -652,6 +652,14 @@ tbody th > a {
   }
 }
 
+.wb-speed-dial-label kbd {
+  margin-left: 0.25rem;
+  padding: 0.05rem 0.3rem;
+  background: var(--bs-tertiary-bg);
+  color: var(--bs-secondary-color);
+  font-size: 0.75rem;
+}
+
 .wb-speed-dial-label {
   padding: 0.2rem 0.6rem;
   border: 1px solid var(--wb-surface-border);

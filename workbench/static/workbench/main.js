@@ -571,6 +571,13 @@ document.addEventListener("DOMContentLoaded", () => {
     window.localStorage.setItem(key, params ? `?${params}` : "")
   }
 
+  // The shortcuts use Ctrl on Macs and Alt elsewhere, see the hotkeys
+  if (!/Mac/.test(navigator.platform)) {
+    for (const kbd of document.querySelectorAll("[data-shortcuts] kbd")) {
+      kbd.textContent = kbd.textContent.replace(/Ctrl-/g, "Alt-")
+    }
+  }
+
   initWidgets()
   initSortableLists()
   initSortableTables()

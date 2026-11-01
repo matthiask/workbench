@@ -296,15 +296,15 @@
   <!-- /container -->
   {% block fixed-add-button %}
     {# Quick actions, revealed by hovering or clicking the plus button #}
-    <div class="wb-speed-dial" data-speed-dial>
+    <div class="wb-speed-dial" data-speed-dial data-shortcuts>
       <div class="wb-speed-dial-actions" id="wb-speed-dial-actions">
         <a href="{% url 'projects_project_select' %}" data-ajaxmodal class="wb-speed-dial-action">
           <span class="wb-speed-dial-icon">{% include "svg/project.svg" %}</span>
-          <span class="wb-speed-dial-label">{% translate 'Jump to project' %}</span>
+          <span class="wb-speed-dial-label">{% translate 'Jump to project' %} <kbd>Ctrl-Shift-P</kbd></span>
         </a>
         <a href="{% url 'logbook_break_create' %}" data-ajaxmodal class="wb-speed-dial-action">
           <span class="wb-speed-dial-icon"><img src="{% static 'workbench/lib/break.svg' %}" alt=""></span>
-          <span class="wb-speed-dial-label">{% translate 'took a break'|capfirst %}</span>
+          <span class="wb-speed-dial-label">{% translate 'took a break'|capfirst %} <kbd>Ctrl-B</kbd></span>
         </a>
         <a
           href="{% block createhours-url %}{% url 'logbook_loggedhours_create' %}{% endblock %}"
@@ -313,7 +313,7 @@
           class="wb-speed-dial-action"
         >
           <span class="wb-speed-dial-icon">{% include "svg/clock.svg" %}</span>
-          <span class="wb-speed-dial-label">{% translate 'log hours'|capfirst %}</span>
+          <span class="wb-speed-dial-label">{% translate 'log hours'|capfirst %} <kbd>Ctrl-L</kbd></span>
         </a>
       </div>
       <button
