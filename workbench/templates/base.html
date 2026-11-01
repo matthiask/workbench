@@ -298,6 +298,10 @@
     {# Quick actions, revealed by hovering or clicking the plus button #}
     <div class="wb-speed-dial" data-speed-dial data-shortcuts>
       <div class="wb-speed-dial-actions" id="wb-speed-dial-actions">
+        <a href="{% url 'contacts_person_select' %}" data-ajaxmodal class="wb-speed-dial-action">
+          <span class="wb-speed-dial-icon">{% include "svg/person.svg" %}</span>
+          <span class="wb-speed-dial-label">{% translate 'Jump to person' %} <kbd>Ctrl-Shift-C</kbd></span>
+        </a>
         <a href="{% url 'projects_project_select' %}" data-ajaxmodal class="wb-speed-dial-action">
           <span class="wb-speed-dial-icon">{% include "svg/project.svg" %}</span>
           <span class="wb-speed-dial-label">{% translate 'Jump to project' %} <kbd>Ctrl-Shift-P</kbd></span>
