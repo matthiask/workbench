@@ -1,9 +1,11 @@
 import datetime as dt
+import io
 from decimal import Decimal
 
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
+from openpyxl import load_workbook
 from time_machine import travel
 
 from workbench import factories
@@ -596,6 +598,19 @@ class LogbookTest(TestCase):
         self.assertContains(response, "+1.0h")
         self.assertContains(response, "-3.0h")
         self.assertContains(response, url.replace("&", "&amp;"))
+
+    def test_xlsx_export_values_invoiced_hours(self):
+        """The XLSX export values work with the invoiced hours"""
+        service = factories.ServiceFactory.create(effort_rate=100)
+        factories.LoggedHoursFactory.create(service=service, hours=1, invoiced_hours=3)
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get("/logbook/hours/?export=xlsx")
+        workbook = load_workbook(io.BytesIO(response.content))
+        for sheet in ["by-service-and-user", "by-service-and-month"]:
+            rows = list(workbook[sheet].values)
+            # Project, service, hourly rate, hours, value
+            self.assertEqual(rows[2][2:5], (100, 1, 300), sheet)
 
     def test_logged_cost_list(self):
         """Filter form smoke test"""
