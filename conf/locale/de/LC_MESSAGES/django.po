@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:14+0100\n"
+"POT-Creation-Date: 2026-11-01 13:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2762,8 +2762,12 @@ msgid "Move %(object)s"
 msgstr "%(object)s verschieben"
 
 #: workbench/logbook/views.py
-msgid "Select project for logging"
-msgstr "Projekt für Erfassung auswählen"
+msgid "Select project for logging costs"
+msgstr "Projekt für Kostenerfassung auswählen"
+
+#: workbench/logbook/views.py
+msgid "Select project for logging hours"
+msgstr "Projekt für Stundenerfassung auswählen"
 
 #: workbench/management/commands/employment_percentages.py
 msgid "employment percentages"

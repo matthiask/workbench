@@ -23,7 +23,9 @@ def create(request, *, viewname):
         "generic/select_object.html",
         {
             "form": form,
-            "title": _("Select project for logging"),
+            "title": _("Select project for logging costs")
+            if viewname == "createcost"
+            else _("Select project for logging hours"),
             "links": [
                 {
                     "title": h(project),

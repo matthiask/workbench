@@ -781,6 +781,12 @@ class LogbookTest(TestCase):
                 Project.urls["autocomplete"]
             ),
         )
+        # The title says what the project is selected for
+        self.assertContains(response, "Select project for logging hours")
+        response = self.client.get(
+            "/logbook/costs/create/", headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertContains(response, "Select project for logging costs")
 
         response = self.client.post(
             "/logbook/hours/create/",
