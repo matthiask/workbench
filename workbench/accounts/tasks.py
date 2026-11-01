@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import CoffeePairings, User
+from workbench.accounts.models import APIToken, CoffeePairings, User
 
 
 CANDIDATES = 20
@@ -51,6 +51,11 @@ def rating(pairing, previous):
     if overlaps:
         return sum(math.pow(0.97, previous[overlap] / 86400) for overlap in overlaps)
     return 0.0
+
+
+def prune_api_tokens():
+    """Expired tokens are useless, people get new ones with wb login"""
+    APIToken.objects.filter(expires_at__lte=timezone.now()).delete()
 
 
 def coffee_invites():

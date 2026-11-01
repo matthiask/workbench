@@ -4,6 +4,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.models import APIToken
+from workbench.accounts.tasks import prune_api_tokens
 from workbench.audit.models import LoggedAction
 
 
@@ -257,3 +258,13 @@ class APITokenTest(TestCase):
             .latest("event_id")
         )
         self.assertEqual(action.user_id, project.owned_by.id, action.user_name)
+
+    def test_prune_expired_tokens(self):
+        """Expired tokens are deleted by the fairy tasks"""
+        user = factories.UserFactory.create()
+        expired, _secret = APIToken.create_for(user=user, title="Old", access="read")
+        valid, _secret = APIToken.create_for(user=user, title="New", access="read")
+        APIToken.objects.filter(pk=expired.pk).update(expires_at=timezone.now())
+
+        prune_api_tokens()
+        self.assertEqual(list(APIToken.objects.all()), [valid])
