@@ -215,6 +215,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating or updating
   deals.
+- The audit log (`LoggedAction`, filled by a database trigger) stores
+  `row_data` and `changed_fields` as hstore keyed by column name. Renaming a
+  field or column loses its history: old entries keep the old key. Only
+  rename on purpose, and update the keys in the migration if the history
+  matters.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Page layout (see `projects/project_detail.html` and the contacts detail
