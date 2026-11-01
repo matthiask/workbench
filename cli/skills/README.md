@@ -36,11 +36,10 @@ email addresses, phone numbers or genders.
 
 Writes controlling summaries, e.g. a monthly summary for the management or
 the team, from the reports: key data, cash data, project budgets, projected
-gross margin, third party costs, hours, squeeze and deals. Requires the
-controlling feature (squeeze the productivity feature) and only reads;
-reports the user can't access are left out. It knows the pitfalls of the
-figures, e.g. that gross margin is not profit and must never be subtracted
-from revenue, and leads with what needs attention.
+gross margin, third party costs, hours and deals. Requires the controlling
+feature and only reads; reports the user can't access are left out. It
+knows the pitfalls of the figures, e.g. that gross margin is not profit and
+must never be subtracted from revenue, and leads with what needs attention.
 
 Payment reminders to customers are only sent on explicit request, after
 showing the recipient and the invoices; that requires the bookkeeping

@@ -1,14 +1,13 @@
 ---
 name: workbench-controlling
-description: Summarize the financial state of the agency from Workbench reports using the `wb` CLI, e.g. a monthly controlling summary for the team. Use when the user asks about key figures, gross margin, open invoices, cash flow, accruals, project budgets, utilization or productivity in Workbench, or wants a controlling report.
+description: Summarize the financial state of the agency from Workbench reports using the `wb` CLI, e.g. a monthly controlling summary for the team. Use when the user asks about key figures, gross margin, open invoices, cash flow, accruals, project budgets or utilization in Workbench, or wants a controlling report.
 ---
 
 # Controlling summaries from Workbench reports
 
 The `wb` CLI talks to Workbench (see `wb --help`). Most reports require the
-controlling feature, squeeze the productivity feature. Reading is enough:
-`wb login URL --read`. If a report answers 403, the user lacks the feature;
-say so and leave that part out.
+controlling feature. Reading is enough: `wb login URL --read`. If a report
+answers 403, the user lacks the feature; say so and leave that part out.
 
 Ask which month or period the summary is about and who reads it (the
 management, the whole team). Default to the last month.
@@ -24,7 +23,6 @@ Use `--json` for exact numbers, the tables for a quick look:
     wb reports third-party-costs --json               # Costs paid for customers, not invoiced yet
     wb reports hours-per-type --period 2026-09 --json # External vs. internal hours per person
     wb reports green-hours --period 2026-09 --json    # Hours within budgets
-    wb reports squeeze --period 2026-09 --json        # Gross margin per person and project
     wb invoices reminders --json                      # Invoices to remind customers of
     wb deals stats --period 2026-09 --json            # Deals won and lost
 
@@ -42,8 +40,6 @@ relative (`last-month`, `this-quarter`).
   only available for the current week.
 - In the budget report, a positive `delta` is work which hasn't been invoiced
   yet, a negative one accruals. Offered amounts only count for open projects.
-- Squeeze for a month may be incomplete until the 9th of the following month
-  (`may_be_incomplete`); say so.
 - Profitability estimates should rather underestimate than overestimate.
 
 ## 3. Write the summary
@@ -57,8 +53,7 @@ Lead with the three or four things which need attention, then the figures:
 - Projects needing attention: large positive deltas (work not invoiced),
   projects over their offers, third party costs not passed on.
 - Sales: deals won and lost, the funnel.
-- Utilization and productivity only if the user asked for it; squeeze shows
-  figures per person, be considerate about sharing them with the whole team.
+- Hours per person only if the user asked for it.
 
 Link projects, invoices and deals with the URLs from the JSON. Don't change
 anything in Workbench while preparing a summary.

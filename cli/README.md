@@ -382,8 +382,7 @@ controlling feature:
     wb reports working-time --year 2025 --user mk
     wb reports working-time --all
 
-Gross margin per user and project of the last month by default, requires the
-productivity feature:
+Productivity of the last month by default, requires the productivity feature:
 
     wb reports squeeze --period 2026-Q3
 
