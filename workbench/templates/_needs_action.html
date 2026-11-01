@@ -14,7 +14,6 @@
         {% if objects %}
           <a href="{{ row.url }}" class="list-group-item wb-list-heading">
             <span>{{ row.verbose_name_plural }}</span>
-            <span>{{ objects|length }}</span>
           </a>
           {% for object in objects %}
             <div class="list-group-item">{% link_or_none object with_badge=True %}</div>
