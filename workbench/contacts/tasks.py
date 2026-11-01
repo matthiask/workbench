@@ -136,8 +136,9 @@ def _reverse_relations(model):
 
 
 def _unused(model, cutoff, *, changed):
-    """Active instances which aren't referenced by anything recent, aren't
-    in active groups and weren't changed since the cutoff"""
+    """Active instances which aren't referenced by anything recent and weren't
+    changed since the cutoff. Active groups keep people, but not organizations:
+    those without active people are useless for mailings anyway"""
     recent = _recent(cutoff)
     keep = [
         Exists(
@@ -149,13 +150,10 @@ def _unused(model, cutoff, *, changed):
         for field in _reverse_relations(model)
         if recent.get(field.related_model) is not NEVER
     ]
-    keep.append(
-        Exists(
-            Group.objects.filter(
-                is_archived=False, **{model._meta.model_name: OuterRef("pk")}
-            )
+    if model is Person:
+        keep.append(
+            Exists(Group.objects.filter(is_archived=False, person=OuterRef("pk")))
         )
-    )
     return (
         model.objects
         .filter(is_archived=False)

@@ -219,7 +219,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   discovered with `_meta.get_fields()`; `_recent()` says which related
   objects count as recent use, contacts referenced by models missing there
   are always kept (a test lists all relations). Membership in groups which
-  aren't archived keeps contacts, so do edits in the audit log.
+  aren't archived keeps people (not organizations: those without active
+  people are useless for mailings), so do edits in the audit log.
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating or updating

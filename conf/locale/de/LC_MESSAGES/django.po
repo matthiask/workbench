@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 20:05+0100\n"
+"POT-Creation-Date: 2026-11-01 20:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1050,7 +1050,7 @@ msgstr "Definierte Suche"
 msgid "Any projects or deals in the last 5 years"
 msgstr "Irgendwelche Projekte oder Geschäfte in den letzten 5 Jahren"
 
-#: workbench/contacts/forms.py workbench/templates/contacts/person_list.html
+#: workbench/contacts/forms.py
 msgid "No group"
 msgstr "Keine Gruppe"
 
@@ -1096,8 +1096,8 @@ msgid "is archived"
 msgstr "ist archiviert"
 
 #: workbench/contacts/models.py
-msgid "Contacts only in archived groups are archived automatically after five years without use."
-msgstr "Kontakte, die nur in archivierten Gruppen sind, werden nach fünf Jahren ohne Verwendung automatisch archiviert."
+msgid "People only in archived groups are archived automatically after five years without use. Groups don't keep organizations without active people."
+msgstr "Personen, die nur in archivierten Gruppen sind, werden nach fünf Jahren ohne Verwendung automatisch archiviert. Gruppen halten Organisationen ohne aktive Personen nicht aktiv."
 
 #: workbench/contacts/models.py
 msgid "group"

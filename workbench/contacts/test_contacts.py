@@ -521,7 +521,7 @@ Other street 42
 
 class ArchiveContactsTest(TestCase):
     def test_unused_contacts(self):
-        """Contacts unused for five years and only in archived groups are
+        """People unused for five years and only in archived groups are
         archived"""
         cutoff = timezone.now() + dt.timedelta(days=1)  # Every change is older
         organization = factories.OrganizationFactory.create()
@@ -562,6 +562,14 @@ class ArchiveContactsTest(TestCase):
         self.assertTrue(organization.is_archived)
         self.assertFalse(Person.objects.get(pk=contact.pk).is_archived)
         self.assertFalse(Person.objects.get(pk=user.person.pk).is_archived)
+
+    def test_groups_keep_people_only(self):
+        """Groups don't keep organizations without active people"""
+        cutoff = timezone.now() + dt.timedelta(days=1)  # Every change is older
+        group = Group.objects.create(title="Industry")
+        organization = factories.OrganizationFactory.create()
+        organization.groups.add(group)
+        self.assertEqual(set(tasks.unused_organizations(cutoff)), {organization})
 
     def test_all_relations_known(self):
         """New relations to contacts keep them active until it's decided

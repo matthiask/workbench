@@ -25,8 +25,9 @@ class Group(Model):
         _("is archived"),
         default=False,
         help_text=_(
-            "Contacts only in archived groups are archived automatically"
-            " after five years without use."
+            "People only in archived groups are archived automatically after"
+            " five years without use. Groups don't keep organizations without"
+            " active people."
         ),
     )
 
