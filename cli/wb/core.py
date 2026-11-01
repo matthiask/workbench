@@ -214,9 +214,49 @@ def save_config(url, token, access=None):
     write_config(config)
 
 
+# The installation selected with --installation for this invocation
+_selected_installation = None
+
+
 def current_installation():
-    """The URL of the installation commands talk to"""
-    return installation_url(os.environ.get("WORKBENCH_URL")) or read_config()["current"]
+    """The URL of the installation commands talk to: --installation, then
+    WORKBENCH_URL (e.g. for one terminal), then the current one"""
+    return (
+        _selected_installation
+        or installation_url(os.environ.get("WORKBENCH_URL"))
+        or read_config()["current"]
+    )
+
+
+def find_installation(name):
+    """The URL of the installation NAME is a unique part of"""
+    urls = sorted(read_config()["installations"])
+    matches = [url for url in urls if url == name] or [
+        url for url in urls if name in url
+    ]
+    if len(matches) != 1:
+        terminate(
+            f"{'Several' if matches else 'No'} installations match {name!r}:"
+            f" {', '.join(matches or urls) or '(none)'}. Add new ones with"
+            " `wb login URL`."
+        )
+    return matches[0]
+
+
+def complete_installations(ctx, param, incomplete):
+    # Host names only: bash splits words at the colon of https://
+    return [
+        CompletionItem(host)
+        for host in sorted(
+            urlsplit(url).netloc for url in read_config()["installations"]
+        )
+        if incomplete in host
+    ]
+
+
+def _select_installation(ctx, param, value):
+    global _selected_installation  # noqa: PLW0603
+    _selected_installation = find_installation(value) if value else None
 
 
 def _config():
@@ -806,6 +846,15 @@ def echo_period(data):
 
 @click.group(cls=_Group)
 @click.version_option(VERSION)
+@click.option(
+    "-i",
+    "--installation",
+    metavar="NAME",
+    expose_value=False,
+    callback=_select_installation,
+    shell_complete=complete_installations,
+    help="Use another installation for this command, any unique part of its URL.",
+)
 def cli():
     pass
 

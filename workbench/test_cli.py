@@ -829,6 +829,20 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertNotIn("offer_guidelines", wb.core.CONFIG.read_text())
 
+        # --installation selects another installation for one command, it
+        # takes precedence over WORKBENCH_URL
+        guidelines.write_text("Other rules\n")
+        result = self.wb("-i", "other", "offers", "guidelines", "--set", guidelines)
+        self.assertEqual(result.exit_code, 0, result.output)
+        config = wb.core.read_config()["installations"]
+        self.assertEqual(
+            config["https://other.example.com"]["offer_guidelines"], str(guidelines)
+        )
+        self.assertNotIn("offer_guidelines", config["http://testserver"])
+        result = self.wb("--installation", "nope", "offers", "guidelines")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("No installations match 'nope'", result.output)
+
     def test_key_data_and_cash_data(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         factories.InvoiceFactory.create(project=project, customer=project.customer)

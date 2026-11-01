@@ -62,9 +62,11 @@ Switch between them with any unique part of their URL:
 The URLs and the tokens are stored in `~/.config/workbench.toml`. Switching
 changes the installation for all terminals. To work with another
 installation in one terminal only, set `WORKBENCH_URL` there to an
-installation you're logged in to:
+installation you're logged in to, or use `--installation` (`-i`, any unique
+part of its URL) for a single command:
 
     export WORKBENCH_URL=https://workbench.example.com
+    wb -i example offers guidelines --set ~/notes/offer-guidelines.md
 
 ## What's on your plate
 

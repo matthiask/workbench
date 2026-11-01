@@ -1,11 +1,8 @@
 """Logging in, installations and shell completion"""
 
-from urllib.parse import urlsplit
-
 import click
 from click.shell_completion import (
     BashComplete,
-    CompletionItem,
     FishComplete,
     ZshComplete,
     add_completion_class,
@@ -16,12 +13,14 @@ from wb import core
 from wb.core import (
     browser_login,
     cli,
+    complete_installations,
     console,
     echo_deal_list,
     echo_fields,
     echo_invoice_list,
     echo_json,
     echo_offer_list,
+    find_installation,
     installation_url,
     link,
     make_table,
@@ -113,7 +112,8 @@ def auth(ctx):
     """Switch between the Workbench installations you're logged in to
 
     `wb login URL` adds installations. Switching affects all terminals;
-    setting WORKBENCH_URL uses another installation in one terminal only.
+    setting WORKBENCH_URL uses another installation in one terminal only,
+    `wb -i NAME` for a single command.
 
     Without a command, lists the installations."""
     if ctx.invoked_subcommand is None:
@@ -134,35 +134,15 @@ def list_installations():
         )
 
 
-def _complete_installations(ctx, param, incomplete):
-    # Host names only: bash splits words at the colon of https://
-    return [
-        CompletionItem(host)
-        for host in sorted(
-            urlsplit(url).netloc for url in read_config()["installations"]
-        )
-        if incomplete in host
-    ]
-
-
 @auth.command("switch")
-@click.argument("name", shell_complete=_complete_installations)
+@click.argument("name", shell_complete=complete_installations)
 def switch_installation(name):
     """Use another installation, NAME is any unique part of its URL"""
+    url = find_installation(name)
     config = read_config()
-    urls = sorted(config["installations"])
-    matches = [url for url in urls if url == name] or [
-        url for url in urls if name in url
-    ]
-    if len(matches) != 1:
-        terminate(
-            f"{'Several' if matches else 'No'} installations match {name!r}:"
-            f" {', '.join(matches or urls) or '(none)'}. Add new ones with"
-            " `wb login URL`."
-        )
-    config["current"] = matches[0]
+    config["current"] = url
     write_config(config)
-    click.echo(f"Using {matches[0]}")
+    click.echo(f"Using {url}")
 
 
 @cli.command()
