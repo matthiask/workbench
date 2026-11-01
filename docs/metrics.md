@@ -484,7 +484,7 @@ Anna: `4'000 / 7'000 × 6'000 = 3'428.57` (171.43/h); Ben: `3'000 / 7'000 ×
 | Total row | Σ period hours, Σ period gross margin |
 
 Per-project modal ("Aufschlüsselung nach Person"): header Umsatz bereinigt /
-Stunden (= relevant hours) / Ansatz; per person Stunden, Verrechnete Stunden
+Stunden (= relevant hours) / Ansatz; per person Stunden, Stunden für Verrechnung
 (`INVOICED_HOURS` in the period), Ohne Stundensatz
 (`hours_rate_unknown`), Umsatz bereinigt (person margin), Ansatz (person
 rate, red < 150); footer shows period totals and the project rate. Note "Stunden
@@ -507,7 +507,7 @@ Everyone who logged hours in the period (also only on internal projects).
 | Abwesenheitstage | Σ absence days in the period (see below) |
 | Stunden | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
 | Ansatz | `gross_margin / hours_in_range`: the overall rate of the person, internal hours included on purpose (not only the rate on profitable projects) |
-| Umsatz bereinigt | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Stunden, Verrechnete Stunden, Ohne Stundensatz, Umsatz bereinigt, Ansatz) |
+| Umsatz bereinigt | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Stunden, Stunden für Verrechnung, Ohne Stundensatz, Umsatz bereinigt, Ansatz) |
 | Extern % | `100 × external_hours / total_hours` (external = hours on non-internal projects, `workbench/projects/reporting.py:hours_per_type`) |
 | Richtwert extern % | `profitable_percentage = 100 − Σ InternalTypeUser.percentage` (per-user override, else the internal type's default percentage) |
 | Δ ext. % | `Extern % − Richtwert extern %`, red if < 0 |
