@@ -58,9 +58,17 @@ $list-group-item-padding-y: 0.5rem;
 $list-group-item-padding-x: 1rem;
 
 $table-cell-padding-y-sm: 0.35rem;
+// Tables lie on whatever surface they're on (sticky rows bring their own)
+$table-bg: transparent;
 $table-border-color: var(--bs-border-color);
 
-$dropdown-border-color: var(--bs-border-color);
+// Everything floating above the page lies on a surface like the cards
+$dropdown-bg: var(--wb-surface-raised);
+$dropdown-border-color: var(--wb-surface-border);
+$modal-content-bg: var(--wb-surface);
+$popover-bg: var(--wb-surface-raised);
+$offcanvas-bg-color: var(--wb-surface);
+$pagination-bg: var(--wb-surface);
 $dropdown-box-shadow: 0 8px 24px rgba(15, 20, 30, 0.12);
 $dropdown-link-active-bg: $primary;
 
@@ -75,6 +83,9 @@ $navbar-padding-y: 0.375rem;
   --wb-surface-muted: #f8f9fa;
   // Boxes stand out from the page, dividers within them stay light
   --wb-surface-border: #d2d7de;
+  // Menus float above surfaces, also above modals
+  --wb-surface-raised: #fff;
+  --wb-shadow-raised: 0 8px 24px rgba(15, 20, 30, 0.16);
   --wb-shadow:
     0 1px 2px rgba(15, 20, 30, 0.08), 0 4px 12px rgba(15, 20, 30, 0.07);
   --wb-input-border: #cdd2d9;
@@ -85,6 +96,8 @@ $navbar-padding-y: 0.375rem;
   --wb-surface: #1d2129;
   --wb-surface-muted: #242932;
   --wb-surface-border: #363c48;
+  --wb-surface-raised: #282d36;
+  --wb-shadow-raised: 0 8px 24px rgba(0, 0, 0, 0.6);
   --wb-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
   --wb-input-border: #3a3f49;
   --wb-check-border: #7a818c;
@@ -708,6 +721,10 @@ tbody th > a {
 }
 .widget--checkboxselectmultiple input:checked ~ label {
   font-weight: bold;
+}
+
+.dropdown-menu {
+  box-shadow: var(--wb-shadow-raised);
 }
 
 .dropdown-menu.show {
