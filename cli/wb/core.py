@@ -9,6 +9,7 @@ import secrets
 import shlex
 import socket
 import sys
+import tempfile
 import threading
 import time
 import tomllib
@@ -192,8 +193,18 @@ def write_config(config):
         for url, installation in sorted(config["installations"].items())
     }
     CONFIG.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG.write_text(tomli_w.dumps(data))
-    CONFIG.chmod(0o600)
+    # mkstemp creates the file readable by its owner only. Replacing the
+    # configuration with it means nobody ever sees a half-written file.
+    fd, path = tempfile.mkstemp(
+        dir=CONFIG.parent, prefix=f".{CONFIG.name}.", suffix=".tmp"
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
+            file.write(tomli_w.dumps(data))
+        os.replace(path, CONFIG)
+    except BaseException:
+        Path(path).unlink(missing_ok=True)
+        raise
 
 
 def save_config(url, token, access=None):

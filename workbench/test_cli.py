@@ -1,4 +1,5 @@
 import datetime as dt
+import os
 import re
 import tempfile
 import threading
@@ -785,6 +786,41 @@ planned_work:
         self.assertIn("Per hour        250.00", result.output)
         # Only the total, no figures per person
         self.assertEqual(result.output.count("Per hour"), 1)
+
+    def test_write_config(self):
+        """The configuration with the tokens is only readable by its owner,
+        also while being written, and replaced atomically"""
+        config = self.directory / "config" / "workbench.toml"
+        replace = os.replace
+        modes = []
+
+        def checked_replace(src, dst):
+            modes.append(os.stat(src).st_mode & 0o777)
+            replace(src, dst)
+
+        with (
+            patch.object(wb.core, "CONFIG", config),
+            patch.object(wb.core.os, "replace", checked_replace),
+        ):
+            wb.core.save_config("https://a.example.com", "secret")
+            config.chmod(0o644)
+            inode = config.stat().st_ino
+            wb.core.save_config("https://b.example.com", "other")
+        # Private before it becomes visible, replaced instead of overwritten
+        self.assertEqual(modes, [0o600, 0o600])
+        self.assertEqual(config.stat().st_mode & 0o777, 0o600)
+        self.assertNotEqual(config.stat().st_ino, inode)
+
+        with (
+            patch.object(wb.core, "CONFIG", config),
+            patch.object(wb.core.os, "replace", side_effect=OSError),
+            self.assertRaises(OSError),
+        ):
+            wb.core.save_config("https://c.example.com", "third")
+        # The old configuration is intact, no temporary files are left
+        self.assertEqual(list(config.parent.iterdir()), [config])
+        self.assertIn("b.example.com", config.read_text())
+        self.assertNotIn("c.example.com", config.read_text())
 
     def test_announce_installation(self):
         """Commands say when they don't use the current installation"""
