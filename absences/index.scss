@@ -1,8 +1,7 @@
-$white: #fff;
-$black: #020202;
-$alto: #ddd;
-
-$zircon: #f4f7ff;
+// Theme colors, they work in light and dark mode
+$surface: var(--wb-surface);
+$divider: var(--bs-border-color);
+$week-stripe: var(--wb-surface-muted);
 
 // The colors of the reasons are defined in main.scss
 $absence-reasons: vacation, sickness, paid, school, other, correction;
@@ -48,64 +47,24 @@ $z-index: (
     /* Person Row Divider */
     repeating-linear-gradient(
       to bottom,
-      $alto 0,
-      $alto var(--grid-gap),
+      $divider 0,
+      $divider var(--grid-gap),
       transparent 0,
       transparent calc(var(--person-row-height) + var(--grid-gap))
     ),
     /* Name Column */
     linear-gradient(
         to right,
-        $white 0,
-        $white calc(var(--name-column-width) + var(--grid-gap))
+        $surface 0,
+        $surface calc(var(--name-column-width) + var(--grid-gap))
       ),
     /* Week Columns */
     repeating-linear-gradient(
         to right,
-        $zircon 0,
-        $zircon calc((var(--day-column-width) + var(--grid-gap)) * 7),
-        $white 0,
-        $white calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
-      );
-  background-position:
-    0 var(--scale-row-height),
-    0,
-    calc(
-        var(--name-column-width) + var(--grid-gap) + var(--day-column-offset) *
-          ((var(--day-column-width) + var(--grid-gap)))
-      )
-      0;
-  background-repeat: no-repeat, no-repeat, repeat;
-  background-size:
-    100%
-      calc(var(--person-count) * (var(--person-row-height) + var(--grid-gap))),
-    calc(var(--name-column-width) + var(--grid-gap)) auto,
-    calc(var(--day-count) * ((var(--day-column-width) + var(--grid-gap)))) 100%;
-}
-
-[data-bs-theme="dark"] .absences {
-  background:
-    /* Person Row Divider */
-    repeating-linear-gradient(
-      to bottom,
-      #555 0,
-      #555 var(--grid-gap),
-      transparent 0,
-      transparent calc(var(--person-row-height) + var(--grid-gap))
-    ),
-    /* Name Column */
-    linear-gradient(
-        to right,
-        #1a1a1a 0,
-        #1a1a1a calc(var(--name-column-width) + var(--grid-gap))
-      ),
-    /* Week Columns */
-    repeating-linear-gradient(
-        to right,
-        #2a2a3a 0,
-        #2a2a3a calc((var(--day-column-width) + var(--grid-gap)) * 7),
-        #1a1a1a 0,
-        #1a1a1a calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
+        $week-stripe 0,
+        $week-stripe calc((var(--day-column-width) + var(--grid-gap)) * 7),
+        $surface 0,
+        $surface calc((var(--day-column-width) + var(--grid-gap)) * 2 * 7)
       );
   background-position:
     0 var(--scale-row-height),
@@ -132,11 +91,7 @@ $z-index: (
 
   position: sticky;
   top: var(--navbar-height, 0px);
-  background-color: $white;
-}
-
-[data-bs-theme="dark"] .absences__scale {
-  background-color: #1a1a1a;
+  background-color: $surface;
 }
 
 .absences__scale-tick {
@@ -168,16 +123,11 @@ $z-index: (
   left: 0;
   padding-left: 0.375rem;
 
-  border-right: lighten($alto, 0%) var(--grid-gap) solid;
-  background-color: $white;
+  border-right: $divider var(--grid-gap) solid;
+  background-color: $surface;
 
   overflow: hidden;
   white-space: nowrap;
-}
-
-[data-bs-theme="dark"] .absences__person {
-  border-right: #555 var(--grid-gap) solid;
-  background-color: #1a1a1a;
 }
 
 .absence {
@@ -192,11 +142,11 @@ $z-index: (
   border-radius: 2px;
 
   font-size: 0.75rem;
-  color: $white;
+  color: #fff;
 
   &:hover {
     text-decoration: none;
-    color: $white;
+    color: #fff;
   }
 
   @each $reason in $absence-reasons {
@@ -207,7 +157,7 @@ $z-index: (
         background-color: color-mix(
           in srgb,
           var(--wb-absence-#{$reason}) 88%,
-          #{$white}
+          #fff
         );
       }
     }
@@ -231,26 +181,18 @@ $z-index: (
   padding: 0.5rem;
   width: $popup-width;
 
-  background-color: $white;
-  color: $black;
-  border: 1px solid $alto;
+  background-color: var(--wb-surface-raised);
+  color: var(--bs-body-color);
+  border: 1px solid var(--wb-surface-border);
+  border-radius: var(--bs-border-radius-sm);
+  box-shadow: var(--wb-shadow-raised);
 
   p {
     margin-bottom: 0;
   }
 
   hr {
-    border-color: $alto;
-  }
-}
-
-[data-bs-theme="dark"] .absence__popup {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-  border: 1px solid #555;
-
-  hr {
-    border-color: #555;
+    border-color: $divider;
   }
 }
 
@@ -334,11 +276,7 @@ $z-index: (
   // Cover the padding of the wrapper left of the sticky names
   .absences__person {
     left: -1rem;
-    box-shadow: -1rem 0 0 $white;
-  }
-
-  [data-bs-theme="dark"] .absences__person {
-    box-shadow: -1rem 0 0 #1a1a1a;
+    box-shadow: -1rem 0 0 $surface;
   }
 
   .absences-legend {
