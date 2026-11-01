@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
-from workbench.accounts.models import APIToken
+from workbench.accounts.models import API_TOKEN_LIFETIME, APIToken
 from workbench.accounts.tasks import prune_api_tokens
 from workbench.audit.models import LoggedAction
 
@@ -260,11 +260,15 @@ class APITokenTest(TestCase):
         self.assertEqual(action.user_id, project.owned_by.id, action.user_name)
 
     def test_prune_expired_tokens(self):
-        """Expired tokens are deleted by the fairy tasks"""
+        """The fairy tasks delete tokens a while after they expired"""
         user = factories.UserFactory.create()
-        expired, _secret = APIToken.create_for(user=user, title="Old", access="read")
+        old, _secret = APIToken.create_for(user=user, title="Old", access="read")
+        recent, _secret = APIToken.create_for(user=user, title="Recent", access="read")
         valid, _secret = APIToken.create_for(user=user, title="New", access="read")
-        APIToken.objects.filter(pk=expired.pk).update(expires_at=timezone.now())
+        APIToken.objects.filter(pk=old.pk).update(
+            expires_at=timezone.now() - API_TOKEN_LIFETIME
+        )
+        APIToken.objects.filter(pk=recent.pk).update(expires_at=timezone.now())
 
         prune_api_tokens()
-        self.assertEqual(list(APIToken.objects.all()), [valid])
+        self.assertEqual(set(APIToken.objects.all()), {recent, valid})

@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import APIToken, CoffeePairings, User
+from workbench.accounts.models import API_TOKEN_LIFETIME, APIToken, CoffeePairings, User
 
 
 CANDIDATES = 20
@@ -54,8 +54,11 @@ def rating(pairing, previous):
 
 
 def prune_api_tokens():
-    """Expired tokens are useless, people get new ones with wb login"""
-    APIToken.objects.filter(expires_at__lte=timezone.now()).delete()
+    """Expired tokens are kept for a while (e.g. to see them on the tokens
+    page or to refresh them), then deleted"""
+    APIToken.objects.filter(
+        expires_at__lte=timezone.now() - API_TOKEN_LIFETIME
+    ).delete()
 
 
 def coffee_invites():
