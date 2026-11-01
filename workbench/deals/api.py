@@ -478,7 +478,7 @@ def deal_create(request, data: DealIn, *, dry_run: bool = False):
         "owned_by": owned_by.pk if owned_by else "",
         "probability": PROBABILITIES[data.probability],
         "decision_expected_on": data.decision_expected_on or "",
-        f"user_{request.user.pk}_contribution": 100,
+        f"user_{(owned_by or request.user).pk}_contribution": 100,
     }
     fields = _values_and_attributes(data, form_data, error)
 
@@ -565,6 +565,10 @@ def deal_update(request, deal_id: int, data: DealPatch, *, dry_run: bool = False
     if patch.get("owned_by"):
         if user := _user_by_short_name(patch["owned_by"], ["owned_by"], error):
             values["owned_by"] = user.pk
+    # The owner contributes to the deal, also when the deal is older than
+    # this rule
+    field = f"user_{values['owned_by']}_contribution"
+    values[field] = values.get(field) or 100
     fields = _values_and_attributes(data, values, error)
     if errors:
         raise ValidationError(errors)

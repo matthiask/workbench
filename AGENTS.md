@@ -211,6 +211,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   objects count as recent use, contacts referenced by models missing there
   are always kept (a test lists all relations). Membership in groups which
   aren't archived keeps contacts, so do edits in the audit log.
+- The owner of a deal always contributes to it (`DealForm.clean()`); the
+  accepted deals report splits a deal's value between the contributors by
+  weight. The API adds the owner with weight 100 when creating or updating
+  deals.
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Page layout (see `projects/project_detail.html` and the contacts detail

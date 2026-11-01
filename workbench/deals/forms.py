@@ -299,6 +299,15 @@ class DealForm(ModelForm):
                 "decision_expected_on",
                 _("This field is required when probability is high."),
             )
+        owner = data.get("owned_by")
+        if (
+            owner
+            and (field := f"user_{owner.pk}_contribution") in self.fields
+            and not data.get(field)
+        ):
+            self.add_error(
+                "owned_by", _("The contact person has to contribute to the deal.")
+            )
         return data
 
     def save(self):

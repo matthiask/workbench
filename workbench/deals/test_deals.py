@@ -36,6 +36,32 @@ class DealsTest(TestCase):
 
         self.assertEqual(self.client.get("/deals/?s=42").status_code, 302)
 
+    def test_owner_contributes(self):
+        """The owner of a deal contributes to it"""
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        other = factories.UserFactory.create()
+        self.client.force_login(person.primary_contact)
+        data = {
+            "customer": person.organization.id,
+            "contact": person.id,
+            "title": "Some deal",
+            "probability": Deal.NORMAL,
+            "owned_by": other.pk,
+            f"user_{person.primary_contact_id}_contribution": 100,
+        }
+
+        response = self.client.post("/deals/create/", data)
+        self.assertContains(
+            response, "The contact person has to contribute to the deal."
+        )
+        self.assertFalse(Deal.objects.exists())
+
+        data[f"user_{other.pk}_contribution"] = 50
+        response = self.client.post("/deals/create/", data)
+        self.assertEqual(response.status_code, 302)
+
     def test_contributor_filter(self):
         """Deals can be filtered by their contributors, not just the owner"""
         deal = factories.DealFactory.create(title="Contributed")

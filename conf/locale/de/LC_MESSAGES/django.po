@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 12:16+0100\n"
+"POT-Creation-Date: 2026-11-01 12:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1589,6 +1589,10 @@ msgstr "hauptsächlich treibende Kraft"
 #: workbench/deals/forms.py
 msgid "This field is required when probability is high."
 msgstr "Dieses Feld wird benötigt wenn die Wahrscheinlichkeit hoch ist."
+
+#: workbench/deals/forms.py
+msgid "The contact person has to contribute to the deal."
+msgstr "Die Ansprechperson muss zum Geschäft beitragen."
 
 #: workbench/deals/forms.py
 #: workbench/templates/reporting/accepted_deals_for_user.html

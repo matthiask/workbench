@@ -148,7 +148,16 @@ class DealsAPITest(TestCase):
         self.assertEqual(created.owned_by, user)
         self.assertEqual(created.value, 5000)
         self.assertEqual([a.title for a in created.attributes.all()], ["Referral"])
-        self.assertEqual(created.contributions.get().user, user)
+        self.assertEqual(list(created.contributors.all()), [user])
+
+        # Deals created for others: the owner contributes
+        other = factories.UserFactory.create(_short_name="cd")
+        response = self.client.post(
+            "/api/deals/", deal | {"owned_by": "cd"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        created = Deal.objects.get(pk=response.json()["id"])
+        self.assertEqual(list(created.contributors.all()), [other])
 
     def test_create_errors(self):
         """Unknown value types and missing attributes list the choices"""
@@ -231,6 +240,16 @@ class DealsAPITest(TestCase):
         self.assertEqual((deal.title, deal.value), ("Relaunch", 6000))
         # Contributions stay as they were
         self.assertEqual(list(deal.contributors.all()), [user])
+
+        # A new owner contributes too
+        factories.UserFactory.create(_short_name="cd")
+        response = patch({"owned_by": "cd"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            sorted(u._short_name for u in deal.contributors.all()), ["ab", "cd"]
+        )
+        response = patch({"owned_by": "ab"})
+        self.assertEqual(response.status_code, 200, response.content)
 
         response = patch({"probability": "high", "decision_expected_on": None})
         self.assertEqual(response.status_code, 422)
