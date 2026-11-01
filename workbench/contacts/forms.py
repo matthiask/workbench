@@ -270,7 +270,7 @@ class PersonSearchForm(Form):
             self
             .apply_renamed(queryset, "g", "groups")
             .select_related("organization", "primary_contact")
-            .prefetch_related("emailaddresses", "phonenumbers", "groups")
+            .prefetch_related("groups")
         )
 
     def response(self, request, queryset):
