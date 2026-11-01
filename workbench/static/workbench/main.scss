@@ -1681,6 +1681,27 @@ a.wb-row-title:hover {
   }
 }
 
+// The outer columns of tables in cards line up with the card headers
+.wb-table-card > .table,
+.wb-table-card > .table-responsive > .table {
+  :is(th, td):first-child {
+    padding-left: var(--bs-card-spacer-x);
+  }
+
+  :is(th, td):last-child {
+    padding-right: var(--bs-card-spacer-x);
+  }
+}
+
+.wb-command {
+  margin-bottom: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--bs-border-radius-sm);
+  background: var(--wb-surface-muted);
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+}
+
 .wb-table-gap > td {
   height: 0.5rem;
   padding: 0;

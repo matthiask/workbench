@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
 
+from workbench import cli_version
 from workbench.accounts.forms import UserForm
 from workbench.accounts.models import API_TOKEN_LIFETIME, APIToken, User
 from workbench.accounts.reporting import logged_hours
@@ -216,6 +217,9 @@ def api_tokens(request):
             "secret": secret,
             "days": API_TOKEN_LIFETIME.days,
             "access_choices": APIToken.Access.choices,
+            "cli_install": cli_version.INSTALL,
+            "cli_readme_url": cli_version.README_URL,
+            "base_url": request.build_absolute_uri("/"),
         },
     )
 

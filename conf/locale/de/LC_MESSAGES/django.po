@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:25+0100\n"
+"POT-Creation-Date: 2026-11-01 13:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3946,6 +3946,18 @@ msgstr[1] "Noch %(more)s anzeigen"
 #, python-format
 msgid "API tokens give command line tools like <code>wb</code> access to Workbench in your name. They expire after %(days)s days. <code>wb login</code> creates tokens through the browser; create them here for computers without a browser."
 msgstr "Mit API-Tokens erhalten Kommandozeilenwerkzeuge wie <code>wb</code> in deinem Namen Zugriff auf Workbench. Sie laufen nach %(days)s Tagen ab. <code>wb login</code> erstellt Tokens über den Browser; erstelle sie hier für Computer ohne Browser."
+
+#: workbench/templates/accounts/api_tokens.html
+msgid "Command line"
+msgstr "Kommandozeile"
+
+#: workbench/templates/accounts/api_tokens.html
+msgid "Install <code>wb</code> with <a href=\"https://docs.astral.sh/uv/\">uv</a> and log in, the browser asks for the access:"
+msgstr "Installiere <code>wb</code> mit <a href=\"https://docs.astral.sh/uv/\">uv</a> und melde dich an, der Browser fragt nach dem Zugriff:"
+
+#: workbench/templates/accounts/api_tokens.html
+msgid "Installation and commands"
+msgstr "Installation und Befehle"
 
 #: workbench/templates/accounts/api_tokens.html
 msgid "Copy the token now, it will not be shown again:"

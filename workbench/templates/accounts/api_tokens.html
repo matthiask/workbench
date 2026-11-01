@@ -17,6 +17,21 @@
       </div>
     </div>
 
+    <section class="card mb-3">
+      <div class="card-header">{% translate 'Command line' %}</div>
+      <div class="card-body">
+        <p>
+          {% blocktranslate trimmed %}
+            Install <code>wb</code> with <a href="https://docs.astral.sh/uv/">uv</a> and log in, the browser asks for
+            the access:
+          {% endblocktranslate %}
+        </p>
+        <pre class="wb-command user-select-all">uv tool install "{{ cli_install }}"
+wb login {{ base_url }}</pre>
+        <a href="{{ cli_readme_url }}" target="_blank" rel="noopener">{% translate 'Installation and commands' %}</a>
+      </div>
+    </section>
+
     {% if secret %}
       <div class="alert alert-success">
         <p>{% translate 'Copy the token now, it will not be shown again:' %}</p>
@@ -25,7 +40,7 @@
     {% endif %}
 
     <section class="card mb-3 wb-table-card">
-      <table class="table table-sm table-hover mb-0 align-middle">
+      <table class="table table-hover mb-0 align-middle">
         <thead>
           <tr>
             <th>{% translate 'title'|capfirst %}</th>

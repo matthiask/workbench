@@ -7,6 +7,9 @@ from django.utils.translation import gettext as _
 
 # Bump this when the API changes in ways older CLIs cannot handle
 MINIMUM = (0, 10, 0)
+# Where wb is installed from and documented
+INSTALL = "git+https://github.com/matthiask/workbench#subdirectory=cli"
+README_URL = "https://github.com/matthiask/workbench/tree/main/cli#readme"
 # The version in the repository, users of older versions are told to upgrade
 LATEST = tomllib.loads((settings.BASE_DIR / "cli" / "pyproject.toml").read_text())[
     "project"
