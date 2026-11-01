@@ -269,7 +269,12 @@
     background-color: var(--st-color, var(--bs-teal));
   }
 
-  &.is-absence,
+  // Absences in the colors of their reasons, see main.scss
+  &.is-absence {
+    background-color: var(--wb-absence, var(--bs-info));
+    color: #fff;
+  }
+
   &.is-project-absence {
     background-color: var(--bs-info);
   }

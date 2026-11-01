@@ -7,6 +7,7 @@ from django.db import connections
 from django.db.models import Q, Sum
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
@@ -249,11 +250,19 @@ class Planning:
                 if date_from <= week <= date_until
             ]
 
+            # The external view is shown to customers: neither the reason
+            # nor the description
+            text, reason = (
+                (capfirst(_("absence")), "absence")
+                if self.external
+                else (absence.public_text(), absence.reason)
+            )
             for idx, week in weeks:
                 self._absences[absence.user][idx].append((
                     hours / len(weeks),
-                    absence.public_text(),
+                    text,
                     absence.urls["detail"],
+                    reason,
                 ))
                 self._by_week[week] += hours / len(weeks)
 
@@ -323,6 +332,7 @@ order by ph.date
                 ph_hours,
                 f"{name} ({detail} = {hours(ph_hours)})",
                 reverse("awt_holiday_detail", kwargs={"pk": id}),
+                "holiday",
             ))
             self._by_week[week] += ph_hours
 

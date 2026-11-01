@@ -119,6 +119,9 @@ $absence-colors: (
   "school": #ae3ec9,
   "other": #7950f2,
   "correction": #868e96,
+  // Not reasons: public holidays, and absences in views for customers
+  "holiday": #868e96,
+  "absence": #868e96,
 );
 
 :root {

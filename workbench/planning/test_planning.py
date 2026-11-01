@@ -510,6 +510,30 @@ class CapacityTest(TestCase):
         planning.add_absences(Absence.objects.all())
         self.assertEqual(len(planning._absences[user][0]), 1)
 
+    def test_absence_reasons(self):
+        """The planning colors absences by their reason, the external view
+        shows neither the reason nor the description"""
+        deactivate_all()
+        user = factories.UserFactory.create()
+        week = monday()
+        Absence.objects.create(
+            user=user,
+            starts_on=week,
+            days=1,
+            reason=Absence.SICKNESS,
+            description="Flu",
+        )
+
+        planning = reporting.Planning(weeks=[week], users=[user])
+        planning.add_absences(Absence.objects.all())
+        [(_hours, text, _url, reason)] = planning._absences[user][0]
+        self.assertEqual((text, reason), ("sickness", Absence.SICKNESS))
+
+        planning = reporting.Planning(weeks=[week], users=[user], external_view=True)
+        planning.add_absences(Absence.objects.all())
+        [(_hours, text, _url, reason)] = planning._absences[user][0]
+        self.assertEqual((text, reason), ("Absence", "absence"))
+
     def test_capacity_employment_changes_during_the_week(self):
         """Employments starting or ending during a week count for the days
         they cover, holidays only within the employment"""

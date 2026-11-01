@@ -1112,8 +1112,9 @@ function Absences({ absences }) {
 const AbsencesTooltip = ({ absences }) => {
   return (
     <div className="description-popup no-pr">
-      {absences.map(([hours, description, url], idx) => (
+      {absences.map(([hours, description, url, reason], idx) => (
         <p key={idx}>
+          <span className={`wb-absence-swatch wb-absence--${reason}`} />
           {url ? (
             <a key={url} href={url} data-ajaxmodal>
               {fixed(hours, 0)}h: {description}
@@ -1140,13 +1141,21 @@ function UserAbsences({ user }) {
         if (!absences.length) return null
 
         const hours = absences.reduce((a, b) => a + Number.parseFloat(b[0]), 0)
+        // The color of the reason with the most hours this week
+        const byReason = {}
+        for (const [h, , , reason] of absences) {
+          byReason[reason] = (byReason[reason] || 0) + Number.parseFloat(h)
+        }
+        const reason = Object.keys(byReason).reduce((a, b) =>
+          byReason[b] > byReason[a] ? b : a,
+        )
 
         return (
           <Cell
             key={idx}
             row={row}
             column={FIRST_DATA_COLUMN + idx}
-            className="planning--range planning--small is-absence has-description-popup"
+            className={`planning--range planning--small is-absence wb-absence--${reason} has-description-popup`}
           >
             {fixed(hours, 0)}
             <AbsencesTooltip {...{ absences }} />
