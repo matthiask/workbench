@@ -23,7 +23,7 @@ service AS (
     (
       ps.offer_id IS NULL
       OR (
-        o.status != %s
+        o.status <> ALL(%s)
         AND NOT o.is_budget_retainer
       )
     )
@@ -40,7 +40,7 @@ FROM logged
 LEFT JOIN service ON logged.project_id=service.project_id
 WHERE service.hours / logged.hours < 1
             """,
-            [Offer.DECLINED],
+            [list(Offer.NOT_PURSUED)],
         )
         green_hours_factor = defaultdict(lambda: Z0 + 1, cursor)
 
@@ -107,8 +107,9 @@ WHERE service.hours / logged.hours < 1
 
 
 def green_hours_by_month():
+    not_pursued = ", ".join(str(status) for status in Offer.NOT_PURSUED)
     with connections["default"].cursor() as cursor:
-        cursor.execute("""\
+        cursor.execute(f"""\
 DROP TABLE IF EXISTS green_hours_factor;
 CREATE TEMPORARY TABLE green_hours_factor AS
 WITH
@@ -120,7 +121,7 @@ service AS (
     (
       ps.offer_id IS NULL
       OR (
-        o.status!=40 -- DECLINED
+        o.status NOT IN ({not_pursued}) -- Offer.NOT_PURSUED
         AND NOT o.is_budget_retainer
       )
     )

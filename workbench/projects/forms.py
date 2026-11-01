@@ -455,6 +455,7 @@ class ProjectForm(ModelForm):
 
     def save(self):
         instance = super().save(commit=False)
+        closing = "closed_on" in self.changed_data and instance.closed_on
         if self.instance.pk and self.instance.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 for service in self.instance.services.editable():
@@ -464,7 +465,26 @@ class ProjectForm(ModelForm):
         instance.save()
         if "customer" in self.changed_data:
             instance.invoices.update(customer=instance.customer)
+        if closing:
+            self.discard_offers_in_preparation(instance)
         return instance
+
+    def discard_offers_in_preparation(self, instance):
+        """Offers in preparation can't lead anywhere once the project is
+        closed. They have never been sent, so they aren't declined."""
+        from workbench.offers.models import Offer
+
+        offers = list(instance.offers.filter(status=Offer.IN_PREPARATION))
+        for offer in offers:
+            offer.status = Offer.DISCARDED
+            offer.closed_on = instance.closed_on
+            offer.save()
+        if offers:
+            messages.info(
+                self.request,
+                _("Offers in preparation have been discarded: %(offers)s.")
+                % {"offers": ", ".join(str(offer) for offer in offers)},
+            )
 
 
 class ServiceForm(ModelForm):

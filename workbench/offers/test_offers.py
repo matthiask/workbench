@@ -310,6 +310,26 @@ class OffersTest(TestCase):
         )
         self.assertEqual(Offer(project=project, status="42").pretty_status, "42")
 
+    def test_discard_only_unsent_offers(self):
+        """Offers which have been sent are declined, not discarded"""
+        complete = {"title": "Relaunch", "postal_address": "Customer\nStreet\nCity"}
+        offer = factories.OfferFactory.create(
+            status=Offer.OFFERED,
+            offered_on=in_days(-10),
+            valid_until=in_days(20),
+            **complete,
+        )
+        offer.status = Offer.DISCARDED
+        with self.assertRaises(ValidationError) as cm:
+            offer.full_clean()
+        self.assertIn("status", cm.exception.message_dict)
+
+        offer = factories.OfferFactory.create(**complete)
+        offer.status = Offer.DISCARDED
+        offer.full_clean()
+        offer.save()
+        self.assertEqual(offer.closed_on, dt.date.today())
+
     def test_declined_offer(self):
         """Declined offers' services do not allow logging and are not part of
         service hours"""

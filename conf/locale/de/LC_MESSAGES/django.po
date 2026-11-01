@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:43+0100\n"
+"POT-Creation-Date: 2026-11-01 13:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2904,6 +2904,10 @@ msgstr "Leistungsgruppe"
 msgid "Offered"
 msgstr "Offeriert"
 
+#: workbench/offers/models.py
+msgid "Discarded"
+msgstr "Verworfen"
+
 #: workbench/offers/models.py workbench/tools/pdf.py
 msgid "offered on"
 msgstr "offeriert am"
@@ -2943,6 +2947,10 @@ msgstr "Offertdatum fehlt f체r den ausgew채hlten Status."
 #: workbench/offers/models.py
 msgid "Valid until date missing for selected state."
 msgstr "Ende der G체ltigkeit fehlt f체r den ausgew채hlten Status."
+
+#: workbench/offers/models.py
+msgid "Offers which have been sent are declined, not discarded."
+msgstr "Versandte Offerten werden abgelehnt, nicht verworfen."
 
 #: workbench/offers/models.py
 msgid "Valid until date has to be after offered on date."
@@ -3399,6 +3407,11 @@ msgstr "Dieses Projekt wurde am oder vor dem {} geschlossen. Wenn Du es wieder �
 #, python-brace-format
 msgid "Cannot close a project with a date of {} or earlier anymore."
 msgstr "Kann Projekte nicht mehr mit einem Datum von {} oder fr체her schliessen."
+
+#: workbench/projects/forms.py
+#, python-format
+msgid "Offers in preparation have been discarded: %(offers)s."
+msgstr "Offerten in Vorbereitung wurden verworfen: %(offers)s."
 
 #: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."

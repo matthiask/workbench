@@ -62,6 +62,9 @@ Contents:
 - **Budgeted services** (`Service.objects.budgeted()`): not optional, and
   either without offer or on an offer which is neither declined nor a budget
   retainer. Services of offers in preparation or offered **do** count.
+- **Discarded offers** (`Offer.DISCARDED`, never sent and not pursued, e.g.
+  offers in preparation of projects being closed) count like declined ones
+  everywhere: "declined" in this document means `Offer.NOT_PURSUED`.
 - **Budget retainer** offers (`Offer.is_budget_retainer`, "behält Budget
   zurück") are only used for budgeting; their services don't count as budget,
   the actual services are created later, usually without offers of their own.

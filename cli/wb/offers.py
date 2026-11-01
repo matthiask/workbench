@@ -53,6 +53,7 @@ def context(project_id):
         "offered",
         "accepted",
         "declined",
+        "discarded",
     ]),
 )
 @click.option("--project", type=int, help="Project ID.")

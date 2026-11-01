@@ -12,6 +12,7 @@ from workbench.offers.models import Offer
 from workbench.projects.charts import projected_vs_invoiced_chart
 from workbench.projects.models import InternalType, Project, Service
 from workbench.projects.views import projected_invoices_timeline
+from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -662,6 +663,48 @@ class ProjectsTest(TestCase):
             project.status_badge,
             '<span class="badge text-bg-light">Order, closed on 31.12.2019</span>',
         )
+
+    def test_closing_discards_offers_in_preparation(self):
+        """Offers in preparation of closed projects are discarded, they can't
+        lead anywhere anymore; offers which have been sent are left alone"""
+        project = factories.ProjectFactory.create()
+        preparing = factories.OfferFactory.create(project=project)
+        offered = factories.OfferFactory.create(
+            project=project,
+            status=Offer.OFFERED,
+            offered_on=in_days(-10),
+            valid_until=in_days(20),
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "closed_on": in_days(-1).isoformat(),
+            },
+        )
+        self.assertRedirects(response, project.urls["detail"])
+        self.assertIn(
+            f"Offers in preparation have been discarded: {preparing}.",
+            messages(response),
+        )
+
+        preparing.refresh_from_db()
+        offered.refresh_from_db()
+        self.assertEqual(preparing.status, Offer.DISCARDED)
+        self.assertEqual(preparing.closed_on, in_days(-1))
+        self.assertEqual(
+            preparing.pretty_status,
+            f"Discarded on {local_date_format(in_days(-1))}",
+        )
+        self.assertEqual(offered.status, Offer.OFFERED)
+        # Discarded offers don't count, like declined ones
+        self.assertTrue(preparing.is_declined)
 
     def test_initialize_customer_contact(self):
         """Initialize customer and/or contact using query parameters"""

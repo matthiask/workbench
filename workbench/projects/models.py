@@ -733,7 +733,7 @@ class Project(Model):
             return
 
         status = set(self.offers.order_by().values_list("status", flat=True))
-        if status == {Offer.DECLINED}:
+        if status and status <= set(Offer.NOT_PURSUED):
             messages.warning(
                 request,
                 _(
@@ -798,7 +798,10 @@ class ServiceQuerySet(SearchQuerySet):
         return self.filter(
             (
                 Q(offer__isnull=True)
-                | ~(Q(offer__status=Offer.DECLINED) | Q(offer__is_budget_retainer=True))
+                | ~(
+                    Q(offer__status__in=Offer.NOT_PURSUED)
+                    | Q(offer__is_budget_retainer=True)
+                )
             )
             & Q(is_optional=False)
         )
@@ -810,7 +813,7 @@ class ServiceQuerySet(SearchQuerySet):
             Q(allow_logging=True),
             Q(offer__isnull=True)
             | ~(
-                Q(offer__status=Offer.DECLINED)
+                Q(offer__status__in=Offer.NOT_PURSUED)
                 | Q(offer__work_completed_on__isnull=False)
                 | Q(offer__is_budget_retainer=True)
             ),

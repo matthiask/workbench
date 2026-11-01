@@ -49,7 +49,7 @@ class OfferQuerySet(SearchQuerySet):
     def not_declined_choices(self, *, include=None):
         offers = {True: [], False: []}
         for offer in self.filter(
-            ~Q(status=Offer.DECLINED) | Q(pk=include)
+            ~Q(status__in=Offer.NOT_PURSUED) | Q(pk=include)
         ).select_related("project", "owned_by"):
             offers[offer.is_declined].append((offer.pk, offer))
         return (
@@ -89,7 +89,7 @@ class OfferQuerySet(SearchQuerySet):
         return self.filter(status=Offer.ACCEPTED)
 
     def not_declined(self):
-        return self.exclude(status=Offer.DECLINED)
+        return self.exclude(status__in=Offer.NOT_PURSUED)
 
 
 @model_urls
@@ -100,6 +100,8 @@ class Offer(ModelWithTotal):
     OFFERED = 20
     ACCEPTED = 30
     DECLINED = 40
+    # Never sent and not pursued anymore, e.g. when the project is closed
+    DISCARDED = 50
 
     STATUS_CHOICES = (
         (IN_PREPARATION, _("In preparation")),
@@ -107,7 +109,10 @@ class Offer(ModelWithTotal):
         (OFFERED, _("Offered")),
         (ACCEPTED, _("Accepted")),
         (DECLINED, _("Declined")),
+        (DISCARDED, _("Discarded")),
     )
+    # Offers which don't count anymore, neither their amounts nor their hours
+    NOT_PURSUED = (DECLINED, DISCARDED)
 
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     project = models.ForeignKey(
@@ -244,6 +249,11 @@ class Offer(ModelWithTotal):
                     _("Valid until date missing for selected state.")
                 )
 
+        if self.status == self.DISCARDED and self.offered_on:
+            errors["status"] = _(
+                "Offers which have been sent are declined, not discarded."
+            )
+
         if self.offered_on and self.valid_until and self.offered_on > self.valid_until:
             errors["valid_until"] = _(
                 "Valid until date has to be after offered on date."
@@ -279,7 +289,7 @@ class Offer(ModelWithTotal):
             return _("Offered on %(offered_on)s") % {
                 "offered_on": local_date_format(self.offered_on)
             }
-        if self.status in (self.ACCEPTED, self.DECLINED):
+        if self.status in (self.ACCEPTED, self.DECLINED, self.DISCARDED):
             return _("%(status)s on %(closed_on)s") % {
                 "status": self.get_status_display(),
                 "closed_on": local_date_format(self.closed_on),
@@ -299,6 +309,7 @@ class Offer(ModelWithTotal):
                 self.OFFERED: "success",
                 self.ACCEPTED: "light",
                 self.DECLINED: "danger",
+                self.DISCARDED: "light",
             }[self.status]
 
         return format_html(
@@ -347,7 +358,8 @@ class Offer(ModelWithTotal):
 
     @property
     def is_declined(self):
-        return self.status == self.DECLINED
+        """Declined or discarded: doesn't count anymore"""
+        return self.status in self.NOT_PURSUED
 
     @property
     def should_collapse(self):

@@ -208,6 +208,7 @@ OFFER_STATUSES = {
     "offered": Offer.OFFERED,
     "accepted": Offer.ACCEPTED,
     "declined": Offer.DECLINED,
+    "discarded": Offer.DISCARDED,
 }
 
 

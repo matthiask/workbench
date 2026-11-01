@@ -125,7 +125,7 @@ def project_planning_context(project):
     """Everything needed to plan the project, and the schema of the import"""
     offers = (
         project.offers
-        .exclude(status=Offer.DECLINED)
+        .exclude(status__in=Offer.NOT_PURSUED)
         .select_related("project")
         .prefetch_related("services")
     )
@@ -263,9 +263,9 @@ def _lookups(project):
         "service_types": {st.title: st for st in ServiceType.objects.all()},
         "offers": {
             offer.code: offer
-            for offer in project.offers.exclude(status=Offer.DECLINED).select_related(
-                "project"
-            )
+            for offer in project.offers.exclude(
+                status__in=Offer.NOT_PURSUED
+            ).select_related("project")
         },
         "milestones": {m.pk: m for m in project.milestones.all()},
     }
