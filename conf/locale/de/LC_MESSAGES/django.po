@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 08:39+0100\n"
+"POT-Creation-Date: 2026-11-01 08:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4780,6 +4780,16 @@ msgstr "Geschichte der Meilensteine"
 msgid "back to project planning"
 msgstr "Zurück zum Projektplan"
 
+#: workbench/templates/projects/_logged_hours_per_rate.html
+msgid "Logged hours per hourly rate"
+msgstr "Erfasste Stunden pro Stundensatz"
+
+#: workbench/templates/projects/_logged_hours_per_rate.html
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/reporting/_budget_statistics_table.html
+msgid "undefined rate"
+msgstr "ohne Stundensatz"
+
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/_budget_statistics_table.html
 #: workbench/templates/reporting/project_budget_statistics.html
@@ -4793,18 +4803,6 @@ msgstr "Offeriert und akzeptiert"
 #: workbench/tools/xlsx.py
 msgid "sold"
 msgstr "verkauft"
-
-#: workbench/templates/projects/campaign_statistics.html
-#: workbench/templates/projects/project_statistics.html
-msgid "Logged hours per hourly rate"
-msgstr "Erfasste Stunden pro Stundensatz"
-
-#: workbench/templates/projects/campaign_statistics.html
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
-#: workbench/templates/reporting/_budget_statistics_table.html
-msgid "undefined rate"
-msgstr "ohne Stundensatz"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Cost"
