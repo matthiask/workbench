@@ -604,6 +604,9 @@ tbody th > a {
   gap: 0.5rem;
   // Instead of a gap so that moving to the actions doesn't close them
   padding: 0 0 0.5rem 0.25rem;
+  // The column catches the mouse between the actions too, but only while
+  // it is visible
+  pointer-events: auto;
   visibility: hidden;
   opacity: 0;
   transform: translateY(0.5rem);
@@ -618,7 +621,6 @@ tbody th > a {
   align-items: center;
   gap: 0.5rem;
   color: var(--bs-body-color);
-  pointer-events: auto;
 
   &:hover {
     text-decoration: none;
