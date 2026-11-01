@@ -12,6 +12,7 @@ from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.api import OrganizationOut, organization_out
+from workbench.deals.api import DealSummary, deal_summary
 from workbench.invoices.api import InvoiceOut, invoice_out
 from workbench.logbook.reporting import logbook_stats
 from workbench.planning.reporting import planning_vs_logbook
@@ -692,6 +693,34 @@ class SqueezeField(Schema):
     external_percentage: Percentage
 
 
+class SqueezeAcquisitionFigures(Schema):
+    hours: Hours
+    deals: Amount
+    deals_per_hour: Amount | None
+
+
+class SqueezeAcquisitionProject(Schema):
+    project: ProjectSummary
+    hours: Hours
+
+
+class SqueezeAcquisitionDeal(Schema):
+    deal: DealSummary
+    share: Amount
+
+
+class SqueezeAcquisitionUser(SqueezeAcquisitionFigures):
+    user: str
+    projects: list[SqueezeAcquisitionProject]
+    deals_accepted: list[SqueezeAcquisitionDeal]
+
+
+class SqueezeAcquisition(Schema):
+    internal_types: list[str]
+    users: list[SqueezeAcquisitionUser]
+    totals: SqueezeAcquisitionFigures
+
+
 class Squeeze(Period):
     may_be_incomplete: bool
     default_hourly_rate: Amount
@@ -700,6 +729,7 @@ class Squeeze(Period):
     projects: list[SqueezeProject]
     customers: list[SqueezeCustomer]
     specialist_fields: list[SqueezeField]
+    acquisition: SqueezeAcquisition
 
 
 @router.get(
@@ -708,10 +738,8 @@ class Squeeze(Period):
     auth=user_auth(feature=FEATURES.PRODUCTIVITY),
 )
 def squeeze_api(request, filters: Query[DateRangeFilter]):
-    """Gross margin per user and project, the last month by default. Projects'
-    gross margins are split between users by the value of their work (invoiced
-    hours times the hourly rate), rates use the hours spent. Invoices of a period may be incomplete until the 9th of the
-    following month."""
+    """Productivity, the last month by default. Invoices of a period may be
+    incomplete until the 9th of the following month."""
     period = date_range(filters, default=last_month_range())
     data = squeeze.squeeze_data(period)
     return {
@@ -748,4 +776,25 @@ def squeeze_api(request, filters: Query[DateRangeFilter]):
             for row in data["organizations"]
         ],
         "specialist_fields": data["fields"],
+        "acquisition": {
+            "internal_types": [
+                type.name for type in data["acquisition"]["internal_types"]
+            ],
+            "users": [
+                row
+                | {
+                    "user": _user(row["user"]),
+                    "projects": [
+                        {"project": project_summary(project, request), "hours": hours}
+                        for project, hours in row["by_project"].items()
+                    ],
+                    "deals_accepted": [
+                        {"deal": deal_summary(deal, request), "share": share}
+                        for deal, share in row["by_deal"].items()
+                    ],
+                }
+                for row in data["acquisition"]["users"]
+            ],
+            "totals": data["acquisition"]["totals"],
+        },
     }

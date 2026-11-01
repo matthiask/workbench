@@ -1,4 +1,5 @@
 import datetime as dt
+from unittest.mock import ANY
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -6,7 +7,9 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
+from workbench.projects.models import InternalType, Project
 from workbench.tools.validation import in_days, monday
 
 
@@ -216,6 +219,61 @@ class ReportsAPITest(TestCase):
         [project_row] = data["projects"]
         self.assertEqual(project_row["project"]["id"], project.id)
         self.assertEqual(list(project_row["users"]), ["ab"])
+        self.assertEqual(
+            data["acquisition"],
+            {
+                "internal_types": [],
+                "users": [],
+                "totals": {"hours": "0.0", "deals": "0.00", "deals_per_hour": None},
+            },
+        )
+
+    def test_squeeze_acquisition(self):
+        """Squeeze compares hours spent on outreach with accepted deals"""
+        outreach = InternalType.objects.create(
+            name="Outreach", percentage=10, is_outreach=True
+        )
+        project = factories.ProjectFactory.create(
+            type=Project.INTERNAL, internal_type=outreach
+        )
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            rendered_by=self.user,
+            rendered_on=dt.date(2026, 9, 10),
+            hours=4,
+        )
+        deal = factories.DealFactory.create(
+            owned_by=self.user, status=Deal.ACCEPTED, closed_on=dt.date(2026, 9, 20)
+        )
+        deal.values.create(type=factories.ValueTypeFactory.create(), value=1000)
+        deal.save()
+        deal.contributions.create(user=self.user, weight=100)
+
+        data = self.get("/api/reports/squeeze/", period="2026-09")
+        [user] = data["acquisition"]["users"]
+        self.assertEqual(user["projects"][0]["project"]["id"], project.id)
+        self.assertEqual(user["deals_accepted"][0]["deal"]["id"], deal.id)
+        self.assertEqual(
+            data["acquisition"],
+            {
+                "internal_types": ["Outreach"],
+                "users": [
+                    {
+                        "user": "ab",
+                        "hours": "4.0",
+                        "deals": "1000.00",
+                        "deals_per_hour": "250.00",
+                        "projects": [{"project": ANY, "hours": "4.0"}],
+                        "deals_accepted": [{"deal": ANY, "share": "1000.00"}],
+                    }
+                ],
+                "totals": {
+                    "hours": "4.0",
+                    "deals": "1000.00",
+                    "deals_per_hour": "250.00",
+                },
+            },
+        )
 
     @override_settings(
         FEATURES={

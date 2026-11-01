@@ -393,6 +393,191 @@
         </table>
       </div>
     </section>
+
+    {% if data.acquisition.internal_types %}
+      {% with types=data.acquisition.type_names %}
+        <div class="modal fade" id="acquisition-help">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">{% translate 'Acquisition' %}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <dl>
+                  <dt>{% translate 'Outreach hours' %}</dt>
+                  <dd>
+                    {% blocktranslate trimmed %}
+                      Hours logged in the period on internal projects of the types marked as outreach ({{ types }}). The
+                      time spent counts, not the hours for invoicing.
+                    {% endblocktranslate %}
+                  </dd>
+                  <dt>{% translate 'Accepted deals' %}</dt>
+                  <dd>
+                    {% blocktranslate trimmed %}
+                      The value of the deals accepted in the period, split between the contributors by their weight like
+                      in the accepted deals report. Deal values are revenue, not gross margin.
+                    {% endblocktranslate %}
+                  </dd>
+                  <dt>{% translate 'Per hour' %}</dt>
+                  <dd>{% translate 'Accepted deals divided by outreach hours.' %}</dd>
+                </dl>
+                <p class="mb-0">
+                  {% blocktranslate trimmed %}
+                    Deals are often won long after the outreach, and outreach also helps deals of others. The figures
+                    only mean something over longer periods, e.g. a year, and need interpretation.
+                  {% endblocktranslate %}
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                  {% translate 'Close' %}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Per-user acquisition modals #}
+        {% for row in data.acquisition.users %}
+          <div class="modal fade" id="acquisition-user-{{ row.user.pk }}">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">{{ row.user }}</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p class="text-body-secondary small">{{ data.date_range.0 }} – {{ data.date_range.1 }}</p>
+                  {% if row.by_project %}
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>{% translate 'Project' %}</th>
+                          <th class="text-end">{% translate 'Outreach hours' %}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for project, hours in row.by_project.items %}
+                          <tr>
+                            <td>{% link_or_none project with_badge=True %}</td>
+                            <td class="text-end">{{ hours|hours }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                      <tfoot>
+                        <tr class="wb-total-row">
+                          <th>{% translate 'Total' %}</th>
+                          <th class="text-end">{{ row.hours|hours }}</th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  {% endif %}
+                  {% if row.by_deal %}
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>{% translate 'Deal' %}</th>
+                          <th>{% translate 'Closed on' %}</th>
+                          <th class="text-end">{% translate 'Value' %}</th>
+                          <th class="text-end">{% translate 'Share' %}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for deal, share in row.by_deal.items %}
+                          <tr>
+                            <td>{% link_or_none deal %}</td>
+                            <td>{{ deal.closed_on|local_date_format }}</td>
+                            <td class="text-end">{{ deal.value|currency }}</td>
+                            <td class="text-end">{{ share|currency }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                      <tfoot>
+                        <tr class="wb-total-row">
+                          <th>{% translate 'Total' %}</th>
+                          <th></th>
+                          <th></th>
+                          <th class="text-end">{{ row.deals|currency }}</th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  {% endif %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    {% translate 'Close' %}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        {# Acquisition table #}
+        <section class="card mb-3 wb-table-card">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <span>
+              {% translate 'Acquisition' %}
+              <small class="text-muted">{{ types }}</small>
+            </span>
+            <button
+              type="button"
+              class="btn btn-quiet btn-sm btn-icon"
+              data-bs-toggle="modal"
+              data-bs-target="#acquisition-help"
+              title="{% translate 'Explanation' %}"
+              aria-label="{% translate 'Explanation' %}"
+            >
+              {% include 'svg/info.svg' %}
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 wb-compact-table">
+              <thead>
+                <tr>
+                  <th>{% translate 'User' %}</th>
+                  <th class="text-end">{% translate 'Outreach hours' %}</th>
+                  <th class="text-end">{% translate 'Accepted deals' %}</th>
+                  <th class="text-end">{% translate 'Per hour' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in data.acquisition.users %}
+                  <tr>
+                    <td>{% link_or_none row.user %}</td>
+                    <td class="text-end">{{ row.hours|hours }}</td>
+                    <td class="text-end">{{ row.deals|currency }}</td>
+                    <td class="text-end">
+                      <a
+                        href="#"
+                        data-bs-toggle="modal"
+                        data-bs-target="#acquisition-user-{{ row.user.pk }}"
+                        title="{% translate 'Breakdown' %}"
+                      >
+                        {% if row.deals_per_hour is not None %}{{ row.deals_per_hour|currency }}{% else %}–{% endif %}
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr class="wb-total-row">
+                  <th>{% translate 'Total' %}</th>
+                  <th class="text-end">{{ data.acquisition.totals.hours|hours }}</th>
+                  <th class="text-end">{{ data.acquisition.totals.deals|currency }}</th>
+                  <th class="text-end">
+                    {% if data.acquisition.totals.deals_per_hour is not None %}
+                      {{ data.acquisition.totals.deals_per_hour|currency }}
+                    {% endif %}
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+      {% endwith %}
+    {% endif %}
   {% else %}
     <p class="text-muted">{% translate 'No data for the selected period.' %}</p>
   {% endif %}

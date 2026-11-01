@@ -758,3 +758,24 @@ def squeeze(period, since, until, as_csv, as_json):
             ", ".join(row["users"]),
         )
     console.print(table)
+    acquisition = data["acquisition"]
+    if acquisition["internal_types"]:
+        table = make_table(
+            "User", "Outreach>", "Accepted deals>", "Per hour>", show_footer=True
+        )
+
+        def acquisition_cells(row):
+            return [
+                format_hours(row["hours"]),
+                format_amount(row["deals"]),
+                format_amount(row["deals_per_hour"])
+                if row["deals_per_hour"] is not None
+                else "",
+            ]
+
+        for row in acquisition["users"]:
+            table.add_row(row["user"], *acquisition_cells(row))
+        table.columns[0].footer = "Total"
+        for index, value in enumerate(acquisition_cells(acquisition["totals"]), 1):
+            table.columns[index].footer = value
+        console.print(table)

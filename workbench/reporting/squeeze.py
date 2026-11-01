@@ -19,6 +19,7 @@ from workbench.accounts.models import User
 from workbench.awt.models import Absence
 from workbench.awt.reporting import employment_percentages
 from workbench.awt.utils import monthly_days
+from workbench.deals.reporting import accepted_deals
 from workbench.invoices.models import Invoice, ProjectedInvoice
 from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -249,6 +250,72 @@ def project_gross_margin(project):
         "offered": offered,
         "projected": projected,
         "invoiced": invoiced,
+    }
+
+
+def acquisition(date_range):
+    """Hours spent on outreach (internal types with ``is_outreach``) compared
+    with the contributions to deals accepted in the period"""
+    internal_types = list(InternalType.objects.filter(is_outreach=True))
+    hours_by_project = defaultdict(dict)
+    for row in (
+        LoggedHours.objects
+        .filter(
+            rendered_on__range=date_range,
+            service__project__internal_type__in=internal_types,
+        )
+        .order_by()
+        .values("rendered_by", "service__project")
+        .annotate(hours_sum=Sum("hours"))
+    ):
+        hours_by_project[row["rendered_by"]][row["service__project"]] = row["hours_sum"]
+    projects = Project.objects.in_bulk(chain.from_iterable(hours_by_project.values()))
+    deals = {row["user"]: row["deals"] for row in accepted_deals(date_range)["by_user"]}
+    users = User.objects.in_bulk(hours_by_project.keys())
+    rows = []
+    for user in sorted({*users.values(), *deals}):
+        user_hours = sum(hours_by_project[user.id].values(), Z1)
+        user_deals = deals.get(user, {})
+        deals_sum = sum(user_deals.values(), Z2)
+        rows.append({
+            "user": user,
+            "hours": user_hours,
+            "deals": deals_sum,
+            "deals_per_hour": deals_sum / user_hours if user_hours else None,
+            "by_project": dict(
+                sorted(
+                    (
+                        (projects[project_id], hours)
+                        for project_id, hours in hours_by_project[user.id].items()
+                    ),
+                    key=lambda item: item[1],
+                    reverse=True,
+                )
+            ),
+            "by_deal": dict(
+                sorted(user_deals.items(), key=lambda item: item[1], reverse=True)
+            ),
+        })
+    total_hours = sum((row["hours"] for row in rows), Z1)
+    total_deals = sum((row["deals"] for row in rows), Z2)
+    return {
+        "internal_types": internal_types,
+        "type_names": ", ".join(type.name for type in internal_types),
+        # Without outreach hours there is no rate, those come last
+        "users": sorted(
+            rows,
+            key=lambda row: (
+                row["deals_per_hour"] is not None,
+                row["deals_per_hour"] or Z2,
+                row["deals"],
+            ),
+            reverse=True,
+        ),
+        "totals": {
+            "hours": total_hours,
+            "deals": total_deals,
+            "deals_per_hour": total_deals / total_hours if total_hours else None,
+        },
     }
 
 
@@ -667,6 +734,7 @@ def squeeze_data(date_range):  # noqa: C901
         "all_users": all_users,
         "types": types,
         "default_hourly_rate": BASE_HOURLY_RATE,
+        "acquisition": acquisition(date_range),
     }
 
 
@@ -838,6 +906,26 @@ def build_xlsx(data):
         ],
     ]
 
+    acquisition = data["acquisition"]
+    acquisition_table = [
+        [
+            _("user"),
+            _("outreach hours"),
+            _("accepted deals"),
+            _("per hour"),
+        ],
+        *[
+            [str(row["user"]), row["hours"], row["deals"], row["deals_per_hour"]]
+            for row in acquisition["users"]
+        ],
+        [
+            _("Total"),
+            acquisition["totals"]["hours"],
+            acquisition["totals"]["deals"],
+            acquisition["totals"]["deals_per_hour"],
+        ],
+    ]
+
     xlsx = WorkbenchXLSXDocument()
     xlsx.add_sheet(_("projects"))
     xlsx.table(None, header + projects_table)
@@ -847,6 +935,9 @@ def build_xlsx(data):
     xlsx.table(None, header + fields_table)
     xlsx.add_sheet(_("organizations"))
     xlsx.table(None, header + organizations_table)
+    if acquisition["internal_types"]:
+        xlsx.add_sheet(_("acquisition"))
+        xlsx.table(None, header + acquisition_table)
 
     return xlsx
 

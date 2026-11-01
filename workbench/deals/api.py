@@ -153,7 +153,7 @@ def _this_week():
     return [monday(), monday() + dt.timedelta(days=6)]
 
 
-def _deal_summary(deal, request):
+def deal_summary(deal, request):
     return {
         "id": deal.id,
         "code": deal.code,
@@ -300,14 +300,14 @@ def deal_stats(request, filters: Query[StatsFilter]):
                 }
                 for row in accepted["by_month_and_valuetype"]
             ],
-            "deals": [_deal_summary(deal, request) for deal in accepted["deals"]],
+            "deals": [deal_summary(deal, request) for deal in accepted["deals"]],
         },
         "declined": {
             "count": len(declined),
             "sum": sum((deal.value for deal in declined), Z2),
             "by_closing_type": by_closing_type,
             "deals": [
-                _deal_summary(deal, request)
+                deal_summary(deal, request)
                 | {
                     "closing_type": str(deal.pretty_closing_type),
                     "closing_notice": deal.closing_notice,
@@ -334,7 +334,7 @@ def deal_history_api(request, filters: Query[StatsFilter]):
             {
                 "created_at": timezone.localtime(change.created_at),
                 "user": str(change.pretty_user_name),
-                "deal": _deal_summary(deal, request)
+                "deal": deal_summary(deal, request)
                 if (deal := deals.get(int(change.version.row_data["id"])))
                 else None,
                 "changes": [html.unescape(strip_tags(text)) for text in change.changes],

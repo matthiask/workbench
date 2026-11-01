@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 14:14+0100\n"
+"POT-Creation-Date: 2026-11-01 15:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -771,7 +771,7 @@ msgstr "endet am"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "description"
 msgstr "Beschreibung"
 
@@ -2444,13 +2444,13 @@ msgstr "Konnte das PDF nicht generieren: {}"
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 #: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "service"
 msgstr "Leistung"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "rendered on"
 msgstr "Erbracht am"
 
@@ -2468,7 +2468,7 @@ msgstr "Stundensatz"
 #: workbench/reporting/squeeze.py workbench/services/models.py
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/timestamps.html
@@ -2650,14 +2650,14 @@ msgid "Move to service"
 msgstr "Zu Leistung verschieben"
 
 #: workbench/logbook/models.py
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "rendered by"
 msgstr "Erbracht von"
 
 #: workbench/logbook/models.py workbench/reporting/squeeze.py
 #: workbench/templates/logbook/_loggedhours_row.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "hours for invoicing"
 msgstr "Stunden für Verrechnung"
 
@@ -3458,6 +3458,14 @@ msgid "Moving %(amount)s away leaves %(project)s with a negative budget. Are you
 msgstr "Wenn Du %(amount)s wegschiebst, bleibt %(project)s mit einem negativen Budget zurück. Bist Du sicher?"
 
 #: workbench/projects/models.py
+msgid "is outreach"
+msgstr "Akquise"
+
+#: workbench/projects/models.py
+msgid "Hours on outreach are compared with accepted deals in the squeeze report."
+msgstr "Die Stunden für Akquise werden im Squeeze-Bericht mit den gewonnenen Geschäften verglichen."
+
+#: workbench/projects/models.py
 msgid "internal type"
 msgstr "interner Typ"
 
@@ -3810,6 +3818,22 @@ msgstr "Richtwert mit {}/h"
 #: workbench/reporting/squeeze.py
 msgid "relevant gross margin"
 msgstr "relevanter Umsatz"
+
+#: workbench/reporting/squeeze.py
+msgid "outreach hours"
+msgstr "Stunden Akquise"
+
+#: workbench/reporting/squeeze.py
+msgid "accepted deals"
+msgstr "gewonnene Geschäfte"
+
+#: workbench/reporting/squeeze.py
+msgid "per hour"
+msgstr "pro Stunde"
+
+#: workbench/reporting/squeeze.py
+msgid "acquisition"
+msgstr "Akquise"
 
 #: workbench/reporting/utils.py workbench/templates/_hours_rings.html
 #: workbench/templates/start.html workbench/templates/timestamps.html
@@ -4333,6 +4357,7 @@ msgstr "Logbuch-Statistik"
 #: workbench/templates/base.html
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
+#: workbench/templates/reporting/squeeze.html
 msgid "Accepted deals"
 msgstr "Gewonnene Geschäfte"
 
@@ -5022,15 +5047,15 @@ msgstr "reserviert, noch kein Zielprojekt"
 msgid "moved from"
 msgstr "verschoben von"
 
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "Logged hours whose hours for invoicing differ from the time spent. The hours for invoicing are what the work is worth, they are used for invoicing and for the value of the work."
 msgstr "Erfasste Stunden, deren Stunden für Verrechnung von der aufgewendeten Zeit abweichen. Die Stunden für Verrechnung sind, was die Arbeit wert ist; sie werden für die Rechnungsstellung und den Wert der Arbeit verwendet."
 
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "Difference"
 msgstr "Differenz"
 
-#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "Show in the logbook"
 msgstr "Im Logbuch anzeigen"
 
@@ -5463,6 +5488,59 @@ msgstr "Organisationen"
 #: workbench/templates/reporting/squeeze.html
 msgid "Organization"
 msgstr "Organisation"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Acquisition"
+msgstr "Akquise"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Outreach hours"
+msgstr "Stunden Akquise"
+
+#: workbench/templates/reporting/squeeze.html
+#, python-format
+msgid "Hours logged in the period on internal projects of the types marked as outreach (%(types)s). The time spent counts, not the hours for invoicing."
+msgstr "Im Zeitraum auf interne Projekte der als Akquise markierten Typen (%(types)s) erfasste Stunden. Es zählt die aufgewendete Zeit, nicht die Stunden für Verrechnung."
+
+#: workbench/templates/reporting/squeeze.html
+msgid "The value of the deals accepted in the period, split between the contributors by their weight like in the accepted deals report. Deal values are revenue, not gross margin."
+msgstr "Der Wert der im Zeitraum gewonnenen Geschäfte, wie im Bericht der gewonnenen Geschäfte nach Gewichtung auf die Beteiligten aufgeteilt. Die Werte der Geschäfte sind Umsatz, nicht bereinigter Umsatz."
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Per hour"
+msgstr "Pro Stunde"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Accepted deals divided by outreach hours."
+msgstr "Gewonnene Geschäfte geteilt durch die Stunden Akquise."
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Deals are often won long after the outreach, and outreach also helps deals of others. The figures only mean something over longer periods, e.g. a year, and need interpretation."
+msgstr "Geschäfte werden oft lange nach der Akquise gewonnen, und Akquise hilft auch Geschäften anderer. Die Zahlen sind nur über längere Zeiträume, z.B. ein Jahr, aussagekräftig und müssen interpretiert werden."
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Deal"
+msgstr "Geschäft"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Closed on"
+msgstr "Geschlossen am"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Value"
+msgstr "Wert"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Share"
+msgstr "Anteil"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Explanation"
+msgstr "Erklärung"
+
+#: workbench/templates/reporting/squeeze.html
+msgid "Breakdown"
+msgstr "Aufschlüsselung"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "No data for the selected period."

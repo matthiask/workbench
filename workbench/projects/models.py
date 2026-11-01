@@ -26,6 +26,13 @@ class InternalType(OrderableModel):
     name = models.CharField(_("name"), max_length=100)
     description = models.CharField(_("description"), max_length=100, blank=True)
     percentage = models.DecimalField(_("percentage"), max_digits=5, decimal_places=2)
+    is_outreach = models.BooleanField(
+        _("is outreach"),
+        default=False,
+        help_text=_(
+            "Hours on outreach are compared with accepted deals in the squeeze report."
+        ),
+    )
 
     class Meta(OrderableModel.Meta):
         verbose_name = _("internal type")

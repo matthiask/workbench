@@ -537,6 +537,22 @@ Per `project.customer`: Σ of the person contributions (margin, period hours) of
 its projects; Ansatz = margin / hours. Internal projects count with their
 (usually 0) margin under the own organization.
 
+#### Acquisition ("Akquise"), sorted by deals per hour desc
+
+Only shown if internal types are marked `is_outreach`. Per person: Stunden
+Akquise = Σ `hours` (not hours for invoicing) logged in the period on projects
+with an outreach internal type; Gewonnene Geschäfte = the person's share of
+the deals accepted (`closed_on`) in the period, `deal.value` split by
+contribution weight like the accepted deals report
+(`accepted_deals()["by_user"]`); Pro Stunde = deals / hours ("–" without
+hours). Everyone with outreach hours or contributions is listed, those
+without outreach hours last (by deals desc). The info button explains the
+columns; the rate links to a modal per person with the outreach projects
+(hours) and the deals (value, share). The total row sums the rows, deals
+without contributions are left out. Deal values are revenue, not gross
+margin, and deals are often won long after the outreach, so the ratio only
+means something over longer periods.
+
 #### Caveats from the code
 
 - All figures are estimates that should rather underestimate (`relevant_hours`
@@ -550,7 +566,7 @@ its projects; Ansatz = margin / hours. Internal projects count with their
 - Third party costs: larger of invoiced vs. logged, because logged costs can't
   be linked to fixed amount invoices and adding both would double count.
 
-Code: `workbench/reporting/squeeze.py:squeeze_data`, `:build_xlsx`,
+Code: `workbench/reporting/squeeze.py:squeeze_data`, `:acquisition`, `:build_xlsx`,
 `:gross_margin_components`, `:hours_components`, `:third_party_costs`,
 `:relevant_hours`, `:working_days_estimation`;
 `workbench/reporting/views.py:squeeze_view`;

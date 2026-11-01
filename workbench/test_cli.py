@@ -22,6 +22,7 @@ from workbench.contacts.models import Person
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
+from workbench.projects.models import InternalType, Project
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days, monday
 
@@ -752,6 +753,31 @@ planned_work:
         result = self.wb("reports", "hours-per-type", "--period", "nope")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("period", result.output)
+
+    def test_squeeze_acquisition(self):
+        outreach = InternalType.objects.create(
+            name="Outreach", percentage=10, is_outreach=True
+        )
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(
+                project=factories.ProjectFactory.create(
+                    type=Project.INTERNAL, internal_type=outreach
+                )
+            ),
+            rendered_by=self.user,
+            hours=4,
+        )
+        deal = factories.DealFactory.create(
+            owned_by=self.user, status=Deal.ACCEPTED, closed_on=dt.date.today()
+        )
+        deal.values.create(type=factories.ValueTypeFactory.create(), value=1000)
+        deal.save()
+        deal.contributions.create(user=self.user, weight=100)
+
+        result = self.wb("reports", "squeeze", "--period", "this-month")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Accepted deals", result.output)
+        self.assertIn("250.00", result.output)
 
     def test_key_data_and_cash_data(self):
         project = factories.ProjectFactory.create(owned_by=self.user)

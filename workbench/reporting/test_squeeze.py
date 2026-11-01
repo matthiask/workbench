@@ -4,8 +4,10 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
+from workbench.projects.models import InternalType, Project
 from workbench.reporting.squeeze import (
     BASE_HOURLY_RATE,
     project_gross_margin,
@@ -228,3 +230,72 @@ class SqueezeTest(TestCase):
         factories.LoggedHoursFactory.create()
         data = squeeze_data((in_days(-1), in_days(1)))
         self.assertEqual([f["name"] for f in data["fields"]], ["<unknown>"])
+
+    def test_acquisition(self):
+        """Hours spent on outreach compared with the contributions to
+        accepted deals"""
+        InternalType.objects.create(name="Other", percentage=10)
+        outreach = InternalType.objects.create(
+            name="Outreach", percentage=10, is_outreach=True
+        )
+        user = factories.UserFactory.create()
+        project = factories.ProjectFactory.create(
+            type=Project.INTERNAL, internal_type=outreach
+        )
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            rendered_by=user,
+            hours=4,
+        )
+        # Not outreach
+        factories.LoggedHoursFactory.create(rendered_by=user, hours=3)
+
+        deal = factories.DealFactory.create(
+            owned_by=user, status=Deal.ACCEPTED, closed_on=dt.date.today()
+        )
+        deal.values.create(type=factories.ValueTypeFactory.create(), value=1000)
+        deal.save()
+        other = factories.UserFactory.create()
+        deal.contributions.create(user=user, weight=60)
+        deal.contributions.create(user=other, weight=40)
+        # More deals, but less per hour
+        third = factories.UserFactory.create()
+        factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            rendered_by=third,
+            hours=10,
+        )
+        third_deal = factories.DealFactory.create(
+            owned_by=third, status=Deal.ACCEPTED, closed_on=dt.date.today()
+        )
+        third_deal.values.create(type=factories.ValueTypeFactory.create(), value=1000)
+        third_deal.save()
+        third_deal.contributions.create(user=third, weight=100)
+
+        acquisition = squeeze_data((in_days(-1), in_days(1)))["acquisition"]
+        self.assertEqual(acquisition["internal_types"], [outreach])
+        self.assertEqual(
+            [
+                (row["user"], row["hours"], row["deals"], row["deals_per_hour"])
+                for row in acquisition["users"]
+            ],
+            [(user, 4, 600, 150), (third, 10, 1000, 100), (other, 0, 400, None)],
+        )
+        [row, *_rest] = acquisition["users"]
+        self.assertEqual(row["by_project"], {project: 4})
+        self.assertEqual(row["by_deal"], {deal: 600})
+        self.assertEqual(acquisition["totals"]["hours"], 14)
+        self.assertEqual(acquisition["totals"]["deals"], 2000)
+        self.assertAlmostEqual(
+            float(acquisition["totals"]["deals_per_hour"]), 2000 / 14
+        )
+
+        self.client.force_login(user)
+        url = f"/report/squeeze/?date_from={in_days(-1)}&date_until={in_days(1)}"
+        response = self.client.get(url)
+        self.assertContains(response, "Outreach hours")
+        self.assertContains(response, 'data-bs-target="#acquisition-help"')
+        self.assertContains(response, "Accepted deals divided by outreach hours.")
+        self.assertContains(response, f'id="acquisition-user-{user.pk}"')
+        self.assertContains(response, deal.get_absolute_url())
+        self.assertEqual(self.client.get(f"{url}&export=xlsx").status_code, 200)
