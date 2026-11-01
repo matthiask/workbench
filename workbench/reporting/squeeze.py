@@ -693,7 +693,7 @@ def build_xlsx(data):
             _("relevant hours"),
             _("rate"),
             _("period hours"),
-            _("period invoiced hours"),
+            _("period hours for invoicing"),
             _("period gross margin"),
             _("period rate"),
             _("hours at default rate ({}/h)").format(BASE_HOURLY_RATE),
@@ -718,7 +718,7 @@ def build_xlsx(data):
                 chain.from_iterable(
                     (
                         _("hours"),
-                        _("invoiced hours"),
+                        _("hours for invoicing"),
                         _("gross margin"),
                         _("rate"),
                         _("hours at default rate"),

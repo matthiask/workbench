@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:47+0100\n"
+"POT-Creation-Date: 2026-11-01 14:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2536,7 +2536,7 @@ msgid "Not archived"
 msgstr "Nicht archiviert"
 
 #: workbench/logbook/forms.py
-msgid "With invoiced hours"
+msgid "With hours for invoicing"
 msgstr "Mit Stunden für Verrechnung"
 
 #: workbench/logbook/forms.py workbench/planning/xlsx.py
@@ -2597,7 +2597,7 @@ msgid "You are a bit late. Please try logging your hours immediately upon finish
 msgstr "Du bist ein bisschen spät dran. Bitte versuche, deine Arbeitsstunden direkt nach Arbeitserledigung zu erfassen."
 
 #: workbench/logbook/forms.py
-msgid "The invoiced hours are lower than the hours. Invoice all the time spent if possible."
+msgid "The hours for invoicing are lower than the hours. Invoice all the time spent if possible."
 msgstr "Die Stunden für Verrechnung sind tiefer als die Stunden. Verrechne wenn möglich die ganze aufgewendete Zeit."
 
 #: workbench/logbook/forms.py
@@ -2658,7 +2658,7 @@ msgstr "Erbracht von"
 #: workbench/templates/logbook/_loggedhours_row.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_invoiced_hours.html
-msgid "invoiced hours"
+msgid "hours for invoicing"
 msgstr "Stunden für Verrechnung"
 
 #: workbench/logbook/models.py
@@ -3736,7 +3736,7 @@ msgid "period hours"
 msgstr "Stunden im Zeitraum"
 
 #: workbench/reporting/squeeze.py
-msgid "period invoiced hours"
+msgid "period hours for invoicing"
 msgstr "Stunden für Verrechnung im Zeitraum"
 
 #: workbench/reporting/squeeze.py
@@ -3949,7 +3949,7 @@ msgstr "Keine Geschichte gefunden"
 msgid "Possibly requiring action"
 msgstr "Benötigen evtl. eine Aktion"
 
-#: workbench/templates/_needs_action.html
+#: workbench/templates/_show_more.html
 #, python-format
 msgid "Show %(more)s more"
 msgid_plural "Show %(more)s more"
@@ -4727,7 +4727,7 @@ msgid "new service"
 msgstr "Neue Leistung"
 
 #: workbench/templates/logbook/loggedhours_form.html
-msgid "The invoiced hours field takes precedence when creating invoices."
+msgid "The hours for invoicing take precedence when creating invoices."
 msgstr "Die Stunden für Verrechnung haben beim Erstellen von Rechnungen Vorrang."
 
 #: workbench/templates/needs_action.html
@@ -4882,8 +4882,8 @@ msgstr "Offerten neu nummerieren"
 
 #: workbench/templates/projects/project_detail.html
 #, python-format
-msgid "%(entries)s entry with invoiced hours"
-msgid_plural "%(entries)s entries with invoiced hours"
+msgid "%(entries)s entry with hours for invoicing"
+msgid_plural "%(entries)s entries with hours for invoicing"
 msgstr[0] "%(entries)s Eintrag mit Stunden für Verrechnung"
 msgstr[1] "%(entries)s Einträge mit Stunden für Verrechnung"
 
@@ -5023,7 +5023,7 @@ msgid "moved from"
 msgstr "verschoben von"
 
 #: workbench/templates/projects/project_invoiced_hours.html
-msgid "Logged hours whose invoiced hours differ from the time spent. Invoiced hours are what the work is worth, they are used for invoicing and for the value of the work."
+msgid "Logged hours whose hours for invoicing differ from the time spent. The hours for invoicing are what the work is worth, they are used for invoicing and for the value of the work."
 msgstr "Erfasste Stunden, deren Stunden für Verrechnung von der aufgewendeten Zeit abweichen. Die Stunden für Verrechnung sind, was die Arbeit wert ist; sie werden für die Rechnungsstellung und den Wert der Arbeit verwendet."
 
 #: workbench/templates/projects/project_invoiced_hours.html
@@ -5243,7 +5243,7 @@ msgid "Productivity costs"
 msgstr "Rentabilitätskosten"
 
 #: workbench/templates/reporting/labor_costs.html
-msgid "The larger of invoiced hours times hourly rate and hours times hourly labor cost"
+msgid "The larger of hours for invoicing times hourly rate and hours times hourly labor cost"
 msgstr "Der grössere Wert aus Stunden für Verrechnung mal Stundensatz und Stunden mal Personalaufwand"
 
 #: workbench/templates/reporting/labor_costs.html
@@ -5369,7 +5369,7 @@ msgid "Squeeze"
 msgstr "Squeeze"
 
 #: workbench/templates/reporting/squeeze.html
-msgid "Invoiced hours"
+msgid "Hours for invoicing"
 msgstr "Stunden für Verrechnung"
 
 #: workbench/templates/reporting/squeeze.html

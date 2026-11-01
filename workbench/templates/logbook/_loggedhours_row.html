@@ -18,7 +18,7 @@
     <span class="wb-row-amount">
       {{ hours.hours|hours }}
       {% if hours.invoiced_hours is not None %}
-        <span class="wb-row-meta d-inline" title="{% translate 'invoiced hours'|capfirst %}">&rarr;
+        <span class="wb-row-meta d-inline" title="{% translate 'hours for invoicing'|capfirst %}">&rarr;
           {{ hours.invoiced_hours|hours }}</span>
       {% endif %}
     </span>

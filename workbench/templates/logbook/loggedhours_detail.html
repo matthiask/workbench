@@ -24,7 +24,7 @@
     <dt>{% translate 'hours'|capfirst %}</dt>
     <dd>{{ object.hours|hours }}</dd>
     {% if object.invoiced_hours is not None %}
-      <dt>{% translate 'invoiced hours'|capfirst %}</dt>
+      <dt>{% translate 'hours for invoicing'|capfirst %}</dt>
       <dd>{{ object.invoiced_hours|hours }}</dd>
     {% endif %}
     <dt>{% translate 'description'|capfirst %}</dt>

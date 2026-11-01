@@ -136,7 +136,7 @@ class SqueezeTest(TestCase):
 
         self.client.force_login(fast.rendered_by)
         url = f"/report/squeeze/?date_from={in_days(-1)}&date_until={in_days(1)}"
-        self.assertContains(self.client.get(url), "Invoiced hours")
+        self.assertContains(self.client.get(url), "Hours for invoicing")
         self.assertEqual(self.client.get(f"{url}&export=xlsx").status_code, 200)
 
     def test_third_party_costs_are_not_subtracted_twice(self):

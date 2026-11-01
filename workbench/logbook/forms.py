@@ -180,7 +180,7 @@ class LoggedHoursSearchForm(Form):
             queryset = queryset.filter(archived_at__isnull=True)
         if data.get("invoiced_hours"):
             self.hidden_filters.append((
-                _("With invoiced hours"),
+                _("With hours for invoicing"),
                 querystring(self.request.GET, invoiced_hours=""),
             ))
             queryset = queryset.filter(invoiced_hours__isnull=False)
@@ -537,7 +537,7 @@ class LoggedHoursForm(ModelForm):
         ):
             self.add_warning(
                 _(
-                    "The invoiced hours are lower than the hours."
+                    "The hours for invoicing are lower than the hours."
                     " Invoice all the time spent if possible."
                 ),
                 code="invoiced-hours-lower",

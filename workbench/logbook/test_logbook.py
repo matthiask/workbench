@@ -68,7 +68,7 @@ class LogbookTest(TestCase):
             self.client.get(
                 hours.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
             ),
-            "The invoiced hours field takes precedence when creating invoices.",
+            "The hours for invoicing take precedence when creating invoices.",
         )
 
         response = self.client.post(
@@ -90,12 +90,14 @@ class LogbookTest(TestCase):
         self.assertEqual(hours.invoiced_hours, 1)
 
         response = send(url=hours.urls["update"], hours="2.0", invoiced_hours="1.0")
-        self.assertContains(response, "The invoiced hours are lower than the hours.")
+        self.assertContains(
+            response, "The hours for invoicing are lower than the hours."
+        )
         self.assertContains(
             self.client.get(
                 hours.urls["detail"], headers={"x-requested-with": "XMLHttpRequest"}
             ),
-            "Invoiced hours",
+            "Hours for invoicing",
         )
 
         response = send()
@@ -566,7 +568,7 @@ class LogbookTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(project.urls["detail"])
-        self.assertContains(response, "1 entry with invoiced hours")
+        self.assertContains(response, "1 entry with hours for invoicing")
         self.assertContains(response, "(+1.0h)")
         self.assertContains(response, project.urls["invoiced_hours"])
         url = f"/logbook/hours/?project={project.pk}&invoiced_hours=1"
@@ -575,13 +577,13 @@ class LogbookTest(TestCase):
         self.assertContains(response, "Worth more")
         self.assertContains(response, "3.0h</span>")
         self.assertNotContains(response, "Plain entry")
-        self.assertContains(response, "With invoiced hours")
+        self.assertContains(response, "With hours for invoicing")
 
         factories.LoggedHoursFactory.create(
             service=service, hours=4, invoiced_hours=1, description="Worth less"
         )
         response = self.client.get(project.urls["detail"])
-        self.assertContains(response, "2 entries with invoiced hours")
+        self.assertContains(response, "2 entries with hours for invoicing")
         # Both directions, they don't cancel each other out
         self.assertContains(response, "(+1.0h,")
         self.assertContains(response, "-3.0h)")

@@ -3,14 +3,14 @@
 {% block size %}modal-xl{% endblock %}
 
 {% block title %}
-  {% translate 'invoiced hours'|capfirst %}
+  {% translate 'hours for invoicing'|capfirst %}
 {% endblock title %}
 
 {% block body %}
   <p class="small text-body-secondary">
     {% blocktranslate trimmed %}
-      Logged hours whose invoiced hours differ from the time spent. Invoiced hours are what the work is worth, they are
-      used for invoicing and for the value of the work.
+      Logged hours whose hours for invoicing differ from the time spent. The hours for invoicing are what the work is
+      worth, they are used for invoicing and for the value of the work.
     {% endblocktranslate %}
   </p>
   <div class="table-responsive">
@@ -22,7 +22,7 @@
           <th>{% translate 'service'|capfirst %}</th>
           <th>{% translate 'description'|capfirst %}</th>
           <th class="text-end">{% translate 'hours'|capfirst %}</th>
-          <th class="text-end">{% translate 'invoiced hours'|capfirst %}</th>
+          <th class="text-end">{% translate 'hours for invoicing'|capfirst %}</th>
           <th class="text-end">{% translate 'Difference' %}</th>
         </tr>
       </thead>

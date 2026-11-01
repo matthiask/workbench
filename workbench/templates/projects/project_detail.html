@@ -151,9 +151,9 @@
             <div class="wb-stat-note">
               <a href="{{ project.urls.invoiced_hours }}" data-ajaxmodal>
                 {% blocktranslate count entries=gs.invoiced_hours_entries trimmed %}
-                  {{ entries }} entry with invoiced hours
+                  {{ entries }} entry with hours for invoicing
                 {% plural %}
-                  {{ entries }} entries with invoiced hours
+                  {{ entries }} entries with hours for invoicing
                 {% endblocktranslate %}</a>
               {% if gs.invoiced_hours_more or gs.invoiced_hours_less %}
                 ({% if gs.invoiced_hours_more %}+{{ gs.invoiced_hours_more|hours }}{% endif %}{% if gs.invoiced_hours_more and gs.invoiced_hours_less %},

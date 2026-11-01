@@ -54,7 +54,7 @@ class LoggedHours(Model):
         verbose_name=_("rendered by"),
     )
     hours = HoursField(_("hours"), validators=[MinValueValidator(Decimal("0.1"))])
-    invoiced_hours = HoursField(_("invoiced hours"), blank=True, null=True)
+    invoiced_hours = HoursField(_("hours for invoicing"), blank=True, null=True)
     description = models.TextField(_("description"))
 
     invoice_service = models.ForeignKey(
