@@ -24,7 +24,6 @@ from workbench.contacts.models import (
 )
 from workbench.tools.forms import (
     Autocomplete,
-    DateInput,
     Form,
     ModelForm,
     Textarea,
@@ -191,7 +190,6 @@ class PersonSearchForm(Form):
         widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
-    added_since = forms.DateField(widget=DateInput, required=False, label="")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -235,20 +233,6 @@ class PersonSearchForm(Form):
             queryset = queryset.active().filter(emailaddresses__isnull=True)
         elif data.get("s") == "no-group":
             queryset = queryset.active().exclude(groups__is_archived=False)
-
-        if added_since := data.get("added_since"):
-            from workbench.audit.models import LoggedAction
-
-            queryset = queryset.filter(
-                id__in=[
-                    action.row_data["id"]
-                    for action in LoggedAction.objects.filter(
-                        table_name="contacts_person",
-                        action="I",
-                        created_at__gte=added_since,
-                    )
-                ],
-            )
 
         queryset = self.apply_owned_by(queryset, attribute="primary_contact")
         return self.apply_renamed(queryset, "g", "groups").select_related(
