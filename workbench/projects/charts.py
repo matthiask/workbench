@@ -129,7 +129,7 @@ def budget_chart(project, *, today=None):
     from django.db.models import Sum
     from django.utils.translation import gettext as _
 
-    from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
+    from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
     from workbench.tools.charts import bar_chart
     from workbench.tools.validation import monday
 
@@ -140,7 +140,7 @@ def budget_chart(project, *, today=None):
         .filter(service__project=project, service__effort_rate__isnull=False)
         .order_by()
         .values("rendered_on", "service__effort_rate")
-        .annotate(invoiced=Sum(INVOICED_HOURS))
+        .annotate(invoiced=Sum(HOURS_FOR_INVOICING))
         .values_list("rendered_on", "service__effort_rate", "invoiced")
     ] + list(
         LoggedCost.objects

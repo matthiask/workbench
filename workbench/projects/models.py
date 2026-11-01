@@ -457,7 +457,11 @@ class Project(Model):
     def grouped_services(self):
         # Avoid circular imports
         from workbench.deals.models import Deal
-        from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
+        from workbench.logbook.models import (
+            HOURS_FOR_INVOICING,
+            LoggedCost,
+            LoggedHours,
+        )
         from workbench.reporting.utils import sum_by
 
         # Logged vs. service hours
@@ -483,13 +487,13 @@ class Project(Model):
         )
 
         logged_hours_per_service_and_user = defaultdict(dict)
-        invoiced_hours_per_service = defaultdict(lambda: Z1)
+        hours_for_invoicing_per_service = defaultdict(lambda: Z1)
         logged_hours_per_user = defaultdict(lambda: Z1)
         logged_hours_per_effort_rate = defaultdict(lambda: Z1)
         # Entries with invoiced hours, for sanity checks
-        invoiced_hours_entries = 0
-        invoiced_hours_more = invoiced_hours_less = Z1
-        difference = F("invoiced_hours") - F("hours")
+        hours_for_invoicing_entries = 0
+        hours_for_invoicing_more = hours_for_invoicing_less = Z1
+        difference = F("hours_for_invoicing") - F("hours")
 
         for row in (
             LoggedHours.objects
@@ -498,24 +502,26 @@ class Project(Model):
             .values("service", "rendered_by")
             .annotate(
                 Sum("hours"),
-                invoiced_hours_sum=Sum(INVOICED_HOURS),
-                invoiced_hours_entries=Count(
-                    "id", filter=Q(invoiced_hours__isnull=False)
+                hours_for_invoicing_sum=Sum(HOURS_FOR_INVOICING),
+                hours_for_invoicing_entries=Count(
+                    "id", filter=Q(hours_for_invoicing__isnull=False)
                 ),
                 # Separately, entries worth less don't cancel out others
-                invoiced_hours_more=Sum(
-                    difference, filter=Q(invoiced_hours__gt=F("hours"))
+                hours_for_invoicing_more=Sum(
+                    difference, filter=Q(hours_for_invoicing__gt=F("hours"))
                 ),
-                invoiced_hours_less=Sum(
-                    difference, filter=Q(invoiced_hours__lt=F("hours"))
+                hours_for_invoicing_less=Sum(
+                    difference, filter=Q(hours_for_invoicing__lt=F("hours"))
                 ),
             )
         ):
             logged_hours_per_user[row["rendered_by"]] += row["hours__sum"]
-            invoiced_hours_entries += row["invoiced_hours_entries"]
-            invoiced_hours_more += row["invoiced_hours_more"] or Z1
-            invoiced_hours_less += row["invoiced_hours_less"] or Z1
-            invoiced_hours_per_service[row["service"]] += row["invoiced_hours_sum"]
+            hours_for_invoicing_entries += row["hours_for_invoicing_entries"]
+            hours_for_invoicing_more += row["hours_for_invoicing_more"] or Z1
+            hours_for_invoicing_less += row["hours_for_invoicing_less"] or Z1
+            hours_for_invoicing_per_service[row["service"]] += row[
+                "hours_for_invoicing_sum"
+            ]
             logged_hours_per_service_and_user[row["service"]][row["rendered_by"]] = row[
                 "hours__sum"
             ]
@@ -532,7 +538,7 @@ class Project(Model):
                 service__effort_rate__isnull=False,
             ),
             key="service",
-            field=INVOICED_HOURS,
+            field=HOURS_FOR_INVOICING,
             default=Z1,
         )
         not_archived_logged_cost_per_service = sum_by(
@@ -592,7 +598,7 @@ class Project(Model):
 
             if service.effort_rate is not None:
                 total_logged_cost += (
-                    service.effort_rate * invoiced_hours_per_service[service.id]
+                    service.effort_rate * hours_for_invoicing_per_service[service.id]
                 )
             else:
                 total_logged_hours_rate_undefined += row["logged_hours"]
@@ -618,9 +624,9 @@ class Project(Model):
                 if item[1]["services"] or item[0] is not None
             ),
             "logged_hours": logged_hours[self],
-            "invoiced_hours_entries": invoiced_hours_entries,
-            "invoiced_hours_more": invoiced_hours_more,
-            "invoiced_hours_less": invoiced_hours_less,
+            "hours_for_invoicing_entries": hours_for_invoicing_entries,
+            "hours_for_invoicing_more": hours_for_invoicing_more,
+            "hours_for_invoicing_less": hours_for_invoicing_less,
             "logged_hours_per_user": sorted(
                 ((users[user], hours) for user, hours in logged_hours_per_user.items()),
                 key=lambda row: row[1],

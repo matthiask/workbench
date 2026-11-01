@@ -41,7 +41,7 @@
               <td>{{ entry.service.title }}</td>
               <td>{{ entry.description|truncatewords:20 }}</td>
               <td class="text-end text-nowrap">{{ entry.hours|hours }}</td>
-              <td class="text-end text-nowrap">{{ entry.invoiced_hours|hours }}</td>
+              <td class="text-end text-nowrap">{{ entry.hours_for_invoicing|hours }}</td>
               <td class="text-end text-nowrap">
                 {% if entry.difference > 0 %}+{% endif %}{{ entry.difference|hours }}
               </td>
@@ -55,7 +55,7 @@
 
 {% block footer %}
   <a
-    href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;invoiced_hours=1"
+    href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;hours_for_invoicing=1"
     class="btn btn-quiet"
   >{% translate 'Show in the logbook' %}</a>
   {{ block.super }}

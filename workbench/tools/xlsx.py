@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 from xlsxdocument import XLSXDocument
 
 from workbench.contacts.models import PostalAddress
-from workbench.logbook.models import INVOICED_HOURS
+from workbench.logbook.models import HOURS_FOR_INVOICING
 from workbench.templatetags.workbench import label
 from workbench.tools.formats import Z1
 
@@ -41,10 +41,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
         by_user_and_month = defaultdict(lambda: defaultdict(lambda: Z1))
         by_month = defaultdict(lambda: Z1)
         # Work is valued with the invoiced hours, everything else is time
-        invoiced_hours_by_service = defaultdict(lambda: Z1)
+        hours_for_invoicing_by_service = defaultdict(lambda: Z1)
 
-        for h in queryset.annotate(hours_to_invoice=INVOICED_HOURS):
-            invoiced_hours_by_service[h.service] += h.hours_to_invoice
+        for h in queryset.annotate(hours_to_invoice=HOURS_FOR_INVOICING):
+            hours_for_invoicing_by_service[h.service] += h.hours_to_invoice
             by_service_and_user[h.service][h.rendered_by] += h.hours
             by_user[h.rendered_by] += h.hours
 
@@ -86,7 +86,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     sum(by_users.values(), Z1),
                     None
                     if service.effort_rate is None
-                    else invoiced_hours_by_service[service] * service.effort_rate,
+                    else hours_for_invoicing_by_service[service] * service.effort_rate,
                 ]
                 + [by_users.get(user) for user in users]
                 for service, by_users in sorted(
@@ -128,7 +128,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     sum(by_months.values(), Z1),
                     None
                     if service.effort_rate is None
-                    else invoiced_hours_by_service[service] * service.effort_rate,
+                    else hours_for_invoicing_by_service[service] * service.effort_rate,
                 ]
                 + [by_months.get(month) for month in months]
                 for service, by_months in sorted(

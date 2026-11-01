@@ -24,7 +24,7 @@ from workbench.tools.validation import logbook_lock, raise_if_errors
 
 # The hours logged work is valued and invoiced with, the time spent itself is
 # always ``hours``
-INVOICED_HOURS = Coalesce("invoiced_hours", "hours")
+HOURS_FOR_INVOICING = Coalesce("hours_for_invoicing", "hours")
 
 
 @model_urls
@@ -54,7 +54,7 @@ class LoggedHours(Model):
         verbose_name=_("rendered by"),
     )
     hours = HoursField(_("hours"), validators=[MinValueValidator(Decimal("0.1"))])
-    invoiced_hours = HoursField(_("hours for invoicing"), blank=True, null=True)
+    hours_for_invoicing = HoursField(_("hours for invoicing"), blank=True, null=True)
     description = models.TextField(_("description"))
 
     invoice_service = models.ForeignKey(

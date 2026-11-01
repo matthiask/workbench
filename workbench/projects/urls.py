@@ -171,9 +171,9 @@ urlpatterns = [
         name="projects_project_profitability",
     ),
     path(
-        "<int:pk>/invoiced-hours/",
+        "<int:pk>/hours-for-invoicing/",
         ProjectInvoicedHoursView.as_view(),
-        name="projects_project_invoiced_hours",
+        name="projects_project_hours_for_invoicing",
     ),
     path(
         "<int:pk>/cost-by-month-and-service-xlsx/",

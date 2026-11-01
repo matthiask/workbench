@@ -39,7 +39,7 @@ def hours(ctx):
 @click.option("--service", type=int, help="Service ID.")
 @click.option("--rendered-by", help="Short name.", shell_complete=complete_short_names)
 @click.option(
-    "--invoiced-hours", is_flag=True, help="Only entries with invoiced hours."
+    "--hours-for-invoicing", is_flag=True, help="Only entries with hours for invoicing."
 )
 @period_options("filters the date the work was done")
 @page_options
@@ -52,7 +52,7 @@ def search_hours(
     offer,
     service,
     rendered_by,
-    invoiced_hours,
+    hours_for_invoicing,
     period,
     since,
     until,
@@ -63,9 +63,12 @@ def search_hours(
 ):
     """Search logged hours, newest first
 
-    Invoiced hours (what the work is worth if that is more than the time
+    Hours for invoicing (what the work is worth if that is more than the time
     spent) are shown after an arrow."""
-    params = {"q": " ".join(query), "invoiced_hours": format_bool(invoiced_hours)}
+    params = {
+        "q": " ".join(query),
+        "hours_for_invoicing": format_bool(hours_for_invoicing),
+    }
     for key, value in [
         ("project", project),
         ("customer", customer),
@@ -100,8 +103,8 @@ def search_hours(
             link(row["project"]["code"], row["project"]["url"]),
             row["service"],
             row["hours"]
-            if row["invoiced_hours"] is None
-            else f"{row['hours']} → {row['invoiced_hours']}",
+            if row["hours_for_invoicing"] is None
+            else f"{row['hours']} → {row['hours_for_invoicing']}",
             row["description"],
         )
     table.columns[0].footer = "Total"

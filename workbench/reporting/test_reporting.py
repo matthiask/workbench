@@ -202,7 +202,7 @@ class ReportingTest(TestCase):
             rendered_by=user,
             rendered_on=dt.date(2026, 3, 10),
             hours=1,
-            invoiced_hours=2,
+            hours_for_invoicing=2,
         )
 
         lc = labor_costs_by_cost_center([dt.date(2026, 3, 1), dt.date(2026, 3, 31)])

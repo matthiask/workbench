@@ -624,7 +624,7 @@ def logging_api(request, filters: Query[DateRangeFilter]):
 
 class SqueezeContribution(Schema):
     hours: Hours
-    invoiced_hours: Hours
+    hours_for_invoicing: Hours
     gross_margin: Amount
     rate: Amount
     hours_rate_unknown: Hours
@@ -652,7 +652,7 @@ class SqueezeFigures(Schema):
 class SqueezeUser(SqueezeFigures):
     user: str
     specialist_field: str | None
-    invoiced_hours_in_range: Hours
+    hours_for_invoicing_in_range: Hours
     profitable_percentage: Percentage
     expected_hourly_rate: Amount
     hours_rate_unknown: Hours
@@ -670,7 +670,7 @@ class SqueezeProject(Schema):
     hours: Hours
     rate: Amount
     hours_in_range: Hours
-    invoiced_hours_in_range: Hours
+    hours_for_invoicing_in_range: Hours
     gross_margin_in_range: Amount
     hours_rate_unknown: Hours
     users: dict[str, SqueezeContribution]

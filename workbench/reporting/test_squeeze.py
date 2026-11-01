@@ -107,32 +107,32 @@ class SqueezeTest(TestCase):
         )
         self.assertEqual(unrated_contrib["hours_rate_unknown"], 10)
 
-    def test_invoiced_hours_split_the_gross_margin(self):
+    def test_hours_for_invoicing_split_the_gross_margin(self):
         """The gross margin is split by the value of the work, the project's
         share of the period and the rates use the time spent"""
         project = factories.ProjectFactory.create()
         service = self.offer(project, status=Offer.ACCEPTED, hours=40)
         fast = factories.LoggedHoursFactory.create(
-            service=service, hours=10, invoiced_hours=20
+            service=service, hours=10, hours_for_invoicing=20
         )
         slow = factories.LoggedHoursFactory.create(service=service, hours=10)
 
         data = squeeze_data((in_days(-1), in_days(1)))
         row = next(p for p in data["projects"] if p["project"] == project)
         self.assertEqual(row["hours_in_range"], 20)
-        self.assertEqual(row["invoiced_hours_in_range"], 30)
+        self.assertEqual(row["hours_for_invoicing_in_range"], 30)
         self.assertAlmostEqual(row["gross_margin_in_range"], 4000)  # 20/40 × 8000
 
         fast_contrib = row["by_user"][fast.rendered_by]
         slow_contrib = row["by_user"][slow.rendered_by]
         self.assertEqual(fast_contrib["hours"], 10)
-        self.assertEqual(fast_contrib["invoiced_hours"], 20)
+        self.assertEqual(fast_contrib["hours_for_invoicing"], 20)
         self.assertAlmostEqual(float(fast_contrib["gross_margin"]), 4000 * 2 / 3)
         self.assertAlmostEqual(float(slow_contrib["gross_margin"]), 4000 / 3)
         self.assertAlmostEqual(float(fast_contrib["rate"]), 4000 * 2 / 3 / 10)
 
         user = next(u for u in data["users"] if u["user"] == fast.rendered_by)
-        self.assertEqual(user["invoiced_hours_in_range"], 20)
+        self.assertEqual(user["hours_for_invoicing_in_range"], 20)
 
         self.client.force_login(fast.rendered_by)
         url = f"/report/squeeze/?date_from={in_days(-1)}&date_until={in_days(1)}"

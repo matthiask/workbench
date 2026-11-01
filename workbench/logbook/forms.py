@@ -109,7 +109,7 @@ class LoggedHoursSearchForm(Form):
     internal_type = forms.IntegerField(
         required=False, widget=forms.HiddenInput, label=""
     )
-    invoiced_hours = forms.BooleanField(
+    hours_for_invoicing = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
 
@@ -178,12 +178,12 @@ class LoggedHoursSearchForm(Form):
                 querystring(self.request.GET, not_archived=""),
             ))
             queryset = queryset.filter(archived_at__isnull=True)
-        if data.get("invoiced_hours"):
+        if data.get("hours_for_invoicing"):
             self.hidden_filters.append((
                 _("With hours for invoicing"),
-                querystring(self.request.GET, invoiced_hours=""),
+                querystring(self.request.GET, hours_for_invoicing=""),
             ))
-            queryset = queryset.filter(invoiced_hours__isnull=False)
+            queryset = queryset.filter(hours_for_invoicing__isnull=False)
         if data.get("internal_type") == -1:
             self.hidden_filters.append((
                 _("External"),
@@ -366,7 +366,7 @@ class LoggedHoursForm(ModelForm):
             "rendered_on",
             "service",
             "hours",
-            "invoiced_hours",
+            "hours_for_invoicing",
             "description",
         )
         widgets = {"description": Textarea({"rows": 2})}
@@ -387,7 +387,7 @@ class LoggedHoursForm(ModelForm):
                         "service": hours.service_id,
                         "rendered_on": hours.rendered_on.isoformat(),
                         "hours": hours.hours,
-                        "invoiced_hours": hours.invoiced_hours,
+                        "hours_for_invoicing": hours.hours_for_invoicing,
                         "description": hours.description,
                     })
 
@@ -532,15 +532,15 @@ class LoggedHoursForm(ModelForm):
 
         if (
             data.get("hours")
-            and data.get("invoiced_hours") is not None
-            and data["invoiced_hours"] < data["hours"]
+            and data.get("hours_for_invoicing") is not None
+            and data["hours_for_invoicing"] < data["hours"]
         ):
             self.add_warning(
                 _(
                     "The hours for invoicing are lower than the hours."
                     " Invoice all the time spent if possible."
                 ),
-                code="invoiced-hours-lower",
+                code="hours-for-invoicing-lower",
             )
 
         if (

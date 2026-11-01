@@ -27,7 +27,7 @@ class LoggedHoursOut(Schema):
     rendered_on: dt.date
     rendered_by: str
     hours: Decimal
-    invoiced_hours: Decimal | None = Field(
+    hours_for_invoicing: Decimal | None = Field(
         description="If set, the work is valued and invoiced with these hours"
         " instead of the hours, e.g. if it's worth more than the time spent."
     )
@@ -54,8 +54,9 @@ class LoggedHoursFilter(DateRangeFilter):
 
 
 class LoggedHoursListFilter(LoggedHoursFilter):
-    invoiced_hours: bool = Field(
-        default=False, description="Only entries with invoiced hours, for sanity checks"
+    hours_for_invoicing: bool = Field(
+        default=False,
+        description="Only entries with hours for invoicing, for sanity checks",
     )
 
 
@@ -94,15 +95,15 @@ def _entry_out(entry, request):
 def logged_hours_list(request, filters: Query[LoggedHoursListFilter]):
     """Logged hours, newest first; the total includes all matching entries"""
     hours = _filter(LoggedHours.objects.all(), filters)
-    if filters.invoiced_hours:
-        hours = hours.filter(invoiced_hours__isnull=False)
+    if filters.hours_for_invoicing:
+        hours = hours.filter(hours_for_invoicing__isnull=False)
     return Serialized(
         hours.select_related("rendered_by", "service__project").order_by(
             "-rendered_on", "-created_at", "-pk"
         ),
         lambda row: (
             _entry_out(row, request)
-            | {"hours": row.hours, "invoiced_hours": row.invoiced_hours}
+            | {"hours": row.hours, "hours_for_invoicing": row.hours_for_invoicing}
         ),
         totals={
             "total_hours": hours.order_by().aggregate(Sum("hours"))["hours__sum"] or Z1

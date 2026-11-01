@@ -64,7 +64,7 @@
                       <tr>
                         <td>{{ user }}</td>
                         <td class="text-end">{{ contrib.hours|hours }}</td>
-                        <td class="text-end">{{ contrib.invoiced_hours|hours }}</td>
+                        <td class="text-end">{{ contrib.hours_for_invoicing|hours }}</td>
                         <td class="text-end">
                           {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
                         </td>
@@ -79,7 +79,7 @@
                     <tr class="wb-total-row">
                       <th>{% translate 'Total' %}</th>
                       <th class="text-end">{{ p.hours_in_range|hours }}</th>
-                      <th class="text-end">{{ p.invoiced_hours_in_range|hours }}</th>
+                      <th class="text-end">{{ p.hours_for_invoicing_in_range|hours }}</th>
                       <th class="text-end">
                         {% if p.hours_rate_unknown %}{{ p.hours_rate_unknown|hours }}{% endif %}
                       </th>
@@ -215,7 +215,7 @@
                       <tr>
                         <td>{% link_or_none project with_badge=True %}</td>
                         <td class="text-end">{{ contrib.hours|hours }}</td>
-                        <td class="text-end">{{ contrib.invoiced_hours|hours }}</td>
+                        <td class="text-end">{{ contrib.hours_for_invoicing|hours }}</td>
                         <td class="text-end">
                           {% if contrib.hours_rate_unknown %}{{ contrib.hours_rate_unknown|hours }}{% endif %}
                         </td>
@@ -230,7 +230,7 @@
                     <tr class="wb-total-row">
                       <th>{% translate 'Total' %}</th>
                       <th class="text-end">{{ ud.hours_in_range|hours }}</th>
-                      <th class="text-end">{{ ud.invoiced_hours_in_range|hours }}</th>
+                      <th class="text-end">{{ ud.hours_for_invoicing_in_range|hours }}</th>
                       <th class="text-end">
                         {% if ud.hours_rate_unknown %}{{ ud.hours_rate_unknown|hours }}{% endif %}
                       </th>

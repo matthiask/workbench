@@ -149,14 +149,14 @@ class InvoicesTest(TestCase):
         )
         self.assertEqual(Invoice.objects.count(), 0)
 
-    def test_invoiced_hours(self):
+    def test_hours_for_invoicing(self):
         """Invoiced hours replace the hours when valuing and invoicing logged
         work, the hours themselves stay the time spent"""
         service = factories.ServiceFactory.create(effort_rate=200)
         project = service.project
         factories.LoggedHoursFactory.create(service=service, hours=1)
         factories.LoggedHoursFactory.create(
-            service=service, hours=Decimal("0.5"), invoiced_hours=2
+            service=service, hours=Decimal("0.5"), hours_for_invoicing=2
         )
 
         gs = project.grouped_services

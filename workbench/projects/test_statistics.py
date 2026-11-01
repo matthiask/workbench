@@ -75,7 +75,7 @@ class StatisticsTest(TestCase):
             service=service, rendered_on=in_days(-14), hours=2
         )
         factories.LoggedHoursFactory.create(
-            service=service, rendered_on=in_days(-7), hours=3, invoiced_hours=4
+            service=service, rendered_on=in_days(-7), hours=3, hours_for_invoicing=4
         )
         factories.LoggedCostFactory.create(service=service, cost=50)
         factories.InvoiceFactory.create(

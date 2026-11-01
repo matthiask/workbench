@@ -12,7 +12,7 @@ from workbench import generic
 from workbench.contacts.models import Person
 from workbench.invoices.forms import SendReminderForm
 from workbench.invoices.models import Invoice
-from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
+from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
 from workbench.tools.pdf import invoice_filename, pdf_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -66,7 +66,7 @@ class InvoiceXLSXView(generic.DetailView):
         for entry in (
             LoggedHours.objects
             .filter(invoice_service__invoice=self.object)
-            .annotate(hours_to_invoice=INVOICED_HOURS)
+            .annotate(hours_to_invoice=HOURS_FOR_INVOICING)
             .reverse()
         ):
             hours[entry.invoice_service_id].append(entry)

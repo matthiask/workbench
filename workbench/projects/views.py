@@ -13,7 +13,7 @@ from workbench import generic
 from workbench.accounts.features import FEATURES
 from workbench.invoices.models import Service as InvoiceService
 from workbench.logbook.forms import LogbookBatchForm
-from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
+from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
 from workbench.projects.charts import budget_chart, projected_vs_invoiced_chart
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
@@ -162,14 +162,14 @@ class ProjectInvoicedHoursView(generic.DetailView):
     sanity checks by the project's owner"""
 
     model = Project
-    template_name_suffix = "_invoiced_hours"
+    template_name_suffix = "_hours_for_invoicing"
 
     def get_context_data(self, **kwargs):
         entries = (
             LoggedHours.objects
-            .filter(service__project=self.object, invoiced_hours__isnull=False)
-            .exclude(invoiced_hours=F("hours"))
-            .annotate(difference=F("invoiced_hours") - F("hours"))
+            .filter(service__project=self.object, hours_for_invoicing__isnull=False)
+            .exclude(hours_for_invoicing=F("hours"))
+            .annotate(difference=F("hours_for_invoicing") - F("hours"))
             .select_related("rendered_by", "service")
             .order_by("-difference", "-rendered_on", "-pk")
         )
@@ -311,7 +311,7 @@ def cost_by_month_and_service_xlsx(request, pk):
     for hours in (
         LoggedHours.objects
         .filter(service__project=project)
-        .annotate(hours_to_invoice=INVOICED_HOURS)
+        .annotate(hours_to_invoice=HOURS_FOR_INVOICING)
         .select_related("service__offer")
     ):
         month = hours.rendered_on.replace(day=1)

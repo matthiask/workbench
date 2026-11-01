@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 
 
 # Bump this when the API changes in ways older CLIs cannot handle
-MINIMUM = (0, 10, 0)
+MINIMUM = (0, 16, 0)
 # Where wb is installed from and documented
 INSTALL = "git+https://github.com/matthiask/workbench#subdirectory=cli"
 README_URL = "https://github.com/matthiask/workbench/tree/main/cli#readme"

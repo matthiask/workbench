@@ -29,11 +29,11 @@ Contents:
 - **Time** always uses `LoggedHours.hours` (utilization, productivity,
   planning, squeeze's hours and rates, budgets in hours). Squeeze splits a
   project's gross margin between people by the value of their work though.
-- **Value** of logged hours uses `INVOICED_HOURS = Coalesce(invoiced_hours,
-  hours)` (`workbench/logbook/models.py`): `invoiced_hours` is optional and
+- **Value** of logged hours uses `HOURS_FOR_INVOICING = Coalesce(hours_for_invoicing,
+  hours)` (`workbench/logbook/models.py`): `hours_for_invoicing` is optional and
   says what the work is worth if that is more than the time spent.
 - **Logbook value ("Logbuch")** = Σ `LoggedCost.cost` + Σ `Service.effort_rate
-  × INVOICED_HOURS`. Hours on services without an effort rate are not valued
+  × HOURS_FOR_INVOICING`. Hours on services without an effort rate are not valued
   (no fallback rate) and are shown separately as hours "ohne Stundensatz"; a
   rate of 0.00 values them at 0. Archived entries are included.
   `workbench/reporting/utils.py:effort_cost_by_project`
@@ -141,7 +141,7 @@ Period: 1 Jan of (current year − 3) to 31 Dec of the current year. `workbench/
 | Label (DE) | Computation |
 |---|---|
 | Leistungsstunden in offenen Aufträgen | Σ Service.service_hours of budgeted services on open projects of type `order`. `key_data.py:service_hours_in_open_orders` |
-| Erfasste Stunden in offenen Aufträgen | Σ LoggedHours.hours (time, not invoiced_hours; all dates) on services of open `order` projects. `key_data.py:logged_hours_in_open_orders` |
+| Erfasste Stunden in offenen Aufträgen | Σ LoggedHours.hours (time, not hours_for_invoicing; all dates) on services of open `order` projects. `key_data.py:logged_hours_in_open_orders` |
 | Total exkl. MwSt aller offenen Rechnungen (EN "Sent invoices total excl. tax") | Σ Invoice.total_excl_tax with status `SENT` (any invoiced_on, any project/none). `key_data.py:sent_invoices_total` |
 | Total exkl. MwSt aller fälligen Rechnungen | Σ Invoice.total_excl_tax with status `SENT` and `due_on <= today`. `key_data.py:due_invoices_total` |
 | Total exkl. MwSt aller offenen Offerten | Σ Offer.total_excl_tax with status `OFFERED` on open projects (no valid_until check, internal projects not excluded). `key_data.py:open_offers_total`, `OfferQuerySet.offered` |
@@ -306,7 +306,7 @@ Sorting: web by delta ascending; API by delta descending.
 | Rabatt (report only) | `discount` | −Σ `Offer.discount` of the same accepted offers as "verkauft" (`accepted_offers_by_project()`). Shown as a negative number. No cutoff. |
 | Logbuch | `logbook` | `cost` + `effort_cost` (see building blocks), entries with `rendered_on <= cutoff`. |
 | (hidden in table, API/XLSX) | `cost` | Σ `LoggedCost.cost`, `rendered_on <= cutoff` |
-| (hidden, API) | `effort_cost` | Σ `effort_rate × INVOICED_HOURS`, `rendered_on <= cutoff`, rate NULL skipped |
+| (hidden, API) | `effort_cost` | Σ `effort_rate × HOURS_FOR_INVOICING`, `rendered_on <= cutoff`, rate NULL skipped |
 | "(+x h)" ohne Stundensatz | `effort_hours_with_rate_undefined` | Σ `hours` on services with `effort_rate IS NULL`, `rendered_on <= cutoff` |
 | Fremdkosten | `third_party_costs` | Σ `LoggedCost.third_party_costs` (not NULL) with `invoice_service IS NULL` (not yet put on a services invoice), `rendered_on <= cutoff`. Display only, not deducted from anything. |
 | Verrechnet | `invoiced` | Σ `Invoice.total_excl_tax`, status SENT/PAID, `invoiced_on <= cutoff`. Third party costs on invoices are **not** deducted. |
@@ -333,7 +333,7 @@ With a past cutoff date the totals (Logbuch, Verrechnet, delta, accruals) are as
 
 **Worked example** (one open project, cutoff today):
 - Accepted offer: subtotal 10,500, discount 500 → total 10,000. Budget transfer in from another project: +1,000. → **verkauft 11,000**, Rabatt −500.
-- Logged 100 h at effort rate 120 (invoiced_hours empty) = 12,000; 5 h on a service without rate; logged cost 800 with third party costs 600, not yet invoiced. → **Logbuch 12,800 (+5 h)**, Fremdkosten 600.
+- Logged 100 h at effort rate 120 (hours_for_invoicing empty) = 12,000; 5 h on a service without rate; logged cost 800 with third party costs 600, not yet invoiced. → **Logbuch 12,800 (+5 h)**, Fremdkosten 600.
 - Invoiced (sent): 8,000. → **Δ = 12,800 − 8,000 = +4,800** → counts toward "Nicht verrechnete Arbeit".
 - Projected gross margin 9,000; invoiced GM = 8,000 − max(0, 600) = 7,400; planned = max(9,000 − 7,400, 0) = 1,600 → davon geplant = min(4,800, 1,600) = **1,600**.
 - davon über Offerte = min(max(12,800 − max(11,000, 8,000), 0), 4,800 − 1,600) = **1,800**.
@@ -364,7 +364,7 @@ Source: `Project.grouped_services` (dict, `workbench/projects/models.py:Project.
 |---|---|---|
 | Stunden: "logged / budgeted" | `gs.logged_hours` / `gs.service_hours` | Σ `LoggedHours.hours` over all services of the project / Σ `service_hours` of services that are not declined, not optional, not on a budget retainer offer (same as `budgeted()`). |
 | Kosten: "logged / budgeted" (only if either ≠ 0) | `gs.logged_cost` / `gs.service_cost` | Σ `LoggedCost.cost` / Σ `Service.cost` (fixed cost part only, no effort) of budgeted services. |
-| Erfasste Kosten (+x h ohne Stundensatz) | `gs.total_logged_cost` | Σ `LoggedCost.cost` + Σ `effort_rate × INVOICED_HOURS` per service with a rate; hours on rate-less services shown as `total_logged_hours_rate_undefined`. Same as report "Logbuch" without cutoff. Bar against `total_service_cost`. |
+| Erfasste Kosten (+x h ohne Stundensatz) | `gs.total_logged_cost` | Σ `LoggedCost.cost` + Σ `effort_rate × HOURS_FOR_INVOICING` per service with a rate; hours on rate-less services shown as `total_logged_hours_rate_undefined`. Same as report "Logbuch" without cutoff. Bar against `total_service_cost`. |
 | Leistungskosten (+x h ohne Stundensatz) | `gs.total_service_cost` | Σ `service_cost` of budgeted services (all offer statuses except declined; incl. services without offer). Rate-less hours: Σ `service_hours` of rate-less services not declined, not optional and not retainer. |
 | Noch nicht akzeptiert (note) | `gs.not_accepted_service_cost` | `total_service_cost − accepted_offers_service_cost`, where the latter = Σ `service_cost` of budgeted services on ACCEPTED offers. So it covers services without offer **and** services on offers in preparation / offered. |
 | Zurückbehaltung von Budget (only if any offer `is_budget_retainer`) | `gs.budget_retainment` | `budget_retainer_total − total_service_cost`; `budget_retainer_total` = Σ `total_excl_tax` of **accepted** retainer offers. Note: "<retainer total> verkauft, <total_service_cost> freigegeben (inkl. <discount> Rabatt)" with discount = Σ discount of accepted retainer offers. |
@@ -381,7 +381,7 @@ Per offer (service list): `service_hours`, `logged_hours`, `service_cost` (Σ `S
 
 Caveats: Budget retainer offers hold budget, real services are added later ("services have to be created later when rendering actual work", `Offer.is_budget_retainer` help text); retainment is the part of the retainer not yet released into services. Released services are usually services without an offer of their own; if they sit on accepted offers, those are not added to the retainer (see `accepted_offers_by_project()`).
 
-Chart (CONTROLLING, `workbench/projects/charts.py:budget_chart`): cumulative per week (per month if the project spans more than 26 weeks) from the first logged entry, invoice or accepted offer until today or the closing date: logbook value (Σ `LoggedCost.cost` + Σ `effort_rate × INVOICED_HOURS`, hours without effort rate not valued, like the tiles), invoiced (Σ `total_excl_tax` of invoiced invoices by `invoiced_on`) and accepted offers (Σ `total_excl_tax` by `closed_on`, else `offered_on`). Not shown if nothing valued has been logged.
+Chart (CONTROLLING, `workbench/projects/charts.py:budget_chart`): cumulative per week (per month if the project spans more than 26 weeks) from the first logged entry, invoice or accepted offer until today or the closing date: logbook value (Σ `LoggedCost.cost` + Σ `effort_rate × HOURS_FOR_INVOICING`, hours without effort rate not valued, like the tiles), invoiced (Σ `total_excl_tax` of invoiced invoices by `invoiced_on`) and accepted offers (Σ `total_excl_tax` by `closed_on`, else `offered_on`). Not shown if nothing valued has been logged.
 
 ---
 
@@ -409,7 +409,7 @@ Example: Project A sold 50,000; transfer 10,000 to B → A sold 40,000, B sold +
 
 Logic:
 - Candidates: open projects (`closed_on IS NULL`) with `budget_alert_at` set and `budget_alert_sent_at` empty (internal projects included).
-- Trigger: `project_budget_statistics(projects)` with cutoff today; alert if `logbook >= budget_alert_at` (logbook = logged cost + effort value incl. INVOICED_HOURS; rate-less hours not counted).
+- Trigger: `project_budget_statistics(projects)` with cutoff today; alert if `logbook >= budget_alert_at` (logbook = logged cost + effort value incl. HOURS_FOR_INVOICING; rate-less hours not counted).
 - One mail per owner listing project, URL, Logbuch, Warnen ab, Verkauft (= report `sold`, incl. budget transfers). Then `budget_alert_sent_at = now`.
 - Re-armed when `budget_alert_at` changes (`Project.save` clears `budget_alert_sent_at`).
 - Form help text "Cost cap" = total of the accepted offers per project (`accepted_offers_by_project()`), with 75/80/90 % shortcuts (`workbench/projects/forms.py`); like "verkauft" but without budget transfers.
@@ -445,7 +445,7 @@ gross margin 0). Gross margin and hours of these projects are **all-time**.
 Per project (`squeeze_data`):
 
 ```
-weight(row)          = INVOICED_HOURS × COALESCE(NULLIF(service.effort_rate, 0.00), 150)
+weight(row)          = HOURS_FOR_INVOICING × COALESCE(NULLIF(service.effort_rate, 0.00), 150)
 hours_in_range_total = Σ hours logged on the project in the period (all people)
 period_margin        = hours_in_range_total / hours × gross_margin          (0 if hours == 0)
 person's margin      = Σ weight(person, period) / Σ weight(all, period) × period_margin
@@ -454,10 +454,10 @@ hours_rate_unknown   = person's period hours on services with effort_rate NULL o
 ```
 
 The total attributed per project equals the hours-only slice; the weighting
-with the value of the work (invoiced hours times the rate) only shifts it
+with the value of the work (hours for invoicing times the rate) only shifts it
 between people. Since the slice is proportional to hours, the project's period
 rate always equals its all-time rate. Someone whose work is worth more than
-the time spent (`invoiced_hours > hours`) gets a larger share and so a higher
+the time spent (`hours_for_invoicing > hours`) gets a larger share and so a higher
 rate per hour spent, at the expense of the others on the project.
 
 **Worked example.** Project, open, gross margin 60'000, relevant hours 400 →
@@ -485,14 +485,14 @@ Anna: `4'000 / 7'000 × 6'000 = 3'428.57` (171.43/h); Ben: `3'000 / 7'000 ×
 
 Per-project modal ("Aufschlüsselung nach Person"): header Umsatz bereinigt /
 Stunden (= relevant hours) / Ansatz; per person Stunden, Stunden für Verrechnung
-(`INVOICED_HOURS` in the period), Ohne Stundensatz
+(`HOURS_FOR_INVOICING` in the period), Ohne Stundensatz
 (`hours_rate_unknown`), Umsatz bereinigt (person margin), Ansatz (person
 rate, red < 150); footer shows period totals and the project rate. Note "Stunden
 ohne Stundensatz: Standard von 150/h angewendet" if any.
 
 XLSX additionally: offered hours (only open projects), logged hours (all
-time), period invoiced hours, period rate (`gross_margin_in_range /
-hours_in_range`), hours at default rate, and per user hours / invoiced hours /
+time), period hours for invoicing, period rate (`gross_margin_in_range /
+hours_in_range`), hours at default rate, and per user hours / hours for invoicing /
 gross margin / rate / hours at default rate.
 
 #### Users table ("Mitarbeiter:innen"), sorted by Delta desc
@@ -627,7 +627,7 @@ and project, against a rough revenue.
 Basis: `LoggedHours` with `rendered_on` in the period, joined to the person's
 `Employment` valid on `rendered_on` (`date_from ≤ rendered_on ≤ date_until`),
 which supplies `hourly_labor_costs` (HLC) and `green_hours_target` (GHT, both set
-or both empty). Uses `hours`, not `invoiced_hours`. Raw SQL in
+or both empty). Uses `hours`, not `hours_for_invoicing`. Raw SQL in
 `LABOR_COSTS_SQL` / `REVENUE_SQL`.
 
 | UI label (de) | Computation |
@@ -639,7 +639,7 @@ or both empty). Uses `hours`, not `invoiced_hours`. Raw SQL in
 | Rentabilitätskosten | Σ `hours × HLC × 100 / GHT` (labor cost grossed up for the share of productive "green" hours) |
 | Fremdkosten | Σ `LoggedCost.third_party_costs` (not NULL) with `rendered_on` in the period |
 | Kosten | `Rentabilitätskosten + Fremdkosten` (template `addf`) |
-| Ertrag | Σ per entry max(`hours × HLC`, `INVOICED_HOURS × service.effort_rate`) (missing values count as 0) + Σ `LoggedCost.cost` with `rendered_on` in the period |
+| Ertrag | Σ per entry max(`hours × HLC`, `HOURS_FOR_INVOICING × service.effort_rate`) (missing values count as 0) + Σ `LoggedCost.cost` with `rendered_on` in the period |
 
 User modal ("Personalaufwand"): per user Stunden, Ohne Stundensatz, Nettopreis,
 Rentabilitätskosten for the selected project / cost center / everything, plus

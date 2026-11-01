@@ -35,7 +35,7 @@ select
     p.id,
     sum(greatest(
         coalesce(hourly_labor_costs, 0) * lh.hours,
-        coalesce(ps.effort_rate, 0) * coalesce(lh.invoiced_hours, lh.hours)
+        coalesce(ps.effort_rate, 0) * coalesce(lh.hours_for_invoicing, lh.hours)
     ))
 from logbook_loggedhours lh
 left join projects_service ps on lh.service_id=ps.id

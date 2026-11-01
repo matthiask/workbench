@@ -147,17 +147,17 @@
             <span class="wb-stat-of">/ {{ gs.service_hours|hours }}</span>
           </div>
           {% bar gs.logged_hours gs.service_hours %}
-          {% if gs.invoiced_hours_entries %}
+          {% if gs.hours_for_invoicing_entries %}
             <div class="wb-stat-note">
-              <a href="{{ project.urls.invoiced_hours }}" data-ajaxmodal>
-                {% blocktranslate count entries=gs.invoiced_hours_entries trimmed %}
+              <a href="{{ project.urls.hours_for_invoicing }}" data-ajaxmodal>
+                {% blocktranslate count entries=gs.hours_for_invoicing_entries trimmed %}
                   {{ entries }} entry with hours for invoicing
                 {% plural %}
                   {{ entries }} entries with hours for invoicing
                 {% endblocktranslate %}</a>
-              {% if gs.invoiced_hours_more or gs.invoiced_hours_less %}
-                ({% if gs.invoiced_hours_more %}+{{ gs.invoiced_hours_more|hours }}{% endif %}{% if gs.invoiced_hours_more and gs.invoiced_hours_less %},
-                {% endif %}{% if gs.invoiced_hours_less %}{{ gs.invoiced_hours_less|hours }}{% endif %})
+              {% if gs.hours_for_invoicing_more or gs.hours_for_invoicing_less %}
+                ({% if gs.hours_for_invoicing_more %}+{{ gs.hours_for_invoicing_more|hours }}{% endif %}{% if gs.hours_for_invoicing_more and gs.hours_for_invoicing_less %},
+                {% endif %}{% if gs.hours_for_invoicing_less %}{{ gs.hours_for_invoicing_less|hours }}{% endif %})
               {% endif %}
             </div>
           {% endif %}

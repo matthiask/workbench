@@ -42,7 +42,7 @@ class LogbookTest(TestCase):
         )
         self.assertLess(
             html.index('name="modal-description"'),
-            html.index('name="modal-invoiced_hours"'),
+            html.index('name="modal-hours_for_invoicing"'),
         )
 
         def send(url=project.urls["createhours"], **kwargs):
@@ -63,7 +63,7 @@ class LogbookTest(TestCase):
 
         hours = LoggedHours.objects.get()
         self.assertEqual(hours.description, "Test")
-        self.assertIsNone(hours.invoiced_hours)
+        self.assertIsNone(hours.hours_for_invoicing)
         self.assertContains(
             self.client.get(
                 hours.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
@@ -78,7 +78,7 @@ class LogbookTest(TestCase):
                 "modal-rendered_on": hours.rendered_on.isoformat(),
                 "modal-service": service.id,
                 "modal-hours": "0.1",
-                "modal-invoiced_hours": "1.0",
+                "modal-hours_for_invoicing": "1.0",
                 "modal-description": "Test",
                 WarningsForm.ignore_warnings_id: "maybe-duplicate",
             },
@@ -87,9 +87,11 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 202)
         hours.refresh_from_db()
         self.assertEqual(hours.hours, Decimal("0.1"))
-        self.assertEqual(hours.invoiced_hours, 1)
+        self.assertEqual(hours.hours_for_invoicing, 1)
 
-        response = send(url=hours.urls["update"], hours="2.0", invoiced_hours="1.0")
+        response = send(
+            url=hours.urls["update"], hours="2.0", hours_for_invoicing="1.0"
+        )
         self.assertContains(
             response, "The hours for invoicing are lower than the hours."
         )
@@ -555,7 +557,7 @@ class LogbookTest(TestCase):
         code("not_archived=1")
         code("export=xlsx")
 
-    def test_invoiced_hours_sanity_check(self):
+    def test_hours_for_invoicing_sanity_check(self):
         """Entries with invoiced hours are linked from the project and listed"""
         service = factories.ServiceFactory.create()
         project = service.project
@@ -563,15 +565,15 @@ class LogbookTest(TestCase):
             service=service, hours=1, description="Plain entry"
         )
         factories.LoggedHoursFactory.create(
-            service=service, hours=2, invoiced_hours=3, description="Worth more"
+            service=service, hours=2, hours_for_invoicing=3, description="Worth more"
         )
         self.client.force_login(project.owned_by)
 
         response = self.client.get(project.urls["detail"])
         self.assertContains(response, "1 entry with hours for invoicing")
         self.assertContains(response, "(+1.0h)")
-        self.assertContains(response, project.urls["invoiced_hours"])
-        url = f"/logbook/hours/?project={project.pk}&invoiced_hours=1"
+        self.assertContains(response, project.urls["hours_for_invoicing"])
+        url = f"/logbook/hours/?project={project.pk}&hours_for_invoicing=1"
 
         response = self.client.get(url)
         self.assertContains(response, "Worth more")
@@ -580,7 +582,7 @@ class LogbookTest(TestCase):
         self.assertContains(response, "With hours for invoicing")
 
         factories.LoggedHoursFactory.create(
-            service=service, hours=4, invoiced_hours=1, description="Worth less"
+            service=service, hours=4, hours_for_invoicing=1, description="Worth less"
         )
         response = self.client.get(project.urls["detail"])
         self.assertContains(response, "2 entries with hours for invoicing")
@@ -591,7 +593,7 @@ class LogbookTest(TestCase):
         # The owner inspects the entries in a modal, with the hours spent
         # and the invoiced hours next to each other
         response = self.client.get(
-            project.urls["invoiced_hours"],
+            project.urls["hours_for_invoicing"],
             headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "Worth more")
@@ -601,10 +603,12 @@ class LogbookTest(TestCase):
         self.assertContains(response, "-3.0h")
         self.assertContains(response, url.replace("&", "&amp;"))
 
-    def test_xlsx_export_values_invoiced_hours(self):
+    def test_xlsx_export_values_hours_for_invoicing(self):
         """The XLSX export values work with the invoiced hours"""
         service = factories.ServiceFactory.create(effort_rate=100)
-        factories.LoggedHoursFactory.create(service=service, hours=1, invoiced_hours=3)
+        factories.LoggedHoursFactory.create(
+            service=service, hours=1, hours_for_invoicing=3
+        )
         self.client.force_login(service.project.owned_by)
 
         response = self.client.get("/logbook/hours/?export=xlsx")

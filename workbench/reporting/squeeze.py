@@ -20,7 +20,7 @@ from workbench.awt.models import Absence
 from workbench.awt.reporting import employment_percentages
 from workbench.awt.utils import monthly_days
 from workbench.invoices.models import Invoice, ProjectedInvoice
-from workbench.logbook.models import INVOICED_HOURS, LoggedCost, LoggedHours
+from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import (
     BudgetTransfer,
@@ -268,17 +268,17 @@ def squeeze_data(date_range):  # noqa: C901
         lambda: {
             "gross_margin": Z2,
             "hours_in_range": Z1,
-            "invoiced_hours_in_range": Z1,
+            "hours_for_invoicing_in_range": Z1,
             "by_project": {},
         }
     )
     user_dict = {u.id: u for u in User.objects.all()}
 
-    # INVOICED_HOURS × COALESCE(effort_rate, default) is the value of the work.
+    # HOURS_FOR_INVOICING × COALESCE(effort_rate, default) is the value of the work.
     # A rate of 0.00 means the work is paid elsewhere (e.g. a package price),
     # not that it is worth nothing, so it gets the default rate too.
     _weighted_hours_expr = ExpressionWrapper(
-        INVOICED_HOURS
+        HOURS_FOR_INVOICING
         * Coalesce(
             NullIf(F("service__effort_rate"), Value(Z2)), Value(BASE_HOURLY_RATE)
         ),
@@ -303,7 +303,7 @@ def squeeze_data(date_range):  # noqa: C901
         .values("rendered_by", "service__project")
         .annotate(
             hours_sum=Sum("hours"),
-            invoiced_hours_sum=Sum(INVOICED_HOURS),
+            hours_for_invoicing_sum=Sum(HOURS_FOR_INVOICING),
             weighted_hours=Sum(_weighted_hours_expr),
             hours_rate_unknown=_hours_rate_unknown_expr,
         )
@@ -313,12 +313,12 @@ def squeeze_data(date_range):  # noqa: C901
         u = user_dict[row["rendered_by"]]
         p["hours_in_range_by_user"][u] = {
             "hours": row["hours_sum"],
-            "invoiced_hours": row["invoiced_hours_sum"],
+            "hours_for_invoicing": row["hours_for_invoicing_sum"],
             "weighted_hours": row["weighted_hours"],
             "hours_rate_unknown": row["hours_rate_unknown"] or Decimal(0),
         }
         users[u]["hours_in_range"] += row["hours_sum"]
-        users[u]["invoiced_hours_in_range"] += row["invoiced_hours_sum"]
+        users[u]["hours_for_invoicing_in_range"] += row["hours_for_invoicing_sum"]
 
     # All-time hours (logged hours are the attribution denominator) and gross
     # margin. Offered amounts and hours only count for open projects.
@@ -374,7 +374,7 @@ def squeeze_data(date_range):  # noqa: C901
                 user_margin = user_weighted / total_weighted_in_range * period_margin
                 contrib = {
                     "hours": user_hours,
-                    "invoiced_hours": user_data["invoiced_hours"],
+                    "hours_for_invoicing": user_data["hours_for_invoicing"],
                     "gross_margin": user_margin,
                     "rate": user_margin / user_hours,
                     "hours_rate_unknown": user_data["hours_rate_unknown"],
@@ -384,7 +384,9 @@ def squeeze_data(date_range):  # noqa: C901
                 by_user[u] = contrib
 
         hours_in_range = sum(d["hours"] for d in by_user.values())
-        invoiced_hours_in_range = sum(d["invoiced_hours"] for d in by_user.values())
+        hours_for_invoicing_in_range = sum(
+            d["hours_for_invoicing"] for d in by_user.values()
+        )
         gross_margin_in_range = sum(d["gross_margin"] for d in by_user.values())
         hours_rate_unknown = sum(d["hours_rate_unknown"] for d in by_user.values())
         by_user = dict(
@@ -403,7 +405,7 @@ def squeeze_data(date_range):  # noqa: C901
             "rate": margin / hours if hours else Z2,
             "by_user": by_user,
             "hours_in_range": hours_in_range,
-            "invoiced_hours_in_range": invoiced_hours_in_range,
+            "hours_for_invoicing_in_range": hours_for_invoicing_in_range,
             "gross_margin_in_range": gross_margin_in_range,
             "hours_rate_unknown": hours_rate_unknown,
         })
@@ -520,7 +522,7 @@ def squeeze_data(date_range):  # noqa: C901
             "employment_percentage": employment_percentage,
             "gross_margin": row["gross_margin"],
             "hours_in_range": row["hours_in_range"],
-            "invoiced_hours_in_range": row["invoiced_hours_in_range"],
+            "hours_for_invoicing_in_range": row["hours_for_invoicing_in_range"],
             "rate": row["gross_margin"] / row["hours_in_range"]
             if row["hours_in_range"]
             else Z2,
@@ -857,7 +859,7 @@ def _project_xlsx_row(p, all_users):
         if d := p["by_user"].get(u):
             return (
                 d["hours"],
-                d["invoiced_hours"],
+                d["hours_for_invoicing"],
                 d["gross_margin"],
                 d["rate"],
                 d["hours_rate_unknown"] or "",
@@ -875,7 +877,7 @@ def _project_xlsx_row(p, all_users):
         hours,
         p["rate"],
         hours_in_range,
-        p["invoiced_hours_in_range"],
+        p["hours_for_invoicing_in_range"],
         p["gross_margin_in_range"],
         p["gross_margin_in_range"] / hours_in_range if hours_in_range else "",
         p["hours_rate_unknown"] or "",

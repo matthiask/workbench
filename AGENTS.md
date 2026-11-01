@@ -158,7 +158,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   logged, whichever is higher). Hours logged on
   services which aren't budgeted (optional, declined) are added on top.
 - Squeeze splits a project's gross margin between people by the value of
-  their work: invoiced hours (`INVOICED_HOURS`) weighted with the service's
+  their work: hours for invoicing (`HOURS_FOR_INVOICING`) weighted with the service's
   hourly rate. The project's share of the period and all rates use `hours`.
   Services without a rate or with a rate of
   0.00 (work paid elsewhere, e.g. by a package price) are weighted with
@@ -182,10 +182,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   internal projects; open invoices include all invoices. `work_not_invoiced`
   is the positive side of the project budget statistics' delta (logged work
   valued at effort rates), `accruals` the negative side.
-- `LoggedHours.invoiced_hours` (optional) is what the work is worth if that
+- `LoggedHours.hours_for_invoicing` (optional) is what the work is worth if that
   is more than the time spent (the form warns about lower values). Value and
-  invoice logged work with `INVOICED_HOURS`
-  (`Coalesce("invoiced_hours", "hours")` in `workbench/logbook/models.py`,
+  invoice logged work with `HOURS_FOR_INVOICING`
+  (`Coalesce("hours_for_invoicing", "hours")` in `workbench/logbook/models.py`,
   annotate querysets with it); everything about
   time (utilization, productivity, planning, squeeze's hours, budgets in hours)
   uses `hours`.
