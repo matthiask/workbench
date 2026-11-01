@@ -153,6 +153,34 @@ class ContactsTest(TestCase):
         response = self.client.get("/contacts/organizations/?g=" + str(group2.pk))
         self.assertNotContains(response, str(organization))
 
+    def test_organization_list_status(self):
+        """Organizations can be filtered by status and defined searches"""
+        customer = factories.ProjectFactory.create(
+            customer=factories.OrganizationFactory.create(name="Customer Ltd.")
+        ).customer
+        customer.groups.set([Group.objects.create(title="Customers")])
+        factories.DealFactory.create(
+            customer=factories.OrganizationFactory.create(name="Lead Ltd.")
+        )
+        factories.OrganizationFactory.create(name="Lonely Ltd.")
+        factories.OrganizationFactory.create(name="Gone Ltd.", is_archived=True)
+
+        self.client.force_login(factories.UserFactory.create())
+
+        def names(query):
+            response = self.client.get("/contacts/organizations/" + query)
+            self.assertEqual(response.status_code, 200)
+            return {
+                organization.name for organization in response.context["object_list"]
+            }
+
+        active = {"Customer Ltd.", "Lead Ltd.", "Lonely Ltd."}
+        self.assertEqual(names(""), active)
+        self.assertEqual(names("?s=all"), active | {"Gone Ltd."})
+        self.assertEqual(names("?s=any-projects-deals"), {"Customer Ltd.", "Lead Ltd."})
+        self.assertEqual(names("?s=no-group"), {"Lead Ltd.", "Lonely Ltd."})
+        self.assertEqual(names("?s=no-people"), {"Lonely Ltd."})
+
     def test_formset(self):
         """The emails formset works"""
         person = factories.PersonFactory.create()

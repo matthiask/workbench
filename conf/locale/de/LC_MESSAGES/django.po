@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 20:01+0100\n"
+"POT-Creation-Date: 2026-11-01 20:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1050,6 +1050,14 @@ msgstr "Definierte Suche"
 msgid "Any projects or deals in the last 5 years"
 msgstr "Irgendwelche Projekte oder Geschäfte in den letzten 5 Jahren"
 
+#: workbench/contacts/forms.py workbench/templates/contacts/person_list.html
+msgid "No group"
+msgstr "Keine Gruppe"
+
+#: workbench/contacts/forms.py
+msgid "No people"
+msgstr "Keine Personen"
+
 #: workbench/contacts/forms.py
 msgid "Missing salutation (only w/email)"
 msgstr "Fehlende Anrede (nur mit Emailadresse)"
@@ -1057,10 +1065,6 @@ msgstr "Fehlende Anrede (nur mit Emailadresse)"
 #: workbench/contacts/forms.py
 msgid "Missing email address"
 msgstr "Fehlende Emailadresse"
-
-#: workbench/contacts/forms.py
-msgid "No group"
-msgstr "Keine Gruppe"
 
 #: workbench/contacts/forms.py
 msgid "substitute with"
@@ -1111,7 +1115,7 @@ msgstr "Es ist bevorzugt, Einträge zu archivieren statt zu löschen."
 msgid "is private person"
 msgstr "ist Privatperson"
 
-#: workbench/contacts/models.py
+#: workbench/contacts/models.py workbench/templates/contacts/person_list.html
 msgid "primary contact"
 msgstr "Hauptkontakt"
 
@@ -4471,6 +4475,7 @@ msgstr[0] "%(count)s archiviert"
 msgstr[1] "%(count)s archiviert"
 
 #: workbench/templates/contacts/group_list.html
+#: workbench/templates/contacts/person_list.html
 msgid "archived"
 msgstr "archiviert"
 

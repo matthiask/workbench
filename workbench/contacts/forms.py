@@ -110,12 +110,44 @@ class GroupForm(ModelForm):
         fields = ["title", "is_archived"]
 
 
+def recent_projects_or_deals(field):
+    """Filter for contacts with projects or deals in the last 5 years, ``field``
+    is the field of projects and deals pointing to them"""
+    from workbench.deals.models import Deal
+    from workbench.projects.models import Project
+
+    cutoff = timezone.now() - dt.timedelta(days=5 * 366)
+    return Q(id__in=Deal.objects.filter(created_at__gte=cutoff).values(field)) | Q(
+        id__in=Project.objects.filter(created_at__gte=cutoff).values(field)
+    )
+
+
 class OrganizationSearchForm(Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": _("Search")}
         ),
+        label="",
+    )
+    s = forms.ChoiceField(
+        choices=[
+            ("", _("Active")),
+            ("all", _("All")),
+            (
+                _("Defined search"),
+                [
+                    (
+                        "any-projects-deals",
+                        _("Any projects or deals in the last 5 years"),
+                    ),
+                    ("no-group", _("No group")),
+                    ("no-people", _("No people")),
+                ],
+            ),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
     g = forms.ModelChoiceField(
@@ -132,12 +164,22 @@ class OrganizationSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        queryset = queryset.search(data.get("q")).active()
+        queryset = queryset.search(data.get("q"))
+        if data.get("s") != "all":
+            queryset = queryset.active()
+        if data.get("s") == "any-projects-deals":
+            queryset = queryset.filter(recent_projects_or_deals("customer"))
+        elif data.get("s") == "no-group":
+            queryset = queryset.exclude(groups__is_archived=False)
+        elif data.get("s") == "no-people":
+            queryset = queryset.exclude(people__is_archived=False)
         return self.apply_renamed(queryset, "g", "groups")
 
     def archived_in_group(self):
-        """Archived organizations aren't listed, the number is shown"""
-        if group := self.cleaned_data.get("g"):
+        """Archived organizations aren't listed unless asked for, the number is
+        shown"""
+        data = self.cleaned_data
+        if (group := data.get("g")) and not data.get("s"):
             return Organization.objects.filter(groups=group, is_archived=True).count()
         return 0
 
@@ -213,18 +255,7 @@ class PersonSearchForm(Form):
         if not data.get("s"):
             queryset = queryset.active()
         elif data.get("s") == "any-projects-deals":
-            from workbench.deals.models import Deal
-            from workbench.projects.models import Project
-
-            cutoff = timezone.now() - dt.timedelta(days=5 * 366)
-            queryset = queryset.filter(
-                Q(id__in=Deal.objects.filter(created_at__gte=cutoff).values("contact"))
-                | Q(
-                    id__in=Project.objects.filter(created_at__gte=cutoff).values(
-                        "contact"
-                    )
-                )
-            ).active()
+            queryset = queryset.filter(recent_projects_or_deals("contact")).active()
         elif data.get("s") == "missing-salutation":
             queryset = queryset.active().filter(
                 salutation="", emailaddresses__isnull=False
