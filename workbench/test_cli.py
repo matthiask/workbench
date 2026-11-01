@@ -786,6 +786,30 @@ planned_work:
         # Only the total, no figures per person
         self.assertEqual(result.output.count("Per hour"), 1)
 
+    def test_announce_installation(self):
+        """Commands say when they don't use the current installation"""
+        result = self.wb("me")
+        self.assertNotIn("Using http://testserver", result.output)
+
+        wb.core.CONFIG.write_text(
+            'current = "https://other.example.com"\n'
+            '[installations."https://other.example.com"]\ntoken = "other"\n'
+        )
+        result = self.wb("me")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(
+            result.output.count(
+                "Using http://testserver (WORKBENCH_URL), not the current"
+                " https://other.example.com."
+            ),
+            1,
+        )
+        # Not part of the data
+        self.assertNotIn("Using", self.wb("me", "--json").stdout)
+
+        result = self.wb("-i", "testserver", "me")
+        self.assertIn("Using http://testserver (--installation)", result.output)
+
     def test_offer_guidelines(self):
         """Private offer guidelines come from a file configured per installation"""
         wb.core.CONFIG.write_text(
@@ -812,7 +836,11 @@ planned_work:
         self.assertNotIn("offer_guidelines", config["https://other.example.com"])
 
         result = self.wb("offers", "guidelines")
-        self.assertEqual(result.output, "# Rules\n\nProject management is 25 %.\n")
+        self.assertEqual(result.stdout, "# Rules\n\nProject management is 25 %.\n")
+        self.assertIn(
+            f"Offer guidelines for http://testserver from {guidelines}",
+            result.stderr,
+        )
 
         # Logging in again keeps the setting
         wb.core.save_config("http://testserver", "new", "write")

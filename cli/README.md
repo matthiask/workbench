@@ -63,7 +63,8 @@ The URLs and the tokens are stored in `~/.config/workbench.toml`. Switching
 changes the installation for all terminals. To work with another
 installation in one terminal only, set `WORKBENCH_URL` there to an
 installation you're logged in to, or use `--installation` (`-i`, any unique
-part of its URL) for a single command:
+part of its URL) for a single command. Commands which don't use the current
+installation say so on stderr:
 
     export WORKBENCH_URL=https://workbench.example.com
     wb -i example offers guidelines --set ~/notes/offer-guidelines.md
@@ -171,7 +172,7 @@ part of Workbench. Point wb to a file of your own, per installation, and the
 `workbench-offer` skill follows it:
 
     wb offers guidelines --set ~/notes/offer-guidelines.md
-    wb offers guidelines            # Prints the file
+    wb offers guidelines            # Prints the file, says which one on stderr
     wb offers guidelines --clear
 
 Offers are written in YAML (or JSON):

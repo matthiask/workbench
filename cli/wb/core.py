@@ -214,8 +214,10 @@ def save_config(url, token, access=None):
     write_config(config)
 
 
-# The installation selected with --installation for this invocation
+# The installation selected with --installation for this invocation, and
+# whether wb already said which installation it uses
 _selected_installation = None
+_announced = False
 
 
 def current_installation():
@@ -255,8 +257,23 @@ def complete_installations(ctx, param, incomplete):
 
 
 def _select_installation(ctx, param, value):
-    global _selected_installation  # noqa: PLW0603
+    global _selected_installation, _announced  # noqa: PLW0603
     _selected_installation = find_installation(value) if value else None
+    _announced = False
+
+
+def announce_installation(url):
+    """Say once when a command doesn't use the current installation, on
+    stderr to keep the output clean"""
+    global _announced  # noqa: PLW0603
+    current = read_config()["current"]
+    if _announced or not current or url == current:
+        return
+    _announced = True
+    source = "--installation" if _selected_installation else "WORKBENCH_URL"
+    click.secho(
+        f"Using {url} ({source}), not the current {current}.", fg="yellow", err=True
+    )
 
 
 def _config():
@@ -268,6 +285,7 @@ def _config():
     token = read_config()["installations"].get(url, {}).get("token")
     if not url or not token:
         terminate("Not configured yet. Run `wb login URL` first.")
+    announce_installation(url)
     return url, token
 
 

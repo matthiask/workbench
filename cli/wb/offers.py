@@ -6,6 +6,7 @@ import click
 
 from wb import core
 from wb.core import (
+    announce_installation,
     cli,
     complete_short_names,
     current_installation,
@@ -64,6 +65,7 @@ def guidelines(path, clear):
     confidential figures, so they are kept in a file of your own instead of
     in Workbench. Configure it once with --set PATH."""
     url = current_installation()
+    announce_installation(url)
     if path or clear:
         config = read_config()
         if url not in config["installations"]:
@@ -89,6 +91,7 @@ def guidelines(path, clear):
         return
     if not Path(configured).is_file():
         terminate(f"{configured} does not exist.")
+    click.echo(f"Offer guidelines for {url} from {configured}", err=True)
     click.echo(Path(configured).read_text(encoding="utf-8"), nl=False)
 
 
