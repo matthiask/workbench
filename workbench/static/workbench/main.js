@@ -534,6 +534,16 @@ on("click", "[data-foreign-currency]", (e, el) => {
   _sel("#id_modal-are_expenses").checked = true
 })
 
+// Long categories of "needs action" show the other entries on request
+on("click", "[data-show-more]", (_e, el) => {
+  let row = el.previousElementSibling
+  while (row?.classList.contains("wb-needs-action-more")) {
+    row.hidden = false
+    row = row.previousElementSibling
+  }
+  el.remove()
+})
+
 // The quick actions in the bottom left corner open on click too (touch)
 function setSpeedDial(dial, open) {
   dial.classList.toggle("is-open", open)

@@ -1836,6 +1836,18 @@ kbd {
   }
 }
 
+// Needs action: compact rows, there may be many
+.wb-needs-action {
+  .list-group-item:not(.wb-list-heading) {
+    padding-block: 0.35rem;
+    font-size: 0.875rem;
+  }
+
+  .wb-needs-action-show-more {
+    color: var(--bs-link-color);
+  }
+}
+
 // Results of the Autocomplete widget, below its input group
 .wb-autocomplete {
   inset: 100% 0 auto 0;

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:16+0100\n"
+"POT-Creation-Date: 2026-11-01 13:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3934,6 +3934,13 @@ msgstr "Keine Geschichte gefunden"
 #: workbench/templates/_needs_action.html workbench/templates/needs_action.html
 msgid "Possibly requiring action"
 msgstr "Benötigen evtl. eine Aktion"
+
+#: workbench/templates/_needs_action.html
+#, python-format
+msgid "Show %(more)s more"
+msgid_plural "Show %(more)s more"
+msgstr[0] "Noch %(more)s anzeigen"
+msgstr[1] "Noch %(more)s anzeigen"
 
 #: workbench/templates/accounts/api_tokens.html
 #, python-format

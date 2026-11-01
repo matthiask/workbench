@@ -24,6 +24,10 @@ from workbench.tools.history import HISTORY, changes
 from workbench.tools.validation import in_days
 
 
+# Long categories show their first entries, the others on request
+NEEDS_ACTION_SHOWN = 5
+
+
 def _needs_action(user):
     rows = []
     if user.features[FEATURES.PLANNING]:
@@ -78,6 +82,12 @@ def _needs_action(user):
         .select_related("owned_by"),
     })
 
+    for row in rows:
+        objects = list(row["objects"])
+        # "Show 1 more" would take as much space as the entry itself
+        shown = NEEDS_ACTION_SHOWN if len(objects) > NEEDS_ACTION_SHOWN + 1 else None
+        row["objects"] = objects[:shown]
+        row["more"] = objects[shown:] if shown else []
     return [row for row in rows if row["objects"]]
 
 
