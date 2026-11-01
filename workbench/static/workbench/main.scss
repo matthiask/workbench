@@ -1871,10 +1871,6 @@ kbd {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-
-    &[hidden] {
-      display: none;
-    }
   }
 
   .wb-needs-action-title {
@@ -1895,30 +1891,34 @@ kbd {
     font-size: 0.8rem;
     white-space: nowrap;
   }
+}
 
-  // A pill on the bottom edge of the last entry shown, without a row of its own
-  .wb-needs-action-show-more {
-    position: relative;
-    z-index: 3;
-    height: 0;
+// A pill on the bottom edge of the last entry shown, without a row of its own
+.wb-show-more {
+  position: relative;
+  z-index: 3;
+  height: 0;
 
-    .btn {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 0.05rem 0.6rem;
-      border: 1px solid var(--wb-surface-border);
-      border-radius: 999px;
-      background: var(--wb-surface-raised);
-      box-shadow: var(--wb-shadow);
-      color: var(--bs-link-color);
-      font-size: 0.75rem;
+  .btn {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0.05rem 0.6rem;
+    border: 1px solid var(--wb-surface-border);
+    border-radius: 999px;
+    background: var(--wb-surface-raised);
+    box-shadow: var(--wb-shadow);
+    color: var(--bs-link-color);
+    font-size: 0.75rem;
 
-      &:hover {
-        color: var(--bs-link-hover-color);
-      }
+    &:hover {
+      color: var(--bs-link-hover-color);
     }
   }
+}
+
+.wb-more[hidden] {
+  display: none;
 }
 
 // Results of the Autocomplete widget, below its input group

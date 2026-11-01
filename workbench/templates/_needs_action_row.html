@@ -1,7 +1,7 @@
 {% load workbench %}
 {# One line: the title is shortened, the status stays visible #}
 <div
-  class="list-group-item wb-needs-action-row{% if more %} wb-needs-action-more{% endif %}"
+  class="list-group-item wb-needs-action-row{% if more %} wb-more{% endif %}"
   {% if more %}hidden{% endif %}
 >
   {% if object.planned_hours %}

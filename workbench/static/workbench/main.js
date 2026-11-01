@@ -534,11 +534,11 @@ on("click", "[data-foreign-currency]", (e, el) => {
   _sel("#id_modal-are_expenses").checked = true
 })
 
-// Long categories of "needs action" show the other entries on request
+// Long lists show the other entries on request (_show_more.html)
 on("click", "[data-show-more]", (_e, el) => {
-  const toggle = el.closest(".wb-needs-action-show-more")
+  const toggle = el.closest(".wb-show-more")
   let row = toggle.nextElementSibling
-  while (row?.classList.contains("wb-needs-action-more")) {
+  while (row?.classList.contains("wb-more")) {
     row.hidden = false
     row = row.nextElementSibling
   }

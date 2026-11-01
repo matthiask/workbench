@@ -25,14 +25,14 @@ class NeedsActionTest(TestCase):
 
         response = self.client.get("/")
         self.assertContains(response, "Show 2 more")
-        self.assertContains(response, "wb-needs-action-more", count=2)
+        self.assertContains(response, "wb-more", count=2)
         for deal in deals:
             self.assertContains(response, deal.get_absolute_url())
 
         # "Show 1 more" would take as much space as the entry itself
         deals[0].delete()
         response = self.client.get("/")
-        self.assertNotContains(response, "wb-needs-action-more")
+        self.assertNotContains(response, "wb-more")
         self.assertContains(response, deals[-1].get_absolute_url())
 
     def test_offers(self):

@@ -1,0 +1,13 @@
+{% load i18n %}
+{% if more %}
+  {# Floats on the bottom edge of the last entry shown, followed by the .wb-more entries #}
+  <div class="wb-show-more">
+    <button type="button" class="btn btn-sm" data-show-more>
+      {% blocktranslate count more=more|length trimmed %}
+        Show {{ more }} more
+      {% plural %}
+        Show {{ more }} more
+      {% endblocktranslate %}
+    </button>
+  </div>
+{% endif %}

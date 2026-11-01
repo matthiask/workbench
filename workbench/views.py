@@ -28,6 +28,16 @@ from workbench.tools.validation import in_days
 NEEDS_ACTION_SHOWN = 3
 
 
+def split_more(objects, shown):
+    """The objects shown right away and those shown with the button of
+    ``_show_more.html``; "Show 1 more" would take as much space as the
+    object itself"""
+    objects = list(objects)
+    if len(objects) > shown + 1:
+        return objects[:shown], objects[shown:]
+    return objects, []
+
+
 def _needs_action(user):
     rows = []
     if user.features[FEATURES.PLANNING]:
@@ -83,11 +93,7 @@ def _needs_action(user):
     })
 
     for row in rows:
-        objects = list(row["objects"])
-        # "Show 1 more" would take as much space as the entry itself
-        shown = NEEDS_ACTION_SHOWN if len(objects) > NEEDS_ACTION_SHOWN + 1 else None
-        row["objects"] = objects[:shown]
-        row["more"] = objects[shown:] if shown else []
+        row["objects"], row["more"] = split_more(row["objects"], NEEDS_ACTION_SHOWN)
     return [row for row in rows if row["objects"]]
 
 
