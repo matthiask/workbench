@@ -184,7 +184,7 @@ def installation_url(url):
 
 
 def write_config(config):
-    lines = [f"current = {json.dumps(config['current'])}"]
+    lines = [f"current = {json.dumps(config['current'])}"] if config["current"] else []
     for url, installation in sorted(config["installations"].items()):
         lines += ["", f"[installations.{json.dumps(url)}]"]
         for key in ["token", "access", "offer_guidelines"]:
@@ -219,14 +219,12 @@ def current_installation():
 
 
 def _config():
-    """URL and token from the environment or from the configuration file
+    """URL and token of the current installation
 
-    WORKBENCH_URL alone selects one of the installations wb is logged in to."""
-    config = read_config()
-    url = installation_url(os.environ.get("WORKBENCH_URL")) or config["current"]
-    token = os.environ.get("WORKBENCH_TOKEN") or (
-        config["installations"].get(url, {}).get("token")
-    )
+    WORKBENCH_URL selects another installation wb is logged in to, e.g. for
+    the commands of one terminal."""
+    url = current_installation()
+    token = read_config()["installations"].get(url, {}).get("token")
     if not url or not token:
         terminate("Not configured yet. Run `wb login URL` first.")
     return url, token
@@ -236,9 +234,8 @@ def _can_login_again(url):
     """The access to ask for again when the token expires, if any
 
     Expired tokens are replaced through the browser, but only for people
-    sitting in front of a terminal, only if the token is stored by wb and
-    only with the same access as before."""
-    if not sys.stdin.isatty() or os.environ.get("WORKBENCH_TOKEN"):
+    sitting in front of a terminal and only with the same access as before."""
+    if not sys.stdin.isatty():
         return None
     return read_config()["installations"].get(url, {}).get("access")
 
@@ -658,11 +655,8 @@ def echo_more(data, offset, what="results", *, note=""):
 def _completion_values(name, path, key):
     """Values for completing options, fetched from the API at most once a day
     per installation; no values if anything fails"""
-    config = read_config()
-    url = installation_url(os.environ.get("WORKBENCH_URL")) or config["current"]
-    token = os.environ.get("WORKBENCH_TOKEN") or (
-        config["installations"].get(url, {}).get("token")
-    )
+    url = current_installation()
+    token = read_config()["installations"].get(url, {}).get("token")
     if not url or not token:
         return []
     cache = CACHE / f"completion-{urlsplit(url).netloc}-{name}.json"

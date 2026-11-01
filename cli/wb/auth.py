@@ -112,8 +112,8 @@ def completion(shell):
 def auth(ctx):
     """Switch between the Workbench installations you're logged in to
 
-    `wb login URL` adds installations. Setting WORKBENCH_URL uses another
-    installation for a single command.
+    `wb login URL` adds installations. Switching affects all terminals;
+    setting WORKBENCH_URL uses another installation in one terminal only.
 
     Without a command, lists the installations."""
     if ctx.invoked_subcommand is None:

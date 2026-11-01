@@ -59,11 +59,12 @@ Switch between them with any unique part of their URL:
     wb auth list
     wb auth switch feinheit
 
-The URLs and the tokens are stored in `~/.config/workbench.toml`. The
-`WORKBENCH_URL` and `WORKBENCH_TOKEN` environment variables take precedence;
-`WORKBENCH_URL` alone uses another installation you're logged in to for a
-single command. `wb` doesn't log in again by itself when `WORKBENCH_TOKEN` is
-used.
+The URLs and the tokens are stored in `~/.config/workbench.toml`. Switching
+changes the installation for all terminals. To work with another
+installation in one terminal only, set `WORKBENCH_URL` there to an
+installation you're logged in to:
+
+    export WORKBENCH_URL=https://workbench.example.com
 
 ## What's on your plate
 

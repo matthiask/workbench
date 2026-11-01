@@ -81,12 +81,16 @@ class CLITest(TestCase):
             _token, token = APIToken.create_for(
                 user=user or self.user, title="Tests", access="write"
             )
+        # Store the token like `wb login`, but don't change the current
+        # installation, tests may have configured others
+        config = wb.core.read_config()
+        config["installations"].setdefault("http://testserver", {})["token"] = token
+        wb.core.write_config(config)
         result = CliRunner().invoke(
             wb.cli,
             [str(arg) for arg in args],
             env={
                 "WORKBENCH_URL": "http://testserver",
-                "WORKBENCH_TOKEN": token,
                 "WB_DEBUG": "1" if debug else "",
             },
         )
