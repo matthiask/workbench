@@ -51,6 +51,18 @@ Read it before drafting anything:
 - `project.flat_rate`: if set, every service uses this rate no matter what.
 - `import_schema`: the exact JSON schema of an offer.
 
+Then load the private offer guidelines, if the user has any:
+
+    wb offers guidelines
+
+They contain the organization's own rules for estimating and challenging
+offers, e.g. factors from past projects, the share of project management,
+templates and a checklist. If it prints guidelines, follow them: they take
+precedence over the general guidelines below. They are confidential, so
+never copy their figures, project names or customers into the offer, its
+descriptions or anything else leaving the conversation. If none are
+configured, continue without them and don't ask about it.
+
 ## 3. Draft the offer
 
 Write the offer as YAML to the scratchpad, e.g. `<scratchpad>/offer.yaml`:
@@ -87,7 +99,8 @@ Guidelines:
   silently picking either.
 - One service per deliverable or phase, with a description saying what is and
   isn't included. Put assumptions and exclusions into the descriptions.
-- Estimate hours realistically, rather a bit high than too low. Things the
+- Estimate hours realistically, rather a bit high than too low. With
+  guidelines, apply their factors and shares and say which ones you applied. Things the
   specification mentions as "maybe", "nice to have" or "later" become optional
   services.
 - Licenses, hosting, stock images etc. are `cost`, with `third_party_costs`
@@ -97,7 +110,8 @@ Guidelines:
 ## 4. Review with the user
 
 Show the draft as a table (service, effort type, hours, rate, amount, optional)
-with the totals, and list your assumptions and open questions. Then validate it
+with the totals, and list your assumptions and open questions. With
+guidelines, go through their checklist and report what it flags. Then validate it
 on the server, which also computes the totals:
 
     wb offers create <project_id> <scratchpad>/offer.yaml --dry-run

@@ -782,6 +782,49 @@ planned_work:
         # Only the total, no figures per person
         self.assertEqual(result.output.count("Per hour"), 1)
 
+    def test_offer_guidelines(self):
+        """Private offer guidelines come from a file configured per installation"""
+        wb.core.CONFIG.write_text(
+            'current = "http://testserver"\n'
+            '[installations."http://testserver"]\ntoken = "secret"\n'
+            '[installations."https://other.example.com"]\ntoken = "other"\n'
+        )
+        result = self.wb("offers", "guidelines")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("No offer guidelines configured", result.output)
+
+        guidelines = self.directory / "Guidelines.md"
+        result = self.wb("offers", "guidelines", "--set", guidelines)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("does not exist", result.output)
+
+        guidelines.write_text("# Rules\n\nProject management is 25 %.\n")
+        result = self.wb("offers", "guidelines", "--set", guidelines)
+        self.assertEqual(result.exit_code, 0, result.output)
+        config = wb.core.read_config()["installations"]
+        self.assertEqual(
+            config["http://testserver"]["offer_guidelines"], str(guidelines)
+        )
+        self.assertNotIn("offer_guidelines", config["https://other.example.com"])
+
+        result = self.wb("offers", "guidelines")
+        self.assertEqual(result.output, "# Rules\n\nProject management is 25 %.\n")
+
+        # Logging in again keeps the setting
+        wb.core.save_config("http://testserver", "new", "write")
+        config = wb.core.read_config()["installations"]["http://testserver"]
+        self.assertEqual(config["offer_guidelines"], str(guidelines))
+        self.assertEqual(config["token"], "new")
+
+        guidelines.unlink()
+        result = self.wb("offers", "guidelines")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("does not exist", result.output)
+
+        result = self.wb("offers", "guidelines", "--clear")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertNotIn("offer_guidelines", wb.core.CONFIG.read_text())
+
     def test_key_data_and_cash_data(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         factories.InvoiceFactory.create(project=project, customer=project.customer)

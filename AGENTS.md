@@ -126,7 +126,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only changes offers
   in preparation: create, replace, update and add, update, delete and reorder
-  single services, all with the rules of `_apply_service()`. Service types only suggest the effort type
+  single services, all with the rules of `_apply_service()`. `wb offers
+  guidelines` prints a private file configured per installation in the wb
+  configuration (`offer_guidelines`), which the `workbench-offer` skill
+  follows; the guidelines contain confidential figures, so they don't live in
+  this public repository. Service types only suggest the effort type
   and the hourly rate, both can be set freely.
 - Timestamps may have a project and a service which pre-fill the logbook form
   of their slice (`wb ts start -p profond`). The API accepts a project ID or a

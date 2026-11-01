@@ -186,13 +186,10 @@ def installation_url(url):
 def write_config(config):
     lines = [f"current = {json.dumps(config['current'])}"]
     for url, installation in sorted(config["installations"].items()):
-        lines += [
-            "",
-            f"[installations.{json.dumps(url)}]",
-            f"token = {json.dumps(installation['token'])}",
-        ]
-        if access := installation.get("access"):
-            lines.append(f"access = {json.dumps(access)}")
+        lines += ["", f"[installations.{json.dumps(url)}]"]
+        for key in ["token", "access", "offer_guidelines"]:
+            if value := installation.get(key):
+                lines.append(f"{key} = {json.dumps(value)}")
     CONFIG.parent.mkdir(parents=True, exist_ok=True)
     CONFIG.write_text("\n".join(lines) + "\n")
     CONFIG.chmod(0o600)
@@ -204,11 +201,21 @@ def save_config(url, token, access=None):
     The access is remembered to ask for the same access when the token
     expires; it is unknown for pasted tokens."""
     config = read_config()
-    config["installations"][url] = {"token": token} | (
-        {"access": access} if access else {}
+    # Keep the other settings of the installation, but not the access of
+    # the old token
+    previous = config["installations"].get(url, {})
+    config["installations"][url] = (
+        {key: value for key, value in previous.items() if key != "access"}
+        | {"token": token}
+        | ({"access": access} if access else {})
     )
     config["current"] = url
     write_config(config)
+
+
+def current_installation():
+    """The URL of the installation commands talk to"""
+    return installation_url(os.environ.get("WORKBENCH_URL")) or read_config()["current"]
 
 
 def _config():

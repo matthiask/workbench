@@ -63,7 +63,9 @@ Turns a specification, a briefing or an email into an offer for a project,
 or revises an offer which is still in preparation. It finds the project (or
 creates it after asking), reads the context of the project — service types
 with their hourly rates, the existing offers whose wording and structure it
-reuses, a flat rate — and drafts the offer as YAML. It shows the draft as a
+reuses, a flat rate — and drafts the offer as YAML. It follows your private
+offer guidelines if you configured a file with
+`wb offers guidelines --set PATH` (see the CLI README). It shows the draft as a
 table with its assumptions and open questions, and creates it with
 `wb offers create`. Revisions change single services with
 `wb offers services add/update/delete/reorder`.

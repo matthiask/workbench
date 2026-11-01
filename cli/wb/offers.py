@@ -1,10 +1,14 @@
 """Offers and their services"""
 
+from pathlib import Path
+
 import click
 
+from wb import core
 from wb.core import (
     cli,
     complete_short_names,
+    current_installation,
     echo_actionable,
     echo_csv,
     echo_json,
@@ -18,9 +22,11 @@ from wb.core import (
     page_params,
     period_options,
     period_params,
+    read_config,
     request,
     terminate,
     text_or_stdin,
+    write_config,
 )
 
 
@@ -41,6 +47,49 @@ def context(project_id):
 
     Feed this to an LLM together with the specification of the offer."""
     echo_json(request("GET", f"projects/{project_id}/offers/context/"))
+
+
+@offers.command()
+@click.option(
+    "--set",
+    "path",
+    type=click.Path(path_type=Path),
+    help="Use this file for the current installation.",
+)
+@click.option("--clear", is_flag=True, help="Stop using a file.")
+def guidelines(path, clear):
+    """Print the private offer guidelines of the current installation
+
+    Guidelines (rules, benchmarks from past projects) often contain
+    confidential figures, so they are kept in a file of your own instead of
+    in Workbench. Configure it once with --set PATH."""
+    url = current_installation()
+    if path or clear:
+        config = read_config()
+        if url not in config["installations"]:
+            terminate("Not configured yet. Run `wb login URL` first.")
+        installation = config["installations"][url]
+        if clear:
+            installation.pop("offer_guidelines", None)
+        else:
+            path = path.expanduser().resolve()
+            if not path.is_file():
+                terminate(f"{path} does not exist.")
+            installation["offer_guidelines"] = str(path)
+        write_config(config)
+        click.echo(f"Saved {core.CONFIG}", err=True)
+        return
+    configured = read_config()["installations"].get(url, {}).get("offer_guidelines")
+    if not configured:
+        click.echo(
+            f"No offer guidelines configured for {url}."
+            " Use `wb offers guidelines --set PATH` to add your own.",
+            err=True,
+        )
+        return
+    if not Path(configured).is_file():
+        terminate(f"{configured} does not exist.")
+    click.echo(Path(configured).read_text(encoding="utf-8"), nl=False)
 
 
 @offers.command("search")

@@ -162,6 +162,15 @@ Hand this to an LLM together with the specification of the offer:
 
     wb offers context 1234 > context.json
 
+Your organization's own rules for offers (factors from past projects,
+templates, a checklist) usually contain confidential figures, so they aren't
+part of Workbench. Point wb to a file of your own, per installation, and the
+`workbench-offer` skill follows it:
+
+    wb offers guidelines --set ~/notes/offer-guidelines.md
+    wb offers guidelines            # Prints the file
+    wb offers guidelines --clear
+
 Offers are written in YAML (or JSON):
 
 ```yaml
