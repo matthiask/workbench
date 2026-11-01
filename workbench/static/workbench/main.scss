@@ -273,6 +273,47 @@ a > small:first-child {
   box-shadow: inset 0 0 0 1px var(--bs-border-color);
 }
 
+// Project types (Open Color, like the absence reasons), chosen by meaning:
+// paid work green (orders) and blue (maintenance), internal work teal,
+// outreach violet; nothing grey like missing data. Closed projects are the
+// past: muted text, outlined in the color of their type.
+$project-type-colors: (
+  "order": #2f9e44,
+  "maintenance": #1c7ed6,
+  "internal": #0c8599,
+  "outreach": #7950f2,
+);
+
+:root {
+  @each $type, $color in $project-type-colors {
+    --wb-project-type-#{$type}: #{$color};
+  }
+}
+
+@each $type, $color in $project-type-colors {
+  .wb-project-type--#{$type} {
+    --wb-project-type: var(--wb-project-type-#{$type});
+  }
+}
+
+.badge.wb-project-type {
+  color: color-mix(in srgb, var(--wb-project-type) 70%, black);
+  background-color: color-mix(in srgb, var(--wb-project-type) 16%, transparent);
+}
+
+[data-bs-theme="dark"] .badge.wb-project-type {
+  color: color-mix(in srgb, var(--wb-project-type) 55%, white);
+  background-color: color-mix(in srgb, var(--wb-project-type) 26%, transparent);
+}
+
+.badge.wb-project-type.wb-project-type--closed,
+[data-bs-theme="dark"] .badge.wb-project-type.wb-project-type--closed {
+  color: var(--bs-secondary-color);
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--wb-project-type) 60%, transparent);
+}
+
 // History links and pins are everywhere, they shouldn't draw attention
 .tiny-icons {
   color: var(--bs-secondary-color);

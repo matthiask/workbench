@@ -5,6 +5,7 @@ from functools import total_ordering
 
 from admin_ordering.models import OrderableModel
 from django.contrib import messages
+from django.core.cache import cache
 from django.db import models
 from django.db.models import Count, F, Prefetch, Q, Sum
 from django.db.models.expressions import RawSQL
@@ -40,6 +41,35 @@ class InternalType(OrderableModel):
 
     def __str__(self):
         return f"{self.name} ({self.description}, {self.percentage:.1f}%)"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(OUTREACH_IDS_CACHE_KEY)
+
+    save.alters_data = True
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        cache.delete(OUTREACH_IDS_CACHE_KEY)
+        return result
+
+    delete.alters_data = True
+
+    @classmethod
+    def outreach_ids(cls):
+        """IDs of the outreach types; project badges need them in lists, where
+        loading the internal type of every project would be one query each.
+        Cached per process, other processes see changes within a minute."""
+        return cache.get_or_set(
+            OUTREACH_IDS_CACHE_KEY,
+            lambda: set(
+                cls.objects.filter(is_outreach=True).values_list("id", flat=True)
+            ),
+            timeout=60,
+        )
+
+
+OUTREACH_IDS_CACHE_KEY = "projects-outreach-internal-type-ids"
 
 
 class InternalTypeUser(models.Model):
@@ -440,22 +470,26 @@ class Project(Model):
         raise_if_errors(errors, exclude)
 
     @property
-    def status_badge(self):
-        css = {
-            self.MAINTENANCE: "secondary",
-            self.ORDER: "success",
-            self.INTERNAL: "info",
-        }[self.type]
-
-        if self.closed_on:
-            css = "light"
-        return format_html(
-            '<span class="badge text-bg-{}">{}</span>', css, self.pretty_status
+    def is_outreach(self):
+        return (
+            self.type == self.INTERNAL
+            and self.internal_type_id in InternalType.outreach_ids()
         )
+
+    @property
+    def status_badge(self):
+        # Colors in main.scss ($project-type-colors), closed projects outlined
+        kind = "outreach" if self.is_outreach else self.type
+        css = f"wb-project-type wb-project-type--{kind}"
+        if self.closed_on:
+            css += " wb-project-type--closed"
+        return format_html('<span class="badge {}">{}</span>', css, self.pretty_status)
 
     @property
     def pretty_status(self):
         parts = [str(self.get_type_display())]
+        if self.is_outreach:
+            parts = [f"{parts[0]} · {gettext('Outreach')}"]
         if self.closed_on:
             parts.append(gettext("closed on %s") % local_date_format(self.closed_on))
         return ", ".join(parts)

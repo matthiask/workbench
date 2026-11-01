@@ -661,8 +661,51 @@ class ProjectsTest(TestCase):
         project.refresh_from_db()
         self.assertEqual(
             project.status_badge,
-            '<span class="badge text-bg-light">Order, closed on 31.12.2019</span>',
+            '<span class="badge wb-project-type wb-project-type--order'
+            ' wb-project-type--closed">Order, closed on 31.12.2019</span>',
         )
+
+    def test_status_badge(self):
+        """The badge shows the type, internal outreach projects get their own"""
+        outreach = InternalType.objects.create(
+            name="Outreach", percentage=10, is_outreach=True
+        )
+        other = InternalType.objects.create(name="Other", percentage=10)
+        cases = [
+            ({"type": Project.ORDER}, "order", "Order"),
+            ({"type": Project.MAINTENANCE}, "maintenance", "Maintenance"),
+            (
+                {"type": Project.INTERNAL, "internal_type": other},
+                "internal",
+                "Internal",
+            ),
+            (
+                {"type": Project.INTERNAL, "internal_type": outreach},
+                "outreach",
+                "Internal · Outreach",
+            ),
+        ]
+        for kwargs, kind, label in cases:
+            with self.subTest(kind=kind):
+                project = factories.ProjectFactory.create(**kwargs)
+                project = Project.objects.get(pk=project.pk)
+                self.assertEqual(
+                    project.status_badge,
+                    f'<span class="badge wb-project-type wb-project-type--{kind}">'
+                    f"{label}</span>",
+                )
+
+        # The internal type isn't loaded for the badge
+        projects = list(Project.objects.all())
+        with self.assertNumQueries(0):
+            for project in projects:
+                str(project.status_badge)
+
+        # Changing internal types takes effect right away
+        other.is_outreach = True
+        other.save()
+        project = Project.objects.get(internal_type=other)
+        self.assertIn("wb-project-type--outreach", project.status_badge)
 
     def test_closing_discards_offers_in_preparation(self):
         """Offers in preparation of closed projects are discarded, they can't
