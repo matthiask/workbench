@@ -4363,6 +4363,10 @@ msgid "took a break"
 msgstr "Habe eine Pause gemacht"
 
 #: workbench/templates/base.html
+msgid "log cost"
+msgstr "Kosten erfassen"
+
+#: workbench/templates/base.html
 #: workbench/templates/projects/project_detail.html
 msgid "log hours"
 msgstr "Stunden erfassen"

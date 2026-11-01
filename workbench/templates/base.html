@@ -311,6 +311,14 @@
           <span class="wb-speed-dial-label">{% translate 'took a break'|capfirst %} <kbd>Ctrl-B</kbd></span>
         </a>
         <a
+          href="{% block createcost-url %}{% url 'logbook_loggedcost_create' %}{% endblock %}"
+          data-ajaxmodal
+          class="wb-speed-dial-action"
+        >
+          <span class="wb-speed-dial-icon">{% include "svg/credit-card.svg" %}</span>
+          <span class="wb-speed-dial-label">{% translate 'log cost'|capfirst %} <kbd>Ctrl-K</kbd></span>
+        </a>
+        <a
           href="{% block createhours-url %}{% url 'logbook_loggedhours_create' %}{% endblock %}"
           data-createhours
           data-ajaxmodal
