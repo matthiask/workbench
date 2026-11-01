@@ -212,7 +212,9 @@ module.exports = (PRODUCTION) => {
       const includePaths = options.includePaths || [
         path.resolve(path.join(cwd, "node_modules")),
       ]
-      const silenceDeprecations = options.silenceDeprecations || []
+      // Bootstrap 5.3 has to be imported with @import to override its
+      // variables, its own deprecation warnings are hidden by quietDeps
+      const silenceDeprecations = options.silenceDeprecations || ["import"]
       return {
         test: /\.scss$/i,
         use: [
@@ -222,7 +224,11 @@ module.exports = (PRODUCTION) => {
             options: {
               api: "modern-compiler",
               implementation: "sass-embedded",
-              sassOptions: { includePaths, silenceDeprecations },
+              sassOptions: {
+                includePaths,
+                silenceDeprecations,
+                quietDeps: true,
+              },
             },
           },
         ],

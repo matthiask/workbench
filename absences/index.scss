@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // Theme colors, they work in light and dark mode
 $surface: var(--wb-surface);
 $divider: var(--bs-border-color);
@@ -15,7 +17,7 @@ $z-index: (
 );
 
 @mixin z-index($val) {
-  z-index: map-get($z-index, $val);
+  z-index: map.get($z-index, $val);
 }
 
 .absences-title {
