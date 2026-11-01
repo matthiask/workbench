@@ -6,20 +6,13 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
-from workbench.awt.models import Absence, Year, visible_absences
+from workbench.awt.models import Absence, Year
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
 from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
 
 class AbsenceSearchForm(Form):
-    q = forms.CharField(
-        required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": _("Search")}
-        ),
-        label="",
-    )
     u = forms.TypedChoiceField(
         coerce=int,
         required=False,
@@ -47,7 +40,6 @@ class AbsenceSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
-        queryset = queryset.search(data.get("q"))
         if data.get("u") == -1:
             queryset = queryset.filter(user=self.request.user)
         elif data.get("u"):
@@ -56,17 +48,12 @@ class AbsenceSearchForm(Form):
             queryset = queryset.filter(reason=data.get("reason"))
         if data.get("s") == "unconfirmed":
             queryset = queryset.unconfirmed()
-        queryset = visible_absences(
-            queryset,
-            self.request.user,
-            searched=bool(data.get("q")),
-        )
         return queryset.select_related("user")
 
     def response(self, request, queryset):
         if (
             request.GET.get("export") == "xlsx"
-            # The export contains the sickness of everyone
+            # The export contains the descriptions of sickness absences
             and request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
         ):
             xlsx = WorkbenchXLSXDocument()

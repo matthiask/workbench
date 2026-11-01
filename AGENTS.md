@@ -193,8 +193,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   schützenswerte Personendaten"): only the absent person and users with
   `PERSONNEL_ADMINISTRATION` see them and may edit those absences
   (`Absence.details_visible_to()`, `description_for()`, the `absences`
-  template filters; `visible_absences()` leaves them out of searches, which
-  match descriptions). `Absence.__str__` contains neither reason nor
+  template filters; absences can't be searched, the reason filter finds
+  them). `Absence.__str__` contains neither reason nor
   description. Planning and its mails use `public_text()`. The annual
   working time report of others requires the feature, the history shows
   descriptions only with it, and `clear_sickness_descriptions()` (fairy

@@ -9,7 +9,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.tools.formats import days, hours, local_date_format
-from workbench.tools.models import HoursField, Model, MoneyField, SearchQuerySet
+from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
@@ -140,16 +140,7 @@ class Employment(Model):
         raise_if_errors(errors, exclude)
 
 
-def visible_absences(queryset, user, *, searched):
-    """Everyone sees that someone is sick, but only the absent person and
-    people administrating personnel see the description. Searches match the
-    description, so they leave out the sickness of others."""
-    if not searched or user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
-        return queryset
-    return queryset.exclude(models.Q(reason=Absence.SICKNESS) & ~models.Q(user=user))
-
-
-class AbsenceQuerySet(SearchQuerySet):
+class AbsenceQuerySet(models.QuerySet):
     def unconfirmed(self):
         return self.filter(reason=Absence.PAID, confirmed_at__isnull=True)
 

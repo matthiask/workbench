@@ -867,15 +867,12 @@ class AWTTest(TestCase):
             with self.subTest(url=url):
                 self.assertTrue(visible(colleague, url, "wb-absence--sickness"))
 
-        # Filtering by the reason is complete, searching would reveal the
-        # description
+        # Filtering by the reason is complete
         link = f'href="{absence.urls["detail"]}"'
         self.assertTrue(visible(colleague, "/absences/?reason=sickness", link))
         self.assertTrue(
             visible(colleague, "/api/absences/?reason=sickness", user.get_short_name())
         )
-        self.assertFalse(visible(colleague, "/absences/?q=flu", link))
-        self.assertTrue(visible(hr, "/absences/?q=flu", link))
 
         # History and the annual working time report
         history = f"/history/awt_absence/id/{absence.pk}/"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 10:00+0100\n"
+"POT-Creation-Date: 2026-11-01 10:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -565,14 +565,6 @@ msgstr "Erfasste Stunden"
 msgid "target time"
 msgstr "Sollstunden"
 
-#: workbench/awt/forms.py workbench/contacts/forms.py
-#: workbench/credit_control/forms.py workbench/deals/forms.py
-#: workbench/invoices/forms.py workbench/logbook/forms.py
-#: workbench/offers/forms.py workbench/projects/forms.py
-#: workbench/templates/base.html workbench/templates/search.html
-msgid "Search"
-msgstr "Suche"
-
 #: workbench/awt/forms.py
 msgid "All reasons"
 msgstr "Alle Gründe"
@@ -1034,6 +1026,14 @@ msgstr "Alle Gruppen"
 #: workbench/contacts/forms.py
 msgid "Archived"
 msgstr "Archiviert"
+
+#: workbench/contacts/forms.py workbench/credit_control/forms.py
+#: workbench/deals/forms.py workbench/invoices/forms.py
+#: workbench/logbook/forms.py workbench/offers/forms.py
+#: workbench/projects/forms.py workbench/templates/base.html
+#: workbench/templates/search.html
+msgid "Search"
+msgstr "Suche"
 
 #: workbench/contacts/forms.py workbench/expenses/forms.py
 #: workbench/projects/forms.py workbench/reporting/views.py
