@@ -757,28 +757,4 @@
   {% endif %}
 {% endblock content %}
 
-{% block fixed-add-button %}
-  <a
-    href="{% url 'projects_project_select' %}"
-    data-ajaxmodal
-    class="btn btn-primary fixed-btn project"
-    title="{% translate 'Jump to project' %}"
-  >
-    {% include "svg/project.svg" %}
-  </a>
-  <a
-    href="{{ project.urls.createhours }}"
-    data-createhours
-    data-ajaxmodal
-    class="btn btn-primary fixed-btn"
-    title="{% translate 'log hours' %}"
-  >
-  </a>
-  <a
-    href="{% url 'logbook_break_create' %}"
-    data-ajaxmodal
-    class="btn btn-primary fixed-btn break"
-    title="{% translate 'took a break' %}"
-  >
-  </a>
-{% endblock fixed-add-button %}
+{% block createhours-url %}{{ project.urls.createhours }}{% endblock %}

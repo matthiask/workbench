@@ -295,28 +295,37 @@
   </div>
   <!-- /container -->
   {% block fixed-add-button %}
-    <a
-      href="{% url 'projects_project_select' %}"
-      data-ajaxmodal
-      class="btn btn-primary fixed-btn project"
-      title="{% translate 'Jump to project' %}"
-    >
-      {% include "svg/project.svg" %}
-    </a>
-    <a
-      href="{% url 'logbook_loggedhours_create' %}"
-      data-createhours
-      data-ajaxmodal
-      class="btn btn-primary fixed-btn hours"
-      title="{% translate 'log hours' %}"
-    >
-    </a>
-    <a
-      href="{% url 'logbook_break_create' %}"
-      data-ajaxmodal
-      class="btn btn-primary fixed-btn break"
-      title="{% translate 'took a break' %}"
-    >
-    </a>
+    {# Quick actions, revealed by hovering or clicking the plus button #}
+    <div class="wb-speed-dial" data-speed-dial>
+      <div class="wb-speed-dial-actions" id="wb-speed-dial-actions">
+        <a href="{% url 'projects_project_select' %}" data-ajaxmodal class="wb-speed-dial-action">
+          <span class="wb-speed-dial-icon">{% include "svg/project.svg" %}</span>
+          <span class="wb-speed-dial-label">{% translate 'Jump to project' %}</span>
+        </a>
+        <a href="{% url 'logbook_break_create' %}" data-ajaxmodal class="wb-speed-dial-action">
+          <span class="wb-speed-dial-icon"><img src="{% static 'workbench/lib/break.svg' %}" alt=""></span>
+          <span class="wb-speed-dial-label">{% translate 'took a break'|capfirst %}</span>
+        </a>
+        <a
+          href="{% block createhours-url %}{% url 'logbook_loggedhours_create' %}{% endblock %}"
+          data-createhours
+          data-ajaxmodal
+          class="wb-speed-dial-action"
+        >
+          <span class="wb-speed-dial-icon">{% include "svg/clock.svg" %}</span>
+          <span class="wb-speed-dial-label">{% translate 'log hours'|capfirst %}</span>
+        </a>
+      </div>
+      <button
+        type="button"
+        class="btn btn-primary wb-speed-dial-toggle"
+        aria-expanded="false"
+        aria-controls="wb-speed-dial-actions"
+        aria-label="{% translate 'Quick actions' %}"
+        title="{% translate 'Quick actions' %}"
+      >
+        {% include "svg/plus.svg" %}
+      </button>
+    </div>
   {% endblock fixed-add-button %}
 {% endblock body %}

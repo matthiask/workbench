@@ -562,46 +562,141 @@ tbody th > a {
   display: none;
 }
 
-.fixed-btn {
+// Quick actions in the bottom left corner: a plus button which reveals the
+// actions when hovered (with a mouse) or clicked
+// Only the button and the revealed actions catch the mouse, not the space
+// the hidden labels would take
+.wb-speed-dial {
   position: fixed;
   bottom: 1.5rem;
   left: 1rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
   z-index: 1030;
-  text-align: center;
-  font-size: 1.8rem;
-  box-shadow: 1px 3px 5px 0 rgba(0, 0, 50, 0.3);
-  background-image: url("lib/stopwatch.png");
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity: 0.5;
-  transition: opacity 0.2s;
-}
-.fixed-btn:hover {
-  opacity: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  pointer-events: none;
 }
 
-.fixed-btn.break {
-  /* bottom: 5rem; */
-  left: 4.25rem;
-  background-image: url("lib/break.svg");
-}
-
-.fixed-btn.project {
-  left: 7.5rem;
+.wb-speed-dial-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-image: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 50, 0.3);
+  opacity: 0.75;
+  pointer-events: auto;
+  transition: opacity 0.2s;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+    transition: transform 0.2s;
+  }
 }
 
-.fixed-btn.project svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  fill: currentColor;
+.wb-speed-dial-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  // Instead of a gap so that moving to the actions doesn't close them
+  padding: 0 0 0.5rem 0.25rem;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition:
+    opacity 0.15s,
+    transform 0.15s,
+    visibility 0.15s;
+}
+
+.wb-speed-dial-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--bs-body-color);
+  pointer-events: auto;
+
+  &:hover {
+    text-decoration: none;
+
+    .wb-speed-dial-icon {
+      filter: brightness(1.1);
+    }
+  }
+}
+
+.wb-speed-dial-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--bs-primary);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 50, 0.3);
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+
+  img {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+}
+
+.wb-speed-dial-label {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--wb-surface-border);
+  border-radius: var(--bs-border-radius-sm);
+  background: var(--wb-surface);
+  box-shadow: var(--wb-shadow);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.wb-speed-dial.is-open,
+.wb-speed-dial:focus-within {
+  .wb-speed-dial-toggle {
+    opacity: 1;
+  }
+}
+
+.wb-speed-dial.is-open {
+  .wb-speed-dial-toggle svg {
+    transform: rotate(45deg);
+  }
+
+  .wb-speed-dial-actions {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (hover: hover) {
+  .wb-speed-dial:hover {
+    .wb-speed-dial-toggle {
+      opacity: 1;
+    }
+
+    .wb-speed-dial-toggle svg {
+      transform: rotate(45deg);
+    }
+
+    .wb-speed-dial-actions {
+      visibility: visible;
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 .widget--checkboxselectmultiple .my-2 {
@@ -682,7 +777,7 @@ a:hover {
     overflow-y: auto;
   }
 
-  body:has(.navbar-collapse.show) .fixed-btn {
+  body:has(.navbar-collapse.show) .wb-speed-dial {
     display: none;
   }
 }

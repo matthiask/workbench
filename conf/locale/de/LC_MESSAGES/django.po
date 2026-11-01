@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 12:21+0100\n"
+"POT-Creation-Date: 2026-11-01 12:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3614,7 +3614,6 @@ msgid "Worth less than the time spent"
 msgstr "Weniger wert als die aufgewendete Zeit"
 
 #: workbench/projects/views.py workbench/templates/base.html
-#: workbench/templates/projects/project_detail.html
 #: workbench/templates/shortcuts.html
 msgid "Jump to project"
 msgstr "Zu Projekt springen"
@@ -4359,14 +4358,17 @@ msgid "Sign out"
 msgstr "Abmelden"
 
 #: workbench/templates/base.html
+msgid "took a break"
+msgstr "Habe eine Pause gemacht"
+
+#: workbench/templates/base.html
 #: workbench/templates/projects/project_detail.html
 msgid "log hours"
 msgstr "Stunden erfassen"
 
 #: workbench/templates/base.html
-#: workbench/templates/projects/project_detail.html
-msgid "took a break"
-msgstr "Habe eine Pause gemacht"
+msgid "Quick actions"
+msgstr "Schnellaktionen"
 
 #: workbench/templates/contacts/group_list.html
 #, python-format

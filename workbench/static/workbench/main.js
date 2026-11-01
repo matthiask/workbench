@@ -534,6 +534,31 @@ on("click", "[data-foreign-currency]", (e, el) => {
   _sel("#id_modal-are_expenses").checked = true
 })
 
+// The quick actions in the bottom left corner open on click too (touch)
+function setSpeedDial(dial, open) {
+  dial.classList.toggle("is-open", open)
+  dial
+    .querySelector(".wb-speed-dial-toggle")
+    .setAttribute("aria-expanded", open ? "true" : "false")
+}
+on("click", ".wb-speed-dial-toggle", (_e, el) => {
+  const dial = el.closest("[data-speed-dial]")
+  setSpeedDial(dial, !dial.classList.contains("is-open"))
+})
+document.addEventListener("click", (e) => {
+  const dial = _sel("[data-speed-dial].is-open")
+  if (
+    dial &&
+    (!dial.contains(e.target) || e.target.closest(".wb-speed-dial-action"))
+  ) {
+    setSpeedDial(dial, false)
+  }
+})
+document.addEventListener("keydown", (e) => {
+  const dial = _sel("[data-speed-dial].is-open")
+  if (dial && e.key === "Escape") setSpeedDial(dial, false)
+})
+
 document.addEventListener("DOMContentLoaded", () => {
   if (_sel(".form-search")) {
     let params = new URLSearchParams(window.location.search.slice(1))
