@@ -57,11 +57,20 @@ Then load the private offer guidelines, if the user has any:
 
 They contain the organization's own rules for estimating and challenging
 offers, e.g. factors from past projects, the share of project management,
-templates and a checklist. If it prints guidelines, follow them: they take
-precedence over the general guidelines below. They are confidential, so
-never copy their figures, project names or customers into the offer, its
-descriptions or anything else leaving the conversation. If none are
-configured, continue without them and don't ask about it.
+templates and a checklist. Always tell the user in one line what happened,
+so a wrong configuration doesn't go unnoticed:
+
+- Loaded: name the file and the installation (`wb` prints both), e.g.
+  "Using the offer guidelines from <file> for <installation>." Follow them:
+  they take precedence over the general guidelines below. They are
+  confidential, so never copy their figures, project names or customers into
+  the offer, its descriptions or anything else leaving the conversation.
+- None configured: say so for the installation and continue with the
+  general guidelines below. Don't ask the user to configure any.
+- Configured but missing (`does not exist`): tell the user and ask whether
+  to continue without them.
+- If `wb` says it uses another installation than the current one, mention
+  that too.
 
 ## 3. Draft the offer
 
