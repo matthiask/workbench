@@ -3,6 +3,7 @@ from django.test.utils import override_settings
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.views import NEEDS_ACTION_SHOWN
 
 
 class NeedsActionTest(TestCase):
@@ -12,7 +13,7 @@ class NeedsActionTest(TestCase):
         user = factories.UserFactory.create()
         deals = [
             factories.DealFactory.create(owned_by=user, title=f"Deal {i}")
-            for i in range(7)
+            for i in range(NEEDS_ACTION_SHOWN + 2)
         ]
         self.client.force_login(user)
 
@@ -26,4 +27,4 @@ class NeedsActionTest(TestCase):
         deals[0].delete()
         response = self.client.get("/")
         self.assertNotContains(response, "wb-needs-action-more")
-        self.assertContains(response, deals[6].get_absolute_url())
+        self.assertContains(response, deals[-1].get_absolute_url())

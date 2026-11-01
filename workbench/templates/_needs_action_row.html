@@ -1,0 +1,20 @@
+{% load workbench %}
+{# One line: the title is shortened, the status stays visible #}
+<div
+  class="list-group-item wb-needs-action-row{% if more %} wb-needs-action-more{% endif %}"
+  {% if more %}hidden{% endif %}
+>
+  {% if object.planned_hours %}
+    {# Planned work: who, how much and when distinguish the entries #}
+    <span
+      class="wb-needs-action-title"
+      title="{{ object.project }}: {{ object }}"
+    >{% link_or_none object object.title %}</span>
+    <span class="wb-needs-action-note">
+      {{ object.user.get_short_name }}, {{ object.planned_hours|hours }}, {{ object.pretty_from_until }}
+    </span>
+  {% else %}
+    <span class="wb-needs-action-title" title="{{ object }}">{% link_or_none object %}</span>
+    {% if object.status_badge %}{{ object.status_badge }}{% endif %}
+  {% endif %}
+</div>

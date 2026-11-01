@@ -1839,12 +1839,46 @@ kbd {
 // Needs action: compact rows, there may be many
 .wb-needs-action {
   .list-group-item:not(.wb-list-heading) {
-    padding-block: 0.35rem;
+    padding-block: 0.3rem;
     font-size: 0.875rem;
   }
 
+  .wb-needs-action-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .wb-needs-action-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .wb-needs-action-row .badge,
+  .wb-needs-action-note {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .wb-needs-action-note {
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .wb-list-heading {
+    align-items: center;
+  }
+
   .wb-needs-action-show-more {
-    color: var(--bs-link-color);
+    font-size: inherit;
+    font-weight: 400;
   }
 }
 

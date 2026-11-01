@@ -25,7 +25,7 @@ from workbench.tools.validation import in_days
 
 
 # Long categories show their first entries, the others on request
-NEEDS_ACTION_SHOWN = 5
+NEEDS_ACTION_SHOWN = 3
 
 
 def _needs_action(user):

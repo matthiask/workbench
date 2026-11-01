@@ -536,10 +536,10 @@ on("click", "[data-foreign-currency]", (e, el) => {
 
 // Long categories of "needs action" show the other entries on request
 on("click", "[data-show-more]", (_e, el) => {
-  let row = el.previousElementSibling
-  while (row?.classList.contains("wb-needs-action-more")) {
+  let row = el.closest(".wb-list-heading").nextElementSibling
+  while (row && !row.classList.contains("wb-list-heading")) {
     row.hidden = false
-    row = row.previousElementSibling
+    row = row.nextElementSibling
   }
   el.remove()
 })

@@ -10,24 +10,24 @@
   </div>
   <div class="list-group list-group-flush">
     {% for row in needs_action %}
-      <a href="{{ row.url }}" class="list-group-item wb-list-heading">
-        <span>{{ row.verbose_name_plural }}</span>
-      </a>
+      <div class="list-group-item wb-list-heading">
+        <a href="{{ row.url }}" class="text-reset">{{ row.verbose_name_plural }}</a>
+        {% if row.more %}
+          <button type="button" class="btn btn-link btn-sm p-0 wb-needs-action-show-more" data-show-more>
+            {% blocktranslate count more=row.more|length trimmed %}
+              Show {{ more }} more
+            {% plural %}
+              Show {{ more }} more
+            {% endblocktranslate %}
+          </button>
+        {% endif %}
+      </div>
       {% for object in row.objects %}
-        <div class="list-group-item">{% link_or_none object with_badge=True %}</div>
+        {% include "_needs_action_row.html" %}
       {% endfor %}
-      {% if row.more %}
-        {% for object in row.more %}
-          <div class="list-group-item wb-needs-action-more" hidden>{% link_or_none object with_badge=True %}</div>
-        {% endfor %}
-        <button type="button" class="list-group-item list-group-item-action wb-needs-action-show-more" data-show-more>
-          {% blocktranslate count more=row.more|length trimmed %}
-            Show {{ more }} more
-          {% plural %}
-            Show {{ more }} more
-          {% endblocktranslate %}
-        </button>
-      {% endif %}
+      {% for object in row.more %}
+        {% include "_needs_action_row.html" with more=True %}
+      {% endfor %}
     {% endfor %}
   </div>
 </section>
