@@ -758,9 +758,9 @@ def squeeze(period, since, until, as_csv, as_json):
             ", ".join(row["users"]),
         )
     console.print(table)
-    acquisition = data["acquisition"]
-    if acquisition["internal_types"]:
-        totals = acquisition["totals"]
+    outreach = data["outreach"]
+    if outreach["internal_types"]:
+        totals = outreach["totals"]
         echo_fields(
             "Outreach",
             [

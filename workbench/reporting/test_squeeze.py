@@ -231,7 +231,7 @@ class SqueezeTest(TestCase):
         data = squeeze_data((in_days(-1), in_days(1)))
         self.assertEqual([f["name"] for f in data["fields"]], ["<unknown>"])
 
-    def test_acquisition(self):
+    def test_outreach(self):
         """Hours spent on outreach compared with the contributions to
         accepted deals"""
         InternalType.objects.create(name="Other", percentage=10)
@@ -272,30 +272,28 @@ class SqueezeTest(TestCase):
         third_deal.save()
         third_deal.contributions.create(user=third, weight=100)
 
-        acquisition = squeeze_data((in_days(-1), in_days(1)))["acquisition"]
-        self.assertEqual(acquisition["internal_types"], [outreach])
+        result = squeeze_data((in_days(-1), in_days(1)))["outreach"]
+        self.assertEqual(result["internal_types"], [outreach])
         self.assertEqual(
             [
                 (row["user"], row["hours"], row["deals"], row["deals_per_hour"])
-                for row in acquisition["users"]
+                for row in result["users"]
             ],
             [(user, 4, 600, 150), (third, 10, 1000, 100), (other, 0, 400, None)],
         )
-        [row, *_rest] = acquisition["users"]
+        [row, *_rest] = result["users"]
         self.assertEqual(row["by_project"], {project: 4})
         self.assertEqual(row["by_deal"], {deal: 600})
-        self.assertEqual(acquisition["totals"]["hours"], 14)
-        self.assertEqual(acquisition["totals"]["deals"], 2000)
-        self.assertAlmostEqual(
-            float(acquisition["totals"]["deals_per_hour"]), 2000 / 14
-        )
+        self.assertEqual(result["totals"]["hours"], 14)
+        self.assertEqual(result["totals"]["deals"], 2000)
+        self.assertAlmostEqual(float(result["totals"]["deals_per_hour"]), 2000 / 14)
 
         self.client.force_login(user)
         url = f"/report/squeeze/?date_from={in_days(-1)}&date_until={in_days(1)}"
         response = self.client.get(url)
         self.assertContains(response, "Outreach hours")
-        self.assertContains(response, 'data-bs-target="#acquisition-help"')
+        self.assertContains(response, 'data-bs-target="#outreach-help"')
         self.assertContains(response, "Accepted deals divided by outreach hours.")
-        self.assertContains(response, f'id="acquisition-user-{user.pk}"')
+        self.assertContains(response, f'id="outreach-user-{user.pk}"')
         self.assertContains(response, deal.get_absolute_url())
         self.assertEqual(self.client.get(f"{url}&export=xlsx").status_code, 200)

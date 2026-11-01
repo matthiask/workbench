@@ -220,7 +220,7 @@ class ReportsAPITest(TestCase):
         self.assertEqual(project_row["project"]["id"], project.id)
         self.assertEqual(list(project_row["users"]), ["ab"])
         self.assertEqual(
-            data["acquisition"],
+            data["outreach"],
             {
                 "internal_types": [],
                 "users": [],
@@ -228,7 +228,7 @@ class ReportsAPITest(TestCase):
             },
         )
 
-    def test_squeeze_acquisition(self):
+    def test_squeeze_outreach(self):
         """Squeeze compares hours spent on outreach with accepted deals"""
         outreach = InternalType.objects.create(
             name="Outreach", percentage=10, is_outreach=True
@@ -250,11 +250,11 @@ class ReportsAPITest(TestCase):
         deal.contributions.create(user=self.user, weight=100)
 
         data = self.get("/api/reports/squeeze/", period="2026-09")
-        [user] = data["acquisition"]["users"]
+        [user] = data["outreach"]["users"]
         self.assertEqual(user["projects"][0]["project"]["id"], project.id)
         self.assertEqual(user["deals_accepted"][0]["deal"]["id"], deal.id)
         self.assertEqual(
-            data["acquisition"],
+            data["outreach"],
             {
                 "internal_types": ["Outreach"],
                 "users": [

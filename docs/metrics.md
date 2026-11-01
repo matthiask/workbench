@@ -567,7 +567,7 @@ after the outreach, so the ratio only means something over longer periods.
 - Third party costs: larger of invoiced vs. logged, because logged costs can't
   be linked to fixed amount invoices and adding both would double count.
 
-Code: `workbench/reporting/squeeze.py:squeeze_data`, `:acquisition`, `:build_xlsx`,
+Code: `workbench/reporting/squeeze.py:squeeze_data`, `:outreach`, `:build_xlsx`,
 `:gross_margin_components`, `:hours_components`, `:third_party_costs`,
 `:relevant_hours`, `:working_days_estimation`;
 `workbench/reporting/views.py:squeeze_view`;

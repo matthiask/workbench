@@ -754,7 +754,7 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("period", result.output)
 
-    def test_squeeze_acquisition(self):
+    def test_squeeze_outreach(self):
         outreach = InternalType.objects.create(
             name="Outreach", percentage=10, is_outreach=True
         )

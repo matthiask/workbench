@@ -693,32 +693,32 @@ class SqueezeField(Schema):
     external_percentage: Percentage
 
 
-class SqueezeAcquisitionFigures(Schema):
+class SqueezeOutreachFigures(Schema):
     hours: Hours
     deals: Amount
     deals_per_hour: Amount | None
 
 
-class SqueezeAcquisitionProject(Schema):
+class SqueezeOutreachProject(Schema):
     project: ProjectSummary
     hours: Hours
 
 
-class SqueezeAcquisitionDeal(Schema):
+class SqueezeOutreachDeal(Schema):
     deal: DealSummary
     share: Amount
 
 
-class SqueezeAcquisitionUser(SqueezeAcquisitionFigures):
+class SqueezeOutreachUser(SqueezeOutreachFigures):
     user: str
-    projects: list[SqueezeAcquisitionProject]
-    deals_accepted: list[SqueezeAcquisitionDeal]
+    projects: list[SqueezeOutreachProject]
+    deals_accepted: list[SqueezeOutreachDeal]
 
 
-class SqueezeAcquisition(Schema):
+class SqueezeOutreach(Schema):
     internal_types: list[str]
-    users: list[SqueezeAcquisitionUser]
-    totals: SqueezeAcquisitionFigures
+    users: list[SqueezeOutreachUser]
+    totals: SqueezeOutreachFigures
 
 
 class Squeeze(Period):
@@ -729,7 +729,7 @@ class Squeeze(Period):
     projects: list[SqueezeProject]
     customers: list[SqueezeCustomer]
     specialist_fields: list[SqueezeField]
-    acquisition: SqueezeAcquisition
+    outreach: SqueezeOutreach
 
 
 @router.get(
@@ -776,9 +776,9 @@ def squeeze_api(request, filters: Query[DateRangeFilter]):
             for row in data["organizations"]
         ],
         "specialist_fields": data["fields"],
-        "acquisition": {
+        "outreach": {
             "internal_types": [
-                type.name for type in data["acquisition"]["internal_types"]
+                type.name for type in data["outreach"]["internal_types"]
             ],
             "users": [
                 row
@@ -793,8 +793,8 @@ def squeeze_api(request, filters: Query[DateRangeFilter]):
                         for deal, share in row["by_deal"].items()
                     ],
                 }
-                for row in data["acquisition"]["users"]
+                for row in data["outreach"]["users"]
             ],
-            "totals": data["acquisition"]["totals"],
+            "totals": data["outreach"]["totals"],
         },
     }

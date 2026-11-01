@@ -253,7 +253,7 @@ def project_gross_margin(project):
     }
 
 
-def acquisition(date_range):
+def outreach(date_range):
     """Hours spent on outreach (internal types with ``is_outreach``) compared
     with the contributions to deals accepted in the period"""
     internal_types = list(InternalType.objects.filter(is_outreach=True))
@@ -734,7 +734,7 @@ def squeeze_data(date_range):  # noqa: C901
         "all_users": all_users,
         "types": types,
         "default_hourly_rate": BASE_HOURLY_RATE,
-        "acquisition": acquisition(date_range),
+        "outreach": outreach(date_range),
     }
 
 
@@ -906,8 +906,8 @@ def build_xlsx(data):
         ],
     ]
 
-    acquisition = data["acquisition"]
-    acquisition_table = [
+    outreach = data["outreach"]
+    outreach_table = [
         [
             _("user"),
             _("outreach hours"),
@@ -916,13 +916,13 @@ def build_xlsx(data):
         ],
         *[
             [str(row["user"]), row["hours"], row["deals"], row["deals_per_hour"]]
-            for row in acquisition["users"]
+            for row in outreach["users"]
         ],
         [
             _("Total"),
-            acquisition["totals"]["hours"],
-            acquisition["totals"]["deals"],
-            acquisition["totals"]["deals_per_hour"],
+            outreach["totals"]["hours"],
+            outreach["totals"]["deals"],
+            outreach["totals"]["deals_per_hour"],
         ],
     ]
 
@@ -935,9 +935,9 @@ def build_xlsx(data):
     xlsx.table(None, header + fields_table)
     xlsx.add_sheet(_("organizations"))
     xlsx.table(None, header + organizations_table)
-    if acquisition["internal_types"]:
+    if outreach["internal_types"]:
         xlsx.add_sheet(_("outreach"))
-        xlsx.table(None, header + acquisition_table)
+        xlsx.table(None, header + outreach_table)
 
     return xlsx
 

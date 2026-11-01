@@ -394,9 +394,9 @@
       </div>
     </section>
 
-    {% if data.acquisition.internal_types %}
-      {% with types=data.acquisition.type_names %}
-        <div class="modal fade" id="acquisition-help">
+    {% if data.outreach.internal_types %}
+      {% with types=data.outreach.type_names %}
+        <div class="modal fade" id="outreach-help">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -443,9 +443,9 @@
           </div>
         </div>
 
-        {# Per-user acquisition modals #}
-        {% for row in data.acquisition.users %}
-          <div class="modal fade" id="acquisition-user-{{ row.user.pk }}">
+        {# Per-user outreach modals #}
+        {% for row in data.outreach.users %}
+          <div class="modal fade" id="outreach-user-{{ row.user.pk }}">
             <div class="modal-dialog modal-xl">
               <div class="modal-content">
                 <div class="modal-header">
@@ -519,7 +519,7 @@
           </div>
         {% endfor %}
 
-        {# Acquisition table #}
+        {# Outreach table #}
         <section class="card mb-3 wb-table-card">
           <div class="card-header d-flex align-items-center justify-content-between">
             <span>
@@ -530,7 +530,7 @@
               type="button"
               class="btn btn-quiet btn-sm btn-icon"
               data-bs-toggle="modal"
-              data-bs-target="#acquisition-help"
+              data-bs-target="#outreach-help"
               title="{% translate 'Explanation' %}"
               aria-label="{% translate 'Explanation' %}"
             >
@@ -548,7 +548,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for row in data.acquisition.users %}
+                {% for row in data.outreach.users %}
                   <tr>
                     <td>{% link_or_none row.user %}</td>
                     <td class="text-end">{{ row.hours|hours }}</td>
@@ -557,7 +557,7 @@
                       <a
                         href="#"
                         data-bs-toggle="modal"
-                        data-bs-target="#acquisition-user-{{ row.user.pk }}"
+                        data-bs-target="#outreach-user-{{ row.user.pk }}"
                         title="{% translate 'Breakdown' %}"
                       >
                         {% if row.deals_per_hour is not None %}{{ row.deals_per_hour|currency }}{% else %}–{% endif %}
@@ -569,11 +569,11 @@
               <tfoot>
                 <tr class="wb-total-row">
                   <th>{% translate 'Total' %}</th>
-                  <th class="text-end">{{ data.acquisition.totals.hours|hours }}</th>
-                  <th class="text-end">{{ data.acquisition.totals.deals|currency }}</th>
+                  <th class="text-end">{{ data.outreach.totals.hours|hours }}</th>
+                  <th class="text-end">{{ data.outreach.totals.deals|currency }}</th>
                   <th class="text-end">
-                    {% if data.acquisition.totals.deals_per_hour is not None %}
-                      {{ data.acquisition.totals.deals_per_hour|currency }}
+                    {% if data.outreach.totals.deals_per_hour is not None %}
+                      {{ data.outreach.totals.deals_per_hour|currency }}
                     {% endif %}
                   </th>
                 </tr>
