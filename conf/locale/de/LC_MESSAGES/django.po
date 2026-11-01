@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 10:08+0100\n"
+"POT-Creation-Date: 2026-11-01 12:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5100,6 +5100,11 @@ msgstr "Median-Alter"
 #: workbench/templates/reporting/accepted_deals.html
 msgid "count"
 msgstr "Anzahl"
+
+#: workbench/templates/reporting/birthdays.html
+#: workbench/templates/reporting/work_anniversaries.html
+msgid "the last 60 days and the coming year"
+msgstr "die letzten 60 Tage und das kommende Jahr"
 
 #: workbench/templates/reporting/birthdays.html
 msgid "Birthday"

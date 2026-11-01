@@ -6,7 +6,10 @@
 
 {% block report_width %}wb-report-narrow{% endblock %}
 
-{% block heading %}{% translate 'Birthdays' %}{% endblock %}
+{% block heading %}
+  {% translate 'Birthdays' %}
+  <span class="wb-heading-note">{% translate 'the last 60 days and the coming year' %}</span>
+{% endblock heading %}
 
 {% block report %}
   <section class="card mb-3 wb-table-card">
@@ -27,7 +30,7 @@
           {% endifchanged %}
           <tr>
             <td>{% link_or_none birthday.user %}</td>
-            <td class="text-end">{{ birthday.user.person.date_of_birth|local_date_format }}</td>
+            <td class="text-end">{{ birthday.on|local_date_format }}</td>
             <td class="text-end">{{ birthday.age }}</td>
           </tr>
         {% endfor %}

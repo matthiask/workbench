@@ -9,11 +9,13 @@ from django.db import connection
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.forms import TeamForm, TeamSearchForm
 from workbench.accounts.models import UnknownFeature, User
+from workbench.accounts.reporting import birthdays, work_anniversaries
 from workbench.projects.models import Project
 from workbench.tools.testing import messages
 
@@ -157,6 +159,50 @@ class AccountsTest(TestCase):
         self.client.force_login(user)
         response = self.client.get("/report/work-anniversaries/")
         self.assertContains(response, user.get_full_name())
+
+    @travel("2026-11-01")
+    def test_birthdays_and_anniversaries_window(self):
+        """Dates of the last 60 days are shown, otherwise the next ones"""
+
+        def user(*, born=None, employed=None):
+            person = factories.PersonFactory.create(date_of_birth=born)
+            return factories.UserFactory.create(
+                person=person, date_of_employment=employed
+            )
+
+        recent = user(born=dt.date(1990, 10, 15), employed=dt.date(2018, 10, 20))
+        older = user(born=dt.date(1990, 8, 1), employed=dt.date(2026, 9, 1))
+        leap = user(born=dt.date(1992, 2, 29), employed=dt.date(2026, 12, 1))
+
+        rows = {row["user"]: row for row in birthdays()["users_with_birthdays"]}
+        self.assertEqual(
+            (rows[recent]["on"], rows[recent]["age"], rows[recent]["already"]),
+            (dt.date(2026, 10, 15), 36, True),
+        )
+        self.assertEqual(
+            (rows[older]["on"], rows[older]["age"], rows[older]["already"]),
+            (dt.date(2027, 8, 1), 37, False),
+        )
+        self.assertEqual(
+            (rows[leap]["on"], rows[leap]["age"]), (dt.date(2027, 2, 28), 35)
+        )
+        self.assertEqual(list(rows), [recent, leap, older])
+
+        rows = {row["user"]: row for row in work_anniversaries()}
+        self.assertEqual(
+            (rows[recent]["this_year"], rows[recent]["anniversary"]),
+            (dt.date(2026, 10, 20), 8),
+        )
+        self.assertTrue(rows[recent]["already"])
+        # The first day of work is shown until the first anniversary
+        self.assertEqual(
+            (rows[leap]["this_year"], rows[leap]["anniversary"]),
+            (dt.date(2026, 12, 1), 0),
+        )
+        self.assertEqual(
+            (rows[older]["this_year"], rows[older]["anniversary"]),
+            (dt.date(2027, 9, 1), 1),
+        )
 
     def test_team_crud(self):
         """CRUD of teams"""

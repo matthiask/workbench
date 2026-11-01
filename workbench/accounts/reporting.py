@@ -147,24 +147,47 @@ ORDER BY series.week
     return stats
 
 
+# Dates this long ago are still shown, everything else comes up within a year
+RECENTLY = dt.timedelta(days=60)
+
+
+def _on(day, year):
+    """The yearly date in the given year, February 29 is February 28 otherwise"""
+    try:
+        return day.replace(year=year)
+    except ValueError:
+        return day.replace(year=year, day=28)
+
+
+def _occurrence(day, today):
+    """The yearly date if it was recently, otherwise the next one"""
+    latest = _on(day, today.year)
+    if latest > today:
+        latest = _on(day, today.year - 1)
+    return latest if today - latest <= RECENTLY else _on(day, latest.year + 1)
+
+
 def work_anniversaries():
     anniversaries = []
     today = dt.date.today()
 
     for user in User.objects.active():
         if user.date_of_employment:
-            this_year = user.date_of_employment.replace(year=today.year)
+            # The first day of work until the first anniversary
+            on = max(
+                _occurrence(user.date_of_employment, today), user.date_of_employment
+            )
             anniversaries.append({
                 "user": user,
-                "this_year": this_year,
-                "anniversary": this_year.year - user.date_of_employment.year,
-                "already": this_year > today,
+                "this_year": on,
+                "anniversary": on.year - user.date_of_employment.year,
+                "already": on < today,
             })
         else:
             anniversaries.append({
                 "user": user,
                 "this_year": dt.date.max,
-                "already": True,
+                "already": False,
             })
 
     return sorted(
@@ -173,24 +196,26 @@ def work_anniversaries():
 
 
 def birthdays():
-    users = {True: [], False: []}
+    users_with_birthdays, users_without_birthdays = [], []
+    today = dt.date.today()
     for user in User.objects.active().select_related("person"):
         if user.person and (dob := user.person.date_of_birth):
-            users[True].append(((dob.month, dob.day), user))
+            on = _occurrence(dob, today)
+            users_with_birthdays.append({
+                "user": user,
+                "on": on,
+                "already": on < today,
+                "age": on.year - dob.year,
+            })
         else:
-            users[False].append(user)
+            users_without_birthdays.append(user)
 
-    today = dt.date.today()
     return {
-        "users_with_birthdays": [
-            {
-                "user": row[1],
-                "already": row[0] < (today.month, today.day),
-                "age": today.year - row[1].person.date_of_birth.year,
-            }
-            for row in sorted(users[True])
-        ],
-        "users_without_birthdays": users[False],
+        "users_with_birthdays": sorted(
+            users_with_birthdays,
+            key=lambda row: (row["on"], row["user"].get_full_name()),
+        ),
+        "users_without_birthdays": users_without_birthdays,
     }
 
 

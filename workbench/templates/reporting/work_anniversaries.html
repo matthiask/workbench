@@ -6,7 +6,10 @@
 
 {% block report_width %}wb-report-narrow{% endblock %}
 
-{% block heading %}{% translate 'Work anniversaries' %}{% endblock %}
+{% block heading %}
+  {% translate 'Work anniversaries' %}
+  <span class="wb-heading-note">{% translate 'the last 60 days and the coming year' %}</span>
+{% endblock heading %}
 
 {% block report %}
   <section class="card mb-3 wb-table-card">
