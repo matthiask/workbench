@@ -297,14 +297,15 @@ changed which deals:
 
 ## Notes
 
-Notes on deals, invoices and recurring invoices. Search all of them or those
-of some objects:
+Notes on deals, invoices, recurring invoices and projects, e.g. the results
+of a project's debriefing. Search all of them or those of some objects:
 
     wb notes search budget
     wb notes search --deal 1234
     wb notes create --deal 1234 --title "Call" --description "Budget approved."
+    wb notes create --project 4321 --title "Debriefing" --description - < debriefing.md
 
-Like in Workbench, adding a note notifies the owner of the deal or invoice.
+Like in Workbench, adding a note notifies the owner of the object.
 
 ## Services
 

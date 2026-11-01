@@ -15,12 +15,13 @@ from wb.core import (
     period_options,
     period_params,
     request,
+    text_or_stdin,
 )
 
 
 @cli.group()
 def notes():
-    """Search and add notes on deals and invoices"""
+    """Search and add notes on deals, invoices and projects"""
 
 
 def _echo_notes(notes):
@@ -43,6 +44,7 @@ def _echo_notes(notes):
 @click.option("--deal", type=int, help="Deal ID.")
 @click.option("--invoice", type=int, help="Invoice ID.")
 @click.option("--recurring-invoice", type=int, help="Recurring invoice ID.")
+@click.option("--project", type=int, help="Project ID.")
 @click.option("--created-by", help="Short name.", shell_complete=complete_short_names)
 @period_options("filters the creation date")
 @page_options
@@ -53,6 +55,7 @@ def search_notes(
     deal,
     invoice,
     recurring_invoice,
+    project,
     created_by,
     period,
     since,
@@ -68,6 +71,7 @@ def search_notes(
         ("deal", deal),
         ("invoice", invoice),
         ("recurring_invoice", recurring_invoice),
+        ("project", project),
         ("created_by", created_by),
     ]:
         if value:
@@ -91,22 +95,24 @@ def search_notes(
 @click.option("--deal", type=int, help="Deal ID.")
 @click.option("--invoice", type=int, help="Invoice ID.")
 @click.option("--recurring-invoice", type=int, help="Recurring invoice ID.")
+@click.option("--project", type=int, help="Project ID.")
 @click.option("--title", required=True)
-@click.option("--description", required=True)
+@click.option("--description", required=True, help="- reads it from stdin.")
 @click.option("--json", "as_json", is_flag=True)
-def create_note(deal, invoice, recurring_invoice, title, description, as_json):
-    """Add a note to exactly one deal, invoice or recurring invoice
+def create_note(deal, invoice, recurring_invoice, project, title, description, as_json):
+    """Add a note to exactly one deal, invoice, recurring invoice or project
 
-    Like in Workbench, the owner of the deal or invoice is notified by email."""
+    Like in Workbench, the owner of the object is notified by email."""
     data = request(
         "POST",
         "notes/",
         json={
             "title": title,
-            "description": description,
+            "description": text_or_stdin(description),
             "deal": deal,
             "invoice": invoice,
             "recurring_invoice": recurring_invoice,
+            "project": project,
         },
     )
     echo_json(data) if as_json else _echo_notes([data])

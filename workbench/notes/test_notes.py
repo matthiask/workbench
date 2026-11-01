@@ -76,6 +76,32 @@ class NotesTest(TestCase):
         note.refresh_from_db()
         self.assertEqual(note.title, "Updated")
 
+    def test_project_notes(self):
+        """Projects have notes too, e.g. for debriefings"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        content_type = ContentType.objects.get_for_model(project)
+
+        response = self.client.get(project.urls["detail"])
+        self.assertContains(response, 'action="/notes/add-note/"')
+        self.assertContains(response, f'value="{content_type.pk}"')
+
+        response = self.client.post(
+            "/notes/add-note/",
+            {
+                "content_type": content_type.pk,
+                "object_id": project.pk,
+                "title": "Debriefing",
+                "description": "The prototype made the implementation predictable.",
+                "next": project.urls["detail"],
+            },
+        )
+        self.assertRedirects(response, project.urls["detail"])
+        self.assertContains(
+            self.client.get(project.urls["detail"]),
+            "The prototype made the implementation predictable.",
+        )
+
     def test_note_notification(self):
         """Adding notes to content objects owned by others sends a notification"""
         deal = factories.DealFactory.create()

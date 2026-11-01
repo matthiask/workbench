@@ -14,6 +14,7 @@ from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
+from workbench.projects.models import Project
 from workbench.tools.api import (
     DateRangeFilter,
     Serialized,
@@ -24,12 +25,13 @@ from workbench.tools.api import (
 
 router = Router(tags=["notes"])
 
-# Notes are shown on these objects in the web interface, which require
-# features
+# Notes are shown on these objects in the web interface, with the features
+# they require (None: everyone)
 TARGETS = {
     "deal": (Deal, FEATURES.DEALS),
     "invoice": (Invoice, FEATURES.CONTROLLING),
     "recurring_invoice": (RecurringInvoice, FEATURES.CONTROLLING),
+    "project": (Project, None),
 }
 
 
@@ -70,7 +72,7 @@ def _content_types(user):
     return {
         ContentType.objects.get_for_model(model).pk: key
         for key, (model, feature) in TARGETS.items()
-        if user.features[feature]
+        if feature is None or user.features[feature]
     }
 
 
@@ -91,13 +93,14 @@ class NoteFilter(DateRangeFilter):
     deal: int | None = None
     invoice: int | None = None
     recurring_invoice: int | None = None
+    project: int | None = None
     created_by: str | None = None
 
 
 @router.get("/notes/", response=list[NoteOut])
 @paginate
 def note_list(request, filters: Query[NoteFilter]):
-    """Notes on deals and invoices, newest first; the period filters the
+    """Notes on deals, invoices and projects, newest first; the period filters the
     creation date
 
     Notes on objects which require features the user hasn't got and notes of
@@ -130,6 +133,7 @@ def note_list(request, filters: Query[NoteFilter]):
                     Deal.objects.select_related("owned_by"),
                     Invoice.objects.select_related("owned_by", "project"),
                     RecurringInvoice.objects.select_related("owned_by"),
+                    Project.objects.select_related("owned_by"),
                 ],
             )
         ).order_by("-created_at", "-pk"),
@@ -143,11 +147,12 @@ class NoteIn(Schema):
     deal: int | None = None
     invoice: int | None = None
     recurring_invoice: int | None = None
+    project: int | None = None
 
 
 @router.post("/notes/", response=NoteOut)
 def note_create(request, data: NoteIn):
-    """Add a note to exactly one deal, invoice or recurring invoice
+    """Add a note to exactly one deal, invoice, recurring invoice or project
 
     Like in the web interface, the owner of the object is notified by
     email."""

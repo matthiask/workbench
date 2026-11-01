@@ -77,7 +77,7 @@ class CLITest(TestCase):
             )
         return Response(response)
 
-    def wb(self, *args, user=None, token=None, debug=True):
+    def wb(self, *args, user=None, token=None, debug=True, input=None):
         if not token:
             _token, token = APIToken.create_for(
                 user=user or self.user, title="Tests", access="write"
@@ -94,6 +94,7 @@ class CLITest(TestCase):
                 "WORKBENCH_URL": "http://testserver",
                 "WB_DEBUG": "1" if debug else "",
             },
+            input=input,
         )
         if result.exception and not isinstance(result.exception, SystemExit):
             raise result.exception
@@ -132,7 +133,24 @@ class CLITest(TestCase):
         self.assertIn("Budget approved", result.output)
         result = self.wb("notes", "create", "--title", "Call", "--description", "x")
         self.assertEqual(result.exit_code, 1)
-        self.assertIn("exactly one of deal, invoice, recurring_invoice", result.output)
+        self.assertIn(
+            "exactly one of deal, invoice, recurring_invoice, project", result.output
+        )
+        result = self.wb(
+            "notes",
+            "create",
+            "--project",
+            project.pk,
+            "--title",
+            "Debriefing",
+            "--description",
+            "-",
+            input="Prototype first\n\nThen the implementation.\n",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb("notes", "search", "--project", project.pk)
+        self.assertIn("Prototype first", result.output)
+        self.assertNotIn("Budget approved", result.output)
 
         result = self.wb("me")
         self.assertEqual(result.exit_code, 0)

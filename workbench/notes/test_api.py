@@ -75,6 +75,34 @@ class NotesAPITest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["items"], [])
 
+    def test_project(self):
+        """Notes on projects need no feature"""
+        project = factories.ProjectFactory.create(title="Relaunch")
+        other = factories.ProjectFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
+            response = self.client.post(
+                "/api/notes/",
+                {
+                    "title": "Debriefing",
+                    "description": "Prototype first",
+                    "project": project.pk,
+                },
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200, response.content)
+            Note.objects.create(
+                content_object=other, created_by=other.owned_by, title="Other"
+            )
+
+            data = self.client.get("/api/notes/", {"project": project.pk}).json()
+        [note] = data["items"]
+        self.assertEqual(note["title"], "Debriefing")
+        self.assertEqual(note["object"]["type"], "project")
+        self.assertEqual(note["object"]["id"], project.pk)
+        self.assertIn("Relaunch", note["object"]["name"])
+
     def test_create(self):
         """Notes are added to exactly one object, its owner is notified"""
         deal = factories.DealFactory.create()
