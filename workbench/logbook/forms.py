@@ -344,6 +344,13 @@ class LoggedCostSearchForm(Form):
         return None
 
 
+def hours_for_invoicing_much_higher(hours, hours_for_invoicing):
+    """Up to 2h extra are always fine, and up to three times the time spent
+    unless that's more than a working day extra"""
+    extra = hours_for_invoicing - hours
+    return extra > 8 or (extra > 2 and hours_for_invoicing > 3 * hours)
+
+
 @add_prefix("modal")
 class LoggedHoursForm(ModelForm):
     user_fields = default_to_current_user = ("rendered_by",)
@@ -544,6 +551,21 @@ class LoggedHoursForm(ModelForm):
                     " Invoice all the time spent if possible."
                 ),
                 code="hours-for-invoicing-lower",
+            )
+        elif (
+            data.get("hours")
+            and data.get("hours_for_invoicing") is not None
+            and {"hours", "hours_for_invoicing"} & set(self.changed_data)
+            and hours_for_invoicing_much_higher(
+                data["hours"], data["hours_for_invoicing"]
+            )
+        ):
+            self.add_warning(
+                _(
+                    "The hours for invoicing are much higher than the hours."
+                    " Are you sure?"
+                ),
+                code="hours-for-invoicing-much-higher",
             )
 
         if (

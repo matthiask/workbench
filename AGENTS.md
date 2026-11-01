@@ -186,7 +186,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   is the positive side of the project budget statistics' delta (logged work
   valued at effort rates), `accruals` the negative side.
 - `LoggedHours.hours_for_invoicing` (optional) is what the work is worth if that
-  is more than the time spent (the form warns about lower values). Value and
+  is more than the time spent (the form warns about lower values and much
+  higher ones, see `hours_for_invoicing_much_higher()`; it can be changed
+  late, until the entry is archived). Value and
   invoice logged work with `HOURS_FOR_INVOICING`
   (`Coalesce("hours_for_invoicing", "hours")` in `workbench/logbook/models.py`,
   annotate querysets with it); everything about

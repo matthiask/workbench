@@ -10,6 +10,7 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.logbook.forms import hours_for_invoicing_much_higher
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
 from workbench.tools.forms import WarningsForm
@@ -217,6 +218,44 @@ class LogbookTest(TestCase):
             headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 202)
+
+    def test_hours_for_invoicing_much_higher(self):
+        """Hours for invoicing much higher than the time spent are suspicious"""
+        for spent, for_invoicing, suspicious in [
+            ("0.1", "1", False),  # Little extra
+            ("2", "4", False),
+            ("1", "3", False),  # 2h extra
+            ("4", "10", False),  # Less than 3×, less than a day extra
+            ("1", "4", True),  # More than 2h extra and more than 3×
+            ("1", "20", True),
+            ("10", "20", True),  # More than a day extra
+            ("2", "1", False),  # Lower has its own warning
+        ]:
+            with self.subTest(spent=spent, for_invoicing=for_invoicing):
+                self.assertEqual(
+                    hours_for_invoicing_much_higher(
+                        Decimal(spent), Decimal(for_invoicing)
+                    ),
+                    suspicious,
+                )
+
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+        response = self.client.post(
+            service.project.urls["createhours"],
+            {
+                "modal-rendered_by": service.project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "1",
+                "modal-hours_for_invoicing": "20",
+                "modal-description": "Test",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(
+            response, "The hours for invoicing are much higher than the hours."
+        )
 
     def test_hours_for_invoicing_editable_late(self):
         """Hours for invoicing can be changed late unless the entry is archived"""
