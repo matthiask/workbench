@@ -252,6 +252,10 @@ a > small:first-child {
       color: var(--bs-body-color);
       background: var(--bs-tertiary-bg);
     }
+
+    &.disabled {
+      color: var(--bs-tertiary-color);
+    }
   }
 }
 
@@ -1572,6 +1576,11 @@ a:hover {
       background: var(--bs-secondary-bg);
       color: var(--bs-body-color);
       font-weight: 500;
+    }
+
+    // The color above would override Bootstrap's disabled color
+    &.disabled {
+      color: var(--bs-tertiary-color);
     }
   }
 }
