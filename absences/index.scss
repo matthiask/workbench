@@ -2,22 +2,10 @@ $white: #fff;
 $black: #020202;
 $alto: #ddd;
 
-$apple: #3eb32d;
-$antique-brass: #cc875c;
-$thing: #3a9ac8;
-$school: #ca13ad;
-$cornflower-blue: #7e73ff;
 $zircon: #f4f7ff;
 
-$absence-colors: (
-  "vacation": $apple,
-  "sickness": $antique-brass,
-  "paid": $thing,
-  "school": $school,
-  "other": $cornflower-blue,
-  "correction": $black,
-  "absent": #8c939d,
-);
+// The colors of the reasons are defined in main.scss
+$absence-reasons: vacation, sickness, paid, school, other, correction, absent;
 
 $popup-width: 12rem;
 
@@ -211,12 +199,16 @@ $z-index: (
     color: $white;
   }
 
-  @each $reason, $color in $absence-colors {
+  @each $reason in $absence-reasons {
     &--#{$reason} {
-      background-color: $color;
+      background-color: var(--wb-absence-#{$reason});
 
       &:hover {
-        background-color: lighten($color, 5%);
+        background-color: color-mix(
+          in srgb,
+          var(--wb-absence-#{$reason}) 88%,
+          #{$white}
+        );
       }
     }
   }
@@ -288,10 +280,10 @@ $z-index: (
     border-radius: 2px;
   }
 
-  @each $reason, $color in $absence-colors {
+  @each $reason in $absence-reasons {
     &--#{$reason} {
       &::before {
-        background-color: $color;
+        background-color: var(--wb-absence-#{$reason});
       }
     }
   }

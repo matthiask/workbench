@@ -23,7 +23,9 @@
         <div class="wb-row-title">{{ object|absence_title:request.user }}</div>
         <div class="wb-row-meta">
           <span>{{ object.user.get_full_name }}</span>
-          <span>{{ object|absence_reason:request.user }}</span>
+          <span><span
+              class="wb-absence-swatch {{ object|absence_color:request.user }}"
+            ></span>{{ object|absence_reason:request.user }}</span>
           <span>{{ object.pretty_status }}</span>
           {% if object.needs_confirmation %}<span
               class="badge text-bg-warning"

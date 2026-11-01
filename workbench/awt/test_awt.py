@@ -864,6 +864,12 @@ class AWTTest(TestCase):
         # The reason itself (lists and the calendar offer it as a filter)
         self.assertFalse(visible(colleague, absence.urls["detail"], "sickness"))
         self.assertFalse(visible(colleague, "/api/absences/", "sickness"))
+        # The color of the reason
+        for url in [absence.urls["detail"], "/absences/"]:
+            with self.subTest(url=url):
+                self.assertTrue(visible(user, url, "wb-absence--sickness"))
+                self.assertFalse(visible(colleague, url, "wb-absence--sickness"))
+                self.assertTrue(visible(colleague, url, "wb-absence--absent"))
 
         # Filtering or searching would reveal the sickness of others
         link = f'href="{absence.urls["detail"]}"'

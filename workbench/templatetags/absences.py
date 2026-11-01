@@ -18,3 +18,9 @@ def absence_description(absence, user):
 @register.filter
 def absence_title(absence, user):
     return absence.description_for(user) or absence.reason_for(user)[1]
+
+
+@register.filter
+def absence_color(absence, user):
+    """The class of the color of the reason the user may see"""
+    return f"wb-absence--{absence.reason_for(user)[0]}"
