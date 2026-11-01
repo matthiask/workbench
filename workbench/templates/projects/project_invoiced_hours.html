@@ -7,7 +7,7 @@
 {% endblock title %}
 
 {% block body %}
-  <p class="text-muted">
+  <p class="small text-body-secondary">
     {% blocktranslate trimmed %}
       Logged hours whose invoiced hours differ from the time spent. Invoiced hours are what the work is worth, they are
       used for invoicing and for the value of the work.
@@ -26,40 +26,29 @@
           <th class="text-end">{% translate 'Difference' %}</th>
         </tr>
       </thead>
-      {% for title, entries in groups %}
-        {% if entries %}
-          <tbody>
-            <tr class="wb-table-heading">
-              <th colspan="7">{{ title }}</th>
+      {% for title, entries, total in groups %}
+        <tbody>
+          <tr class="wb-table-heading">
+            <th colspan="6">{{ title }}</th>
+            <th class="text-end text-nowrap">{% if total > 0 %}+{% endif %}{{ total|hours }}</th>
+          </tr>
+          {% for entry in entries %}
+            <tr>
+              <td class="text-nowrap">
+                <a href="{{ entry.get_absolute_url }}" data-ajaxmodal>{{ entry.rendered_on|local_date_format }}</a>
+              </td>
+              <td>{{ entry.rendered_by.get_short_name }}</td>
+              <td>{{ entry.service.title }}</td>
+              <td>{{ entry.description|truncatewords:20 }}</td>
+              <td class="text-end text-nowrap">{{ entry.hours|hours }}</td>
+              <td class="text-end text-nowrap">{{ entry.invoiced_hours|hours }}</td>
+              <td class="text-end text-nowrap">
+                {% if entry.difference > 0 %}+{% endif %}{{ entry.difference|hours }}
+              </td>
             </tr>
-            {% for entry in entries %}
-              <tr>
-                <td class="text-nowrap">
-                  <a href="{{ entry.get_absolute_url }}" data-ajaxmodal>{{ entry.rendered_on|local_date_format }}</a>
-                </td>
-                <td>{{ entry.rendered_by.get_short_name }}</td>
-                <td>{{ entry.service.title }}</td>
-                <td>{{ entry.description|truncatewords:20 }}</td>
-                <td class="text-end text-nowrap">{{ entry.hours|hours }}</td>
-                <td class="text-end text-nowrap">{{ entry.invoiced_hours|hours }}</td>
-                <td class="text-end text-nowrap">
-                  {% if entry.difference > 0 %}+{% endif %}{{ entry.difference|hours }}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        {% endif %}
+          {% endfor %}
+        </tbody>
       {% endfor %}
-      <tfoot>
-        <tr class="wb-total-row">
-          <th colspan="6">{% translate 'Total' %}</th>
-          <th class="text-end text-nowrap">
-            {% if more %}+{{ more|hours }}{% endif %}
-            {% if more and less %}<br>{% endif %}
-            {% if less %}{{ less|hours }}{% endif %}
-          </th>
-        </tr>
-      </tfoot>
     </table>
   </div>
 {% endblock body %}

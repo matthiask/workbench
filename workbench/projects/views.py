@@ -174,14 +174,16 @@ class ProjectInvoicedHoursView(generic.DetailView):
             .order_by("-difference", "-rendered_on", "-pk")
         )
         more = [entry for entry in entries if entry.difference > 0]
-        less = [entry for entry in entries if entry.difference < 0]
+        less = [entry for entry in entries if entry.difference < 0][::-1]
         return super().get_context_data(
             groups=[
-                (_("Worth more than the time spent"), more),
-                (_("Worth less than the time spent"), less[::-1]),
+                (title, group, sum((entry.difference for entry in group), Z1))
+                for title, group in [
+                    (_("Worth more than the time spent"), more),
+                    (_("Worth less than the time spent"), less),
+                ]
+                if group
             ],
-            more=sum((entry.difference for entry in more), Z1),
-            less=sum((entry.difference for entry in less), Z1),
             **kwargs,
         )
 

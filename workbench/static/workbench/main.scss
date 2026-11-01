@@ -1488,7 +1488,11 @@ a.wb-row-title:hover {
   &.table-responsive {
     overflow-x: auto;
   }
+}
 
+// Tables in reports and in modals look the same
+.wb-table-card,
+.modal-body {
   > .table,
   > .table-responsive > .table {
     font-variant-numeric: tabular-nums;

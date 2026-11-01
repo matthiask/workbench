@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 08:35+0100\n"
+"POT-Creation-Date: 2026-11-01 08:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -919,7 +919,6 @@ msgstr "Guthaben an Ferientagen"
 
 #: workbench/awt/pdf.py workbench/reporting/squeeze.py
 #: workbench/templates/awt/_year_details.html
-#: workbench/templates/projects/project_invoiced_hours.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/hours_per_type.html
 #: workbench/templates/reporting/projected_gross_margin.html
@@ -4997,6 +4996,15 @@ msgid "Gross margin"
 msgstr "Umsatz bereinigt"
 
 #: workbench/templates/projects/project_profitability.html
+#: workbench/templates/reporting/squeeze.html
+msgid "Rate"
+msgstr "Ansatz"
+
+#: workbench/templates/projects/project_profitability.html
+msgid "Accepted offers only"
+msgstr "Nur akzeptierte Offerten"
+
+#: workbench/templates/projects/project_profitability.html
 msgid "not used for closed projects"
 msgstr "bei geschlossenen Projekten nicht verwendet"
 
@@ -5025,15 +5033,6 @@ msgstr "Erfasste Stunden auf anderen Leistungen"
 #: workbench/templates/reporting/squeeze.html
 msgid "Relevant hours"
 msgstr "Relevante Stunden"
-
-#: workbench/templates/projects/project_profitability.html
-#: workbench/templates/reporting/squeeze.html
-msgid "Rate"
-msgstr "Ansatz"
-
-#: workbench/templates/projects/project_profitability.html
-msgid "Accepted offers only"
-msgstr "Nur akzeptierte Offerten"
 
 #: workbench/templates/projects/project_profitability.html
 msgid "Offered hours"
