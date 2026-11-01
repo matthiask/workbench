@@ -26,6 +26,8 @@ from workbench.tools.validation import in_days
 
 # Long categories show their first entries, the others on request
 NEEDS_ACTION_SHOWN = 3
+SEARCH_SHOWN = 5
+SEARCH_LIMIT = 100
 
 
 def split_more(objects, shown):
@@ -181,18 +183,30 @@ def search(request):
     results = []
     if q := request.GET.get("q", ""):
         sources = search_sources(request.user)
-        results = [
-            {
+        for queryset in sources:
+            objects = list(queryset.search(q)[: SEARCH_LIMIT + 1])
+            shown, more = split_more(objects[:SEARCH_LIMIT], SEARCH_SHOWN)
+            results.append({
+                "id": queryset.model._meta.model_name,
                 "verbose_name_plural": queryset.model._meta.verbose_name_plural,
                 "url": list_url(queryset.model),
-                "results": queryset.search(q)[:101],
-            }
-            for queryset in sources
-        ]
+                "count": len(objects[:SEARCH_LIMIT]),
+                "objects": shown,
+                "more": more,
+                "truncated": len(objects) > SEARCH_LIMIT,
+            })
     else:
         messages.error(request, _("Search query missing."))
 
-    return render(request, "search.html", {"query": q, "results": results})
+    return render(
+        request,
+        "search.html",
+        {
+            "query": q,
+            "results": results,
+            "found": any(result["count"] for result in results),
+        },
+    )
 
 
 DB_TABLE_TO_MODEL = {model._meta.db_table: model for model in apps.get_models()}

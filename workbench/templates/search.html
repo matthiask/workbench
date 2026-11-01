@@ -12,36 +12,55 @@
         {% if query %}<span class="wb-heading-note">{{ query }}</span>{% endif %}
       </h1>
     </div>
+    {% if results %}
+      {# Jump links, types without results are only listed #}
+      <nav class="nav wb-subnav mb-3">
+        {% for result in results %}
+          {% if result.count %}
+            <a class="nav-link" href="#search-{{ result.id }}">
+              {{ result.verbose_name_plural|capfirst }}
+              <span class="text-secondary">{{ result.count }}{% if result.truncated %}+{% endif %}</span>
+            </a>
+          {% else %}
+            <span class="nav-link disabled">{{ result.verbose_name_plural|capfirst }}</span>
+          {% endif %}
+        {% endfor %}
+      </nav>
+    {% endif %}
     {% for result in results %}
-      <section class="card mb-3">
-        <div class="card-header">
-          <a
-            href="{{ result.url }}?q={{ query|urlencode }}"
-            class="text-reset"
-          >{{ result.verbose_name_plural|capfirst }}</a>
-        </div>
-        <div class="list-group list-group-flush">
-          {% for result in result.results %}
-            {% if forloop.counter == 101 %}
-              <div class="list-group-item text-secondary">
-                {% translate 'Only showing 100 items. Additional results have been omitted.' %}
-              </div>
-            {% else %}
-              <a href="{{ result.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
-                <span class="wb-row-main">
-                  {{ result|h }}
-                  {% if result.organization %}<span
-                      class="wb-row-meta d-inline"
-                    >{{ result.organization }}</span>{% endif %}
-                </span>
-                {{ result.status_badge }}
-              </a>
+      {% if result.count %}
+        <section class="card mb-3 wb-search-results" id="search-{{ result.id }}">
+          <div class="card-header">
+            <a
+              href="{{ result.url }}?q={{ query|urlencode }}"
+              class="text-reset"
+            >{{ result.verbose_name_plural|capfirst }}</a>
+          </div>
+          <div class="list-group list-group-flush">
+            {% for object in result.objects %}
+              {% include "_search_row.html" %}
+            {% endfor %}
+            {% include "_show_more.html" with more=result.more %}
+            {% for object in result.more %}
+              {% include "_search_row.html" with more=True %}
+            {% endfor %}
+            {% if result.truncated %}
+              <a
+                href="{{ result.url }}?q={{ query|urlencode }}"
+                class="list-group-item list-group-item-action text-secondary wb-more"
+                {% if result.more %}hidden{% endif %}
+              >{% translate 'Only showing 100 items. Additional results have been omitted.' %}</a>
             {% endif %}
-          {% empty %}
-            <div class="list-group-item text-secondary">{% translate 'No results found.' %}</div>
-          {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    {% endfor %}
+    {% if results and not found %}
+      <section class="card mb-3">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item text-secondary">{% translate 'No results found.' %}</div>
         </div>
       </section>
-    {% endfor %}
+    {% endif %}
   </div>
 {% endblock content %}

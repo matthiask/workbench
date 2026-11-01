@@ -1,0 +1,12 @@
+{% load workbench %}
+<a
+  href="{{ object.get_absolute_url }}"
+  class="list-group-item list-group-item-action wb-row{% if more %} wb-more{% endif %}"
+  {% if more %}hidden{% endif %}
+>
+  <span class="wb-row-main">
+    {{ object|h }}
+    {% if object.organization %}<span class="wb-row-meta d-inline">{{ object.organization }}</span>{% endif %}
+  </span>
+  {{ object.status_badge }}
+</a>

@@ -1921,6 +1921,16 @@ kbd {
   display: none;
 }
 
+// The pill hangs below the card while the other entries are hidden
+.card:has(> .list-group > .wb-show-more) {
+  margin-bottom: 1.75rem !important;
+}
+
+// Search: the jump links shouldn't scroll the results below the navbar
+.wb-search-results {
+  scroll-margin-top: 5rem;
+}
+
 // Results of the Autocomplete widget, below its input group
 .wb-autocomplete {
   inset: 100% 0 auto 0;
