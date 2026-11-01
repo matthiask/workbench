@@ -3,7 +3,7 @@ import datetime as dt
 from django.conf import settings
 from django.contrib import messages
 from django.db import connections, models
-from django.db.models import F, Q, Sum
+from django.db.models import Case, F, Q, Sum, When
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Coalesce
 from django.utils import timezone
@@ -58,14 +58,28 @@ class InvoiceQuerySet(SearchQuerySet):
         )
 
     def maybe_actionable(self, *, user):
-        return self.filter(
-            Q(status=Invoice.IN_PREPARATION)
-            | Q(status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)),
-            Q(owned_by=user)
-            | Q(owned_by__is_active=False, project__isnull=True)
-            | Q(owned_by__is_active=False, project__owned_by__is_active=False)
-            | Q(owned_by__is_active=False, project__owned_by=user),
-        ).select_related("project", "owned_by")
+        return (
+            self
+            .filter(
+                Q(status=Invoice.IN_PREPARATION)
+                | Q(
+                    status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)
+                ),
+                Q(owned_by=user)
+                | Q(owned_by__is_active=False, project__isnull=True)
+                | Q(owned_by__is_active=False, project__owned_by__is_active=False)
+                | Q(owned_by__is_active=False, project__owned_by=user),
+            )
+            .select_related("project", "owned_by")
+            .order_by(
+                # Overdue invoices first, longest overdue first, then those in
+                # preparation (which have a due date too), oldest first
+                Case(When(status=Invoice.SENT, then=0), default=1),
+                F("due_on").asc(nulls_last=True),
+                "created_at",
+                "pk",
+            )
+        )
 
 
 @model_urls

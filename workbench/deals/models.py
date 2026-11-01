@@ -2,7 +2,7 @@ import datetime as dt
 from functools import total_ordering
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import F, Q
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -74,20 +74,30 @@ class ClosingType(models.Model):
 
 class DealQuerySet(SearchQuerySet):
     def maybe_actionable(self, *, user):
-        return self.filter(
-            Q(status=Deal.OPEN),
-            Q(owned_by=user)
-            | Q(owned_by__is_active=False)
-            | Q(id__in=user.contribution_set.values("deal")),
-            Q(probability__gte=Deal.HIGH)
-            | (
-                Q(probability__lt=Deal.HIGH)
-                & (
-                    Q(decision_expected_on__isnull=True)
-                    | Q(decision_expected_on__gte=in_days(-90))
-                )
-            ),
-        ).select_related("owned_by")
+        return (
+            self
+            .filter(
+                Q(status=Deal.OPEN),
+                Q(owned_by=user)
+                | Q(owned_by__is_active=False)
+                | Q(id__in=user.contribution_set.values("deal")),
+                Q(probability__gte=Deal.HIGH)
+                | (
+                    Q(probability__lt=Deal.HIGH)
+                    & (
+                        Q(decision_expected_on__isnull=True)
+                        | Q(decision_expected_on__gte=in_days(-90))
+                    )
+                ),
+            )
+            .select_related("owned_by")
+            .order_by(
+                # The decisions which are due first
+                F("decision_expected_on").asc(nulls_last=True),
+                "created_at",
+                "pk",
+            )
+        )
 
     def with_archived_valuestypes(self):
         return self.filter(

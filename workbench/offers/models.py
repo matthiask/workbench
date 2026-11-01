@@ -4,7 +4,7 @@ from functools import total_ordering
 from django.conf import settings
 from django.contrib import messages
 from django.db import models
-from django.db.models import Q
+from django.db.models import Case, F, Q, When
 from django.db.models.expressions import RawSQL
 from django.urls import reverse
 from django.utils import timezone
@@ -59,15 +59,28 @@ class OfferQuerySet(SearchQuerySet):
         )
 
     def maybe_actionable(self, *, user):
-        return self.filter(
-            Q(status=Offer.IN_PREPARATION)
-            | Q(status=Offer.OFFERED, project__closed_on__isnull=True),
-            Q(owned_by=user)
-            | Q(owned_by__is_active=False, project__owned_by__is_active=False)
-            | Q(owned_by__is_active=False, project__owned_by=user),
-            Q(work_completed_on__isnull=True)
-            | Q(work_completed_on__gt=dt.date.today()),
-        ).select_related("project", "owned_by")
+        """Offers sent first, those which aren't valid anymore first, then
+        those in preparation, oldest first. Offers on closed projects can't
+        lead anywhere anymore."""
+        return (
+            self
+            .filter(
+                Q(status__in=[Offer.IN_PREPARATION, Offer.OFFERED]),
+                Q(project__closed_on__isnull=True),
+                Q(owned_by=user)
+                | Q(owned_by__is_active=False, project__owned_by__is_active=False)
+                | Q(owned_by__is_active=False, project__owned_by=user),
+                Q(work_completed_on__isnull=True)
+                | Q(work_completed_on__gt=dt.date.today()),
+            )
+            .select_related("project", "owned_by")
+            .order_by(
+                Case(When(status=Offer.OFFERED, then=0), default=1),
+                F("valid_until").asc(nulls_last=True),
+                "created_at",
+                "pk",
+            )
+        )
 
     def offered(self):
         return self.filter(project__closed_on__isnull=True, status=Offer.OFFERED)

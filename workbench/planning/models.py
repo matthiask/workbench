@@ -166,13 +166,21 @@ class PlannedWorkQuerySet(SearchQuerySet):
     def maybe_actionable(self, *, user):
         day = monday()
         weeks = [day + dt.timedelta(days=days) for days in [0, 7, 14, 21]]
-        return self.filter(
-            Q(user=user)
-            | Q(created_by=user)
-            | Q(project__owned_by=user, project__suppress_planning_update_mails=False),
-            Q(is_provisional=True),
-            Q(weeks__overlap=weeks),
-        ).select_related("project__owned_by", "user")
+        return (
+            self
+            .filter(
+                Q(user=user)
+                | Q(created_by=user)
+                | Q(
+                    project__owned_by=user,
+                    project__suppress_planning_update_mails=False,
+                ),
+                Q(is_provisional=True),
+                Q(weeks__overlap=weeks),
+            )
+            .select_related("project__owned_by", "user")
+            .order_by("weeks", "pk")
+        )
 
 
 @model_urls
