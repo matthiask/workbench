@@ -488,7 +488,8 @@ class Project(Model):
         logged_hours_per_effort_rate = defaultdict(lambda: Z1)
         # Entries with invoiced hours, for sanity checks
         invoiced_hours_entries = 0
-        invoiced_hours_difference = Z1
+        invoiced_hours_more = invoiced_hours_less = Z1
+        difference = F("invoiced_hours") - F("hours")
 
         for row in (
             LoggedHours.objects
@@ -501,11 +502,19 @@ class Project(Model):
                 invoiced_hours_entries=Count(
                     "id", filter=Q(invoiced_hours__isnull=False)
                 ),
+                # Separately, entries worth less don't cancel out others
+                invoiced_hours_more=Sum(
+                    difference, filter=Q(invoiced_hours__gt=F("hours"))
+                ),
+                invoiced_hours_less=Sum(
+                    difference, filter=Q(invoiced_hours__lt=F("hours"))
+                ),
             )
         ):
             logged_hours_per_user[row["rendered_by"]] += row["hours__sum"]
             invoiced_hours_entries += row["invoiced_hours_entries"]
-            invoiced_hours_difference += row["invoiced_hours_sum"] - row["hours__sum"]
+            invoiced_hours_more += row["invoiced_hours_more"] or Z1
+            invoiced_hours_less += row["invoiced_hours_less"] or Z1
             invoiced_hours_per_service[row["service"]] += row["invoiced_hours_sum"]
             logged_hours_per_service_and_user[row["service"]][row["rendered_by"]] = row[
                 "hours__sum"
@@ -610,7 +619,8 @@ class Project(Model):
             ),
             "logged_hours": logged_hours[self],
             "invoiced_hours_entries": invoiced_hours_entries,
-            "invoiced_hours_difference": invoiced_hours_difference,
+            "invoiced_hours_more": invoiced_hours_more,
+            "invoiced_hours_less": invoiced_hours_less,
             "logged_hours_per_user": sorted(
                 ((users[user], hours) for user, hours in logged_hours_per_user.items()),
                 key=lambda row: row[1],

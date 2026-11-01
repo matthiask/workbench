@@ -3,6 +3,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from django.contrib import messages
+from django.db.models import F
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
@@ -19,7 +20,7 @@ from workbench.projects.models import Project, Service
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
 from workbench.templatetags.workbench import h
-from workbench.tools.formats import Z2, local_date_format
+from workbench.tools.formats import Z1, Z2, local_date_format
 
 
 PROJECTED_INVOICE_LEEWAY = Decimal(1000)
@@ -153,6 +154,35 @@ class ProjectProfitabilityView(generic.DetailView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(
             squeeze=project_gross_margin(self.object), **kwargs
+        )
+
+
+class ProjectInvoicedHoursView(generic.DetailView):
+    """Logged hours whose invoiced hours differ from the time spent, for
+    sanity checks by the project's owner"""
+
+    model = Project
+    template_name_suffix = "_invoiced_hours"
+
+    def get_context_data(self, **kwargs):
+        entries = (
+            LoggedHours.objects
+            .filter(service__project=self.object, invoiced_hours__isnull=False)
+            .exclude(invoiced_hours=F("hours"))
+            .annotate(difference=F("invoiced_hours") - F("hours"))
+            .select_related("rendered_by", "service")
+            .order_by("-difference", "-rendered_on", "-pk")
+        )
+        more = [entry for entry in entries if entry.difference > 0]
+        less = [entry for entry in entries if entry.difference < 0]
+        return super().get_context_data(
+            groups=[
+                (_("Worth more than the time spent"), more),
+                (_("Worth less than the time spent"), less[::-1]),
+            ],
+            more=sum((entry.difference for entry in more), Z1),
+            less=sum((entry.difference for entry in less), Z1),
+            **kwargs,
         )
 
 

@@ -38,6 +38,7 @@ from workbench.projects.models import BudgetTransfer, Campaign, Project, Service
 from workbench.projects.views import (
     OffersRenumberView,
     ProjectDetailView,
+    ProjectInvoicedHoursView,
     ProjectProfitabilityView,
     ProjectProjectedInvoicesView,
     assign_service_type,
@@ -168,6 +169,11 @@ urlpatterns = [
         "<int:pk>/profitability/",
         controlling_only(ProjectProfitabilityView.as_view()),
         name="projects_project_profitability",
+    ),
+    path(
+        "<int:pk>/invoiced-hours/",
+        ProjectInvoicedHoursView.as_view(),
+        name="projects_project_invoiced_hours",
     ),
     path(
         "<int:pk>/cost-by-month-and-service-xlsx/",

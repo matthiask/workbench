@@ -566,8 +566,8 @@ class LogbookTest(TestCase):
         response = self.client.get(project.urls["detail"])
         self.assertContains(response, "1 entry with invoiced hours")
         self.assertContains(response, "(+1.0h)")
+        self.assertContains(response, project.urls["invoiced_hours"])
         url = f"/logbook/hours/?project={project.pk}&invoiced_hours=1"
-        self.assertContains(response, url.replace("&", "&amp;"))
 
         response = self.client.get(url)
         self.assertContains(response, "Worth more")
@@ -575,9 +575,26 @@ class LogbookTest(TestCase):
         self.assertNotContains(response, "Plain entry")
         self.assertContains(response, "With invoiced hours")
 
-        factories.LoggedHoursFactory.create(service=service, invoiced_hours=0)
+        factories.LoggedHoursFactory.create(
+            service=service, hours=4, invoiced_hours=1, description="Worth less"
+        )
         response = self.client.get(project.urls["detail"])
         self.assertContains(response, "2 entries with invoiced hours")
+        # Both directions, they don't cancel each other out
+        self.assertContains(response, "(+1.0h, -3.0h)")
+
+        # The owner inspects the entries in a modal, with the hours spent
+        # and the invoiced hours next to each other
+        response = self.client.get(
+            project.urls["invoiced_hours"],
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "Worth more")
+        self.assertContains(response, "Worth less")
+        self.assertNotContains(response, "Plain entry")
+        self.assertContains(response, "+1.0h")
+        self.assertContains(response, "-3.0h")
+        self.assertContains(response, url.replace("&", "&amp;"))
 
     def test_logged_cost_list(self):
         """Filter form smoke test"""

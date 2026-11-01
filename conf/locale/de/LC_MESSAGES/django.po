@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 18:09+0100\n"
+"POT-Creation-Date: 2026-11-01 08:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -779,6 +779,7 @@ msgstr "endet am"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/projects/project_invoiced_hours.html
 msgid "description"
 msgstr "Beschreibung"
 
@@ -918,6 +919,7 @@ msgstr "Guthaben an Ferientagen"
 
 #: workbench/awt/pdf.py workbench/reporting/squeeze.py
 #: workbench/templates/awt/_year_details.html
+#: workbench/templates/projects/project_invoiced_hours.html
 #: workbench/templates/projects/project_statistics.html
 #: workbench/templates/reporting/hours_per_type.html
 #: workbench/templates/reporting/projected_gross_margin.html
@@ -2437,12 +2439,14 @@ msgstr "Konnte das PDF nicht generieren: {}"
 #: workbench/projects/views.py workbench/services/models.py
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/projects/project_detail.html workbench/timer/models.py
-#: workbench/tools/xlsx.py
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_invoiced_hours.html
+#: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "service"
 msgstr "Leistung"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
+#: workbench/templates/projects/project_invoiced_hours.html
 msgid "rendered on"
 msgstr "Erbracht am"
 
@@ -2460,6 +2464,7 @@ msgstr "Stundensatz"
 #: workbench/reporting/squeeze.py workbench/services/models.py
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_invoiced_hours.html
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/timestamps.html
@@ -2641,12 +2646,14 @@ msgid "Move to service"
 msgstr "Zu Leistung verschieben"
 
 #: workbench/logbook/models.py
+#: workbench/templates/projects/project_invoiced_hours.html
 msgid "rendered by"
 msgstr "Erbracht von"
 
 #: workbench/logbook/models.py workbench/reporting/squeeze.py
 #: workbench/templates/logbook/_loggedhours_row.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/projects/project_invoiced_hours.html
 msgid "invoiced hours"
 msgstr "Verrechnete Stunden"
 
@@ -3595,6 +3602,14 @@ msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 #, python-format
 msgid "until %s"
 msgstr "bis %s"
+
+#: workbench/projects/views.py
+msgid "Worth more than the time spent"
+msgstr "Mehr wert als die aufgewendete Zeit"
+
+#: workbench/projects/views.py
+msgid "Worth less than the time spent"
+msgstr "Weniger wert als die aufgewendete Zeit"
 
 #: workbench/projects/views.py workbench/templates/base.html
 #: workbench/templates/projects/project_detail.html
@@ -4962,6 +4977,18 @@ msgstr "reserviert, noch kein Zielprojekt"
 #: workbench/templates/projects/project_detail.html
 msgid "moved from"
 msgstr "verschoben von"
+
+#: workbench/templates/projects/project_invoiced_hours.html
+msgid "Logged hours whose invoiced hours differ from the time spent. Invoiced hours are what the work is worth, they are used for invoicing and for the value of the work."
+msgstr "Erfasste Stunden, deren verrechnete Stunden von der aufgewendeten Zeit abweichen. Verrechnete Stunden sind, was die Arbeit wert ist; sie werden für die Rechnungsstellung und den Wert der Arbeit verwendet."
+
+#: workbench/templates/projects/project_invoiced_hours.html
+msgid "Difference"
+msgstr "Differenz"
+
+#: workbench/templates/projects/project_invoiced_hours.html
+msgid "Show in the logbook"
+msgstr "Im Logbuch anzeigen"
 
 #: workbench/templates/projects/project_profitability.html
 #: workbench/templates/reporting/key_data.html

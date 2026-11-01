@@ -1,0 +1,73 @@
+{% extends 'modal.html' %}
+{% load i18n workbench %}
+{% block size %}modal-xl{% endblock %}
+
+{% block title %}
+  {% translate 'invoiced hours'|capfirst %}
+{% endblock title %}
+
+{% block body %}
+  <p class="text-muted">
+    {% blocktranslate trimmed %}
+      Logged hours whose invoiced hours differ from the time spent. Invoiced hours are what the work is worth, they are
+      used for invoicing and for the value of the work.
+    {% endblocktranslate %}
+  </p>
+  <div class="table-responsive">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>{% translate 'rendered on'|capfirst %}</th>
+          <th>{% translate 'rendered by'|capfirst %}</th>
+          <th>{% translate 'service'|capfirst %}</th>
+          <th>{% translate 'description'|capfirst %}</th>
+          <th class="text-end">{% translate 'hours'|capfirst %}</th>
+          <th class="text-end">{% translate 'invoiced hours'|capfirst %}</th>
+          <th class="text-end">{% translate 'Difference' %}</th>
+        </tr>
+      </thead>
+      {% for title, entries in groups %}
+        {% if entries %}
+          <tbody>
+            <tr class="wb-table-heading">
+              <th colspan="7">{{ title }}</th>
+            </tr>
+            {% for entry in entries %}
+              <tr>
+                <td class="text-nowrap">
+                  <a href="{{ entry.get_absolute_url }}" data-ajaxmodal>{{ entry.rendered_on|local_date_format }}</a>
+                </td>
+                <td>{{ entry.rendered_by.get_short_name }}</td>
+                <td>{{ entry.service.title }}</td>
+                <td>{{ entry.description|truncatewords:20 }}</td>
+                <td class="text-end text-nowrap">{{ entry.hours|hours }}</td>
+                <td class="text-end text-nowrap">{{ entry.invoiced_hours|hours }}</td>
+                <td class="text-end text-nowrap">
+                  {% if entry.difference > 0 %}+{% endif %}{{ entry.difference|hours }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        {% endif %}
+      {% endfor %}
+      <tfoot>
+        <tr class="wb-total-row">
+          <th colspan="6">{% translate 'Total' %}</th>
+          <th class="text-end text-nowrap">
+            {% if more %}+{{ more|hours }}{% endif %}
+            {% if more and less %}<br>{% endif %}
+            {% if less %}{{ less|hours }}{% endif %}
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+{% endblock body %}
+
+{% block footer %}
+  <a
+    href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}&amp;invoiced_hours=1"
+    class="btn btn-quiet"
+  >{% translate 'Show in the logbook' %}</a>
+  {{ block.super }}
+{% endblock footer %}
