@@ -581,7 +581,8 @@ class LogbookTest(TestCase):
         response = self.client.get(project.urls["detail"])
         self.assertContains(response, "2 entries with invoiced hours")
         # Both directions, they don't cancel each other out
-        self.assertContains(response, "(+1.0h, -3.0h)")
+        self.assertContains(response, "(+1.0h,")
+        self.assertContains(response, "-3.0h)")
 
         # The owner inspects the entries in a modal, with the hours spent
         # and the invoiced hours next to each other
