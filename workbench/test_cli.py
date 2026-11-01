@@ -539,8 +539,17 @@ planned_work:
     def test_deals(self):
         """Searching, creating, updating, closing and reopening deals"""
         project = factories.ProjectFactory.create(owned_by=self.user)
-        factories.DealFactory.create(owned_by=self.user, title="Big deal")
+        deal = factories.DealFactory.create(owned_by=self.user, title="Big deal")
         self.assertIn("Big deal", self.wb("deals", "search").output)
+        self.assertNotIn(
+            "Big deal",
+            self.wb("deals", "search", "--contributor", self.user._short_name).output,
+        )
+        deal.contributions.create(user=self.user)
+        self.assertIn(
+            "Big deal",
+            self.wb("deals", "search", "--contributor", self.user._short_name).output,
+        )
 
         factories.ValueTypeFactory.create(title="Design")
         result = self.wb(

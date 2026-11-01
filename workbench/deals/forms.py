@@ -14,6 +14,7 @@ from workbench.contacts.models import Organization, Person
 from workbench.deals.models import (
     Attribute,
     AttributeGroup,
+    Contribution,
     Deal,
     DealAttribute,
     Value,
@@ -64,12 +65,23 @@ class DealSearchForm(Form):
         widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
+    contributor = forms.TypedChoiceField(
+        coerce=int,
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["owned_by"].choices = User.objects.choices(
             collapse_inactive=True, myself=True
         )
+        self.fields["contributor"].choices = [
+            ("", _("All contributors")),
+            (-1, _("My contributions")),
+            *User.objects.choices(collapse_inactive=False)[1:],
+        ]
 
     def filter(self, queryset):
         data = self.cleaned_data
@@ -88,6 +100,11 @@ class DealSearchForm(Form):
             )
         queryset = self.apply_renamed(queryset, "org", "customer")
         queryset = self.apply_owned_by(queryset)
+        if contributor := self.cleaned_data.get("contributor"):
+            user = self.request.user if contributor == -1 else contributor
+            queryset = queryset.filter(
+                id__in=Contribution.objects.filter(user=user).values("deal")
+            )
         return queryset.select_related("owned_by", "customer", "contact__organization")
 
     def response(self, request, queryset):

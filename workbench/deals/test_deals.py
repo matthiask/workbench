@@ -36,6 +36,21 @@ class DealsTest(TestCase):
 
         self.assertEqual(self.client.get("/deals/?s=42").status_code, 302)
 
+    def test_contributor_filter(self):
+        """Deals can be filtered by their contributors, not just the owner"""
+        deal = factories.DealFactory.create(title="Contributed")
+        other = factories.DealFactory.create(title="Not contributed")
+        user = factories.UserFactory.create()
+        deal.contributions.create(user=user, weight=50)
+        self.client.force_login(user)
+
+        for query in [f"?contributor={user.pk}", "?contributor=-1"]:
+            with self.subTest(query=query):
+                response = self.client.get(f"/deals/{query}")
+                self.assertContains(response, deal.title)
+                self.assertNotContains(response, other.title)
+        self.assertContains(self.client.get("/deals/"), "All contributors")
+
     def test_detail(self):
         """Deals detail view"""
         deal = factories.DealFactory.create()

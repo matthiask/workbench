@@ -19,7 +19,7 @@ from workbench.accounts.models import User
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm, SetStatusForm
-from workbench.deals.models import AttributeGroup, Deal, ValueType
+from workbench.deals.models import AttributeGroup, Contribution, Deal, ValueType
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.tools.api import (
     Amount,
@@ -110,6 +110,9 @@ class DealFilter(DateRangeFilter):
     status: Literal["open", "accepted", "declined"] | None = None
     customer: int | None = None
     owned_by: str | None = None
+    contributor: str | None = Field(
+        None, description="Short name of someone contributing to the deal"
+    )
 
 
 @router.get("/deals/", response=list[DealOut])
@@ -125,6 +128,12 @@ def deal_list(request, filters: Query[DealFilter]):
         deals = deals.filter(customer=filters.customer)
     if filters.owned_by:
         deals = deals.filter(owned_by___short_name__iexact=filters.owned_by)
+    if filters.contributor:
+        deals = deals.filter(
+            id__in=Contribution.objects.filter(
+                user___short_name__iexact=filters.contributor
+            ).values("deal")
+        )
     if filters.q:
         deals = deals.search(filters.q)
     deals = filter_date_range(

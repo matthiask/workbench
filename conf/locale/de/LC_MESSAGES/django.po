@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 12:14+0100\n"
+"POT-Creation-Date: 2026-11-01 12:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1535,6 +1535,14 @@ msgstr "Abgeschlossen"
 #: workbench/deals/forms.py
 msgid "Deals with archived value types"
 msgstr "Geschäfte mit archivierten Werttypen"
+
+#: workbench/deals/forms.py
+msgid "All contributors"
+msgstr "Alle Beitragenden"
+
+#: workbench/deals/forms.py
+msgid "My contributions"
+msgstr "Meine Beiträge"
 
 #: workbench/deals/forms.py
 msgid "This deal is already closed. I assume you know what you're doing and wont stand in the way."

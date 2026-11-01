@@ -44,6 +44,11 @@ def deals(ctx):
 )
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@click.option(
+    "--contributor",
+    help="Short name of someone contributing.",
+    shell_complete=complete_short_names,
+)
 @period_options("filters the decision date (closed or expected)")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -53,6 +58,7 @@ def search_deals(
     status,
     customer,
     owned_by,
+    contributor,
     period,
     since,
     until,
@@ -67,6 +73,8 @@ def search_deals(
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
+    if contributor:
+        params["contributor"] = contributor
     params |= period_params(period, since, until)
     data = request("GET", "deals/", params=params | page_params(limit, offset))
     if as_csv:

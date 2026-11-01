@@ -43,6 +43,9 @@ class DealsAPITest(TestCase):
 
         self.assertEqual(ids("?status=open"), [deal.pk])
         self.assertEqual(ids("?owned_by=AB"), [deal.pk])
+        declined.contributions.create(user=user, weight=100)
+        self.assertEqual(ids("?status=declined&contributor=AB"), [declined.pk])
+        self.assertEqual(ids("?status=open&contributor=AB"), [])
         self.assertEqual(ids(f"?customer={declined.customer_id}"), [declined.pk])
         self.assertEqual(ids("?q=relaunch"), [deal.pk])
         # Open deals by their expected decision, closed deals by closing date
