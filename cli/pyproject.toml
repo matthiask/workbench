@@ -25,6 +25,7 @@ dependencies = [
   "pyyaml",
   "requests",
   "rich",
+  "tomli-w",
 ]
 scripts.wb = "wb:cli"
 

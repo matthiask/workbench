@@ -22,6 +22,7 @@ from urllib.parse import parse_qs, urlencode, urljoin, urlsplit
 
 import click
 import requests
+import tomli_w
 import yaml
 from click.shell_completion import CompletionItem
 from rich import box
@@ -184,14 +185,14 @@ def installation_url(url):
 
 
 def write_config(config):
-    lines = [f"current = {json.dumps(config['current'])}"] if config["current"] else []
-    for url, installation in sorted(config["installations"].items()):
-        lines += ["", f"[installations.{json.dumps(url)}]"]
-        for key in ["token", "access", "offer_guidelines"]:
-            if value := installation.get(key):
-                lines.append(f"{key} = {json.dumps(value)}")
+    """TOML has no null, leave out empty values"""
+    data = {"current": config["current"]} if config["current"] else {}
+    data["installations"] = {
+        url: {key: value for key, value in installation.items() if value}
+        for url, installation in sorted(config["installations"].items())
+    }
     CONFIG.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG.write_text("\n".join(lines) + "\n")
+    CONFIG.write_text(tomli_w.dumps(data))
     CONFIG.chmod(0o600)
 
 
