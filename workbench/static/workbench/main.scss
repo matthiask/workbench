@@ -1872,13 +1872,28 @@ kbd {
     white-space: nowrap;
   }
 
-  .wb-list-heading {
-    align-items: center;
-  }
-
+  // A pill on the bottom edge of the last entry shown, without a row of its own
   .wb-needs-action-show-more {
-    font-size: inherit;
-    font-weight: 400;
+    position: relative;
+    z-index: 3;
+    height: 0;
+
+    .btn {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 0.05rem 0.6rem;
+      border: 1px solid var(--wb-surface-border);
+      border-radius: 999px;
+      background: var(--wb-surface-raised);
+      box-shadow: var(--wb-shadow);
+      color: var(--bs-link-color);
+      font-size: 0.75rem;
+
+      &:hover {
+        color: var(--bs-link-hover-color);
+      }
+    }
   }
 }
 
