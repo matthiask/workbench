@@ -175,8 +175,8 @@ msgid "productivity"
 msgstr "Produktivität"
 
 #: workbench/accounts/features.py
-msgid "Access to per-user productivity reports including gross margin breakdown."
-msgstr "Zugriff auf nutzer:innenspezifische Produktivitätsberichte inkl. Aufteilung des bereinigten Umsatzes"
+msgid "Access to productivity reports."
+msgstr "Zugriff auf Produktivitätsberichte."
 
 #: workbench/accounts/features.py workbench/invoices/models.py
 #: workbench/reporting/views.py workbench/templates/base.html

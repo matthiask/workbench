@@ -123,9 +123,7 @@ LABELS = {
     },
     FEATURES.PRODUCTIVITY: {
         "label": capfirst(_("productivity")),
-        "help_text": _(
-            "Access to per-user productivity reports including gross margin breakdown."
-        ),
+        "help_text": _("Access to productivity reports."),
     },
     FEATURES.PROJECTED_GROSS_MARGIN: {
         "label": capfirst(_("projected gross margin")),
