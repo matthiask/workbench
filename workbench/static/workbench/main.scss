@@ -964,7 +964,16 @@ a:hover {
   }
 }
 
+// Icon buttons are as high as buttons with text next to them, also those
+// without a line of text (e.g. a button containing only an icon)
 .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(
+    var(--bs-btn-padding-y) * 2 + var(--bs-btn-font-size) *
+      var(--bs-btn-line-height) + var(--bs-btn-border-width) * 2
+  );
   padding-inline: 0.45rem;
 
   svg {
