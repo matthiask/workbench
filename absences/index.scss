@@ -289,6 +289,23 @@ $z-index: (
   }
 }
 
+// Corrections aren't time away, they are only outlined
+.absence--correction {
+  border: 1px solid var(--wb-absence-correction);
+  background-color: transparent;
+  color: var(--bs-body-color);
+
+  &:hover {
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+  }
+}
+
+.absences-legend__item--correction::before {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--wb-absence-correction);
+}
+
 // Paid leave not confirmed yet
 .absence--unconfirmed {
   background-image: repeating-linear-gradient(
