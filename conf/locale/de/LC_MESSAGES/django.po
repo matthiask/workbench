@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 08:47+0100\n"
+"POT-Creation-Date: 2026-11-01 10:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -803,8 +803,7 @@ msgstr "bestätigt am"
 msgid "confirmed by"
 msgstr "bestätigt von"
 
-#: workbench/awt/models.py workbench/awt/views.py workbench/planning/updates.py
-#: workbench/templates/awt/absence_calendar.html
+#: workbench/awt/models.py workbench/templates/awt/absence_calendar.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/planning/_new_dropdown.html
 msgid "absence"

@@ -59,7 +59,7 @@ class AbsenceSearchForm(Form):
         queryset = visible_absences(
             queryset,
             self.request.user,
-            filtered=bool(data.get("q") or data.get("reason")),
+            searched=bool(data.get("q")),
         )
         return queryset.select_related("user")
 

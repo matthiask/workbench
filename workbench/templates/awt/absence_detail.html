@@ -12,9 +12,7 @@
     <dd>{{ object.pretty_status }}</dd>
     <dt>{% translate 'reason'|capfirst %}</dt>
     <dd>
-      <span
-        class="wb-absence-swatch {{ object|absence_color:request.user }}"
-      ></span>{{ object|absence_reason:request.user }}
+      <span class="wb-absence-swatch wb-absence--{{ object.reason }}"></span>{{ object.get_reason_display }}
     </dd>
     {% if object.reason == 'paid' %}
       <dt>{% translate 'confirmed'|capfirst %}</dt>

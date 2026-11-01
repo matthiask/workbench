@@ -11,7 +11,6 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.dateparse import parse_date
-from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
 from workbench.accounts.models import User
@@ -314,8 +313,8 @@ def changes(*, since):
 
 
 def _public_reasons():
-    """Sickness is health data, the mails only say that someone is absent"""
-    return dict(Absence.REASON_CHOICES) | {Absence.SICKNESS: capfirst(_("absence"))}
+    """Everyone may know that someone is sick, but not the description"""
+    return dict(Absence.REASON_CHOICES)
 
 
 def pretty_changes_absence(*, users):

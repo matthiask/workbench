@@ -140,14 +140,11 @@ class Employment(Model):
         raise_if_errors(errors, exclude)
 
 
-# The reason shown instead of sickness to people who may not see it
-HIDDEN_REASON = "absent"
-
-
-def visible_absences(queryset, user, *, filtered):
-    """Searching or filtering by reason would reveal the sickness of others
-    even when the details are hidden, those absences are left out then"""
-    if not filtered or user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
+def visible_absences(queryset, user, *, searched):
+    """Everyone sees that someone is sick, but only the absent person and
+    people administrating personnel see the description. Searches match the
+    description, so they leave out the sickness of others."""
+    if not searched or user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
         return queryset
     return queryset.exclude(models.Q(reason=Absence.SICKNESS) & ~models.Q(user=user))
 
@@ -242,19 +239,14 @@ class Absence(Model):
     update_confirmation.alters_data = True
 
     def details_visible_to(self, user):
-        """Sickness is health data: only the absent person and people
-        administrating personnel see the reason and the description"""
+        """The description of sickness may be health data: only the absent
+        person and people administrating personnel see it and may edit the
+        absence. Everyone sees that someone is sick."""
         return (
             self.reason != self.SICKNESS
             or self.user_id == user.id
             or user.features[FEATURES.PERSONNEL_ADMINISTRATION]
         )
-
-    def reason_for(self, user):
-        """The reason (key, label) the user may see"""
-        if self.details_visible_to(user):
-            return self.reason, self.get_reason_display()
-        return HIDDEN_REASON, capfirst(gettext("absence"))
 
     def description_for(self, user):
         return self.description if self.details_visible_to(user) else ""
@@ -262,7 +254,7 @@ class Absence(Model):
     def public_text(self):
         """What everyone may see, e.g. in the planning"""
         if self.reason == self.SICKNESS:
-            return capfirst(gettext("absence"))
+            return self.get_reason_display()
         return " - ".join(filter(None, [self.get_reason_display(), self.description]))
 
     def save(self, *args, **kwargs):

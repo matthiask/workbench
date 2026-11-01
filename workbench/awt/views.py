@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
@@ -20,7 +19,7 @@ from workbench.awt.charts import (
     working_time_chart,
 )
 from workbench.awt.forms import CalendarFilterForm
-from workbench.awt.models import HIDDEN_REASON, Absence, Year
+from workbench.awt.models import Absence, Year
 from workbench.awt.pdf import annual_working_time_pdf
 from workbench.awt.reporting import (
     active_users,
@@ -196,8 +195,8 @@ def absence_calendar(request, form):
             "absences": [
                 {
                     "id": absence.id,
-                    "reason": absence.reason_for(request.user)[0],
-                    "reasonDisplay": absence.reason_for(request.user)[1],
+                    "reason": absence.reason,
+                    "reasonDisplay": absence.get_reason_display(),
                     "startsOn": time.mktime(max(absence.starts_on, cutoff).timetuple())
                     * 1000,
                     "endsOn": time.mktime(
@@ -220,9 +219,7 @@ def absence_calendar(request, form):
         {
             "absences_data": {
                 "absencesByPerson": absences,
-                "reasonList": Absence.REASON_CHOICES
-                if request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
-                else [*Absence.REASON_CHOICES, (HIDDEN_REASON, capfirst(_("absence")))],
+                "reasonList": Absence.REASON_CHOICES,
                 "timeBoundaries": {
                     "start": time.mktime(monday(min(dates)).timetuple()) * 1000,
                     "end": time.mktime(max(dates).timetuple()) * 1000,

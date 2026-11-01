@@ -240,8 +240,8 @@ class ChangesTest(TestCase):
         changed = {row["field"]: (row["old"], row["new"]) for row in updated["changes"]}
         self.assertEqual(changed["user_id"], (pw.user, other.user))
         self.assertEqual(changed["ends_on"], ("<no value>", "27.10.2021"))
-        # Sickness is health data, the mails only say that someone is absent
-        self.assertEqual(changed["reason"], ("vacation", "Absence"))
+        # Everyone may know that someone is sick
+        self.assertEqual(changed["reason"], ("vacation", "sickness"))
         self.assertEqual(changed["days"], ("1.00", "3.00"))
         # Derived from the reason, not worth reporting
         self.assertNotIn("is_vacation", changed)

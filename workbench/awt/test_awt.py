@@ -828,8 +828,8 @@ class AWTTest(TestCase):
 
     @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
     def test_sickness_is_private(self):
-        """Only the absent person and people administrating personnel see that
-        and why someone is sick"""
+        """Everyone sees that someone is sick, but only the absent person and
+        people administrating personnel see the description"""
         user = factories.UserFactory.create()
         absence = Absence.objects.create(
             user=user,
@@ -861,25 +861,21 @@ class AWTTest(TestCase):
                 self.assertTrue(visible(user, url))
                 self.assertTrue(visible(hr, url))
                 self.assertFalse(visible(colleague, url))
-        # The reason itself (lists and the calendar offer it as a filter)
-        self.assertFalse(visible(colleague, absence.urls["detail"], "sickness"))
-        self.assertFalse(visible(colleague, "/api/absences/", "sickness"))
-        # The color of the reason
+                # The reason and its color aren't private
+                self.assertTrue(visible(colleague, url, "ickness"))
         for url in [absence.urls["detail"], "/absences/"]:
             with self.subTest(url=url):
-                self.assertTrue(visible(user, url, "wb-absence--sickness"))
-                self.assertFalse(visible(colleague, url, "wb-absence--sickness"))
-                self.assertTrue(visible(colleague, url, "wb-absence--absent"))
+                self.assertTrue(visible(colleague, url, "wb-absence--sickness"))
 
-        # Filtering or searching would reveal the sickness of others
+        # Filtering by the reason is complete, searching would reveal the
+        # description
         link = f'href="{absence.urls["detail"]}"'
-        self.assertFalse(visible(colleague, "/absences/?reason=sickness", link))
-        self.assertTrue(visible(hr, "/absences/?reason=sickness", link))
-        self.assertFalse(visible(colleague, "/absences/?q=flu", link))
-        self.assertTrue(visible(colleague, "/absences/", link))
-        self.assertFalse(
+        self.assertTrue(visible(colleague, "/absences/?reason=sickness", link))
+        self.assertTrue(
             visible(colleague, "/api/absences/?reason=sickness", user.get_short_name())
         )
+        self.assertFalse(visible(colleague, "/absences/?q=flu", link))
+        self.assertTrue(visible(hr, "/absences/?q=flu", link))
 
         # History and the annual working time report
         history = f"/history/awt_absence/id/{absence.pk}/"

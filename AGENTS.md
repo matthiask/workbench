@@ -188,17 +188,18 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   annotate querysets with it); everything about
   time (utilization, productivity, planning, squeeze's hours, budgets in hours)
   uses `hours`.
-- Sickness absences are health data ("besonders schützenswerte
-  Personendaten"): only the absent person and users with
-  `PERSONNEL_ADMINISTRATION` see their reason and description
-  (`Absence.details_visible_to()`, `reason_for()`, `description_for()`, the
-  `absences` template filters; `visible_absences()` leaves them out of
-  searches and reason filters). Others see an "absence". `Absence.__str__`
-  contains neither. Planning and its mails use `public_text()`. The annual
+- Everyone may know that someone is sick (the team talks about it anyway),
+  but the descriptions of sickness absences may be health data ("besonders
+  schützenswerte Personendaten"): only the absent person and users with
+  `PERSONNEL_ADMINISTRATION` see them and may edit those absences
+  (`Absence.details_visible_to()`, `description_for()`, the `absences`
+  template filters; `visible_absences()` leaves them out of searches, which
+  match descriptions). `Absence.__str__` contains neither reason nor
+  description. Planning and its mails use `public_text()`. The annual
   working time report of others requires the feature, the history shows
-  reasons and descriptions only with it, and `clear_sickness_descriptions()`
-  (fairy tasks) clears descriptions and history after three years, like
-  the audit log pruning of absences.
+  descriptions only with it, and `clear_sickness_descriptions()` (fairy
+  tasks) clears descriptions and history after three years, like the audit
+  log pruning of absences.
   Descriptions of absences are optional. Paid leave counts right away but
   needs a confirmation by someone with `PERSONNEL_ADMINISTRATION`
   (`Absence.needs_confirmation`, `update_confirmation()` in the form,

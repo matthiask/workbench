@@ -354,7 +354,7 @@
                       <tr {% if not absence.is_working_time %}class="text-body-secondary"{% endif %}>
                         <td>{{ absence.pretty_period }}</td>
                         <td>
-                          {% with reason=absence|absence_reason:request.user description=absence|absence_description:request.user %}
+                          {% with reason=absence.get_reason_display description=absence|absence_description:request.user %}
                             <a href="{{ absence.get_absolute_url }}" data-ajaxmodal>{{ reason|capfirst }}</a>
                             {% if description and description|lower != reason|lower %}
                               <span class="text-body-secondary">{{ description }}</span>
