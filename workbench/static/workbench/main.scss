@@ -586,9 +586,7 @@ tbody th > a {
   padding: 0;
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0, 0, 50, 0.3);
-  opacity: 0.75;
   pointer-events: auto;
-  transition: opacity 0.2s;
 
   svg {
     width: 1rem;
@@ -664,13 +662,6 @@ tbody th > a {
   white-space: nowrap;
 }
 
-.wb-speed-dial.is-open,
-.wb-speed-dial:focus-within {
-  .wb-speed-dial-toggle {
-    opacity: 1;
-  }
-}
-
 .wb-speed-dial.is-open {
   .wb-speed-dial-toggle svg {
     transform: rotate(45deg);
@@ -685,10 +676,6 @@ tbody th > a {
 
 @media (hover: hover) {
   .wb-speed-dial:hover {
-    .wb-speed-dial-toggle {
-      opacity: 1;
-    }
-
     .wb-speed-dial-toggle svg {
       transform: rotate(45deg);
     }
