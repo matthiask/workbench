@@ -117,6 +117,23 @@ class ContactsTest(TestCase):
         response = self.client.get("/contacts/people/?export=vcard")
         self.assertEqual(response.status_code, 200)
 
+    def test_person_list_rows(self):
+        """Rows show the organization, contact details and groups"""
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create(name="Acme Ltd.")
+        )
+        person.emailaddresses.create(email="jane@example.com")
+        person.groups.set([Group.objects.create(title="Newsletter")])
+        factories.PersonFactory.create(given_name="Groupless")
+
+        self.client.force_login(person.primary_contact)
+        with self.assertNumQueries(12):
+            response = self.client.get(person.urls["list"])
+        self.assertContains(response, "Acme Ltd.")
+        self.assertContains(response, "mailto:jane@example.com")
+        self.assertContains(response, ">Newsletter</a>")
+        self.assertContains(response, "<span>No group</span>", html=True)
+
     def test_organization_list(self):
         """The organization list basically works"""
         group1 = Group.objects.create(title="A")

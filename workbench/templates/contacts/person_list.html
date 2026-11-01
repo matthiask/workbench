@@ -1,5 +1,5 @@
 {% extends "contacts/object_list.html" %}
-{% load workbench %}
+{% load i18n workbench %}
 
 {% block search-form-buttons %}
   {% if request.GET %}
@@ -14,3 +14,36 @@
   {% endif %}
   {{ block.super }}
 {% endblock search-form-buttons %}
+
+{% block rows %}
+  {% for person in object_list %}
+    <div class="list-group-item wb-row">
+      <div class="wb-row-main">
+        <a class="wb-row-title" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>
+        <div class="wb-row-meta">
+          {% if person.organization and not person.organization.is_private_person %}
+            <a href="{{ person.organization.get_absolute_url }}">{{ person.organization }}</a>
+          {% endif %}
+          {% with email=person.emailaddresses.all.0 phone=person.phonenumbers.all.0 %}
+            {% if email %}<a href="mailto:{{ email.email }}">{{ email.email }}</a>{% endif %}
+            {% if phone %}<a href="tel:{{ phone.phone_number }}">{{ phone.pretty_number }}</a>{% endif %}
+          {% endwith %}
+        </div>
+        <div class="wb-row-meta">
+          {% for group in person.groups.all %}
+            <a href="{% url 'contacts_person_list' %}?g={{ group.pk }}">{{ group }}</a>
+          {% empty %}
+            <span>{% translate 'No group' %}</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="wb-row-aside">
+        <span
+          class="text-secondary small"
+          title="{% translate 'primary contact'|capfirst %}"
+        >{{ person.primary_contact.get_short_name }}</span>
+        {% if person.is_archived %}<span class="badge text-bg-secondary">{% translate 'archived' %}</span>{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+{% endblock rows %}

@@ -235,8 +235,11 @@ class PersonSearchForm(Form):
             queryset = queryset.active().exclude(groups__is_archived=False)
 
         queryset = self.apply_owned_by(queryset, attribute="primary_contact")
-        return self.apply_renamed(queryset, "g", "groups").select_related(
-            "organization"
+        return (
+            self
+            .apply_renamed(queryset, "g", "groups")
+            .select_related("organization", "primary_contact")
+            .prefetch_related("emailaddresses", "phonenumbers", "groups")
         )
 
     def response(self, request, queryset):
