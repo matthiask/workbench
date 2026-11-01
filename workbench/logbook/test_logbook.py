@@ -218,6 +218,41 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 202)
 
+    def test_hours_for_invoicing_editable_late(self):
+        """Hours for invoicing can be changed late unless the entry is archived"""
+        hours = factories.LoggedHoursFactory.create(rendered_on=in_days(-14), hours=2)
+        self.client.force_login(hours.rendered_by)
+
+        def send():
+            return self.client.post(
+                hours.urls["update"],
+                {
+                    "modal-service": hours.service_id,
+                    "modal-description": "Test",
+                    "modal-hours_for_invoicing": "3",
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        self.assertEqual(send().status_code, 202)
+        hours.refresh_from_db()
+        self.assertEqual(hours.hours_for_invoicing, 3)
+
+        hours.hours_for_invoicing = None
+        hours.archived_at = timezone.now()
+        hours.save()
+        response = self.client.get(
+            hours.urls["update"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertContains(response, 'name="modal-hours_for_invoicing"')
+        self.assertRegex(
+            response.content.decode(),
+            r'<input[^>]*name="modal-hours_for_invoicing"[^>]*disabled',
+        )
+        send()
+        hours.refresh_from_db()
+        self.assertIsNone(hours.hours_for_invoicing)
+
     def test_past_week_logging(self):
         """Past week logging is allowed with LATE_LOGGING"""
         service = factories.ServiceFactory.create()

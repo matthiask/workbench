@@ -438,6 +438,9 @@ class LoggedHoursForm(ModelForm):
                 self.fields["hours"].disabled = True
                 self.fields["rendered_by"].disabled = True
                 self.fields["rendered_on"].disabled = True
+            # Can be changed late, but not after invoicing
+            if self.instance.archived_at:
+                self.fields["hours_for_invoicing"].disabled = True
 
         else:
             if self.project.flat_rate is not None:
