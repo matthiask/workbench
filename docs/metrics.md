@@ -537,10 +537,10 @@ Per `project.customer`: Σ of the person contributions (margin, period hours) of
 its projects; Ansatz = margin / hours. Internal projects count with their
 (usually 0) margin under the own organization.
 
-#### Acquisition ("Akquise"), sorted by deals per hour desc
+#### Acquisition ("Outreach"), sorted by deals per hour desc
 
 Only shown if internal types are marked `is_outreach`. Per person: Stunden
-Akquise = Σ `hours` (not hours for invoicing) logged in the period on projects
+Outreach = Σ `hours` (not hours for invoicing) logged in the period on projects
 with an outreach internal type; Gewonnene Geschäfte = the person's share of
 the deals accepted (`closed_on`) in the period, `deal.value` split by
 contribution weight like the accepted deals report

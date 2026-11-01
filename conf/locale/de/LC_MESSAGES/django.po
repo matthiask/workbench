@@ -3459,11 +3459,11 @@ msgstr "Wenn Du %(amount)s wegschiebst, bleibt %(project)s mit einem negativen B
 
 #: workbench/projects/models.py
 msgid "is outreach"
-msgstr "Akquise"
+msgstr "Outreach"
 
 #: workbench/projects/models.py
 msgid "Hours on outreach are compared with accepted deals in the squeeze report."
-msgstr "Die Stunden für Akquise werden im Squeeze-Bericht mit den gewonnenen Geschäften verglichen."
+msgstr "Die Stunden für Outreach werden im Squeeze-Bericht mit den gewonnenen Geschäften verglichen."
 
 #: workbench/projects/models.py
 msgid "internal type"
@@ -3821,7 +3821,7 @@ msgstr "relevanter Umsatz"
 
 #: workbench/reporting/squeeze.py
 msgid "outreach hours"
-msgstr "Stunden Akquise"
+msgstr "Stunden Outreach"
 
 #: workbench/reporting/squeeze.py
 msgid "accepted deals"
@@ -3833,7 +3833,7 @@ msgstr "pro Stunde"
 
 #: workbench/reporting/squeeze.py
 msgid "acquisition"
-msgstr "Akquise"
+msgstr "Outreach"
 
 #: workbench/reporting/utils.py workbench/templates/_hours_rings.html
 #: workbench/templates/start.html workbench/templates/timestamps.html
@@ -5491,16 +5491,16 @@ msgstr "Organisation"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Acquisition"
-msgstr "Akquise"
+msgstr "Outreach"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Outreach hours"
-msgstr "Stunden Akquise"
+msgstr "Stunden Outreach"
 
 #: workbench/templates/reporting/squeeze.html
 #, python-format
 msgid "Hours logged in the period on internal projects of the types marked as outreach (%(types)s). The time spent counts, not the hours for invoicing."
-msgstr "Im Zeitraum auf interne Projekte der als Akquise markierten Typen (%(types)s) erfasste Stunden. Es zählt die aufgewendete Zeit, nicht die Stunden für Verrechnung."
+msgstr "Im Zeitraum auf interne Projekte der als Outreach markierten Typen (%(types)s) erfasste Stunden. Es zählt die aufgewendete Zeit, nicht die Stunden für Verrechnung."
 
 #: workbench/templates/reporting/squeeze.html
 msgid "The value of the deals accepted in the period, split between the contributors by their weight like in the accepted deals report. Deal values are revenue, not gross margin."
@@ -5512,15 +5512,15 @@ msgstr "Pro Stunde"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Accepted deals divided by outreach hours."
-msgstr "Gewonnene Geschäfte geteilt durch die Stunden Akquise."
+msgstr "Gewonnene Geschäfte geteilt durch die Stunden Outreach."
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Outreach also contains work which serves acquisition only indirectly, e.g. company communications."
-msgstr "Akquise enthält auch Arbeit, welche der Akquise nur indirekt dient, z.B. die Unternehmenskommunikation."
+msgstr "Outreach enthält auch Arbeit, welche der Akquise nur indirekt dient, z.B. die Unternehmenskommunikation."
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Deals are often won long after the outreach, and outreach also helps deals of others. The figures only mean something over longer periods, e.g. a year, and need interpretation."
-msgstr "Geschäfte werden oft lange nach der Akquise gewonnen, und Akquise hilft auch Geschäften anderer. Die Zahlen sind nur über längere Zeiträume, z.B. ein Jahr, aussagekräftig und müssen interpretiert werden."
+msgstr "Geschäfte werden oft lange nach dem Outreach gewonnen, und Outreach hilft auch Geschäften anderer. Die Zahlen sind nur über längere Zeiträume, z.B. ein Jahr, aussagekräftig und müssen interpretiert werden."
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Deal"
