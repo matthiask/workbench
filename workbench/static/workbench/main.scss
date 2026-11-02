@@ -1990,8 +1990,18 @@ kbd {
   scroll-margin-top: 5rem;
 }
 
+// Highlight the note a link jumped to, fading out after a moment
 .wb-note:target {
-  background: var(--bs-primary-bg-subtle);
+  animation: wb-target-fade 1.5s ease-out 2s both;
+}
+
+@keyframes wb-target-fade {
+  from {
+    background-color: var(--bs-primary-bg-subtle);
+  }
+  to {
+    background-color: transparent;
+  }
 }
 
 // Results of the Autocomplete widget, below its input group
