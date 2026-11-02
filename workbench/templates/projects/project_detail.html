@@ -452,6 +452,20 @@
               <span class="wb-when-collapsed">{% include 'svg/unfold.svg' %}</span>
               <span class="wb-when-expanded">{% include 'svg/fold.svg' %}</span>
             </button>
+            {% if request.user.features.CONTROLLING %}
+              <a
+                class="btn btn-quiet btn-sm btn-icon"
+                href="{{ offer.urls.pdf }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="PDF"
+              >
+                {% include 'svg/file-pdf.svg' %}
+              </a>
+              <a class="btn btn-quiet btn-sm btn-icon" href="{{ offer.urls.update }}" title="{% translate 'Update' %}">
+                {% include 'svg/pencil.svg' %}
+              </a>
+            {% endif %}
             {% if request.user.features.CONTROLLING or request.user.features.PLANNING and not offer.work_completed_on %}
               <span class="dropdown">
                 <button
@@ -467,9 +481,6 @@
                 <div class="dropdown-menu dropdown-menu-end">
                   {% if request.user.features.CONTROLLING %}
                     <h6 class="dropdown-header">PDF</h6>
-                    <a class="dropdown-item" href="{{ offer.urls.pdf }}" target="_blank" rel="noopener noreferrer">
-                      {% translate 'Show' %}
-                    </a>
                     <a class="dropdown-item" href="{{ offer.urls.pdf }}?disposition=attachment">
                       {% translate 'Download' %}
                     </a>
@@ -490,7 +501,6 @@
                   {% if request.user.features.CONTROLLING %}
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">{% translate 'offer'|capfirst %}</h6>
-                    <a class="dropdown-item" href="{{ offer.urls.update }}">{% translate 'Update' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.pricing }}">{% translate 'Pricing' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.copy }}" data-ajaxmodal>{% translate 'Copy' %}</a>
                     <a class="dropdown-item text-danger" href="{{ offer.urls.delete }}">{% translate 'Delete' %}</a>
