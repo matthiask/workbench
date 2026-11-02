@@ -286,6 +286,55 @@ def reopen_deal(deal_id, dry_run, as_json):
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
 
 
+@deals.group("offers")
+def deal_offers():
+    """Link offers to open deals and unlink them
+
+    Offers are given by ID or code (e.g. 2026-0179-o02), like `wb deals show`
+    prints them."""
+
+
+@deal_offers.command("add")
+@click.argument("deal_id", type=int)
+@click.argument("offers", nargs=-1, required=True)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Also link offers of other customers' projects, e.g. of the end"
+    " client when the deal is with an agency.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def add_deal_offers(deal_id, offers, force, dry_run, as_json):
+    """Link offers to an open deal
+
+    Only offers in preparation, service groups and offered offers can be
+    linked; closing the deal accepts or declines them."""
+    data = request(
+        "POST",
+        f"deals/{deal_id}/offers/",
+        params={"dry_run": format_bool(dry_run)},
+        json={"offers": list(offers), "force": force},
+    )
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
+@deal_offers.command("remove")
+@click.argument("deal_id", type=int)
+@click.argument("offers", nargs=-1, required=True)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def remove_deal_offers(deal_id, offers, dry_run, as_json):
+    """Unlink offers from an open deal"""
+    data = request(
+        "POST",
+        f"deals/{deal_id}/offers/remove/",
+        params={"dry_run": format_bool(dry_run)},
+        json={"offers": list(offers)},
+    )
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
 @deals.command("stats")
 @period_options("defaults to this week")
 @users_options

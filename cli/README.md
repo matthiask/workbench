@@ -289,6 +289,14 @@ them with `--offer` or pass `--keep-offers`:
     wb deals close 1234 declined --closing-type "Too expensive" --notice "Chose a cheaper agency" --keep-planned-work
     wb deals reopen 1234
 
+Link offers to open deals and unlink them, by ID or code. Only offers which
+are in preparation, service groups or offered can be linked; offers of other
+customers' projects need `--force` (e.g. when the deal is with an agency):
+
+    wb deals offers add 1234 2026-0179-o02 2026-0179-o03 --dry-run
+    wb deals offers add 1234 5678 --force
+    wb deals offers remove 1234 2026-0179-o02
+
 Deals accepted and declined in a period (this week by default), and who
 changed which deals:
 

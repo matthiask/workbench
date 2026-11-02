@@ -623,6 +623,33 @@ planned_work:
         open_deal.refresh_from_db()
         self.assertEqual(open_deal.status, Deal.OPEN)
 
+    def test_deal_offers(self):
+        """Offers are linked to deals and unlinked by ID or code"""
+        offer = factories.OfferFactory.create(status=Offer.OFFERED)
+        other = factories.OfferFactory.create(status=Offer.OFFERED)
+        deal = factories.DealFactory.create(
+            owned_by=self.user, customer=offer.project.customer
+        )
+        result = self.wb("deals", "offers", "add", deal.pk, offer.code, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(offer.code, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertFalse(deal.related_offers.exists())
+
+        result = self.wb("deals", "offers", "add", deal.pk, offer.code, other.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("not of the deal's customer", result.output)
+        self.assertFalse(deal.related_offers.exists())
+        result = self.wb(
+            "deals", "offers", "add", deal.pk, offer.code, other.pk, "--force"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(set(deal.related_offers.all()), {offer, other})
+
+        result = self.wb("deals", "offers", "remove", deal.pk, other.code)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(deal.related_offers.get(), offer)
+
     def test_deal_stats(self):
         deal = factories.DealFactory.create(
             title="Relaunch",

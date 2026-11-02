@@ -144,6 +144,20 @@ Only after the user explicitly approves:
 Report the offer code and its URL. Remind the user that the offer is in
 preparation and still has to be checked and sent in Workbench.
 
+Then suggest linking the offer to the deal it belongs to, so that closing the
+deal accepts or declines it. Look for the open deals of the project's
+customer (`wb deals search --customer <organization_id>`, step 2 may already
+have found them) and ask the user which one it is, even if there is only one;
+never pick a deal on your own. If there is none, mention that and leave it.
+After the user confirmed the deal:
+
+    wb deals offers add <deal_id> <offer_code> --dry-run
+    wb deals offers add <deal_id> <offer_code>
+
+Only open deals accept offers. An offer of another customer's project (e.g.
+the deal is with an agency, the project with its client) is rejected; only
+add `--force` if the user confirms the link is right.
+
 ## Revising an offer
 
 Offers in preparation are changed service by service. Look at the current

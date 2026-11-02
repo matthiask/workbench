@@ -53,7 +53,8 @@ the open deals with their notes, points out stale ones (decisions expected in
 the past, missing dates or values, no notes for a long time) and asks the
 user what they know. It then updates probabilities, decision dates and
 values, adds notes (which notify the deal's owner) and closes deals as won
-or lost, which also accepts or declines their offers like in Workbench.
+or lost, which also accepts or declines their offers like in Workbench. It
+links offers to open deals and unlinks them.
 
 It changes only what the user told it, and never closes, declines or reopens
 deals on its own or invents values, probabilities, dates or reasons.
@@ -68,8 +69,9 @@ reuses, a flat rate, the notes of the project and its deals — and drafts the
 offer as YAML. It follows your private offer guidelines if you configured a
 file with `wb offers guidelines --set PATH` (see the CLI README). It shows
 the draft as a table with its assumptions and open questions, and creates it
-with `wb offers create`. Revisions change single services with
-`wb offers services add/update/delete/reorder`.
+with `wb offers create`. Afterwards it suggests linking the offer to the
+customer's open deal, after asking which one. Revisions change single
+services with `wb offers services add/update/delete/reorder`.
 
 Offers created this way are always in preparation: people check and send
 them in Workbench, the skill never sends anything to customers and doesn't

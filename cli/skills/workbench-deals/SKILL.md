@@ -44,7 +44,26 @@ Change only what the user told you, one command per deal, first with
   `wb notes create --deal <deal_id> --title "<title>" --description "<text>"`.
   The deal's owner is notified by email, mention that to the user.
 
-## 3. Close deals
+## 3. Link offers
+
+Closing a deal accepts or declines its related offers, so link the offers
+which belong to an open deal, e.g. after creating them with `wb offers
+create`. Offers are given by ID or code (`wb deals show` prints codes):
+
+    wb offers search --customer <organization_id>   # Newest first
+    wb deals offers add <deal_id> <offer> ... --dry-run
+    wb deals offers remove <deal_id> <offer> ... --dry-run
+
+- Only open deals can be changed, and only offers in preparation, service
+  groups and offered offers can be linked. Linking an offer twice or removing
+  one which isn't linked is an error.
+- Offers of another customer's projects (agencies and their clients,
+  departments of the same city) are rejected; add `--force` only after the
+  user confirmed the link.
+- Ask the user which deal an offer belongs to when the customer has several
+  open deals.
+
+## 4. Close deals
 
 Closing works like in Workbench: accepting or declining a deal also accepts
 or declines its related offers which haven't been accepted yet.
