@@ -289,6 +289,28 @@ class ProjectsAPITest(TestCase):
         project.refresh_from_db()
         self.assertIsNone(project.closed_on)
 
+        # Planned work of offers which are discarded when closing needs a
+        # decision
+        offer = factories.OfferFactory.create(project=project)
+        factories.PlannedWorkFactory.create(
+            project=project, offer=offer, weeks=[dt.date.today()]
+        )
+        response = patch({"closed_on": dt.date.today().isoformat()})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["body", "data", "delete_planned_work"]],
+        )
+        response = patch({
+            "closed_on": dt.date.today().isoformat(),
+            "delete_planned_work": False,
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.DISCARDED)
+        self.assertEqual(offer.planned_work.count(), 1)
+        patch({"closed_on": None})
+
         # Warnings of the web interface are errors
         factories.InvoiceFactory.create(project=project, customer=project.customer)
         response = patch({

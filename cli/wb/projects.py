@@ -219,6 +219,12 @@ def _echo_saved_project(data, *, dry_run, as_json):
     help="Close the project on this date.",
 )
 @click.option("--reopen", is_flag=True, help="Open a closed project again.")
+@click.option(
+    "--delete-planned-work/--keep-planned-work",
+    default=None,
+    help="Required when closing a project whose offers in preparation (which"
+    " are discarded) have planned work.",
+)
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_project(
@@ -232,10 +238,13 @@ def update_project(
     close,
     closed_on,
     reopen,
+    delete_planned_work,
     dry_run,
     as_json,
 ):
-    """Change, close or reopen a project, only the given fields"""
+    """Change, close or reopen a project, only the given fields
+
+    Closing a project discards its offers in preparation."""
     if sum(map(bool, [close, closed_on, reopen])) > 1:
         terminate("Use only one of --close, --closed-on and --reopen.")
     data = {
@@ -256,6 +265,8 @@ def update_project(
         data["closed_on"] = closed_on.date().isoformat()
     elif reopen:
         data["closed_on"] = None
+    if delete_planned_work is not None:
+        data["delete_planned_work"] = delete_planned_work
     if not data:
         terminate("Nothing to change.")
     data = request(

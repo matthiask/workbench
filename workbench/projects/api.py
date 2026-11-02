@@ -185,6 +185,12 @@ class ProjectPatch(Schema):
     closed_on: dt.date | None = Field(
         default=None, description="Closes the project, null reopens it."
     )
+    delete_planned_work: bool | None = Field(
+        default=None,
+        description="Required when closing a project whose offers in"
+        " preparation (which are discarded) have planned work: delete it or"
+        " keep it.",
+    )
 
 
 @router.patch("/projects/{int:project_id}/", response=ProjectOut)
@@ -213,6 +219,8 @@ def project_update(
                 }
             ])
         values["owned_by"] = owned_by.pk
+    if data.delete_planned_work is not None:
+        values["delete_planned_work"] = int(data.delete_planned_work)
 
     form = ProjectForm(values, instance=project, request=request)
     if not form.is_valid():

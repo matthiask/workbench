@@ -107,6 +107,9 @@ Projects are changed field by field, closed and reopened the same way:
     wb projects update 1234 --close --dry-run
     wb projects update 1234 --reopen
 
+Closing a project discards its offers in preparation; if they have planned
+work, decide with `--delete-planned-work` or `--keep-planned-work`.
+
 `wb organizations show 123` and `wb people show 345` show the details of the
 search results, e.g. the people of an organization or the email addresses of a
 person.

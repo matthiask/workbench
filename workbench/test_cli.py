@@ -205,6 +205,21 @@ class CLITest(TestCase):
         result = self.wb("projects", "update", project.pk, "--close", "--reopen")
         self.assertEqual(result.exit_code, 1)
 
+        # Closing discards offers in preparation, their planned work needs a
+        # decision
+        offer = factories.OfferFactory.create(project=project)
+        factories.PlannedWorkFactory.create(
+            project=project, offer=offer, weeks=[dt.date.today()]
+        )
+        result = self.wb("projects", "update", project.pk, "--close")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("delete_planned_work", result.output)
+        result = self.wb(
+            "projects", "update", project.pk, "--close", "--delete-planned-work"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertFalse(offer.planned_work.exists())
+
     def test_people(self):
         """People are created from YAML files"""
         person = self.file(
