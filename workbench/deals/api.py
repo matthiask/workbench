@@ -1,5 +1,6 @@
 import datetime as dt
 import html
+import re
 from decimal import Decimal
 from typing import Literal
 
@@ -18,9 +19,10 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
-from workbench.deals.forms import DealForm, SetStatusForm
+from workbench.deals.forms import DealForm, RelatedOfferForm, SetStatusForm
 from workbench.deals.models import AttributeGroup, Contribution, Deal, ValueType
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
+from workbench.offers.models import Offer
 from workbench.tools.api import (
     Amount,
     DateRangeFilter,
@@ -644,3 +646,114 @@ def deal_status(request, deal_id: int, data: DealStatusIn, *, dry_run: bool = Fa
     if not form.is_valid():
         raise_form_errors(form, fields={"related_offers": ["offers"]})
     return _save_deal(form, request, dry_run=dry_run)
+
+
+class RelatedOffersRemove(Schema):
+    offers: list[int | str] = Field(
+        min_length=1,
+        description="IDs or codes of offers, e.g. 2026-0179-o02.",
+    )
+
+
+class RelatedOffersAdd(RelatedOffersRemove):
+    force: bool = Field(
+        default=False,
+        description="Also link offers of other customers' projects, e.g. of"
+        " the end client when the deal is with an agency.",
+    )
+
+
+OFFER_CODE = re.compile(r"^(?P<year>\d{4})-(?P<project>\d+)-o(?P<offer>\d+)$")
+
+
+def _offer(value):
+    """The offer with this ID or code, or ``None``"""
+    offers = Offer.objects.select_related("project")
+    if value.isdigit():
+        return offers.filter(pk=value).first()
+    if not (match := OFFER_CODE.match(value.casefold())):
+        return None
+    year = int(match["year"])
+    # The code contains the year of the project in UTC
+    candidates = offers.filter(
+        _code=match["offer"],
+        project___code=match["project"],
+        project__created_at__year__in=[year - 1, year, year + 1],
+    )
+    return next((offer for offer in candidates if offer.code == value), None)
+
+
+def _change_related_offers(request, deal_id, data, *, remove, force, dry_run):
+    deal = get_object_or_404(Deal, pk=deal_id)
+    errors = []
+    forms = []
+    seen = set()
+    for index, value in enumerate(data.offers):
+        loc = ["body", "data", "offers", index]
+        offer = _offer(str(value).strip().casefold())
+        if not offer:
+            errors.append({
+                "loc": loc,
+                "msg": _("Unknown offer %r, expected an ID or a code like %s.")
+                % (value, "2026-0179-o02"),
+            })
+            continue
+        if offer.pk in seen:
+            continue
+        seen.add(offer.pk)
+        form = RelatedOfferForm(
+            {"modal-offer": offer.pk}, deal=deal, remove=remove, request=request
+        )
+        if form.is_valid(ignore_warnings=force):
+            forms.append(form)
+            continue
+        for field, messages in form.errors.items():
+            for message in messages:
+                error = {
+                    "loc": loc if field == "offer" else ["body", "data"],
+                    "msg": message,
+                }
+                if error not in errors:
+                    errors.append(error)
+        if not force:
+            errors.extend(
+                {"loc": loc, "msg": str(warning)} for warning in form.warnings.values()
+            )
+    if errors:
+        raise ValidationError(errors)
+
+    with transaction.atomic():
+        for form in forms:
+            form.save()
+        result = deal_out(with_related(Deal.objects.all()).get(pk=deal.pk), request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+@router.post("/deals/{deal_id}/offers/", response=DealOut)
+def deal_offers_add(
+    request, deal_id: int, data: RelatedOffersAdd, *, dry_run: bool = False
+):
+    """Link offers to an open deal like in the web interface
+
+    Only offers which are in preparation, service groups or offered can be
+    linked. Offers of other customers' projects are rejected unless ``force``
+    is given (a warning in the web interface). Nothing is saved if anything is
+    invalid or with ``dry_run``."""
+    return _change_related_offers(
+        request, deal_id, data, remove=False, force=data.force, dry_run=dry_run
+    )
+
+
+@router.post("/deals/{deal_id}/offers/remove/", response=DealOut)
+def deal_offers_remove(
+    request, deal_id: int, data: RelatedOffersRemove, *, dry_run: bool = False
+):
+    """Unlink offers from an open deal like in the web interface
+
+    Offers which aren't linked are rejected. Nothing is saved if anything is
+    invalid or with ``dry_run``."""
+    return _change_related_offers(
+        request, deal_id, data, remove=True, force=False, dry_run=dry_run
+    )

@@ -1531,6 +1531,11 @@ msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
 msgid "Unknown or missing closing type. Choices: %s"
 msgstr "Unbekannter oder fehlender Abschlussgrund. Auswahl: %s"
 
+#: workbench/deals/api.py
+#, python-format
+msgid "Unknown offer %r, expected an ID or a code like %s."
+msgstr "Unbekannte Offerte %r, erwartet wird eine ID oder ein Code wie %s."
+
 #: workbench/deals/apps.py workbench/deals/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
 msgid "deals"

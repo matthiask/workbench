@@ -6,6 +6,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.accounts.models import APIToken
 from workbench.deals.models import Deal, Value
 from workbench.offers.models import Offer
 from workbench.tools.validation import in_days
@@ -317,3 +318,132 @@ class DealsAPITest(TestCase):
         offer.refresh_from_db()
         self.assertEqual((deal.status, offer.status), (Deal.DECLINED, Offer.DECLINED))
         self.assertEqual(deal.closing_notice, "Cheaper offer")
+
+    def test_related_offers(self):
+        """Offers are linked to open deals and unlinked like in the web
+        interface, by ID or code"""
+        user = factories.UserFactory.create()
+        offer = factories.OfferFactory.create(status=Offer.OFFERED)
+        deal = factories.DealFactory.create(
+            owned_by=user, customer=offer.project.customer
+        )
+        self.client.force_login(user)
+        url = f"/api/deals/{deal.pk}/offers/"
+
+        def post(path, data, query=""):
+            return self.client.post(
+                f"{path}{query}", data, content_type="application/json"
+            )
+
+        def errors(response):
+            self.assertEqual(response.status_code, 422)
+            return [(e["loc"][2:], e["msg"]) for e in response.json()["detail"]]
+
+        response = post(url, {"offers": [offer.code]}, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["related_offers"], [offer.code])
+        self.assertFalse(deal.related_offers.exists())
+
+        response = post(url, {"offers": [offer.code.upper()]})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(deal.related_offers.get(), offer)
+
+        response = post(url, {"offers": [offer.pk, "nope", 0]})
+        self.assertEqual(
+            errors(response),
+            [
+                (
+                    ["offers", 0],
+                    f"The offer {offer.code} is already linked to this deal.",
+                ),
+                (
+                    ["offers", 1],
+                    (
+                        "Unknown offer 'nope', expected an ID or a code like"
+                        " 2026-0179-o02."
+                    ),
+                ),
+                (
+                    ["offers", 2],
+                    "Unknown offer 0, expected an ID or a code like 2026-0179-o02.",
+                ),
+            ],
+        )
+
+        # Closed offers are settled
+        declined = factories.OfferFactory.create(
+            project=offer.project, status=Offer.DECLINED
+        )
+        response = post(url, {"offers": [declined.pk]})
+        self.assertIn("is Declined, only offers", errors(response)[0][1])
+
+        # Offers of other customers need force, nothing is saved before
+        other = factories.OfferFactory.create()
+        response = post(url, {"offers": [other.pk]})
+        self.assertEqual(
+            errors(response),
+            [
+                (
+                    ["offers", 0],
+                    (
+                        f"The offer {other.code} belongs to a project of"
+                        f" {other.project.customer}, not of the deal's customer"
+                        f" {deal.customer}."
+                    ),
+                )
+            ],
+        )
+        response = post(url, {"offers": [other.pk], "force": True})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(set(deal.related_offers.all()), {offer, other})
+
+        remove = f"{url}remove/"
+        response = post(remove, {"offers": [other.code]}, "?dry_run=true")
+        self.assertEqual(response.json()["related_offers"], [offer.code])
+        self.assertEqual(deal.related_offers.count(), 2)
+        response = post(remove, {"offers": [other.code, other.pk]})
+        self.assertEqual(response.json()["related_offers"], [offer.code])
+        response = post(remove, {"offers": [other.code]})
+        self.assertEqual(
+            errors(response),
+            [(["offers", 0], f"The offer {other.code} isn't linked to this deal.")],
+        )
+
+        # Only open deals
+        deal.status = Deal.ACCEPTED
+        deal.save()
+        for path in [url, remove]:
+            response = post(path, {"offers": [offer.pk, declined.pk]})
+            self.assertEqual(
+                errors(response),
+                [
+                    (
+                        [],
+                        (
+                            "Offers can only be linked to and unlinked from open"
+                            " deals, reopen the deal first."
+                        ),
+                    )
+                ],
+            )
+
+        self.assertEqual(post(url, {"offers": []}).status_code, 422)
+        self.assertEqual(
+            post("/api/deals/0/offers/", {"offers": [offer.pk]}).status_code, 404
+        )
+
+    def test_related_offers_read_only(self):
+        """Read only tokens can't link offers, not even in dry runs"""
+        offer = factories.OfferFactory.create()
+        deal = factories.DealFactory.create(customer=offer.project.customer)
+        _token, secret = APIToken.create_for(
+            user=deal.owned_by, title="CLI", access="read"
+        )
+        response = self.client.post(
+            f"/api/deals/{deal.pk}/offers/?dry_run=true",
+            {"offers": [offer.pk]},
+            content_type="application/json",
+            headers={"authorization": f"Bearer {secret}"},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(deal.related_offers.exists())
