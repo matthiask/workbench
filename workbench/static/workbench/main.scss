@@ -1991,6 +1991,11 @@ kbd {
 }
 
 // Highlight the note a link jumped to, fading out after a moment
+// Long notes stay readable
+.wb-note-text {
+  max-width: 75ch;
+}
+
 .wb-note:target {
   animation: wb-target-fade 1.5s ease-out 2s both;
 }
