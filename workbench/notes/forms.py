@@ -113,7 +113,7 @@ class NoteForm(ModelForm):
                     {
                         "note": instance,
                         "url": self.request.build_absolute_uri(
-                            instance.content_object.get_absolute_url()
+                            instance.get_absolute_url()
                         ),
                     },
                     to=[owned_by.email],

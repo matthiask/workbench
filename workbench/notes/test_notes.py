@@ -91,7 +91,7 @@ class NotesTest(TestCase):
                 "next": deal.urls["detail"],
             },
         )
-        self.assertRedirects(response, deal.urls["detail"])
+        self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())
         self.assertEqual(messages(response), [])
 
         response = self.client.post(
@@ -143,7 +143,7 @@ class NotesTest(TestCase):
                 "next": project.urls["detail"],
             },
         )
-        self.assertRedirects(response, project.urls["detail"])
+        self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())
         self.assertContains(
             self.client.get(project.urls["detail"]),
             "The prototype made the implementation predictable.",
@@ -166,7 +166,7 @@ class NotesTest(TestCase):
                 "next": deal.urls["detail"],
             },
         )
-        self.assertRedirects(response, deal.urls["detail"])
+        self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())
 
         self.assertEqual(len(mail.outbox), 0)
 
@@ -181,11 +181,13 @@ class NotesTest(TestCase):
                 "next": deal.urls["detail"],
             },
         )
-        self.assertRedirects(response, deal.urls["detail"])
+        self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEqual(len(mail.outbox[0].reply_to), 2)
+        note = Note.objects.latest("pk")
+        self.assertIn(f"{deal.urls['detail']}#note-{note.pk}", mail.outbox[0].body)
 
     def test_content_object_url(self):
         """The content_object_url admin helper works"""
@@ -194,8 +196,8 @@ class NotesTest(TestCase):
         content_type = ContentType.objects.get_for_model(deal)
 
         self.assertEqual(
-            content_object_url(Note(content_type=content_type, object_id=42)),
-            '<a href="/deals/42/">deal</a>',
+            content_object_url(Note(content_type=content_type, object_id=42, pk=3)),
+            '<a href="/deals/42/#note-3">deal</a>',
         )
 
         # No URL

@@ -1985,6 +1985,15 @@ kbd {
   scroll-margin-top: 5rem;
 }
 
+// Anchors (e.g. links to notes) shouldn't scroll below the sticky navbar
+:target {
+  scroll-margin-top: 5rem;
+}
+
+.wb-note:target {
+  background: var(--bs-primary-bg-subtle);
+}
+
 // Results of the Autocomplete widget, below its input group
 .wb-autocomplete {
   inset: 100% 0 auto 0;
