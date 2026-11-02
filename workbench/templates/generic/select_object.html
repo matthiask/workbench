@@ -20,15 +20,15 @@
               {% for link in links %}
                 <a
                   href="{{ link.url }}"
-                  class="list-group-item list-group-item-action"
+                  class="list-group-item list-group-item-action wb-select-link"
                   {{ link.attrs|safe }}
                   data-number-shortcut="{{ link.shortcut }}"
                 >
-                  {% if link.shortcut is not None %}<span
-                      class="badge text-bg-secondary float-end mt-1"
-                    >{{ link.shortcut }}</span>{% endif %}
-                  {{ link.title }}
-                  {% if link.is_pinned %}<small>&#128204;</small>{% endif %}
+                  <span>{{ link.title }}</span>
+                  <small>{% if link.is_pinned %}&#128204;{% endif %}</small>
+                  <span>{% if link.shortcut is not None %}<span
+                        class="badge text-bg-secondary"
+                      >{{ link.shortcut }}</span>{% endif %}</span>
                 </a>
               {% endfor %}
             </div>

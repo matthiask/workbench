@@ -858,6 +858,12 @@ tbody th > a {
   &[data-pinned="true"] {
     filter: none;
   }
+
+  // Match the position of the history link next to it
+  h1 & {
+    padding-block: 0;
+    vertical-align: 0.4em;
+  }
 }
 
 a {
@@ -1323,8 +1329,24 @@ a:hover {
   }
 }
 
-.wb-service-title .pin {
-  padding: 0;
+.wb-service-title {
+  font-weight: 500;
+
+  .pin {
+    padding: 0;
+  }
+}
+
+// Links of the select object modal: title, pin and shortcut in columns
+.wb-select-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.25rem 1.5rem;
+  align-items: center;
+  gap: 0.5rem;
+
+  > :last-child {
+    text-align: right;
+  }
 }
 
 .wb-service-description {
