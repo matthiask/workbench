@@ -229,6 +229,32 @@ class HistoryTest(TestCase):
         url = f"/history/projects_service/id/{service.pk}/"
         self.assert_only_visible_with(url, "'Cost'", FEATURES.CONTROLLING)
 
+    def test_features_prettification(self):
+        """Features are shown with their labels, sorted by label"""
+        user = factories.UserFactory.create(
+            _features=[
+                FEATURES.PERSONNEL_ADMINISTRATION,
+                FEATURES.CONTROLLING,
+                FEATURES.BOOKKEEPING,
+            ]
+        )
+        self.client.force_login(user)
+        response = self.client.get(f"/history/accounts_user/id/{user.pk}/")
+        self.assertContains(
+            response,
+            "Initial value of 'Features' was"
+            " 'Bookkeeping, Controlling, Personnel administration'.",
+        )
+
+        values = {"_features": '{OBSOLETE,"WEIRD, STUFF",DEALS}'}
+        field = factories.User._meta.get_field("_features")
+        self.assertEqual(
+            Prettifier().format(values, field), "Deals, OBSOLETE, WEIRD, STUFF"
+        )
+
+        values = {"_features": "{}"}
+        self.assertEqual(Prettifier().format(values, field), "<no value>")
+
     def test_accounts_user_visibility(self):
         """PLanned work of users is only visible with PLANNING"""
         user = factories.UserFactory.create()

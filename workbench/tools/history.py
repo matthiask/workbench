@@ -1,3 +1,4 @@
+import re
 from collections import namedtuple
 from decimal import Decimal
 
@@ -9,7 +10,7 @@ from django.utils.html import conditional_escape, format_html, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 
-from workbench.accounts.features import FEATURES
+from workbench.accounts.features import FEATURES, LABELS
 from workbench.accounts.models import SpecialistField, Team, User
 from workbench.awt.models import (
     Absence,
@@ -61,6 +62,19 @@ Change = namedtuple("Change", "changes created_at pretty_user_name values versio
 
 def default_if_none(value, default):
     return default if value is None else value
+
+
+ARRAY_ELEMENT_RE = re.compile(r'"((?:[^"\\]|\\.)*)"|([^,{}]+)')
+
+
+def parse_array(value):
+    """Parse the text representation of a one-dimensional PostgreSQL array"""
+    return [
+        re.sub(r"\\(.)", r"\1", quoted) if unquoted is None else unquoted.strip()
+        for quoted, unquoted in (
+            (m[1], m[2]) for m in ARRAY_ELEMENT_RE.finditer(value.strip("{}"))
+        )
+    ]
 
 
 class Prettifier:
@@ -152,8 +166,21 @@ class Prettifier:
         self._prettified_instances[key] = (instance, pretty)
         return pretty
 
+    def handle_features(self, values, field):
+        value = values.get(field.attname)
+        if not value:
+            return _("<no value>")
+        features = [
+            str(LABELS[feature]["label"]) if feature in LABELS else feature
+            for feature in parse_array(value)
+        ]
+        return ", ".join(sorted(features, key=str.casefold)) or _("<no value>")
+
     def format(self, values, field):
         value = values.get(field.attname)
+
+        if field.model is User and field.name == "_features":
+            return self.handle_features(values, field)
 
         if field.choices:
             return self.handle_choice(values, field)
