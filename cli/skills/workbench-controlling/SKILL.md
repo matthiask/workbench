@@ -29,6 +29,11 @@ Use `--json` for exact numbers, the tables for a quick look:
 Periods are years (`2026`), months (`2026-09`), quarters (`2026-Q3`) or
 relative (`last-month`, `this-quarter`).
 
+For overdue invoices, look at their notes: customers' payment promises or
+disputes change how an open invoice should be described.
+
+    wb notes search --invoice <invoice_id>
+
 ## 2. Read the figures correctly
 
 - Amounts are excl. tax unless a field says `incl_tax`. Gross margin is
@@ -68,5 +73,7 @@ the recipient:
     wb invoices send-reminder <contact_id> --to <email> --dry-run
     wb invoices send-reminder <contact_id> --to <email>
 
-The contact IDs are in `wb invoices reminders`. Sending marks the invoices
-as reminded today; requires the bookkeeping feature.
+The contact IDs are in `wb invoices reminders`. Check the notes of the
+invoices first (`wb notes search --invoice <invoice_id>`) and mention
+payment promises or disputes before the user decides. Sending marks the
+invoices as reminded today; requires the bookkeeping feature.

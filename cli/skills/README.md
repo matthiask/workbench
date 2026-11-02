@@ -40,6 +40,7 @@ gross margin, third party costs, hours and deals. Requires the controlling
 feature and only reads; reports the user can't access are left out. It
 knows the pitfalls of the figures, e.g. that gross margin is not profit and
 must never be subtracted from revenue, and leads with what needs attention.
+It reads the notes of overdue invoices for payment promises and disputes.
 
 Payment reminders to customers are only sent on explicit request, after
 showing the recipient and the invoices; that requires the bookkeeping
@@ -63,11 +64,11 @@ Turns a specification, a briefing or an email into an offer for a project,
 or revises an offer which is still in preparation. It finds the project (or
 creates it after asking), reads the context of the project — service types
 with their hourly rates, the existing offers whose wording and structure it
-reuses, a flat rate — and drafts the offer as YAML. It follows your private
-offer guidelines if you configured a file with
-`wb offers guidelines --set PATH` (see the CLI README). It shows the draft as a
-table with its assumptions and open questions, and creates it with
-`wb offers create`. Revisions change single services with
+reuses, a flat rate, the notes of the project and its deals — and drafts the
+offer as YAML. It follows your private offer guidelines if you configured a
+file with `wb offers guidelines --set PATH` (see the CLI README). It shows
+the draft as a table with its assumptions and open questions, and creates it
+with `wb offers create`. Revisions change single services with
 `wb offers services add/update/delete/reorder`.
 
 Offers created this way are always in preparation: people check and send
@@ -79,10 +80,12 @@ invent rates or discounts.
 Plans projects: milestones and planned work per person and week, from the
 offers' services, a timeline and the capacity of the people. It reads the
 planning context (offers, people with their planning hours, absences,
-existing planning), checks the free capacity of teams and people, and
-imports the plan with `wb planning import`. Single planned work can be
-changed too, e.g. made definitive once a deal is won, moved or removed. It
-also answers who has time when, which only needs read access.
+existing planning) and the project's notes, checks the free capacity of
+teams and people, and imports the plan with `wb planning import`. Single
+planned work can be changed too, e.g. made definitive once a deal is won,
+moved or removed. It also answers who has time when, which only needs read
+access. It offers to record why work was rescheduled or added as a note on
+the project.
 
 New work is provisional unless the user says otherwise. The import doesn't
 check capacity; the skill does that itself. The import context is

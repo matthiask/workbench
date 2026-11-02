@@ -32,7 +32,12 @@ With users or a team, the table shows the free capacity per person and week
 The context contains the project, its offers with their services, the people
 (short names and planning hours per day), their absences, the existing
 milestones and planned work, and `import_schema`, the exact JSON schema of
-the import. Check everyone's capacity in the weeks in question:
+the import. Read the project's notes too, debriefings and agreements (e.g.
+a prototype first, no launch before a date) change the plan:
+
+    wb notes search --project <project_id>
+
+Check everyone's capacity in the weeks in question:
 
     wb planning export --team "<team>" --since <first monday> --until <last day>
 
@@ -91,3 +96,10 @@ replaces all weeks. New work is provisional unless `--definitive` is given.
 When a deal is won or lost (see the workbench-deals skill), look for
 provisional planned work on the offers related to the deal and offer to make
 it definitive or to delete it.
+
+When work is rescheduled or added because something changed (the customer
+asked for more, a decision came late), offer to record the reason as a note
+on the project, so the deviation from the offer stays traceable; it notifies
+the project's owner:
+
+    wb notes create --project <project_id> --title "<title>" --description "<text>"

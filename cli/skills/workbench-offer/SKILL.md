@@ -51,6 +51,13 @@ Read it before drafting anything:
 - `project.flat_rate`: if set, every service uses this rate no matter what.
 - `import_schema`: the exact JSON schema of an offer.
 
+Read the notes of the project and of the customer's deals, they contain what
+was discussed and agreed, e.g. in sales calls:
+
+    wb notes search --project <project_id>
+    wb deals search --customer <organization_id>
+    wb notes search --deal <deal_id>
+
 Then load the private offer guidelines, if the user has any:
 
     wb offers guidelines
@@ -180,3 +187,7 @@ explicit approval:
 
 `replace` swaps title, description and all services, so start from the
 current offer and keep what wasn't asked to change.
+
+If the reason for a revision isn't obvious from the offer itself (a new
+requirement, a changed estimate), offer to record it as a note on the
+project with `wb notes create --project <project_id>`.
