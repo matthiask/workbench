@@ -1992,8 +1992,12 @@ kbd {
 
 // Highlight the note a link jumped to, fading out after a moment
 // Long notes stay readable
+// The text below the title and the metadata, separated so that its own
+// headings don't compete with the note's title
 .wb-note-text {
   max-width: 75ch;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--bs-border-color-translucent);
 
   > :last-child {
     margin-bottom: 0;
