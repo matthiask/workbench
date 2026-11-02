@@ -646,6 +646,10 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(set(deal.related_offers.all()), {offer, other})
 
+        # Dry runs show the result
+        result = self.wb("deals", "offers", "remove", deal.pk, other.code, "--dry-run")
+        self.assertNotIn(other.code, result.output)
+        self.assertEqual(deal.related_offers.count(), 2)
         result = self.wb("deals", "offers", "remove", deal.pk, other.code)
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(deal.related_offers.get(), offer)
