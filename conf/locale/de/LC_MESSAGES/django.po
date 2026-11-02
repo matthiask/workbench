@@ -1762,7 +1762,7 @@ msgstr "Abschlussnotiz"
 
 #: workbench/deals/models.py
 msgid "related offers"
-msgstr "verbundenen Offerten"
+msgstr "verbundene Offerten"
 
 #: workbench/deals/models.py workbench/templates/deals/deal_form.html
 msgid "driving force"
