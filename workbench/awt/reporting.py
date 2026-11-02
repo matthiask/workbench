@@ -174,10 +174,10 @@ def balance_cutoff(year, *, today=None):
     return None
 
 
-def vacation_days_taken_and_planned(absences, *, today=None):
-    """Vacation days up to and including today, and after today
+def days_taken_and_planned(absences, *, today=None):
+    """Days of absences up to and including today, and after today
 
-    A vacation spanning today is split by weekdays."""
+    An absence spanning today is split by weekdays."""
     today = today or dt.date.today()
     taken = planned = Z1
     for absence in absences:
@@ -387,9 +387,17 @@ def annual_working_time(year, *, users):  # noqa: C901
         month_data = months[user.id]
         wtm_id = month_data["year"].working_time_model_id
         sums = monthly_sums(month_data)
-        vacation_taken, vacation_planned = vacation_days_taken_and_planned(
+        vacation_taken, vacation_planned = days_taken_and_planned(
             absences[user.id]["absence_vacation"]
         )
+        # Days of future absences other than vacation, e.g. planned surgery or
+        # unpaid leave, which matter for planning like vacations
+        _taken, absences_planned = days_taken_and_planned([
+            *absences[user.id]["absence_sickness"],
+            *absences[user.id]["absence_paid"],
+            *absences[user.id]["absence_school"],
+            *other_absences[user.id],
+        ])
         at = absences_time(month_data)
         wt = working_time(month_data)
         balance = (
@@ -451,6 +459,7 @@ def annual_working_time(year, *, users):  # noqa: C901
                         - vacation_taken
                         - vacation_planned
                     ).quantize(Z2),
+                    "absences_planned": absences_planned.quantize(Z2),
                 },
             })
         )
@@ -476,6 +485,7 @@ def annual_working_time(year, *, users):  # noqa: C901
             "vacation_days_taken",
             "vacation_days_planned",
             "vacation_days_left",
+            "absences_planned",
         ]
     }
     overall["balance_as_of"] = (

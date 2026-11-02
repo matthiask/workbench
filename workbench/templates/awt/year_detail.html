@@ -33,20 +33,20 @@
       {% endfor %}
     </div>
   </span>
-  {% if request.user.features.PERSONNEL_ADMINISTRATION %}
-    <a
-      class="btn btn-quiet {% if request.GET.user == 'active' %}active{% endif %}"
-      href="{% querystring user='active' %}"
-    >{% translate 'active users' %}</a>
+  <a
+    class="btn btn-quiet {% if request.GET.user == 'active' %}active{% endif %}"
+    href="{% querystring user='active' %}"
+  >{% translate 'active users' %}</a>
+  {% if details or not overview %}
+    <a class="btn btn-quiet" href="{% querystring export='pdf' %}">
+      {% include 'svg/file-pdf.svg' %}
+      PDF
+    </a>
   {% endif %}
-  <a class="btn btn-quiet" href="{% querystring export='pdf' %}">
-    {% include 'svg/file-pdf.svg' %}
-    PDF
-  </a>
 {% endblock actions %}
 
 {% block report %}
-  {% if overview %}
+  {% if overview and details %}
     <div class="wb-stats wb-stats-5 mb-3">
       <div class="wb-stat">
         <div class="wb-stat-label">{% translate 'sickness days'|capfirst %}</div>
@@ -76,6 +76,8 @@
         <div class="wb-stat-value">{{ overall.vacation_days_taken|days }}</div>
       </div>
     </div>
+  {% endif %}
+  {% if overview %}
     <section class="card mb-3 wb-table-card">
       <div class="table-responsive">
         <table class="table table-sm table-hover mb-0 wb-compact-table" data-sortable>
@@ -92,7 +94,16 @@
               <th data-no-sort>{% translate 'Trend' %}</th>
               <th class="text-end" data-sort-default="desc">{% translate 'Vacation days left' %}</th>
               <th class="text-end" data-sort-default="desc">{% translate 'planned'|capfirst %}</th>
-              <th class="text-end" data-sort-default="desc">{% translate 'sickness days'|capfirst %}</th>
+              <th
+                class="text-end"
+                data-sort-default="desc"
+                title="{% translate 'Future absences except vacation, e.g. sickness or unpaid leave' %}"
+              >
+                {% translate 'Other planned absences' %}
+              </th>
+              {% if details %}
+                <th class="text-end" data-sort-default="desc">{% translate 'sickness days'|capfirst %}</th>
+              {% endif %}
               <th data-no-sort>{% translate 'notes'|capfirst %}</th>
             </tr>
           </thead>
@@ -104,7 +115,10 @@
               <td></td>
               <th class="text-end">{{ overall.vacation_days_left|days }}</th>
               <th class="text-end">{{ overall.vacation_days_planned|days }}</th>
-              <th class="text-end">{{ overall.absence_sickness|days }}</th>
+              <th class="text-end">{{ overall.absences_planned|days }}</th>
+              {% if details %}
+                <th class="text-end">{{ overall.absence_sickness|days }}</th>
+              {% endif %}
               <td></td>
             </tr>
           </tfoot>
@@ -112,7 +126,13 @@
             <tbody {% if forloop.last %}class="text-body-secondary"{% endif %}>
               {% for row in rows %}
                 <tr>
-                  <td><a href="{% querystring user=row.user.pk %}">{{ row.user }}</a></td>
+                  <td>
+                    {% if details or row.user == request.user %}
+                      <a href="{% querystring user=row.user.pk %}">{{ row.user }}</a>
+                    {% else %}
+                      {{ row.user }}
+                    {% endif %}
+                  </td>
                   <td class="text-end" data-sort-value="{{ row.totals.percentage|stringformat:'.2f' }}">
                     {{ row.totals.percentage|stringformat:'.0f' }}%
                   </td>
@@ -151,16 +171,21 @@
                   <td class="text-end" data-sort-value="{{ row.totals.vacation_days_planned|stringformat:'.2f' }}">
                     {{ row.totals.vacation_days_planned|days }}
                   </td>
-                  <td class="text-end" data-sort-value="{{ row.totals.absence_sickness|stringformat:'.2f' }}">
-                    {{ row.totals.absence_sickness|days }}
+                  <td class="text-end" data-sort-value="{{ row.totals.absences_planned|stringformat:'.2f' }}">
+                    {{ row.totals.absences_planned|days }}
                   </td>
+                  {% if details %}
+                    <td class="text-end" data-sort-value="{{ row.totals.absence_sickness|stringformat:'.2f' }}">
+                      {{ row.totals.absence_sickness|days }}
+                    </td>
+                  {% endif %}
                   <td>
                     {% if not row.user.is_active %}
                       <span class="badge text-bg-light fw-normal">{% translate 'inactive' %}</span>
                     {% elif not row.vacation_planning.fine %}
                       <span class="badge text-bg-warning fw-normal">{% translate 'Vacation planning!' %}</span>
                     {% endif %}
-                    {% if row.unconfirmed %}
+                    {% if row.unconfirmed and details %}
                       <span class="badge text-bg-warning fw-normal">{% translate 'Unconfirmed' %}</span>
                     {% endif %}
                   </td>

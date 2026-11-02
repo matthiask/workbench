@@ -153,6 +153,43 @@ def cash_data(date, as_json):
     console.print(table)
 
 
+def _working_time_summary(data, *, as_csv):
+    if as_csv:
+        echo_csv(data["summary"])
+        return
+    for warning in data["warnings"]:
+        click.secho(warning, fg="yellow", err=True)
+    as_of = next((row["as_of"] for row in data["summary"] if row["as_of"]), None)
+    table = make_table(
+        "User",
+        "Employment>",
+        f"Balance {as_of}>" if as_of else "Balance>",
+        "Vacation left>",
+        "Vacation planned>",
+        "Other absences planned>",
+        "Notes",
+    )
+    for row in data["summary"]:
+        notes = []
+        if not row["is_active"]:
+            notes.append("inactive")
+        elif not row["vacation_planning_fine"]:
+            notes.append("Vacation planning!")
+        table.add_row(
+            row["user"],
+            format_percentage(row["percentage"]),
+            format_hours(row["balance_as_of"])
+            if row["balance_as_of"] is not None
+            else "",
+            format_days(row["vacation_days_left"]),
+            format_days(row["vacation_days_planned"]),
+            format_days(row["absences_planned"]),
+            ", ".join(notes),
+        )
+    console.print(f"{data['year']}", style="bold")
+    console.print(table)
+
+
 @reports.command("working-time")
 @click.option("--year", type=int, help="Defaults to the current year.")
 @click.option(
@@ -165,8 +202,8 @@ def cash_data(date, as_json):
     "--all",
     "all_",
     is_flag=True,
-    help="Everyone employed during the year, requires the personnel"
-    " administration feature.",
+    help="Summary of everyone employed during the year: Balance, vacation and"
+    " planned absences.",
 )
 @click.option("--weekly", is_flag=True, help="Show the hours per week.")
 @click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
@@ -187,6 +224,9 @@ def working_time(year, user, all_, weekly, as_csv, as_json):
         "reports/working-time/",
         params={key: value for key, value in params.items() if value},
     )
+    if all_ and not as_json:
+        _working_time_summary(data, as_csv=as_csv)
+        return
     if as_csv:
         echo_csv([
             {"user": row["user"]} | entry

@@ -888,6 +888,36 @@ class AWTTest(TestCase):
             response, absence.urls["detail"], fetch_redirect_response=False
         )
 
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
+    def test_everyone_sees_the_summary(self):
+        """Everyone sees balances, vacations and planned absences of everyone,
+        but neither sickness days nor the details of others"""
+        user = factories.UserFactory.create()
+        factories.YearFactory.create(working_time_model=user.working_time_model)
+        factories.EmploymentFactory.create(user=user, date_from=dt.date(2020, 1, 1))
+        colleague = factories.UserFactory.create()
+        hr = factories.UserFactory.create()
+        hr._features.append(FEATURES.PERSONNEL_ADMINISTRATION)
+        hr.save()
+
+        overview = "/report/annual-working-time/?user=active"
+        self.client.force_login(colleague)
+        response = self.client.get(overview)
+        self.assertContains(response, user.get_full_name())
+        self.assertContains(response, "Other planned absences")
+        self.assertNotContains(response, "Sickness days")
+        self.assertNotContains(response, f"user={user.pk}")
+        self.assertNotContains(response, "export=pdf")
+        response = self.client.get(f"{overview}&export=pdf")
+        self.assertEqual(response.status_code, 302)
+
+        self.client.force_login(hr)
+        response = self.client.get(overview)
+        self.assertContains(response, "Sickness days")
+        self.assertContains(response, f"user={user.pk}")
+        response = self.client.get(f"{overview}&export=pdf")
+        self.assertEqual(response.status_code, 200)
+
     def test_absence_without_description(self):
         """Descriptions are optional"""
         absence = Absence.objects.create(

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 11:58+0100\n"
+"POT-Creation-Date: 2026-11-02 14:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -194,8 +194,8 @@ msgid "personnel administration"
 msgstr "Personaladministration"
 
 #: workbench/accounts/features.py
-msgid "Sees the reasons of sickness absences and the annual working time of everyone, confirms paid leave and records working time corrections."
-msgstr "Sieht die Gründe von Krankheitsabsenzen und die Jahresarbeitszeit aller, bestätigt bezahlten Urlaub und erfasst Arbeitszeit-Korrekturen."
+msgid "Sees the descriptions of sickness absences and the details of everyone's annual working time, confirms paid leave and records working time corrections."
+msgstr "Sieht die Beschreibungen von Krankheitsabsenzen und die Details der Jahresarbeitszeit aller, bestätigt bezahlten Urlaub und erfasst Arbeitszeit-Korrekturen."
 
 #: workbench/accounts/forms.py
 msgid "Contact your administrator to change this value."
@@ -4282,6 +4282,14 @@ msgstr "Verbleibende Ferientage"
 #: workbench/templates/awt/year_detail.html
 msgid "planned"
 msgstr "geplant"
+
+#: workbench/templates/awt/year_detail.html
+msgid "Future absences except vacation, e.g. sickness or unpaid leave"
+msgstr "Künftige Absenzen ausser Ferien, z.B. Krankheit oder unbezahlter Urlaub"
+
+#: workbench/templates/awt/year_detail.html
+msgid "Other planned absences"
+msgstr "Andere geplante Absenzen"
 
 #: workbench/templates/awt/year_detail.html
 msgid "inactive"

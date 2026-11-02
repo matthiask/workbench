@@ -131,9 +131,9 @@ LABELS = {
     FEATURES.PERSONNEL_ADMINISTRATION: {
         "label": capfirst(_("personnel administration")),
         "help_text": _(
-            "Sees the reasons of sickness absences and the annual working time"
-            " of everyone, confirms paid leave and records working time"
-            " corrections."
+            "Sees the descriptions of sickness absences and the details of"
+            " everyone's annual working time, confirms paid leave and records"
+            " working time corrections."
         ),
     },
 }

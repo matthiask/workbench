@@ -200,6 +200,7 @@ class WorkingTimeTotals(Schema):
     vacation_days_taken: Days
     vacation_days_planned: Days
     vacation_days_left: Days
+    absences_planned: Days
 
 
 class WorkingTimeWeek(Schema):
@@ -220,18 +221,34 @@ class UserWorkingTime(Schema):
     weeks: list[WorkingTimeWeek] | None
 
 
+class WorkingTimeSummary(Schema):
+    user: str
+    is_active: bool
+    percentage: Percentage
+    as_of: dt.date | None
+    balance_as_of: Hours | None
+    vacation_days_left: Days
+    vacation_days_planned: Days
+    vacation_planning_fine: bool
+    absences_planned: Days = Field(
+        description="Future absences except vacation, e.g. sickness or unpaid leave."
+    )
+
+
 class WorkingTime(Schema):
     year: int
     warnings: list[str]
     users: list[UserWorkingTime]
+    summary: list[WorkingTimeSummary] | None
 
 
 @router.get("/reports/working-time/", response=WorkingTime)
 def working_time(request, filters: Query[WorkingTimeFilter]):
     """Annual working time of the authenticated user, of the user with the
-    given short name, or of ``all`` users employed during the year. Others'
-    require the personnel administration feature like in the web interface,
-    since the report contains sickness absences (health data).
+    given short name, or of ``all`` users employed during the year. Everyone
+    gets the ``summary`` of ``all`` (balance, vacation and planned absences,
+    for planning), the details of others (``users``) require the personnel
+    administration feature like in the web interface.
 
     Hours are per month: The target, logged hours, absences and their sum
     (working time) and the balance. ``balance_as_of`` is the running balance
@@ -240,13 +257,14 @@ def working_time(request, filters: Query[WorkingTimeFilter]):
     includes the vacation days credit. ``weekly`` adds the hours per week
     until the current one."""
     year = filters.year or dt.date.today().year
+    details = request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
     if filters.all:
-        check_feature(request.user, FEATURES.PERSONNEL_ADMINISTRATION)
         users = list(active_users(year))
     elif (
         filters.user and filters.user.casefold() != request.user._short_name.casefold()
     ):
-        check_feature(request.user, FEATURES.PERSONNEL_ADMINISTRATION)
+        if not details:
+            check_feature(request.user, FEATURES.PERSONNEL_ADMINISTRATION)
         users = list(User.objects.filter(_short_name__iexact=filters.user))
         if not users:
             raise ValidationError([
@@ -299,8 +317,24 @@ def working_time(request, filters: Query[WorkingTimeFilter]):
             else None,
         }
 
+    def _summary(row):
+        totals = row["totals"]
+        return {
+            "user": row["user"].get_short_name(),
+            "is_active": row["user"].is_active,
+            "percentage": totals["percentage"],
+            "as_of": row["as_of"],
+            "balance_as_of": totals["balance_as_of"],
+            "vacation_days_left": totals["vacation_days_left"],
+            "vacation_days_planned": totals["vacation_days_planned"],
+            "vacation_planning_fine": row["vacation_planning"]["fine"],
+            "absences_planned": totals["absences_planned"],
+        }
+
+    rows = statistics["statistics"]
     return {
         "year": year,
         "warnings": [str(warning) for warning in warnings],
-        "users": [_user(row) for row in statistics["statistics"]],
+        "users": [_user(row) for row in rows] if details or not filters.all else [],
+        "summary": [_summary(row) for row in rows] if filters.all else None,
     }

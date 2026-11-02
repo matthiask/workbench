@@ -39,13 +39,14 @@ def annual_working_time_view(request):
     user = request.GET.get("user")
     users = None
     overview_requested = False
-    # The report contains sickness absences, which are health data
-    if request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
-        if user == "active":
-            overview_requested = True
-            users = active_users(year)
-        elif user:
-            users = User.objects.filter(id=user)
+    # Sickness days and descriptions, monthly figures, the PDF
+    details = request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
+    if user == "active":
+        # Everyone sees the summary, it helps with planning
+        overview_requested = True
+        users = active_users(year)
+    elif user and details:
+        users = User.objects.filter(id=user)
     if not users:
         users = [request.user]
     statistics = annual_working_time(year, users=users)
@@ -74,7 +75,7 @@ def annual_working_time_view(request):
 
     if request.GET.get("export") == "pdf":
         # The messages above say why there's nothing to export
-        if not statistics["statistics"]:
+        if not statistics["statistics"] or (overview_requested and not details):
             return redirect(f".?year={year}")
         return annual_working_time_pdf(statistics)
 
@@ -107,6 +108,7 @@ def annual_working_time_view(request):
             "this_year": this_year,
             "has_public_holidays": statistics["has_public_holidays"],
             "has_company_holidays": statistics["has_company_holidays"],
+            "details": details,
         },
     )
 

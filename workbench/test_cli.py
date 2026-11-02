@@ -953,6 +953,10 @@ planned_work:
         result = self.wb("reports", "working-time", "--weekly")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(monday().isoformat(), result.output)
+        result = self.wb("reports", "working-time", "--all")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Other absences planned", result.output)
+        self.assertIn(self.user.get_short_name(), result.output)
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_missing_feature(self):

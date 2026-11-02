@@ -210,7 +210,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   template filters; absences can't be searched, the reason filter finds
   them). `Absence.__str__` contains neither reason nor
   description. Planning and its mails use `public_text()`. The annual
-  working time report of others requires the feature, the history shows
+  working time summary (balance, vacation, planned absences) is for
+  everyone because it helps planning; the details of others (also
+  sickness days) require the feature; the history shows
   descriptions only with it, and `clear_sickness_descriptions()` (fairy
   tasks) clears descriptions and history after three years, like the audit
   log pruning of absences.

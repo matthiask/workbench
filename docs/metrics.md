@@ -694,7 +694,7 @@ Productivity in the sense of the `PRODUCTIVITY` feature ("Produktivität") is th
 ### Annual working time (Jahresarbeitszeit)
 
 - Where: web `/report/annual-working-time/` (`awt_year_report`, `workbench/awt/views.py:annual_working_time_view`), with `?year=`, `?user=<id>|active` and `?export=pdf` (one PDF, or a ZIP of PDFs plus an XLSX sheet "Stundensaldo fortlaufend" and a holiday list, `workbench/awt/pdf.py:annual_working_time_pdf`). API: `GET /api/reports/working-time/?year=&user=&all=&weekly=` (`workbench/awt/api.py:working_time`), CLI `wb reports working-time`.
-- Access: your own report needs no feature. Other users and everyone (web `active`, API `all`) require `PERSONNEL_ADMINISTRATION`, because the report contains sickness absences. On the web the parameter is silently ignored without the feature and you get your own report; the API answers 403.
+- Access: your own report needs no feature. Everyone sees the summary of everyone (web `active`, API `all` with `summary`) for planning: employment, balance as of the cutoff and its trend, vacation days left and planned, other planned absences and the vacation planning warning. The details of others (monthly figures, absences, sickness days, unconfirmed paid leave, the company-wide tiles and the PDF/ZIP) require `PERSONNEL_ADMINISTRATION`; without, the web ignores `?user=<id>` and shows your own report, the API answers 403 and returns `all` without `users`.
 - Answers: did the person work their target time this year, counting absences, and how many vacation days are left?
 
 #### Inputs
@@ -730,6 +730,7 @@ As of figures (`balance_cutoff`, `vacation_days_taken_and_planned`); hours and v
 - `balance_as_of` = the running balance at the end of the month of `as_of` (hours logged in advance in later months don't count).
 - `vacation_days_taken` = `Σ days` of vacation absences ending today or earlier, `vacation_days_planned` those starting after today. A vacation spanning today is split by weekdays (by calendar days if it has none). Rounded to 0.01.
 - `vacation_days_left` = available vacation days (after the override) − taken − planned, may be negative. Rounded to 0.01.
+- `absences_planned` ("other planned absences") = days of sickness, paid leave, school and `other` absences (not working time, e.g. unpaid leave) after today, split like vacations. Corrections are left out, they aren't absences.
 
 The web report of a person (`workbench/awt/charts.py`) shows these as tiles, the running balance per week (`working_time_by_week`, weeks after `as_of` lighter) with dashed lines at ±40 h (`BALANCE_LIMIT`, the limit of the contracts, only a hint), and per month the logged hours and countable absence hours by reason (vacation less the vacation days correction) against the target time. The monthly table above is in the collapsed "Details" section, the PDF is unchanged.
 

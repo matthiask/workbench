@@ -110,9 +110,8 @@ class WorkingTimeAPITest(TestCase):
 
     @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.NEVER})
     def test_permissions(self):
-        """The annual working time contains sickness absences, which are
-        health data: Others' and everyone's require the personnel
-        administration feature like in the web interface"""
+        """Others' annual working time requires personnel administration
+        like in the web interface"""
         user = factories.UserFactory.create(_short_name="ab")
         factories.UserFactory.create(_short_name="cd")
         self.client.force_login(user)
@@ -121,8 +120,41 @@ class WorkingTimeAPITest(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get("/api/reports/working-time/", {"user": "CD"})
         self.assertEqual(response.status_code, 403)
-        response = self.client.get("/api/reports/working-time/", {"all": True})
-        self.assertEqual(response.status_code, 403)
+
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.NEVER})
+    def test_summary(self):
+        """Everyone gets the summary of everyone, for planning"""
+        user = factories.UserFactory.create(_short_name="ab")
+        colleague = factories.UserFactory.create(_short_name="cd")
+        for u in [user, colleague]:
+            factories.YearFactory.create(
+                year=2026, working_time_model=u.working_time_model
+            )
+            factories.EmploymentFactory.create(user=u, date_from=dt.date(2020, 1, 1))
+        Absence.objects.create(
+            user=colleague,
+            starts_on=dt.date(2026, 11, 16),
+            ends_on=dt.date(2026, 11, 20),
+            days=5,
+            reason=Absence.SICKNESS,
+        )
+        Absence.objects.create(
+            user=colleague,
+            starts_on=dt.date(2026, 10, 1),
+            days=1,
+            reason=Absence.SICKNESS,
+        )
+        self.client.force_login(user)
+
+        with travel("2026-11-02 12:00"):
+            response = self.client.get("/api/reports/working-time/", {"all": True})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["users"], [])
+        summary = {row["user"]: row for row in data["summary"]}
+        self.assertEqual(summary["cd"]["absences_planned"], "5.00")
+        self.assertEqual(summary["cd"]["as_of"], "2026-10-31")
+        self.assertNotIn("months", summary["cd"])
 
     @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.ALWAYS})
     def test_permissions_personnel_administration(self):
