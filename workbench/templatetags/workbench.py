@@ -21,6 +21,7 @@ from workbench.reporting.utils import sum_by
 from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
 from workbench.tools.forms import querystring as _qs
 from workbench.tools.history import EVERYTHING
+from workbench.tools.markdown import render_markdown
 
 
 register = template.Library()
@@ -29,6 +30,11 @@ register = template.Library()
 register.filter(currency)
 register.filter(days)
 register.filter(hours)
+
+
+@register.filter
+def markdown(text):
+    return render_markdown(text)
 
 
 @register.filter(name="local_date_format")

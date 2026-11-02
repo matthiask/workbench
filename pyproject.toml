@@ -24,6 +24,7 @@ dependencies = [
   "factory-boy>=3.3.3",
   "granian>=2.7",
   "lxml>=6.0.2",
+  "markdown-it-py[linkify]>=4.2",
   "more-itertools>=10.8",
   "now>=0.0.6",
   "pdfdocument>=4",

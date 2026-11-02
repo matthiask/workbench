@@ -1994,6 +1994,35 @@ kbd {
 // Long notes stay readable
 .wb-note-text {
   max-width: 75ch;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  // Headings structure the note, they shouldn't dominate the page
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.125rem;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
 }
 
 .wb-note:target {

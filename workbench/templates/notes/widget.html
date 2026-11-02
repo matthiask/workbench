@@ -22,7 +22,7 @@
           <a href="{{ note.urls.update }}" class="btn btn-quiet btn-sm" data-ajaxmodal>{% translate 'Update' %}</a>
         </div>
         {% if note.description %}
-          <div class="mt-1 wb-note-text">{{ note.description|linebreaksbr|urlize }}</div>
+          <div class="mt-3 wb-note-text">{{ note.description|markdown }}</div>
         {% endif %}
       </div>
     {% empty %}

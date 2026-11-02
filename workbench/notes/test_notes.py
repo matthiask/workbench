@@ -160,6 +160,18 @@ class NotesTest(TestCase):
             "The prototype made the implementation predictable.",
         )
 
+        # Notes are Markdown
+        Note.objects.create(
+            content_object=project,
+            created_by=project.owned_by,
+            title="Next steps",
+            description="- **Workshop** with <the customer>",
+        )
+        self.assertContains(
+            self.client.get(project.urls["detail"]),
+            "<li><strong>Workshop</strong> with &lt;the customer&gt;</li>",
+        )
+
     def test_note_notification(self):
         """Adding notes to content objects owned by others sends a notification"""
         deal = factories.DealFactory.create()

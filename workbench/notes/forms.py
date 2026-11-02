@@ -63,6 +63,12 @@ class NoteForm(ModelForm):
         model = Note
         fields = ["title", "description"]
         widgets = {"description": Textarea({"rows": 15})}
+        help_texts = {
+            "description": gettext_lazy(
+                "Markdown: **bold**, *italic*, lines starting with - or 1. for"
+                " lists, # for headings. Links are detected automatically."
+            )
+        }
 
     def __init__(self, *args, **kwargs):
         content_object = kwargs.pop("content_object", None)

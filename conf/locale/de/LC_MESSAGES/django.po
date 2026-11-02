@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 07:54+0100\n"
+"POT-Creation-Date: 2026-11-02 08:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2834,12 +2834,20 @@ msgid "All objects"
 msgstr "Alle Objekte"
 
 #: workbench/notes/forms.py
+msgid "Markdown: **bold**, *italic*, lines starting with - or 1. for lists, # for headings. Links are detected automatically."
+msgstr "Markdown: **fett**, *kursiv*, Zeilen mit - oder 1. am Anfang für Listen, # für Titel. Links werden automatisch erkannt."
+
+#: workbench/notes/forms.py
 msgid "Unable to determine the object this note should be added to."
 msgstr "Konnte Objekt nicht bestimmen, wo die Notiz angehängt werden soll."
 
 #: workbench/notes/models.py
 msgid "note"
 msgstr "Notiz"
+
+#: workbench/notes/views.py workbench/templates/notes/widget.html
+msgid "Add note"
+msgstr "Notiz hinzufügen"
 
 #: workbench/offers/api.py workbench/planning/api.py
 #, python-format
@@ -4630,7 +4638,6 @@ msgstr "Bitte korrigiere die folgenden Fehler:"
 #: workbench/templates/logbook/loggedcost_form.html
 #: workbench/templates/logbook/loggedhours_form.html
 #: workbench/templates/modalform.html workbench/templates/notes/note_form.html
-#: workbench/templates/notes/widget.html
 #: workbench/templates/projects/budgettransfer_form.html
 msgid "Save"
 msgstr "Sichern"
@@ -4801,10 +4808,6 @@ msgstr "Neue Notiz bei %(content_object)s"
 #, python-format
 msgid "%(created_by)s just created a new note on \"%(content_object)s\":"
 msgstr "%(created_by)s hat soeben eine neue Notiz bei \"%(content_object)s\" hinzugefügt:"
-
-#: workbench/templates/notes/widget.html
-msgid "Add note"
-msgstr "Notiz hinzufügen"
 
 #: workbench/templates/offers/offer_pricing.html
 msgid "effort hours"
