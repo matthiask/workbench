@@ -1,7 +1,7 @@
 {% load fineforms i18n workbench %}
 <section class="card mt-4">
   <div class="card-header d-flex justify-content-between align-items-center">
-    {% translate 'notes'|capfirst %}
+    {% translate 'notes' context 'notes feature' as notes_heading %}{{ notes_heading|capfirst }}
     <button
       type="button"
       class="btn btn-quiet btn-sm"

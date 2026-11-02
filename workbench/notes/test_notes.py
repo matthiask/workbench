@@ -1,9 +1,11 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.notes.admin import content_object_url
 from workbench.notes.models import Note
 from workbench.tools.testing import check_code, messages
@@ -21,6 +23,51 @@ class NotesTest(TestCase):
 
         code = check_code(self, "/notes/")
         code("")
+
+    def test_list_search(self):
+        """The notes list can be searched and filtered, and leaves out notes
+        the user may not see"""
+        user = factories.UserFactory.create()
+        deal = factories.DealFactory.create()
+        invoice = factories.InvoiceFactory.create()
+        Note.objects.create(
+            content_object=deal,
+            created_by=user,
+            title="Call with the board",
+            description="Budget approved",
+        )
+        Note.objects.create(
+            content_object=invoice,
+            created_by=invoice.owned_by,
+            title="Payment reminder",
+            description="Customer promised to pay next week",
+        )
+        self.client.force_login(user)
+
+        def titles(query=""):
+            response = self.client.get(f"/notes/{query}")
+            self.assertEqual(response.status_code, 200)
+            return [
+                title
+                for title in ["Call with the board", "Payment reminder"]
+                if title in response.content.decode()
+            ]
+
+        self.assertEqual(titles(), ["Call with the board", "Payment reminder"])
+        self.assertEqual(titles("?q=budget"), ["Call with the board"])
+        self.assertEqual(titles("?q=pay"), ["Payment reminder"])
+        self.assertEqual(titles("?type=invoice"), ["Payment reminder"])
+        self.assertEqual(titles("?created_by=-1"), ["Call with the board"])
+        self.assertEqual(
+            titles(f"?created_by={invoice.owned_by.pk}"), ["Payment reminder"]
+        )
+
+        with override_settings(
+            FEATURES={FEATURES.CONTROLLING: F.NEVER, FEATURES.DEALS: F.ALWAYS}
+        ):
+            self.assertEqual(titles(), ["Call with the board"])
+            # Not offered as a choice anymore
+            self.assertEqual(self.client.get("/notes/?type=invoice").status_code, 302)
 
     def test_form(self):
         """Assigning a note to a content object works as expected"""

@@ -1,16 +1,67 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.deals.models import Deal
+from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.projects.models import Project
 from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
+# Notes are shown on these objects in the web interface, with the features
+# they require (None: everyone)
+TARGETS = {
+    "deal": (Deal, FEATURES.DEALS),
+    "invoice": (Invoice, FEATURES.CONTROLLING),
+    "recurring_invoice": (RecurringInvoice, FEATURES.CONTROLLING),
+    "project": (Project, None),
+}
+
+
+def visible_content_types(user):
+    """Content types of the objects whose notes the user may see"""
+    return {
+        ContentType.objects.get_for_model(model).pk: key
+        for key, (model, feature) in TARGETS.items()
+        if feature is None or user.features[feature]
+    }
+
+
 class NoteQuerySet(SearchQuerySet):
+    def visible(self, types):
+        """Notes of existing objects of the given content types (see
+        ``visible_content_types()``); deleting objects doesn't delete their
+        notes"""
+        q = Q(pk__in=[])
+        for content_type, key in types.items():
+            q |= Q(
+                content_type=content_type,
+                object_id__in=TARGETS[key][0].objects.values("pk"),
+            )
+        return self.filter(q)
+
+    def with_content_objects(self):
+        # Their names include their owner, invoice codes the project's
+        return self.prefetch_related(
+            GenericPrefetch(
+                "content_object",
+                [
+                    Deal.objects.select_related("owned_by"),
+                    Invoice.objects.select_related("owned_by", "project"),
+                    RecurringInvoice.objects.select_related("owned_by"),
+                    Project.objects.select_related("owned_by"),
+                ],
+            )
+        )
+
     def for_content_object(self, content_object):
         return self.filter(
             content_type=ContentType.objects.get_for_model(content_object),
@@ -41,7 +92,7 @@ class Note(Model):
     class Meta:
         ordering = ["-created_at"]
         verbose_name = _("note")
-        verbose_name_plural = _("notes")
+        verbose_name_plural = pgettext_lazy("notes feature", "notes")
 
     def __str__(self):
         return f"{self.title} - {self.content_type.name} {self.object_id} - {self.created_by.get_short_name()}"

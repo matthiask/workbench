@@ -4,8 +4,12 @@
   {% for object in object_list %}
     <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
       <div class="wb-row-main">
-        <div class="wb-row-title">{{ object|h }}</div>
-        <div class="wb-row-meta"><span>{{ object.created_by }}</span></div>
+        <div class="wb-row-title">{{ object.title }}</div>
+        <div class="wb-row-meta">
+          <span>{{ object.content_object }}</span>
+          <span>{{ object.created_by }}</span>
+        </div>
+        <div class="wb-row-meta">{{ object.description|truncatechars:200 }}</div>
       </div>
       <div class="wb-row-aside wb-row-meta">{{ object.created_at|local_date_format }}</div>
     </a>

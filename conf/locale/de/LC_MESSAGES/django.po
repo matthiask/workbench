@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 20:14+0100\n"
+"POT-Creation-Date: 2026-11-02 07:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -707,12 +707,10 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
 #: workbench/awt/models.py workbench/awt/pdf.py workbench/contacts/models.py
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
-#: workbench/credit_control/reporting.py workbench/notes/apps.py
-#: workbench/notes/models.py workbench/planning/models.py
+#: workbench/credit_control/reporting.py workbench/planning/models.py
 #: workbench/projects/models.py workbench/templates/awt/year_detail.html
-#: workbench/templates/base.html
 #: workbench/templates/credit_control/creditentry_list.html
-#: workbench/templates/notes/widget.html workbench/timer/models.py
+#: workbench/timer/models.py
 msgid "notes"
 msgstr "Bemerkungen"
 
@@ -1030,9 +1028,9 @@ msgstr "Archiviert"
 
 #: workbench/contacts/forms.py workbench/credit_control/forms.py
 #: workbench/deals/forms.py workbench/invoices/forms.py
-#: workbench/logbook/forms.py workbench/offers/forms.py
-#: workbench/projects/forms.py workbench/templates/base.html
-#: workbench/templates/search.html
+#: workbench/logbook/forms.py workbench/notes/forms.py
+#: workbench/offers/forms.py workbench/projects/forms.py
+#: workbench/templates/base.html workbench/templates/search.html
 msgid "Search"
 msgstr "Suche"
 
@@ -2825,13 +2823,23 @@ msgstr "Inhaltsobjekt"
 msgid "Add the note to exactly one of %s."
 msgstr "Füge die Notiz genau einem von %s hinzu."
 
+#: workbench/notes/apps.py workbench/notes/models.py
+#: workbench/templates/base.html workbench/templates/notes/widget.html
+msgctxt "notes feature"
+msgid "notes"
+msgstr "Notizen"
+
+#: workbench/notes/forms.py
+msgid "All objects"
+msgstr "Alle Objekte"
+
 #: workbench/notes/forms.py
 msgid "Unable to determine the object this note should be added to."
-msgstr "Konnte Objekt nicht bestimmen, wo die Bemerkung angehängt werden soll."
+msgstr "Konnte Objekt nicht bestimmen, wo die Notiz angehängt werden soll."
 
 #: workbench/notes/models.py
 msgid "note"
-msgstr "Bemerkung"
+msgstr "Notiz"
 
 #: workbench/offers/api.py workbench/planning/api.py
 #, python-format
@@ -4787,16 +4795,16 @@ msgstr "Benötigt eine Aktion"
 #: workbench/templates/notes/note_notification.txt
 #, python-format
 msgid "New note on %(content_object)s"
-msgstr "Neue Bemerkung bei %(content_object)s"
+msgstr "Neue Notiz bei %(content_object)s"
 
 #: workbench/templates/notes/note_notification.txt
 #, python-format
 msgid "%(created_by)s just created a new note on \"%(content_object)s\":"
-msgstr "%(created_by)s hat soeben eine neue Bemerkung bei \"%(content_object)s\" hinzugefügt:"
+msgstr "%(created_by)s hat soeben eine neue Notiz bei \"%(content_object)s\" hinzugefügt:"
 
 #: workbench/templates/notes/widget.html
 msgid "Add note"
-msgstr "Bemerkung hinzufügen"
+msgstr "Notiz hinzufügen"
 
 #: workbench/templates/offers/offer_pricing.html
 msgid "effort hours"

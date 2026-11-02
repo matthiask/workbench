@@ -253,7 +253,7 @@
               </a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{% url 'notes_note_list' %}">
-                {% translate 'notes'|capfirst %}
+                {% translate 'notes' context 'notes feature' as notes_heading %}{{ notes_heading|capfirst }}
               </a>
               <a class="dropdown-item" href="{% url 'report_work_anniversaries' %}">
                 {% translate 'Work anniversaries' %}

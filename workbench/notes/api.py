@@ -1,7 +1,6 @@
 import datetime as dt
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
@@ -9,12 +8,8 @@ from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import check_feature
-from workbench.accounts.features import FEATURES
-from workbench.deals.models import Deal
-from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.notes.forms import NoteForm
-from workbench.notes.models import Note
-from workbench.projects.models import Project
+from workbench.notes.models import TARGETS, Note, visible_content_types
 from workbench.tools.api import (
     DateRangeFilter,
     Serialized,
@@ -24,15 +19,6 @@ from workbench.tools.api import (
 
 
 router = Router(tags=["notes"])
-
-# Notes are shown on these objects in the web interface, with the features
-# they require (None: everyone)
-TARGETS = {
-    "deal": (Deal, FEATURES.DEALS),
-    "invoice": (Invoice, FEATURES.CONTROLLING),
-    "recurring_invoice": (RecurringInvoice, FEATURES.CONTROLLING),
-    "project": (Project, None),
-}
 
 
 class NoteObject(Schema):
@@ -67,27 +53,6 @@ def note_out(note, request, *, types):
     }
 
 
-def _content_types(user):
-    """Content types of the objects whose notes the user may see"""
-    return {
-        ContentType.objects.get_for_model(model).pk: key
-        for key, (model, feature) in TARGETS.items()
-        if feature is None or user.features[feature]
-    }
-
-
-def _visible(types):
-    """Notes of existing objects the user may see; deleting objects doesn't
-    delete their notes"""
-    q = Q(pk__in=[])
-    for content_type, key in types.items():
-        q |= Q(
-            content_type=content_type,
-            object_id__in=TARGETS[key][0].objects.values("pk"),
-        )
-    return q
-
-
 class NoteFilter(DateRangeFilter):
     q: str = ""
     deal: int | None = None
@@ -105,10 +70,8 @@ def note_list(request, filters: Query[NoteFilter]):
 
     Notes on objects which require features the user hasn't got and notes of
     deleted objects are left out."""
-    types = _content_types(request.user)
-    notes = Note.objects.filter(_visible(types)).select_related(
-        "created_by", "content_type"
-    )
+    types = visible_content_types(request.user)
+    notes = Note.objects.visible(types).select_related("created_by", "content_type")
     objects = Q()
     for key in TARGETS:
         if object_id := getattr(filters, key):
@@ -125,18 +88,7 @@ def note_list(request, filters: Query[NoteFilter]):
         notes = notes.search(filters.q)
     notes = filter_date_range(notes, filters, "created_at__date")
     return Serialized(
-        notes.prefetch_related(
-            # Their names include their owner, invoice codes the project's
-            GenericPrefetch(
-                "content_object",
-                [
-                    Deal.objects.select_related("owned_by"),
-                    Invoice.objects.select_related("owned_by", "project"),
-                    RecurringInvoice.objects.select_related("owned_by"),
-                    Project.objects.select_related("owned_by"),
-                ],
-            )
-        ).order_by("-created_at", "-pk"),
+        notes.with_content_objects().order_by("-created_at", "-pk"),
         lambda note: note_out(note, request, types=types),
     )
 
@@ -179,4 +131,4 @@ def note_create(request, data: NoteIn):
     )
     if not form.is_valid():
         raise ValidationError(form_errors(form))
-    return note_out(form.save(), request, types=_content_types(request.user))
+    return note_out(form.save(), request, types=visible_content_types(request.user))
