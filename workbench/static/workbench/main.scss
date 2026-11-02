@@ -474,7 +474,9 @@ tbody th > a {
   gap: 4px;
   margin-bottom: 0;
 
-  > label {
+  > label,
+  .form-check,
+  .form-check-label {
     margin-bottom: 0;
   }
 }
