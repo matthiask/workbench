@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 14:14+0100\n"
+"POT-Creation-Date: 2026-11-02 15:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1648,6 +1648,30 @@ msgstr "Wegen folgenden Fehlern ist es nicht möglich, den Status der Offerte \"
 #: workbench/deals/forms.py
 msgid "Attention! The closed on date is more than tree months in the future!"
 msgstr "Achtung! Das Abschlussdatum liegt mehr als drei Monate in der Zukunft!"
+
+#: workbench/deals/forms.py
+msgid "Offers can only be linked to and unlinked from open deals, reopen the deal first."
+msgstr "Offerten können nur mit offenen Geschäften verbunden und von ihnen gelöst werden, öffne das Geschäft zuerst wieder."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The offer %(offer)s isn't linked to this deal."
+msgstr "Die Offerte %(offer)s ist nicht mit diesem Geschäft verbunden."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The offer %(offer)s is already linked to this deal."
+msgstr "Die Offerte %(offer)s ist bereits mit diesem Geschäft verbunden."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The offer %(offer)s is %(status)s, only offers which are in preparation, service groups or offered can be linked."
+msgstr "Die Offerte %(offer)s hat den Status «%(status)s», nur Offerten in Vorbereitung, Leistungsgruppen und offerierte Offerten können verbunden werden."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The offer %(offer)s belongs to a project of %(customer)s, not of the deal's customer %(deal_customer)s."
+msgstr "Die Offerte %(offer)s gehört zu einem Projekt von %(customer)s, nicht vom Kunden des Geschäfts, %(deal_customer)s."
 
 #: workbench/deals/models.py
 msgid "is required"

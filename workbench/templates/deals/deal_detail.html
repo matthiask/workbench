@@ -47,7 +47,9 @@
         </div>
       </span>
       <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
-      <a href="{{ object.urls.add_offer }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Link offer' %}</a>
+      {% if object.status == object.OPEN %}
+        <a href="{{ object.urls.add_offer }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Link offer' %}</a>
+      {% endif %}
       <span class="dropdown">
         <button
           type="button"
@@ -128,13 +130,15 @@
           {% for offer in object.get_related_offers %}
             <div class="list-group-item d-flex justify-content-between align-items-center gap-2">
               <div class="min-w-0">{% link_or_none offer with_badge=True %}</div>
-              <form method="post" action="{{ object.urls.remove_offer }}">
-                {% csrf_token %}
-                <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
-                <button type="submit" title="{% translate 'Unlink offer' %}" class="btn btn-quiet btn-sm btn-icon">
-                  {% include 'svg/x.svg' %}
-                </button>
-              </form>
+              {% if object.status == object.OPEN %}
+                <form method="post" action="{{ object.urls.remove_offer }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="modal-offer" value="{{ offer.pk }}">
+                  <button type="submit" title="{% translate 'Unlink offer' %}" class="btn btn-quiet btn-sm btn-icon">
+                    {% include 'svg/x.svg' %}
+                  </button>
+                </form>
+              {% endif %}
             </div>
           {% empty %}
             <div class="list-group-item text-secondary">{% translate 'No related offers' %}</div>

@@ -13,6 +13,7 @@ from workbench.deals.models import Deal
 from workbench.deals.reporting import accepted_deals
 from workbench.invoices.models import Invoice
 from workbench.management.commands.analyze_deals import gross_margin_projection
+from workbench.offers.models import Offer
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
@@ -529,13 +530,13 @@ class DealsTest(TestCase):
 
     def test_related_offers(self):
         """Offers can be linked to deals"""
-        deal = factories.DealFactory.create()
         offer = factories.OfferFactory.create(
             title="Test",
             postal_address="Test\nTest street\nTest",
             # offered_on=in_days(0),
             # valid_until=in_days(60),
         )
+        deal = factories.DealFactory.create(customer=offer.project.customer)
 
         self.client.force_login(deal.owned_by)
 
@@ -586,14 +587,60 @@ class DealsTest(TestCase):
         self.assertEqual(offer.status, offer.ACCEPTED)
         self.assertTrue(offer.closed_on is not None)
 
-        # Remove offers
-        response = self.client.post(deal.urls["remove_offer"], {"modal-offer": ""})
-        self.assertRedirects(response, deal.urls["detail"])
+        # Closed deals keep their offers
+        response = self.client.post(
+            deal.urls["remove_offer"], {"modal-offer": offer.pk}, follow=True
+        )
+        self.assertEqual(deal.related_offers.get(), offer)
+        self.assertContains(response, "only be linked to and unlinked from open")
+        self.assertNotContains(response, deal.urls["add_offer"])
+        self.assertNotContains(response, deal.urls["remove_offer"])
+
+    def test_related_offer_rules(self):
+        """Only offers which aren't closed yet are linked to open deals, offers
+        of other customers are a warning"""
+        offer = factories.OfferFactory.create()
+        deal = factories.DealFactory.create(customer=offer.project.customer)
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.post(
+            deal.urls["remove_offer"], {"modal-offer": offer.pk}, follow=True
+        )
+        self.assertContains(response, "isn&#x27;t linked to this deal")
+
+        self.client.post(deal.urls["add_offer"], {"modal-offer": offer.pk})
+        response = self.client.post(deal.urls["add_offer"], {"modal-offer": offer.pk})
+        self.assertContains(response, "is already linked to this deal")
 
         response = self.client.post(
             deal.urls["remove_offer"], {"modal-offer": offer.pk}
         )
         self.assertRedirects(response, deal.urls["detail"])
+        self.assertFalse(deal.related_offers.exists())
+
+        declined = factories.OfferFactory.create(
+            project=offer.project, status=Offer.DECLINED
+        )
+        response = self.client.post(
+            deal.urls["add_offer"], {"modal-offer": declined.pk}
+        )
+        self.assertContains(response, "only offers which are in preparation")
+
+        other = factories.OfferFactory.create()
+        response = self.client.post(deal.urls["add_offer"], {"modal-offer": other.pk})
+        self.assertContains(response, "belongs to a project of")
+        self.assertFalse(deal.related_offers.exists())
+
+        form = response.context["form"]
+        response = self.client.post(
+            deal.urls["add_offer"],
+            {
+                "modal-offer": other.pk,
+                form.ignore_warnings_id: form.ignore_warnings_value,
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(deal.related_offers.get(), other)
 
     def test_decline_related_offer_with_planned_work(self):
         """Declining a related offer through a deal forces a decision about
@@ -602,13 +649,13 @@ class DealsTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
 
         def declined_offer_with_planned_work():
-            deal = factories.DealFactory.create()
             offer = factories.OfferFactory.create(
                 title="Test",
                 postal_address="Test\nTest street\nTest",
                 offered_on=in_days(0),
                 valid_until=in_days(60),
             )
+            deal = factories.DealFactory.create(customer=offer.project.customer)
             factories.PlannedWorkFactory.create(
                 project=offer.project, offer=offer, weeks=[in_days(7)]
             )

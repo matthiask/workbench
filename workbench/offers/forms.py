@@ -371,12 +371,3 @@ class OfferDeleteForm(ModelForm):
         if self.cleaned_data.get("delete_planned_work"):
             self.instance.planned_work.all().delete()
         self.instance.delete()
-
-
-@add_prefix("modal")
-class OfferAutocompleteForm(forms.Form):
-    offer = forms.ModelChoiceField(
-        queryset=Offer.objects.all(),
-        widget=Autocomplete(model=Offer),
-        label="",
-    )

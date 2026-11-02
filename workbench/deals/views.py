@@ -4,16 +4,17 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
+from workbench.deals.forms import RelatedOfferForm
 from workbench.deals.models import Deal
-from workbench.offers.forms import OfferAutocompleteForm
 
 
 def add_offer(request, pk):
     deal = get_object_or_404(Deal, pk=pk)
-    form = OfferAutocompleteForm(request.POST if request.method == "POST" else None)
+    form = RelatedOfferForm(
+        request.POST if request.method == "POST" else None, deal=deal, request=request
+    )
     if form.is_valid():
-        offer = form.cleaned_data["offer"]
-        deal.related_offers.add(offer)
+        offer = form.save()
         messages.success(
             request,
             _("Successfully added the offer %(offer)s as a related offer.")
@@ -31,13 +32,15 @@ def add_offer(request, pk):
 @require_POST
 def remove_offer(request, pk):
     deal = get_object_or_404(Deal, pk=pk)
-    form = OfferAutocompleteForm(request.POST)
+    form = RelatedOfferForm(request.POST, deal=deal, remove=True, request=request)
     if form.is_valid():
-        offer = form.cleaned_data["offer"]
-        deal.related_offers.remove(offer)
+        offer = form.save()
         messages.success(
             request,
             _("Successfully removed the offer %(offer)s as a related offer.")
             % {"offer": offer},
         )
+    else:
+        for error in form.errors.values():
+            messages.error(request, " ".join(error))
     return redirect(deal)

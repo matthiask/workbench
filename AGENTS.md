@@ -234,6 +234,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   but saves them on the organization; only people without an organization
   are members themselves. Turning the flag on moves existing memberships to
   the organizations (`Group.move_people_to_organizations()`).
+- Offers are only linked to and unlinked from open deals, and only offers
+  which aren't closed yet (in preparation, service group, offered): closing a
+  deal settles its offers. Offers of other customers' projects are a warning
+  (agencies and their clients, departments of a city), `force` in the API.
+  Web views and API share `RelatedOfferForm` in `workbench/deals/forms.py`.
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating or updating

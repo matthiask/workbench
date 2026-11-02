@@ -20,8 +20,9 @@ from workbench.deals.models import (
     Value,
     ValueType,
 )
+from workbench.offers.models import Offer
 from workbench.tools.formats import Z2
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea
+from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
 from workbench.tools.validation import in_days
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -506,3 +507,83 @@ class SetStatusForm(ModelForm):
 
         instance.save()
         return instance
+
+
+# Closing a deal accepts or declines its offers, closed offers are settled
+LINKABLE_OFFER_STATUSES = {Offer.IN_PREPARATION, Offer.SERVICE_GROUP, Offer.OFFERED}
+
+
+@add_prefix("modal")
+class RelatedOfferForm(Form):
+    """Link an offer to an open deal, or unlink it with ``remove=True``
+
+    Offers of other customers' projects are a warning, e.g. for agencies and
+    their clients or several departments of the same city."""
+
+    offer = forms.ModelChoiceField(
+        queryset=Offer.objects.select_related("project"),
+        widget=Autocomplete(model=Offer),
+        label="",
+    )
+
+    def __init__(self, *args, deal, remove=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.deal = deal
+        self.remove = remove
+
+    def clean(self):
+        data = super().clean()
+        if self.deal.status != Deal.OPEN:
+            raise ValidationError(
+                _(
+                    "Offers can only be linked to and unlinked from open deals,"
+                    " reopen the deal first."
+                )
+            )
+        if not (offer := data.get("offer")):
+            return data
+        linked = self.deal.related_offers.filter(pk=offer.pk).exists()
+        if self.remove:
+            if not linked:
+                self.add_error(
+                    "offer",
+                    _("The offer %(offer)s isn't linked to this deal.")
+                    % {"offer": offer.code},
+                )
+        elif linked:
+            self.add_error(
+                "offer",
+                _("The offer %(offer)s is already linked to this deal.")
+                % {"offer": offer.code},
+            )
+        elif offer.status not in LINKABLE_OFFER_STATUSES:
+            self.add_error(
+                "offer",
+                _(
+                    "The offer %(offer)s is %(status)s, only offers which are"
+                    " in preparation, service groups or offered can be linked."
+                )
+                % {"offer": offer.code, "status": offer.get_status_display()},
+            )
+        elif offer.project.customer_id != self.deal.customer_id:
+            self.add_warning(
+                _(
+                    "The offer %(offer)s belongs to a project of %(customer)s,"
+                    " not of the deal's customer %(deal_customer)s."
+                )
+                % {
+                    "offer": offer.code,
+                    "customer": offer.project.customer,
+                    "deal_customer": self.deal.customer,
+                },
+                code="other-customer",
+            )
+        return data
+
+    def save(self):
+        offer = self.cleaned_data["offer"]
+        if self.remove:
+            self.deal.related_offers.remove(offer)
+        else:
+            self.deal.related_offers.add(offer)
+        return offer
