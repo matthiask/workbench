@@ -578,6 +578,8 @@ class ProjectsTest(TestCase):
             html=True,
         )
         self.assertNotContains(response, 'id="id_service_type"')
+        # The autofill script expects the service type select
+        self.assertNotContains(response, "data-autofill")
 
     def test_add_flat_rate_to_existing_project(self):
         """Adding a flat rate to a project with services warns about

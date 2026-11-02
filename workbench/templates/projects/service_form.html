@@ -21,7 +21,8 @@
       {% ff_field form.allow_logging %}
     </div>
     <div class="col-md-5">
-      <div data-autofill="{{ view.default_service_types_json }}">
+      {# Projects with a flat rate have no service types #}
+      <div {% if form.service_type %}data-autofill="{{ view.default_service_types_json }}"{% endif %}>
         <h5>{% translate 'effort' %}</h5>
         {% if form.service_type %}
           {% ff_field form.service_type %}

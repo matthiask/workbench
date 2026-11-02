@@ -622,7 +622,7 @@ function initWidgets() {
   )) {
     el.classList.add("initialized")
     const data = JSON.parse(el.dataset.autofill)
-    el.querySelector("select").addEventListener("change", (e) => {
+    el.querySelector("select")?.addEventListener("change", (e) => {
       for (const [key, value] of Object.entries(data[e.target.value] || {})) {
         for (const field of el.querySelectorAll(`[name$='${key}']`)) {
           setValue(field, value ?? "")
