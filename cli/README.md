@@ -26,9 +26,10 @@ The `wb` program talks to the Workbench JSON API. Install it with
 
     uv tool install "git+https://github.com/matthiask/workbench#subdirectory=cli"
 
-Upgrade it when `wb` tells you to:
+Upgrade it when `wb` tells you to, it prints the command. `--python` switches
+to a newer Python when `wb` needs one, `uv tool upgrade` fails otherwise:
 
-    uv tool upgrade workbench-cli
+    uv tool upgrade --python 3.15 workbench-cli
 
 Enable completing commands, options and installations with Tab in your shell:
 

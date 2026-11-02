@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 08:53+0100\n"
+"POT-Creation-Date: 2026-11-02 11:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -986,8 +986,9 @@ msgid "The absence has been confirmed."
 msgstr "Die Abwesenheit wurde bestätigt."
 
 #: workbench/cli_version.py
-msgid "Your wb is too old for this Workbench, please upgrade it: uv tool upgrade workbench-cli"
-msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: uv tool upgrade workbench-cli"
+#, python-format
+msgid "Your wb is too old for this Workbench, please upgrade it: %(command)s"
+msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: %(command)s"
 
 #: workbench/contacts/api.py
 #, python-format
@@ -4032,6 +4033,10 @@ msgstr "Kommandozeile"
 #: workbench/templates/accounts/api_tokens.html
 msgid "Install <code>wb</code> with <a href=\"https://docs.astral.sh/uv/\">uv</a> and log in, the browser asks for the access:"
 msgstr "Installiere <code>wb</code> mit <a href=\"https://docs.astral.sh/uv/\">uv</a> und melde dich an, der Browser fragt nach dem Zugriff:"
+
+#: workbench/templates/accounts/api_tokens.html
+msgid "Upgrade it when <code>wb</code> tells you to:"
+msgstr "Aktualisiere es, wenn <code>wb</code> dich dazu auffordert:"
 
 #: workbench/templates/accounts/api_tokens.html
 msgid "Installation and commands"

@@ -10,10 +10,15 @@ MINIMUM = (0, 16, 0)
 # Where wb is installed from and documented
 INSTALL = "git+https://github.com/matthiask/workbench#subdirectory=cli"
 README_URL = "https://github.com/matthiask/workbench/tree/main/cli#readme"
-# The version in the repository, users of older versions are told to upgrade
-LATEST = tomllib.loads((settings.BASE_DIR / "cli" / "pyproject.toml").read_text())[
+_PROJECT = tomllib.loads((settings.BASE_DIR / "cli" / "pyproject.toml").read_text())[
     "project"
-]["version"]
+]
+# The version in the repository, users of older versions are told to upgrade
+LATEST = _PROJECT["version"]
+# uv tool upgrade keeps the tool's Python and fails when the CLI requires a
+# newer one, --python switches to it
+PYTHON = _PROJECT["requires-python"].removeprefix(">=")
+UPGRADE = f"uv tool upgrade --python {PYTHON} workbench-cli"
 
 
 def _parse(version):
@@ -35,13 +40,15 @@ def cli_version_middleware(get_response):
                 {
                     "detail": _(
                         "Your wb is too old for this Workbench, please upgrade"
-                        " it: uv tool upgrade workbench-cli"
+                        " it: %(command)s"
                     )
+                    % {"command": UPGRADE}
                 },
                 status=426,
             )
         response = get_response(request)
         response["X-Workbench-CLI-Latest"] = LATEST
+        response["X-Workbench-CLI-Upgrade"] = UPGRADE
         return response
 
     return middleware

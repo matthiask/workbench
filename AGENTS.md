@@ -118,7 +118,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `MINIMUM` in `workbench/cli_version.py` when older versions don't work
   anymore.
   The CLI requires the same Python as the server (ruff's target version
-  applies to it too); `uv tool install` fetches it.
+  applies to it too); `uv tool install` fetches it, but `uv tool upgrade`
+  keeps the old Python, so the server tells the CLI the upgrade command with
+  `--python` (`UPGRADE` in `workbench/cli_version.py`).
   `workbench/test_cli.py` runs the real CLI commands against the API (requests
   go through Django's test client); add a test there for new commands. The CLI
   is installed with the project's dev dependencies, not in the container.

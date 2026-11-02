@@ -1072,6 +1072,7 @@ planned_work:
             result = self.wb("me")
         self.assertEqual(result.exit_code, 0)
         self.assertIn("wb 99.0.0 is available", result.output)
+        self.assertIn(cli_version.UPGRADE, result.output)
 
         wb.core._check_version.cache_clear()
         with patch.object(cli_version, "LATEST", "0.0.1"):
@@ -1082,7 +1083,7 @@ planned_work:
         with patch.object(cli_version, "MINIMUM", (99, 0, 0)):
             result = self.wb("me")
         self.assertEqual(result.exit_code, 1)
-        self.assertIn("uv tool upgrade workbench-cli", result.output)
+        self.assertIn(cli_version.UPGRADE, result.output)
 
     def test_browser_login(self):
         """wb login authorizes the CLI in the browser"""

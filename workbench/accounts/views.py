@@ -218,6 +218,7 @@ def api_tokens(request):
             "days": API_TOKEN_LIFETIME.days,
             "access_choices": APIToken.Access.choices,
             "cli_install": cli_version.INSTALL,
+            "cli_upgrade": cli_version.UPGRADE,
             "cli_readme_url": cli_version.README_URL,
             "base_url": request.build_absolute_uri("/"),
         },

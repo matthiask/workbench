@@ -373,17 +373,19 @@ def _parse_version(version):
 
 
 @cache
-def _check_version(latest):
+def _check_version(latest, upgrade):
     """Tell the user about a newer version, or that the Workbench is older
     than the CLI and may not support everything yet, once
 
-    ``latest`` is the version of the CLI in the Workbench's checkout."""
+    ``latest`` is the version of the CLI in the Workbench's checkout,
+    ``upgrade`` the command which upgrades to it (it may need a newer
+    Python)."""
     if not latest:
         return
     if _parse_version(latest) > _parse_version(VERSION):
+        upgrade = upgrade or "uv tool upgrade workbench-cli"
         click.secho(
-            f"wb {latest} is available (you have {VERSION}):"
-            " uv tool upgrade workbench-cli",
+            f"wb {latest} is available (you have {VERSION}): {upgrade}",
             fg="yellow",
             err=True,
         )
@@ -428,7 +430,10 @@ def request(method, path, *, optional=False, **kwargs):
         click.secho("Your access has expired.", fg="yellow", err=True)
         token = browser_login(url, access)
         response = _send(method, url, path, token, **kwargs)
-    _check_version(response.headers.get("x-workbench-cli-latest"))
+    _check_version(
+        response.headers.get("x-workbench-cli-latest"),
+        response.headers.get("x-workbench-cli-upgrade"),
+    )
     if response.status_code == 401:
         terminate("Not authorized (anymore). Run `wb login` to log in again.")
     if response.status_code == 403 and optional:
