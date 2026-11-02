@@ -62,7 +62,7 @@ class NoteForm(ModelForm):
     class Meta:
         model = Note
         fields = ["title", "description"]
-        widgets = {"description": Textarea}
+        widgets = {"description": Textarea({"rows": 15})}
 
     def __init__(self, *args, **kwargs):
         content_object = kwargs.pop("content_object", None)

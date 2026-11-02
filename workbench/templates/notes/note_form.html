@@ -1,5 +1,7 @@
 {% extends "modalform.html" %}
 {% load i18n %}
+{% block size %}modal-lg{% endblock %}
+
 {% block footer %}
   <button type="submit" class="btn btn-primary me-auto">{% translate 'Save' %}</button>
   <a href="{{ object.urls.delete }}" data-ajaxmodal class="btn btn-outline-danger">{% translate 'Delete' %}</a>
