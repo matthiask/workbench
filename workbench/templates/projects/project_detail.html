@@ -599,12 +599,21 @@
               {% if row.service.is_logging_allowed and row.service.pk %}
                 <a
                   href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
-                  class="btn btn-quiet btn-sm"
+                  class="btn btn-quiet btn-sm btn-icon"
                   title="{% translate 'log hours' %}"
                   data-ajaxmodal
                 >
                   {% include "svg/plus.svg" %}
-                  {% translate 'Hours' %}
+                </a>
+              {% endif %}
+              {% if row.service.pk and request.user.features.CONTROLLING %}
+                <a
+                  href="{{ row.service.urls.update }}"
+                  class="btn btn-quiet btn-sm btn-icon"
+                  title="{% translate 'Update' %}"
+                  data-ajaxmodal
+                >
+                  {% include "svg/pencil.svg" %}
                 </a>
               {% endif %}
               {% if row.service.pk and request.user.features.CONTROLLING or row.service.pk and request.user.features.PLANNING or row.service.is_logging_allowed %}
@@ -642,11 +651,6 @@
                     {% if row.service.pk and request.user.features.CONTROLLING %}
                       <div class="dropdown-divider"></div>
                       <h6 class="dropdown-header">{% translate 'service'|capfirst %}</h6>
-                      <a
-                        class="dropdown-item"
-                        href="{{ row.service.urls.update }}"
-                        data-ajaxmodal
-                      >{% translate 'Update' %}</a>
                       <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-ajaxmodal>
                         {% translate 'Reassign logbook entries' %}
                       </a>
