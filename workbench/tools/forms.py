@@ -136,6 +136,26 @@ class WarningsForm:
     ignore_warnings_id = f"__ig_{int(time.time() / 10800)}"
 
 
+def delete_planned_work_field(label):
+    """Asks whether the planned work of offers which aren't pursued anymore
+    should be deleted, there's no default"""
+    return forms.TypedChoiceField(
+        label=label,
+        choices=[
+            (1, _("Yes, delete the planning entries")),
+            (0, _("No, keep them")),
+        ],
+        coerce=int,
+        widget=forms.RadioSelect,
+        required=True,
+        error_messages={
+            "required": _(
+                "Please decide whether the linked planning entries should be deleted."
+            )
+        },
+    )
+
+
 class DateInput(forms.TextInput):
     input_type = "date"
 

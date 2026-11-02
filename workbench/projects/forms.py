@@ -23,6 +23,7 @@ from workbench.tools.forms import (
     ModelForm,
     Textarea,
     add_prefix,
+    delete_planned_work_field,
 )
 from workbench.tools.validation import in_days, is_only_url, is_title_specific
 
@@ -373,6 +374,26 @@ class ProjectForm(ModelForm):
         else:
             self.fields.pop("closed_on")
 
+        if (
+            self.instance.pk
+            and not self.instance.closed_on
+            and self.is_bound
+            and self.data.get(self.add_prefix("closed_on"))
+            and self._planned_work_of_offers_in_preparation().exists()
+        ):
+            self.fields["delete_planned_work"] = delete_planned_work_field(
+                _(
+                    "Closing the project discards its offers in preparation,"
+                    " some of them have planning entries linked to them."
+                    " Delete them?"
+                )
+            )
+
+    def _planned_work_of_offers_in_preparation(self):
+        from workbench.offers.models import Offer
+
+        return self.instance.planned_work.filter(offer__status=Offer.IN_PREPARATION)
+
     def clean(self):
         data = super().clean()
 
@@ -474,6 +495,8 @@ class ProjectForm(ModelForm):
         closed. They have never been sent, so they aren't declined."""
         from workbench.offers.models import Offer
 
+        if self.cleaned_data.get("delete_planned_work"):
+            self._planned_work_of_offers_in_preparation().delete()
         offers = list(instance.offers.filter(status=Offer.IN_PREPARATION))
         for offer in offers:
             offer.status = Offer.DISCARDED

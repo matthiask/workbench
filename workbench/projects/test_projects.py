@@ -760,6 +760,49 @@ class ProjectsTest(TestCase):
         # Discarded offers don't count, like declined ones
         self.assertTrue(preparing.is_declined)
 
+    def test_closing_with_planned_work_of_offers_in_preparation(self):
+        """Closing a project discards its offers in preparation, the planned
+        work of those offers needs a decision"""
+        project = factories.ProjectFactory.create()
+        preparing = factories.OfferFactory.create(project=project)
+        factories.PlannedWorkFactory.create(
+            project=project, offer=preparing, weeks=[in_days(7)]
+        )
+        # Planned work without offer is left alone
+        factories.PlannedWorkFactory.create(project=project, weeks=[in_days(7)])
+        self.client.force_login(project.owned_by)
+        data = {
+            "customer": project.customer_id,
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "type": project.type,
+            "closed_on": in_days(-1).isoformat(),
+        }
+
+        response = self.client.post(project.urls["update"], data)
+        self.assertContains(
+            response,
+            "Please decide whether the linked planning entries should be deleted.",
+        )
+        project.refresh_from_db()
+        self.assertIsNone(project.closed_on)
+
+        # Editing the project without closing it doesn't ask
+        response = self.client.post(
+            project.urls["update"], {**data, "closed_on": "", "title": "Changed"}
+        )
+        self.assertRedirects(response, project.urls["detail"])
+
+        response = self.client.post(
+            project.urls["update"], {**data, "delete_planned_work": "1"}
+        )
+        self.assertRedirects(response, project.urls["detail"])
+        preparing.refresh_from_db()
+        self.assertEqual(preparing.status, Offer.DISCARDED)
+        self.assertEqual(preparing.planned_work.count(), 0)
+        self.assertEqual(project.planned_work.count(), 1)
+
     def test_initialize_customer_contact(self):
         """Initialize customer and/or contact using query parameters"""
         person = factories.PersonFactory(

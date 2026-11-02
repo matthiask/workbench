@@ -628,6 +628,41 @@ class OffersTest(TestCase):
         )
         self.assertEqual(offer.planned_work.count(), 0)
 
+    def test_discard_offer_with_planned_work(self):
+        """Discarding an offer with linked planning entries forces a decision
+        like declining it"""
+        offer = factories.OfferFactory.create()
+        factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, weeks=[in_days(7)]
+        )
+        self.client.force_login(offer.owned_by)
+        data = {
+            "title": "Stuff",
+            "owned_by": offer.owned_by_id,
+            "discount": "10",
+            "liable_to_vat": "1",
+            "tax_rate": "7.70",
+            "postal_address": "Anything\nStreet\nCity",
+            "status": Offer.DISCARDED,
+        }
+
+        response = self.client.post(offer.urls["update"], data)
+        self.assertContains(
+            response,
+            "Please decide whether the linked planning entries should be deleted.",
+        )
+        self.assertContains(response, "now that the offer is being discarded")
+
+        response = self.client.post(
+            offer.urls["update"], {**data, "delete_planned_work": "1"}
+        )
+        self.assertRedirects(
+            response, offer.get_absolute_url(), fetch_redirect_response=False
+        )
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.DISCARDED)
+        self.assertEqual(offer.planned_work.count(), 0)
+
     @travel("2020-04-21 12:00")
     def test_offer_with_closed_project(self):
         """Sent offers on closed projects have a warning badge"""

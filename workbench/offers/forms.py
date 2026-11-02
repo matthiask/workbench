@@ -11,7 +11,14 @@ from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.tools.formats import currency, local_date_format
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
+from workbench.tools.forms import (
+    Autocomplete,
+    Form,
+    ModelForm,
+    Textarea,
+    add_prefix,
+    delete_planned_work_field,
+)
 from workbench.tools.models import ProtectedError, SlowCollector
 
 
@@ -192,25 +199,20 @@ class OfferForm(PostalAddressSelectionForm):
             posted_status = (
                 self.data.get(self.add_prefix("status")) if self.is_bound else None
             )
-            if str(Offer.DECLINED) in (posted_status, str(self.instance.status)):
-                self.fields["delete_planned_work"] = forms.TypedChoiceField(
-                    label=_(
+            status = posted_status or str(self.instance.status)
+            if status == str(Offer.DECLINED):
+                self.fields["delete_planned_work"] = delete_planned_work_field(
+                    _(
                         "This offer has planning entries linked to it."
                         " Delete them now that the offer is being declined?"
-                    ),
-                    choices=[
-                        (1, _("Yes, delete the planning entries")),
-                        (0, _("No, keep them")),
-                    ],
-                    coerce=int,
-                    widget=forms.RadioSelect,
-                    required=True,
-                    error_messages={
-                        "required": _(
-                            "Please decide whether the linked planning"
-                            " entries should be deleted."
-                        )
-                    },
+                    )
+                )
+            elif status == str(Offer.DISCARDED):
+                self.fields["delete_planned_work"] = delete_planned_work_field(
+                    _(
+                        "This offer has planning entries linked to it."
+                        " Delete them now that the offer is being discarded?"
+                    )
                 )
 
     def clean(self):
@@ -253,7 +255,7 @@ class OfferForm(PostalAddressSelectionForm):
             offer=None
         )
         instance.save()
-        if instance.status == Offer.DECLINED and self.cleaned_data.get(
+        if instance.status in Offer.NOT_PURSUED and self.cleaned_data.get(
             "delete_planned_work"
         ):
             instance.planned_work.all().delete()

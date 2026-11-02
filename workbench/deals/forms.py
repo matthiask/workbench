@@ -22,7 +22,14 @@ from workbench.deals.models import (
 )
 from workbench.offers.models import Offer
 from workbench.tools.formats import Z2
-from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
+from workbench.tools.forms import (
+    Autocomplete,
+    Form,
+    ModelForm,
+    Textarea,
+    add_prefix,
+    delete_planned_work_field,
+)
 from workbench.tools.validation import in_days
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -428,25 +435,12 @@ class SetStatusForm(ModelForm):
                 if instance.status == Deal.DECLINED and any(
                     offer.planned_work.exists() for offer in related_offers
                 ):
-                    self.fields["delete_planned_work"] = forms.TypedChoiceField(
-                        label=_(
+                    self.fields["delete_planned_work"] = delete_planned_work_field(
+                        _(
                             "Some of these offers have planning entries linked"
                             " to them. Delete them now that the offers are"
                             " being declined?"
-                        ),
-                        choices=[
-                            (1, _("Yes, delete the planning entries")),
-                            (0, _("No, keep them")),
-                        ],
-                        coerce=int,
-                        widget=forms.RadioSelect,
-                        required=True,
-                        error_messages={
-                            "required": _(
-                                "Please decide whether the linked planning"
-                                " entries should be deleted."
-                            )
-                        },
+                        )
                     )
 
     def clean(self):

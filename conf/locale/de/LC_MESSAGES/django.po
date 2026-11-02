@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 15:31+0100\n"
+"POT-Creation-Date: 2026-11-02 15:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1629,18 +1629,6 @@ msgstr "Offerten ablehnen"
 msgid "Some of these offers have planning entries linked to them. Delete them now that the offers are being declined?"
 msgstr "Einige dieser Offerten haben Planungseinträge. Sollen diese jetzt, wo die Offerten abgelehnt werden, gelöscht werden?"
 
-#: workbench/deals/forms.py workbench/offers/forms.py
-msgid "Yes, delete the planning entries"
-msgstr "Ja, die Planungseinträge löschen"
-
-#: workbench/deals/forms.py workbench/offers/forms.py
-msgid "No, keep them"
-msgstr "Nein, behalten"
-
-#: workbench/deals/forms.py workbench/offers/forms.py
-msgid "Please decide whether the linked planning entries should be deleted."
-msgstr "Bitte entscheide, ob die verknüpften Planungseinträge gelöscht werden sollen."
-
 #: workbench/deals/forms.py
 msgid "This field is required when closing a deal."
 msgstr "Dieses Feld wird benötigt wenn Du ein Geschäft schliesst."
@@ -2940,6 +2928,10 @@ msgid "This offer has planning entries linked to it. Delete them now that the of
 msgstr "Diese Offerte hat Planungseinträge. Sollen diese jetzt, wo die Offerte abgelehnt wird, gelöscht werden?"
 
 #: workbench/offers/forms.py
+msgid "This offer has planning entries linked to it. Delete them now that the offer is being discarded?"
+msgstr "Diese Offerte hat Planungseinträge. Sollen diese jetzt, wo die Offerte verworfen wird, gelöscht werden?"
+
+#: workbench/offers/forms.py
 #, python-format
 msgid "You are attempting to set status to '%(to)s', but the offer has already been closed on %(closed)s. Are you sure?"
 msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde schon am %(closed)s geschlossen. Bist Du sicher?"
@@ -3447,6 +3439,10 @@ msgstr "Kostendach: {cost_cap}. Verwende {percentages}."
 #: workbench/projects/forms.py
 msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
+
+#: workbench/projects/forms.py
+msgid "Closing the project discards its offers in preparation, some of them have planning entries linked to them. Delete them?"
+msgstr "Beim Schliessen des Projekts werden seine Offerten in Vorbereitung verworfen, einige davon haben Planungseinträge. Sollen diese gelöscht werden?"
 
 #: workbench/projects/forms.py
 msgid "Selecting an internal type is required for internal projects."
@@ -5857,6 +5853,18 @@ msgid "%s minute"
 msgid_plural "%s minutes"
 msgstr[0] "%s Minute"
 msgstr[1] "%s Minuten"
+
+#: workbench/tools/forms.py
+msgid "Yes, delete the planning entries"
+msgstr "Ja, die Planungseinträge löschen"
+
+#: workbench/tools/forms.py
+msgid "No, keep them"
+msgstr "Nein, behalten"
+
+#: workbench/tools/forms.py
+msgid "Please decide whether the linked planning entries should be deleted."
+msgstr "Bitte entscheide, ob die verknüpften Planungseinträge gelöscht werden sollen."
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
