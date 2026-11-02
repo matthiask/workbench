@@ -214,10 +214,7 @@ OFFER_STATUSES = {
 
 class OfferFilter(DateRangeFilter):
     q: str = ""
-    status: (
-        Literal["in_preparation", "service_group", "offered", "accepted", "declined"]
-        | None
-    ) = None
+    status: Literal[tuple(OFFER_STATUSES)] | None = None
     project: int | None = None
     customer: int | None = None
     owned_by: str | None = None

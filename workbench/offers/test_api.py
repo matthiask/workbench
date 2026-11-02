@@ -249,6 +249,9 @@ class OffersAPITest(TestCase):
         self.assertEqual(ids("?q=relaunch"), [relaunch.pk])
         self.assertEqual(ids(f"?q={other.project.code}"), [other.pk])
         self.assertEqual(ids("?status=declined"), [other.pk])
+        discarded = factories.OfferFactory.create(status=Offer.DISCARDED)
+        self.assertEqual(ids("?status=discarded"), [discarded.pk])
+        discarded.delete()
         self.assertEqual(ids("?owned_by=AB"), [relaunch.pk])
         self.assertEqual(ids(f"?project={other.project_id}"), [other.pk])
         self.assertEqual(
