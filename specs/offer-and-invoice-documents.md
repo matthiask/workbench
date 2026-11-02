@@ -10,8 +10,8 @@ Zwischen-Fliesstext für Workbench-Offerten", March 2024), and later for the
 logo on offers and invoices.
 
 Instead of bolting this onto the current reportlab code, this spec proposes
-to render offers and invoices from HTML templates with WeasyPrint, with rich
-text descriptions and a structure for offers (sections).
+to render offers and invoices from HTML templates with WeasyPrint, with
+descriptions in Markdown and a structure for offers (sections).
 
 The layout of all documents will change a lot, old ones included. That's
 accepted. The content of old documents must not change.
@@ -67,9 +67,9 @@ reportlab for now:
 ## 2. Old documents
 
 Old offers and invoices are rendered with the new layout and the new
-renderer, like everything else. Their content stays exactly the same: the
-data migration (section 4) converts their descriptions to HTML without
-changing their meaning. That's the same situation as today, where every
+renderer, like everything else. Their content stays the same: their
+descriptions are rendered as Markdown, and the texts which would change
+their meaning are reviewed and escaped before the switch (section 4). That's the same situation as today, where every
 change to `pdf.py` or to the settings already changes old documents; it
 hasn't been a problem in practice (the bank account changed once in 20
 years).
@@ -92,7 +92,8 @@ storing the PDF when an offer is offered or an invoice is sent (a small
   middle (`break-inside: avoid`), headings stay with the following content
   (`break-after: avoid`). Today a service's title can end up at the bottom
   of a page with its description on the next one.
-- Rich text in descriptions is just HTML.
+- Markdown in descriptions renders to HTML, which the templates include
+  directly.
 - Fonts through `@font-face` from `conf/fonts/`, as today.
 - SVG directly: the QR bill from `qrbill` and the logo as SVG instead of a
   PNG with hard-coded dimensions in millimetres.
@@ -200,104 +201,138 @@ Rich text is the main benefit of moving to HTML, so it's part of the first
 version, not an afterthought. Lists, emphasis and links are what offers
 currently fake with dashes and line breaks, or move into a presentation.
 
-#### Fields
+#### Markdown, not an editor
 
-Rich text (HTML) from the start:
+Descriptions are Markdown, stored as text, edited in a textarea and rendered
+to HTML when shown. Notes already work this way (`render_markdown()` in
+`workbench/tools/markdown.py`, markdown-it-py).
+
+Why not HTML with django-prose-editor (the old `mk/prose-editing` branch
+tried it on `Offer.description`):
+
+- Offer texts are mostly written by hand, and people already write
+  Markdown without knowing it: dashes for lists, blank lines between
+  paragraphs. Markdown makes what they type today render properly.
+- Offers created through `wb` and the `workbench-offer` skill: LLMs write
+  Markdown without being told; HTML needs a list of allowed tags in the
+  skill and sanitising of everything the API receives.
+- The text stays readable as it is wherever HTML doesn't fit: service
+  choices, the logbook, search, exports, mails, the CLI. No conversion to
+  plain text at a dozen call sites.
+- Plain text is valid Markdown: no data migration converting formats, no
+  breaking change of the APIs.
+- No editor JavaScript (which would also have to work in the modal forms),
+  readable diffs in the audit log.
+
+The cost: no toolbar. Since the texts are written by hand, that's the main
+cost: people write `**bold**` and `- item` without seeing the result. A
+hint below the field (as with notes) and a preview in the offer form
+(rendered by the server with the same preset) make up for it; the preview
+is part of the first version. And existing texts are reinterpreted, see
+below.
+
+#### Fields and presets
 
 | Field | Headings | Notes |
 |---|---|---|
-| `Offer.description` | h2, h3 | intro text, may have its own structure |
-| `projects.Service.section_description` | h3 | see sections above |
+| `Offer.description` | yes | intro text, may have its own structure |
+| `projects.Service.section_description` | yes | see sections above |
 | `projects.Service.description` | — | headings would compete with sections |
-| `Invoice.description` | h2, h3 | |
+| `Invoice.description` | yes | |
 | `invoices.Service.description` | — | copied from project services |
-| `RecurringInvoice.description` | h2, h3 | copied to the invoices it creates |
+| `RecurringInvoice.description` | yes | copied to the invoices it creates |
 
-Everywhere: paragraphs, hard breaks, bold, italic, bullet and numbered lists,
-links. No images, no tables, no colours, no font sizes: the document layout
-decides how things look, the text only decides structure and emphasis.
+Everywhere: paragraphs, line breaks, bold, italic, bullet and numbered
+lists, links (also detected automatically). No images, no tables, no
+colours, no font sizes: the document layout decides how things look, the
+text only decides structure and emphasis.
 
-Titles (`title`, `section_title`) stay plain text. So do the logbook
-descriptions, notes, deals etc., which never end up on a customer document.
+Two presets in `workbench/tools/markdown.py`, with and without headings,
+each a markdown-it configuration with an explicit list of enabled rules
+instead of "CommonMark minus something":
 
-#### Editor and sanitising
+- Raw HTML is escaped (`html: False`), so the output is safe without
+  sanitising, in templates as well as in the PDF. markdown-it already
+  rejects `javascript:` and similar links.
+- Single line breaks stay line breaks (`breaks: True`), as in the plain
+  text today.
+- Disabled because old texts trigger them by accident and nobody needs
+  them in an offer: indented code blocks (four leading spaces), fenced
+  code, block quotes (`>`), headings underlined with `---` or `===`
+  (setext), horizontal rules, images.
+- Headings (`#`) only with the heading preset. They are shifted by one
+  level (`#` becomes `<h2>`), the document title is the only `<h1>`. In
+  the preset without headings, a line starting with `#` stays text.
 
-django-prose-editor, which we use elsewhere (the old `mk/prose-editing`
-branch already tried it on `Offer.description`). A field helper in
-`workbench/tools/` with two presets (with and without headings), using the
-editor's extension configuration so that the toolbar and the server-side
-sanitising (nh3) allow exactly the same tags. Sanitising happens on save, so
-the stored HTML can be trusted when rendering, in templates as well as in the
-PDF.
+Titles (`title`, `section_title`) stay plain text. So do logbook
+descriptions, deals etc. Notes use the same Markdown, with the notes'
+own configuration.
 
 #### Existing data
 
-A data migration converts all existing plain text in these fields to HTML:
-escape, then paragraphs from blank lines and `<br>` from single line breaks
-(what Django's `linebreaks` filter does). This keeps the meaning of every
-existing text exactly: a line starting with `#`, `-` or `*` stays literal text,
-nothing is reinterpreted as Markdown. There's no format flag and no second
-code path; after the migration every one of these fields is HTML.
+No format conversion: every existing text is already Markdown. But some of
+them render differently than today. Before the switch, a script lists all
+descriptions whose Markdown output differs from today's output beyond
+line breaks, grouped by what changes:
 
-The reportlab renderer can't render HTML. So rich text and the switch to
-WeasyPrint for offers *and* invoices ship together.
+- Lines starting with `- ` or `* ` become bullet lists. Mostly what was
+  meant, accepted (the layout changes, the content doesn't).
+- Lines starting with `1. ` become numbered lists. Accepted if the numbers
+  stay the same (markdown-it keeps the start number), checked otherwise.
+- `*`, `_` and `**` inside text become emphasis, e.g. footnote stars
+  (`Preis*`) or snake_case identifiers. These have to be looked at.
+- Lines starting with `#` in fields with headings become headings.
+- Lines starting with `+ ` become lists too.
 
-Lists written with dashes in old descriptions stay paragraphs with dashes.
-Not worth a heuristic.
+Texts whose meaning would change are escaped in a data migration with
+backslashes (`\*`, `\#`), only these characters in only these texts, so
+they render exactly as before. Texts which improve (dashes becoming a
+list) stay as they are. The script is run against production data and
+its output reviewed before writing the migration.
+
+The same applies to the web pages which show descriptions (project, offer
+and invoice detail): they render the Markdown too, from the same switch on.
 
 #### Plain text where HTML doesn't fit
 
-Descriptions are used in many places besides the documents. A single helper,
-`html_to_text(html)` in `workbench/tools/`, turns the restricted HTML into
-readable plain text (paragraphs separated by blank lines, list items with
-`- ` or `1. `, links as `text (url)`). It's used by:
+The Markdown source is used as it is: `ServiceBase.__str__()` and
+`project_service_title()` (service choices, logbook, the planning UI), full
+text search, the XLSX and list exports, `title` attributes, mails, and the
+GitHub matching which looks for issue URLs in service descriptions (URLs
+stay literal in the source). If the markup turns out to be distracting
+somewhere (e.g. `**` in service choices), a small `markdown_to_text()`
+using the same parser can strip it there; not needed at first.
 
-- `ServiceBase.__str__()` and `project_service_title()` (service choices,
-  logbook, the planning UI)
-- full text search (`_fts` on offers and invoices)
-- the invoice XLSX export (`InvoiceXLSXView`) and the list exports
-- `title` attributes and other places which render descriptions inline
-  (`workbench/credit_control/forms.py`, `workbench/invoices/forms.py`)
-- the GitHub matching which looks for issue URLs in service descriptions
-  (`update_service_estimates`, the cost allocation report's legacy
-  fallback). URLs survive in `href` and in the text, but the substring check
-  should run on the converted text to be safe.
+Copying stays text to text: invoices from offers
+(`create_services_from_offer`), from the logbook, from recurring invoices;
+copying offers.
 
-Web pages which show descriptions (project detail, offer and invoice detail)
-render the stored HTML directly, it's sanitised.
+#### Markdown in the APIs
 
-Copying stays HTML to HTML: invoices from offers (`create_services_from_offer`),
-from the logbook, from recurring invoices; copying offers.
+The JSON APIs take and return the Markdown source, like today's plain
+text. Nothing is stripped or converted. Syntax a field doesn't support
+(a heading in a service description) is simply rendered as text.
 
-#### HTML in the APIs
+The `workbench-offer` skill lists what's supported: lists, bold, italic,
+links everywhere, headings (`#`, `##`) only in the offer, invoice and
+section descriptions.
 
-The JSON APIs take and return the same HTML as the editor. Input from the
-API goes through the same sanitising as input from the editor (the field's
-nh3 configuration), so the API can't store anything the editor couldn't:
-disallowed tags are removed (keeping their text), attributes and styles
-stripped. No Markdown, no second format, no conversion back and forth.
-
-The offers API is mostly fed by LLMs through `wb` and the `workbench-offer`
-skill; the small tag set (`p`, `br`, `strong`, `em`, `ul`, `ol`, `li`, `a`,
-`h2`, `h3`) is easy for them to write correctly when the skill lists it.
-
-This is a breaking change of the API (descriptions were plain text). Fine as
-long as the CLI has no users outside Feinheit; raise `MINIMUM` in
-`workbench/cli_version.py` anyway.
+This is not a breaking change of the API: plain text is valid Markdown.
+Older CLI versions keep working.
 
 ### API and CLI
 
-- `workbench/offers/api.py`: descriptions as HTML (above); accept
+- `workbench/offers/api.py`: descriptions as Markdown (above); accept
   `section_title` and `section_description` per service when creating and
   replacing offers; return them in the offer detail. Same for the invoices
   API where it exposes descriptions.
-- `wb offers show` prints sections and the descriptions (as text, through
-  `html_to_text()` on the server or a small converter in the CLI);
-  `wb offers create` takes them from the JSON input. Bump the CLI version.
+- `wb offers show` prints sections and the descriptions as they are (the
+  Markdown source reads fine in a terminal); `wb offers create` takes them
+  from the JSON input. Bump the CLI version.
 - `workbench-offer` skill: explain when to use sections (a few groups of
-  related services, not one section per service), and which tags are
-  allowed (lists, bold, italic, links; headings only in the offer and section
-  descriptions).
+  related services, not one section per service), and which Markdown is
+  supported (lists, bold, italic, links; headings only in the offer and
+  section descriptions).
 
 ## 5. Layout
 
@@ -323,31 +358,34 @@ both renderers side by side and review them.
 
 ## 6. Plan
 
-Steps 1 and 2 go live together (the reportlab renderer can't render HTML
-descriptions); they can be developed and reviewed separately.
+Steps 1 and 2 go live together (the reportlab renderer can't render
+Markdown, it would print the markup); they can be developed and reviewed
+separately.
 
 1. **WeasyPrint renderer** for offers, invoices (QR bill, credits, down
    payments), the dunning letter and the project offers PDF. System
    dependencies in the container, templates, CSS, fonts, logo. Developed
    behind `?renderer=weasyprint` to compare against reportlab, with plain
    text descriptions rendered through `linebreaks` in the meantime.
-2. **Rich text**: field helper with django-prose-editor and sanitising,
-   `html_to_text()` and its call sites, sanitised HTML in the APIs, CLI
-   and skill updates, the data migration converting existing descriptions.
+2. **Markdown**: the two presets, rendering in the document templates and
+   on the web pages, the hint and a preview in the forms, the skill update. The
+   script listing old texts which render differently, its review, and the
+   data migration escaping the texts whose meaning would change.
    From then on WeasyPrint is the only renderer for offers and invoices; remove
    `process_offer()`, `process_invoice()` and friends from `pdf.py`. Keep
    `PDFDocument` for the internal reports (or move those too, later).
 3. **Sections** on services: model, form, project detail page, offer
    template, API, CLI, skill.
-4. Maybe: HTML preview on the offer page while editing, PDF/A, storing sent
-   documents (section 2).
+4. Maybe: a preview of the whole document on the offer page while editing,
+   PDF/A, storing sent documents (section 2).
 
 ## 7. Open questions
 
 - Subtotals per section: always, never, or a checkbox on the offer?
-- Disallowed tags sent through the API (e.g. a heading in a service
-  description): silently stripped by nh3 like editor input, or rejected with
-  an error? Rejecting teaches LLMs the rule through the error message.
+- Unsupported Markdown (e.g. a heading in a service description): render it
+  as text (the default), or warn in the form and the API? A warning teaches
+  LLMs the rule through the response; rejecting would be too strict for
+  old texts.
 - With headings allowed in the offer description, are sections still needed
   as fields, or could the offer description and service descriptions carry
   all the structure? Sections are the only way to put text *between*
