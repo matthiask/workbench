@@ -3,6 +3,7 @@ FROM --platform=linux/amd64 ghcr.io/astral-sh/uv:debian as backend
 WORKDIR /src
 ENV PYTHONUNBUFFERED=1 \
     UV_PYTHON_INSTALL_DIR=/opt/uv \
+    UV_PYTHON_CACHE_DIR=/root/.cache/uv/python \
     UV_NO_DEV=1 \
     UV_FROZEN=1
 ADD pyproject.toml uv.lock .
