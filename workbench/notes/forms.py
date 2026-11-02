@@ -1,8 +1,7 @@
-from authlib.email import render_to_mail
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import gettext as _, gettext_lazy, override
+from django.utils.translation import gettext as _, gettext_lazy
 
 from workbench.accounts.models import User
 from workbench.notes.models import TARGETS, Note, visible_content_types
@@ -110,20 +109,4 @@ class NoteForm(ModelForm):
         instance.content_object = self.cleaned_data["content_object"]
         instance.created_by = self.request.user
         instance.save()
-
-        owned_by = getattr(instance.content_object, "owned_by", None)
-        if owned_by and owned_by.is_active and owned_by != instance.created_by:
-            with override(owned_by.language):
-                render_to_mail(
-                    "notes/note_notification",
-                    {
-                        "note": instance,
-                        "url": self.request.build_absolute_uri(
-                            instance.get_absolute_url()
-                        ),
-                    },
-                    to=[owned_by.email],
-                    reply_to=[owned_by.email, instance.created_by.email],
-                ).send(fail_silently=True)
-
         return instance

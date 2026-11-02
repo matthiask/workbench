@@ -237,6 +237,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   field or column loses its history: old entries keep the old key. Only
   rename on purpose, and update the keys in the migration if the history
   matters.
+- Creating notes sends no mail. The fairy tasks send owners one daily digest
+  with titles, truncated descriptions and links of the notes others added or
+  edited on their deals, invoices and projects the day before, found in the
+  audit log (`send_notes_digest()` in `workbench/notes/tasks.py`).
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work.
 - Page layout (see `projects/project_detail.html` and the contacts detail

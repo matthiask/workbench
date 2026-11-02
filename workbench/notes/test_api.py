@@ -104,7 +104,7 @@ class NotesAPITest(TestCase):
         self.assertIn("Relaunch", note["object"]["name"])
 
     def test_create(self):
-        """Notes are added to exactly one object, its owner is notified"""
+        """Notes are added to exactly one object, without an immediate mail"""
         deal = factories.DealFactory.create()
         self.client.force_login(factories.UserFactory.create())
 
@@ -116,8 +116,7 @@ class NotesAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         note = Note.objects.get()
         self.assertEqual(note.content_object, deal)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to, [deal.owned_by.email])
+        self.assertEqual(len(mail.outbox), 0)
 
         response = self.client.post(
             "/api/notes/",

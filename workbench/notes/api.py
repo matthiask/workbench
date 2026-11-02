@@ -107,7 +107,7 @@ def note_create(request, data: NoteIn):
     """Add a note to exactly one deal, invoice, recurring invoice or project
 
     The description is Markdown. Like in the web interface, the owner of the
-    object is notified by email."""
+    object finds it in the daily notes digest mail."""
     targets = [key for key in TARGETS if getattr(data, key)]
     if len(targets) != 1:
         raise ValidationError([

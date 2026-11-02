@@ -102,7 +102,8 @@ def search_notes(
 def create_note(deal, invoice, recurring_invoice, project, title, description, as_json):
     """Add a note to exactly one deal, invoice, recurring invoice or project
 
-    Like in Workbench, the owner of the object is notified by email."""
+    Like in Workbench, the owner of the object finds it in the daily notes
+    digest mail."""
     data = request(
         "POST",
         "notes/",

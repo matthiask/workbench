@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 08:13+0100\n"
+"POT-Creation-Date: 2026-11-02 08:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4799,15 +4799,19 @@ msgstr "Die Stunden für Verrechnung haben beim Erstellen von Rechnungen Vorrang
 msgid "needs action"
 msgstr "Benötigt eine Aktion"
 
-#: workbench/templates/notes/note_notification.txt
+#: workbench/templates/notes/notes_digest.txt
 #, python-format
-msgid "New note on %(content_object)s"
-msgstr "Neue Notiz bei %(content_object)s"
+msgid "New notes on your objects (%(day)s)"
+msgstr "Neue Notizen bei Deinen Objekten (%(day)s)"
 
-#: workbench/templates/notes/note_notification.txt
+#: workbench/templates/notes/notes_digest.txt
 #, python-format
-msgid "%(created_by)s just created a new note on \"%(content_object)s\":"
-msgstr "%(created_by)s hat soeben eine neue Notiz bei \"%(content_object)s\" hinzugefügt:"
+msgid "Hello %(owner)s"
+msgstr "Hallo %(owner)s"
+
+#: workbench/templates/notes/notes_digest.txt
+msgid "Others have added or edited these notes on your deals, invoices and projects. Read them in Workbench:"
+msgstr "Andere haben diese Notizen bei Deinen Geschäften, Rechnungen und Projekten hinzugefügt oder bearbeitet. Lies sie in Workbench:"
 
 #: workbench/templates/offers/offer_pricing.html
 msgid "effort hours"
@@ -5957,6 +5961,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "%(created_by)s just created a new note on \"%(content_object)s\":"
+#~ msgstr "%(created_by)s hat soeben eine neue Notiz bei \"%(content_object)s\" hinzugefügt:"
 
 #~ msgid "acquisition"
 #~ msgstr "Outreach"

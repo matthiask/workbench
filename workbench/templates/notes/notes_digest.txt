@@ -1,0 +1,15 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate with day=day|date:"d.m.Y" %}New notes on your objects ({{ day }}){% endblocktranslate %}
+
+{% blocktranslate trimmed %}
+Hello {{ owner }}
+{% endblocktranslate %}
+
+{% blocktranslate trimmed %}
+Others have added or edited these notes on your deals, invoices and projects. Read them in Workbench:
+{% endblocktranslate %}
+{% for note, authors in notes %}
+{{ note.content_object }}
+- {{ note.title }} ({% for user in authors %}{{ user }}{% if not forloop.last %}, {% endif %}{% endfor %})
+{% if note.description %}  {{ note.description|truncatewords:40 }}
+{% endif %}  {{ WORKBENCH.URL }}{{ note.get_absolute_url }}
+{% endfor %}{% endautoescape %}
