@@ -14,8 +14,8 @@
   <div class="wb-page-header">
     <div class="min-w-0">
       <h1 class="mb-1">
-        {% pin object request.user %}
         {{ project|h }}
+        {% pin object request.user %}
         {% history_link project %}
         <span class="wb-title-badge">{{ object.status_badge }}</span>
       </h1>
@@ -540,11 +540,11 @@
             {% endif %}
             <div class="wb-service-main">
               <div class="wb-service-title">
-                {% pin row.service request.user %}
                 <span>{{ row.service.title }}</span>
                 {% if row.service.is_optional %}
                   <em class="text-secondary">({% translate 'optional' %})</em>
                 {% endif %}
+                {% pin row.service request.user %}
                 {% history_link row.service %}
               </div>
               {% if row.service.description or row.service.external_reference %}

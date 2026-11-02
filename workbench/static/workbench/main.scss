@@ -1307,7 +1307,8 @@ a:hover {
   }
 
   .wb-grabber,
-  .tiny-icons {
+  .tiny-icons,
+  .pin[data-pinned="false"] {
     visibility: hidden;
   }
 
@@ -1316,18 +1317,14 @@ a:hover {
   }
 
   &:hover .wb-grabber,
-  &:hover .tiny-icons {
+  &:hover .tiny-icons,
+  &:hover .pin {
     visibility: visible;
   }
 }
 
-.wb-service-title {
-  font-weight: 500;
-
-  .pin {
-    padding: 0;
-    opacity: 0.6;
-  }
+.wb-service-title .pin {
+  padding: 0;
 }
 
 .wb-service-description {

@@ -53,8 +53,8 @@
             {% for project in user.active_projects %}
               <div class="list-group-item wb-row align-items-center">
                 <div class="wb-row-main">
-                  {% if project.is_pinned %}<small>&#128204;</small>{% endif %}
                   <a href="{{ project.get_absolute_url }}">{{ project|h }}</a>
+                  {% if project.is_pinned %}<small>&#128204;</small>{% endif %}
                   {{ project.status_badge }}
                 </div>
                 <a
