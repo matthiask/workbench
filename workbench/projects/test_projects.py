@@ -178,6 +178,17 @@ class ProjectsTest(TestCase):
             effort_rate=0,
         ).full_clean()
 
+    def test_service_effort_type_on_project(self):
+        """The project page shows the effort type of services"""
+        service = factories.ServiceFactory.create(
+            effort_type="Projektleitung", effort_rate=180, effort_hours=8
+        )
+        self.client.force_login(service.project.owned_by)
+        response = self.client.get(service.project.get_absolute_url())
+        self.assertContains(
+            response, '<span class="wb-figure-note">Projektleitung</span>'
+        )
+
     def test_service_hours_without_rate(self):
         """Optional services don't count towards the budgeted hours without
         an effort rate, like towards all other budgeted totals"""

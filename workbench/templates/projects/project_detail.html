@@ -551,12 +551,13 @@
                 <a
                   class="wb-figure"
                   href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}"
-                  {% if row.service.effort_type %}title="{{ row.service.effort_type }}"{% endif %}
                 >
                   <span>{{ row.logged_hours|hours }}</span>
                   {% if row.service.service_hours %}<span class="wb-stat-of">/
                       {{ row.service.service_hours|hours }}</span>{% endif %}
-                  {% if not row.service.effort_type and row.logged_hours or not row.service.effort_type and row.service.service_hours %}
+                  {% if row.service.effort_type %}
+                    <span class="wb-figure-note">{{ row.service.effort_type }}</span>
+                  {% elif row.logged_hours or row.service.service_hours %}
                     <span class="wb-figure-note text-warning">{% translate 'undefined rate' %}</span>
                   {% endif %}
                   {% bar row.logged_hours row.service.service_hours %}
