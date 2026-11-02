@@ -1,29 +1,15 @@
-{% load fineforms i18n workbench %}
+{% load i18n workbench %}
 <section class="card mt-4" id="notes">
   <div class="card-header d-flex justify-content-between align-items-center">
     {% translate 'notes' context 'notes feature' as notes_heading %}{{ notes_heading|capfirst }}
-    <button
-      type="button"
+    <a
+      href="{% url 'notes_note_add' %}?content_type={{ content_type.pk }}&amp;object_id={{ instance.pk }}"
       class="btn btn-quiet btn-sm"
-      data-bs-target="#note-add-form"
-      data-bs-toggle="collapse"
-      aria-expanded="false"
+      data-ajaxmodal
     >
       {% include "svg/plus.svg" %}
       {% translate 'Add note' %}
-    </button>
-  </div>
-  <div class="collapse" id="note-add-form">
-    <div class="card-body border-bottom">
-      <form method="POST" action="{% url 'notes_note_add' %}">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        {% include 'fineforms/warnings.html' %}
-        {% ff_errors form %}
-        {% ff_fields form %}
-        <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
-      </form>
-    </div>
+    </a>
   </div>
   <div class="list-group list-group-flush">
     {% for note in notes %}

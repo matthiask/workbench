@@ -8,7 +8,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.notes.admin import content_object_url
 from workbench.notes.models import Note
-from workbench.tools.testing import check_code, messages
+from workbench.tools.testing import check_code
 
 
 class NotesTest(TestCase):
@@ -74,12 +74,20 @@ class NotesTest(TestCase):
         deal = factories.DealFactory.create()
         self.client.force_login(deal.owned_by)
 
-        response = self.client.get(deal.urls["detail"])
-
         content_type = ContentType.objects.get_for_model(deal)
+        add_url = (
+            f"/notes/add-note/?content_type={content_type.pk}&amp;object_id={deal.pk}"
+        )
+        self.assertContains(self.client.get(deal.urls["detail"]), add_url)
 
+        # The form opens in a modal
+        response = self.client.get(
+            add_url.replace("&amp;", "&"),
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
         self.assertContains(response, f'value="{content_type.pk}"')
         self.assertContains(response, f'value="{deal.pk}"')
+        self.assertNotContains(response, "Delete")
 
         response = self.client.post(
             "/notes/add-note/",
@@ -88,27 +96,30 @@ class NotesTest(TestCase):
                 "object_id": deal.pk,
                 "title": "Test title",
                 "description": "Test description",
-                "next": deal.urls["detail"],
             },
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
-        self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())
-        self.assertEqual(messages(response), [])
+        self.assertEqual(response.status_code, 299)
+        self.assertEqual(
+            response.json(), {"redirect": Note.objects.get().get_absolute_url()}
+        )
 
+        # Errors are shown in the modal
         response = self.client.post(
             "/notes/add-note/",
             {
                 "content_type": content_type.pk,
                 "object_id": deal.pk + 1,
                 "title": "Test title",
-                "description": "Test description",
-                "next": deal.urls["detail"],
+                "description": "",
             },
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
-        self.assertRedirects(response, deal.urls["detail"])
-        self.assertEqual(
-            messages(response),
-            ["Unable to determine the object this note should be added to."],
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Unable to determine the object this note should be added to."
         )
+        self.assertContains(response, "This field is required.")
 
         # print(response, response.content.decode("utf-8"))
 
@@ -129,9 +140,10 @@ class NotesTest(TestCase):
         self.client.force_login(project.owned_by)
         content_type = ContentType.objects.get_for_model(project)
 
-        response = self.client.get(project.urls["detail"])
-        self.assertContains(response, 'action="/notes/add-note/"')
-        self.assertContains(response, f'value="{content_type.pk}"')
+        self.assertContains(
+            self.client.get(project.urls["detail"]),
+            f"/notes/add-note/?content_type={content_type.pk}&amp;object_id={project.pk}",
+        )
 
         response = self.client.post(
             "/notes/add-note/",
@@ -140,7 +152,6 @@ class NotesTest(TestCase):
                 "object_id": project.pk,
                 "title": "Debriefing",
                 "description": "The prototype made the implementation predictable.",
-                "next": project.urls["detail"],
             },
         )
         self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())
@@ -163,7 +174,6 @@ class NotesTest(TestCase):
                 "object_id": deal.pk,
                 "title": "Test title",
                 "description": "Test description",
-                "next": deal.urls["detail"],
             },
         )
         self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())
@@ -178,7 +188,6 @@ class NotesTest(TestCase):
                 "object_id": deal.pk,
                 "title": "Test title",
                 "description": "Test description",
-                "next": deal.urls["detail"],
             },
         )
         self.assertRedirects(response, Note.objects.latest("pk").get_absolute_url())

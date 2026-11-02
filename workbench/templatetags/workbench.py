@@ -4,6 +4,7 @@ from collections import defaultdict
 from itertools import groupby
 
 from django import template
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.template.defaultfilters import linebreaksbr
 from django.urls import reverse
@@ -14,7 +15,6 @@ from django.utils.translation import gettext as _
 from workbench.deals.models import Deal
 from workbench.logbook.celebrations import SESSION_KEY
 from workbench.logbook.models import LoggedHours
-from workbench.notes.forms import NoteForm
 from workbench.notes.models import Note
 from workbench.projects.models import Project, Service
 from workbench.reporting.utils import sum_by
@@ -274,16 +274,15 @@ def addf(a, b):
     return a + b
 
 
-@register.inclusion_tag("notes/widget.html", takes_context=True)
-def notes(context, instance):
-    request = context["request"]
+@register.inclusion_tag("notes/widget.html")
+def notes(instance):
     notes = (
         Note.objects.for_content_object(instance).select_related("created_by").reverse()
     )
     return {
-        "form": NoteForm(request=request, content_object=instance),
+        "content_type": ContentType.objects.get_for_model(instance),
+        "instance": instance,
         "notes": notes,
-        "request": request,
     }
 
 
