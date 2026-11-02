@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 15:41+0100\n"
+"POT-Creation-Date: 2026-11-02 16:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5076,6 +5076,14 @@ msgstr "Das Total der geplanten Rechnungen ist nicht hoch genug, um die erfasste
 #: workbench/templates/projects/project_detail.html
 msgid "Related deals"
 msgstr "Verbundene Geschäfte"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Expand all"
+msgstr "Alles aufklappen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Collapse all"
+msgstr "Alles zuklappen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Plan work"

@@ -986,3 +986,39 @@ document.addEventListener("click", (e) => {
   const clamp = e.target.closest("[data-clamp]")
   if (clamp && !e.target.closest("a")) clamp.classList.add("is-expanded")
 })
+
+// Expand the description and the services of an offer at once
+document.addEventListener("click", (e) => {
+  const button = e.target.closest("[data-expand-offer]")
+  if (!button) return
+
+  const offer = button.closest(".wb-offer")
+  const expand = button.getAttribute("aria-expanded") !== "true"
+  for (const clamp of offer.querySelectorAll("[data-clamp]")) {
+    clamp.classList.toggle("is-expanded", expand)
+  }
+  for (const el of offer.querySelectorAll(".collapse")) {
+    bootstrap.Collapse.getOrCreateInstance(el, { toggle: false })[
+      expand ? "show" : "hide"
+    ]()
+  }
+
+  button.dataset.titleCollapsed ??= button.title
+  button.title = expand
+    ? button.dataset.titleExpanded
+    : button.dataset.titleCollapsed
+  button.setAttribute("aria-expanded", expand ? "true" : "false")
+})
+
+// Hide the button when there is nothing to expand
+function hideUselessExpandButtons() {
+  for (const button of document.querySelectorAll("[data-expand-offer]")) {
+    const offer = button.closest(".wb-offer")
+    button.hidden =
+      !offer.querySelector(".collapse") &&
+      ![...offer.querySelectorAll("[data-clamp]")].some(
+        (clamp) => clamp.scrollHeight > clamp.clientHeight,
+      )
+  }
+}
+document.addEventListener("DOMContentLoaded", hideUselessExpandButtons)

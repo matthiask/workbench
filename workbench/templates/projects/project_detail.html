@@ -440,16 +440,18 @@
         </div>
 
         <div class="wb-row-actions">
-          {% if offer and offer.should_collapse %}
-            <a
-              href="#"
-              data-bs-toggle="collapse"
-              data-bs-target=".offer-{{ offer.id }}-collapsed"
-              aria-expanded="false"
-              class="btn btn-quiet btn-sm"
-            >{% translate 'Show' %}</a>
-          {% endif %}
           {% if offer %}
+            <button
+              type="button"
+              class="btn btn-quiet btn-sm btn-icon"
+              data-expand-offer
+              aria-expanded="false"
+              title="{% translate 'Expand all' %}"
+              data-title-expanded="{% translate 'Collapse all' %}"
+            >
+              <span class="wb-when-collapsed">{% include 'svg/unfold.svg' %}</span>
+              <span class="wb-when-expanded">{% include 'svg/fold.svg' %}</span>
+            </button>
             {% if request.user.features.CONTROLLING or request.user.features.PLANNING and not offer.work_completed_on %}
               <span class="dropdown">
                 <button

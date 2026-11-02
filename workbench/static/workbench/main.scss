@@ -1335,6 +1335,22 @@ a:hover {
   font-size: 0.85rem;
 }
 
+[data-expand-offer] {
+  .wb-when-expanded {
+    display: none;
+  }
+
+  &[aria-expanded="true"] {
+    .wb-when-collapsed {
+      display: none;
+    }
+
+    .wb-when-expanded {
+      display: contents;
+    }
+  }
+}
+
 .wb-clamp {
   display: -webkit-box;
   -webkit-box-orient: vertical;
