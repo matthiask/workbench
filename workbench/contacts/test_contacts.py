@@ -1,4 +1,5 @@
 import datetime as dt
+from unittest import mock
 
 from django.core import mail
 from django.core.exceptions import ValidationError
@@ -570,6 +571,22 @@ class ArchiveContactsTest(TestCase):
         organization = factories.OrganizationFactory.create()
         organization.groups.add(group)
         self.assertEqual(set(tasks.unused_organizations(cutoff)), {organization})
+
+    @override_settings(BREVO_WEBHOOK_URL="https://brevo.example.com/hook")
+    def test_brevo_person_without_logged_insert(self):
+        """People whose creation isn't in the audit log (anymore) are sent too"""
+        person = factories.PersonFactory.create()
+        LoggedAction.objects.filter(
+            table_name=Person._meta.db_table, action="I"
+        ).delete()
+        person.emailaddresses.create(email="test@example.com")
+
+        with mock.patch("workbench.contacts.tasks.api.post") as post:
+            tasks.upload_contacts_to_brevo()
+
+        post.assert_called_once()
+        self.assertEqual(post.call_args.kwargs["json"]["email"], "test@example.com")
+        self.assertEqual(post.call_args.kwargs["json"]["created_at"], "")
 
     def test_all_relations_known(self):
         """New relations to contacts keep them active until it's decided

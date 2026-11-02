@@ -60,12 +60,10 @@ def upload_contacts_to_brevo():
         if not email:
             continue
 
-        logged_action = LoggedAction.objects.get(
+        # The audit log may not know the creation of old people (anymore)
+        logged_action = LoggedAction.objects.filter(
             table_name=Person._meta.db_table, row_data__id=person.id, action="I"
-        )
-
-        if not logged_action:
-            continue
+        ).first()
 
         forward_data = {
             "email": email.email,
@@ -74,7 +72,7 @@ def upload_contacts_to_brevo():
             "salutation": person.address,
             "full_salutation": person.salutation,
             "primary_contact": person.primary_contact.get_full_name(),
-            "created_at": str(logged_action.created_at),
+            "created_at": str(logged_action.created_at) if logged_action else "",
             "groups": ", ".join([g.title for g in person.all_groups()]),
             "organization": person.organization.name if person.organization else "",
         }
