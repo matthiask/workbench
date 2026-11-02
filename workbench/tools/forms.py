@@ -119,7 +119,9 @@ class WarningsForm:
         if not super().is_valid():
             return False
 
-        return not (self.warnings and not self.should_ignore_warnings())
+        return not (
+            self.warnings and not (ignore_warnings or self.should_ignore_warnings())
+        )
 
     def should_ignore_warnings(self):
         ignore = set(self.data.get(self.ignore_warnings_id, "").split())
