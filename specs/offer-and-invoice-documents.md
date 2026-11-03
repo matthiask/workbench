@@ -297,11 +297,10 @@ and invoice detail): they render the Markdown too, from the same switch on.
 
 The Markdown source is used as it is: `ServiceBase.__str__()` and
 `project_service_title()` (service choices, logbook, the planning UI), full
-text search, the XLSX and list exports, `title` attributes, mails, and the
-GitHub matching which looks for issue URLs in service descriptions (URLs
-stay literal in the source). If the markup turns out to be distracting
-somewhere (e.g. `**` in service choices), a small `markdown_to_text()`
-using the same parser can strip it there; not needed at first.
+text search, the XLSX and list exports, `title` attributes and mails. If
+the markup turns out to be distracting somewhere (e.g. `**` in service
+choices), a small `markdown_to_text()` using the same parser can strip it
+there; not needed at first.
 
 Copying stays text to text: invoices from offers
 (`create_services_from_offer`), from the logbook, from recurring invoices;

@@ -32,10 +32,6 @@ file on the production server)::
     OAUTH2_CLIENT_ID=...
     OAUTH2_CLIENT_SECRET=...
 
-    # For the GitHub estimates importer:
-    GITHUB_API_TOKEN=...
-    GITHUB_PROJECT_URLS=["https://github.com/orgs/your-org/projects/1"]
-
 Local setup
 ===========
 
@@ -80,27 +76,6 @@ Command line interface
 
 ``wb`` in ``cli/`` is a client of the JSON API (``/api/``), see
 ``cli/README.md``. ``wb login`` gets an API token through the browser.
-
-GitHub integration
-==================
-
-Workbench can import time estimates from GitHub Project boards into the effort
-hours of services:
-
-1. Add a GitHub API token to ``.env`` with ``GITHUB_API_TOKEN=...`` (the
-   token needs the ``repo`` scope to access private repositories)
-2. Add the project board URLs to ``.env`` with
-   ``GITHUB_PROJECT_URLS=["https://github.com/orgs/your-org/projects/1"]``
-3. Include GitHub issue URLs in the descriptions of services (e.g. "See
-   https://github.com/owner/repo/issues/123")
-
-The update fetches the cards of the boards and sets the effort hours of every
-service whose description contains the card's issue URL. Estimates are read
-from number fields of the board whose name contains "hour", "time", "estimate"
-or "duration". It isn't part of the fairy tasks, run it daily with a separate
-cronjob or manually::
-
-    uv run ./manage.py update_service_estimates
 
 Deployment
 ==========
