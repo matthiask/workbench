@@ -445,6 +445,10 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         service.refresh_from_db()
         self.assertIsNone(service.offer)
+        result = self.wb("services", "update", service.pk, "--description", "Text")
+        self.assertEqual(result.exit_code, 0, result.output)
+        service.refresh_from_db()
+        self.assertEqual(service.description, "Text")
         result = self.wb("services", "update", service.pk)
         self.assertEqual(result.exit_code, 1)
         result = self.wb(

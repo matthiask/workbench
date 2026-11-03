@@ -239,6 +239,7 @@ preparation or service groups, not out of offers which have been sent):
     wb services update 902 --external-reference https://github.com/org/repo/issues/12
     wb services update 902 --offer 5678
     wb services update 902 --clear-offer
+    wb services update 902 --description "Without the URL"
 
 Services are given with options or as YAML (or JSON) files like a service of
 `wb offers create`; options override the file. `update` only changes the given

@@ -390,6 +390,11 @@ class ProjectsAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["offer"], accepted.code)
 
+        # The description of services of sent offers is locked too
+        self.assertEqual(
+            locs(patch({"description": "Text"})), [["body", "data", "description"]]
+        )
+
         # Warnings about the fields which aren't changed don't get in the way
         unspecific = factories.ServiceFactory.create(
             project=project, title="Programmierung allgemein"
@@ -400,6 +405,23 @@ class ProjectsAPITest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 200, response.content)
+
+    def test_service_description(self):
+        """Descriptions of services which aren't bound to sent offers can be
+        changed, e.g. to move URLs into the external reference"""
+        service = factories.ServiceFactory.create(
+            description="https://example.com/issues/1"
+        )
+        self.client.force_login(service.project.owned_by)
+        response = self.client.patch(
+            f"/api/services/{service.pk}/",
+            {"description": "", "external_reference": "https://example.com/issues/1"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        service.refresh_from_db()
+        self.assertEqual(service.description, "")
+        self.assertEqual(service.external_reference, "https://example.com/issues/1")
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_services_rates_require_controlling(self):

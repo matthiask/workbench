@@ -576,6 +576,11 @@ class ServicePatch(Schema):
         " or a service group, null removes the service from its offer. Services"
         " of offers which have been sent or accepted can't be moved.",
     )
+    description: str | None = Field(
+        default=None,
+        description="Null removes it. Not for services of offers which have"
+        " been sent or accepted.",
+    )
     external_reference: str | None = Field(
         default=None,
         max_length=500,
@@ -588,9 +593,9 @@ class ServicePatch(Schema):
 def service_update(
     request, service_id: int, data: ServicePatch, *, dry_run: bool = False
 ):
-    """Move a service to another offer or change its external reference,
-    validated with the form of the web interface; other fields are changed
-    through the offers
+    """Move a service to another offer or change its description or external
+    reference, validated with the form of the web interface; other fields are
+    changed through the offers
 
     Warnings about fields which aren't changed here (e.g. the title) are
     ignored."""
@@ -598,18 +603,23 @@ def service_update(
     patch = data.model_dump(exclude_unset=True)
     values = form_data(ServiceForm(instance=service, request=request))
     form = ServiceForm(instance=service, request=request)
-    if "offer" in patch and form.fields["offer"].disabled:
+    if locked := [
+        f for f in ("offer", "description") if f in patch and form.fields[f].disabled
+    ]:
         raise ValidationError([
             {
-                "loc": ["body", "data", "offer"],
+                "loc": ["body", "data", field],
                 "msg": _(
                     "The service is bound to an offer which is not in"
                     " preparation anymore."
                 ),
             }
+            for field in locked
         ])
     if "offer" in patch:
         values["offer"] = patch["offer"] or ""
+    if "description" in patch:
+        values["description"] = patch["description"] or ""
     if "external_reference" in patch:
         values["external_reference"] = (patch["external_reference"] or "").strip()
 
