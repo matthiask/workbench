@@ -264,6 +264,28 @@ class OffersAPITest(TestCase):
         self.assertEqual(ids("?period=2026-09"), [relaunch.pk])
         self.assertEqual(ids("?until=2026-08-31"), [])
 
+    def test_dates(self):
+        """Offers have their dates, closed_on is the date of the acceptance"""
+        offer = factories.OfferFactory.create(
+            status=Offer.ACCEPTED,
+            offered_on=dt.date(2026, 9, 1),
+            valid_until=dt.date(2026, 9, 30),
+            closed_on=dt.date(2026, 9, 15),
+            work_completed_on=dt.date(2026, 10, 31),
+        )
+        self.client.force_login(offer.owned_by)
+        data = self.client.get(f"/api/offers/{offer.pk}/").json()
+        self.assertEqual(
+            {key: data[key] for key in data if key.endswith(("_on", "_until"))},
+            {
+                "offered_on": "2026-09-01",
+                "valid_until": "2026-09-30",
+                "closed_on": "2026-09-15",
+                "work_completed_on": "2026-10-31",
+            },
+        )
+        self.assertTrue(data["created_at"].startswith(str(offer.created_at.year)))
+
 
 class OfferServicesAPITest(TestCase):
     """Editing single services of offers in preparation"""

@@ -1,3 +1,4 @@
+import datetime as dt
 from decimal import Decimal
 from typing import Literal
 
@@ -117,6 +118,11 @@ class OfferOut(Schema):
     title: str
     description: str
     status: str
+    created_at: dt.datetime
+    offered_on: dt.date | None
+    closed_on: dt.date | None = Field(description="Date of acceptance or decline.")
+    valid_until: dt.date | None
+    work_completed_on: dt.date | None
     subtotal: Decimal
     discount: Decimal
     total_excl_tax: Decimal
@@ -166,6 +172,11 @@ def offer_out(offer, services, request):
         "title": offer.title,
         "description": offer.description,
         "status": offer.get_status_display(),
+        "created_at": offer.created_at,
+        "offered_on": offer.offered_on,
+        "closed_on": offer.closed_on,
+        "valid_until": offer.valid_until,
+        "work_completed_on": offer.work_completed_on,
         "subtotal": offer.subtotal,
         "discount": offer.discount,
         "total_excl_tax": offer.total_excl_tax,

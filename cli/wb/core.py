@@ -513,7 +513,15 @@ def echo_fields(title, fields, *, url=None):
 def echo_offer(offer):
     echo_fields(
         f"{offer['code'] or '(new offer)'} {offer['title']}",
-        [("ID", offer["id"]), ("Status", offer["status"]), ("URL", offer["url"])],
+        [
+            ("ID", offer["id"]),
+            ("Status", offer["status"]),
+            ("Offered on", offer.get("offered_on")),
+            ("Valid until", offer.get("valid_until")),
+            ("Closed on", offer.get("closed_on")),
+            ("Work completed on", offer.get("work_completed_on")),
+            ("URL", offer["url"]),
+        ],
         url=offer["url"],
     )
     table = make_table(
