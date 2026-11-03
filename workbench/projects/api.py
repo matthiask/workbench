@@ -18,7 +18,7 @@ from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.planning.models import PlannedWork
-from workbench.projects.forms import ProjectForm
+from workbench.projects.forms import ProjectForm, ServiceForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
@@ -568,6 +568,14 @@ def service_list(request, filters: Query[ServiceFilter]):
 
 
 class ServicePatch(Schema):
+    """Fields which aren't given are left alone"""
+
+    offer: int | None = Field(
+        default=None,
+        description="ID of an offer of the same project which is in preparation"
+        " or a service group, null removes the service from its offer. Services"
+        " of offers which have been sent or accepted can't be moved.",
+    )
     external_reference: str | None = Field(
         default=None,
         max_length=500,
@@ -580,12 +588,37 @@ class ServicePatch(Schema):
 def service_update(
     request, service_id: int, data: ServicePatch, *, dry_run: bool = False
 ):
-    """Change the external reference of a service, in any state of its offer
-    (like in the web interface); other fields are changed through the offers"""
-    service = get_object_or_404(Service, pk=service_id)
-    service.external_reference = (data.external_reference or "").strip()
+    """Move a service to another offer or change its external reference,
+    validated with the form of the web interface; other fields are changed
+    through the offers
+
+    Warnings about fields which aren't changed here (e.g. the title) are
+    ignored."""
+    service = get_object_or_404(Service.objects.select_related("offer"), pk=service_id)
+    patch = data.model_dump(exclude_unset=True)
+    values = form_data(ServiceForm(instance=service, request=request))
+    form = ServiceForm(instance=service, request=request)
+    if "offer" in patch and form.fields["offer"].disabled:
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "offer"],
+                "msg": _(
+                    "The service is bound to an offer which is not in"
+                    " preparation anymore."
+                ),
+            }
+        ])
+    if "offer" in patch:
+        values["offer"] = patch["offer"] or ""
+    if "external_reference" in patch:
+        values["external_reference"] = (patch["external_reference"] or "").strip()
+
+    form = ServiceForm(values, instance=service, request=request)
+    if not form.is_valid(ignore_warnings=True):
+        raise_form_errors(form)
+
     with transaction.atomic():
-        service.save(update_fields=["external_reference"])
+        service = form.save()
         result = _service_out(
             _services().get(pk=service.pk),
             request,

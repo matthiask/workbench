@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 18:19+0100\n"
+"POT-Creation-Date: 2026-11-03 22:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3356,6 +3356,10 @@ msgstr "Gesamtkapazität"
 #: workbench/projects/api.py
 msgid "Select projects using ids, open or closed_since."
 msgstr "Wähle Projekte mit ids, open oder closed_since aus."
+
+#: workbench/projects/api.py
+msgid "The service is bound to an offer which is not in preparation anymore."
+msgstr "Die Leistung gehört zu einer Offerte, die nicht mehr in Vorbereitung ist."
 
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/reporting/squeeze.py workbench/templates/base.html

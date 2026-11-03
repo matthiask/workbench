@@ -14,6 +14,7 @@ from wb.core import (
     page_options,
     page_params,
     request,
+    terminate,
 )
 
 
@@ -88,27 +89,46 @@ def search_services(
 @services.command("update")
 @click.argument("service_id", type=int)
 @click.option(
-    "--external-reference",
-    required=True,
-    help='E.g. the URL of an issue, "" removes it.',
+    "--offer",
+    type=int,
+    help="Move the service to this offer of the same project (in preparation"
+    " or a service group).",
 )
+@click.option("--clear-offer", is_flag=True, help="Remove it from its offer.")
+@click.option("--external-reference", help='E.g. the URL of an issue, "" removes it.')
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
-def update_service(service_id, external_reference, dry_run, as_json):
-    """Change the external reference of a service, also when its offer has
-    been sent or accepted (other fields are changed with `wb offers
-    services update`)"""
+def update_service(
+    service_id, offer, clear_offer, external_reference, dry_run, as_json
+):
+    """Move a service to another offer or change its external reference
+
+    Like in the web interface, services of offers which have been sent or
+    accepted can't be moved, but their external reference can be changed.
+    Other fields are changed with `wb offers services update`."""
+    if offer and clear_offer:
+        terminate("Pass either --offer or --clear-offer.")
+    data = {}
+    if offer or clear_offer:
+        data["offer"] = offer
+    if external_reference is not None:
+        data["external_reference"] = external_reference
+    if not data:
+        terminate(
+            "Nothing to change, pass --offer, --clear-offer or --external-reference."
+        )
     data = request(
         "PATCH",
         f"services/{service_id}/",
-        json={"external_reference": external_reference},
+        json=data,
         params={"dry_run": format_bool(dry_run)},
     )
     if as_json:
         echo_json(data)
         return
-    reference = data["external_reference"] or "(none)"
     prefix = "Dry run, nothing changed: " if dry_run else ""
     console.print(
-        f"{prefix}{link(data['id'], data['url'])} {data['title']}: {reference}"
+        f"{prefix}{link(data['id'], data['url'])} {data['title']}"
+        f" | offer: {data['offer'] or '(none)'}"
+        f" | external reference: {data['external_reference'] or '(none)'}"
     )

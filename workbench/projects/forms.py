@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Q
 from django.forms.models import inlineformset_factory
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
@@ -547,8 +548,15 @@ class ServiceForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
+        from workbench.offers.models import Offer
+
+        # Only offers which may receive services are valid, not only offered
+        include = getattr(self.instance, "offer_id", None)
+        self.fields["offer"].queryset = self.project.offers.filter(
+            Q(status__lte=Offer.SERVICE_GROUP) | Q(pk=include)
+        )
         self.fields["offer"].choices = self.project.offers.service_form_choices(
-            include=getattr(self.instance, "offer_id", None)
+            include=include
         )
         self.instance.project = self.project
 

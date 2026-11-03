@@ -340,6 +340,67 @@ class ProjectsAPITest(TestCase):
             404,
         )
 
+    def test_service_move_to_offer(self):
+        """Services are moved between offers with the rules of the web
+        interface: only offers of the same project which are in preparation
+        or service groups, and not out of offers which have been sent"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        group = factories.OfferFactory.create(
+            project=project, status=Offer.SERVICE_GROUP
+        )
+        accepted = factories.OfferFactory.create(project=project)
+        Offer.objects.filter(pk=accepted.pk).update(status=Offer.ACCEPTED)
+        other = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(project=project, title="Design")
+        self.client.force_login(project.owned_by)
+        url = f"/api/services/{service.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        def locs(response):
+            self.assertEqual(response.status_code, 422, response.content)
+            return [e["loc"] for e in response.json()["detail"]]
+
+        response = patch({"offer": offer.pk}, "?dry_run=1")
+        self.assertEqual(response.json()["offer"], offer.code)
+        service.refresh_from_db()
+        self.assertIsNone(service.offer)
+
+        response = patch({"offer": offer.pk})
+        self.assertEqual(response.json()["offer"], offer.code)
+        response = patch({"offer": group.pk})
+        self.assertEqual(response.json()["offer"], group.code)
+        response = patch({"offer": None})
+        self.assertIsNone(response.json()["offer"])
+
+        self.assertEqual(
+            locs(patch({"offer": accepted.pk})), [["body", "data", "offer"]]
+        )
+        self.assertEqual(locs(patch({"offer": other.pk})), [["body", "data", "offer"]])
+
+        service.offer = accepted
+        service.save()
+        self.assertEqual(locs(patch({"offer": offer.pk})), [["body", "data", "offer"]])
+        # The external reference can still be changed
+        response = patch({"external_reference": "https://example.com/issues/2"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["offer"], accepted.code)
+
+        # Warnings about the fields which aren't changed don't get in the way
+        unspecific = factories.ServiceFactory.create(
+            project=project, title="Programmierung allgemein"
+        )
+        response = self.client.patch(
+            f"/api/services/{unspecific.pk}/",
+            {"offer": offer.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_services_rates_require_controlling(self):
         """Rates require the controlling feature, like on the project page"""

@@ -232,9 +232,13 @@ the existing ones; Workbench only stores them and doesn't talk to GitHub:
     wb offers search --external-reference https://github.com/org/repo/issues/12
 
 The external reference of a single service can be changed the same way, also
-when its offer has been accepted:
+when its offer has been accepted. Services are moved to another offer of the
+same project with the rules of the web interface (only to offers in
+preparation or service groups, not out of offers which have been sent):
 
     wb services update 902 --external-reference https://github.com/org/repo/issues/12
+    wb services update 902 --offer 5678
+    wb services update 902 --clear-offer
 
 Services are given with options or as YAML (or JSON) files like a service of
 `wb offers create`; options override the file. `update` only changes the given

@@ -437,6 +437,16 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         service.refresh_from_db()
         self.assertEqual(service.external_reference, "https://example.com/issues/1")
+        offer = factories.OfferFactory.create(project=project)
+        result = self.wb("services", "update", service.pk, "--offer", offer.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(offer.code, result.output)
+        result = self.wb("services", "update", service.pk, "--clear-offer")
+        self.assertEqual(result.exit_code, 0, result.output)
+        service.refresh_from_db()
+        self.assertIsNone(service.offer)
+        result = self.wb("services", "update", service.pk)
+        self.assertEqual(result.exit_code, 1)
         result = self.wb(
             "hours", "search", "--project", project.pk, "--rendered-by", "ab"
         )
