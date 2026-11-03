@@ -254,7 +254,7 @@ def services(request, pk):
         if service.offer not in offers:
             offers[service.offer] = {"label": str(service.offer), "options": []}
         offers[service.offer]["options"].append({
-            "label": str(service),
+            "label": service.choice_label(),
             "value": service.id,
         })
 

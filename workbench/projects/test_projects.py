@@ -532,6 +532,25 @@ class ProjectsTest(TestCase):
         self.assertIn(offer.code, services[0]["label"])
         self.assertEqual(services[1]["label"], "Not offered yet")
 
+    def test_long_service_descriptions_in_choices(self):
+        """Long descriptions are truncated in dropdowns, Chrome can't show them"""
+        service = factories.ServiceFactory.create(
+            title="Projektleitung", description="Lorem ipsum " * 100
+        )
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get(service.project.urls["services"])
+        label = response.json()["services"][0]["options"][0]["label"]
+        self.assertTrue(label.startswith("Projektleitung: Lorem ipsum"))
+        self.assertEqual(len(label), 100)
+
+        response = self.client.get(
+            service.project.urls["createhours"],
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "Projektleitung: Lorem ipsum")
+        self.assertNotContains(response, "Lorem ipsum " * 10)
+
     def test_projects_api(self):
         """The projects API returns JSON"""
         user = factories.UserFactory.create()

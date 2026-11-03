@@ -934,6 +934,11 @@ class EntriesChoiceField(forms.ModelMultipleChoiceField):
         return obj.pretty()
 
 
+class ServiceChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.choice_label()
+
+
 class LogbookBatchForm(Form):
     def __init__(self, *args, **kwargs):
         self._project = kwargs.pop("project")
@@ -946,7 +951,7 @@ class LogbookBatchForm(Form):
             widget=forms.SelectMultiple(attrs={"size": min(30, len(self._entries))}),
         )
 
-        self.fields["service"] = forms.ModelChoiceField(
+        self.fields["service"] = ServiceChoiceField(
             self._project.services.logging(),
             label=_("Move to service"),
             required=False,
