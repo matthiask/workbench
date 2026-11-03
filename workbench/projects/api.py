@@ -469,8 +469,13 @@ class ServiceOut(Schema):
     description: str
     external_reference: str
     effort_type: str
+    effort_rate: Decimal | None = Field(
+        description="Requires the controlling feature, null otherwise."
+    )
     service_hours: Decimal
     logged_hours: Decimal
+    invoiced_hours: Decimal = Field(description="Logged hours on invoices.")
+    not_invoiced_hours: Decimal = Field(description="Logged hours not invoiced yet.")
     cost: Decimal | None
     logged_cost: Decimal
     is_optional: bool
@@ -481,13 +486,14 @@ class ServiceFilter(Schema):
     q: str = ""
     project: int | None = None
     offer: int | None = None
+    external_reference: str | None = Field(default=None, description="Exact match")
 
 
-def _sum_of(model, field):
+def _sum_of(model, field, **filters):
     """Subquery summing up ``field`` of the service's logbook entries"""
     return Subquery(
         model.objects
-        .filter(service=OuterRef("pk"))
+        .filter(service=OuterRef("pk"), **filters)
         .order_by()
         .values("service")
         .annotate(total=Sum(field))
@@ -508,6 +514,10 @@ def service_list(request, filters: Query[ServiceFilter]):
         .select_related("project", "offer__project")
         .annotate(
             logged_hours=_sum_of(LoggedHours, "hours"),
+            invoiced_hours=_sum_of(LoggedHours, "hours", invoice_service__isnull=False),
+            not_invoiced_hours=_sum_of(
+                LoggedHours, "hours", invoice_service__isnull=True
+            ),
             logged_cost=_sum_of(LoggedCost, "cost"),
         )
         .order_by("project", "offer_id", "position", "pk")
@@ -516,8 +526,11 @@ def service_list(request, filters: Query[ServiceFilter]):
         services = services.filter(project=filters.project)
     if filters.offer:
         services = services.filter(offer=filters.offer)
+    if filters.external_reference:
+        services = services.filter(external_reference=filters.external_reference)
     if filters.q:
         services = services.search(filters.q)
+    controlling = request.user.features[FEATURES.CONTROLLING]
     return Serialized(
         services,
         lambda service: {
@@ -535,8 +548,11 @@ def service_list(request, filters: Query[ServiceFilter]):
             "description": service.description,
             "external_reference": service.external_reference,
             "effort_type": service.effort_type,
+            "effort_rate": service.effort_rate if controlling else None,
             "service_hours": service.service_hours,
             "logged_hours": service.logged_hours or Z1,
+            "invoiced_hours": service.invoiced_hours or Z1,
+            "not_invoiced_hours": service.not_invoiced_hours or Z1,
             "cost": service.cost,
             "logged_cost": service.logged_cost or Z2,
             "is_optional": service.is_optional,

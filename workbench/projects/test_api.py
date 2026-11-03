@@ -2,9 +2,11 @@ import datetime as dt
 from decimal import Decimal
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
@@ -253,12 +255,58 @@ class ProjectsAPITest(TestCase):
         )
         self.assertEqual(data[1]["cost"], "500.00")
         self.assertEqual(data[1]["logged_cost"], "100.00")
-        self.assertNotIn("effort_rate", data[0])
+        self.assertEqual(data[0]["effort_rate"], "200.00")
 
         data = self.client.get(f"/api/services/?offer={offer.pk}").json()["items"]
         self.assertEqual([s["id"] for s in data], [design.pk])
         data = self.client.get("/api/services/?q=hosting").json()["items"]
         self.assertEqual([s["id"] for s in data], [hosting.pk])
+
+    def test_services_invoiced_hours(self):
+        """Services split their logged hours into invoiced and not invoiced ones"""
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(
+            project=project, external_reference="https://example.com/issues/1"
+        )
+        factories.ServiceFactory.create(
+            project=project, external_reference="https://example.com/issues/12"
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=3)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        factories.LoggedHoursFactory.create(service=service, hours=2)
+        self.client.force_login(project.owned_by)
+
+        data = self.client.get(
+            "/api/services/", {"external_reference": "https://example.com/issues/1"}
+        ).json()["items"]
+        self.assertEqual(
+            [
+                (
+                    s["id"],
+                    s["logged_hours"],
+                    s["invoiced_hours"],
+                    s["not_invoiced_hours"],
+                )
+                for s in data
+            ],
+            [(service.pk, "5.0", "3.0", "2.0")],
+        )
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
+    def test_services_rates_require_controlling(self):
+        """Rates require the controlling feature, like on the project page"""
+        service = factories.ServiceFactory.create(
+            effort_type="Design", effort_hours=10, effort_rate=200
+        )
+        self.client.force_login(service.project.owned_by)
+        data = self.client.get("/api/services/").json()["items"]
+        self.assertIsNone(data[0]["effort_rate"])
 
     def test_update(self):
         """Projects are changed field by field and closed like in the web

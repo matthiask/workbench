@@ -25,16 +25,21 @@ def services():
 @click.argument("query", nargs=-1)
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--offer", type=int, help="Offer ID.")
+@click.option("--external-reference", help="Exact match, e.g. a URL.")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
-def search_services(query, project, offer, limit, offset, as_csv, as_json):
+def search_services(
+    query, project, offer, external_reference, limit, offset, as_csv, as_json
+):
     """Search services, ordered by project and offer"""
     params = {"q": " ".join(query)}
     if project:
         params["project"] = project
     if offer:
         params["offer"] = offer
+    if external_reference:
+        params["external_reference"] = external_reference
     data = request("GET", "services/", params=params | page_params(limit, offset))
     if as_csv:
         echo_csv(data["items"])
