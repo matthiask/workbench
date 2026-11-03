@@ -522,12 +522,24 @@ class CreateProjectInvoiceForm(InvoiceForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop("project")
         type = kwargs["request"].GET.get("type")
+        # Invoices for one offer (from the offer's menu) start with its title,
+        # description and services
+        self.offer = None
+        if (
+            type == Invoice.SERVICES
+            and (offer := kwargs["request"].GET.get("offer", "")).isdigit()
+        ):
+            self.offer = self.project.offers.filter(pk=offer).first()
         kwargs["instance"] = Invoice(
             customer=self.project.customer,
             contact=self.project.contact,
             project=self.project,
-            title=self.project.title,
-            description=self.project.description,
+            # Both titles, people remove what doesn't fit
+            title=f"{self.project.title} - {self.offer.title}"
+            if self.offer
+            else self.project.title,
+            description=(self.offer.description if self.offer else "")
+            or self.project.description,
             type=type,
             third_party_costs=Z2
             if type in {Invoice.SERVICES, Invoice.CREDIT}
@@ -629,7 +641,15 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 yield from services
 
         choices = []
+        selected = []
+        # Offers for the filter above the form, which preselects their services
+        self.offer_filter = []
         for offer, offer_data in self.project.grouped_services["offers"]:
+            rows = list(filter(offer_data["services"]))
+            if offer and rows:
+                self.offer_filter.append((offer, offer == self.offer))
+            if self.offer and offer == self.offer:
+                selected = [row["service"].id for row in rows]
             id = f"offer-{offer.pk if offer else 'none'}"
             choices.append((
                 format_html(
@@ -656,12 +676,13 @@ class CreateProjectInvoiceForm(InvoiceForm):
                             amount(row),
                         ),
                     )
-                    for row in filter(offer_data["services"])
+                    for row in rows
                 ],
             ))
 
         self.fields["selected_services"] = forms.MultipleChoiceField(
             choices=choices,
+            initial=selected,
             label=_("services"),
             widget=forms.CheckboxSelectMultiple(attrs={"size": 30}),
         )

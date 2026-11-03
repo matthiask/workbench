@@ -502,6 +502,20 @@
                   {% endif %}
                   {% if request.user.features.CONTROLLING %}
                     <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">{% translate 'invoice'|capfirst %}</h6>
+                    <a
+                      class="dropdown-item"
+                      href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook&amp;offer={{ offer.pk }}"
+                    >
+                      {% translate 'Services from logbook' %}
+                    </a>
+                    <a
+                      class="dropdown-item"
+                      href="{{ project.urls.createinvoice }}?type=services&amp;source=offer&amp;offer={{ offer.pk }}"
+                    >
+                      {% translate 'Services from offer' %}
+                    </a>
+                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">{% translate 'offer'|capfirst %}</h6>
                     <a class="dropdown-item" href="{{ offer.urls.pricing }}">{% translate 'Pricing' %}</a>
                     <a class="dropdown-item" href="{{ offer.urls.copy }}" data-ajaxmodal>{% translate 'Copy' %}</a>

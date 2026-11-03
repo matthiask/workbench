@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 22:32+0100\n"
+"POT-Creation-Date: 2026-11-03 22:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2997,7 +2997,8 @@ msgid "The offer is only used for budgeting; services have to be created later w
 msgstr "Diese Offerte wird nur zur Zurückbehaltung von Budget verwendet; wenn später Stunden oder Kosten erfasst werden, müssen individuelle Leistungen erstellt werden."
 
 #: workbench/offers/models.py workbench/planning/models.py
-#: workbench/projects/models.py workbench/templates/offers/offer_pricing.html
+#: workbench/projects/models.py workbench/templates/invoices/invoice_form.html
+#: workbench/templates/offers/offer_pricing.html
 #: workbench/templates/planning/planning_import.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/service_form.html workbench/tools/pdf.py
@@ -4744,6 +4745,10 @@ msgstr "Zwischentotal"
 #: workbench/tools/models.py workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "discount"
 msgstr "Rabatt"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "Select services yourself"
+msgstr "Leistungen selbst auswählen"
 
 #: workbench/templates/invoices/invoice_list.html
 #: workbench/templates/projects/project_detail.html

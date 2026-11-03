@@ -10,3 +10,21 @@
     {{ block.super }}
   {% endif %}
 {% endblock uplink %}
+
+{% block meta %}
+  {% if form.offer_filter %}
+    <form method="get" class="wb-meta d-flex align-items-center gap-2" data-autosubmit>
+      <input type="hidden" name="type" value="{{ request.GET.type }}">
+      <input type="hidden" name="source" value="{{ request.GET.source }}">
+      <label for="invoice-offer-filter" class="wb-meta-label mb-0">{% translate 'offer'|capfirst %}:</label>
+      <select name="offer" id="invoice-offer-filter" class="form-select form-select-sm w-auto">
+        <option value="">{% translate 'Select services yourself' %}</option>
+        {% for offer, selected in form.offer_filter %}
+          <option value="{{ offer.pk }}" {% if selected %}selected{% endif %}>
+            {{ offer.code }} {{ offer.title }}
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+  {% endif %}
+{% endblock meta %}

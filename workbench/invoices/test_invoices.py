@@ -94,6 +94,53 @@ class InvoicesTest(TestCase):
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertAlmostEqual(invoice.subtotal, Decimal(2500))
 
+    def test_create_service_invoice_for_one_offer(self):
+        """The menu of an offer creates invoices with its title, description and
+        services, the latter only if there's something to invoice when
+        invoicing the logbook"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(
+            project=project, title="Phase 2", description="Scope of phase 2"
+        )
+        logged = factories.ServiceFactory.create(
+            project=project, offer=offer, effort_type="Programming", effort_rate=180
+        )
+        factories.LoggedHoursFactory.create(service=logged, hours=2)
+        nothing_logged = factories.ServiceFactory.create(
+            project=project, offer=offer, cost=100
+        )
+        other = factories.ServiceFactory.create(
+            project=project, effort_type="Programming", effort_rate=180
+        )
+        factories.LoggedHoursFactory.create(service=other, hours=1)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["detail"])
+        self.assertContains(
+            response,
+            f"?type=services&amp;source=logbook&amp;offer={offer.pk}",
+        )
+
+        def form(query):
+            response = self.client.get(project.urls["createinvoice"] + query)
+            self.assertEqual(response.status_code, 200)
+            return response.context["form"]
+
+        f = form(f"?type=services&source=logbook&offer={offer.pk}")
+        self.assertEqual(f.offer_filter, [(offer, True)])
+        self.assertEqual(f["title"].value(), f"{project.title} - Phase 2")
+        self.assertEqual(f["description"].value(), "Scope of phase 2")
+        self.assertEqual(f["selected_services"].value(), [logged.pk])
+
+        f = form(f"?type=services&source=offer&offer={offer.pk}")
+        self.assertEqual(f["selected_services"].value(), [logged.pk, nothing_logged.pk])
+
+        # Offers of other projects and garbage are ignored
+        for value in [factories.OfferFactory.create().pk, "abc"]:
+            f = form(f"?type=services&source=logbook&offer={value}")
+            self.assertEqual(f["title"].value(), project.title)
+            self.assertFalse(f["selected_services"].value())
+
     def test_create_service_invoice_from_offer(self):
         """Service invoice creation from offers (services) works and results in
         the expected invoice total"""
