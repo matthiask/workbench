@@ -616,17 +616,6 @@ tbody th > a {
 }
 
 // Takes no room, also not in flex rows with gaps
-.anchor-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.anchor {
-  position: relative;
-  top: -80px;
-}
-
 .debug-is-active::after {
   content: "DEBUG";
   position: fixed;
@@ -2083,7 +2072,8 @@ kbd {
   scroll-margin-top: 5rem;
 }
 
-// Highlight the note a link jumped to, fading out after a moment
+// Highlight the note, offer or service a link jumped to, fading out after a
+// moment
 // Long notes stay readable
 // The text below the title and the metadata, separated so that its own
 // headings don't compete with the note's title
@@ -2122,16 +2112,17 @@ kbd {
   }
 }
 
-.wb-note:target {
+// The offer's header, its card is hidden behind the header and the services
+.wb-note:target,
+.wb-offer:target > .wb-offer-header,
+.wb-service:target {
   animation: wb-target-fade 1.5s ease-out 2s both;
 }
 
+// Without an end value the elements return to their own background
 @keyframes wb-target-fade {
   from {
     background-color: var(--bs-primary-bg-subtle);
-  }
-  to {
-    background-color: transparent;
   }
 }
 

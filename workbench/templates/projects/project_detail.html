@@ -376,6 +376,7 @@
 
   {% for offer, offer_data in gs.offers %}
     <section
+      {% if offer %}id="offer{{ offer.pk }}"{% endif %}
       class="
         card wb-offer mb-3
         {% if offer and offer.is_declined %}wb-offer-declined{% endif %}
@@ -386,9 +387,6 @@
       <div class="wb-offer-header">
         <div class="min-w-0">
           {% if offer %}
-            <div class="anchor-container">
-              <a name="offer{{ offer.pk }}" class="anchor"> </a>
-            </div>
             <h2 class="wb-offer-title">
               <a href="{{ offer.get_absolute_url }}">{{ offer|h }}</a>
               {% history_link offer %}
@@ -541,13 +539,8 @@
         {% for row in offer_data.services %}
           <div
             class="list-group-item wb-service"
-            {% if row.service.pk %}data-sortable-item="{{ row.service.pk }}"{% endif %}
+            {% if row.service.pk %}id="service{{ row.service.pk }}" data-sortable-item="{{ row.service.pk }}"{% endif %}
           >
-            {% if row.service.pk %}
-              <div class="anchor-container">
-                <a name="service{{ row.service.pk }}" class="anchor"> </a>
-              </div>
-            {% endif %}
             <div class="wb-service-main">
               <div class="wb-service-title">
                 <span>{{ row.service.title }}</span>
