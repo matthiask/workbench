@@ -89,7 +89,7 @@ class TimestampsTest(TestCase):
         self.assertEqual(created_at.minute, 23)
 
     def test_timestamp_with_project(self):
-        """The controller's endpoint matches pinned projects like the API"""
+        """The controller's endpoint matches projects like the API"""
         user = factories.UserFactory.create()
         project = factories.ProjectFactory.create(title="Forum relaunch")
         user.pinned_projects.add(project)

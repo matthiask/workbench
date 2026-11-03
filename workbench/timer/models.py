@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import capfirst
@@ -22,30 +23,38 @@ TIMESTAMPS_DETECT_GAP = 120  # seconds
 
 
 def timestamp_project(user, value):
-    """The project with this ID, or the open pinned project matching the text"""
+    """The project with this ID, or the open project matching the text
+
+    Uses the full text search of projects. A unique match among the pinned
+    projects wins, otherwise the match among all open projects has to be
+    unique."""
     if isinstance(value, int) or value.isdigit():
         if project := Project.objects.filter(pk=value).first():
             return project
         raise ValidationError(gettext("This project doesn't exist."))
-    projects = [
-        project
-        for project in user.pinned_projects
+    projects = list(
+        Project.objects
         .open()
-        .select_related("customer", "owned_by")
-        .order_by("pk")
-        if value.casefold()
-        in f"{project.code} {project.title} {project.customer.name}".casefold()
-    ]
-    if len(projects) == 1:
-        return projects[0]
-    if projects:
-        raise ValidationError(
-            gettext("Several pinned projects match %(text)r: %(projects)s")
-            % {"text": value, "projects": "; ".join(str(p) for p in projects)}
+        .search(value)
+        .annotate(
+            is_pinned=Exists(
+                User.pinned_projects.through.objects.filter(
+                    user=user, project=OuterRef("pk")
+                )
+            )
         )
-    raise ValidationError(
-        gettext("No pinned project matches %r. Pin it or use the project's ID.") % value
+        .select_related("customer")
+        .order_by("pk")
     )
+    for matches in [[p for p in projects if p.is_pinned], projects]:
+        if len(matches) == 1:
+            return matches[0]
+        if matches:
+            raise ValidationError(
+                gettext("Several projects match %(text)r: %(projects)s")
+                % {"text": value, "projects": "; ".join(str(p) for p in matches)}
+            )
+    raise ValidationError(gettext("No open project matches %r.") % value)
 
 
 class Slice(UserDict):

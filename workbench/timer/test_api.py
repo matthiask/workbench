@@ -78,14 +78,14 @@ class TimestampsAPITest(TestCase):
         self.assertEqual(create(type="start", project=0).status_code, 422)
 
     def test_pinned_project_by_name(self):
-        """Pinned projects can be passed as a part of their code, title or
+        """Pinned projects can be passed as words of their code, title or
         customer"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
         profond = factories.ProjectFactory.create(
             title="Website", customer=factories.OrganizationFactory(name="Profond")
         )
-        forum = factories.ProjectFactory.create(title="Forum relaunch")
+        forum = factories.ProjectFactory.create(title="Forum website")
         factories.ProjectFactory.create(title="Profond intranet")  # Not pinned
         closed = factories.ProjectFactory.create(
             title="Forum archive", closed_on=dt.date(2026, 1, 1)
@@ -108,11 +108,45 @@ class TimestampsAPITest(TestCase):
         self.assertEqual(project("FORUM"), forum.pk)
         self.assertEqual(project(profond.code), profond.pk)
         self.assertEqual(project(str(forum.pk)), forum.pk)
+        self.assertContains(project("websi"), "Several projects match", status_code=422)
         self.assertContains(
-            project("o"), "Several pinned projects match", status_code=422
+            project("archive"), "No open project matches", status_code=422
+        )
+
+    def test_project_words(self):
+        """Every word has to match, a unique pinned project wins over the other
+        open projects"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        profond = factories.OrganizationFactory.create(name="Profond")
+        website = factories.ProjectFactory.create(title="Website", customer=profond)
+        user.pinned_projects.add(website)
+        kennzahlen = factories.ProjectFactory.create(
+            title="Kennzahlen", customer=profond
+        )
+        factories.ProjectFactory.create(title="Manual", customer=profond)
+        factories.ProjectFactory.create(title="Kennzahlen")
+
+        def project(value):
+            response = self.client.post(
+                "/api/timestamps/",
+                {"type": "start", "project": value},
+                content_type="application/json",
+            )
+            return (
+                response.json()["project"]["id"]
+                if response.status_code == 200
+                else response
+            )
+
+        self.assertEqual(project("profond"), website.pk)
+        self.assertEqual(project("profond kennzahlen"), kennzahlen.pk)
+        self.assertEqual(project("PROFOND  kenn"), kennzahlen.pk)
+        self.assertContains(
+            project("kennzahlen"), "Several projects match", status_code=422
         )
         self.assertContains(
-            project("intranet"), "No pinned project matches", status_code=422
+            project("profond game"), "No open project matches", status_code=422
         )
 
     @travel("2026-10-30T12:00:00+01:00", tick=False)

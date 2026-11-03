@@ -138,8 +138,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   and the hourly rate, both can be set freely.
 - Timestamps may have a project and a service which pre-fill the logbook form
   of their slice (`wb ts start -p profond`). The API accepts a project ID or a
-  part of the code, title or customer of one of the user's open pinned
-  projects (`_project()` in `workbench/timer/api.py`).
+  full text search of open projects (`-p "profond kennzahlen"`, the existing
+  index which also covers descriptions); a unique match among the user's
+  pinned projects wins, otherwise the match among all open projects has to
+  be unique (`timestamp_project()` in `workbench/timer/models.py`).
 - Short names (`User._short_name`) are unique when case folding, unless blank.
   APIs identify people by their short name and match it case-insensitively.
 - The planning import (`wb planning import`) adds entries without an `id`,

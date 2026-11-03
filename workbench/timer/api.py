@@ -86,8 +86,9 @@ class TimestampIn(Schema):
     )
     project: int | str | None = Field(
         default=None,
-        description="Pre-fills the logbook form of the slice. An ID or a part of"
-        " the code, title or customer of one of your pinned projects.",
+        description="Pre-fills the logbook form of the slice. An ID or a search"
+        " for an open project like the project search, e.g. 'profond"
+        " kennzahlen'. A unique match among your pinned projects wins.",
     )
     service: int | None = Field(
         default=None,

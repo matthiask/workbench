@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 07:56+0100\n"
+"POT-Creation-Date: 2026-11-03 10:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5806,13 +5806,13 @@ msgstr "Dieses Projekt existiert nicht."
 
 #: workbench/timer/models.py
 #, python-format
-msgid "Several pinned projects match %(text)r: %(projects)s"
-msgstr "Mehrere gepinnte Projekte passen zu %(text)r: %(projects)s"
+msgid "Several projects match %(text)r: %(projects)s"
+msgstr "Mehrere Projekte passen zu %(text)r: %(projects)s"
 
 #: workbench/timer/models.py
 #, python-format
-msgid "No pinned project matches %r. Pin it or use the project's ID."
-msgstr "Kein gepinntes Projekt passt zu %r. Pinne es oder verwende die ID des Projekts."
+msgid "No open project matches %r."
+msgstr "Kein offenes Projekt passt zu %r."
 
 #: workbench/timer/models.py
 msgid "Stop"
@@ -6035,6 +6035,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "No pinned project matches %r. Pin it or use the project's ID."
+#~ msgstr "Kein gepinntes Projekt passt zu %r. Pinne es oder verwende die ID des Projekts."
 
 #, python-format
 #~ msgid "%(created_by)s just created a new note on \"%(content_object)s\":"

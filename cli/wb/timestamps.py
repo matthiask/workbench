@@ -68,8 +68,9 @@ _TIMESTAMP_HELP = """
     wb timestamps {0} +15               # In 15 minutes
     wb timestamps {0} -p profond        # Pre-fill the logbook form
 
-    -p/--project is a project ID or a part of the code, title or customer of one
-    of your pinned projects."""
+    -p/--project is a project ID or a search for an open project like the
+    project search, e.g. "profond kennzahlen". A unique match among your pinned
+    projects wins."""
 
 
 def _project_options(fn):
@@ -77,7 +78,7 @@ def _project_options(fn):
         fn
     )
     return click.option(
-        "-p", "--project", help="Project ID or name of a pinned project."
+        "-p", "--project", help="Project ID or search for an open project."
     )(fn)
 
 
