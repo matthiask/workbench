@@ -11,20 +11,48 @@
   {% endif %}
 {% endblock uplink %}
 
-{% block meta %}
+{% block before_form %}
   {% if form.offer_filter %}
-    <form method="get" class="wb-meta d-flex align-items-center gap-2" data-autosubmit>
+    <form method="get" data-autosubmit>
       <input type="hidden" name="type" value="{{ request.GET.type }}">
       <input type="hidden" name="source" value="{{ request.GET.source }}">
-      <label for="invoice-offer-filter" class="wb-meta-label mb-0">{% translate 'offer'|capfirst %}:</label>
-      <select name="offer" id="invoice-offer-filter" class="form-select form-select-sm w-auto">
-        <option value="">{% translate 'Select services yourself' %}</option>
-        {% for offer, selected in form.offer_filter %}
-          <option value="{{ offer.pk }}" {% if selected %}selected{% endif %}>
-            {{ offer.code }} {{ offer.title }}
-          </option>
-        {% endfor %}
-      </select>
+      <section class="card mb-3">
+        <div class="card-body">
+          <div class="form-group">
+            <label
+              for="invoice-offer-filter"
+              class="form-label fw-semibold"
+            >{% translate 'Invoice for an offer' %}</label>
+            <small class="form-text text-muted form-help-text">
+              {% if request.GET.source == "logbook" %}
+                {% translate "Takes the title and the description of the offer and selects its services with logged hours or costs which haven't been invoiced yet. You can change everything below." %}
+              {% else %}
+                {% translate "Takes the title and the description of the offer and selects its services. You can change everything below." %}
+              {% endif %}
+              {% translate "Changing the offer reloads the form, changes made below are lost." %}
+            </small>
+            <select name="offer" id="invoice-offer-filter" class="form-select">
+              <option value="">{% translate 'No offer, select services yourself' %}</option>
+              {% for offer, selected in form.offer_filter %}
+                <option value="{{ offer.pk }}" {% if selected %}selected{% endif %}>
+                  {{ offer.code }} {{ offer.title }} ({{ offer.get_status_display }})
+                </option>
+              {% endfor %}
+            </select>
+            {% if form.offer %}
+              <small class="form-text text-muted d-block mt-2">
+                {% if form.showing_all %}
+                  {% translate 'All services of the project are listed below.' %}
+                  <a href="{{ form.toggle_all_url }}">{% translate 'Only list the services of the offer' %}</a>
+                {% else %}
+                  {% translate 'Only the services of the offer are listed below.' %}
+                  <a href="{{ form.toggle_all_url }}">{% translate 'List all services of the project' %}</a>
+                {% endif %}
+              </small>
+            {% endif %}
+          </div>
+        </div>
+      </section>
     </form>
   {% endif %}
-{% endblock meta %}
+{% endblock before_form %}

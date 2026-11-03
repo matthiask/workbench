@@ -36,6 +36,7 @@
         </div>
       </form>
     {% else %}
+      {% block before_form %}{% endblock %}
       <form
         method="POST"
         action="{{ request.get_full_path }}"

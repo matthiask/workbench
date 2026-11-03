@@ -135,6 +135,29 @@ class InvoicesTest(TestCase):
         f = form(f"?type=services&source=offer&offer={offer.pk}")
         self.assertEqual(f["selected_services"].value(), [logged.pk, nothing_logged.pk])
 
+        # With an offer, only its services are offered, unless all are wanted
+        def offered(f):
+            return [
+                value
+                for _group, options in f.fields["selected_services"].choices
+                for value, _label in options
+            ]
+
+        f = form(f"?type=services&source=offer&offer={offer.pk}")
+        self.assertEqual(offered(f), [logged.pk, nothing_logged.pk])
+        self.assertIn("all=1", f.toggle_all_url)
+        f = form(f"?type=services&source=offer&offer={offer.pk}&all=1")
+        self.assertEqual(offered(f), [logged.pk, nothing_logged.pk, other.pk])
+        self.assertNotIn("all=1", f.toggle_all_url)
+
+        # The filter offers all offers with services, also those without
+        # anything to invoice from the logbook
+        empty = factories.OfferFactory.create(project=project)
+        factories.ServiceFactory.create(project=project, offer=empty)
+        f = form(f"?type=services&source=logbook&offer={empty.pk}")
+        self.assertEqual(f.offer_filter, [(offer, False), (empty, True)])
+        self.assertFalse(f["selected_services"].value())
+
         # Offers of other projects and garbage are ignored
         for value in [factories.OfferFactory.create().pk, "abc"]:
             f = form(f"?type=services&source=logbook&offer={value}")

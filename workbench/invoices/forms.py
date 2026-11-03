@@ -643,13 +643,26 @@ class CreateProjectInvoiceForm(InvoiceForm):
         choices = []
         selected = []
         # Offers for the filter above the form, which preselects their services
+        # and only lists them unless all services of the project are wanted
         self.offer_filter = []
+        show_all = self.request.GET.get("all") == "1"
+        params = self.request.GET.copy()
+        if show_all:
+            params.pop("all")
+        else:
+            params["all"] = "1"
+        self.toggle_all_url = f"?{params.urlencode()}"
+        self.showing_all = show_all
         for offer, offer_data in self.project.grouped_services["offers"]:
             rows = list(filter(offer_data["services"]))
-            if offer and rows:
+            # All offers with services, whatever the source; selecting one
+            # without anything to invoice preselects nothing
+            if offer and offer_data["services"]:
                 self.offer_filter.append((offer, offer == self.offer))
             if self.offer and offer == self.offer:
                 selected = [row["service"].id for row in rows]
+            elif self.offer and not show_all:
+                continue
             id = f"offer-{offer.pk if offer else 'none'}"
             choices.append((
                 format_html(
