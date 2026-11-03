@@ -465,6 +465,66 @@ planned_work:
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(result.output.startswith("project_id,project,"))
 
+    def test_invoiced_work(self):
+        """Hours and services know what has been invoiced, invoices their
+        services"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        offer = factories.OfferFactory.create(
+            project=project, offered_on=dt.date(2026, 9, 1)
+        )
+        service = factories.ServiceFactory.create(
+            project=project,
+            offer=offer,
+            title="Design",
+            effort_type="Design",
+            effort_rate=200,
+            external_reference="https://example.com/issues/1",
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, hours=3, description="Wireframes"
+        )
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        factories.LoggedHoursFactory.create(
+            service=service, hours=2, description="Sketches"
+        )
+
+        result = self.wb("hours", "search", "--invoiced")
+        self.assertIn("Wireframes", result.output)
+        self.assertNotIn("Sketches", result.output)
+        result = self.wb("hours", "search", "--not-invoiced", "--json")
+        self.assertIn("Sketches", result.output)
+        self.assertNotIn("Wireframes", result.output)
+        self.assertIn('"invoice": null', result.output)
+
+        result = self.wb(
+            "services",
+            "search",
+            "--external-reference",
+            "https://example.com/issues/1",
+            "--json",
+        )
+        self.assertIn('"invoiced_hours": "3.0"', result.output)
+        self.assertIn('"not_invoiced_hours": "2.0"', result.output)
+        result = self.wb(
+            "services", "search", "--external-reference", "https://example.com/"
+        )
+        self.assertNotIn("Design", result.output)
+
+        result = self.wb("invoices", "show", invoice.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Design", result.output)
+        self.assertIn(offer.code, result.output)
+        self.assertIn("600.00", result.output)
+
+        result = self.wb("offers", "show", offer.pk)
+        self.assertIn("2026-09-01", result.output)
+
     def test_absences(self):
         factories.AbsenceFactory.create(
             user=self.user, starts_on=in_days(7), description="Holidays"

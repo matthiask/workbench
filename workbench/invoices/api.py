@@ -86,6 +86,61 @@ def invoice_out(invoice, request):
     }
 
 
+class InvoiceServiceOut(Schema):
+    id: int
+    position: int
+    title: str
+    description: str
+    effort_type: str
+    effort_hours: Decimal | None
+    effort_rate: Decimal | None
+    cost: Decimal | None
+    third_party_costs: Decimal | None
+    service_hours: Decimal
+    service_cost: Decimal
+    project_service_id: int | None
+    offer_id: int | None = Field(description="The offer of the project service")
+    offer: str | None
+
+
+class InvoiceDetailOut(InvoiceOut):
+    services: list[InvoiceServiceOut] = Field(
+        description="The lines of invoices for services, empty for fixed amount"
+        " and down payment invoices."
+    )
+
+
+def _invoice_service_out(service):
+    offer = service.project_service.offer if service.project_service else None
+    return {
+        "id": service.id,
+        "position": service.position,
+        "title": service.title,
+        "description": service.description,
+        "effort_type": service.effort_type,
+        "effort_hours": service.effort_hours,
+        "effort_rate": service.effort_rate,
+        "cost": service.cost,
+        "third_party_costs": service.third_party_costs,
+        "service_hours": service.service_hours,
+        "service_cost": service.service_cost,
+        "project_service_id": service.project_service_id,
+        "offer_id": offer.id if offer else None,
+        "offer": offer.code if offer else None,
+    }
+
+
+def _invoice_services(invoice):
+    if invoice.type in {Invoice.FIXED, Invoice.DOWN_PAYMENT}:
+        return []
+    return [
+        _invoice_service_out(service)
+        for service in invoice.services.select_related(
+            "project_service__offer__project"
+        ).order_by("position", "created_at", "pk")
+    ]
+
+
 class InvoiceFilter(DateRangeFilter):
     q: str = ""
     project: int | None = None
@@ -328,15 +383,13 @@ def postpone_reminders(request, invoice_id: int, data: PostponeReminders):
     return invoice_out(invoice, request)
 
 
-@router.get("/invoices/{invoice_id}/", response=InvoiceOut)
+@router.get("/invoices/{invoice_id}/", response=InvoiceDetailOut)
 def invoice_detail(request, invoice_id: int):
-    return invoice_out(
-        get_object_or_404(
-            Invoice.objects.select_related("project", "customer", "owned_by"),
-            pk=invoice_id,
-        ),
-        request,
+    invoice = get_object_or_404(
+        Invoice.objects.select_related("project", "customer", "owned_by"),
+        pk=invoice_id,
     )
+    return invoice_out(invoice, request) | {"services": _invoice_services(invoice)}
 
 
 class ProjectedInvoiceOut(Schema):

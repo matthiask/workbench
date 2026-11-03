@@ -130,6 +130,21 @@ def show_invoice(invoice_id, as_json):
     if data["description"]:
         console.print()
         console.print(data["description"])
+    if data.get("services"):
+        table = make_table(
+            "Service", "Offer", "Effort type", "Hours>", "Rate>", "Cost>"
+        )
+        for service in data["services"]:
+            table.add_row(
+                service["title"],
+                service["offer"] or "",
+                service["effort_type"],
+                service["effort_hours"] or "",
+                service["effort_rate"] or "",
+                service["service_cost"],
+            )
+        console.print()
+        console.print(table)
 
 
 @invoices.command("reminders")

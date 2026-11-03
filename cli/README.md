@@ -246,6 +246,9 @@ Invoices are read-only in the CLI:
     wb invoices search hosting --customer 345
     wb invoices show 5678
 
+`wb invoices show` lists the services of the invoice with their offers
+(fixed amount and down payment invoices have none).
+
 Overdue invoices to remind customers of, per customer and contact, like the
 reminders in the web interface (without postponed reminders):
 
@@ -322,11 +325,14 @@ Like in Workbench, adding a note notifies the owner of the object.
 ## Services
 
 Services with their hours and costs, and what has been logged on them so far.
-Rates are shown with the offers (`wb offers show`) and the project statistics.
+Rates are shown with the offers (`wb offers show`) and the project statistics;
+`--json` has the hourly rate too (with the controlling feature) and splits the
+logged hours into invoiced and not invoiced ones.
 
     wb services search --project 1234
     wb services search --offer 5678
     wb services search hosting
+    wb services search --external-reference https://github.com/org/repo/issues/12
 
 ## Logged hours and costs
 
@@ -337,6 +343,7 @@ Searching them works in the CLI:
     wb hours search --rendered-by mk --since 2026-10-01
     wb hours search --project 1234 --period last-month
     wb hours search wireframes --customer 345
+    wb hours search --project 1234 --not-invoiced
     wb costs search --project 1234
     wb costs search --expenses --rendered-by mk
 

@@ -64,6 +64,58 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(data["total_excl_tax"], "100.00")
         self.assertEqual(data["url"], f"http://testserver{sent.get_absolute_url()}")
 
+    def test_detail_services(self):
+        """Invoices for services list their services with the offers"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        service = factories.ServiceFactory.create(
+            project=project,
+            offer=offer,
+            title="Design",
+            effort_type="Design",
+            effort_rate=200,
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=3)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        self.client.force_login(project.owned_by)
+
+        data = self.client.get(f"/api/invoices/{invoice.pk}/").json()
+        self.assertEqual(len(data["services"]), 1)
+        line = data["services"][0]
+        self.assertEqual(
+            {
+                key: line[key]
+                for key in [
+                    "title",
+                    "effort_hours",
+                    "effort_rate",
+                    "service_cost",
+                    "project_service_id",
+                    "offer_id",
+                    "offer",
+                ]
+            },
+            {
+                "title": "Design",
+                "effort_hours": "3.0",
+                "effort_rate": "200.00",
+                "service_cost": "600.00",
+                "project_service_id": service.pk,
+                "offer_id": offer.pk,
+                "offer": offer.code,
+            },
+        )
+
+        fixed = factories.InvoiceFactory.create(subtotal=100)
+        data = self.client.get(f"/api/invoices/{fixed.pk}/").json()
+        self.assertEqual(data["services"], [])
+
     def test_projected_invoices(self):
         """The planned invoicing of a project"""
         project = factories.ProjectFactory.create()
