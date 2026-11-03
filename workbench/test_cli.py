@@ -426,6 +426,17 @@ planned_work:
         )
         result = self.wb("services", "search", "--project", project.pk)
         self.assertIn("3.0", result.output)
+        service = project.services.get()
+        result = self.wb(
+            "services",
+            "update",
+            service.pk,
+            "--external-reference",
+            "https://example.com/issues/1",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        service.refresh_from_db()
+        self.assertEqual(service.external_reference, "https://example.com/issues/1")
         result = self.wb(
             "hours", "search", "--project", project.pk, "--rendered-by", "ab"
         )

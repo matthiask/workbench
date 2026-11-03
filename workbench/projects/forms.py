@@ -555,7 +555,7 @@ class ServiceForm(ModelForm):
         offer = self.instance.offer
         if offer and offer.status > offer.SERVICE_GROUP:
             for field in self.fields:
-                if field != "allow_logging":
+                if field not in {"allow_logging", "external_reference"}:
                     self.fields[field].disabled = True
 
             if self.request.method == "GET":

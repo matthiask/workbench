@@ -490,6 +490,31 @@ class ProjectsTest(TestCase):
             response, "The offer must belong to the same project as the service."
         )
 
+    def test_external_reference_of_service_bound_to_offer(self):
+        """The external reference of services stays editable when their offer
+        has been sent or accepted, the other fields don't"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        service = factories.ServiceFactory.create(
+            project=project, offer=offer, title="Design"
+        )
+        Offer.objects.filter(pk=offer.pk).update(status=Offer.ACCEPTED)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            service.urls["update"],
+            {
+                "title": "Something else",
+                "external_reference": "https://example.com/issues/1",
+                "allow_logging": True,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        service.refresh_from_db()
+        self.assertEqual(service.external_reference, "https://example.com/issues/1")
+        self.assertEqual(service.title, "Design")
+
     def test_select(self):
         """Test the project select modal"""
         project = factories.ProjectFactory.create()

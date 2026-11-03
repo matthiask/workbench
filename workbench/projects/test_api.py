@@ -298,6 +298,48 @@ class ProjectsAPITest(TestCase):
             [(service.pk, "5.0", "3.0", "2.0")],
         )
 
+    def test_service_external_reference(self):
+        """The external reference of services can be changed in any state of
+        their offer, also of services without offer"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        service = factories.ServiceFactory.create(project=project, offer=offer)
+        Offer.objects.filter(pk=offer.pk).update(status=Offer.ACCEPTED)
+        self.client.force_login(project.owned_by)
+        url = f"/api/services/{service.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch(
+            {"external_reference": " https://example.com/issues/1 "}, "?dry_run=1"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["external_reference"], "https://example.com/issues/1"
+        )
+        service.refresh_from_db()
+        self.assertEqual(service.external_reference, "")
+
+        response = patch({"external_reference": "https://example.com/issues/1"})
+        self.assertEqual(response.json()["offer"], offer.code)
+        service.refresh_from_db()
+        self.assertEqual(service.external_reference, "https://example.com/issues/1")
+
+        response = patch({"external_reference": None})
+        self.assertEqual(response.json()["external_reference"], "")
+
+        response = patch({"external_reference": "x" * 501})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            self.client.patch(
+                "/api/services/0/", {}, content_type="application/json"
+            ).status_code,
+            404,
+        )
+
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_services_rates_require_controlling(self):
         """Rates require the controlling feature, like on the project page"""

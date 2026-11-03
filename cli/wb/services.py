@@ -8,6 +8,7 @@ from wb.core import (
     echo_csv,
     echo_json,
     echo_more,
+    format_bool,
     link,
     make_table,
     page_options,
@@ -82,3 +83,32 @@ def search_services(
         )
     console.print(table)
     echo_more(data, offset, "services")
+
+
+@services.command("update")
+@click.argument("service_id", type=int)
+@click.option(
+    "--external-reference",
+    required=True,
+    help='E.g. the URL of an issue, "" removes it.',
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_service(service_id, external_reference, dry_run, as_json):
+    """Change the external reference of a service, also when its offer has
+    been sent or accepted (other fields are changed with `wb offers
+    services update`)"""
+    data = request(
+        "PATCH",
+        f"services/{service_id}/",
+        json={"external_reference": external_reference},
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    reference = data["external_reference"] or "(none)"
+    prefix = "Dry run, nothing changed: " if dry_run else ""
+    console.print(
+        f"{prefix}{link(data['id'], data['url'])} {data['title']}: {reference}"
+    )

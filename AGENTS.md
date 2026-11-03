@@ -132,7 +132,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   in preparation: create, replace, update and add, update, delete and reorder
   single services, all with the rules of `_apply_service()`. Only the
   external references (URLs, one per line) can be changed for offers in any
-  state; Workbench stores them but doesn't talk to GitHub. `wb offers
+  state, the external reference of services too (`PATCH /api/services/<id>/`,
+  `wb services update`, also in the web form); Workbench stores them but
+  doesn't talk to GitHub. `wb offers
   guidelines` prints a private file configured per installation in the wb
   configuration (`offer_guidelines`), which the `workbench-offer` skill
   follows; the guidelines contain confidential figures, so they don't live in

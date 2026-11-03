@@ -502,14 +502,8 @@ def _sum_of(model, field, **filters):
     )
 
 
-@router.get("/services/", response=list[ServiceOut])
-@paginate
-def service_list(request, filters: Query[ServiceFilter]):
-    """Services with their logged hours and costs
-
-    Same as on the project page: rates and amounts other than costs require
-    the controlling feature (see the offers and the project statistics)."""
-    services = (
+def _services():
+    return (
         Service.objects
         .select_related("project", "offer__project")
         .annotate(
@@ -522,6 +516,42 @@ def service_list(request, filters: Query[ServiceFilter]):
         )
         .order_by("project", "offer_id", "position", "pk")
     )
+
+
+def _service_out(service, request, *, controlling):
+    return {
+        "id": service.id,
+        "url": request.build_absolute_uri(
+            f"{service.project.get_absolute_url()}#service{service.pk}"
+        ),
+        "project": project_summary(service.project, request),
+        "offer_id": service.offer_id,
+        "offer": service.offer.code if service.offer else None,
+        "offer_status": service.offer.get_status_display() if service.offer else None,
+        "title": service.title,
+        "description": service.description,
+        "external_reference": service.external_reference,
+        "effort_type": service.effort_type,
+        "effort_rate": service.effort_rate if controlling else None,
+        "service_hours": service.service_hours,
+        "logged_hours": service.logged_hours or Z1,
+        "invoiced_hours": service.invoiced_hours or Z1,
+        "not_invoiced_hours": service.not_invoiced_hours or Z1,
+        "cost": service.cost,
+        "logged_cost": service.logged_cost or Z2,
+        "is_optional": service.is_optional,
+        "is_logging_allowed": service.is_logging_allowed(),
+    }
+
+
+@router.get("/services/", response=list[ServiceOut])
+@paginate
+def service_list(request, filters: Query[ServiceFilter]):
+    """Services with their logged hours and costs
+
+    Same as on the project page: rates and amounts other than costs require
+    the controlling feature (see the offers and the project statistics)."""
+    services = _services()
     if filters.project:
         services = services.filter(project=filters.project)
     if filters.offer:
@@ -533,29 +563,34 @@ def service_list(request, filters: Query[ServiceFilter]):
     controlling = request.user.features[FEATURES.CONTROLLING]
     return Serialized(
         services,
-        lambda service: {
-            "id": service.id,
-            "url": request.build_absolute_uri(
-                f"{service.project.get_absolute_url()}#service{service.pk}"
-            ),
-            "project": project_summary(service.project, request),
-            "offer_id": service.offer_id,
-            "offer": service.offer.code if service.offer else None,
-            "offer_status": service.offer.get_status_display()
-            if service.offer
-            else None,
-            "title": service.title,
-            "description": service.description,
-            "external_reference": service.external_reference,
-            "effort_type": service.effort_type,
-            "effort_rate": service.effort_rate if controlling else None,
-            "service_hours": service.service_hours,
-            "logged_hours": service.logged_hours or Z1,
-            "invoiced_hours": service.invoiced_hours or Z1,
-            "not_invoiced_hours": service.not_invoiced_hours or Z1,
-            "cost": service.cost,
-            "logged_cost": service.logged_cost or Z2,
-            "is_optional": service.is_optional,
-            "is_logging_allowed": service.is_logging_allowed(),
-        },
+        lambda service: _service_out(service, request, controlling=controlling),
     )
+
+
+class ServicePatch(Schema):
+    external_reference: str | None = Field(
+        default=None,
+        max_length=500,
+        description="E.g. the URL of an issue, null removes it. Can also be"
+        " changed when the offer of the service has been sent or accepted.",
+    )
+
+
+@router.patch("/services/{int:service_id}/", response=ServiceOut)
+def service_update(
+    request, service_id: int, data: ServicePatch, *, dry_run: bool = False
+):
+    """Change the external reference of a service, in any state of its offer
+    (like in the web interface); other fields are changed through the offers"""
+    service = get_object_or_404(Service, pk=service_id)
+    service.external_reference = (data.external_reference or "").strip()
+    with transaction.atomic():
+        service.save(update_fields=["external_reference"])
+        result = _service_out(
+            _services().get(pk=service.pk),
+            request,
+            controlling=request.user.features[FEATURES.CONTROLLING],
+        )
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
