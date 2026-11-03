@@ -19,6 +19,11 @@ from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
 
+def normalize_external_reference(value):
+    """One reference per line, without blank lines"""
+    return "\n".join(filter(None, map(str.strip, value.splitlines())))
+
+
 class OfferQuerySet(SearchQuerySet):
     def service_form_choices(self, *, include=None):
         offers = {
@@ -134,6 +139,11 @@ class Offer(ModelWithTotal):
             " further logging on this offers' services."
         ),
     )
+    external_reference = models.TextField(
+        _("external reference"),
+        blank=True,
+        help_text=_("One URL per line, e.g. of issues or pull requests."),
+    )
     is_budget_retainer = models.BooleanField(
         _("is budget retainer"),
         default=False,
@@ -238,6 +248,7 @@ class Offer(ModelWithTotal):
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         errors = {}
+        self.external_reference = normalize_external_reference(self.external_reference)
 
         if self.status in (self.OFFERED, self.ACCEPTED, self.DECLINED):
             if not self.offered_on:

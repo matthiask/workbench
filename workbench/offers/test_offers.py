@@ -106,6 +106,42 @@ class OffersTest(TestCase):
         self.assertEqual(response["content-type"], "application/pdf")
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.ALWAYS})
+    def test_external_reference(self):
+        """Accepted offers' external references can be changed, one per line,
+        and show up in the history"""
+        offer = factories.OfferFactory.create(
+            status=Offer.ACCEPTED,
+            offered_on=dt.date.today(),
+            valid_until=in_days(30),
+        )
+        self.client.force_login(offer.owned_by)
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Test",
+                "owned_by": offer.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "tax_rate": "7.70",
+                "postal_address": "Anything\nStreet\nCity",
+                "offered_on": offer.offered_on.isoformat(),
+                "valid_until": offer.valid_until.isoformat(),
+                "status": Offer.ACCEPTED,
+                "external_reference": " https://example.com/1\r\n\r\n"
+                "https://example.com/2 \r\n",
+            },
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        offer.refresh_from_db()
+        self.assertEqual(
+            offer.external_reference, "https://example.com/1\nhttps://example.com/2"
+        )
+        response = self.client.get(f"/history/offers_offer/id/{offer.pk}/")
+        self.assertContains(response, "https://example.com/2")
+        response = self.client.get(offer.project.get_absolute_url())
+        self.assertContains(response, 'href="https://example.com/2"')
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.ALWAYS})
     def test_update_offer(self):
         """Offer and bound services update warnings and errors"""
         offer = factories.OfferFactory.create(title="Test")

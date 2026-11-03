@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 10:25+0100\n"
+"POT-Creation-Date: 2026-11-03 18:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2576,7 +2576,8 @@ msgstr "Mit Stunden für Verrechnung"
 msgid "External"
 msgstr "Extern"
 
-#: workbench/logbook/forms.py workbench/projects/models.py
+#: workbench/logbook/forms.py workbench/offers/models.py
+#: workbench/projects/models.py
 msgid "external reference"
 msgstr "externe Referenz"
 
@@ -2982,6 +2983,10 @@ msgstr "Arbeit abgeschlossen am"
 #: workbench/offers/models.py
 msgid "Fill in this field if you want to prohibit further logging on this offers' services."
 msgstr "Fülle dieses Feld aus, wenn Du die weitere Leistungserfassung auf den Leistungen dieser Offerte verbieten willst."
+
+#: workbench/offers/models.py
+msgid "One URL per line, e.g. of issues or pull requests."
+msgstr "Eine URL pro Zeile, z.B. von Issues oder Pull Requests."
 
 #: workbench/offers/models.py workbench/templates/projects/project_detail.html
 msgid "is budget retainer"

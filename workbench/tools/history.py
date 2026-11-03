@@ -432,6 +432,7 @@ def _offers_offer_cfg(user):
         "closed_on",
         "work_completed_on",
         "is_budget_retainer",
+        "external_reference",
         "title",
         "description",
         "owned_by",

@@ -111,6 +111,7 @@ def guidelines(path, clear):
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@click.option("--external-reference", help="Exact match of one of the URLs.")
 @period_options("filters the offer date")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -121,6 +122,7 @@ def search_offers(
     project,
     customer,
     owned_by,
+    external_reference,
     period,
     since,
     until,
@@ -139,6 +141,8 @@ def search_offers(
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
+    if external_reference:
+        params["external_reference"] = external_reference
     params |= period_params(period, since, until)
     data = request("GET", "offers/", params=params | page_params(limit, offset))
     if as_csv:
@@ -214,22 +218,37 @@ def _echo_changed_offer(data, *, dry_run, as_json):
 @click.option(
     "--discount", type=float, help="Amount excl. tax, 0 removes the discount."
 )
+@click.option(
+    "--external-reference",
+    multiple=True,
+    help="URL, e.g. of an issue; repeat it for several. Replaces the existing"
+    ' ones, "" removes them.',
+)
 @click.option("--dry-run", is_flag=True, help="Validate and show totals only.")
 @click.option("--json", "as_json", is_flag=True)
-def update_offer(offer_id, title, description, discount, dry_run, as_json):
+def update_offer(
+    offer_id, title, description, discount, external_reference, dry_run, as_json
+):
     """Change the title, the description or the discount of an offer in
-    preparation"""
+    preparation, or the external references of any offer"""
     data = {
         key: value
         for key, value in [
             ("title", title),
             ("description", text_or_stdin(description)),
             ("discount", discount),
+            (
+                "external_reference",
+                "\n".join(external_reference) if external_reference else None,
+            ),
         ]
         if value is not None
     }
     if not data:
-        terminate("Nothing to change, pass --title, --description or --discount.")
+        terminate(
+            "Nothing to change, pass --title, --description, --discount"
+            " or --external-reference."
+        )
     data = request(
         "PATCH",
         f"offers/{offer_id}/",

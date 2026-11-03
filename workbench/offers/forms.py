@@ -116,9 +116,11 @@ class OfferForm(PostalAddressSelectionForm):
             "show_service_details",
             "work_completed_on",
             "is_budget_retainer",
+            "external_reference",
         )
         widgets = {
             "description": Textarea,
+            "external_reference": Textarea,
             "status": forms.RadioSelect,
             "postal_address": Textarea,
             "tax_rate": forms.RadioSelect,

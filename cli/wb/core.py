@@ -520,6 +520,7 @@ def echo_offer(offer):
             ("Valid until", offer.get("valid_until")),
             ("Closed on", offer.get("closed_on")),
             ("Work completed on", offer.get("work_completed_on")),
+            ("External reference", offer.get("external_reference")),
             ("URL", offer["url"]),
         ],
         url=offer["url"],

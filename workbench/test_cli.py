@@ -525,6 +525,33 @@ planned_work:
         result = self.wb("offers", "show", offer.pk)
         self.assertIn("2026-09-01", result.output)
 
+        # External references, also of offers which have been sent
+        offer.status = Offer.OFFERED
+        offer.valid_until = dt.date(2026, 9, 30)
+        offer.save()
+        result = self.wb(
+            "offers",
+            "update",
+            offer.pk,
+            "--external-reference",
+            "https://example.com/issues/1",
+            "--external-reference",
+            "https://example.com/pull/2",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        offer.refresh_from_db()
+        self.assertEqual(
+            offer.external_reference,
+            "https://example.com/issues/1\nhttps://example.com/pull/2",
+        )
+        result = self.wb(
+            "offers", "search", "--external-reference", "https://example.com/pull/2"
+        )
+        self.assertIn(offer.code, result.output)
+        self.wb("offers", "update", offer.pk, "--external-reference", "")
+        offer.refresh_from_db()
+        self.assertEqual(offer.external_reference, "")
+
     def test_absences(self):
         factories.AbsenceFactory.create(
             user=self.user, starts_on=in_days(7), description="Holidays"

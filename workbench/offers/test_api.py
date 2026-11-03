@@ -355,6 +355,41 @@ class OfferServicesAPITest(TestCase):
         response = self.send("patch", data={"discount": None})
         self.assertEqual(response.json()["total_excl_tax"], "3000.00")
 
+    def test_external_reference(self):
+        """External references are changed for offers in any state and
+        searched line by line"""
+        self.offer.status = Offer.ACCEPTED
+        self.offer.offered_on = dt.date.today()
+        self.offer.valid_until = dt.date.today()
+        self.offer.save()
+        urls = "https://example.com/issues/1\n\n https://example.com/issues/12"
+        response = self.send("patch", data={"external_reference": urls}, dry_run=True)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.external_reference, "")
+
+        response = self.send("patch", data={"external_reference": urls})
+        self.assertEqual(
+            response.json()["external_reference"],
+            "https://example.com/issues/1\nhttps://example.com/issues/12",
+        )
+        other = factories.OfferFactory.create(
+            external_reference="https://example.com/issues/12"
+        )
+
+        def ids(url):
+            data = self.client.get("/api/offers/", {"external_reference": url}).json()
+            return {o["id"] for o in data["items"]}
+
+        self.assertEqual(ids("https://example.com/issues/1"), {self.offer.pk})
+        self.assertEqual(
+            ids("https://example.com/issues/12"), {self.offer.pk, other.pk}
+        )
+        self.assertEqual(ids("https://example.com/issues"), set())
+
+        response = self.send("patch", data={"external_reference": None})
+        self.assertEqual(response.json()["external_reference"], "")
+
     def test_add(self):
         """Services are added at the end or after another service"""
         service = {"title": "Design", "service_type": "production", "hours": 5}
@@ -496,6 +531,7 @@ class OfferServicesAPITest(TestCase):
         self.offer.status = Offer.OFFERED
         self.offer.save()
         for method, path, data in [
+            ("patch", "", {"title": "X", "external_reference": ""}),
             ("patch", "", {"title": "X"}),
             ("post", "services/", {"title": "X", "cost": 1}),
             ("patch", f"services/{self.concept.pk}/", {"hours": 1}),

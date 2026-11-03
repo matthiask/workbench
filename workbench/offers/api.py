@@ -4,6 +4,7 @@ from typing import Literal
 
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _, override
 from ninja import Field, Query, Router, Schema
@@ -13,7 +14,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.contacts.models import postal_address_choices
-from workbench.offers.models import Offer
+from workbench.offers.models import Offer, normalize_external_reference
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
@@ -123,6 +124,7 @@ class OfferOut(Schema):
     closed_on: dt.date | None = Field(description="Date of acceptance or decline.")
     valid_until: dt.date | None
     work_completed_on: dt.date | None
+    external_reference: str = Field(description="URLs, one per line.")
     subtotal: Decimal
     discount: Decimal
     total_excl_tax: Decimal
@@ -177,6 +179,7 @@ def offer_out(offer, services, request):
         "closed_on": offer.closed_on,
         "valid_until": offer.valid_until,
         "work_completed_on": offer.work_completed_on,
+        "external_reference": offer.external_reference,
         "subtotal": offer.subtotal,
         "discount": offer.discount,
         "total_excl_tax": offer.total_excl_tax,
@@ -229,6 +232,9 @@ class OfferFilter(DateRangeFilter):
     project: int | None = None
     customer: int | None = None
     owned_by: str | None = None
+    external_reference: str | None = Field(
+        default=None, description="Exact match of one of the references"
+    )
 
 
 @router.get("/offers/", response=list[OfferOut])
@@ -249,6 +255,13 @@ def offer_list_search(request, filters: Query[OfferFilter]):
         offers = offers.filter(status=OFFER_STATUSES[filters.status])
     if filters.owned_by:
         offers = offers.filter(owned_by___short_name__iexact=filters.owned_by)
+    if url := filters.external_reference:
+        offers = offers.filter(
+            Q(external_reference=url)
+            | Q(external_reference__startswith=f"{url}\n")
+            | Q(external_reference__endswith=f"\n{url}")
+            | Q(external_reference__contains=f"\n{url}\n")
+        )
     if filters.q:
         offers = offers.search(filters.q)
     offers = filter_date_range(offers, filters, "offered_on")
@@ -497,14 +510,25 @@ class OfferPatch(Schema):
     discount: float | None = Field(
         default=None, ge=0, description="Amount excl. tax, null removes it."
     )
+    external_reference: str | None = Field(
+        default=None,
+        description="URLs, one per line; replaces the existing ones. Can also"
+        " be changed when the offer isn't in preparation anymore.",
+    )
 
 
 @router.patch("/offers/{offer_id}/", response=OfferOut)
 def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: bool = False):
     """Change the title, the description, the postal address or the discount
-    of an offer in preparation; fields which aren't given are left alone"""
+    of an offer in preparation, or the external references of any offer;
+    fields which aren't given are left alone"""
+    fields = data.model_dump(exclude_unset=True)
+    if fields.keys() == {"external_reference"}:
+        return _update_external_reference(
+            request, offer_id, fields["external_reference"], dry_run=dry_run
+        )
     offer = _changeable_offer(offer_id)
-    for field, value in data.model_dump(exclude_unset=True).items():
+    for field, value in fields.items():
         if field == "discount":
             offer.discount = _decimal(value or 0, "0.00")
         else:
@@ -514,6 +538,22 @@ def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: bool = Fa
     if errors:
         raise ValidationError(errors)
     return _save(offer, [], request, dry_run=dry_run)
+
+
+def _update_external_reference(request, offer_id, value, *, dry_run):
+    """Only the external references, also of offers which have been sent or
+    accepted (like in the web interface, which only warns)"""
+    offer = get_object_or_404(
+        Offer.objects.select_related("project__customer", "project__contact"),
+        pk=offer_id,
+    )
+    offer.external_reference = normalize_external_reference(value or "")
+    with transaction.atomic():
+        offer.save(update_fields=["external_reference"])
+        result = offer_out(offer, list(offer.services.all()), request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
 
 
 def _renumbered(services):

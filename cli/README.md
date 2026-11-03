@@ -224,6 +224,13 @@ totals, `--dry-run` without saving anything:
     wb offers services delete 5678 904
     wb offers services reorder 5678 903 901 902
 
+External references (URLs of issues or pull requests, for example) can be
+changed for any offer, also when it has been accepted already. They replace
+the existing ones; Workbench only stores them and doesn't talk to GitHub:
+
+    wb offers update 5678 --external-reference https://github.com/org/repo/issues/12 --external-reference https://github.com/org/repo/pull/13
+    wb offers search --external-reference https://github.com/org/repo/issues/12
+
 Services are given with options or as YAML (or JSON) files like a service of
 `wb offers create`; options override the file. `update` only changes the given
 fields. Services with logged hours or costs can be changed but not deleted.

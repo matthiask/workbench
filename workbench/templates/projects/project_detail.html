@@ -521,9 +521,15 @@
         </div>
       </div>
 
-      {% if offer.description %}
+      {% if offer.description or offer.external_reference %}
         <div class="wb-offer-description {% if offer.should_collapse %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
-          <div class="wb-clamp" data-clamp>{{ offer.description|linebreaksbr|urlizetrunc:60 }}</div>
+          <div class="wb-clamp" data-clamp>
+            {{ offer.description|linebreaksbr|urlizetrunc:60 }}
+            {% if offer.external_reference %}
+              {% if offer.description %}<br>{% endif %}
+              <em>{{ offer.external_reference|linebreaksbr|urlizetrunc:60 }}</em>
+            {% endif %}
+          </div>
         </div>
       {% endif %}
 
