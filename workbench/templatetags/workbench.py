@@ -1,6 +1,7 @@
 import datetime as dt
 import math
 from collections import defaultdict
+from decimal import Decimal
 from itertools import groupby, pairwise
 
 from django import template
@@ -173,16 +174,19 @@ def group_deals_by_probability(iterable, should_group):
 
 
 @register.simple_tag
-def bar(value, one, surcharge=None):
+def bar(value, one, surcharge=None, unit=None):
     """Progress of ``value`` towards ``one``
 
     ``surcharge`` (e.g. hours for invoicing above the hours) is added on top
-    of ``value`` and shown lighter: it uses up the budget as well."""
+    of ``value`` and shown lighter: it uses up the budget as well. The tooltip
+    shows the values if the ``unit`` is known (``"hours"``), otherwise only
+    percentages."""
     if not one:
         return ""
 
+    surcharge = max(0, surcharge or 0)
     own = max(0, int(100 * value / one))
-    percentage = max(own, int(100 * (value + max(0, surcharge or 0)) / one))
+    percentage = max(own, int(100 * (value + surcharge) / one))
 
     # Split at the thresholds of the colors and where the surcharge starts
     points = sorted({0, own, percentage} | {p for p in (75, 100) if p < percentage})
@@ -197,12 +201,27 @@ def bar(value, one, surcharge=None):
     if percentage > 100:
         bars = [(cls, round(part * 100 / percentage, 2)) for cls, part in bars]
 
-    title = f"{percentage}%"
-    if percentage > own:
+    if unit == "hours":
+        values = {
+            "value": hours(Decimal(value)),
+            "surcharge": hours(Decimal(surcharge)),
+            "one": hours(Decimal(one)),
+            "percentage": percentage,
+        }
+        title = (
+            _("%(value)s + %(surcharge)s surcharges of %(one)s (%(percentage)s%%)")
+            if surcharge
+            else _("%(value)s of %(one)s (%(percentage)s%%)")
+        ) % values
+    elif unit is not None:
+        raise ValueError(f"Unknown unit {unit!r}")
+    elif percentage > own:
         title = _("%(percentage)s%% (%(surcharge)s%% surcharges)") % {
             "percentage": percentage,
             "surcharge": percentage - own,
         }
+    else:
+        title = f"{percentage}%"
 
     return format_html(
         '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{title}">'

@@ -72,6 +72,17 @@ class TemplateTagsTest(TestCase):
             '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="150%"><div class="progress progress-line"><div class="progress-bar bg-success" role="progressbar" style="width:50.0%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:16.67%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:33.33%"></div></div></div>',
         )
 
+    def test_bar_unit(self):
+        """The tooltip shows the values when the unit is known"""
+        deactivate_all()
+        t = Template(
+            "{% load workbench %}{% bar value one surcharge=surcharge unit='hours' %}"
+        )
+        html = t.render(Context({"value": 6, "one": 10, "surcharge": 3}))
+        self.assertIn('title="6.0h + 3.0h surcharges of 10.0h (90%)"', html)
+        html = t.render(Context({"value": 6, "one": 10, "surcharge": 0}))
+        self.assertIn('title="6.0h of 10.0h (60%)"', html)
+
     def test_bar_surcharge(self):
         """Surcharges (hours for invoicing above the hours) use up the budget too"""
         deactivate_all()

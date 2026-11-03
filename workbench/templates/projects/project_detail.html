@@ -146,7 +146,7 @@
             <a href="{% url 'logbook_loggedhours_list' %}?project={{ project.pk }}">{{ gs.logged_hours|hours }}</a>
             <span class="wb-stat-of">/ {{ gs.service_hours|hours }}</span>
           </div>
-          {% bar gs.logged_hours gs.service_hours surcharge=gs.surcharge %}
+          {% bar gs.logged_hours gs.service_hours surcharge=gs.surcharge unit="hours" %}
           {% if gs.hours_for_invoicing_entries %}
             <div class="wb-stat-note">
               <a href="{{ project.urls.hours_for_invoicing }}" data-ajaxmodal>
@@ -429,7 +429,7 @@
               >+{{ offer_data.surcharge|hours }}</span>{% endif %}
             {% if offer_data.service_hours %}<span class="wb-stat-of">/
                 {{ offer_data.service_hours|hours }}</span>{% endif %}
-            {% bar offer_data.logged_hours offer_data.service_hours surcharge=offer_data.surcharge %}
+            {% bar offer_data.logged_hours offer_data.service_hours surcharge=offer_data.surcharge unit="hours" %}
           </a>
           {% if offer_data.logged_cost or offer_data.service_cost %}
             <a
@@ -580,7 +580,7 @@
                   {% elif row.logged_hours or row.service.service_hours %}
                     <span class="wb-figure-note text-warning">{% translate 'undefined rate' %}</span>
                   {% endif %}
-                  {% bar row.logged_hours row.service.service_hours surcharge=row.surcharge %}
+                  {% bar row.logged_hours row.service.service_hours surcharge=row.surcharge unit="hours" %}
                 </a>
               {% endif %}
               {% if row.logged_cost or row.service.cost %}

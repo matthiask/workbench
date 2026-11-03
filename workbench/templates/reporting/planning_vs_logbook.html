@@ -44,7 +44,7 @@
         {% for customer_row in stats.per_customer %}
           <tr>
             <td>{{ customer_row.customer }}</td>
-            <td class="align-middle">{% bar customer_row.logged customer_row.planned %}</td>
+            <td class="align-middle">{% bar customer_row.logged customer_row.planned unit="hours" %}</td>
             <td class="text-end">
               <span
                 class="{% if not customer_row.planned %}text-black-30{% endif %}"

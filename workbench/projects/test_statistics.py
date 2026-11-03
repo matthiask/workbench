@@ -127,11 +127,15 @@ class StatisticsTest(TestCase):
         self.client.force_login(project.owned_by)
         response = self.client.get(project.get_absolute_url())
         # Project and offer, the other service has no service hours
-        self.assertContains(response, 'title="90% (20% surcharges)"', 2)
-        self.assertContains(response, 'title="70% (20% surcharges)"', 1)
+        self.assertContains(
+            response, 'title="7.0h + 2.0h surcharges of 10.0h (90%)"', 2
+        )
+        self.assertContains(
+            response, 'title="5.0h + 2.0h surcharges of 10.0h (70%)"', 1
+        )
 
         response = self.client.get("/projects/")
-        self.assertContains(response, 'title="90% (20% surcharges)"')
+        self.assertContains(response, 'title="7.0h + 2.0h surcharges of 10.0h (90%)"')
 
         response = self.client.get(
             project.urls["createhours"],

@@ -521,6 +521,10 @@ tbody th > a {
   margin: -0.5rem 0;
 }
 
+.tooltip {
+  --bs-tooltip-max-width: 20rem;
+}
+
 // Hours for invoicing above the hours, see the bar template tag
 .progress-bar.wb-surcharge {
   opacity: 0.4;

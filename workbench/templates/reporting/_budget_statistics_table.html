@@ -34,7 +34,7 @@
         <td class="text-end">{{ statistics.overall.invoiced|currency }}</td>
         <td class="text-end text-nowrap">
           {{ statistics.overall.hours|hours }} / {{ statistics.overall.service_hours|hours }}
-          {% bar statistics.overall.hours statistics.overall.service_hours %}
+          {% bar statistics.overall.hours statistics.overall.service_hours unit="hours" %}
         </td>
         <td class="text-end text-nowrap">
           {{ statistics.overall.delta_positive|currency:True }}
@@ -72,7 +72,7 @@
           </td>
           <td class="text-end text-nowrap">
             {{ project.hours|hours }} / {{ project.service_hours|hours }}
-            {% bar project.hours project.service_hours %}
+            {% bar project.hours project.service_hours unit="hours" %}
           </td>
           <td class="text-end {% if not project.delta %}text-black-30{% endif %}">
             {{ project.delta|currency:True }}

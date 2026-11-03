@@ -28,7 +28,9 @@
             <th class="text-end text-nowrap">
               <a href="{% url 'logbook_loggedhours_list' %}?project={{ object.pk }}">{{ gs.logged_hours|hours }}</a>
             </th>
-            <th class="progress-cell">{% bar gs.logged_hours gs.service_hours surcharge=gs.surcharge %}</th>
+            <th class="progress-cell">
+              {% bar gs.logged_hours gs.service_hours surcharge=gs.surcharge unit="hours" %}
+            </th>
             {% for user, hours in gs.logged_hours_per_user %}
               <th class="text-end text-nowrap">
                 <a
@@ -45,7 +47,7 @@
               <th class="text-end text-nowrap">{{ offer_data.service_hours|hours }}</th>
               <th class="text-end text-nowrap">{{ offer_data.logged_hours|hours }}</th>
               <th class="progress-cell">
-                {% bar offer_data.logged_hours offer_data.service_hours surcharge=offer_data.surcharge %}
+                {% bar offer_data.logged_hours offer_data.service_hours surcharge=offer_data.surcharge unit="hours" %}
               </th>
               {% if gs.logged_hours_per_user %}<th colspan="{{ gs.logged_hours_per_user|length }}"></th>{% endif %}
             </tr>
@@ -64,7 +66,7 @@
                   </td>
                   <td class="progress-cell">
                     {% if row.service.allow_logging or row.logged_hours %}
-                      {% bar row.logged_hours row.service.service_hours surcharge=row.surcharge %}
+                      {% bar row.logged_hours row.service.service_hours surcharge=row.surcharge unit="hours" %}
                     {% endif %}
                   </td>
                   {% project_statistics_row gs.logged_hours_per_user row.logged_hours_per_user as user_row %}

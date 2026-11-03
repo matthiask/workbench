@@ -76,7 +76,7 @@
             {{ statistics.overall.hours|hours }}
             <span class="wb-stat-of">/ {{ statistics.overall.service_hours|hours }}</span>
           </div>
-          {% bar statistics.overall.hours statistics.overall.service_hours %}
+          {% bar statistics.overall.hours statistics.overall.service_hours unit="hours" %}
         </div>
         <div class="wb-stat">
           <div class="wb-stat-label">{% translate 'Gross margin / hour' %}</div>
