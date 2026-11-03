@@ -517,7 +517,13 @@ tbody th > a {
 
 // Hours for invoicing above the hours, see the bar template tag
 .progress-bar.wb-surcharge {
-  opacity: 0.45;
+  opacity: 0.4;
+}
+
+// A gap where the time spent ends, shows the track without changing widths
+.progress-bar:not(.wb-surcharge) + .wb-surcharge {
+  padding-left: 2px;
+  background-clip: content-box;
 }
 
 [data-field-value] {
