@@ -279,7 +279,6 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - In templates, when you check a queryset for existence and then iterate it,
   bind it once with `{% with objects=obj.related.all %}` -- otherwise the
   attribute is evaluated (and the query run) twice.
-- The "add issue to project" GitHub Actions workflow is duplicated across individual repos and should be consolidated into the org-level `.github` repo (org-level workflows apply to all repos). The cross-app parent warning workflow goes there too. See `specs/github-cost-allocation-report.md`.
 
 # Deployments
 
