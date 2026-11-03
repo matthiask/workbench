@@ -41,6 +41,11 @@ def hours(ctx):
 @click.option(
     "--hours-for-invoicing", is_flag=True, help="Only entries with hours for invoicing."
 )
+@click.option(
+    "--invoiced/--not-invoiced",
+    default=None,
+    help="Only entries which are (not) on an invoice.",
+)
 @period_options("filters the date the work was done")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -53,6 +58,7 @@ def search_hours(
     service,
     rendered_by,
     hours_for_invoicing,
+    invoiced,
     period,
     since,
     until,
@@ -69,6 +75,8 @@ def search_hours(
         "q": " ".join(query),
         "hours_for_invoicing": format_bool(hours_for_invoicing),
     }
+    if invoiced is not None:
+        params["invoiced"] = format_bool(invoiced)
     for key, value in [
         ("project", project),
         ("customer", customer),

@@ -21,6 +21,12 @@ from workbench.tools.formats import Z1, Z2
 router = Router(tags=["logbook"])
 
 
+class InvoiceSummary(Schema):
+    id: int
+    code: str
+    status: str
+
+
 class LoggedHoursOut(Schema):
     id: int
     url: str
@@ -35,6 +41,10 @@ class LoggedHoursOut(Schema):
     project: ProjectSummary
     service_id: int
     service: str
+    archived_at: dt.datetime | None
+    invoice: InvoiceSummary | None = Field(
+        description="The invoice which contains the entry, if any."
+    )
 
 
 class LoggedHoursPagination(TotalsPagination):
@@ -51,6 +61,9 @@ class LoggedHoursFilter(DateRangeFilter):
     offer: int | None = None
     service: int | None = None
     rendered_by: str | None = None
+    invoiced: bool | None = Field(
+        default=None, description="Only entries which are (not) on an invoice"
+    )
 
 
 class LoggedHoursListFilter(LoggedHoursFilter):
@@ -71,6 +84,8 @@ def _filter(queryset, filters):
         queryset = queryset.filter(service=filters.service)
     if filters.rendered_by:
         queryset = queryset.filter(rendered_by___short_name__iexact=filters.rendered_by)
+    if filters.invoiced is not None:
+        queryset = queryset.filter(invoice_service__isnull=not filters.invoiced)
     queryset = filter_date_range(queryset, filters, "rendered_on")
     if filters.q:
         queryset = queryset.search(filters.q)
@@ -87,6 +102,14 @@ def _entry_out(entry, request):
         "project": project_summary(entry.service.project, request),
         "service_id": entry.service_id,
         "service": entry.service.title,
+        "archived_at": entry.archived_at,
+        "invoice": {
+            "id": invoice.id,
+            "code": invoice.code,
+            "status": invoice.get_status_display(),
+        }
+        if (invoice := entry.invoice_service and entry.invoice_service.invoice)
+        else None,
     }
 
 
@@ -98,9 +121,9 @@ def logged_hours_list(request, filters: Query[LoggedHoursListFilter]):
     if filters.hours_for_invoicing:
         hours = hours.filter(hours_for_invoicing__isnull=False)
     return Serialized(
-        hours.select_related("rendered_by", "service__project").order_by(
-            "-rendered_on", "-created_at", "-pk"
-        ),
+        hours.select_related(
+            "rendered_by", "service__project", "invoice_service__invoice__project"
+        ).order_by("-rendered_on", "-created_at", "-pk"),
         lambda row: (
             _entry_out(row, request)
             | {"hours": row.hours, "hours_for_invoicing": row.hours_for_invoicing}
@@ -123,6 +146,10 @@ class LoggedCostOut(Schema):
     project: ProjectSummary
     service_id: int
     service: str
+    archived_at: dt.datetime | None
+    invoice: InvoiceSummary | None = Field(
+        description="The invoice which contains the entry, if any."
+    )
 
 
 class LoggedCostPagination(TotalsPagination):
@@ -150,9 +177,9 @@ def logged_cost_list(request, filters: Query[LoggedCostFilter]):
         cost=Sum("cost"), third_party_costs=Sum("third_party_costs")
     )
     return Serialized(
-        costs.select_related("rendered_by", "service__project").order_by(
-            "-rendered_on", "-created_at", "-pk"
-        ),
+        costs.select_related(
+            "rendered_by", "service__project", "invoice_service__invoice__project"
+        ).order_by("-rendered_on", "-created_at", "-pk"),
         lambda row: (
             _entry_out(row, request)
             | {

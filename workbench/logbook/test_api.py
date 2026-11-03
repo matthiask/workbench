@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.invoices.models import Invoice
 
 
 class LogbookAPITest(TestCase):
@@ -69,6 +70,36 @@ class LogbookAPITest(TestCase):
         self.assertEqual(ids("?rendered_by=AB"), [mine.pk])
         self.assertEqual(ids("?since=2026-09-15"), [mine.pk])
         self.assertEqual(ids("?until=2026-09-15"), [other.pk])
+
+    def test_invoiced(self):
+        """Logged hours have their invoice and can be filtered by it"""
+        service = factories.ServiceFactory.create()
+        invoiced = factories.LoggedHoursFactory.create(service=service)
+        invoice = factories.InvoiceFactory.create(
+            project=service.project,
+            customer=service.project.customer,
+            contact=service.project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        not_invoiced = factories.LoggedHoursFactory.create(service=service)
+        self.client.force_login(service.project.owned_by)
+
+        def rows(query=""):
+            data = self.client.get(f"/api/logbook/hours/{query}").json()
+            return {row["id"]: row for row in data["items"]}
+
+        data = rows()
+        self.assertEqual(
+            data[invoiced.pk]["invoice"],
+            {"id": invoice.pk, "code": invoice.code, "status": "In preparation"},
+        )
+        self.assertIsNotNone(data[invoiced.pk]["archived_at"])
+        self.assertIsNone(data[not_invoiced.pk]["invoice"])
+        self.assertIsNone(data[not_invoiced.pk]["archived_at"])
+
+        self.assertEqual(set(rows("?invoiced=true")), {invoiced.pk})
+        self.assertEqual(set(rows("?invoiced=false")), {not_invoiced.pk})
 
     def test_costs(self):
         """Logged costs can be filtered, the totals include all matches"""
