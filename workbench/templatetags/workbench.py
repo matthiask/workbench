@@ -205,7 +205,8 @@ def bar(value, one, surcharge=None):
         }
 
     return format_html(
-        '<div class="progress progress-line" title="{title}">{bars}</div>',
+        '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{title}">'
+        '<div class="progress progress-line">{bars}</div></div>',
         title=title,
         bars=format_html_join(
             "",

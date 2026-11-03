@@ -515,6 +515,12 @@ tbody th > a {
   height: 4px;
 }
 
+// Hover target for the tooltip of the bar template tag, taller than the bar
+.wb-bar {
+  padding: 0.5rem 0;
+  margin: -0.5rem 0;
+}
+
 // Hours for invoicing above the hours, see the bar template tag
 .progress-bar.wb-surcharge {
   opacity: 0.4;

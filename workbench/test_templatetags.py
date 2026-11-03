@@ -59,17 +59,17 @@ class TemplateTagsTest(TestCase):
         t = Template("{% load workbench %}{% bar value one %}")
         self.assertEqual(
             t.render(Context({"value": 10, "one": 100})),
-            '<div class="progress progress-line" title="10%">'
+            '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="10%"><div class="progress progress-line">'
             '<div class="progress-bar bg-success" role="progressbar"'
-            ' style="width:10%"></div></div>',
+            ' style="width:10%"></div></div></div>',
         )
         self.assertEqual(
             t.render(Context({"value": 80, "one": 100})),
-            '<div class="progress progress-line" title="80%"><div class="progress-bar bg-success" role="progressbar" style="width:75%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:5%"></div></div>',
+            '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="80%"><div class="progress progress-line"><div class="progress-bar bg-success" role="progressbar" style="width:75%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:5%"></div></div></div>',
         )
         self.assertEqual(
             t.render(Context({"value": 150, "one": 100})),
-            '<div class="progress progress-line" title="150%"><div class="progress-bar bg-success" role="progressbar" style="width:50.0%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:16.67%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:33.33%"></div></div>',
+            '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="150%"><div class="progress progress-line"><div class="progress-bar bg-success" role="progressbar" style="width:50.0%"></div><div class="progress-bar bg-caveat" role="progressbar" style="width:16.67%"></div><div class="progress-bar bg-danger" role="progressbar" style="width:33.33%"></div></div></div>',
         )
 
     def test_bar_surcharge(self):
@@ -78,26 +78,26 @@ class TemplateTagsTest(TestCase):
         t = Template("{% load workbench %}{% bar value one surcharge=surcharge %}")
         self.assertEqual(
             t.render(Context({"value": 60, "one": 100, "surcharge": 30})),
-            '<div class="progress progress-line" title="90% (30% surcharges)">'
+            '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="90% (30% surcharges)"><div class="progress progress-line">'
             '<div class="progress-bar bg-success" role="progressbar" style="width:60%"></div>'
             '<div class="progress-bar bg-success wb-surcharge" role="progressbar" style="width:15%"></div>'
             '<div class="progress-bar bg-caveat wb-surcharge" role="progressbar" style="width:15%"></div>'
-            "</div>",
+            "</div></div>",
         )
         self.assertEqual(
             t.render(Context({"value": 100, "one": 100, "surcharge": 100})),
-            '<div class="progress progress-line" title="200% (100% surcharges)">'
+            '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="200% (100% surcharges)"><div class="progress progress-line">'
             '<div class="progress-bar bg-success" role="progressbar" style="width:37.5%"></div>'
             '<div class="progress-bar bg-caveat" role="progressbar" style="width:12.5%"></div>'
             '<div class="progress-bar bg-danger wb-surcharge" role="progressbar" style="width:50.0%"></div>'
-            "</div>",
+            "</div></div>",
         )
         # Nothing changes without (positive) surcharges
         self.assertEqual(
             t.render(Context({"value": 10, "one": 100, "surcharge": -5})),
-            '<div class="progress progress-line" title="10%">'
+            '<div class="wb-bar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="10%"><div class="progress progress-line">'
             '<div class="progress-bar bg-success" role="progressbar"'
-            ' style="width:10%"></div></div>',
+            ' style="width:10%"></div></div></div>',
         )
 
     def test_pie(self):

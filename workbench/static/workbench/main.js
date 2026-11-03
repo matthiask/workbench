@@ -617,6 +617,10 @@ function initWidgets() {
     validUntil.value = daysLater(offeredOn.value, 59)
   })
 
+  for (const el of document.querySelectorAll('[data-bs-toggle="tooltip"]')) {
+    bootstrap.Tooltip.getOrCreateInstance(el)
+  }
+
   for (const el of document.querySelectorAll(
     "[data-autofill]:not(.initialized)",
   )) {
