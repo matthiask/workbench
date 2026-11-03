@@ -3,7 +3,7 @@ import datetime as dt
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q, Sum
+from django.db.models import F, Q, Sum
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.html import mark_safe
@@ -457,12 +457,21 @@ class LoggedHoursForm(ModelForm):
             row["id"]: {
                 "service_hours": float(row["service_hours"]),
                 "logged_hours": float(row["loggedhours__hours__sum"] or 0),
+                "surcharge": float(row["surcharge"] or 0),
             }
             for row in self.project.services
             .logging()
             .order_by()
             .values("id", "service_hours")
-            .annotate(Sum("loggedhours__hours"))
+            .annotate(
+                Sum("loggedhours__hours"),
+                surcharge=Sum(
+                    F("loggedhours__hours_for_invoicing") - F("loggedhours__hours"),
+                    filter=Q(
+                        loggedhours__hours_for_invoicing__gt=F("loggedhours__hours")
+                    ),
+                ),
+            )
         }
 
     def clean(self):  # noqa: C901

@@ -39,12 +39,8 @@
   <div data-service-progress class="mb-3">
     {% ff_field form.service %}
     <div class="d-flex gap-3 w-100 align-items-center">
-      <div class="progress progress-line flex-grow-1">
-        <div class="progress-bar bg-success" role="progressbar"></div>
-        <div class="progress-bar bg-caveat" role="progressbar"></div>
-        <div class="progress-bar bg-danger" role="progressbar"></div>
-      </div>
-      <small data-numbers class="d-inline-block text-end" style="width: 15ch"></small>
+      <div class="progress progress-line flex-grow-1"></div>
+      <small data-numbers class="d-inline-block text-end" style="width: 20ch"></small>
     </div>
     {{ form.progress_on_selectable_services|json_script }}
   </div>

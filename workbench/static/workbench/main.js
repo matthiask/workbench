@@ -676,31 +676,46 @@ function initWidgets() {
     el.setAttribute("lang", "en-US")
   }
 
-  // The logged hours form has a nice progress bar showing the percentage for each service
+  // The logged hours form has a nice progress bar showing the percentage for
+  // each service, see the bar template tag in workbench/templatetags/workbench.py
   for (const el of document.querySelectorAll("[data-service-progress]")) {
     const select = el.querySelector("select")
-    const bars = [...el.querySelectorAll(".progress-bar")]
+    const progress = el.querySelector(".progress")
     const numbers = el.querySelector("[data-numbers]")
     const data = JSON.parse(el.querySelector("script").textContent)
 
     const update = () => {
-      const row = data[select.value]
-      const { logged_hours, service_hours } = row || {
+      const { logged_hours, service_hours, surcharge } = data[select.value] || {
         logged_hours: 0,
         service_hours: 0,
+        surcharge: 0,
       }
+      const own = service_hours ? (100 * logged_hours) / service_hours : 0
       const percentage = service_hours
-        ? (100 * logged_hours) / service_hours
+        ? (100 * (logged_hours + surcharge)) / service_hours
         : 0
-
       const f = percentage > 100 ? 100 / percentage : 1
 
-      bars[0].style.width = `${f * Math.min(75, percentage)}%`
-      bars[1].style.width =
-        percentage > 75 ? `${f * Math.min(25, percentage - 75)}%` : "0%"
-      bars[2].style.width = percentage > 100 ? `${percentage - 100}%` : "0%"
+      const points = [
+        ...new Set([
+          0,
+          own,
+          percentage,
+          ...[75, 100].filter((p) => p < percentage),
+        ]),
+      ].sort((a, b) => a - b)
+      progress.replaceChildren(
+        ...points.slice(1).map((b, i) => {
+          const a = points[i]
+          const bar = document.createElement("div")
+          bar.className = `progress-bar ${a < 75 ? "bg-success" : a < 100 ? "bg-caveat" : "bg-danger"}${a >= own ? " wb-surcharge" : ""}`
+          bar.setAttribute("role", "progressbar")
+          bar.style.width = `${f * (b - a)}%`
+          return bar
+        }),
+      )
 
-      numbers.textContent = `${logged_hours.toFixed(1)}h / ${service_hours.toFixed(1)}h`
+      numbers.textContent = `${logged_hours.toFixed(1)}h${surcharge ? ` +${surcharge.toFixed(1)}h` : ""} / ${service_hours.toFixed(1)}h`
     }
 
     update()

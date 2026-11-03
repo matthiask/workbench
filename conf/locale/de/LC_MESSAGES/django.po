@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 16:18+0100\n"
+"POT-Creation-Date: 2026-11-03 07:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2693,6 +2693,7 @@ msgstr "Erbracht von"
 #: workbench/logbook/models.py workbench/reporting/squeeze.py
 #: workbench/templates/logbook/_loggedhours_row.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "hours for invoicing"
 msgstr "Stunden für Verrechnung"
@@ -5763,6 +5764,11 @@ msgstr "Tiefe Wahrscheinlichkeit"
 #: workbench/templatetags/workbench.py
 msgid "unknown probability"
 msgstr "Wahrscheinlichkeit unbekannt"
+
+#: workbench/templatetags/workbench.py
+#, python-format
+msgid "%(percentage)s%% (%(surcharge)s%% surcharges)"
+msgstr "%(percentage)s%% (davon %(surcharge)s%% Zuschläge)"
 
 #: workbench/timer/api.py
 msgid "This service doesn't exist."

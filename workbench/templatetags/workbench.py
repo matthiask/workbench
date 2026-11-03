@@ -1,11 +1,12 @@
 import datetime as dt
 import math
 from collections import defaultdict
-from itertools import groupby
+from itertools import groupby, pairwise
 
 from django import template
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import F
 from django.template.defaultfilters import linebreaksbr
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join, mark_safe
@@ -172,23 +173,40 @@ def group_deals_by_probability(iterable, should_group):
 
 
 @register.simple_tag
-def bar(value, one):
+def bar(value, one, surcharge=None):
+    """Progress of ``value`` towards ``one``
+
+    ``surcharge`` (e.g. hours for invoicing above the hours) is added on top
+    of ``value`` and shown lighter: it uses up the budget as well."""
     if not one:
         return ""
 
-    percentage = int(100 * value / one)
+    own = max(0, int(100 * value / one))
+    percentage = max(own, int(100 * (value + max(0, surcharge or 0)) / one))
 
-    bars = [("bg-success", min(75, max(0, percentage)))]
-
-    if percentage >= 75:
-        bars.append(("bg-caveat", min(25, percentage - 75)))
+    # Split at the thresholds of the colors and where the surcharge starts
+    points = sorted({0, own, percentage} | {p for p in (75, 100) if p < percentage})
+    bars = [
+        (
+            ("bg-success" if a < 75 else "bg-caveat" if a < 100 else "bg-danger")
+            + (" wb-surcharge" if a >= own else ""),
+            b - a,
+        )
+        for a, b in pairwise(points)
+    ] or [("bg-success", 0)]
     if percentage > 100:
-        bars.append(("bg-danger", percentage - 100))
         bars = [(cls, round(part * 100 / percentage, 2)) for cls, part in bars]
 
+    title = f"{percentage}%"
+    if percentage > own:
+        title = _("%(percentage)s%% (%(surcharge)s%% surcharges)") % {
+            "percentage": percentage,
+            "surcharge": percentage - own,
+        }
+
     return format_html(
-        '<div class="progress progress-line" title="{percentage}%">{bars}</div>',
-        percentage=percentage,
+        '<div class="progress progress-line" title="{title}">{bars}</div>',
+        title=title,
         bars=format_html_join(
             "",
             '<div class="progress-bar {}" role="progressbar" style="width:{}%"></div>',
@@ -307,11 +325,20 @@ def analyze_projects(object_list):
         field="hours",
         default=Z1,
     )
+    surcharge = sum_by(
+        LoggedHours.objects.filter(
+            service__project__in=pks, hours_for_invoicing__gt=F("hours")
+        ),
+        key="service__project",
+        field=F("hours_for_invoicing") - F("hours"),
+        default=Z1,
+    )
 
     for object in object_list:
         object.analyzed = {
             "service_hours": service_hours[object.pk],
             "logged_hours": logged_hours[object.pk],
+            "surcharge": surcharge[object.pk],
         }
     return object_list
 

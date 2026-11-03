@@ -102,6 +102,46 @@ class StatisticsTest(TestCase):
         response = self.client.get(project.get_absolute_url())
         self.assertContains(response, "Logbook, invoiced and accepted offers")
 
+    def test_surcharge(self):
+        """Hours for invoicing above the hours use up the budget too, the
+        progress bars show them separately"""
+        service = factories.ServiceFactory.create(effort_rate=100, effort_hours=10)
+        other = factories.ServiceFactory.create(project=service.project)
+        factories.LoggedHoursFactory.create(service=service, hours=3)
+        factories.LoggedHoursFactory.create(
+            service=service, hours=2, hours_for_invoicing=4
+        )
+        # Lower hours for invoicing don't reduce the progress
+        factories.LoggedHoursFactory.create(
+            service=other, hours=2, hours_for_invoicing=1
+        )
+
+        project = service.project
+        gs = project.grouped_services
+        self.assertEqual(gs["logged_hours"], 7)
+        self.assertEqual(gs["surcharge"], 2)
+        [(_offer, offer_data)] = gs["offers"]
+        self.assertEqual(offer_data["surcharge"], 2)
+        self.assertEqual([row["surcharge"] for row in offer_data["services"]], [2, 0])
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.get_absolute_url())
+        # Project and offer, the other service has no service hours
+        self.assertContains(response, 'title="90% (20% surcharges)"', 2)
+        self.assertContains(response, 'title="70% (20% surcharges)"', 1)
+
+        response = self.client.get("/projects/")
+        self.assertContains(response, 'title="90% (20% surcharges)"')
+
+        response = self.client.get(
+            project.urls["createhours"],
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(
+            response.context["form"].progress_on_selectable_services[service.id],
+            {"service_hours": 10.0, "logged_hours": 5.0, "surcharge": 2.0},
+        )
+
     def test_projected_gross_margin_view(self):
         user = factories.UserFactory.create()
         self.client.force_login(user)

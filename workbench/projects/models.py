@@ -508,6 +508,8 @@ class Project(Model):
         # Logged vs. service hours
         service_hours = defaultdict(lambda: Z1)
         logged_hours = defaultdict(lambda: Z1)
+        # Hours for invoicing above the hours use up the budget too
+        surcharge = defaultdict(lambda: Z1)
         # Logged vs. service cost
         service_cost = defaultdict(lambda: Z2)
         logged_cost = defaultdict(lambda: Z2)
@@ -529,6 +531,7 @@ class Project(Model):
 
         logged_hours_per_service_and_user = defaultdict(dict)
         hours_for_invoicing_per_service = defaultdict(lambda: Z1)
+        surcharge_per_service = defaultdict(lambda: Z1)
         logged_hours_per_user = defaultdict(lambda: Z1)
         logged_hours_per_effort_rate = defaultdict(lambda: Z1)
         # Entries with invoiced hours, for sanity checks
@@ -559,6 +562,9 @@ class Project(Model):
             logged_hours_per_user[row["rendered_by"]] += row["hours__sum"]
             hours_for_invoicing_entries += row["hours_for_invoicing_entries"]
             hours_for_invoicing_more += row["hours_for_invoicing_more"] or Z1
+            surcharge_per_service[row["service"]] += (
+                row["hours_for_invoicing_more"] or Z1
+            )
             hours_for_invoicing_less += row["hours_for_invoicing_less"] or Z1
             hours_for_invoicing_per_service[row["service"]] += row[
                 "hours_for_invoicing_sum"
@@ -604,6 +610,7 @@ class Project(Model):
                     key=lambda row: row[1],
                     reverse=True,
                 ),
+                "surcharge": surcharge_per_service[service.id],
                 "logged_cost": logged_cost_per_service[service.id],
                 "not_archived_logged_hours": not_archived_logged_hours_per_service[
                     service.id
@@ -619,6 +626,8 @@ class Project(Model):
             logged_hours[service.offer] += row["logged_hours"]
             logged_cost[service.offer] += row["logged_cost"]
             logged_hours[service.project] += row["logged_hours"]
+            surcharge[service.offer] += row["surcharge"]
+            surcharge[service.project] += row["surcharge"]
             logged_cost[service.project] += row["logged_cost"]
             total_logged_cost += row["logged_cost"]
             logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
@@ -655,6 +664,7 @@ class Project(Model):
         for offer, offer_data in services_by_offer.items():
             offer_data["service_hours"] = service_hours[offer]
             offer_data["logged_hours"] = logged_hours[offer]
+            offer_data["surcharge"] = surcharge[offer]
             offer_data["service_cost"] = service_cost[offer]
             offer_data["logged_cost"] = logged_cost[offer]
 
@@ -665,6 +675,7 @@ class Project(Model):
                 if item[1]["services"] or item[0] is not None
             ),
             "logged_hours": logged_hours[self],
+            "surcharge": surcharge[self],
             "hours_for_invoicing_entries": hours_for_invoicing_entries,
             "hours_for_invoicing_more": hours_for_invoicing_more,
             "hours_for_invoicing_less": hours_for_invoicing_less,

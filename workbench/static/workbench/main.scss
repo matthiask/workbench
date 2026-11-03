@@ -515,6 +515,11 @@ tbody th > a {
   height: 4px;
 }
 
+// Hours for invoicing above the hours, see the bar template tag
+.progress-bar.wb-surcharge {
+  opacity: 0.45;
+}
+
 [data-field-value] {
   cursor: pointer;
 }
