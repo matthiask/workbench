@@ -168,9 +168,13 @@ function initModal(html) {
     if (form) {
       const serialize = () => new URLSearchParams(new FormData(form)).toString()
       let initial = null
+      let lastEscape = 0
       el.addEventListener("keydown", (e) => {
         if (e.key !== "Escape" || e.defaultPrevented) return
-        if (initial === null || serialize() === initial) {
+        // Pressing escape again shortly after closes changed forms anyway
+        const repeated = e.timeStamp - lastEscape < 1500
+        lastEscape = e.timeStamp
+        if (initial === null || serialize() === initial || repeated) {
           modal.hide()
         } else {
           // The same hint as Bootstrap's for static backdrops
