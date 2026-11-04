@@ -52,7 +52,11 @@
             </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'contacts' %}">{% translate 'contacts'|capfirst %}</a>
+            <a
+              class="nav-link"
+              href="{% url 'contacts' %}"
+              data-search-path="{% url 'contacts_person_list' %}"
+            >{% translate 'contacts'|capfirst %}</a>
           </li>
           <li class="nav-item dropdown">
             <a

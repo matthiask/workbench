@@ -330,10 +330,12 @@ function restoreSearch(href) {
   return href + (window.localStorage.getItem(localStorageKeyFor(href)) || "")
 }
 
-// Restore the search params when going through the main menu...
+// Restore the search params when going through the main menu... Links to
+// pages which redirect (e.g. /contacts/) name the list in data-search-path,
+// their href stays for marking the current section
 on("click", ".navbar a", (e, el) => {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
-  const href = el.getAttribute("href")
+  const href = el.dataset.searchPath || el.getAttribute("href")
   if (!href) return
 
   e.preventDefault()
