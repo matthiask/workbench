@@ -18,7 +18,7 @@ from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.planning.models import PlannedWork
-from workbench.projects.forms import ProjectForm, ServiceForm
+from workbench.projects.forms import ProjectForm, ReassignLogbookForm, ServiceForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
@@ -634,6 +634,62 @@ def service_update(
             request,
             controlling=request.user.features[FEATURES.CONTROLLING],
         )
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+class ReassignLogbookIn(Schema):
+    to: int = Field(
+        description="ID of a service of the same project which allows logging"
+    )
+    include_invoiced: bool = Field(
+        default=False,
+        description="Also reassign invoiced entries; otherwise they stay with"
+        " the service their invoice lines refer to.",
+    )
+
+
+class ReassignLogbookOut(Schema):
+    hours: int = Field(description="Number of reassigned logged hours")
+    costs: int = Field(description="Number of reassigned logged costs")
+    from_: ServiceOut = Field(alias="from")
+    to: ServiceOut
+
+
+@router.post(
+    "/services/{int:service_id}/reassign-logbook/",
+    response=ReassignLogbookOut,
+    by_alias=True,
+)
+def service_reassign_logbook(
+    request, service_id: int, data: ReassignLogbookIn, *, dry_run: bool = False
+):
+    """Reassign the logged hours and costs of a service to another service,
+    validated with the form of the web interface
+
+    Services can't be deleted afterwards like in the web interface."""
+    service = get_object_or_404(Service, pk=service_id)
+    form = ReassignLogbookForm(
+        {"service": data.to, "include_invoiced": data.include_invoiced or ""},
+        instance=service,
+        request=request,
+    )
+    if not form.is_valid(ignore_warnings=True):
+        raise_form_errors(form, fields={"service": ["to"]})
+
+    controlling = request.user.features[FEATURES.CONTROLLING]
+    with transaction.atomic():
+        hours, costs = form.logbook_entries()
+        counts = {"hours": hours.count(), "costs": costs.count()}
+        target = form.save()
+        services = {s.pk: s for s in _services().filter(pk__in=[service.pk, target.pk])}
+        result = counts | {
+            "from": _service_out(
+                services[service.pk], request, controlling=controlling
+            ),
+            "to": _service_out(services[target.pk], request, controlling=controlling),
+        }
         if dry_run:
             transaction.set_rollback(True)
     return result

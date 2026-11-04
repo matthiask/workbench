@@ -639,13 +639,18 @@ class ReassignLogbookForm(Form):
                 required=False,
             )
 
-    def save(self):
-        service = self.cleaned_data["service"]
+    def logbook_entries(self):
+        """The logged hours and costs which are reassigned"""
         hours = self.from_service.loggedhours.all()
         costs = self.from_service.loggedcosts.all()
         if not self.cleaned_data.get("include_invoiced"):
             hours = hours.filter(invoice_service__isnull=True)
             costs = costs.filter(invoice_service__isnull=True)
+        return hours, costs
+
+    def save(self):
+        service = self.cleaned_data["service"]
+        hours, costs = self.logbook_entries()
         hours.update(service=service)
         costs.update(service=service)
 

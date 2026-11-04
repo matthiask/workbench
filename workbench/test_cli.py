@@ -451,6 +451,11 @@ planned_work:
         self.assertEqual(service.description, "Text")
         result = self.wb("services", "update", service.pk)
         self.assertEqual(result.exit_code, 1)
+        target = factories.ServiceFactory.create(project=project)
+        result = self.wb("services", "reassign-logbook", service.pk, "--to", target.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("1 logged hours", result.output)
+        self.assertEqual(target.loggedhours.count(), 1)
         result = self.wb(
             "hours", "search", "--project", project.pk, "--rendered-by", "ab"
         )

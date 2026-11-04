@@ -136,7 +136,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `wb services update`, also in the web form); Workbench stores them but
   doesn't talk to GitHub. The same endpoint changes the description and moves services between offers,
   validated with the web interface's `ServiceForm` (which also restricts the
-  offer queryset, not only the choices). `wb offers
+  offer queryset, not only the choices). `POST
+  /api/services/<id>/reassign-logbook/` (`wb services reassign-logbook`)
+  reassigns logged hours and costs with `ReassignLogbookForm`; invoiced
+  entries only with `include_invoiced`. It doesn't delete the old service:
+  the form reports that through Django's messages, which would show up later
+  in the web interface. `wb offers
   guidelines` prints a private file configured per installation in the wb
   configuration (`offer_guidelines`), which the `workbench-offer` skill
   follows; the guidelines contain confidential figures, so they don't live in

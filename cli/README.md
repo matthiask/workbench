@@ -241,6 +241,13 @@ preparation or service groups, not out of offers which have been sent):
     wb services update 902 --clear-offer
     wb services update 902 --description "Without the URL"
 
+Logged hours and costs are reassigned to another service of the project like
+in the web interface; invoiced entries stay with their service unless they are
+included:
+
+    wb services reassign-logbook 902 --to 905 --dry-run
+    wb services reassign-logbook 902 --to 905 --include-invoiced
+
 Services are given with options or as YAML (or JSON) files like a service of
 `wb offers create`; options override the file. `update` only changes the given
 fields. Services with logged hours or costs can be changed but not deleted.

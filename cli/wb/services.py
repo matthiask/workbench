@@ -141,3 +141,41 @@ def update_service(
         f" | offer: {data['offer'] or '(none)'}"
         f" | external reference: {data['external_reference'] or '(none)'}"
     )
+
+
+@services.command("reassign-logbook")
+@click.argument("service_id", type=int)
+@click.option(
+    "--to",
+    "to",
+    type=int,
+    required=True,
+    help="ID of a service of the same project which allows logging.",
+)
+@click.option(
+    "--include-invoiced",
+    is_flag=True,
+    help="Also reassign invoiced entries; otherwise they stay with the service"
+    " their invoice lines refer to.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate and count only.")
+@click.option("--json", "as_json", is_flag=True)
+def reassign_logbook(service_id, to, include_invoiced, dry_run, as_json):
+    """Reassign the logged hours and costs of a service to another service,
+    like in the web interface (which can also delete the old service)"""
+    data = request(
+        "POST",
+        f"services/{service_id}/reassign-logbook/",
+        json={"to": to, "include_invoiced": include_invoiced},
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    prefix = "Dry run, nothing changed: " if dry_run else ""
+    source, target = data["from"], data["to"]
+    console.print(
+        f"{prefix}{data['hours']} logged hours and {data['costs']} logged costs"
+        f" from {link(source['id'], source['url'])} {source['title']}"
+        f" to {link(target['id'], target['url'])} {target['title']}"
+    )
