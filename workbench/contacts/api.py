@@ -365,6 +365,12 @@ class PersonIn(DetailsIn):
         min_length=1,
         description="Name of an organization to create with the person.",
     )
+    primary_contact: str | None = Field(
+        default=None,
+        description="Short name, defaults to the current user. May be someone"
+        " who isn't active anymore, e.g. who used to know the person, so that"
+        " the contact can be found and reassigned later.",
+    )
 
 
 class PersonCreated(PersonDetailOut):
@@ -473,6 +479,16 @@ def person_create(
             "msg": _("Either use an existing organization or create a new one."),
         })
     errors.extend(_duplicates(data, allow_duplicates=allow_duplicates))
+    primary_contact = request.user
+    if data.primary_contact:
+        primary_contact = User.objects.filter(
+            _short_name__iexact=data.primary_contact
+        ).first()
+        if not primary_contact:
+            errors.append({
+                "loc": ["body", "data", "primary_contact"],
+                "msg": _("Unknown user %r.") % data.primary_contact,
+            })
 
     details = _details(data, errors)
 
@@ -505,6 +521,10 @@ def person_create(
             raise ValidationError(errors)
 
         person = form.save()
+        if primary_contact != request.user:
+            # The form only offers active users
+            person.primary_contact = primary_contact
+            person.save(update_fields=["primary_contact"])
         _save_details(person, details)
 
         result = person_out(person, request)

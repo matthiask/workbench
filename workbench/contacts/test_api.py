@@ -379,6 +379,35 @@ class ContactsAPITest(TestCase):
         self.assertEqual(Person.objects.count(), 2)
         self.assertEqual(Organization.objects.count(), 1)
 
+    def test_create_primary_contact(self):
+        """The primary contact defaults to the current user, and may be someone
+        who isn't active anymore, e.g. the person who used to know them, so
+        that the contact can be found and reassigned later"""
+        user = factories.UserFactory.create()
+        former = factories.UserFactory.create(_short_name="old", is_active=False)
+        self.client.force_login(user)
+
+        def create(**data):
+            return self.client.post(
+                "/api/contacts/people/",
+                {"given_name": "Hans", "salutation": "Guten Tag", **data},
+                content_type="application/json",
+            )
+
+        response = create(family_name="Muster")
+        self.assertEqual(response.json()["primary_contact"], user.get_short_name())
+        response = create(family_name="Beispiel", primary_contact="OLD")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            Person.objects.get(family_name="Beispiel").primary_contact, former
+        )
+        response = create(family_name="Nobody", primary_contact="nope")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["body", "data", "primary_contact"]],
+        )
+
     def test_create_errors(self):
         """Nothing is saved if anything is invalid"""
         self.client.force_login(factories.UserFactory.create())

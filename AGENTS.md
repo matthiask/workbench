@@ -102,7 +102,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `GroupForm` of the web interface); the API rejects duplicate titles
   because the other endpoints find groups by their title. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
-  interface doesn't). Shared validation helpers for the APIs are in
+  interface doesn't). Its `primary_contact` defaults to the current user and
+  may be an inactive user (e.g. who used to know the person), so that imported
+  contacts can be found and reassigned with the primary contact filter. Shared validation helpers for the APIs are in
   `workbench/tools/api.py`, also `DateRangeFilter` (`period` like `2026-Q3` or
   `last-month`, `since`, `until`) with `date_range()` and `filter_date_range()`
   for reports and searches, and `UsersFilter` with `filter_users()` for
