@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 23:01+0100\n"
+"POT-Creation-Date: 2026-11-04 07:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3488,6 +3488,14 @@ msgstr "Offerten in Vorbereitung wurden verworfen: %(offers)s."
 #: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."
 msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
+
+#: workbench/projects/forms.py
+msgid "Only reassign logbook entries which haven't been invoiced yet"
+msgstr "Nur noch nicht verrechnete Einträge umbuchen"
+
+#: workbench/projects/forms.py
+msgid "Invoiced entries stay with this service and their invoice."
+msgstr "Verrechnete Einträge bleiben bei dieser Leistung und ihrer Rechnung."
 
 #: workbench/projects/forms.py
 msgid "Try deleting the service after reassigning logbook entries"

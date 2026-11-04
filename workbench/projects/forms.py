@@ -615,6 +615,24 @@ class ReassignLogbookForm(Form):
             pk=self.from_service.pk
         )
 
+        # Invoiced entries may stay with the old service, e.g. when an issue
+        # moved to another offer: what has been invoiced stays, the rest moves
+        if (
+            self.from_service.loggedhours.filter(invoice_service__isnull=False).exists()
+            or self.from_service.loggedcosts.filter(
+                invoice_service__isnull=False
+            ).exists()
+        ):
+            self.fields["only_not_invoiced"] = forms.BooleanField(
+                label=_(
+                    "Only reassign logbook entries which haven't been invoiced yet"
+                ),
+                help_text=_(
+                    "Invoiced entries stay with this service and their invoice."
+                ),
+                required=False,
+            )
+
         offer = self.from_service.offer
         if not offer or offer.status <= offer.IN_PREPARATION:
             self.fields["try_delete"] = forms.BooleanField(
@@ -624,8 +642,13 @@ class ReassignLogbookForm(Form):
 
     def save(self):
         service = self.cleaned_data["service"]
-        self.from_service.loggedhours.update(service=service)
-        self.from_service.loggedcosts.update(service=service)
+        hours = self.from_service.loggedhours.all()
+        costs = self.from_service.loggedcosts.all()
+        if self.cleaned_data.get("only_not_invoiced"):
+            hours = hours.filter(invoice_service__isnull=True)
+            costs = costs.filter(invoice_service__isnull=True)
+        hours.update(service=service)
+        costs.update(service=service)
 
         if self.cleaned_data.get("try_delete") and self.from_service.allow_delete(
             self.from_service, self.request
