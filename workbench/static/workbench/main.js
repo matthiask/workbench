@@ -251,9 +251,12 @@ on("submit", ".modal-dialog form", async (e, form) => {
       return
     }
 
+    // Don't submit twice, but keep the form and its data until the server
+    // answered: after network errors it's still there to try again
+    if (form.inert) return
     const body = new FormData(form)
-    // Don't submit twice
-    form.remove()
+    form.inert = true
+    form.classList.add("wb-submitting")
     const response = await fetch(action, {
       method: "POST",
       body,
@@ -284,6 +287,8 @@ on("submit", ".modal-dialog form", async (e, form) => {
     }
   } catch (err) {
     console.error(err)
+    form.inert = false
+    form.classList.remove("wb-submitting")
     alert(gettext("Unable to submit the form"))
   }
 })

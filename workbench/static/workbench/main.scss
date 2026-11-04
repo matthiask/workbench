@@ -2126,6 +2126,13 @@ kbd {
   }
 }
 
+// Modal forms while they're being submitted
+.wb-submitting {
+  opacity: 0.6;
+  cursor: progress;
+  transition: opacity 0.2s 0.2s;
+}
+
 // Results of the Autocomplete widget, below its input group
 .wb-autocomplete {
   inset: 100% 0 auto 0;
