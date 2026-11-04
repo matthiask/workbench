@@ -46,6 +46,14 @@ class ProjectsAPITest(TestCase):
                 "is_archived": False,
             },
         )
+        item = next(
+            p
+            for p in self.client.get("/api/projects/?q=relaunch").json()["items"]
+            if p["id"] == project.pk
+        )
+        self.assertEqual(item["contact"]["id"], project.contact_id)
+        self.assertEqual(item["contact"]["full_name"], project.contact.full_name)
+        self.assertEqual(item["created_at"][:10], project.created_at.date().isoformat())
 
     def test_stats(self):
         """Statistics of the selected projects"""

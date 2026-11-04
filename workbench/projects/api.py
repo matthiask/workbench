@@ -14,7 +14,12 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.contacts.api import OrganizationOut, organization_out
+from workbench.contacts.api import (
+    OrganizationOut,
+    PersonSummary,
+    organization_out,
+    person_summary,
+)
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.planning.models import PlannedWork
@@ -52,8 +57,10 @@ class ProjectOut(Schema):
     title: str
     description: str
     customer: OrganizationOut
+    contact: PersonSummary | None
     owned_by: str
     flat_rate: Decimal | None
+    created_at: dt.datetime
     closed_on: dt.date | None
 
 
@@ -65,8 +72,12 @@ def project_out(project, request):
         "title": project.title,
         "description": project.description,
         "customer": organization_out(project.customer, request),
+        "contact": person_summary(project.contact, request)
+        if project.contact
+        else None,
         "owned_by": project.owned_by.get_short_name(),
         "flat_rate": project.flat_rate,
+        "created_at": project.created_at,
         "closed_on": project.closed_on,
     }
 
@@ -82,7 +93,9 @@ class ProjectFilter(Schema):
 @paginate
 def project_list(request, filters: Query[ProjectFilter]):
     """Search projects, open projects only by default, newest first"""
-    projects = Project.objects.select_related("customer", "owned_by").order_by("-pk")
+    projects = Project.objects.select_related(
+        "customer", "contact", "owned_by"
+    ).order_by("-pk")
     if not filters.include_closed:
         projects = projects.open()
     if filters.customer:
@@ -98,7 +111,8 @@ def project_list(request, filters: Query[ProjectFilter]):
 def project_detail(request, project_id: int):
     return project_out(
         get_object_or_404(
-            Project.objects.select_related("customer", "owned_by"), pk=project_id
+            Project.objects.select_related("customer", "contact", "owned_by"),
+            pk=project_id,
         ),
         request,
     )
@@ -329,7 +343,10 @@ def project_stats(request, filters: Query[StatsFilter]):
         raise HttpError(400, _("Select projects using ids, open or closed_since."))
 
     projects = list(
-        Project.objects.filter(q).select_related("customer", "owned_by").order_by("pk")
+        Project.objects
+        .filter(q)
+        .select_related("customer", "contact", "owned_by")
+        .order_by("pk")
     )
     budget = {
         row["project"].id: row

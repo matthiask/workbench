@@ -203,7 +203,7 @@ def _project_offers(project, request):
 def offer_context(request, project_id: int):
     """Everything needed to write an offer, and the schema of the offer"""
     project = get_object_or_404(
-        Project.objects.select_related("customer", "owned_by"), pk=project_id
+        Project.objects.select_related("customer", "contact", "owned_by"), pk=project_id
     )
     service_types = list(ServiceType.objects.all())
     return {

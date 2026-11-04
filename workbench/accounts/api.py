@@ -127,7 +127,7 @@ def overview(request):
             for project in Project.objects
             .open()
             .filter(owned_by=user)
-            .select_related("customer", "owned_by")
+            .select_related("customer", "contact", "owned_by")
         ],
         "planned_work": [
             {
@@ -138,7 +138,9 @@ def overview(request):
             }
             for pw in PlannedWork.objects.filter(
                 user=user, weeks__contains=[week]
-            ).select_related("project__customer", "project__owned_by")
+            ).select_related(
+                "project__customer", "project__contact", "project__owned_by"
+            )
         ],
         "offers": [
             offer_out(offer, list(offer.services.all()), request)
