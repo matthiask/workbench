@@ -152,6 +152,44 @@ class OffersAPITest(TestCase):
         )
         self.assertFalse(Offer.objects.exists())
 
+    def test_create_service_group(self):
+        """Service groups may be created without services, with references"""
+        project = factories.ProjectFactory.create()
+        factories.PostalAddressFactory.create(person=project.contact)
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/offers/"
+        milestone = "https://github.com/example/repo/milestone/3"
+
+        response = self.client.post(
+            url, {"title": "Tranche 2"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "services"]
+        )
+
+        data = self.client.post(
+            url,
+            {
+                "title": "Tranche 2",
+                "status": "service_group",
+                "external_reference": f" {milestone} \n",
+            },
+            content_type="application/json",
+        ).json()
+        offer = Offer.objects.get()
+        self.assertEqual(data["id"], offer.pk)
+        self.assertEqual(offer.status, Offer.SERVICE_GROUP)
+        self.assertEqual(offer.external_reference, milestone)
+        self.assertFalse(offer.services.exists())
+
+        response = self.client.post(
+            url,
+            {"title": "Sent", "status": "accepted"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+
     def test_effort_type(self):
         """Service types only suggest the effort type and the hourly rate"""
         factories.service_types()

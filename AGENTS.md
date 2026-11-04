@@ -152,7 +152,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only changes offers
   in preparation: create, replace, update and add, update, delete and reorder
-  single services, all with the rules of `_apply_service()`. Only the
+  single services, all with the rules of `_apply_service()`. Creating
+  also allows service groups (`status: service_group`, which may have no
+  services yet) and external references. Only the
   external references (URLs, one per line) can be changed for offers in any
   state, the external reference of services too (`PATCH /api/services/<id>/`,
   `wb services update`, also in the web form); Workbench stores them but

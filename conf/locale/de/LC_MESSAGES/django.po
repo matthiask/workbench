@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 12:01+0100\n"
+"POT-Creation-Date: 2026-11-04 13:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2962,6 +2962,10 @@ msgstr "%s: Es wurden noch weder Stunden noch Kosten angegeben."
 #: workbench/offers/api.py
 msgid "The project is closed."
 msgstr "Das Projekt ist geschlossen."
+
+#: workbench/offers/api.py
+msgid "Offers in preparation need at least one service."
+msgstr "Offerten in Vorbereitung brauchen mindestens eine Leistung."
 
 #: workbench/offers/api.py
 msgid "Only offers in preparation can be replaced."

@@ -80,6 +80,16 @@ class OfferIn(Schema):
     services: list[ServiceIn] = Field(min_length=1)
 
 
+class OfferCreateIn(OfferIn):
+    status: Literal["in_preparation", "service_group"] = Field(
+        default="in_preparation",
+        description="Service groups collect services without being offered,"
+        " they may be created without services.",
+    )
+    external_reference: str = Field(default="", description="URLs, one per line.")
+    services: list[ServiceIn] = []
+
+
 def offer_import_schema(*, service_types):
     """JSON schema of an offer which only allows the given service types"""
     schema = OfferIn.model_json_schema()
@@ -401,8 +411,10 @@ def _save(offer, services, request, *, dry_run, delete=(), warnings=()):
 
 
 @router.post("/projects/{project_id}/offers/", response=OfferOut)
-def offer_create(request, project_id: int, data: OfferIn, *, dry_run: bool = False):
-    """Create an offer in preparation with its services
+def offer_create(
+    request, project_id: int, data: OfferCreateIn, *, dry_run: bool = False
+):
+    """Create an offer in preparation or a service group with its services
 
     Nothing is saved if anything is invalid or with ``dry_run``."""
     project = get_object_or_404(
@@ -414,6 +426,11 @@ def offer_create(request, project_id: int, data: OfferIn, *, dry_run: bool = Fal
         errors.append({
             "loc": ["path", "project_id"],
             "msg": _("The project is closed."),
+        })
+    if data.status == "in_preparation" and not data.services:
+        errors.append({
+            "loc": ["body", "data", "services"],
+            "msg": _("Offers in preparation need at least one service."),
         })
 
     postal_address = data.postal_address
@@ -430,7 +447,8 @@ def offer_create(request, project_id: int, data: OfferIn, *, dry_run: bool = Fal
         description=data.description,
         owned_by=request.user,
         postal_address=postal_address or "",
-        status=Offer.IN_PREPARATION,
+        status=OFFER_STATUSES[data.status],
+        external_reference=data.external_reference,
     )
     full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
     warnings = []
