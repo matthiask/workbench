@@ -1,13 +1,16 @@
 from django.db import transaction
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
+from workbench.accounts.models import User
 from workbench.contacts.forms import PersonForm
 from workbench.contacts.models import (
     EmailAddress,
+    Group,
     Organization,
     Person,
     PhoneNumber,
@@ -35,6 +38,14 @@ class PersonSummary(Schema):
 
 class PersonOut(PersonSummary):
     organization: OrganizationOut | None
+
+
+class PersonListOut(PersonOut):
+    primary_contact: str
+    groups: list[str] = Field(
+        description="Active groups, also those of the organization which apply"
+        " to organizations"
+    )
 
 
 def organization_out(organization, request):
@@ -84,22 +95,73 @@ def organization_list(request, filters: Query[OrganizationFilter]):
 
 class PersonFilter(OrganizationFilter):
     organization: int | None = None
+    group: str | None = Field(
+        default=None,
+        description="ID or title of a group; also people who are in it through"
+        " their organization",
+    )
+    without_groups: bool = Field(
+        default=False, description="Only people in no active group"
+    )
+    primary_contact: str | None = Field(default=None, description="Short name")
 
 
-@router.get("/contacts/people/", response=list[PersonOut])
+def _query_error(field, msg):
+    return ValidationError([{"loc": ["query", field], "msg": msg}])
+
+
+@router.get("/contacts/people/", response=list[PersonListOut])
 @paginate
 def person_list(request, filters: Query[PersonFilter]):
-    """Search people, e.g. the contact of a new project"""
-    people = Person.objects.select_related("organization").order_by(
-        "given_name", "family_name", "pk"
+    """Search people, e.g. the contact of a new project, or the members of a
+    group like the list of people in the web interface"""
+    active_groups = Group.objects.filter(is_archived=False)
+    people = (
+        Person.objects
+        .select_related("organization", "primary_contact")
+        .prefetch_related(
+            Prefetch("groups", queryset=active_groups),
+            Prefetch(
+                "organization__groups",
+                queryset=active_groups.filter(applies_to_organizations=True),
+            ),
+        )
+        .order_by("given_name", "family_name", "pk")
     )
     if not filters.include_archived:
         people = people.active()
     if filters.organization:
         people = people.filter(organization=filters.organization)
+    if filters.group:
+        group = (
+            Group.objects.filter(pk=filters.group).first()
+            if filters.group.isdigit()
+            else Group.objects.filter(title__iexact=filters.group).first()
+        )
+        if not group:
+            raise _query_error("group", _("Unknown group %r.") % filters.group)
+        people = people.in_group(group)
+    if filters.without_groups:
+        people = people.without_groups()
+    if filters.primary_contact:
+        user = User.objects.filter(_short_name__iexact=filters.primary_contact).first()
+        if not user:
+            raise _query_error(
+                "primary_contact", _("Unknown user %r.") % filters.primary_contact
+            )
+        people = people.filter(primary_contact=user)
     if filters.q:
         people = people.search(filters.q)
-    return Serialized(people, lambda person: person_list_out(person, request))
+    return Serialized(
+        people,
+        lambda person: (
+            person_list_out(person, request)
+            | {
+                "primary_contact": person.primary_contact.get_short_name(),
+                "groups": [group.title for group in person.all_groups()],
+            }
+        ),
+    )
 
 
 class OrganizationDetail(OrganizationOut):

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
-from workbench.contacts.models import Organization, Person
+from workbench.contacts.models import Group, Organization, Person
 
 
 class ContactsAPITest(TestCase):
@@ -45,6 +45,53 @@ class ContactsAPITest(TestCase):
             f"/api/contacts/people/?organization={organization.pk}"
         ).json()["items"]
         self.assertEqual([p["id"] for p in data], [person.pk])
+
+    def test_people_filters(self):
+        """People are filtered like in the web interface: by group (also
+        through their organization), without any active group and by primary
+        contact"""
+        mailing = Group.objects.create(title="Mailing")
+        industry = Group.objects.create(title="Industry", applies_to_organizations=True)
+        old = Group.objects.create(title="Old", is_archived=True)
+        organization = factories.OrganizationFactory.create()
+        organization.groups.add(industry)
+        member = factories.PersonFactory.create(given_name="Anna")
+        member.groups.add(mailing)
+        factories.PersonFactory.create(given_name="Bea", organization=organization)
+        only_archived = factories.PersonFactory.create(given_name="Cleo")
+        only_archived.groups.add(old)
+        archived_member = factories.PersonFactory.create(
+            given_name="Dora", is_archived=True
+        )
+        archived_member.groups.add(mailing)
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        def names(**params):
+            response = self.client.get("/api/contacts/people/", params)
+            self.assertEqual(response.status_code, 200, response.content)
+            return [p["full_name"].split()[0] for p in response.json()["items"]]
+
+        self.assertEqual(names(group="Mailing"), ["Anna"])
+        self.assertEqual(
+            names(group="mailing", include_archived="true"), ["Anna", "Dora"]
+        )
+        self.assertEqual(names(group=str(industry.pk)), ["Bea"])
+        self.assertEqual(names(without_groups="true"), ["Cleo"])
+        self.assertEqual(
+            self.client.get("/api/contacts/people/", {"group": "Nope"}).status_code,
+            422,
+        )
+
+        member.primary_contact = user
+        member.save()
+        self.assertEqual(names(primary_contact=user.get_short_name()), ["Anna"])
+
+        data = self.client.get("/api/contacts/people/", {"group": "Mailing"}).json()
+        self.assertEqual(data["items"][0]["groups"], ["Mailing"])
+        self.assertEqual(data["items"][0]["primary_contact"], user.get_short_name())
+        data = self.client.get("/api/contacts/people/", {"group": "Industry"}).json()
+        self.assertEqual(data["items"][0]["groups"], ["Industry"])
 
     def test_detail(self):
         """Organizations and people with their contact details"""

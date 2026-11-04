@@ -87,7 +87,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   The package `cli/wb/` has one module per noun (`wb/offers.py`); `wb/core.py`
   has the configuration, requests, output helpers and options they share.
   `wb contacts search` finds both organizations and people, `wb organizations
-  show` and `wb people show` show them. `wb people create` is mostly fed by
+  show` and `wb people show` show them. `wb people search` filters people like
+  the people list of the web interface (`--group`, also through the
+  organization, `--without-groups`, `--primary-contact`); the list's XLSX
+  export (e.g. of a group for a mailing) stays in the web interface. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Shared validation helpers for the APIs are in
   `workbench/tools/api.py`, also `DateRangeFilter` (`period` like `2026-Q3` or

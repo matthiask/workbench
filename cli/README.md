@@ -142,6 +142,13 @@ postal_addresses:
     wb people create person.yaml --dry-run
     wb people create person.yaml
 
+People are searched like on the people list of the web interface, e.g. the
+members of a group (also through their organization) or people without any
+active group:
+
+    wb people search --group "Newsletter"
+    wb people search --without-groups --primary-contact mk
+
 People and organizations whose names exist already are rejected unless you
 pass `--allow-duplicates`; email addresses which are in use are always
 rejected.

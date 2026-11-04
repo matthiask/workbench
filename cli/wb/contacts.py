@@ -4,7 +4,9 @@ import click
 
 from wb.core import (
     cli,
+    complete_short_names,
     console,
+    echo_csv,
     echo_fields,
     echo_json,
     echo_more,
@@ -105,7 +107,72 @@ def show_organization(organization_id, as_json):
 
 @cli.group()
 def people():
-    """Look at and add people, search them with `wb contacts search`"""
+    """Look at, search and add people"""
+
+
+@people.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--organization", type=int, help="Organization ID.")
+@click.option(
+    "--group",
+    help="ID or title of a group, also people in it through their organization.",
+)
+@click.option("--without-groups", is_flag=True, help="Only people in no active group.")
+@click.option(
+    "--primary-contact", help="Short name.", shell_complete=complete_short_names
+)
+@click.option("--all", "include_archived", is_flag=True, help="Include archived.")
+@page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
+@click.option("--json", "as_json", is_flag=True)
+def search_people(
+    query,
+    organization,
+    group,
+    without_groups,
+    primary_contact,
+    include_archived,
+    limit,
+    offset,
+    as_csv,
+    as_json,
+):
+    """Search people, e.g. the members of a group or people without any
+    group like the list of people in the web interface"""
+    params = {
+        "q": " ".join(query),
+        "include_archived": format_bool(include_archived),
+        "without_groups": format_bool(without_groups),
+    }
+    if organization:
+        params["organization"] = organization
+    if group:
+        params["group"] = group
+    if primary_contact:
+        params["primary_contact"] = primary_contact
+    data = request(
+        "GET", "contacts/people/", params=params | page_params(limit, offset)
+    )
+    if as_csv:
+        echo_csv(data["items"])
+        echo_more(data, offset)
+        return
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("ID>", "Name", "Organization", "Groups", "Primary contact")
+    for person in data["items"]:
+        organization = person["organization"] or {}
+        table.add_row(
+            link(person["id"], person["url"]),
+            link(person["full_name"], person["url"])
+            + (" (archived)" if person["is_archived"] else ""),
+            link(organization.get("name", ""), organization.get("url")),
+            ", ".join(person["groups"]),
+            person["primary_contact"],
+        )
+    console.print(table)
+    echo_more(data, offset, "people")
 
 
 @people.command("show")

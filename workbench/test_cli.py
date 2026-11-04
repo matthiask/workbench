@@ -19,7 +19,7 @@ from django.utils.translation import deactivate_all
 from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
-from workbench.contacts.models import Person
+from workbench.contacts.models import Group, Person
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
@@ -250,6 +250,14 @@ email_addresses:
         result = self.wb("people", "add-details", created.pk, details)
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("+41441234567", result.output)
+
+        group = Group.objects.create(title="Mailing")
+        created.groups.add(group)
+        result = self.wb("people", "search", "--group", "Mailing")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Hans Muster", result.output)
+        result = self.wb("people", "search", "--without-groups", "--csv")
+        self.assertNotIn("Hans Muster", result.output)
 
     def test_offers(self):
         """Offers are created and replaced from YAML files"""
