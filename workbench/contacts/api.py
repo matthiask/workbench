@@ -42,12 +42,48 @@ class PersonOut(PersonSummary):
     organization: OrganizationOut | None
 
 
+class PostalAddressOut(Schema):
+    type: str
+    street: str
+    house_number: str
+    address_suffix: str
+    postal_code: str
+    city: str
+    country: str = Field(description="ISO 3166-1 code, e.g. CH")
+    postal_address_override: str
+    value: str = Field(description="The formatted address")
+
+
 class PersonListOut(PersonOut):
     primary_contact: str
     groups: list[str] = Field(
         description="Active groups, also those of the organization which apply"
         " to organizations"
     )
+    postal_address: PostalAddressOut | None = Field(
+        description="The address with the highest weight, like the XLSX export"
+        " of the people list"
+    )
+
+
+def _postal_address_out(person):
+    if not (address := next(iter(person.postaladdresses.all()), None)):
+        return None
+    return {
+        field: getattr(address, field)
+        for field in [
+            "type",
+            "street",
+            "house_number",
+            "address_suffix",
+            "postal_code",
+            "city",
+            "postal_address_override",
+        ]
+    } | {
+        "country": address.country.code or "",
+        "value": address.postal_address,
+    }
 
 
 def organization_out(organization, request):
@@ -142,6 +178,7 @@ def person_list(request, filters: Query[PersonFilter]):
                 "organization__groups",
                 queryset=active_groups.filter(applies_to_organizations=True),
             ),
+            "postaladdresses",
         )
         .order_by("given_name", "family_name", "pk")
     )
@@ -174,6 +211,7 @@ def person_list(request, filters: Query[PersonFilter]):
             | {
                 "primary_contact": person.primary_contact.get_short_name(),
                 "groups": [group.title for group in person.all_groups()],
+                "postal_address": _postal_address_out(person),
             }
         ),
     )

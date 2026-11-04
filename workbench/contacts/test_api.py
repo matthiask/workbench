@@ -97,6 +97,39 @@ class ContactsAPITest(TestCase):
         data = self.client.get("/api/contacts/people/", {"group": "Industry"}).json()
         self.assertEqual(data["items"][0]["groups"], ["Industry"])
 
+    def test_people_postal_address(self):
+        """The list has the postal address like the XLSX export: the one with
+        the highest weight, e.g. work before home"""
+        person = factories.PersonFactory.create()
+        person.postaladdresses.create(
+            type="home",
+            street="Nebenweg",
+            house_number="2",
+            postal_code="3000",
+            city="Bern",
+        )
+        person.postaladdresses.create(
+            type="work",
+            street="Hauptstrasse",
+            house_number="1",
+            postal_code="8000",
+            city="Zürich",
+            country="CH",
+            postal_address_override="Override",
+        )
+        other = factories.PersonFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+        items = {
+            p["id"]: p for p in self.client.get("/api/contacts/people/").json()["items"]
+        }
+        address = items[person.pk]["postal_address"]
+        self.assertEqual(
+            (address["street"], address["city"], address["country"]),
+            ("Hauptstrasse", "Zürich", "CH"),
+        )
+        self.assertEqual(address["postal_address_override"], "Override")
+        self.assertIsNone(items[other.pk]["postal_address"])
+
     def test_people_with_recent_projects_or_deals(self):
         """People who are the contact of projects or deals created since a
         date, like the defined search of the web interface"""

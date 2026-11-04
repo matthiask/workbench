@@ -91,8 +91,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   the people list of the web interface (`--group`, also through the
   organization, `--without-groups`, `--primary-contact`,
   `--projects-or-deals-since` like the defined search of the last five
-  years, `recent_projects_or_deals()`); the list's XLSX
-  export (e.g. of a group for a mailing) stays in the web interface. `wb
+  years, `recent_projects_or_deals()`) and has the postal address the XLSX
+  export of the people list uses (highest weight), so scripts can build
+  mailing lists without fetching every person. `wb
   people update` changes the primary contact, adds and removes groups and
   archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
   to organizations go to the organization like in the person form
