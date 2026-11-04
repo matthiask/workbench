@@ -6,6 +6,7 @@ from django.db.models import ProtectedError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
@@ -1025,6 +1026,32 @@ class InvoicesTest(TestCase):
             f"Paid on {fmt}",
         )
         self.assertEqual(Invoice(status=Invoice.CANCELED).pretty_status, "Canceled")
+
+    def test_status_badge_tooltip(self):
+        """The status badge shows all dates and the service period as tooltip"""
+        day = dt.date(2026, 9, 1)
+        invoice = Invoice(
+            status=Invoice.PAID,
+            created_at=timezone.make_aware(dt.datetime(2026, 8, 28, 12)),
+            invoiced_on=day,
+            due_on=dt.date(2026, 9, 30),
+            last_reminded_on=dt.date(2026, 10, 7),
+            closed_on=dt.date(2026, 10, 10),
+            service_period_from=dt.date(2026, 8, 1),
+            service_period_until=dt.date(2026, 8, 31),
+        )
+        self.assertEqual(invoice.pretty_status, "Paid on 10.10.2026")
+        self.assertEqual(
+            invoice.status_details,
+            "Created on 28.08.2026\n"
+            "Invoiced on 01.09.2026\n"
+            "Due on 30.09.2026\n"
+            "Last reminded on 07.10.2026\n"
+            "Paid on 10.10.2026\n"
+            "Service period 01.08.2026 - 31.08.2026",
+        )
+        self.assertIn('data-bs-toggle="tooltip"', invoice.status_badge)
+        self.assertIn('title="Created on 28.08.2026', invoice.status_badge)
 
     def test_service_update(self):
         """Updating invoice services"""

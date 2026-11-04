@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 09:01+0100\n"
+"POT-Creation-Date: 2026-11-04 12:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1042,6 +1042,10 @@ msgstr "Eine Gruppe mit diesem Titel gibt es schon."
 #: workbench/contacts/api.py
 msgid "Either reassign to someone or to the suggestions."
 msgstr "Entweder einer Person oder gemäss den Vorschlägen zuweisen."
+
+#: workbench/contacts/api.py workbench/projects/forms.py
+msgid "This field is required."
+msgstr "Dieses Feld ist zwingend erforderlich."
 
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
@@ -2349,6 +2353,46 @@ msgstr "heute"
 msgid "Not reminded yet"
 msgstr "Noch nicht erinnert"
 
+#: workbench/invoices/models.py
+#, python-format
+msgid "Created on %(day)s"
+msgstr "Erstellt am %(day)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Invoiced on %(day)s"
+msgstr "Verrechnet am %(day)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Due on %(day)s"
+msgstr "Fällig am %(day)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Last reminded on %(day)s"
+msgstr "Zuletzt erinnert am %(day)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Reminders postponed until %(day)s"
+msgstr "Erinnerungen aufgeschoben bis %(day)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Paid on %(day)s"
+msgstr "Bezahlt am %(day)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Canceled on %(day)s"
+msgstr "Storniert am %(day)s"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "Service period %s"
+msgstr "Leistungszeitraum %s"
+
 #: workbench/invoices/models.py workbench/templates/invoices/reminders.html
 msgid "Total excl. tax"
 msgstr "Total exkl. MwSt"
@@ -3545,10 +3589,6 @@ msgstr "Dieses Projekt wurde schon geschlossen."
 #, python-format
 msgid "The project %(project)s has a flat rate which will be applied to this service too."
 msgstr "Das Projekt %(project)s hat einen Pauschalsatz, welcher auf diese Leistung auch angewendet wird."
-
-#: workbench/projects/forms.py
-msgid "This field is required."
-msgstr "Dieses Feld ist zwingend erforderlich."
 
 #: workbench/projects/forms.py
 msgid "Codes must be unique."

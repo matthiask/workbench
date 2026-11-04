@@ -461,8 +461,40 @@ class Invoice(ModelWithTotal):
             css = "warning"
 
         return format_html(
-            '<span class="badge text-bg-{}">{}</span>', css, self.pretty_status
+            '<span class="badge text-bg-{}" data-bs-toggle="tooltip" title="{}">'
+            "{}</span>",
+            css,
+            self.status_details,
+            self.pretty_status,
         )
+
+    @property
+    def status_details(self):
+        """All dates of the invoice and its service period, one per line"""
+
+        def line(text, day):
+            return text % {"day": local_date_format(day)} if day else None
+
+        lines = [
+            line(_("Created on %(day)s"), self.created_at.date()),
+            line(_("Invoiced on %(day)s"), self.invoiced_on),
+            line(_("Due on %(day)s"), self.due_on),
+            line(_("Last reminded on %(day)s"), self.last_reminded_on),
+        ]
+        if self.reminders_are_postponed:
+            lines.append(
+                line(
+                    _("Reminders postponed until %(day)s"),
+                    self.postpone_reminders_until,
+                )
+            )
+        if self.status == self.PAID:
+            lines.append(line(_("Paid on %(day)s"), self.closed_on))
+        elif self.status == self.CANCELED:
+            lines.append(line(_("Canceled on %(day)s"), self.closed_on))
+        if self.service_period:
+            lines.append(_("Service period %s") % self.service_period)
+        return "\n".join(str(line) for line in lines if line)
 
     @property
     def subtotal_title(self):
