@@ -264,7 +264,11 @@ email_addresses:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertNotIn("Hans Muster", result.output)
 
-        Group.objects.create(title="Christmas")
+        result = self.wb("groups", "create", "Christmas")
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb("groups")
+        self.assertIn("Christmas", result.output)
+        self.assertIn("Mailing", result.output)
         result = self.wb(
             "people",
             "update",
@@ -281,6 +285,13 @@ email_addresses:
         result = self.wb("people", "update", created.pk, "--archive")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("(archived)", result.output)
+
+        christmas = Group.objects.get(title="Christmas")
+        result = self.wb("groups", "update", christmas.pk, "--archive")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("(archived)", result.output)
+        result = self.wb("groups", "search", "--archived")
+        self.assertIn("Christmas", result.output)
 
     def test_offers(self):
         """Offers are created and replaced from YAML files"""

@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import Literal
 
 from django.db import transaction
 from django.db.models import Prefetch
@@ -9,7 +10,12 @@ from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
 from workbench.accounts.models import User
-from workbench.contacts.forms import PersonForm, recent_projects_or_deals
+from workbench.contacts.forms import (
+    GroupForm,
+    GroupSearchForm,
+    PersonForm,
+    recent_projects_or_deals,
+)
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -18,7 +24,12 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
-from workbench.tools.api import Serialized, form_errors, full_clean
+from workbench.tools.api import (
+    Serialized,
+    form_errors,
+    full_clean,
+    raise_form_errors,
+)
 
 
 router = Router(tags=["contacts"])
@@ -609,3 +620,119 @@ def person_update(request, person_id: int, data: PersonPatch, *, dry_run: bool =
         if dry_run:
             transaction.set_rollback(True)
     return result
+
+
+class GroupOut(Schema):
+    id: int
+    url: str
+    title: str
+    is_archived: bool
+    applies_to_organizations: bool
+    people_count: int | None = Field(
+        default=None, description="Active people, also through organizations"
+    )
+    organizations_count: int | None = Field(
+        default=None, description="Active organizations"
+    )
+
+
+class GroupFilter(Schema):
+    q: str = ""
+    s: Literal["", "archived", "all"] = Field(
+        default="", description="Active groups by default"
+    )
+
+
+def _group_out(group, request):
+    return {
+        "id": group.id,
+        "url": request.build_absolute_uri(group.get_absolute_url()),
+        "title": group.title,
+        "is_archived": group.is_archived,
+        "applies_to_organizations": group.applies_to_organizations,
+        "people_count": getattr(group, "people_count", None),
+        "organizations_count": getattr(group, "organizations_count", None),
+    }
+
+
+@router.get("/contacts/groups/", response=list[GroupOut])
+@paginate
+def group_list(request, filters: Query[GroupFilter]):
+    """Groups with their active members, like the list of groups in the web
+    interface"""
+    form = GroupSearchForm(filters.dict(), request=request)
+    form.is_valid()
+    return Serialized(
+        form.filter(Group.objects.all()), lambda group: _group_out(group, request)
+    )
+
+
+class GroupIn(Schema):
+    title: str = Field(min_length=1, max_length=100)
+    applies_to_organizations: bool = False
+
+
+class GroupPatch(Schema):
+    """Fields which aren't given are left alone"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=100)
+    applies_to_organizations: bool | None = Field(
+        default=None,
+        description="Turning it on moves the people's memberships to their"
+        " organizations, like in the web interface.",
+    )
+    is_archived: bool | None = None
+
+
+def _save_group(request, group, values, *, dry_run):
+    """Validate with the group form of the web interface; titles are unique
+    because the APIs find groups by their title"""
+    # The form has a prefix (it's shown in modals)
+    prefix = GroupForm(request=request).add_prefix
+    form = GroupForm(
+        {prefix(name): value for name, value in values.items()},
+        instance=group,
+        request=request,
+    )
+    if not form.is_valid(ignore_warnings=True):
+        raise_form_errors(form)
+    if (
+        Group.objects
+        .filter(title__iexact=form.cleaned_data["title"])
+        .exclude(pk=group.pk)
+        .exists()
+    ):
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "title"],
+                "msg": _("A group with this title exists already."),
+            }
+        ])
+    with transaction.atomic():
+        group = form.save()
+        result = _group_out(group, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+def _group_values(group, request):
+    """The group's current values, keyed by field name"""
+    form = GroupForm(instance=group, request=request)
+    return {name: form[name].value() for name in form.fields}
+
+
+@router.post("/contacts/groups/", response=GroupOut)
+def group_create(request, data: GroupIn, *, dry_run: bool = False):
+    """Create a group, e.g. for a mailing"""
+    group = Group()
+    values = _group_values(group, request) | data.dict()
+    return _save_group(request, group, values, dry_run=dry_run)
+
+
+@router.patch("/contacts/groups/{int:group_id}/", response=GroupOut)
+def group_update(request, group_id: int, data: GroupPatch, *, dry_run: bool = False):
+    """Rename or archive a group, or let it apply to organizations"""
+    group = get_object_or_404(Group, pk=group_id)
+    values = _group_values(group, request) | data.dict(exclude_unset=True)
+    return _save_group(request, group, values, dry_run=dry_run)

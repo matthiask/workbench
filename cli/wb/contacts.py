@@ -345,3 +345,129 @@ def _echo_person(data):
     if data["notes"]:
         console.print()
         console.print(data["notes"])
+
+
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def groups(ctx):
+    """Find, create and archive groups of people, e.g. for mailings
+
+    Without a command, lists the active groups."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_groups)
+
+
+@groups.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--archived", "status", flag_value="archived", help="Only archived.")
+@click.option("--all", "status", flag_value="all", help="Include archived.")
+@page_options
+@click.option("--json", "as_json", is_flag=True)
+def search_groups(query, status, limit, offset, as_json):
+    """Search groups with their active people and organizations"""
+    params = {"q": " ".join(query), "s": status or ""}
+    data = request(
+        "GET", "contacts/groups/", params=params | page_params(limit, offset)
+    )
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("ID>", "Group", "People>", "Organizations>")
+    for group in data["items"]:
+        notes = [
+            note
+            for note, flag in [
+                ("applies to organizations", group["applies_to_organizations"]),
+                ("archived", group["is_archived"]),
+            ]
+            if flag
+        ]
+        table.add_row(
+            link(group["id"], group["url"]),
+            group["title"] + (f" ({', '.join(notes)})" if notes else ""),
+            str(group["people_count"]),
+            str(group["organizations_count"]),
+            style="dim" if group["is_archived"] else None,
+        )
+    console.print(table)
+    echo_more(data, offset, "groups")
+
+
+def _echo_group(data, *, dry_run):
+    prefix = "Dry run, nothing changed: " if dry_run else ""
+    notes = [
+        note
+        for note, flag in [
+            ("applies to organizations", data["applies_to_organizations"]),
+            ("archived", data["is_archived"]),
+        ]
+        if flag
+    ]
+    console.print(
+        f"{prefix}{link(data['id'], data['url'])} {data['title']}"
+        + (f" ({', '.join(notes)})" if notes else "")
+    )
+
+
+@groups.command("create")
+@click.argument("title")
+@click.option(
+    "--applies-to-organizations",
+    is_flag=True,
+    help="E.g. industries: people are in it through their organization.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_group(title, applies_to_organizations, dry_run, as_json):
+    """Create a group, titles are unique"""
+    data = request(
+        "POST",
+        "contacts/groups/",
+        json={"title": title, "applies_to_organizations": applies_to_organizations},
+        params={"dry_run": format_bool(dry_run)},
+    )
+    echo_json(data) if as_json else _echo_group(data, dry_run=dry_run)
+
+
+@groups.command("update")
+@click.argument("group_id", type=int)
+@click.option("--title")
+@click.option(
+    "--archive/--unarchive",
+    "is_archived",
+    default=None,
+    help="People only in archived groups are archived after five years without use.",
+)
+@click.option(
+    "--applies-to-organizations/--applies-to-people",
+    "applies_to_organizations",
+    default=None,
+    help="Applying to organizations moves the memberships to the organizations.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_group(
+    group_id, title, is_archived, applies_to_organizations, dry_run, as_json
+):
+    """Rename or archive a group"""
+    data = {
+        key: value
+        for key, value in [
+            ("title", title),
+            ("is_archived", is_archived),
+            ("applies_to_organizations", applies_to_organizations),
+        ]
+        if value is not None
+    }
+    if not data:
+        terminate(
+            "Nothing to change, pass --title, --archive, --unarchive,"
+            " --applies-to-organizations or --applies-to-people."
+        )
+    data = request(
+        "PATCH",
+        f"contacts/groups/{group_id}/",
+        json=data,
+        params={"dry_run": format_bool(dry_run)},
+    )
+    echo_json(data) if as_json else _echo_group(data, dry_run=dry_run)

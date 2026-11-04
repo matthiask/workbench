@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 07:34+0100\n"
+"POT-Creation-Date: 2026-11-04 07:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1034,6 +1034,10 @@ msgstr "Die Gruppe %r ist archiviert."
 #, python-format
 msgid "Unknown or inactive user %r."
 msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
+
+#: workbench/contacts/api.py
+msgid "A group with this title exists already."
+msgstr "Eine Gruppe mit diesem Titel gibt es schon."
 
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html

@@ -97,7 +97,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   people update` changes the primary contact, adds and removes groups and
   archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
   to organizations go to the organization like in the person form
-  (`Person.add_to_group()`, `remove_from_group()`). `wb people create` is mostly fed by
+  (`Person.add_to_group()`, `remove_from_group()`). `wb groups` lists, creates
+  and archives groups (`/api/contacts/groups/`, with `GroupSearchForm` and
+  `GroupForm` of the web interface); the API rejects duplicate titles
+  because the other endpoints find groups by their title. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Shared validation helpers for the APIs are in
   `workbench/tools/api.py`, also `DateRangeFilter` (`period` like `2026-Q3` or

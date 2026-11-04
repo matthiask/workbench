@@ -211,6 +211,54 @@ class ContactsAPITest(TestCase):
         self.assertTrue(person.is_archived)
         self.assertEqual(list(person.groups.all()), [])
 
+    def test_groups(self):
+        """Groups are listed with their members, created and changed with the
+        form of the web interface; titles are unique"""
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        mailing = Group.objects.create(title="Mailing")
+        person.groups.add(mailing)
+        Group.objects.create(title="Old", is_archived=True)
+        self.client.force_login(factories.UserFactory.create())
+
+        data = self.client.get("/api/contacts/groups/").json()
+        self.assertEqual(
+            [(g["title"], g["people_count"]) for g in data["items"]], [("Mailing", 1)]
+        )
+        data = self.client.get("/api/contacts/groups/", {"s": "all"}).json()
+        self.assertEqual([g["title"] for g in data["items"]], ["Mailing", "Old"])
+
+        def send(method, path, data, query=""):
+            return getattr(self.client, method)(
+                f"/api/contacts/groups/{path}{query}",
+                data,
+                content_type="application/json",
+            )
+
+        response = send("post", "", {"title": "Christmas"}, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(Group.objects.filter(title="Christmas").exists())
+        response = send("post", "", {"title": "Christmas"})
+        christmas = Group.objects.get(title="Christmas")
+        self.assertEqual(response.json()["id"], christmas.pk)
+
+        response = send("post", "", {"title": "christmas"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]], [["body", "data", "title"]]
+        )
+
+        # Like the form: groups which start to apply to organizations move
+        # their people's memberships to the organizations
+        response = send("patch", f"{mailing.pk}/", {"applies_to_organizations": True})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(list(person.organization.groups.all()), [mailing])
+        response = send("patch", f"{mailing.pk}/", {"is_archived": True})
+        self.assertTrue(response.json()["is_archived"])
+        response = send("patch", f"{mailing.pk}/", {"title": "Christmas"})
+        self.assertEqual(response.status_code, 422)
+
     def test_detail(self):
         """Organizations and people with their contact details"""
         person = factories.PersonFactory.create(

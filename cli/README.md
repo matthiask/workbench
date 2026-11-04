@@ -156,6 +156,12 @@ archives them, e.g. someone who left:
     wb people update 1234 --primary-contact mk --add-group "Newsletter"
     wb people update 1234 --archive
 
+Groups are listed, created and archived with `wb groups`:
+
+    wb groups
+    wb groups create "Newsletter 2027"
+    wb groups update 56 --archive
+
 People and organizations whose names exist already are rejected unless you
 pass `--allow-duplicates`; email addresses which are in use are always
 rejected.
