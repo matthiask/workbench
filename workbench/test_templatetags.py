@@ -49,6 +49,22 @@ class TemplateTagsTest(TestCase):
                 if notexists:
                     self.assertNotIn(notexists, html)
 
+    def test_mark_current_multiline(self):
+        """Tags spanning several lines (as formatted by djangofmt) are marked
+        too"""
+        t = Template("""
+            {% load mark_current %}
+            {% mark_current path %}
+            <a
+              class="nav-link"
+              href="/contacts/"
+              data-search-path="/contacts/people/"
+            >Contacts</a>
+            {% endmark_current %}
+            """)
+        html = t.render(Context({"path": "/contacts/organizations/"}))
+        self.assertIn('class="nav-link active"', html)
+
     def test_invalid(self):
         """Invalid mark_current usage (no argument)"""
         with self.assertRaises(TemplateSyntaxError):

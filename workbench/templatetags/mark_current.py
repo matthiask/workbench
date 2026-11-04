@@ -46,6 +46,11 @@ def mark_current(navigation, current):
 
     current_matcher = re.compile('href="(' + "|".join(tokens) + ')"')
 
+    # The matching works line by line, so tags spanning several lines (one
+    # attribute per line, as formatted by djangofmt) are joined first
+    navigation = re.sub(
+        r"<[^<>]*\n[^<>]*>", lambda m: " ".join(m.group(0).split()), navigation
+    )
     lines = navigation.splitlines()
     out = []
     for line in lines:
