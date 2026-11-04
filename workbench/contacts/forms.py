@@ -134,13 +134,18 @@ class GroupForm(ModelForm):
         return instance
 
 
-def recent_projects_or_deals(field):
-    """Filter for contacts with projects or deals in the last 5 years, ``field``
-    is the field of projects and deals pointing to them"""
+def recent_projects_or_deals(field, *, since=None):
+    """Filter for contacts with projects or deals created since the date,
+    the last 5 years by default; ``field`` is the field of projects and deals
+    pointing to them"""
     from workbench.deals.models import Deal
     from workbench.projects.models import Project
 
-    cutoff = timezone.now() - dt.timedelta(days=5 * 366)
+    cutoff = (
+        timezone.make_aware(dt.datetime.combine(since, dt.time.min))
+        if since
+        else timezone.now() - dt.timedelta(days=5 * 366)
+    )
     return Q(id__in=Deal.objects.filter(created_at__gte=cutoff).values(field)) | Q(
         id__in=Project.objects.filter(created_at__gte=cutoff).values(field)
     )

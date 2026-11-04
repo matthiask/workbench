@@ -258,6 +258,11 @@ email_addresses:
         self.assertIn("Hans Muster", result.output)
         result = self.wb("people", "search", "--without-groups", "--csv")
         self.assertNotIn("Hans Muster", result.output)
+        result = self.wb(
+            "people", "search", "--projects-or-deals-since", "2020-01-01", "--csv"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertNotIn("Hans Muster", result.output)
 
         Group.objects.create(title="Christmas")
         result = self.wb(

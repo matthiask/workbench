@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.db import transaction
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -7,7 +9,7 @@ from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
 from workbench.accounts.models import User
-from workbench.contacts.forms import PersonForm
+from workbench.contacts.forms import PersonForm, recent_projects_or_deals
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -104,6 +106,11 @@ class PersonFilter(OrganizationFilter):
         default=False, description="Only people in no active group"
     )
     primary_contact: str | None = Field(default=None, description="Short name")
+    projects_or_deals_since: dt.date | None = Field(
+        default=None,
+        description="Only contacts of projects or deals created since the date,"
+        " like the defined search of the web interface (5 years)",
+    )
 
 
 def _group(value):
@@ -156,6 +163,8 @@ def person_list(request, filters: Query[PersonFilter]):
                 "primary_contact", _("Unknown user %r.") % filters.primary_contact
             )
         people = people.filter(primary_contact=user)
+    if since := filters.projects_or_deals_since:
+        people = people.filter(recent_projects_or_deals("contact", since=since))
     if filters.q:
         people = people.search(filters.q)
     return Serialized(

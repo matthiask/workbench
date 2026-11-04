@@ -1,8 +1,12 @@
+import datetime as dt
+
 from django.test import TestCase
+from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.contacts.models import Group, Organization, Person
+from workbench.projects.models import Project
 
 
 class ContactsAPITest(TestCase):
@@ -92,6 +96,32 @@ class ContactsAPITest(TestCase):
         self.assertEqual(data["items"][0]["primary_contact"], user.get_short_name())
         data = self.client.get("/api/contacts/people/", {"group": "Industry"}).json()
         self.assertEqual(data["items"][0]["groups"], ["Industry"])
+
+    def test_people_with_recent_projects_or_deals(self):
+        """People who are the contact of projects or deals created since a
+        date, like the defined search of the web interface"""
+        project = factories.ProjectFactory.create()
+        deal = factories.DealFactory.create(contact=factories.PersonFactory.create())
+        old = factories.ProjectFactory.create()
+        Project.objects.filter(pk=old.pk).update(
+            created_at=timezone.now() - dt.timedelta(days=1000)
+        )
+        factories.PersonFactory.create()
+        self.client.force_login(factories.UserFactory.create())
+
+        def ids(since):
+            response = self.client.get(
+                "/api/contacts/people/", {"projects_or_deals_since": since}
+            )
+            self.assertEqual(response.status_code, 200, response.content)
+            return {p["id"] for p in response.json()["items"]}
+
+        recent = dt.date.today() - dt.timedelta(days=365)
+        self.assertEqual(ids(recent), {project.contact_id, deal.contact_id})
+        self.assertEqual(
+            ids(recent - dt.timedelta(days=1000)),
+            {project.contact_id, deal.contact_id, old.contact_id},
+        )
 
     def test_update_person(self):
         """People get a primary contact, are added to and removed from groups

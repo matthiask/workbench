@@ -122,6 +122,11 @@ def people():
 @click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names
 )
+@click.option(
+    "--projects-or-deals-since",
+    type=click.DateTime(["%Y-%m-%d"]),
+    help="Only contacts of projects or deals created since the date.",
+)
 @click.option("--all", "include_archived", is_flag=True, help="Include archived.")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -132,6 +137,7 @@ def search_people(
     group,
     without_groups,
     primary_contact,
+    projects_or_deals_since,
     include_archived,
     limit,
     offset,
@@ -151,6 +157,8 @@ def search_people(
         params["group"] = group
     if primary_contact:
         params["primary_contact"] = primary_contact
+    if projects_or_deals_since:
+        params["projects_or_deals_since"] = projects_or_deals_since.date().isoformat()
     data = request(
         "GET", "contacts/people/", params=params | page_params(limit, offset)
     )

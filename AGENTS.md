@@ -89,7 +89,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `wb contacts search` finds both organizations and people, `wb organizations
   show` and `wb people show` show them. `wb people search` filters people like
   the people list of the web interface (`--group`, also through the
-  organization, `--without-groups`, `--primary-contact`); the list's XLSX
+  organization, `--without-groups`, `--primary-contact`,
+  `--projects-or-deals-since` like the defined search of the last five
+  years, `recent_projects_or_deals()`); the list's XLSX
   export (e.g. of a group for a mailing) stays in the web interface. `wb
   people update` changes the primary contact, adds and removes groups and
   archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
