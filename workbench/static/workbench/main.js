@@ -769,13 +769,13 @@ function initAutocomplete(el) {
   el.after(menu)
 
   let results = []
-  let active = -1
+  let active = null
   let timeout = null
   let request = 0
 
   const close = () => {
     menu.classList.remove("show")
-    active = -1
+    active = null
   }
 
   const highlight = (index) => {
@@ -818,7 +818,7 @@ function initAutocomplete(el) {
         return item
       }),
     )
-    active = -1
+    active = null
     menu.classList.toggle("show", results.length > 0)
   }
 
@@ -833,8 +833,14 @@ function initAutocomplete(el) {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault()
       const step = e.key === "ArrowDown" ? 1 : -1
-      highlight((active + step + results.length) % results.length)
-    } else if (e.key === "Enter" && active >= 0) {
+      highlight(
+        active === null
+          ? step > 0
+            ? 0
+            : results.length - 1
+          : (active + step + results.length) % results.length,
+      )
+    } else if (e.key === "Enter" && active !== null) {
       e.preventDefault()
       choose(active)
     } else if (e.key === "Escape") {
