@@ -340,13 +340,18 @@ class ContactsAPITest(TestCase):
         lonely.refresh_from_db()
         self.assertEqual(lonely.primary_contact, former)
 
+        # Without from, the suggestions apply to everyone whose primary
+        # contact isn't active anymore
+        response = reassign({"suggested": True}, "?dry_run=true")
+        self.assertEqual(len(response.json()["changes"]), 1)
+
         response = reassign({"from": "old", "to": "other"})
         self.assertEqual(len(response.json()["changes"]), 1)
         lonely.refresh_from_db()
         self.assertEqual(lonely.primary_contact, other)
 
         # Only to active users, and either to someone or to the suggestions
-        for data in [{"from": "lead", "to": "old"}, {"from": "lead"}]:
+        for data in [{"from": "lead", "to": "old"}, {"from": "lead"}, {"to": "lead"}]:
             self.assertEqual(reassign(data).status_code, 422, data)
 
     def test_detail(self):

@@ -164,6 +164,7 @@ own before their organization's), or all of them go to one person:
     wb people reassign-suggestions --from ab --since 2023-01-01
     wb people reassign --from ab --suggested --since 2023-01-01 --dry-run
     wb people reassign --from ab --to cd
+    wb people reassign --suggested --since 2023-01-01 --dry-run   # everyone who left
 
 Groups are listed, created and archived with `wb groups`:
 

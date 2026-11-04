@@ -317,8 +317,8 @@ def reassign_suggestions(primary_contact, since, limit, offset, as_csv, as_json)
 @click.option(
     "--from",
     "former",
-    required=True,
-    help="Short name, also of someone who isn't active anymore.",
+    help="Short name, also of someone who isn't active anymore. With"
+    " --suggested it defaults to everyone who isn't active anymore.",
     shell_complete=complete_short_names,
 )
 @click.option(
@@ -341,6 +341,8 @@ def reassign_people(former, to, suggested, since, dry_run, as_json):
     suggestions, e.g. when someone left"""
     if bool(to) == suggested:
         terminate("Pass either --to or --suggested.")
+    if to and not former:
+        terminate("--to needs --from.")
     data = request(
         "POST",
         "contacts/people/reassign/",
@@ -360,7 +362,10 @@ def reassign_people(former, to, suggested, since, dry_run, as_json):
         table.add_row(str(change["id"]), change["full_name"], change["to"])
     console.print(table)
     prefix = "Dry run, nothing changed: " if dry_run else ""
-    console.print(f"{prefix}{len(data['changes'])} people reassigned from {former}.")
+    console.print(
+        f"{prefix}{len(data['changes'])} people reassigned"
+        + (f" from {former}." if former else ".")
+    )
 
 
 @people.command("context")

@@ -858,7 +858,12 @@ def person_reassign_suggestions(request, filters: Query[ReassignFilter]):
 
 
 class ReassignIn(Schema):
-    from_: str = Field(alias="from", description="Short name, also of inactive users")
+    from_: str | None = Field(
+        default=None,
+        alias="from",
+        description="Short name, also of inactive users; with suggested it"
+        " defaults to everyone who isn't active anymore",
+    )
     to: str | None = Field(default=None, description="Short name of an active user")
     suggested: bool = Field(
         default=False,
@@ -891,8 +896,18 @@ def person_reassign(request, data: ReassignIn, *, dry_run: bool = False):
                 "msg": _("Either reassign to someone or to the suggestions."),
             }
         ])
-    former = _user(data.from_, ["body", "data", "from"])
-    people = list(Person.objects.active().filter(primary_contact=former).order_by("pk"))
+    if data.to and not data.from_:
+        raise ValidationError([
+            {"loc": ["body", "data", "from"], "msg": _("This field is required.")}
+        ])
+    people = Person.objects.active().select_related("primary_contact").order_by("pk")
+    if data.from_:
+        people = people.filter(
+            primary_contact=_user(data.from_, ["body", "data", "from"])
+        )
+    else:
+        people = people.filter(primary_contact__is_active=False)
+    people = list(people)
     if data.to:
         user = _user(data.to, ["body", "data", "to"], active_only=True)
         targets = {person.pk: user for person in people}
@@ -906,7 +921,7 @@ def person_reassign(request, data: ReassignIn, *, dry_run: bool = False):
     changes = []
     with transaction.atomic():
         for person in people:
-            if (user := targets.get(person.pk)) and user != former:
+            if (user := targets.get(person.pk)) and user != person.primary_contact:
                 person.primary_contact = user
                 person.save(update_fields=["primary_contact"])
                 changes.append({
