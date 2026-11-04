@@ -120,6 +120,11 @@ def people():
 )
 @click.option("--without-groups", is_flag=True, help="Only people in no active group.")
 @click.option(
+    "--missing-postal-address",
+    is_flag=True,
+    help="Only people without a postal address with street, postal code and city.",
+)
+@click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names
 )
 @click.option(
@@ -136,6 +141,7 @@ def search_people(
     organization,
     group,
     without_groups,
+    missing_postal_address,
     primary_contact,
     projects_or_deals_since,
     include_archived,
@@ -150,6 +156,7 @@ def search_people(
         "q": " ".join(query),
         "include_archived": format_bool(include_archived),
         "without_groups": format_bool(without_groups),
+        "missing_postal_address": format_bool(missing_postal_address),
     }
     if organization:
         params["organization"] = organization

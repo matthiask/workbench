@@ -736,6 +736,37 @@ class GroupsTest(TestCase):
         self.assertContains(response, "Formerly Nachname")
         self.assertNotContains(response, "Gone Nachname")
 
+    def test_missing_postal_address(self):
+        """The defined search finds people without a complete postal address,
+        e.g. the members of a group for a mailing"""
+        self.client.force_login(factories.UserFactory.create())
+        complete = factories.PersonFactory.create(given_name="Complete")
+        complete.postaladdresses.create(
+            street="Hauptstrasse", house_number="1", postal_code="8000", city="Zürich"
+        )
+        incomplete = factories.PersonFactory.create(given_name="Incomplete")
+        incomplete.postaladdresses.create(street="Hauptstrasse", city="Zürich")
+        override = factories.PersonFactory.create(given_name="Override")
+        override.postaladdresses.create(
+            street="-", city="-", postal_address_override="Postfach\n8000 Zürich"
+        )
+        factories.PersonFactory.create(given_name="Missing")
+        factories.PersonFactory.create(given_name="Gone", is_archived=True)
+
+        response = self.client.get("/contacts/people/?s=missing-postal-address")
+        self.assertNotContains(response, "Complete Nachname")
+        self.assertContains(response, "Incomplete Nachname")
+        self.assertNotContains(response, "Override Nachname")
+        self.assertContains(response, "Missing Nachname")
+        self.assertNotContains(response, "Gone Nachname")
+
+        data = self.client.get(
+            "/api/contacts/people/", {"missing_postal_address": "true"}
+        ).json()
+        self.assertEqual(
+            {p["given_name"] for p in data["items"]}, {"Incomplete", "Missing"}
+        )
+
     def test_member_counts(self):
         """People and organizations are counted independently of each other"""
         group = Group.objects.create(title="Newsletter")

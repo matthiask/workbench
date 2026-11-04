@@ -89,7 +89,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `wb contacts search` finds both organizations and people, `wb organizations
   show` and `wb people show` show them. `wb people search` filters people like
   the people list of the web interface (`--group`, also through the
-  organization, `--without-groups`, `--primary-contact`,
+  organization, `--without-groups`, `--missing-postal-address` like the
+  defined search, `Person.objects.without_complete_postal_address()`,
+  `--primary-contact`,
   `--projects-or-deals-since` like the defined search of the last five
   years, `recent_projects_or_deals()`) and has the postal address the XLSX
   export of the people list uses (highest weight), so scripts can build

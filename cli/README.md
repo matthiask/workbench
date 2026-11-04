@@ -148,6 +148,7 @@ active group:
 
     wb people search --group "Newsletter"
     wb people search --without-groups --primary-contact mk
+    wb people search --group "Newsletter" --missing-postal-address
     wb people search --projects-or-deals-since 2023-01-01 --csv
 
 `wb people update` changes the primary contact and the groups of a person or

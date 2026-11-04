@@ -156,6 +156,11 @@ class PersonFilter(OrganizationFilter):
     without_groups: bool = Field(
         default=False, description="Only people in no active group"
     )
+    missing_postal_address: bool = Field(
+        default=False,
+        description="Only people without a postal address with street, postal"
+        " code and city, like the defined search",
+    )
     primary_contact: str | None = Field(default=None, description="Short name")
     projects_or_deals_since: dt.date | None = Field(
         default=None,
@@ -208,6 +213,8 @@ def person_list(request, filters: Query[PersonFilter]):
         people = people.in_group(group)
     if filters.without_groups:
         people = people.without_groups()
+    if filters.missing_postal_address:
+        people = people.without_complete_postal_address()
     if filters.primary_contact:
         user = User.objects.filter(_short_name__iexact=filters.primary_contact).first()
         if not user:

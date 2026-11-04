@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 07:47+0100\n"
+"POT-Creation-Date: 2026-11-04 08:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1091,6 +1091,17 @@ msgid "Missing email address"
 msgstr "Fehlende Emailadresse"
 
 #: workbench/contacts/forms.py
+msgid "Missing or incomplete postal address"
+msgstr "Fehlende oder unvollständige Postadresse"
+
+#: workbench/contacts/forms.py workbench/contacts/models.py
+#: workbench/templates/contacts/object_list.html
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
+msgid "people"
+msgstr "Personen"
+
+#: workbench/contacts/forms.py
 msgid "substitute with"
 msgstr "ersetzen durch"
 
@@ -1203,12 +1214,6 @@ msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 #: workbench/contacts/models.py
 msgid "date of birth"
 msgstr "Geburtstag"
-
-#: workbench/contacts/models.py workbench/templates/contacts/object_list.html
-#: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/shortcuts.html
-msgid "people"
-msgstr "Personen"
 
 #: workbench/contacts/models.py
 msgid "work"

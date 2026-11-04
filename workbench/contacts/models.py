@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 import phonenumbers
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Exists, OuterRef, Q, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
 from django_countries.fields import CountryField
@@ -171,6 +171,18 @@ class PersonQuerySet(SearchQuerySet):
         """People in the group, also through their organization if the group
         applies to organizations"""
         return self.filter(in_group_q(group))
+
+    def without_complete_postal_address(self):
+        """People without a postal address with street, postal code and city
+        (or one which is overridden completely), e.g. for mailings"""
+        return self.exclude(
+            Exists(
+                PostalAddress.objects.filter(person=OuterRef("pk")).filter(
+                    ~Q(postal_address_override="")
+                    | (~Q(street="") & ~Q(postal_code="") & ~Q(city=""))
+                )
+            )
+        )
 
     def without_groups(self):
         """People in no active group, also not through their organization"""

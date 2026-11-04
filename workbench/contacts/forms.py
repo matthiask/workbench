@@ -241,6 +241,10 @@ class PersonSearchForm(Form):
                         "missing-email",
                         _("Missing email address"),
                     ),
+                    (
+                        "missing-postal-address",
+                        _("Missing or incomplete postal address"),
+                    ),
                     ("no-group", _("No group")),
                 ],
             ),
@@ -292,6 +296,8 @@ class PersonSearchForm(Form):
             )
         elif data.get("s") == "missing-email":
             queryset = queryset.active().filter(emailaddresses__isnull=True)
+        elif data.get("s") == "missing-postal-address":
+            queryset = queryset.active().without_complete_postal_address()
         elif data.get("s") == "no-group":
             queryset = queryset.active().without_groups()
 
