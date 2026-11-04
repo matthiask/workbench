@@ -421,7 +421,9 @@ class PersonForm(ModelForm):
 
     class Meta:
         model = Person
+        # Archiving comes first, it shouldn't need searching for
         fields = (
+            "is_archived",
             "address",
             "given_name",
             "family_name",
@@ -432,7 +434,6 @@ class PersonForm(ModelForm):
             "organization",
             "primary_contact",
             "groups",
-            "is_archived",
         )
         widgets = {
             "notes": Textarea(),
