@@ -90,7 +90,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   show` and `wb people show` show them. `wb people search` filters people like
   the people list of the web interface (`--group`, also through the
   organization, `--without-groups`, `--primary-contact`); the list's XLSX
-  export (e.g. of a group for a mailing) stays in the web interface. `wb people create` is mostly fed by
+  export (e.g. of a group for a mailing) stays in the web interface. `wb
+  people update` changes the primary contact, adds and removes groups and
+  archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
+  to organizations go to the organization like in the person form
+  (`Person.add_to_group()`, `remove_from_group()`). `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Shared validation helpers for the APIs are in
   `workbench/tools/api.py`, also `DateRangeFilter` (`period` like `2026-Q3` or

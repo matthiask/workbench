@@ -17,6 +17,7 @@ from wb.core import (
     page_options,
     page_params,
     request,
+    terminate,
 )
 
 
@@ -182,6 +183,63 @@ def show_person(person_id, as_json):
     """Show a person and their contact details"""
     data = request("GET", f"contacts/people/{person_id}/")
     echo_json(data) if as_json else _echo_person(data)
+
+
+@people.command("update")
+@click.argument("person_id", type=int)
+@click.option(
+    "--primary-contact", help="Short name.", shell_complete=complete_short_names
+)
+@click.option(
+    "--add-group",
+    "add_groups",
+    multiple=True,
+    help="ID or title of a group; repeat it for several. Groups which apply to"
+    " organizations are added to the organization.",
+)
+@click.option(
+    "--remove-group",
+    "remove_groups",
+    multiple=True,
+    help="ID or title of a group; repeat it for several.",
+)
+@click.option(
+    "--archive/--unarchive", "is_archived", default=None, help="E.g. who left."
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_person(
+    person_id, primary_contact, add_groups, remove_groups, is_archived, dry_run, as_json
+):
+    """Change the primary contact and the groups of a person or archive them,
+    like in the web interface"""
+    data = {
+        key: value
+        for key, value in [
+            ("primary_contact", primary_contact),
+            ("add_groups", list(add_groups)),
+            ("remove_groups", list(remove_groups)),
+            ("is_archived", is_archived),
+        ]
+        if value not in (None, [])
+    }
+    if not data:
+        terminate(
+            "Nothing to change, pass --primary-contact, --add-group,"
+            " --remove-group, --archive or --unarchive."
+        )
+    data = request(
+        "PATCH",
+        f"contacts/people/{person_id}/",
+        json=data,
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing changed:")
+    _echo_person(data)
 
 
 @people.command("context")

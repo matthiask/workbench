@@ -259,6 +259,24 @@ email_addresses:
         result = self.wb("people", "search", "--without-groups", "--csv")
         self.assertNotIn("Hans Muster", result.output)
 
+        Group.objects.create(title="Christmas")
+        result = self.wb(
+            "people",
+            "update",
+            created.pk,
+            "--add-group",
+            "Christmas",
+            "--remove-group",
+            "Mailing",
+            "--primary-contact",
+            self.user.get_short_name(),
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual([g.title for g in created.groups.all()], ["Christmas"])
+        result = self.wb("people", "update", created.pk, "--archive")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("(archived)", result.output)
+
     def test_offers(self):
         """Offers are created and replaced from YAML files"""
         factories.service_types()

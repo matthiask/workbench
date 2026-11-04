@@ -93,6 +93,61 @@ class ContactsAPITest(TestCase):
         data = self.client.get("/api/contacts/people/", {"group": "Industry"}).json()
         self.assertEqual(data["items"][0]["groups"], ["Industry"])
 
+    def test_update_person(self):
+        """People get a primary contact, are added to and removed from groups
+        with the rules of the person form (groups which apply to organizations
+        go to the organization) and archived"""
+        mailing = Group.objects.create(title="Mailing")
+        industry = Group.objects.create(title="Industry", applies_to_organizations=True)
+        old = Group.objects.create(title="Old", is_archived=True)
+        organization = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(organization=organization)
+        user = factories.UserFactory.create(_short_name="xy")
+        self.client.force_login(user)
+        url = f"/api/contacts/people/{person.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch(
+            {"primary_contact": "XY", "add_groups": ["Mailing", str(industry.pk)]},
+            "?dry_run=true",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["groups"], ["Industry", "Mailing"])
+        self.assertEqual(list(person.groups.all()), [])
+
+        response = patch({
+            "primary_contact": "XY",
+            "add_groups": ["Mailing", str(industry.pk)],
+        })
+        self.assertEqual(response.json()["primary_contact"], "xy")
+        self.assertEqual(list(person.groups.all()), [mailing])
+        self.assertEqual(list(organization.groups.all()), [industry])
+
+        response = patch({"remove_groups": ["Mailing", "Industry"]})
+        self.assertEqual(response.json()["groups"], [])
+        self.assertEqual(list(organization.groups.all()), [])
+
+        for data, loc in [
+            ({"add_groups": ["Old"]}, ["body", "data", "add_groups", 0]),
+            ({"add_groups": ["Nope"]}, ["body", "data", "add_groups", 0]),
+            ({"primary_contact": "nobody"}, ["body", "data", "primary_contact"]),
+        ]:
+            response = patch(data)
+            self.assertEqual(response.status_code, 422, data)
+            self.assertEqual([e["loc"] for e in response.json()["detail"]], [loc])
+
+        # Archived groups can be removed if the person is in them
+        person.groups.add(old)
+        response = patch({"remove_groups": ["Old"], "is_archived": True})
+        self.assertEqual(response.status_code, 200, response.content)
+        person.refresh_from_db()
+        self.assertTrue(person.is_archived)
+        self.assertEqual(list(person.groups.all()), [])
+
     def test_detail(self):
         """Organizations and people with their contact details"""
         person = factories.PersonFactory.create(

@@ -106,6 +106,16 @@ class PersonFilter(OrganizationFilter):
     primary_contact: str | None = Field(default=None, description="Short name")
 
 
+def _group(value):
+    """A group by its ID or title"""
+    groups = Group.objects.all()
+    return (
+        groups.filter(pk=value).first()
+        if value.isdigit()
+        else groups.filter(title__iexact=value).first()
+    )
+
+
 def _query_error(field, msg):
     return ValidationError([{"loc": ["query", field], "msg": msg}])
 
@@ -133,11 +143,7 @@ def person_list(request, filters: Query[PersonFilter]):
     if filters.organization:
         people = people.filter(organization=filters.organization)
     if filters.group:
-        group = (
-            Group.objects.filter(pk=filters.group).first()
-            if filters.group.isdigit()
-            else Group.objects.filter(title__iexact=filters.group).first()
-        )
+        group = _group(filters.group)
         if not group:
             raise _query_error("group", _("Unknown group %r.") % filters.group)
         people = people.in_group(group)
@@ -474,6 +480,84 @@ def person_add_details(
 
     with transaction.atomic():
         _save_details(person, details)
+        result = person_out(person, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+class PersonPatch(Schema):
+    """Fields which aren't given are left alone"""
+
+    primary_contact: str | None = Field(
+        default=None, description="Short name of an active user"
+    )
+    add_groups: list[str] = Field(
+        default=[],
+        description="IDs or titles of active groups. Groups which apply to"
+        " organizations are added to the organization, like in the person form.",
+    )
+    remove_groups: list[str] = Field(
+        default=[],
+        description="IDs or titles of groups. Groups which apply to"
+        " organizations are removed from the organization too.",
+    )
+    is_archived: bool | None = None
+
+
+@router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
+def person_update(request, person_id: int, data: PersonPatch, *, dry_run: bool = False):
+    """Change the primary contact and the groups of a person or archive them,
+    with the rules of the person form; contact details are added with
+    ``details/``"""
+    person = get_object_or_404(
+        Person.objects.select_related("organization"), pk=person_id
+    )
+    errors = []
+
+    def error(loc, msg):
+        errors.append({"loc": ["body", "data", *loc], "msg": msg})
+
+    current = {group.pk for group in person.all_groups()}
+    add, remove = [], []
+    for key, values, target in [
+        ("add_groups", data.add_groups, add),
+        ("remove_groups", data.remove_groups, remove),
+    ]:
+        for index, value in enumerate(values):
+            group = _group(value)
+            if not group:
+                error([key, index], _("Unknown group %r.") % value)
+            elif key == "add_groups" and group.is_archived and group.pk not in current:
+                # Like the form, which only offers archived groups to members
+                error([key, index], _("The group %r is archived.") % group.title)
+            else:
+                target.append(group)
+    if data.primary_contact is not None:
+        user = User.objects.filter(
+            is_active=True, _short_name__iexact=data.primary_contact
+        ).first()
+        if user:
+            person.primary_contact = user
+        else:
+            error(
+                ["primary_contact"],
+                _("Unknown or inactive user %r.") % data.primary_contact,
+            )
+    if errors:
+        raise ValidationError(errors)
+
+    if data.is_archived is not None:
+        person.is_archived = data.is_archived
+    with transaction.atomic():
+        person.save()
+        for group in add:
+            person.add_to_group(group)
+        for group in remove:
+            person.remove_from_group(group)
+        person = Person.objects.select_related("organization", "primary_contact").get(
+            pk=person.pk
+        )
         result = person_out(person, request)
         if dry_run:
             transaction.set_rollback(True)

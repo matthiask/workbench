@@ -260,6 +260,22 @@ class Person(Model):
             }
         return sorted(groups.values(), key=lambda group: group.title.lower())
 
+    def add_to_group(self, group):
+        """Groups which apply to organizations go to the organization, like in
+        the person form; only people without organization are members
+        themselves"""
+        if group.applies_to_organizations and self.organization:
+            self.organization.groups.add(group)
+        else:
+            self.groups.add(group)
+
+    def remove_from_group(self, group):
+        """Also removes groups which apply to organizations from the
+        organization, like unchecking them in the person form"""
+        self.groups.remove(group)
+        if group.applies_to_organizations and self.organization:
+            self.organization.groups.remove(group)
+
     @property
     def name_with_organization(self):
         if self.organization and not self.organization.is_private_person:

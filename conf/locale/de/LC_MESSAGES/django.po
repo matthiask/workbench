@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 07:29+0100\n"
+"POT-Creation-Date: 2026-11-04 07:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1024,6 +1024,17 @@ msgstr "Verwende entweder eine existierende Organisation oder erstelle eine neue
 msgid "%(person)s has this phone number already."
 msgstr "%(person)s hat diese Telefonnummer bereits."
 
+#: workbench/contacts/api.py
+#, python-format
+msgid "The group %r is archived."
+msgstr "Die Gruppe %r ist archiviert."
+
+#: workbench/contacts/api.py workbench/deals/api.py workbench/planning/api.py
+#: workbench/projects/api.py
+#, python-format
+msgid "Unknown or inactive user %r."
+msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
+
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
 msgid "contacts"
@@ -1530,11 +1541,6 @@ msgstr "Unbekanntes Attribut. Auswahl: %s"
 #, python-format
 msgid "This field is required. Choices: %s"
 msgstr "Dieses Feld ist zwingend erforderlich. Auswahl: %s"
-
-#: workbench/deals/api.py workbench/planning/api.py workbench/projects/api.py
-#, python-format
-msgid "Unknown or inactive user %r."
-msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
 
 #: workbench/deals/api.py
 #, python-format
