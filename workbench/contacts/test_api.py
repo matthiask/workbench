@@ -38,6 +38,9 @@ class ContactsAPITest(TestCase):
         self.assertEqual(data[0]["id"], person.pk)
         self.assertEqual(data[0]["full_name"], "Hans Muster")
         self.assertEqual(
+            (data[0]["given_name"], data[0]["family_name"]), ("Hans", "Muster")
+        )
+        self.assertEqual(
             data[0]["url"], f"http://testserver{person.get_absolute_url()}"
         )
         self.assertEqual(data[0]["organization"]["name"], "Beispiel")

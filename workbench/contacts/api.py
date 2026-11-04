@@ -50,6 +50,8 @@ class PersonSummary(Schema):
 
 
 class PersonOut(PersonSummary):
+    given_name: str
+    family_name: str
     organization: OrganizationOut | None
 
 
@@ -117,9 +119,11 @@ def person_summary(person, request):
 
 def person_list_out(person, request):
     return person_summary(person, request) | {
+        "given_name": person.given_name,
+        "family_name": person.family_name,
         "organization": organization_out(person.organization, request)
         if person.organization
-        else None
+        else None,
     }
 
 
