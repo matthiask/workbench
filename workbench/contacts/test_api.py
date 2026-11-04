@@ -262,6 +262,93 @@ class ContactsAPITest(TestCase):
         response = send("patch", f"{mailing.pk}/", {"title": "Christmas"})
         self.assertEqual(response.status_code, 422)
 
+    def test_reassign(self):
+        """People of users who left get suggestions from their projects and
+        deals (as their contact first, then of their organization) and are
+        reassigned in bulk"""
+        former = factories.UserFactory.create(_short_name="old", is_active=False)
+        lead = factories.UserFactory.create(_short_name="lead")
+        other = factories.UserFactory.create(_short_name="other")
+        organization = factories.OrganizationFactory.create()
+        contact = factories.PersonFactory.create(
+            given_name="Contact", organization=organization, primary_contact=former
+        )
+        factories.PersonFactory.create(
+            given_name="Colleague", organization=organization, primary_contact=former
+        )
+        dealt = factories.PersonFactory.create(
+            given_name="Dealt", primary_contact=former
+        )
+        lonely = factories.PersonFactory.create(
+            given_name="Lonely", primary_contact=former
+        )
+        factories.PersonFactory.create(given_name="Fine", primary_contact=lead)
+        factories.ProjectFactory.create(
+            customer=organization, contact=contact, owned_by=lead
+        )
+        factories.DealFactory.create(contact=dealt, owned_by=other)
+        old_project = factories.ProjectFactory.create(contact=lonely, owned_by=lead)
+        Project.objects.filter(pk=old_project.pk).update(
+            created_at=timezone.now() - dt.timedelta(days=2000)
+        )
+        self.client.force_login(lead)
+
+        def suggestions(**params):
+            data = self.client.get("/api/contacts/people/reassign/", params).json()
+            return {
+                row["person"]["full_name"].split()[0]: (
+                    row["suggestion"]["short_name"],
+                    row["suggestion"]["source"],
+                )
+                if row["suggestion"]
+                else None
+                for row in data["items"]
+            }
+
+        self.assertEqual(
+            suggestions(),
+            {
+                "Contact": ("lead", "project"),
+                "Colleague": ("lead", "organization's project"),
+                "Dealt": ("other", "deal"),
+                "Lonely": ("lead", "project"),
+            },
+        )
+        since = (dt.date.today() - dt.timedelta(days=365)).isoformat()
+        self.assertEqual(suggestions(since=since)["Lonely"], None)
+
+        def reassign(data, query=""):
+            return self.client.post(
+                f"/api/contacts/people/reassign/{query}",
+                data,
+                content_type="application/json",
+            )
+
+        response = reassign(
+            {"from": "old", "suggested": True, "since": since}, "?dry_run=true"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(len(response.json()["changes"]), 3)
+        contact.refresh_from_db()
+        self.assertEqual(contact.primary_contact, former)
+
+        response = reassign({"from": "old", "suggested": True, "since": since})
+        self.assertEqual(
+            {(c["full_name"].split()[0], c["to"]) for c in response.json()["changes"]},
+            {("Contact", "lead"), ("Colleague", "lead"), ("Dealt", "other")},
+        )
+        lonely.refresh_from_db()
+        self.assertEqual(lonely.primary_contact, former)
+
+        response = reassign({"from": "old", "to": "other"})
+        self.assertEqual(len(response.json()["changes"]), 1)
+        lonely.refresh_from_db()
+        self.assertEqual(lonely.primary_contact, other)
+
+        # Only to active users, and either to someone or to the suggestions
+        for data in [{"from": "lead", "to": "old"}, {"from": "lead"}]:
+            self.assertEqual(reassign(data).status_code, 422, data)
+
     def test_detail(self):
         """Organizations and people with their contact details"""
         person = factories.PersonFactory.create(

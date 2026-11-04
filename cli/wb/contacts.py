@@ -257,6 +257,112 @@ def update_person(
     _echo_person(data)
 
 
+@people.command("reassign-suggestions")
+@click.option(
+    "--from",
+    "primary_contact",
+    help="Short name; defaults to everyone who isn't active anymore.",
+    shell_complete=complete_short_names,
+)
+@click.option(
+    "--since",
+    type=click.DateTime(["%Y-%m-%d"]),
+    help="Only projects and deals created since the date.",
+)
+@page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
+@click.option("--json", "as_json", is_flag=True)
+def reassign_suggestions(primary_contact, since, limit, offset, as_csv, as_json):
+    """Suggest new primary contacts for people of users who left: the lead of
+    the latest project or the owner of the latest deal, the person's own
+    before those of their organization"""
+    params = {}
+    if primary_contact:
+        params["primary_contact"] = primary_contact
+    if since:
+        params["since"] = since.date().isoformat()
+    data = request(
+        "GET", "contacts/people/reassign/", params=params | page_params(limit, offset)
+    )
+    if as_csv:
+        echo_csv(data["items"])
+        echo_more(data, offset)
+        return
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table(
+        "ID>", "Person", "Organization", "From", "Suggestion", "Source", "Date"
+    )
+    for row in data["items"]:
+        person = row["person"]
+        suggestion = row["suggestion"] or {}
+        table.add_row(
+            link(person["id"], person["url"]),
+            person["full_name"],
+            (person["organization"] or {}).get("name", ""),
+            row["primary_contact"],
+            suggestion.get("short_name", ""),
+            link(f"{suggestion['source']}: {suggestion['title']}", suggestion["url"])
+            if suggestion
+            else "",
+            suggestion.get("created_at", "")[:10],
+            style=None if suggestion else "dim",
+        )
+    console.print(table)
+    echo_more(data, offset, "people")
+
+
+@people.command("reassign")
+@click.option(
+    "--from",
+    "former",
+    required=True,
+    help="Short name, also of someone who isn't active anymore.",
+    shell_complete=complete_short_names,
+)
+@click.option(
+    "--to", help="Short name of an active user.", shell_complete=complete_short_names
+)
+@click.option(
+    "--suggested",
+    is_flag=True,
+    help="Reassign to the suggestions (see reassign-suggestions) instead.",
+)
+@click.option(
+    "--since",
+    type=click.DateTime(["%Y-%m-%d"]),
+    help="With --suggested: only projects and deals created since the date.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate and list the changes only.")
+@click.option("--json", "as_json", is_flag=True)
+def reassign_people(former, to, suggested, since, dry_run, as_json):
+    """Reassign the active people of a user to another user or to the
+    suggestions, e.g. when someone left"""
+    if bool(to) == suggested:
+        terminate("Pass either --to or --suggested.")
+    data = request(
+        "POST",
+        "contacts/people/reassign/",
+        json={
+            "from": former,
+            "to": to,
+            "suggested": suggested,
+            "since": since.date().isoformat() if since else None,
+        },
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("ID>", "Person", "To")
+    for change in data["changes"]:
+        table.add_row(str(change["id"]), change["full_name"], change["to"])
+    console.print(table)
+    prefix = "Dry run, nothing changed: " if dry_run else ""
+    console.print(f"{prefix}{len(data['changes'])} people reassigned from {former}.")
+
+
 @people.command("context")
 def people_context():
     """Print the schema of a person to create

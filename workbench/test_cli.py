@@ -286,6 +286,18 @@ email_addresses:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("(archived)", result.output)
 
+        former = factories.UserFactory.create(_short_name="old", is_active=False)
+        orphan = factories.PersonFactory.create(primary_contact=former)
+        factories.ProjectFactory.create(contact=orphan, owned_by=self.user)
+        result = self.wb("people", "reassign-suggestions", "--from", "old")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(orphan.full_name, result.output)
+        result = self.wb("people", "reassign", "--from", "old", "--suggested")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("1 people reassigned", result.output)
+        orphan.refresh_from_db()
+        self.assertEqual(orphan.primary_contact, self.user)
+
         christmas = Group.objects.get(title="Christmas")
         result = self.wb("groups", "update", christmas.pk, "--archive")
         self.assertEqual(result.exit_code, 0, result.output)

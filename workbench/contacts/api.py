@@ -24,6 +24,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
 )
+from workbench.contacts.reassign import primary_contact_suggestions
 from workbench.tools.api import (
     Serialized,
     form_errors,
@@ -767,3 +768,152 @@ def group_update(request, group_id: int, data: GroupPatch, *, dry_run: bool = Fa
     group = get_object_or_404(Group, pk=group_id)
     values = _group_values(group, request) | data.dict(exclude_unset=True)
     return _save_group(request, group, values, dry_run=dry_run)
+
+
+class SuggestionOut(Schema):
+    short_name: str
+    source: Literal["project", "deal", "organization's project", "organization's deal"]
+    title: str = Field(description="The project or deal")
+    url: str
+    created_at: dt.datetime
+
+
+class ReassignSuggestionOut(Schema):
+    person: PersonOut
+    primary_contact: str
+    suggestion: SuggestionOut | None
+
+
+class ReassignFilter(Schema):
+    primary_contact: str | None = Field(
+        default=None,
+        description="Short name; defaults to all users who aren't active anymore",
+    )
+    since: dt.date | None = Field(
+        default=None, description="Only projects and deals created since the date"
+    )
+
+
+def _user(short_name, loc, *, active_only=False):
+    users = User.objects.filter(_short_name__iexact=short_name)
+    if active_only:
+        users = users.filter(is_active=True)
+    if user := users.first():
+        return user
+    raise ValidationError([
+        {
+            "loc": loc,
+            "msg": (
+                _("Unknown or inactive user %r.")
+                if active_only
+                else _("Unknown user %r.")
+            )
+            % short_name,
+        }
+    ])
+
+
+def _suggestion_out(suggestion, request):
+    if not suggestion:
+        return None
+    item = suggestion["item"]
+    return {
+        "short_name": suggestion["user"].get_short_name(),
+        "source": suggestion["source"],
+        "title": str(item),
+        "url": request.build_absolute_uri(item.get_absolute_url()),
+        "created_at": item.created_at,
+    }
+
+
+@router.get("/contacts/people/reassign/", response=list[ReassignSuggestionOut])
+@paginate
+def person_reassign_suggestions(request, filters: Query[ReassignFilter]):
+    """Active people whose primary contact isn't active anymore (or the given
+    user), with a suggestion for a new primary contact: the lead of the
+    latest project or the owner of the latest deal, the person's own before
+    those of their organization"""
+    people = (
+        Person.objects
+        .active()
+        .select_related("organization", "primary_contact")
+        .order_by("primary_contact", "given_name", "family_name", "pk")
+    )
+    if filters.primary_contact:
+        people = people.filter(
+            primary_contact=_user(filters.primary_contact, ["query", "primary_contact"])
+        )
+    else:
+        people = people.filter(primary_contact__is_active=False)
+    people = list(people)
+    suggestions = primary_contact_suggestions(people, since=filters.since)
+    return [
+        {
+            "person": person_list_out(person, request),
+            "primary_contact": person.primary_contact.get_short_name(),
+            "suggestion": _suggestion_out(suggestions.get(person.pk), request),
+        }
+        for person in people
+    ]
+
+
+class ReassignIn(Schema):
+    from_: str = Field(alias="from", description="Short name, also of inactive users")
+    to: str | None = Field(default=None, description="Short name of an active user")
+    suggested: bool = Field(
+        default=False,
+        description="Reassign to the suggestions instead (see the GET endpoint);"
+        " people without a suggestion stay",
+    )
+    since: dt.date | None = Field(
+        default=None, description="With suggested: only projects and deals since"
+    )
+
+
+class ReassignChange(Schema):
+    id: int
+    full_name: str
+    to: str
+
+
+class ReassignOut(Schema):
+    changes: list[ReassignChange]
+
+
+@router.post("/contacts/people/reassign/", response=ReassignOut)
+def person_reassign(request, data: ReassignIn, *, dry_run: bool = False):
+    """Reassign the active people of a user to another active user or to the
+    suggestions, e.g. when someone left"""
+    if bool(data.to) == data.suggested:
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "to"],
+                "msg": _("Either reassign to someone or to the suggestions."),
+            }
+        ])
+    former = _user(data.from_, ["body", "data", "from"])
+    people = list(Person.objects.active().filter(primary_contact=former).order_by("pk"))
+    if data.to:
+        user = _user(data.to, ["body", "data", "to"], active_only=True)
+        targets = {person.pk: user for person in people}
+    else:
+        targets = {
+            pk: suggestion["user"]
+            for pk, suggestion in primary_contact_suggestions(
+                people, since=data.since
+            ).items()
+        }
+    changes = []
+    with transaction.atomic():
+        for person in people:
+            if (user := targets.get(person.pk)) and user != former:
+                person.primary_contact = user
+                person.save(update_fields=["primary_contact"])
+                changes.append({
+                    "id": person.pk,
+                    "full_name": person.full_name,
+                    "to": user.get_short_name(),
+                })
+        if dry_run:
+            transaction.set_rollback(True)
+    return {"changes": changes}

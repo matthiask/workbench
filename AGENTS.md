@@ -99,7 +99,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   people update` changes the primary contact, adds and removes groups and
   archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
   to organizations go to the organization like in the person form
-  (`Person.add_to_group()`, `remove_from_group()`). `wb groups` lists, creates
+  (`Person.add_to_group()`, `remove_from_group()`). `wb people
+  reassign-suggestions` and `wb people reassign` move the people of users who
+  left (`/api/contacts/people/reassign/`): suggestions are the lead of the
+  latest project or the owner of the latest deal, the person's own before
+  their organization's, only active users (`primary_contact_suggestions()` in
+  `workbench/contacts/reassign.py`); people without a suggestion stay. `wb groups` lists, creates
   and archives groups (`/api/contacts/groups/`, with `GroupSearchForm` and
   `GroupForm` of the web interface); the API rejects duplicate titles
   because the other endpoints find groups by their title. `wb people create` is mostly fed by

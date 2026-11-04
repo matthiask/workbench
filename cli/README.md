@@ -157,6 +157,14 @@ archives them, e.g. someone who left:
     wb people update 1234 --primary-contact mk --add-group "Newsletter"
     wb people update 1234 --archive
 
+People whose primary contact left get new ones from their projects and deals
+(the lead of the latest project or the owner of the latest deal, the person's
+own before their organization's), or all of them go to one person:
+
+    wb people reassign-suggestions --from ab --since 2023-01-01
+    wb people reassign --from ab --suggested --since 2023-01-01 --dry-run
+    wb people reassign --from ab --to cd
+
 Groups are listed, created and archived with `wb groups`:
 
     wb groups
