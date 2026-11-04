@@ -1,21 +1,32 @@
 {% load i18n workbench %}
-<dl class="wb-fields mb-4">
-  <dt>{% translate 'Logged hours per effort type and hourly rate' %}</dt>
-  <dd>
-    {% for effort_type, rate, hours in logged_hours_per_effort %}
-      <div {% if rate is None %}class="text-warning"{% endif %}>
-        {{ hours|hours }}
-        <span class="text-body-secondary">
-          {% if effort_type %}{{ effort_type }},{% endif %}
-          {% if rate is None %}
-            {% translate 'undefined rate' %}
-          {% else %}
-            {{ rate|currency }}/h
-          {% endif %}
-        </span>
-      </div>
-    {% empty %}
-      &ndash;
-    {% endfor %}
-  </dd>
-</dl>
+<section class="mb-4">
+  <h3 class="h6 mb-2">{% translate 'Logged hours per effort type and hourly rate' %}</h3>
+  {% if logged_hours_per_effort %}
+    <table class="table table-sm w-auto mb-0">
+      <thead>
+        <tr>
+          <th>{% translate 'effort type'|capfirst %}</th>
+          <th class="text-end ps-4">{% translate 'hourly rate'|capfirst %}</th>
+          <th class="text-end ps-4">{% translate 'Logged' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for effort_type, rate, hours in logged_hours_per_effort %}
+          <tr>
+            <td>{{ effort_type|default:"&ndash;" }}</td>
+            <td class="text-end text-nowrap ps-4 {% if rate is None %}text-warning{% endif %}">
+              {% if rate is None %}
+                {% translate 'undefined rate' %}
+              {% else %}
+                {{ rate|currency }}/h
+              {% endif %}
+            </td>
+            <td class="text-end text-nowrap ps-4">{{ hours|hours }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    &ndash;
+  {% endif %}
+</section>
