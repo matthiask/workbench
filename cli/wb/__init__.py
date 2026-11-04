@@ -7,6 +7,7 @@ from wb import (  # noqa: F401 Register the commands
     deals,
     invoices,
     logbook,
+    milestones,
     notes,
     offers,
     planning,

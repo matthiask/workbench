@@ -290,6 +290,23 @@ have been logged on its services:
 
 All commands which output data accept `--json`.
 
+## GitHub milestones
+
+Offers can be linked with GitHub milestones: the URLs of the milestones are
+external references of the offer, one per repository. `wb milestones` uses the
+GitHub CLI [`gh`](https://cli.github.com/) for GitHub, Workbench itself doesn't
+talk to GitHub. Milestones without an offer, a new milestone for an offer,
+linking an existing one, and a service group (without services yet) for a
+milestone; the link to the offer is added to the milestone's description:
+
+    wb milestones list acme/web acme/app --unlinked
+    wb milestones create 5678 acme/web --title "Phase 2" --dry-run
+    wb milestones link 5678 https://github.com/acme/web/milestone/3
+    wb milestones offer 1234 https://github.com/acme/web/milestone/4
+
+Every milestone should belong to one offer, `link` and `offer` refuse
+milestones which are linked already unless you pass `--force`.
+
 ## Invoices
 
 Invoices are read-only in the CLI:

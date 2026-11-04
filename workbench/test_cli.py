@@ -636,6 +636,92 @@ planned_work:
         offer.refresh_from_db()
         self.assertEqual(offer.external_reference, "")
 
+    def test_milestones(self):
+        """Milestones are linked with offers through their external references"""
+        project = factories.ProjectFactory.create(title="Relaunch", owned_by=self.user)
+        factories.PostalAddressFactory.create(person=project.contact)
+        offer = factories.OfferFactory.create(
+            project=project, title="Relaunch | Phase 1"
+        )
+        base = "https://github.com/acme/web/milestone"
+        github = {
+            1: {"number": 1, "title": "Phase 1", "description": "", "state": "open"},
+            2: {
+                "number": 2,
+                "title": "Extras",
+                "description": "Ideas",
+                "state": "open",
+            },
+        }
+        calls = []
+
+        def gh(path, *, method="GET", fields=None, paginate=False):
+            calls.append((method, path, fields))
+            for m in github.values():
+                m |= {"html_url": f"{base}/{m['number']}", "open_issues": 0}
+                m |= {"closed_issues": 0}
+            if path.startswith("repos/acme/web/milestones?"):
+                return list(github.values())
+            number = int(path.rsplit("/", 1)[-1]) if path[-1].isdigit() else None
+            if method == "POST":
+                number = 3
+                github[3] = {"number": 3, "state": "open", **fields}
+                return gh("repos/acme/web/milestones/3")
+            if method == "PATCH":
+                github[number] |= fields
+            return github[number]
+
+        patcher = patch.object(wb.milestones, "gh", gh)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+        result = self.wb("milestones", "list", "acme/web", "--unlinked")
+        self.assertIn("Phase 1", result.output)
+        self.assertIn("Extras", result.output)
+
+        # Link an existing milestone
+        result = self.wb("milestones", "link", offer.pk, f"{base}/1", "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        offer.refresh_from_db()
+        self.assertEqual(offer.external_reference, "")
+        result = self.wb("milestones", "link", offer.pk, f"{base}/1")
+        self.assertEqual(result.exit_code, 0, result.output)
+        offer.refresh_from_db()
+        self.assertEqual(offer.external_reference, f"{base}/1")
+        self.assertIn(offer.code, github[1]["description"])
+        result = self.wb("milestones", "list", "acme/web", "--unlinked")
+        self.assertNotIn("Phase 1", result.output)
+
+        # A service group for a milestone without offer
+        other = factories.OfferFactory.create(project=project)
+        result = self.wb("milestones", "link", other.pk, f"{base}/1")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("already linked", result.output)
+        result = self.wb("milestones", "offer", project.pk, f"{base}/2")
+        self.assertEqual(result.exit_code, 0, result.output)
+        group = Offer.objects.get(external_reference=f"{base}/2")
+        self.assertEqual(group.status, Offer.SERVICE_GROUP)
+        self.assertEqual(group.title, "Relaunch | Extras")
+        self.assertEqual(group.description, "Ideas")
+        self.assertIn(group.code, github[2]["description"])
+
+        # A new milestone for an offer
+        result = self.wb(
+            "milestones", "create", other.pk, "acme/web", "--title", "Extras"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("already has the milestone", result.output)
+        result = self.wb(
+            "milestones", "create", other.pk, "acme/web", "--title", "Phase 2"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        other.refresh_from_db()
+        self.assertEqual(other.external_reference, f"{base}/3")
+        self.assertIn(other.code, github[3]["description"])
+        self.assertEqual(
+            [call[0] for call in calls if call[0] != "GET"], ["PATCH", "PATCH", "POST"]
+        )
+
     def test_absences(self):
         factories.AbsenceFactory.create(
             user=self.user, starts_on=in_days(7), description="Holidays"

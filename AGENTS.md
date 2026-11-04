@@ -158,7 +158,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   external references (URLs, one per line) can be changed for offers in any
   state, the external reference of services too (`PATCH /api/services/<id>/`,
   `wb services update`, also in the web form); Workbench stores them but
-  doesn't talk to GitHub. The same endpoint changes the description and moves services between offers,
+  doesn't talk to GitHub. `wb milestones` (the only command which talks to
+  GitHub, through `gh`) links GitHub milestones with offers through these
+  references and creates milestones and service groups for each other. The same endpoint changes the description and moves services between offers,
   validated with the web interface's `ServiceForm` (which also restricts the
   offer queryset, not only the choices). `POST
   /api/services/<id>/reassign-logbook/` (`wb services reassign-logbook`)
