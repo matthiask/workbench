@@ -351,14 +351,15 @@ class OrganizationForm(ModelForm):
 
     class Meta:
         model = Organization
+        # Archiving comes first, it shouldn't need searching for
         fields = (
+            "is_archived",
             "name",
             "is_private_person",
             "notes",
             "primary_contact",
             "default_billing_address",
             "groups",
-            "is_archived",
         )
         widgets = {
             "name": Textarea(),
