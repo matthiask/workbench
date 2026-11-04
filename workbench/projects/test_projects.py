@@ -148,9 +148,9 @@ class ProjectsTest(TestCase):
         self.assertEqual(response.status_code, 202)
         self.assertEqual(set(project.services.all()), {service2})
 
-    def test_reassign_only_not_invoiced(self):
+    def test_reassign_include_invoiced(self):
         """Reassigning logbook entries leaves invoiced entries where they are
-        by default, the option is only offered if there are any"""
+        unless they are included, the option is only offered if there are any"""
         project = factories.ProjectFactory.create()
         service = factories.ServiceFactory.create(project=project)
         target = factories.ServiceFactory.create(project=project)
@@ -160,7 +160,7 @@ class ProjectsTest(TestCase):
         url = service.urls["reassign_logbook"]
         ajax = {"x-requested-with": "XMLHttpRequest"}
 
-        self.assertNotContains(self.client.get(url, headers=ajax), "only_not_invoiced")
+        self.assertNotContains(self.client.get(url, headers=ajax), "include_invoiced")
 
         invoice = factories.InvoiceFactory.create(
             project=project,
@@ -171,18 +171,21 @@ class ProjectsTest(TestCase):
         invoice.create_services_from_logbook([service])
         open_hours = factories.LoggedHoursFactory.create(service=service, hours=2)
         open_cost = factories.LoggedCostFactory.create(service=service, cost=50)
-        response = self.client.get(url, headers=ajax)
-        # Checked by default
-        self.assertTrue(response.context["form"]["only_not_invoiced"].value())
+        self.assertContains(self.client.get(url, headers=ajax), "include_invoiced")
 
-        response = self.client.post(
-            url, {"service": target.pk, "only_not_invoiced": "on"}, headers=ajax
-        )
+        response = self.client.post(url, {"service": target.pk}, headers=ajax)
         self.assertEqual(response.status_code, 202)
         self.assertEqual(list(target.loggedhours.all()), [open_hours])
         self.assertEqual(list(target.loggedcosts.all()), [open_cost])
         self.assertEqual(service.loggedhours.count(), 1)
         self.assertEqual(service.loggedcosts.count(), 1)
+
+        response = self.client.post(
+            url, {"service": target.pk, "include_invoiced": "on"}, headers=ajax
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(service.loggedhours.count(), 0)
+        self.assertEqual(service.loggedcosts.count(), 0)
 
     def test_try_delete_available(self):
         """The try_delete box is only available if service isn't bound to an offer"""

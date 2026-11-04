@@ -615,23 +615,21 @@ class ReassignLogbookForm(Form):
             pk=self.from_service.pk
         )
 
-        # Invoiced entries may stay with the old service, e.g. when an issue
-        # moved to another offer: what has been invoiced stays, the rest moves
+        # Invoiced entries stay with the old service unless they are included,
+        # e.g. when an issue moved to another offer: what has been invoiced
+        # stays, the rest moves
         if (
             self.from_service.loggedhours.filter(invoice_service__isnull=False).exists()
             or self.from_service.loggedcosts.filter(
                 invoice_service__isnull=False
             ).exists()
         ):
-            self.fields["only_not_invoiced"] = forms.BooleanField(
-                label=_(
-                    "Only reassign logbook entries which haven't been invoiced yet"
-                ),
+            self.fields["include_invoiced"] = forms.BooleanField(
+                label=_("Also reassign invoiced logbook entries"),
                 help_text=_(
-                    "Invoiced entries stay with this service and their invoice."
+                    "Otherwise they stay with this service, to which their invoice lines refer."
                 ),
                 required=False,
-                initial=True,
             )
 
         offer = self.from_service.offer
@@ -645,7 +643,7 @@ class ReassignLogbookForm(Form):
         service = self.cleaned_data["service"]
         hours = self.from_service.loggedhours.all()
         costs = self.from_service.loggedcosts.all()
-        if self.cleaned_data.get("only_not_invoiced"):
+        if not self.cleaned_data.get("include_invoiced"):
             hours = hours.filter(invoice_service__isnull=True)
             costs = costs.filter(invoice_service__isnull=True)
         hours.update(service=service)
