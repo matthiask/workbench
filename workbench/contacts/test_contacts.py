@@ -15,6 +15,7 @@ from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
 from workbench.contacts import tasks
 from workbench.contacts.forms import GroupSearchForm
+from workbench.contacts.merge import merge_people
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
 from workbench.tools.testing import messages
@@ -407,6 +408,81 @@ class ContactsTest(TestCase):
         person.refresh_from_db()
         self.assertEqual(person.organization, new)
         self.assertEqual(new.groups.count(), 0)  # Group (m2m) not assigned
+
+    def test_merge_people(self):
+        """Merging moves relations, details and groups to the person to keep
+        and drops details the person to keep has already"""
+        keep = factories.PersonFactory.create(notes="Keep")
+        duplicate = factories.PersonFactory.create(
+            notes="Duplicate", date_of_birth=dt.date(1980, 1, 1)
+        )
+        project = factories.ProjectFactory.create(contact=duplicate)
+        user = factories.UserFactory.create(person=duplicate)
+        group = Group.objects.create(title="Christmas")
+        duplicate.groups.add(group)
+        keep.emailaddresses.create(email="carmen@example.com")
+        duplicate.emailaddresses.create(email="Carmen@example.com")
+        duplicate.emailaddresses.create(email="other@example.com")
+        keep.phonenumbers.create(phone_number="+41441234567")
+        duplicate.phonenumbers.create(phone_number="+41441234567")
+
+        merge_people(duplicate=duplicate, keep=keep)
+
+        self.assertFalse(Person.objects.filter(pk=duplicate.pk).exists())
+        project.refresh_from_db()
+        self.assertEqual(project.contact, keep)
+        user.refresh_from_db()
+        self.assertEqual(user.person, keep)
+        keep.refresh_from_db()
+        self.assertEqual(list(keep.groups.all()), [group])
+        self.assertEqual(
+            sorted(keep.emailaddresses.values_list("email", flat=True)),
+            ["carmen@example.com", "other@example.com"],
+        )
+        self.assertEqual(keep.phonenumbers.count(), 1)
+        self.assertEqual(keep.notes, "Keep\n\nDuplicate")
+        self.assertEqual(keep.date_of_birth, dt.date(1980, 1, 1))
+        self.assertIn("other@example.com", keep._fts)
+
+    def test_merge_people_linked_to_users(self):
+        """People who are both linked to a user cannot be merged"""
+        keep = factories.UserFactory.create(
+            person=factories.PersonFactory.create()
+        ).person
+        duplicate = factories.UserFactory.create(
+            person=factories.PersonFactory.create()
+        ).person
+        with self.assertRaises(ValidationError):
+            merge_people(duplicate=duplicate, keep=keep)
+        with self.assertRaises(ValidationError):
+            merge_people(duplicate=keep, keep=keep)
+        self.assertEqual(Person.objects.count(), 2)
+
+    def test_person_delete_merge(self):
+        """People can be deleted or merged into a different person, which is
+        required if they are linked to a user"""
+        person = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.get(person.urls["delete"])
+        self.assertContains(response, "merge_into")
+        response = self.client.post(person.urls["delete"])
+        self.assertRedirects(response, person.urls["list"])
+        self.assertEqual(Person.objects.count(), 0)
+
+        person = factories.PersonFactory.create()
+        project = factories.ProjectFactory.create(contact=person)
+        factories.UserFactory.create(person=person)
+        response = self.client.post(person.urls["delete"])
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Person.objects.filter(pk=person.pk).exists())
+
+        keep = factories.PersonFactory.create()
+        response = self.client.post(person.urls["delete"], {"merge_into": keep.pk})
+        self.assertRedirects(response, keep.urls["detail"])
+        self.assertFalse(Person.objects.filter(pk=person.pk).exists())
+        project.refresh_from_db()
+        self.assertEqual(project.contact, keep)
 
     def test_create_person_with_preselected_organization(self):
         """Adding a person to an existing org. preselects the organization"""

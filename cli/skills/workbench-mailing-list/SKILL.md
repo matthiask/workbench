@@ -84,6 +84,11 @@ missing. Don't guess on several matches; ask.
   existing organization if there is one.
 - Postal addresses are only added to people without one
   (`wb people add-details`); different addresses are shown, not changed.
+- Duplicates are merged after the user confirms which one to keep (usually
+  the one with projects, deals or the current name, e.g. after a marriage):
+  `wb people merge <duplicate_id> --into <keep_id> --dry-run`. Details,
+  groups and projects move, name and organization stay those of the person
+  kept.
 - The primary contact is only set where the current one isn't active anymore.
   Take the responsible person from the list if they're active, otherwise
   propose the lead of the person's latest project (as its contact, else of

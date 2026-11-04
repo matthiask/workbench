@@ -368,6 +368,35 @@ def reassign_people(former, to, suggested, since, dry_run, as_json):
     )
 
 
+@people.command("merge")
+@click.argument("person_id", type=int)
+@click.option("--into", type=int, required=True, help="ID of the person to keep.")
+@click.option("--dry-run", is_flag=True, help="Validate and show the result only.")
+@click.option("--json", "as_json", is_flag=True)
+def merge_person(person_id, into, dry_run, as_json):
+    """Merge a duplicate into the person to keep and delete it
+
+    Projects, deals, invoices, the linked user, contact details (except
+    those the person to keep has already) and groups move, notes are
+    appended. Name, organization and primary contact stay those of the
+    person to keep."""
+    data = request(
+        "POST",
+        f"contacts/people/{person_id}/merge/",
+        json={"into": into},
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_person(data)
+    console.print(
+        f"Dry run, nothing changed: {person_id} would be merged into {into}."
+        if dry_run
+        else f"{person_id} has been merged into {into}."
+    )
+
+
 @people.command("context")
 def people_context():
     """Print the schema of a person to create

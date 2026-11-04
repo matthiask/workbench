@@ -298,6 +298,15 @@ email_addresses:
         orphan.refresh_from_db()
         self.assertEqual(orphan.primary_contact, self.user)
 
+        duplicate = factories.PersonFactory.create(given_name="Duplicate")
+        factories.ProjectFactory.create(contact=duplicate)
+        result = self.wb("people", "merge", duplicate.pk, "--into", orphan.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(
+            f"{duplicate.pk} has been merged into {orphan.pk}.", result.output
+        )
+        self.assertEqual(orphan.project_set.count(), 2)
+
         christmas = Group.objects.get(title="Christmas")
         result = self.wb("groups", "update", christmas.pk, "--archive")
         self.assertEqual(result.exit_code, 0, result.output)

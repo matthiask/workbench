@@ -16,6 +16,7 @@ from workbench.contacts.forms import (
     PersonForm,
     recent_projects_or_deals,
 )
+from workbench.contacts.merge import merge_errors, merge_people
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -649,6 +650,37 @@ def person_update(request, person_id: int, data: PersonPatch, *, dry_run: bool =
             pk=person.pk
         )
         result = person_out(person, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+class MergeIn(Schema):
+    into: int = Field(description="ID of the person to keep")
+
+
+@router.post("/contacts/people/{int:person_id}/merge/", response=PersonDetailOut)
+def person_merge(request, person_id: int, data: MergeIn, *, dry_run: bool = False):
+    """Merge a duplicate into the person to keep, like deleting a person in
+    the web interface: projects, deals, invoices, the linked user, contact
+    details (except those the person to keep has already) and groups move,
+    notes are appended; the duplicate is deleted"""
+    duplicate = get_object_or_404(Person, pk=person_id)
+    keep = Person.objects.filter(pk=data.into).first()
+    if not keep:
+        errors = [_("Unknown person %r.") % data.into]
+    else:
+        errors = merge_errors(duplicate=duplicate, keep=keep)
+    if errors:
+        raise ValidationError([
+            {"loc": ["body", "data", "into"], "msg": str(error)} for error in errors
+        ])
+    with transaction.atomic():
+        merge_people(duplicate=duplicate, keep=keep)
+        keep = Person.objects.select_related("organization", "primary_contact").get(
+            pk=keep.pk
+        )
+        result = person_out(keep, request)
         if dry_run:
             transaction.set_rollback(True)
     return result

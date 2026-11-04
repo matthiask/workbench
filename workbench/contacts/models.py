@@ -294,6 +294,10 @@ class Person(Model):
             return f"{self.organization} / {self.full_name}"
         return self.full_name
 
+    @classmethod
+    def allow_delete(cls, instance, request):
+        return None
+
     def recent_projects(self):
         return self.project_set.select_related("owned_by")[:10]
 

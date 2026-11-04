@@ -7,6 +7,7 @@ from workbench.contacts.forms import (
     GroupSearchForm,
     OrganizationDeleteForm,
     OrganizationForm,
+    PersonDeleteForm,
     PersonForm,
     PersonSearchForm,
 )
@@ -92,7 +93,7 @@ urlpatterns = [
     ),
     path(
         "people/<int:pk>/delete/",
-        generic.DeleteView.as_view(model=Person),
+        generic.DeleteView.as_view(model=Person, delete_form_class=PersonDeleteForm),
         name="contacts_person_delete",
     ),
     path("people/<int:pk>/vcard/", person_vcard, name="contacts_person_vcard"),

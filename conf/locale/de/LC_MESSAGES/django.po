@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 13:05+0100\n"
+"POT-Creation-Date: 2026-11-04 20:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1036,6 +1036,11 @@ msgid "Unknown or inactive user %r."
 msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
 
 #: workbench/contacts/api.py
+#, python-format
+msgid "Unknown person %r."
+msgstr "Unbekannte Person %r."
+
+#: workbench/contacts/api.py
 msgid "A group with this title exists already."
 msgstr "Eine Gruppe mit diesem Titel gibt es schon."
 
@@ -1118,6 +1123,23 @@ msgid "This organization has related objects. It is therefore not possible to de
 msgstr "Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, die Organisation zu löschen, aber Du kannst die Objekte mit einer anderen Organisation verbinden. Alternativ kannst Du diese Organisation auch archivieren."
 
 #: workbench/contacts/forms.py
+msgid "merge into"
+msgstr "zusammenführen mit"
+
+#: workbench/contacts/forms.py
+msgid "Moves projects, deals, invoices, contact details and groups to this person, e.g. if someone exists twice. Otherwise they lose their contact."
+msgstr "Verschiebt Projekte, Deals, Rechnungen, Kontaktangaben und Gruppen zu dieser Person, z.B. wenn jemand doppelt erfasst ist. Sonst verlieren diese ihren Kontakt."
+
+#: workbench/contacts/forms.py
+msgid "This person is linked to a user. It is therefore not possible to delete them, but you may merge them into a different person. Alternatively, you can also archive the person."
+msgstr "Diese Person ist mit einem:r Benutzer:in verknüpft. Es ist deshalb nicht möglich, sie zu löschen, aber Du kannst sie mit einer anderen Person zusammenführen. Alternativ kannst Du die Person auch archivieren."
+
+#: workbench/contacts/forms.py
+#, python-format
+msgid "%(duplicate)s has been merged into %(keep)s."
+msgstr "%(duplicate)s wurde mit %(keep)s zusammengeführt."
+
+#: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
 msgstr "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
 
@@ -1133,6 +1155,14 @@ msgstr "Wähle eine der folgenden Adressen:"
 #: workbench/contacts/forms.py
 msgid "The postal address should probably be at least three lines long."
 msgstr "Die Postadresse müsste vermutlich mindestens drei Zeilen lang sein."
+
+#: workbench/contacts/merge.py
+msgid "A person cannot be merged with themselves."
+msgstr "Eine Person kann nicht mit sich selbst zusammengeführt werden."
+
+#: workbench/contacts/merge.py
+msgid "Both people are linked to a user, unlink one of them in the user's profile first."
+msgstr "Beide Personen sind mit einem:r Benutzer:in verknüpft, entferne zuerst eine der Verknüpfungen im Profil."
 
 #: workbench/contacts/models.py workbench/deals/models.py
 msgid "is archived"

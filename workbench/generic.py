@@ -249,18 +249,21 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
                 context["form"] = form
                 return self.render_to_response(context)
         else:
+            form = None
             self.object.delete()
 
+        # Delete forms may do something else, e.g. merge objects
         messages.success(
             self.request,
-            capfirst(
+            getattr(form, "success_message", None)
+            or capfirst(
                 _("%(class)s '%(object)s' has been deleted successfully.")
                 % {"class": self.model._meta.verbose_name, "object": self.object},
             ),
         )
         if request.is_ajax():
             return HttpResponse(status=204)  # No content
-        return redirect(self.get_success_url())
+        return redirect(getattr(form, "success_url", None) or self.get_success_url())
 
     def get_context_data(self, **kwargs):
         if self.delete_form_class and self.request.method == "GET":

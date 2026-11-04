@@ -82,7 +82,10 @@ Validate it on the server and show the result to the user:
 Workbench rejects people and organizations whose names exist already, and email
 addresses which are in use. Show these to the user instead of working around
 them. Only pass `--allow-duplicates` when the user confirms that it's really
-someone (or something) else with the same name.
+someone (or something) else with the same name. If the person exists twice
+already (e.g. under an old name), propose merging them with
+`wb people merge <duplicate_id> --into <keep_id> --dry-run` and only run it
+without `--dry-run` once the user confirms.
 
 Only after the user explicitly approves:
 

@@ -104,7 +104,15 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   left (`/api/contacts/people/reassign/`): suggestions are the lead of the
   latest project or the owner of the latest deal, the person's own before
   their organization's, only active users (`primary_contact_suggestions()` in
-  `workbench/contacts/reassign.py`); people without a suggestion stay. `wb groups` lists, creates
+  `workbench/contacts/reassign.py`); people without a suggestion stay. `wb people merge ID --into ID`
+  merges duplicates (`POST /api/contacts/people/<id>/merge/`, also in the
+  web interface when deleting a person; `merge_people()` in
+  `workbench/contacts/merge.py`): reverse relations move with
+  `substitute_with()`, groups are added with `add_to_group()`, details the
+  person kept has already are dropped, notes are appended; people who are
+  both linked to a user can't be merged. Projects, deals and invoices
+  `SET_NULL` their contact, so deleting a person without merging loses
+  those links. `wb groups` lists, creates
   and archives groups (`/api/contacts/groups/`, with `GroupSearchForm` and
   `GroupForm` of the web interface); the API rejects duplicate titles
   because the other endpoints find groups by their title. `wb people create` is mostly fed by

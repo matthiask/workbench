@@ -354,6 +354,40 @@ class ContactsAPITest(TestCase):
         for data in [{"from": "lead", "to": "old"}, {"from": "lead"}, {"to": "lead"}]:
             self.assertEqual(reassign(data).status_code, 422, data)
 
+    def test_merge(self):
+        """Duplicates are merged into the person to keep"""
+        keep = factories.PersonFactory.create(given_name="Carmen")
+        duplicate = factories.PersonFactory.create(given_name="Duplicate")
+        project = factories.ProjectFactory.create(contact=duplicate)
+        duplicate.emailaddresses.create(email="carmen@example.com")
+        self.client.force_login(keep.primary_contact)
+        url = f"/api/contacts/people/{duplicate.pk}/merge/"
+
+        response = self.client.post(
+            url + "?dry_run=true", {"into": keep.pk}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["email_addresses"][0]["value"], "carmen@example.com"
+        )
+        self.assertTrue(Person.objects.filter(pk=duplicate.pk).exists())
+
+        for into in [duplicate.pk, 0]:
+            response = self.client.post(
+                url, {"into": into}, content_type="application/json"
+            )
+            self.assertEqual(response.status_code, 422)
+            self.assertEqual(response.json()["detail"][0]["loc"][-1], "into")
+
+        response = self.client.post(
+            url, {"into": keep.pk}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["id"], keep.pk)
+        self.assertFalse(Person.objects.filter(pk=duplicate.pk).exists())
+        project.refresh_from_db()
+        self.assertEqual(project.contact, keep)
+
     def test_detail(self):
         """Organizations and people with their contact details"""
         person = factories.PersonFactory.create(

@@ -14,6 +14,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.accounts.models import User
+from workbench.contacts.merge import merge_errors, merge_people
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -413,6 +414,61 @@ class OrganizationDeleteForm(ModelForm):
             substitute_with(
                 to_delete=self.instance, keep=self.cleaned_data["substitute_with"]
             )
+        else:
+            self.instance.delete()
+
+
+class PersonDeleteForm(ModelForm):
+    class Meta:
+        model = Person
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        collector = SlowCollector(using=self.instance._state.db)
+        try:
+            collector.collect([self.instance])
+        except ProtectedError:
+            required = True
+        else:
+            required = False
+        self.fields["merge_into"] = forms.ModelChoiceField(
+            Person.objects.exclude(pk=self.instance.pk),
+            widget=Autocomplete(model=Person),
+            label=_("merge into"),
+            required=required,
+            help_text=_(
+                "Moves projects, deals, invoices, contact details and groups"
+                " to this person, e.g. if someone exists twice. Otherwise they"
+                " lose their contact."
+            ),
+        )
+        if required and self.request.method == "GET":
+            messages.info(
+                self.request,
+                _(
+                    "This person is linked to a user. It is therefore not"
+                    " possible to delete them, but you may merge them into a"
+                    " different person. Alternatively, you can also archive"
+                    " the person."
+                ),
+            )
+
+    def clean(self):
+        data = super().clean()
+        if keep := data.get("merge_into"):
+            for error in merge_errors(duplicate=self.instance, keep=keep):
+                self.add_error("merge_into", error)
+        return data
+
+    def delete(self):
+        if keep := self.cleaned_data.get("merge_into"):
+            merge_people(duplicate=self.instance, keep=keep)
+            self.success_url = keep.get_absolute_url()
+            self.success_message = _("%(duplicate)s has been merged into %(keep)s.") % {
+                "duplicate": self.instance,
+                "keep": keep,
+            }
         else:
             self.instance.delete()
 
