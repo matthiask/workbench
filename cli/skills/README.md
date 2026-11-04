@@ -59,6 +59,21 @@ links offers to open deals and unlinks them.
 It changes only what the user told it, and never closes, declines or reopens
 deals on its own or invents values, probabilities, dates or reasons.
 
+## workbench-mailing-list
+
+Maintains a group of people for a mailing, e.g. Christmas cards, gifts or
+invitations. Workbench is the source of truth and the list for the mailing is
+an export of the group. It looks at the members (archived people usually
+left, so it proposes others from the same organization), finds who is
+missing (contacts of recent projects and deals, people in no group yet) and
+presents the candidates by their primary contact, so that everyone decides
+about the people they know. It can import an old spreadsheet once.
+
+It only adds what's missing: people to the group, postal addresses to people
+without one, primary contacts where the current one isn't active anymore. It
+shows differences instead of overwriting them and never archives people or
+groups without being told to.
+
 ## workbench-offer
 
 Turns a specification, a briefing or an email into an offer for a project,

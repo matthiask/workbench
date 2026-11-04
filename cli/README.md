@@ -503,8 +503,8 @@ name.
 ## Claude Code skills
 
 [`skills/`](skills/) contains [Claude Code](https://claude.com/claude-code)
-skills for common Workbench tasks: offers, contacts, deals, planning and
-controlling summaries. See its README for what they do and how to install
+skills for common Workbench tasks: offers, contacts, deals, planning,
+mailing lists and controlling summaries. See its README for what they do and how to install
 them.
 
 ## Bug reports
