@@ -5,7 +5,12 @@ from django.utils.text import capfirst, slugify
 from django.utils.translation import gettext as _
 from xlsxdocument import XLSXDocument
 
-from workbench.contacts.models import PostalAddress
+from workbench.contacts.models import (
+    EmailAddress,
+    Person,
+    PhoneNumber,
+    PostalAddress,
+)
 from workbench.logbook.models import HOURS_FOR_INVOICING
 from workbench.templatetags.workbench import label
 from workbench.tools.formats import Z1
@@ -194,31 +199,83 @@ class WorkbenchXLSXDocument(XLSXDocument):
         )
 
     def people(self, queryset):
-        addresses = {
-            address.person_id: address
-            for address in PostalAddress.objects.filter(person__in=queryset).reverse()
-        }
+        """The columns of a mailing list first (primary contact, organization,
+        name, postal address), then the other details"""
+        people = queryset.select_related(
+            "organization", "primary_contact"
+        ).prefetch_related(
+            "postaladdresses", "emailaddresses", "phonenumbers", "groups"
+        )
+        address_fields = [
+            "street",
+            "house_number",
+            "address_suffix",
+            "postal_code",
+            "city",
+            "country",
+            "postal_address_override",
+        ]
 
-        def getter(field):
-            def attribute(person):
-                return getattr(addresses.get(person.id), field, "")
+        def first(details):
+            # Ordered by weight, like the people list and the vCard export
+            return next(iter(details.all()), None)
 
-            return attribute
+        def row(person):
+            address = first(person.postaladdresses)
+            email = first(person.emailaddresses)
+            phone = first(person.phonenumbers)
+            return [
+                person.primary_contact.get_full_name(),
+                person.organization.name if person.organization else "",
+                person.given_name,
+                person.family_name,
+                *(
+                    (
+                        address.country.code
+                        if field == "country"
+                        else getattr(address, field)
+                    )
+                    if address
+                    else ""
+                    for field in address_fields
+                ),
+                person.address,
+                person.salutation,
+                person.address_on_first_name_terms,
+                email.email if email else "",
+                phone.phone_number if phone else "",
+                ", ".join(group.title for group in person.all_groups()),
+                person.notes,
+                person.date_of_birth,
+                person.is_archived,
+                person.pk,
+            ]
 
-        self.table_from_queryset(
-            queryset.select_related("organization", "primary_contact"),
-            additional=[
-                (str(label(PostalAddress, field)), getter(field))
+        self.add_sheet(slugify(_("people")))
+        self.table(
+            [
+                str(label(Person, field))
                 for field in [
-                    "street",
-                    "house_number",
-                    "address_suffix",
-                    "postal_code",
-                    "city",
-                    "country",
-                    "postal_address_override",
+                    "primary_contact",
+                    "organization",
+                    "given_name",
+                    "family_name",
                 ]
+            ]
+            + [str(label(PostalAddress, field)) for field in address_fields]
+            + [
+                str(label(Person, "address")),
+                str(label(Person, "salutation")),
+                str(label(Person, "address_on_first_name_terms")),
+                str(label(EmailAddress, "email")),
+                str(label(PhoneNumber, "phone_number")),
+                str(label(Person, "groups")),
+                str(label(Person, "notes")),
+                str(label(Person, "date_of_birth")),
+                str(label(Person, "is_archived")),
+                "ID",
             ],
+            [row(person) for person in people],
         )
 
     def project_budget_statistics(self, statistics):

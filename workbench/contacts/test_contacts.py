@@ -1,4 +1,5 @@
 import datetime as dt
+import io
 from unittest import mock
 
 from django.core import mail
@@ -7,6 +8,7 @@ from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.translation import deactivate_all
+from openpyxl import load_workbook
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
@@ -117,6 +119,66 @@ class ContactsTest(TestCase):
 
         response = self.client.get("/contacts/people/?export=vcard")
         self.assertEqual(response.status_code, 200)
+
+    def test_people_xlsx_export(self):
+        """The export of the people list has the columns of a mailing list
+        first, and the group and the date in the file name"""
+        group = Group.objects.create(title="Christmas Mailing")
+        person = factories.PersonFactory.create(
+            given_name="Hans",
+            family_name="Muster",
+            organization=factories.OrganizationFactory.create(name="Beispiel AG"),
+        )
+        person.groups.add(group)
+        person.postaladdresses.create(
+            street="Hauptstrasse",
+            house_number="1",
+            postal_code="8000",
+            city="Zürich",
+            country="CH",
+        )
+        person.emailaddresses.create(email="hans@example.com")
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.get(f"/contacts/people/?g={group.pk}&export=xlsx")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            f'filename="people-christmas-mailing-{dt.date.today().isoformat()}.xlsx"',
+            response["content-disposition"],
+        )
+        sheet = load_workbook(io.BytesIO(response.content)).active
+        header, row = ([cell.value for cell in r] for r in sheet.iter_rows(max_row=2))
+        header = [title.lower() for title in header]
+        self.assertEqual(
+            header[:11],
+            [
+                "primary contact",
+                "organization",
+                "given name",
+                "family name",
+                "street",
+                "house number",
+                "address suffix",
+                "postal code",
+                "city",
+                "country",
+                "override",
+            ],
+        )
+        values = dict(zip(header, row, strict=True))
+        self.assertEqual(
+            values["primary contact"], person.primary_contact.get_full_name()
+        )
+        self.assertEqual(values["organization"], "Beispiel AG")
+        self.assertEqual(values["country"], "CH")
+        self.assertEqual(values["email"], "hans@example.com")
+        self.assertEqual(values["groups"], "Christmas Mailing")
+
+        response = self.client.get("/contacts/people/?export=xlsx")
+        self.assertIn(
+            f'filename="people-{dt.date.today().isoformat()}.xlsx"',
+            response["content-disposition"],
+        )
 
     def test_person_list_rows(self):
         """Rows show the organization and the active groups"""

@@ -10,6 +10,7 @@ from django.forms.models import inlineformset_factory
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.html import format_html, format_html_join
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.accounts.models import User
@@ -312,7 +313,19 @@ class PersonSearchForm(Form):
         if request.GET.get("export") == "xlsx":
             xlsx = WorkbenchXLSXDocument()
             xlsx.people(queryset)
-            return xlsx.to_response("people.xlsx")
+            # E.g. people-christmas-mailing-2026-11-04.xlsx
+            group = self.cleaned_data.get("g")
+            name = "-".join(
+                filter(
+                    None,
+                    [
+                        str(slugify(_("people"))),
+                        slugify(group.title) if group else "",
+                        dt.date.today().isoformat(),
+                    ],
+                )
+            )
+            return xlsx.to_response(f"{name}.xlsx")
 
         if request.GET.get("export") == "vcard":
             return render_vcard_response(
