@@ -149,8 +149,8 @@ class ProjectsTest(TestCase):
         self.assertEqual(set(project.services.all()), {service2})
 
     def test_reassign_only_not_invoiced(self):
-        """Reassigning logbook entries can leave invoiced entries where they
-        are, the option is only offered if there are any"""
+        """Reassigning logbook entries leaves invoiced entries where they are
+        by default, the option is only offered if there are any"""
         project = factories.ProjectFactory.create()
         service = factories.ServiceFactory.create(project=project)
         target = factories.ServiceFactory.create(project=project)
@@ -171,7 +171,9 @@ class ProjectsTest(TestCase):
         invoice.create_services_from_logbook([service])
         open_hours = factories.LoggedHoursFactory.create(service=service, hours=2)
         open_cost = factories.LoggedCostFactory.create(service=service, cost=50)
-        self.assertContains(self.client.get(url, headers=ajax), "only_not_invoiced")
+        response = self.client.get(url, headers=ajax)
+        # Checked by default
+        self.assertTrue(response.context["form"]["only_not_invoiced"].value())
 
         response = self.client.post(
             url, {"service": target.pk, "only_not_invoiced": "on"}, headers=ajax

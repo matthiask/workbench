@@ -631,6 +631,7 @@ class ReassignLogbookForm(Form):
                     "Invoiced entries stay with this service and their invoice."
                 ),
                 required=False,
+                initial=True,
             )
 
         offer = self.from_service.offer
