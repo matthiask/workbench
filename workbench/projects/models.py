@@ -187,16 +187,17 @@ class Campaign(Model):
         return pbs
 
     @cached_property
-    def logged_hours_per_effort_rate(self):
+    def logged_hours_per_effort(self):
+        """(effort type, hourly rate, hours), highest rates first"""
         from workbench.logbook.models import LoggedHours
 
         return (
             LoggedHours.objects
             .filter(service__project__campaign=self)
-            .values("service__effort_rate")
+            .values("service__effort_type", "service__effort_rate")
             .annotate(Sum("hours"))
-            .values_list("service__effort_rate", "hours__sum")
-            .order_by("service__effort_rate")
+            .values_list("service__effort_type", "service__effort_rate", "hours__sum")
+            .order_by("-service__effort_rate", "service__effort_type")
         )
 
 
@@ -533,7 +534,7 @@ class Project(Model):
         hours_for_invoicing_per_service = defaultdict(lambda: Z1)
         surcharge_per_service = defaultdict(lambda: Z1)
         logged_hours_per_user = defaultdict(lambda: Z1)
-        logged_hours_per_effort_rate = defaultdict(lambda: Z1)
+        logged_hours_per_effort = defaultdict(lambda: Z1)
         # Entries with invoiced hours, for sanity checks
         hours_for_invoicing_entries = 0
         hours_for_invoicing_more = hours_for_invoicing_less = Z1
@@ -630,7 +631,9 @@ class Project(Model):
             surcharge[service.project] += row["surcharge"]
             logged_cost[service.project] += row["logged_cost"]
             total_logged_cost += row["logged_cost"]
-            logged_hours_per_effort_rate[service.effort_rate] += row["logged_hours"]
+            logged_hours_per_effort[service.effort_type, service.effort_rate] += row[
+                "logged_hours"
+            ]
 
             if (
                 not service.is_declined
@@ -684,14 +687,15 @@ class Project(Model):
                 key=lambda row: row[1],
                 reverse=True,
             ),
-            "logged_hours_per_effort_rate": sorted(
+            # (effort type, hourly rate, hours): undefined rates first (they
+            # are warnings), then the highest rates
+            "logged_hours_per_effort": sorted(
                 (
-                    (rate, hours)
-                    for rate, hours in logged_hours_per_effort_rate.items()
+                    (effort_type, rate, hours)
+                    for (effort_type, rate), hours in logged_hours_per_effort.items()
                     if hours
                 ),
-                key=lambda row: row[0] or Decimal(9999999),
-                reverse=True,
+                key=lambda row: (row[1] is not None, -(row[1] or 0), row[0]),
             ),
             "logged_cost": logged_cost[self],
             "service_hours": service_hours[self],

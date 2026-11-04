@@ -18,6 +18,35 @@ from workbench.tools.validation import in_days
 
 
 class StatisticsTest(TestCase):
+    def test_logged_hours_per_effort_type_and_rate(self):
+        """Logged hours are grouped by effort type and hourly rate, for
+        projects and campaigns"""
+        campaign = factories.CampaignFactory.create()
+        project = factories.ProjectFactory.create(campaign=campaign)
+        for effort_type, rate, hours in [
+            ("Programming", 180, 3),
+            ("Programming", 180, 2),
+            ("Consulting", 180, 1),
+            ("Design", 150, 4),
+        ]:
+            factories.LoggedHoursFactory.create(
+                service=factories.ServiceFactory.create(
+                    project=project, effort_type=effort_type, effort_rate=rate
+                ),
+                hours=hours,
+            )
+        expected = [
+            ("Consulting", Decimal("180.00"), Decimal("1.0")),
+            ("Programming", Decimal("180.00"), Decimal("5.0")),
+            ("Design", Decimal("150.00"), Decimal("4.0")),
+        ]
+        self.assertEqual(project.grouped_services["logged_hours_per_effort"], expected)
+        self.assertEqual(list(campaign.logged_hours_per_effort), expected)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.urls["statistics"])
+        self.assertContains(response, "Consulting")
+
     def test_view(self):
         """Hit a few reporting views"""
         self.client.force_login(factories.UserFactory.create())

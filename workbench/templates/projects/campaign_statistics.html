@@ -6,5 +6,5 @@
 {% endblock title %}
 
 {% block body %}
-  {% include 'projects/_logged_hours_per_rate.html' with logged_hours_per_effort_rate=object.logged_hours_per_effort_rate %}
+  {% include 'projects/_logged_hours_per_rate.html' with logged_hours_per_effort=object.logged_hours_per_effort %}
 {% endblock body %}

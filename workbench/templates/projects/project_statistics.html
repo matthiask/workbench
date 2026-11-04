@@ -8,7 +8,7 @@
 
 {% block body %}
   {% with gs=object.grouped_services %}
-    {% include 'projects/_logged_hours_per_rate.html' with logged_hours_per_effort_rate=gs.logged_hours_per_effort_rate %}
+    {% include 'projects/_logged_hours_per_rate.html' with logged_hours_per_effort=gs.logged_hours_per_effort %}
 
     <div class="table-responsive">
       <table class="table table-sm">
