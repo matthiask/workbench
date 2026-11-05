@@ -63,21 +63,7 @@
             </a>
             <div class="dropdown-divider"></div>
             <h6 class="dropdown-header">{% translate 'invoice'|capfirst %}</h6>
-            <a
-              class="dropdown-item"
-              href="{{ project.urls.createinvoice }}?type=fixed"
-            >{% translate 'Fixed amount' %}</a>
-            <a
-              class="dropdown-item"
-              href="{{ project.urls.createinvoice }}?type=down-payment"
-            >{% translate 'Down payment' %}</a>
-            <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">
-              {% translate 'Services from logbook' %}
-            </a>
-            <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">
-              {% translate 'Services from offer' %}
-            </a>
-            <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=credit">{% translate 'Credit' %}</a>
+            {% include "projects/_create_invoice_items.html" %}
           {% endif %}
         </div>
       </span>
@@ -778,9 +764,26 @@
     {% endif %}
   {% endwith %}
 
-  {% if request.user.features.CONTROLLING and object.project_invoices %}
+  {% if request.user.features.CONTROLLING %}
     <section class="card mb-3">
-      <div class="card-header">{% translate 'invoices'|capfirst %}</div>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        {% translate 'invoices'|capfirst %}
+        <span class="dropdown">
+          <button
+            class="btn btn-quiet btn-sm dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {% include "svg/plus.svg" %}
+            {% translate 'New' %}
+          </button>
+          <div class="dropdown-menu dropdown-menu-end">
+            {% include "projects/_create_invoice_items.html" %}
+          </div>
+        </span>
+      </div>
       <div class="list-group list-group-flush">
         {% for invoice in object.project_invoices %}
           <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action wb-invoice">
