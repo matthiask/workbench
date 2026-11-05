@@ -504,6 +504,28 @@ class StatisticsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_cost_by_month_uses_hours_for_invoicing(self):
+        """Work is valued with the hours for invoicing, the time spent otherwise"""
+        service = factories.ServiceFactory.create(effort_rate=100)
+        factories.LoggedHoursFactory.create(
+            service=service, hours=2, hours_for_invoicing=3
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=1)
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get(
+            service.project.urls["cost_by_month_and_service_xlsx"]
+        )
+        rows = list(
+            load_workbook(io.BytesIO(response.content)).active.iter_rows(
+                values_only=True
+            )
+        )
+        project_row = next(row for row in rows if row[0] == str(service.project))
+        self.assertEqual(project_row[1], 400)
+        service_row = next(row for row in rows if row[2] == str(service))
+        self.assertEqual(service_row[3], 400)
+
     def test_cost_by_month_without_declined_offers(self):
         """Declined offers are left out unless work has been logged on them"""
         project = factories.ProjectFactory.create()
