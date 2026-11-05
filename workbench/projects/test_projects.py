@@ -597,9 +597,7 @@ class ProjectsTest(TestCase):
         self.assertEqual(services[1]["label"], "Not offered yet")
 
     def test_long_service_descriptions_in_choices(self):
-        """Long descriptions are truncated in selects, Chrome can't show them
-
-        The timer's autocomplete wraps labels and shows them completely."""
+        """Long descriptions aren't truncated, Chrome's customizable select wraps them"""
         service = factories.ServiceFactory.create(
             title="Projektleitung", description="Lorem ipsum " * 100
         )
@@ -613,8 +611,9 @@ class ProjectsTest(TestCase):
             service.project.urls["createhours"],
             headers={"x-requested-with": "XMLHttpRequest"},
         )
-        self.assertContains(response, "Projektleitung: Lorem ipsum")
-        self.assertNotContains(response, "Lorem ipsum " * 10)
+        self.assertContains(response, 'class="wb-long-options form-select"')
+        self.assertContains(response, "<selectedcontent>")
+        self.assertContains(response, str(service).strip())
 
     def test_projects_api(self):
         """The projects API returns JSON"""

@@ -60,10 +60,6 @@ class ServiceBase(Model):
     def __str__(self):
         return ": ".join(filter(None, (self.title, self.description)))
 
-    def choice_label(self):
-        """Labels of options in selects, Chrome cuts off long ones unreadably"""
-        return Truncator(str(self)).chars(100)
-
     def __lt__(self, other):
         return self.position < other.position if isinstance(other, ServiceBase) else 1
 

@@ -844,7 +844,7 @@ class ServiceQuerySet(SearchQuerySet):
                 1,
                 (
                     _("Pinned"),
-                    [(service.id, service.choice_label()) for service in pinned],
+                    [(service.id, str(service)) for service in pinned],
                 ),
             )
         return choices
@@ -852,7 +852,7 @@ class ServiceQuerySet(SearchQuerySet):
     def choices(self):
         offers = defaultdict(list)
         for service in self.select_related("offer__project", "offer__owned_by"):
-            offers[service.offer].append((service.id, service.choice_label()))
+            offers[service.offer].append((service.id, str(service)))
         return [("", "----------")] + [
             (offer or _("Not offered yet"), services)
             for offer, services in sorted(offers.items())
