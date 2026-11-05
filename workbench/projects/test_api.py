@@ -502,6 +502,130 @@ class ProjectsAPITest(TestCase):
         service.refresh_from_db()
         self.assertEqual(service.title, "#12 New title of the issue")
 
+    def test_service_fields(self):
+        """All fields of the web form can be changed, service types fill in
+        the effort type and the rate; sent offers lock everything but the
+        external reference"""
+        factories.service_types()
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(project=project, title="Design")
+        self.client.force_login(project.owned_by)
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"/api/services/{service.pk}/{query}",
+                data,
+                content_type="application/json",
+            )
+
+        response = patch({"service_type": "production", "hours": 5, "cost": 100})
+        self.assertEqual(response.status_code, 200, response.content)
+        service.refresh_from_db()
+        self.assertEqual(service.effort_type, "production")
+        self.assertEqual(service.effort_hours, 5)
+        self.assertEqual(service.service_cost, 5 * service.effort_rate + 100)
+
+        response = patch({"hours": None, "is_optional": True}, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["service_hours"], "0.0")
+        service.refresh_from_db()
+        self.assertEqual((service.effort_hours, service.is_optional), (5, False))
+
+        response = patch({"service_type": "unknown"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "service_type"]
+        )
+
+        offer = factories.OfferFactory.create(project=project)
+        Offer.objects.filter(pk=offer.pk).update(status=Offer.ACCEPTED)
+        service.offer = offer
+        service.save()
+        response = patch({"hours": 1, "external_reference": "https://example.com/1"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "hours"]],
+        )
+        response = patch({"external_reference": "https://example.com/1"})
+        self.assertEqual(response.status_code, 200, response.content)
+
+    def test_service_create_delete_reorder(self):
+        """Services are created at the end of their group or after another
+        service, deleted and reordered like in the web interface"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        first = factories.ServiceFactory.create(project=project, offer=offer)
+        second = factories.ServiceFactory.create(project=project, offer=offer)
+        loose = factories.ServiceFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+
+        def post(url, data, query=""):
+            return self.client.post(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        def order():
+            return list(offer.services.values_list("pk", flat=True))
+
+        response = post(
+            "/api/services/",
+            {"offer": offer.pk, "title": "Concept", "after": first.pk},
+            "?dry_run=true",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertEqual(order(), [first.pk, second.pk])
+
+        response = post(
+            "/api/services/", {"offer": offer.pk, "title": "Concept", "after": first.pk}
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        created = response.json()["id"]
+        self.assertEqual(response.json()["project"]["id"], project.pk)
+        self.assertEqual(order(), [first.pk, created, second.pk])
+
+        # Not after services of other groups, and a project or an offer is needed
+        response = post(
+            "/api/services/", {"offer": offer.pk, "title": "X", "after": loose.pk}
+        )
+        self.assertEqual(response.status_code, 422)
+        response = post("/api/services/", {"title": "X"})
+        self.assertEqual(response.status_code, 422)
+        response = post("/api/services/", {"project": project.pk, "title": "Loose"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["offer"])
+
+        # Reorder all services of one group
+        response = post("/api/services/reorder/", {"services": [second.pk, first.pk]})
+        self.assertEqual(response.status_code, 422)
+        response = post(
+            "/api/services/reorder/", {"services": [second.pk, first.pk, loose.pk]}
+        )
+        self.assertEqual(response.status_code, 422)
+        response = post(
+            "/api/services/reorder/", {"services": [second.pk, created, first.pk]}
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            [s["id"] for s in response.json()], [second.pk, created, first.pk]
+        )
+        self.assertEqual(order(), [second.pk, created, first.pk])
+
+        # Delete, not with logged hours and not out of sent offers
+        response = self.client.delete(f"/api/services/{created}/?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(offer.services.count(), 3)
+        response = self.client.delete(f"/api/services/{created}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(order(), [second.pk, first.pk])
+        factories.LoggedHoursFactory.create(service=first)
+        response = self.client.delete(f"/api/services/{first.pk}/")
+        self.assertEqual(response.status_code, 422)
+        Offer.objects.filter(pk=offer.pk).update(status=Offer.OFFERED)
+        response = self.client.delete(f"/api/services/{second.pk}/")
+        self.assertEqual(response.status_code, 422)
+
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_services_rates_require_controlling(self):
         """Rates require the controlling feature, like on the project page"""

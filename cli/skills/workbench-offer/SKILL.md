@@ -160,8 +160,8 @@ add `--force` if the user confirms the link is right.
 
 ## Revising an offer
 
-Offers in preparation are changed service by service. Look at the current
-offer first; its table shows the IDs of the services:
+Offers in preparation are changed service by service with `wb services`.
+Look at the current offer first; its table shows the IDs of the services:
 
     wb offers show <offer_id>
 
@@ -169,12 +169,12 @@ Change only what was asked, one command per change, each one first with
 `--dry-run`:
 
     wb offers update <offer_id> --title "<title>" --description - < <scratchpad>/text.txt
-    wb offers services add <offer_id> --title "<title>" --service-type "<type>" --hours 12 --after <service_id> --dry-run
-    wb offers services add <offer_id> <scratchpad>/service.yaml --dry-run
-    wb offers services update <offer_id> <service_id> --hours 20 --dry-run
-    wb offers services update <offer_id> <service_id> <scratchpad>/service.yaml --dry-run
-    wb offers services delete <offer_id> <service_id> --dry-run
-    wb offers services reorder <offer_id> <service_id> <service_id> ... --dry-run
+    wb services create --offer <offer_id> --title "<title>" --service-type "<type>" --hours 12 --after <service_id> --dry-run
+    wb services create --offer <offer_id> <scratchpad>/service.yaml --dry-run
+    wb services update <service_id> --hours 20 --dry-run
+    wb services update <service_id> <scratchpad>/service.yaml --dry-run
+    wb services delete <service_id> --dry-run
+    wb services reorder <service_id> <service_id> ... --dry-run
 
 - `update` only sends the given fields, everything else stays as it is.
   `--clear-hours` and `--clear-cost` remove values, `--optional` and
@@ -182,11 +182,11 @@ Change only what was asked, one command per change, each one first with
 - A service file contains a single service like in step 3 (`title`,
   `description`, `service_type`, `hours`, `cost`, ...); options override it.
   Use files for longer descriptions.
-- Show the user how the change affects the totals (the dry run prints the
-  whole offer) and run the command without `--dry-run` only after their
-  explicit approval.
-- Services with logged hours or costs can be changed but not deleted, and the
-  last service of an offer can't be deleted.
+- Show the user the change (the dry run prints the service; `wb offers
+  show` shows the totals afterwards) and run the command without `--dry-run`
+  only after their explicit approval.
+- `reorder` needs the IDs of all services of the offer.
+- Services with logged hours or costs can be changed but not deleted.
 - Services without hours or a cost are allowed (Workbench only warns), e.g.
   when several people estimate their own services one after the other. Only
   touch the services you were asked about, never fill in or delete others.

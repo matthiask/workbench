@@ -238,21 +238,13 @@ created in preparation; review and send them in Workbench.
     wb offers create 1234 offer.yaml --dry-run
     wb offers create 1234 offer.yaml
 
-Offers in preparation can be changed service by service. `wb offers show`
-lists the IDs of the services; every change shows the offer with its new
-totals, `--dry-run` without saving anything:
+`wb offers show` lists the IDs of the services and the totals:
 
     wb offers search --project 1234
     wb offers search relaunch --status offered
     wb offers show 5678
     wb offers update 5678 --title "Relaunch 2027" --description - < text.txt
     wb offers update 5678 --discount 500 --dry-run
-    wb offers services add 5678 --title "Newsletter" --service-type "Programmierung & IT" --hours 12 --after 901 --dry-run
-    wb offers services add 5678 service.yaml
-    wb offers services update 5678 902 --hours 20 --description "Incl. testing"
-    wb offers services update 5678 903 --clear-cost --optional
-    wb offers services delete 5678 904
-    wb offers services reorder 5678 903 901 902
 
 External references (URLs of issues or pull requests, for example) can be
 changed for any offer, also when it has been accepted already. They replace
@@ -261,16 +253,26 @@ the existing ones; Workbench only stores them and doesn't talk to GitHub:
     wb offers update 5678 --external-reference https://github.com/org/repo/issues/12 --external-reference https://github.com/org/repo/pull/13
     wb offers search --external-reference https://github.com/org/repo/issues/12
 
-The external reference of a single service can be changed the same way, also
-when its offer has been accepted. Services are moved to another offer of the
-same project with the rules of the web interface (only to offers in
-preparation or service groups, not out of offers which have been sent):
+Services are created, changed, moved, deleted and reordered one by one with
+`wb services`, with the rules of the web interface: services of offers which
+have been sent or accepted can't be changed anymore, only their external
+reference can; services are only moved to offers in preparation or service
+groups; services with logged hours or costs can't be deleted. `--dry-run`
+validates without saving anything:
 
+    wb services create --offer 5678 --title "Newsletter" --service-type "Programmierung & IT" --hours 12 --after 901 --dry-run
+    wb services create --project 1234 service.yaml
+    wb services update 902 --hours 20 --description "Incl. testing"
+    wb services update 903 --clear-cost --optional
     wb services update 902 --external-reference https://github.com/org/repo/issues/12
     wb services update 902 --offer 5678
     wb services update 902 --clear-offer
-    wb services update 902 --description "Without the URL"
     wb services update 902 --title "#12 Title of the issue"
+    wb services delete 904
+    wb services reorder 903 901 902
+
+`reorder` takes all services of one offer, or all services without offer of a
+project, in the new order.
 
 Logged hours and costs are reassigned to another service of the project like
 in the web interface; invoiced entries stay with their service unless they are

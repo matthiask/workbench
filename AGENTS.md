@@ -159,8 +159,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `--to` it only shows the addresses and invoices.
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only changes offers
-  in preparation: create, replace, update and add, update, delete and reorder
-  single services, all with the rules of `_apply_service()`. Creating
+  in preparation: create, replace and update, with the rules of
+  `_apply_service()` for their services (its endpoints for single services
+  remain for older CLIs; `wb` uses `/api/services/`). Creating
   also allows service groups (`status: service_group`, which may have no
   services yet) and external references. Only the
   external references (URLs, one per line) can be changed for offers in any
@@ -168,9 +169,14 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `wb services update`, also in the web form); Workbench stores them but
   doesn't talk to GitHub. `wb milestones` (the only command which talks to
   GitHub, through `gh`) links GitHub milestones with offers through these
-  references and creates milestones and service groups for each other. The same endpoint changes the title and the description and moves services between offers,
+  references and creates milestones and service groups for each other. Single services are created, changed, moved between offers, deleted and
+  reordered through `/api/services/` (`wb services create/update/delete/reorder`),
   validated with the web interface's `ServiceForm` (which also restricts the
-  offer queryset, not only the choices). `POST
+  offer queryset, not only the choices) and its rules: services of offers which
+  have been sent or accepted only allow changing the external reference,
+  deleting is only possible in offers in preparation or without offer and
+  without logged hours or costs, reordering takes all services of one offer
+  (or the services without offer of one project). `POST
   /api/services/<id>/reassign-logbook/` (`wb services reassign-logbook`)
   reassigns logged hours and costs with `ReassignLogbookForm`; invoiced
   entries only with `include_invoiced`. It doesn't delete the old service:

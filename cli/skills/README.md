@@ -86,7 +86,7 @@ file with `wb offers guidelines --set PATH` (see the CLI README). It shows
 the draft as a table with its assumptions and open questions, and creates it
 with `wb offers create`. Afterwards it suggests linking the offer to the
 customer's open deal, after asking which one. Revisions change single
-services with `wb offers services add/update/delete/reorder`.
+services with `wb services create/update/delete/reorder`.
 
 Offers created this way are always in preparation: people check and send
 them in Workbench, the skill never sends anything to customers and doesn't

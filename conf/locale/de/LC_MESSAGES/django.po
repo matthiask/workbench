@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 20:40+0100\n"
+"POT-Creation-Date: 2026-11-05 15:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2102,12 +2102,13 @@ msgid "Determined by project."
 msgstr "Durch Projekt bestimmt."
 
 #: workbench/invoices/forms.py workbench/invoices/models.py
-#: workbench/templates/projects/project_detail.html workbench/tools/pdf.py
+#: workbench/templates/projects/_create_invoice_items.html
+#: workbench/tools/pdf.py
 msgid "Down payment"
 msgstr "Anzahlung"
 
 #: workbench/invoices/forms.py workbench/invoices/models.py
-#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/_create_invoice_items.html
 msgid "Credit"
 msgstr "Gutschrift"
 
@@ -2257,7 +2258,7 @@ msgid "Paid"
 msgstr "Bezahlt"
 
 #: workbench/invoices/models.py
-#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/_create_invoice_items.html
 msgid "Fixed amount"
 msgstr "Fixbetrag"
 
@@ -2975,7 +2976,7 @@ msgstr "Notiz"
 msgid "Add note"
 msgstr "Notiz hinzufügen"
 
-#: workbench/offers/api.py workbench/planning/api.py
+#: workbench/offers/api.py workbench/planning/api.py workbench/projects/api.py
 #, python-format
 msgid "Unknown service type %r."
 msgstr "Unbekannter Leistungstyp %r."
@@ -3013,7 +3014,7 @@ msgstr "Nur Offerten in Vorbereitung können geändert werden."
 msgid "The offer has no service with this ID."
 msgstr "Die Offerte hat keine Leistung mit dieser ID."
 
-#: workbench/offers/api.py
+#: workbench/offers/api.py workbench/projects/api.py
 msgid "Hours or costs have been logged on this service, it cannot be deleted."
 msgstr "Auf dieser Leistung wurden bereits Stunden oder Kosten erfasst, sie kann nicht gelöscht werden."
 
@@ -3468,8 +3469,29 @@ msgid "Select projects using ids, open or closed_since."
 msgstr "Wähle Projekte mit ids, open oder closed_since aus."
 
 #: workbench/projects/api.py
+msgid "Either the project or the offer is required."
+msgstr "Das Projekt oder die Offerte wird benötigt."
+
+#: workbench/projects/api.py
+msgid "The offer (or the services without offer) has no service with this ID."
+msgstr "Die Offerte (bzw. die Leistungen ohne Offerte) hat keine Leistung mit dieser ID."
+
+#: workbench/projects/api.py
 msgid "The service is bound to an offer which is not in preparation anymore."
 msgstr "Die Leistung gehört zu einer Offerte, die nicht mehr in Vorbereitung ist."
+
+#: workbench/projects/api.py workbench/projects/models.py
+msgid "Cannot delete a service bound to an offer which is not in preparation anymore."
+msgstr "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht löschen."
+
+#: workbench/projects/api.py workbench/tools/models.py
+#, python-format
+msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
+msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
+
+#: workbench/projects/api.py
+msgid "Expected the IDs of all services of one offer, or of all services without offer of one project, once."
+msgstr "Erwartet werden die IDs aller Leistungen einer Offerte oder aller Leistungen ohne Offerte eines Projekts, jede genau einmal."
 
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/reporting/squeeze.py workbench/templates/base.html
@@ -3757,10 +3779,6 @@ msgstr "ist optional"
 #: workbench/projects/models.py
 msgid "Optional services do not count towards the offer total."
 msgstr "Optionale Leistungen werden nicht zum Offertentotal hinzugerechnet."
-
-#: workbench/projects/models.py
-msgid "Cannot delete a service bound to an offer which is not in preparation anymore."
-msgstr "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht löschen."
 
 #: workbench/projects/models.py
 msgid "The offer must belong to the same project as the service."
@@ -5090,6 +5108,16 @@ msgstr "Geschichte der Meilensteine"
 msgid "back to project planning"
 msgstr "Zurück zum Projektplan"
 
+#: workbench/templates/projects/_create_invoice_items.html
+#: workbench/templates/projects/project_detail.html
+msgid "Services from logbook"
+msgstr "Leistungen aus dem Logbuch"
+
+#: workbench/templates/projects/_create_invoice_items.html
+#: workbench/templates/projects/project_detail.html
+msgid "Services from offer"
+msgstr "Leistungen aus Offerte"
+
 #: workbench/templates/projects/_logged_hours_per_rate.html
 msgid "Logged hours per effort type and hourly rate"
 msgstr "Erfasste Stunden pro Aufwandtyp und Stundensatz"
@@ -5123,14 +5151,6 @@ msgstr "verkauft"
 #: workbench/templates/projects/project_detail.html
 msgid "Cost"
 msgstr "Kosten"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Services from logbook"
-msgstr "Leistungen aus dem Logbuch"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Services from offer"
-msgstr "Leistungen aus Offerte"
 
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_profitability.html
@@ -6086,11 +6106,6 @@ msgstr "Neuer Wert von '%(field)s' war '%(current)s'."
 #, python-format
 msgid "Final value of '%(field)s' was '%(current)s'."
 msgstr "Finaler Wert von '%(field)s' war '%(current)s'."
-
-#: workbench/tools/models.py
-#, python-format
-msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
-msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
 
 #: workbench/tools/models.py
 msgid "liable to VAT"

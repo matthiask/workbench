@@ -1,10 +1,18 @@
 import datetime as dt
 from collections import defaultdict
 from decimal import Decimal
+from itertools import islice
 from typing import Literal
 
 from django.db import transaction
-from django.db.models import DecimalField, OuterRef, Q, Subquery, Sum
+from django.db.models import (
+    DecimalField,
+    OuterRef,
+    ProtectedError,
+    Q,
+    Subquery,
+    Sum,
+)
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
@@ -22,11 +30,13 @@ from workbench.contacts.api import (
 )
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import ProjectForm, ReassignLogbookForm, ServiceForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
+from workbench.services.models import ServiceType
 from workbench.tools.api import Serialized, form_data, raise_form_errors
 from workbench.tools.formats import Z1, Z2
 
@@ -476,8 +486,8 @@ def project_stats(request, filters: Query[StatsFilter]):
 
 
 class ServiceOut(Schema):
-    id: int
-    url: str
+    id: int | None = Field(description="Null for services created with dry_run.")
+    url: str | None
     project: ProjectSummary
     offer_id: int | None
     offer: str | None
@@ -584,81 +594,306 @@ def service_list(request, filters: Query[ServiceFilter]):
     )
 
 
-class ServicePatch(Schema):
-    """Fields which aren't given are left alone"""
+class ServiceFields(Schema):
+    """Fields which aren't given are left alone, ``null`` clears values"""
+
+    title: str | None = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, description="Null removes it.")
+    external_reference: str | None = Field(
+        default=None,
+        max_length=500,
+        description="E.g. the URL of an issue, null removes it.",
+    )
+    service_type: str | None = Field(
+        default=None,
+        description="Title of a service type. Fills in the effort type and the"
+        " hourly rate unless they are given too.",
+    )
+    effort_type: str | None = Field(default=None, max_length=50)
+    hours: float | None = Field(default=None, ge=0)
+    hourly_rate: float | None = Field(default=None, ge=0)
+    cost: float | None = Field(
+        default=None, description="Fixed costs in addition to hours."
+    )
+    third_party_costs: float | None = Field(
+        default=None,
+        ge=0,
+        description="Total incl. tax for third parties contained in the cost.",
+    )
+    is_optional: bool | None = Field(default=None, description="Not part of the total.")
+
+
+class ServicePatch(ServiceFields):
+    """Fields which aren't given are left alone, ``null`` clears values
+
+    Services of offers which have been sent or accepted can't be changed
+    anymore, only their external reference can."""
 
     offer: int | None = Field(
         default=None,
         description="ID of an offer of the same project which is in preparation"
-        " or a service group, null removes the service from its offer. Services"
-        " of offers which have been sent or accepted can't be moved.",
+        " or a service group, null removes the service from its offer.",
     )
-    title: str | None = Field(
+
+
+class ServiceCreate(ServiceFields):
+    title: str = Field(min_length=1, max_length=200)
+    project: int | None = Field(
+        default=None, description="Defaults to the project of the offer."
+    )
+    offer: int | None = Field(
         default=None,
-        description="Not for services of offers which have been sent or accepted.",
+        description="ID of an offer of the project which is in preparation or a"
+        " service group.",
     )
-    description: str | None = Field(
+    after: int | None = Field(
         default=None,
-        description="Null removes it. Not for services of offers which have"
-        " been sent or accepted.",
+        description="ID of the service of the same offer (or of the services"
+        " without offer) after which the new one is inserted, defaults to the end.",
     )
-    external_reference: str | None = Field(
-        default=None,
-        max_length=500,
-        description="E.g. the URL of an issue, null removes it. Can also be"
-        " changed when the offer of the service has been sent or accepted.",
+
+
+# Names in the API and in the form
+SERVICE_FORM_FIELDS = {
+    "offer": "offer",
+    "title": "title",
+    "description": "description",
+    "external_reference": "external_reference",
+    "effort_type": "effort_type",
+    "hours": "effort_hours",
+    "hourly_rate": "effort_rate",
+    "cost": "cost",
+    "third_party_costs": "third_party_costs",
+    "is_optional": "is_optional",
+}
+
+
+def _service_values(values, fields):
+    """Apply the fields of the API to the data for the ``ServiceForm``"""
+    if (title := fields.get("service_type")) is not None:
+        service_type = ServiceType.objects.filter(title=title).first()
+        if not service_type:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "service_type"],
+                    "msg": _("Unknown service type %r.") % title,
+                }
+            ])
+        if "effort_type" not in fields:
+            values["effort_type"] = service_type.title
+        if "hourly_rate" not in fields:
+            values["effort_rate"] = service_type.hourly_rate
+    for field, form_field in SERVICE_FORM_FIELDS.items():
+        if field not in fields:
+            continue
+        value = fields[field]
+        if field == "is_optional":
+            values[form_field] = bool(value)
+        elif isinstance(value, str):
+            values[form_field] = value if field == "description" else value.strip()
+        else:
+            values[form_field] = "" if value is None else value
+    return values
+
+
+def _service_result(service, request, *, dry_run=False, created=False):
+    result = _service_out(
+        _services().get(pk=service.pk),
+        request,
+        controlling=request.user.features[FEATURES.CONTROLLING],
     )
+    if dry_run and created:
+        result |= {"id": None, "url": None}
+    return result
+
+
+@router.post("/services/", response=ServiceOut)
+def service_create(request, data: ServiceCreate, *, dry_run: bool = False):
+    """Create a service, validated with the form of the web interface, at
+    the end of its offer (or of the services without offer) or after another
+    service
+
+    The ID and the URL are null with ``dry_run``."""
+    fields = data.model_dump(exclude_unset=True)
+    if data.project:
+        project = get_object_or_404(Project, pk=data.project)
+    elif data.offer:
+        project = get_object_or_404(
+            Offer.objects.select_related("project"), pk=data.offer
+        ).project
+    else:
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "project"],
+                "msg": _("Either the project or the offer is required."),
+            }
+        ])
+    values = form_data(ServiceForm(project=project, request=request))
+    values = _service_values(values, fields)
+    form = ServiceForm(values, project=project, request=request)
+    if not form.is_valid(ignore_warnings=True):
+        raise_form_errors(form, fields={v: [k] for k, v in SERVICE_FORM_FIELDS.items()})
+
+    group = list(
+        Service.objects.filter(
+            project=project, offer=form.cleaned_data.get("offer")
+        ).order_by("position", "pk")
+    )
+    if data.after is not None and data.after not in {s.pk for s in group}:
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "after"],
+                "msg": _(
+                    "The offer (or the services without offer) has no service"
+                    " with this ID."
+                ),
+            }
+        ])
+
+    with transaction.atomic():
+        service = form.save()
+        if data.after is not None:
+            index = 1 + [s.pk for s in group].index(data.after)
+            group.insert(index, service)
+            for position, s in enumerate(group, 1):
+                Service.objects.filter(pk=s.pk).update(position=10 * position)
+        result = _service_result(service, request, dry_run=dry_run, created=True)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
 
 
 @router.patch("/services/{int:service_id}/", response=ServiceOut)
 def service_update(
     request, service_id: int, data: ServicePatch, *, dry_run: bool = False
 ):
-    """Move a service to another offer or change its title, description or
-    external reference, validated with the form of the web interface; other
-    fields are changed through the offers
+    """Change a service or move it to another offer, validated with the form
+    of the web interface
 
-    Warnings about fields which aren't changed here (e.g. the title) are
-    ignored."""
+    Services of offers which have been sent or accepted can't be changed
+    anymore, only their external reference can. Warnings (e.g. about
+    unspecific titles) are ignored."""
     service = get_object_or_404(Service.objects.select_related("offer"), pk=service_id)
-    patch = data.model_dump(exclude_unset=True)
+    fields = data.model_dump(exclude_unset=True)
+    if service.offer and service.offer.status > Offer.SERVICE_GROUP:
+        if locked := [f for f in fields if f != "external_reference"]:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", field],
+                    "msg": _(
+                        "The service is bound to an offer which is not in"
+                        " preparation anymore."
+                    ),
+                }
+                for field in locked
+            ])
     values = form_data(ServiceForm(instance=service, request=request))
-    form = ServiceForm(instance=service, request=request)
-    if locked := [
-        f
-        for f in ("offer", "title", "description")
-        if f in patch and form.fields[f].disabled
-    ]:
-        raise ValidationError([
-            {
-                "loc": ["body", "data", field],
-                "msg": _(
-                    "The service is bound to an offer which is not in"
-                    " preparation anymore."
-                ),
-            }
-            for field in locked
-        ])
-    if "offer" in patch:
-        values["offer"] = patch["offer"] or ""
-    if "title" in patch:
-        values["title"] = (patch["title"] or "").strip()
-    if "description" in patch:
-        values["description"] = patch["description"] or ""
-    if "external_reference" in patch:
-        values["external_reference"] = (patch["external_reference"] or "").strip()
-
+    values = _service_values(values, fields)
     form = ServiceForm(values, instance=service, request=request)
     if not form.is_valid(ignore_warnings=True):
-        raise_form_errors(form)
+        raise_form_errors(form, fields={v: [k] for k, v in SERVICE_FORM_FIELDS.items()})
 
     with transaction.atomic():
         service = form.save()
-        result = _service_out(
-            _services().get(pk=service.pk),
-            request,
-            controlling=request.user.features[FEATURES.CONTROLLING],
+        result = _service_result(service, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+@router.delete("/services/{int:service_id}/", response=ServiceOut)
+def service_delete(request, service_id: int, *, dry_run: bool = False):
+    """Delete a service like in the web interface: not when it is bound to an
+    offer which isn't in preparation anymore, and not when hours or costs
+    have been logged on it
+
+    Returns the deleted service."""
+    service = get_object_or_404(Service.objects.select_related("offer"), pk=service_id)
+    errors = []
+    if service.offer and service.offer.status > Offer.IN_PREPARATION:
+        errors.append({
+            "loc": ["path", "service_id"],
+            "msg": _(
+                "Cannot delete a service bound to an offer"
+                " which is not in preparation anymore."
+            ),
+        })
+    if service.loggedhours.exists() or service.loggedcosts.exists():
+        errors.append({
+            "loc": ["path", "service_id"],
+            "msg": _(
+                "Hours or costs have been logged on this service, it cannot be deleted."
+            ),
+        })
+    if errors:
+        raise ValidationError(errors)
+    result = _service_result(service, request)
+    with transaction.atomic():
+        try:
+            service.delete()
+        except ProtectedError as exc:
+            raise ValidationError([
+                {
+                    "loc": ["path", "service_id"],
+                    "msg": _(
+                        "Cannot delete '%(object)s'"
+                        " because of related objects (%(related)s)."
+                    )
+                    % {
+                        "object": service,
+                        "related": ", ".join(
+                            str(o) for o in islice(exc.protected_objects, 10)
+                        ),
+                    },
+                }
+            ]) from exc
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+class ServiceOrder(Schema):
+    services: list[int] = Field(
+        description="The IDs of all services of one offer, or of all services"
+        " without offer of one project, in the new order."
+    )
+
+
+@router.post("/services/reorder/", response=list[ServiceOut])
+def service_reorder(request, data: ServiceOrder, *, dry_run: bool = False):
+    """Reorder the services of an offer, or the services without offer of a
+    project, like in the web interface (where services are reordered by
+    dragging them)"""
+    services = {s.pk: s for s in Service.objects.filter(pk__in=data.services)}
+    first = services.get(data.services[0]) if data.services else None
+    group = (
+        set(
+            Service.objects.filter(
+                project=first.project_id, offer=first.offer_id
+            ).values_list("pk", flat=True)
         )
+        if first
+        else set()
+    )
+    if not first or len(data.services) != len(group) or set(data.services) != group:
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "services"],
+                "msg": _(
+                    "Expected the IDs of all services of one offer, or of all"
+                    " services without offer of one project, once."
+                ),
+            }
+        ])
+    controlling = request.user.features[FEATURES.CONTROLLING]
+    with transaction.atomic():
+        for position, pk in enumerate(data.services, 1):
+            Service.objects.filter(pk=pk).update(position=10 * position)
+        ordered = {s.pk: s for s in _services().filter(pk__in=data.services)}
+        result = [
+            _service_out(ordered[pk], request, controlling=controlling)
+            for pk in data.services
+        ]
         if dry_run:
             transaction.set_rollback(True)
     return result

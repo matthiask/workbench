@@ -358,9 +358,9 @@ services:
         self.assertIn(str(concept.pk), result.output)
 
         result = self.wb(
-            "offers",
             "services",
-            "add",
+            "create",
+            "--offer",
             created.pk,
             "--title",
             "Design",
@@ -374,49 +374,45 @@ services:
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("(new)", result.output)
-        self.assertIn("3900.00", result.output)
         self.assertIn("Dry run", result.output)
         self.assertEqual(created.services.count(), 2)
 
         self.file("title: Design\nservice_type: production\nhours: 5\n")
-        result = self.wb("offers", "services", "add", created.pk, offer, "--hours", 6)
+        result = self.wb(
+            "services",
+            "create",
+            offer,
+            "--offer",
+            created.pk,
+            "--hours",
+            6,
+            "--after",
+            concept.pk,
+        )
         self.assertEqual(result.exit_code, 0, result.output)
         design = created.services.get(title="Design")
         self.assertEqual(design.effort_hours, 6)
+        self.assertEqual(
+            [s.pk for s in created.services.all()], [concept.pk, design.pk, hosting.pk]
+        )
 
-        result = self.wb(
-            "offers", "services", "update", created.pk, hosting.pk, "--clear-cost"
-        )
+        result = self.wb("services", "update", hosting.pk, "--clear-cost")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("Warning: Hosting: Neither hours nor a cost", result.output)
-        result = self.wb(
-            "offers",
-            "services",
-            "update",
-            created.pk,
-            hosting.pk,
-            "--cost",
-            600,
-            "--optional",
-        )
+        hosting.refresh_from_db()
+        self.assertIsNone(hosting.cost)
+        result = self.wb("services", "update", hosting.pk, "--cost", 600, "--optional")
         self.assertEqual(result.exit_code, 0, result.output)
         hosting.refresh_from_db()
         self.assertEqual((hosting.cost, hosting.is_optional), (600, True))
 
-        result = self.wb(
-            "offers",
-            "services",
-            "reorder",
-            created.pk,
-            hosting.pk,
-            design.pk,
-            concept.pk,
-        )
+        result = self.wb("services", "reorder", hosting.pk, design.pk, concept.pk)
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(
             [s.pk for s in created.services.all()], [hosting.pk, design.pk, concept.pk]
         )
-        result = self.wb("offers", "services", "delete", created.pk, design.pk)
+        result = self.wb("services", "reorder", hosting.pk, design.pk)
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb("services", "delete", design.pk)
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(created.services.count(), 2)
 
@@ -1491,11 +1487,12 @@ planned_work:
             return [item.value for item in complete.get_completions(args, incomplete)]
 
         self.assertIn("switch", complete(["auth"], ""))
-        self.assertIn("services", complete(["offers"], ""))
+        self.assertNotIn("services", complete(["offers"], ""))
         self.assertEqual(
-            complete(["offers", "services"], ""), ["add", "delete", "reorder", "update"]
+            complete(["services"], ""),
+            ["create", "delete", "reassign-logbook", "reorder", "search", "update"],
         )
-        self.assertIn("--clear-cost", complete(["offers", "services", "update"], "--"))
+        self.assertIn("--clear-cost", complete(["services", "update"], "--"))
         # Host names only: bash splits words at the colon of https://
         self.assertEqual(
             complete(["auth", "switch"], ""), ["a.example.com", "b.example.org"]
