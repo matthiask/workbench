@@ -294,25 +294,9 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 capfirst(_("service hours")),
                 _("Delta"),
                 capfirst(_("projected gross margin")),
+                statistics["cutoff_date"],
             ],
             [
-                [
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    _("total"),
-                    statistics["cutoff_date"],
-                ]
-            ]
-            + [
                 (
                     project["project"],
                     project["project"].owned_by.get_short_name(),

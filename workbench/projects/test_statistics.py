@@ -81,6 +81,21 @@ class StatisticsTest(TestCase):
         code("internal=on")
         code("export=xlsx")
 
+    def test_project_budget_statistics_xlsx_headers(self):
+        """Every column of the project budget statistics XLSX has a header"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get("/report/project-budget-statistics/?export=xlsx")
+        header, *rows = load_workbook(io.BytesIO(response.content)).active.iter_rows(
+            values_only=True
+        )
+        self.assertTrue(rows)
+        for row in rows:
+            for value, title in zip(row, header, strict=False):
+                if value not in {None, ""}:
+                    self.assertTrue(title, row)
+
     def test_budget_chart(self):
         """The project page shows the cumulative logbook value, the invoiced
         total and the accepted offers per week"""
