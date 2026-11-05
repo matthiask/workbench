@@ -398,10 +398,11 @@ class ProjectsAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["offer"], accepted.code)
 
-        # The description of services of sent offers is locked too
+        # The title and the description of services of sent offers are locked too
         self.assertEqual(
             locs(patch({"description": "Text"})), [["body", "data", "description"]]
         )
+        self.assertEqual(locs(patch({"title": "Text"})), [["body", "data", "title"]])
 
         # Warnings about the fields which aren't changed don't get in the way
         unspecific = factories.ServiceFactory.create(
@@ -479,6 +480,27 @@ class ProjectsAPITest(TestCase):
             self.assertEqual(
                 [e["loc"] for e in response.json()["detail"]], [["body", "data", "to"]]
             )
+
+    def test_service_title(self):
+        """Titles of services which aren't bound to sent offers can be changed,
+        e.g. to the title of their issue; they are required"""
+        service = factories.ServiceFactory.create(title="#12 Old title")
+        self.client.force_login(service.project.owned_by)
+
+        def patch(data):
+            return self.client.patch(
+                f"/api/services/{service.pk}/", data, content_type="application/json"
+            )
+
+        response = patch({"title": " #12 New title of the issue "})
+        self.assertEqual(response.status_code, 200, response.content)
+        service.refresh_from_db()
+        self.assertEqual(service.title, "#12 New title of the issue")
+
+        response = patch({"title": ""})
+        self.assertEqual(response.status_code, 422, response.content)
+        service.refresh_from_db()
+        self.assertEqual(service.title, "#12 New title of the issue")
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_services_rates_require_controlling(self):

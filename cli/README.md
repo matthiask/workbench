@@ -270,6 +270,7 @@ preparation or service groups, not out of offers which have been sent):
     wb services update 902 --offer 5678
     wb services update 902 --clear-offer
     wb services update 902 --description "Without the URL"
+    wb services update 902 --title "#12 Title of the issue"
 
 Logged hours and costs are reassigned to another service of the project like
 in the web interface; invoiced entries stay with their service unless they are

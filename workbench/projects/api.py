@@ -593,6 +593,10 @@ class ServicePatch(Schema):
         " or a service group, null removes the service from its offer. Services"
         " of offers which have been sent or accepted can't be moved.",
     )
+    title: str | None = Field(
+        default=None,
+        description="Not for services of offers which have been sent or accepted.",
+    )
     description: str | None = Field(
         default=None,
         description="Null removes it. Not for services of offers which have"
@@ -610,9 +614,9 @@ class ServicePatch(Schema):
 def service_update(
     request, service_id: int, data: ServicePatch, *, dry_run: bool = False
 ):
-    """Move a service to another offer or change its description or external
-    reference, validated with the form of the web interface; other fields are
-    changed through the offers
+    """Move a service to another offer or change its title, description or
+    external reference, validated with the form of the web interface; other
+    fields are changed through the offers
 
     Warnings about fields which aren't changed here (e.g. the title) are
     ignored."""
@@ -621,7 +625,9 @@ def service_update(
     values = form_data(ServiceForm(instance=service, request=request))
     form = ServiceForm(instance=service, request=request)
     if locked := [
-        f for f in ("offer", "description") if f in patch and form.fields[f].disabled
+        f
+        for f in ("offer", "title", "description")
+        if f in patch and form.fields[f].disabled
     ]:
         raise ValidationError([
             {
@@ -635,6 +641,8 @@ def service_update(
         ])
     if "offer" in patch:
         values["offer"] = patch["offer"] or ""
+    if "title" in patch:
+        values["title"] = (patch["title"] or "").strip()
     if "description" in patch:
         values["description"] = patch["description"] or ""
     if "external_reference" in patch:

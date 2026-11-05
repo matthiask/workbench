@@ -96,6 +96,7 @@ def search_services(
     " or a service group).",
 )
 @click.option("--clear-offer", is_flag=True, help="Remove it from its offer.")
+@click.option("--title")
 @click.option(
     "--description", help='The text, or - to read it from stdin, "" removes it.'
 )
@@ -103,28 +104,37 @@ def search_services(
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_service(
-    service_id, offer, clear_offer, description, external_reference, dry_run, as_json
+    service_id,
+    offer,
+    clear_offer,
+    title,
+    description,
+    external_reference,
+    dry_run,
+    as_json,
 ):
-    """Move a service to another offer or change its description or external
-    reference
+    """Move a service to another offer or change its title, description or
+    external reference
 
     Like in the web interface, services of offers which have been sent or
-    accepted can't be moved and their description can't be changed, but their
-    external reference can.
+    accepted can't be moved and their title and description can't be changed,
+    but their external reference can.
     Other fields are changed with `wb offers services update`."""
     if offer and clear_offer:
         terminate("Pass either --offer or --clear-offer.")
     data = {}
     if offer or clear_offer:
         data["offer"] = offer
+    if title is not None:
+        data["title"] = title
     if description is not None:
         data["description"] = text_or_stdin(description)
     if external_reference is not None:
         data["external_reference"] = external_reference
     if not data:
         terminate(
-            "Nothing to change, pass --offer, --clear-offer, --description or"
-            " --external-reference."
+            "Nothing to change, pass --offer, --clear-offer, --title,"
+            " --description or --external-reference."
         )
     data = request(
         "PATCH",
