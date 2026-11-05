@@ -597,7 +597,9 @@ class ProjectsTest(TestCase):
         self.assertEqual(services[1]["label"], "Not offered yet")
 
     def test_long_service_descriptions_in_choices(self):
-        """Long descriptions are truncated in dropdowns, Chrome can't show them"""
+        """Long descriptions are truncated in selects, Chrome can't show them
+
+        The timer's autocomplete wraps labels and shows them completely."""
         service = factories.ServiceFactory.create(
             title="Projektleitung", description="Lorem ipsum " * 100
         )
@@ -605,8 +607,7 @@ class ProjectsTest(TestCase):
 
         response = self.client.get(service.project.urls["services"])
         label = response.json()["services"][0]["options"][0]["label"]
-        self.assertTrue(label.startswith("Projektleitung: Lorem ipsum"))
-        self.assertEqual(len(label), 100)
+        self.assertEqual(label, str(service))
 
         response = self.client.get(
             service.project.urls["createhours"],

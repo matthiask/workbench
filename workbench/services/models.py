@@ -61,7 +61,7 @@ class ServiceBase(Model):
         return ": ".join(filter(None, (self.title, self.description)))
 
     def choice_label(self):
-        """Labels of options, Chrome cuts off long ones unreadably"""
+        """Labels of options in selects, Chrome cuts off long ones unreadably"""
         return Truncator(str(self)).chars(100)
 
     def __lt__(self, other):
