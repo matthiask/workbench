@@ -911,7 +911,7 @@ class Service(ServiceBase):
         blank=True,
         null=True,
     )
-    external_reference = models.CharField(
+    external_reference = models.URLField(
         _("external reference"),
         max_length=500,
         blank=True,

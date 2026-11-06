@@ -366,6 +366,24 @@ class LogbookTest(TestCase):
         self.assertEqual(entry.service.external_reference, "https://example.com/")
         self.assertEqual(entry.service.effort_rate, types.administration.hourly_rate)
 
+        response = self.client.post(
+            project.urls["createhours"],
+            {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                "modal-service_title": "service title",
+                "modal-service_external_reference": "issue 1",
+                "modal-service_type": types.administration.pk,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            list(response.context["form"].errors), ["service_external_reference"]
+        )
+
         response = self.client.get(
             entry.urls["detail"], headers={"x-requested-with": "XMLHttpRequest"}
         )

@@ -3,6 +3,8 @@ from functools import total_ordering
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Case, F, Q, When
 from django.db.models.expressions import RawSQL
@@ -20,8 +22,20 @@ from workbench.tools.validation import raise_if_errors
 
 
 def normalize_external_reference(value):
-    """One reference per line, without blank lines"""
-    return "\n".join(filter(None, map(str.strip, value.splitlines())))
+    """One reference per line; references are separated by whitespace"""
+    return "\n".join(value.split())
+
+
+def validate_external_reference(value):
+    """References are URLs separated by whitespace (also newlines)"""
+    validator = URLValidator()
+    for url in value.split():
+        try:
+            validator(url)
+        except ValidationError:
+            raise ValidationError(
+                _("%(value)s is not a valid URL."), params={"value": url}
+            ) from None
 
 
 class OfferQuerySet(SearchQuerySet):
@@ -143,6 +157,7 @@ class Offer(ModelWithTotal):
         _("external reference"),
         blank=True,
         help_text=_("One URL per line, e.g. of issues or pull requests."),
+        validators=[validate_external_reference],
     )
     is_budget_retainer = models.BooleanField(
         _("is budget retainer"),

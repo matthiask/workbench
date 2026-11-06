@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import Literal
 
 from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -14,7 +15,11 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.contacts.models import postal_address_choices
-from workbench.offers.models import Offer, normalize_external_reference
+from workbench.offers.models import (
+    Offer,
+    normalize_external_reference,
+    validate_external_reference,
+)
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
@@ -86,7 +91,9 @@ class OfferCreateIn(OfferIn):
         description="Service groups collect services without being offered,"
         " they may be created without services.",
     )
-    external_reference: str = Field(default="", description="URLs, one per line.")
+    external_reference: str = Field(
+        default="", description="URLs separated by whitespace (also newlines)."
+    )
     services: list[ServiceIn] = []
 
 
@@ -530,7 +537,7 @@ class OfferPatch(Schema):
     )
     external_reference: str | None = Field(
         default=None,
-        description="URLs, one per line; replaces the existing ones. Can also"
+        description="URLs separated by whitespace; replaces the existing ones. Can also"
         " be changed when the offer isn't in preparation anymore.",
     )
 
@@ -565,6 +572,13 @@ def _update_external_reference(request, offer_id, value, *, dry_run):
         Offer.objects.select_related("project__customer", "project__contact"),
         pk=offer_id,
     )
+    try:
+        validate_external_reference(value or "")
+    except DjangoValidationError as exc:
+        raise ValidationError([
+            {"loc": ["body", "data", "external_reference"], "msg": message}
+            for message in exc.messages
+        ]) from None
     offer.external_reference = normalize_external_reference(value or "")
     with transaction.atomic():
         offer.save(update_fields=["external_reference"])

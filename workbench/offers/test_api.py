@@ -428,6 +428,31 @@ class OfferServicesAPITest(TestCase):
         response = self.send("patch", data={"external_reference": None})
         self.assertEqual(response.json()["external_reference"], "")
 
+    def test_external_reference_validation(self):
+        """External references of offers are URLs separated by whitespace"""
+        response = self.send(
+            "patch",
+            data={"external_reference": "https://example.com/1 https://example.com/2"},
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["external_reference"],
+            "https://example.com/1\nhttps://example.com/2",
+        )
+
+        for data in [
+            {"external_reference": "https://example.com/1 issue 2"},
+            {"external_reference": "issue 2", "title": "Test"},
+        ]:
+            with self.subTest(data=data):
+                response = self.send("patch", data=data)
+                self.assertEqual(response.status_code, 422, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(
+            self.offer.external_reference,
+            "https://example.com/1\nhttps://example.com/2",
+        )
+
     def test_add(self):
         """Services are added at the end or after another service"""
         service = {"title": "Design", "service_type": "production", "hours": 5}

@@ -341,6 +341,10 @@ class ProjectsAPITest(TestCase):
 
         response = patch({"external_reference": "x" * 501})
         self.assertEqual(response.status_code, 422)
+        for value in ["issue 1", "https://example.com/1 https://example.com/2"]:
+            with self.subTest(value=value):
+                response = patch({"external_reference": value})
+                self.assertEqual(response.status_code, 422, response.content)
         self.assertEqual(
             self.client.patch(
                 "/api/services/0/", {}, content_type="application/json"

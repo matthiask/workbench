@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 13:55+0100\n"
+"POT-Creation-Date: 2026-11-06 16:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3064,6 +3064,11 @@ msgstr "Offertleistungen löschen?"
 #: workbench/offers/forms.py
 msgid "Delete planned work linked to offer?"
 msgstr "Verbundene geplante Arbeit löschen?"
+
+#: workbench/offers/models.py
+#, python-format
+msgid "%(value)s is not a valid URL."
+msgstr "%(value)s ist keine gültige URL."
 
 #: workbench/offers/models.py
 msgid "Service group"

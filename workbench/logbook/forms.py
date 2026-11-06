@@ -360,7 +360,7 @@ class LoggedHoursForm(ModelForm):
     service_description = forms.CharField(
         label=_("description"), required=False, widget=Textarea({"rows": 2})
     )
-    service_external_reference = forms.CharField(
+    service_external_reference = forms.URLField(
         label=capfirst(_("external reference")), required=False, max_length=500
     )
     service_type = forms.ModelChoiceField(
