@@ -921,6 +921,20 @@ function initCombobox(select) {
             : items.length - 1
           : (active + step + items.length) % items.length,
       )
+    } else if (
+      (e.key === "PageDown" || e.key === "PageUp") &&
+      menu.classList.contains("show") &&
+      items.length
+    ) {
+      e.preventDefault()
+      // Move by the height of the menu, stop at the first or last option
+      const down = e.key === "PageDown"
+      const current = items[active ?? (down ? 0 : items.length - 1)]
+      const target = current.offsetTop + (down ? 1 : -1) * menu.clientHeight
+      const index = down
+        ? items.findLastIndex((item) => item.offsetTop <= target)
+        : items.findIndex((item) => item.offsetTop >= target)
+      highlight(Math.max(index, 0))
     } else if (e.key === "Enter" && menu.classList.contains("show")) {
       // Don't submit the form
       e.preventDefault()
