@@ -168,7 +168,7 @@ function initModal(html) {
     if (form) {
       const serialize = () => new URLSearchParams(new FormData(form)).toString()
       let initial = null
-      let lastEscape = 0
+      let lastEscape = Number.NEGATIVE_INFINITY
       el.addEventListener("keydown", (e) => {
         if (e.key !== "Escape" || e.defaultPrevented) return
         // Pressing escape again shortly after closes changed forms anyway
