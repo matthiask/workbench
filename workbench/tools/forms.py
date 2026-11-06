@@ -39,14 +39,12 @@ _PLUS_TEMPLATE = """
 """
 
 
-class LongOptionsSelect(forms.Select):
-    """Wraps long options in Chrome's customizable select, which cuts them off
-    otherwise; browsers without it ignore the button"""
-
-    template_name = "widgets/long_options_select.html"
+class ComboboxSelect(forms.Select):
+    """Select with a search field which finds the words anywhere in the
+    options and wraps long ones, see initCombobox in main.js"""
 
     def __init__(self, attrs=None, choices=()):
-        super().__init__({"class": "wb-long-options"} | (attrs or {}), choices)
+        super().__init__({"data-combobox": ""} | (attrs or {}), choices)
 
 
 class Autocomplete(forms.TextInput):

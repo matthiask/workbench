@@ -653,6 +653,13 @@ function initWidgets() {
     initAutocomplete(el)
   }
 
+  for (const el of document.querySelectorAll(
+    "select[data-combobox]:not(.initialized)",
+  )) {
+    el.classList.add("initialized")
+    initCombobox(el)
+  }
+
   for (const form of document.querySelectorAll("[data-offer-form]")) {
     const read = (sel, root = document) =>
       Number.parseFloat(root.querySelector(sel).value) || 0
@@ -760,6 +767,174 @@ window.addInlineForm = function addInlineForm(slug) {
   return false
 }
 
+// The menus of autocompletes and comboboxes may be wider than their input
+function keepInViewport(menu) {
+  menu.style.left = ""
+  const overflow =
+    menu.getBoundingClientRect().right -
+    (document.documentElement.clientWidth - 16)
+  if (overflow > 0) menu.style.left = `${-overflow}px`
+}
+
+// Search field in front of a select (ComboboxSelect in
+// workbench/tools/forms.py) which shows all options with their groups and
+// finds the words anywhere in the option and its group. The select stays the
+// form field, choosing an option dispatches its change event.
+function initCombobox(select) {
+  const wrapper = document.createElement("div")
+  wrapper.className = "position-relative"
+  const input = document.createElement("input")
+  input.type = "text"
+  input.className = "form-select"
+  input.autocomplete = "off"
+  input.disabled = select.disabled
+  input.setAttribute("role", "combobox")
+  input.setAttribute("aria-expanded", "false")
+  input.placeholder = gettext("Search...")
+  if (select.id) {
+    input.id = `${select.id}_combobox`
+    for (const label of document.querySelectorAll(`label[for="${select.id}"]`))
+      label.htmlFor = input.id
+  }
+  const menu = document.createElement("div")
+  menu.className = "dropdown-menu wb-autocomplete"
+  menu.setAttribute("role", "listbox")
+
+  select.before(wrapper)
+  wrapper.append(input, menu, select)
+  // Still validated and submitted, but not shown or focused
+  select.classList.add("visually-hidden")
+  select.tabIndex = -1
+  if (select.autofocus) {
+    select.autofocus = false
+    input.autofocus = true
+  }
+
+  let items = []
+  let active = null
+
+  const reset = () => {
+    input.value = select.value ? select.selectedOptions[0]?.text || "" : ""
+  }
+  reset()
+  select.addEventListener("change", reset)
+
+  const close = () => {
+    menu.classList.remove("show")
+    input.setAttribute("aria-expanded", "false")
+    active = null
+  }
+
+  const highlight = (index) => {
+    active = index
+    items.forEach((item, i) => {
+      item.classList.toggle("active", i === active)
+      if (i === active) item.scrollIntoView({ block: "nearest" })
+    })
+  }
+
+  const choose = (option) => {
+    select.value = option.value
+    select.dispatchEvent(new Event("change", { bubbles: true }))
+    close()
+  }
+
+  const render = (term) => {
+    const words = term.toLowerCase().split(/\s+/).filter(Boolean)
+    const matches = (text) => words.every((word) => text.includes(word))
+    const children = []
+    items = []
+    const addOption = (option, group) => {
+      if (option.disabled) return
+      // The empty option only when browsing
+      if (!option.value && words.length) return
+      if (!matches(`${group} ${option.text}`.toLowerCase())) return
+      const item = document.createElement("button")
+      item.type = "button"
+      item.className = "dropdown-item"
+      item.setAttribute("role", "option")
+      item.textContent = option.text
+      if (option.selected) item.classList.add("wb-selected")
+      // Keep the focus in the input until the click has been handled
+      item.addEventListener("mousedown", (e) => e.preventDefault())
+      item.addEventListener("click", () => choose(option))
+      children.push(item)
+      items.push(item)
+      return item
+    }
+    for (const child of select.children) {
+      if (child.tagName === "OPTGROUP") {
+        const header = document.createElement("h6")
+        header.className = "dropdown-header"
+        header.textContent = child.label
+        const count = items.length
+        children.push(header)
+        for (const option of child.children) addOption(option, child.label)
+        if (items.length === count) children.pop()
+      } else {
+        addOption(child, "")
+      }
+    }
+    if (!items.length) {
+      const empty = document.createElement("span")
+      empty.className = "dropdown-item-text text-body-secondary"
+      empty.textContent = gettext("No results")
+      children.push(empty)
+    }
+    menu.replaceChildren(...children)
+    menu.classList.add("show")
+    input.setAttribute("aria-expanded", "true")
+    keepInViewport(menu)
+    // Browsing starts at the selected option, searching at the first match
+    const selected = items.findIndex((item) =>
+      item.classList.contains("wb-selected"),
+    )
+    if (words.length) highlight(items.length ? 0 : null)
+    else if (selected >= 0) highlight(selected)
+    else active = null
+  }
+
+  // Opening on focus would cover the form when it's autofocused, the list
+  // opens when typing, clicking or with the arrow keys
+  input.addEventListener("focus", () => input.select())
+  input.addEventListener("click", () => {
+    if (!menu.classList.contains("show")) render("")
+  })
+  input.addEventListener("input", () => render(input.value))
+  input.addEventListener("blur", () => {
+    close()
+    reset()
+  })
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault()
+      if (!menu.classList.contains("show")) {
+        render("")
+        return
+      }
+      if (!items.length) return
+      const step = e.key === "ArrowDown" ? 1 : -1
+      highlight(
+        active === null
+          ? step > 0
+            ? 0
+            : items.length - 1
+          : (active + step + items.length) % items.length,
+      )
+    } else if (e.key === "Enter" && menu.classList.contains("show")) {
+      // Don't submit the form
+      e.preventDefault()
+      if (active !== null) items[active].click()
+    } else if (e.key === "Escape" && menu.classList.contains("show")) {
+      // Don't close the modal too
+      e.stopPropagation()
+      close()
+      reset()
+      input.select()
+    }
+  })
+}
+
 // Search field filling a hidden input with the ID of the chosen result, see
 // Autocomplete in workbench/tools/forms.py
 function initAutocomplete(el) {
@@ -820,12 +995,7 @@ function initAutocomplete(el) {
     )
     active = null
     menu.classList.toggle("show", results.length > 0)
-    // The menu may be wider than its input, keep it inside the viewport
-    menu.style.left = ""
-    const overflow =
-      menu.getBoundingClientRect().right -
-      (document.documentElement.clientWidth - 16)
-    if (overflow > 0) menu.style.left = `${-overflow}px`
+    keepInViewport(menu)
   }
 
   el.addEventListener("input", () => {

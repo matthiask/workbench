@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 09:36+0100\n"
+"POT-Creation-Date: 2026-11-06 08:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -158,6 +158,10 @@ msgstr "Meilensteine"
 msgid "No project selected"
 msgstr "Kein Projekt ausgewählt"
 
+#: conf/strings.js workbench/static/workbench/main.js
+msgid "No results"
+msgstr "Keine Treffer"
+
 #: conf/strings.js timer/activity.js
 msgid "No services available"
 msgstr "Keine Leistungen verfügbar"
@@ -217,6 +221,10 @@ msgstr "Pause speichern"
 #: conf/strings.js planning/drag.js
 msgid "Saving..."
 msgstr "Speichern..."
+
+#: conf/strings.js workbench/static/workbench/main.js
+msgid "Search..."
+msgstr "Suchen..."
 
 #: conf/strings.js timer/activity.js
 msgid "Select or search project..."

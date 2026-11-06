@@ -470,65 +470,6 @@ tbody th > a {
   margin-bottom: $spacer;
 }
 
-// Chrome cuts off long options (e.g. service descriptions); its
-// customizable select wraps them. Firefox's native picker shows them anyway.
-@supports (appearance: base-select) {
-  select.wb-long-options,
-  select.wb-long-options::picker(select) {
-    appearance: base-select;
-  }
-
-  // Bootstrap's background image is the arrow; the button (only rendered
-  // by browsers which support this) shows the selected option on one line
-  select.wb-long-options::picker-icon {
-    display: none;
-  }
-
-  select.wb-long-options > button {
-    all: unset;
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  select.wb-long-options::picker(select) {
-    max-width: min(60rem, calc(100vw - 2rem));
-    max-height: min(30rem, 80vh);
-    padding: 0.25rem 0;
-    border: var(--bs-border-width) solid var(--bs-border-color);
-    border-radius: var(--bs-border-radius);
-    background: var(--bs-body-bg);
-    color: var(--bs-body-color);
-    box-shadow: var(--bs-box-shadow);
-  }
-
-  select.wb-long-options optgroup {
-    font-weight: 600;
-  }
-
-  select.wb-long-options option {
-    padding: 0.25rem 0.75rem;
-    white-space: normal;
-    font-weight: normal;
-  }
-
-  select.wb-long-options option::checkmark {
-    display: none;
-  }
-
-  select.wb-long-options option:checked {
-    background: var(--bs-secondary-bg);
-  }
-
-  select.wb-long-options option:hover,
-  select.wb-long-options option:focus-visible {
-    background: var(--bs-primary);
-    color: #fff;
-  }
-}
-
 // Filter rows space their fields with a gap, aligned with their buttons
 .form-search .form-group {
   display: flex;
@@ -2208,12 +2149,32 @@ kbd {
   max-height: min(30rem, 70vh);
   overflow-y: auto;
 
+  padding-top: 0;
+
   .dropdown-item {
     white-space: normal;
   }
 
   .dropdown-item + .dropdown-item {
-    border-top: var(--bs-border-width) solid var(--bs-border-color-translucent);
+    border-top: var(--bs-border-width) solid
+      color-mix(in srgb, var(--bs-border-color) 40%, transparent);
+  }
+
+  // Groups (e.g. the offers of services) stay visible while scrolling
+  .dropdown-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding-block: 0.4rem;
+    border-block: var(--bs-border-width) solid var(--bs-border-color);
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-emphasis-color);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .dropdown-header:first-child {
+    border-top: 0;
   }
 }
 

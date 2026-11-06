@@ -23,9 +23,9 @@ from workbench.services.models import ServiceType
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import (
     Autocomplete,
+    ComboboxSelect,
     DateInput,
     Form,
-    LongOptionsSelect,
     ModelForm,
     Textarea,
     add_prefix,
@@ -420,7 +420,7 @@ class LoggedHoursForm(ModelForm):
             self.project = kwargs["instance"].service.project
 
         super().__init__(*args, **kwargs)
-        self.fields["service"].widget = LongOptionsSelect()
+        self.fields["service"].widget = ComboboxSelect()
         self.fields[
             "service"
         ].choices = self.project.services.logging().choices_with_pins(
@@ -705,7 +705,7 @@ class LoggedCostForm(ModelForm):
         if not self.instance.pk:
             self.instance.created_by = self.request.user
 
-        self.fields["service"].widget = LongOptionsSelect()
+        self.fields["service"].widget = ComboboxSelect()
         self.fields["service"].choices = self.project.services.logging().choices()
         self.fields["cost"].help_text = mark_safe(
             "{} "
@@ -953,7 +953,7 @@ class LogbookBatchForm(Form):
             self._project.services.logging(),
             label=_("Move to service"),
             required=False,
-            widget=LongOptionsSelect,
+            widget=ComboboxSelect,
         )
 
     def process(self):
