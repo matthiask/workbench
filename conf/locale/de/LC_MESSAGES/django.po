@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-05 15:10+0100\n"
+"POT-Creation-Date: 2026-11-06 13:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4190,8 +4190,8 @@ msgstr[1] "Noch %(more)s anzeigen"
 
 #: workbench/templates/accounts/api_tokens.html
 #, python-format
-msgid "API tokens give command line tools like <code>wb</code> access to Workbench in your name. They expire after %(days)s days. <code>wb login</code> creates tokens through the browser; create them here for computers without a browser."
-msgstr "Mit API-Tokens erhalten Kommandozeilenwerkzeuge wie <code>wb</code> in deinem Namen Zugriff auf Workbench. Sie laufen nach %(days)s Tagen ab. <code>wb login</code> erstellt Tokens über den Browser; erstelle sie hier für Computer ohne Browser."
+msgid "API tokens give command line tools like <code>wb</code> access to Workbench in your name. They expire %(days)s days after their last use. <code>wb login</code> creates tokens through the browser; create them here for computers without a browser."
+msgstr "Mit API-Tokens erhalten Kommandozeilenwerkzeuge wie <code>wb</code> in deinem Namen Zugriff auf Workbench. Sie laufen %(days)s Tage nach ihrer letzten Verwendung ab. <code>wb login</code> erstellt Tokens über den Browser; erstelle sie hier für Computer ohne Browser."
 
 #: workbench/templates/accounts/api_tokens.html
 msgid "Command line"
@@ -4264,8 +4264,8 @@ msgstr "Die Kommandozeile <code>wb</code> möchte in deinem Namen auf Workbench 
 
 #: workbench/templates/accounts/cli_login.html
 #, python-format
-msgid "The access expires after %(days)s days, <code>wb</code> will ask you to authorize it again."
-msgstr "Der Zugriff läuft nach %(days)s Tagen ab, <code>wb</code> wird dich dann erneut um Autorisierung bitten."
+msgid "The access expires %(days)s days after its last use, <code>wb</code> will ask you to authorize it again then."
+msgstr "Der Zugriff läuft %(days)s Tage nach der letzten Verwendung ab, <code>wb</code> wird dich dann erneut um Autorisierung bitten."
 
 #: workbench/templates/accounts/cli_login.html
 msgid "wb can change offers, deals, projects and more in your name."

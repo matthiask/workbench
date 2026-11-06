@@ -60,9 +60,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   one router per app. Endpoints authenticate with the user's session by
   default, or with personal API tokens (`APIToken`, sent as bearer token,
   checked before the session because session auth requires a CSRF token, see
-  `user_auth()` in `workbench/accounts/api_auth.py`). Tokens expire after
-  `API_TOKEN_LIFETIME` (the fairy tasks delete them after another
-  `API_TOKEN_LIFETIME`); `wb login` gets a new one through `/cli-login/` in the
+  `user_auth()` in `workbench/accounts/api_auth.py`). Tokens expire
+  `API_TOKEN_LIFETIME` after their last use (each use extends them; the fairy
+  tasks delete them after another `API_TOKEN_LIFETIME`); `wb login` gets a new one through `/cli-login/` in the
   browser, which posts it to a server the CLI runs on a local port. Tokens
   are created with an explicit `access` (read only or read and write, no
   default); read only tokens are rejected for everything but GET requests. Endpoints require the

@@ -492,7 +492,9 @@ class SpecialistField(models.Model):
         return self.name < other.name if isinstance(other, SpecialistField) else 1
 
 
-# Short lived: The CLI logs in again through the browser when its token expires
+# Each use extends a token: one in use (e.g. of a daily script) stays valid, one
+# nobody uses expires. The CLI logs in again through the browser when its token
+# expired.
 API_TOKEN_LIFETIME = dt.timedelta(days=30)
 
 
@@ -519,7 +521,10 @@ class APITokenQuerySet(models.QuerySet):
         )
         if not token:
             return None
-        self.filter(pk=token.pk).update(last_used_at=timezone.now())
+        now = timezone.now()
+        self.filter(pk=token.pk).update(
+            last_used_at=now, expires_at=now + API_TOKEN_LIFETIME
+        )
         return token
 
 

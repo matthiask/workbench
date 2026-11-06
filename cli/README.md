@@ -49,8 +49,8 @@ for tools and agents which only answer questions:
     wb login https://workbench.feinheit.ch --read
     wb login https://workbench.feinheit.ch --write
 
-Check it with `wb me`. Access expires after 30 days; `wb` then opens the
-browser again by itself and asks for the same access. On computers without a
+Check it with `wb me`. Access expires 30 days after its last use; `wb` then
+opens the browser again by itself and asks for the same access. On computers without a
 browser, create a token in Workbench ("API tokens" in the user menu, choose its
 access there) and use `wb login URL --token`.
 

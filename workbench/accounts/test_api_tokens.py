@@ -1,3 +1,6 @@
+import datetime as dt
+
+import time_machine
 from django.test import Client, TestCase
 from django.utils import timezone
 from django.utils.translation import deactivate_all
@@ -156,6 +159,18 @@ class APITokenTest(TestCase):
 
         APIToken.create_for(user=user, title="New", access="write")
         self.assertEqual(list(user.api_tokens.values_list("title", flat=True)), ["New"])
+
+    def test_tokens_extend_themselves(self):
+        """A token in use stays valid, one nobody uses expires after 30 days"""
+        user = factories.UserFactory.create()
+        _token, secret = APIToken.create_for(user=user, title="CLI", access="read")
+        headers = {"authorization": f"Bearer {secret}"}
+        start = timezone.now()
+        for days, status in [(20, 200), (45, 200), (80, 401)]:
+            with time_machine.travel(start + dt.timedelta(days=days)):
+                self.assertEqual(
+                    self.client.get("/api/me/", headers=headers).status_code, status
+                )
 
     def test_read_only(self):
         """Read only tokens can't change anything, not even in dry runs"""
