@@ -2198,10 +2198,23 @@ kbd {
 }
 
 // Results of the Autocomplete widget, below its input group
+// Results may be long (e.g. service descriptions with their project at the
+// end), so they wrap and the menu may be wider than its input or modal
 .wb-autocomplete {
-  inset: 100% 0 auto 0;
-  max-height: 20rem;
+  inset: 100% auto auto 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(60rem, calc(100vw - 2rem));
+  max-height: min(30rem, 70vh);
   overflow-y: auto;
+
+  .dropdown-item {
+    white-space: normal;
+  }
+
+  .dropdown-item + .dropdown-item {
+    border-top: var(--bs-border-width) solid var(--bs-border-color-translucent);
+  }
 }
 
 // Annual working time: taken, planned and excess vacation days

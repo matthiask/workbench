@@ -820,6 +820,12 @@ function initAutocomplete(el) {
     )
     active = null
     menu.classList.toggle("show", results.length > 0)
+    // The menu may be wider than its input, keep it inside the viewport
+    menu.style.left = ""
+    const overflow =
+      menu.getBoundingClientRect().right -
+      (document.documentElement.clientWidth - 16)
+    if (overflow > 0) menu.style.left = `${-overflow}px`
   }
 
   el.addEventListener("input", () => {
