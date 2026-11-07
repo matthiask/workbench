@@ -1,5 +1,5 @@
 import datetime as dt
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from functools import partial
 from itertools import islice
 
@@ -145,7 +145,7 @@ class ModelWithTotal(Model):
         )
 
     def _round_5cents(self, value):
-        return (value / 5).quantize(Decimal("0.00")) * 5
+        return (value / 5).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP) * 5
 
     @property
     def tax_amount(self):

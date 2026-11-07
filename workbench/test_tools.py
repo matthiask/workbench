@@ -46,6 +46,10 @@ class ToolsTest(TestCase):
 
         self.assertAlmostEqual(m._round_5cents(Decimal("1.02")), Decimal("1.00"))
         self.assertAlmostEqual(m._round_5cents(Decimal("1.03")), Decimal("1.05"))
+        # Commercial rounding: exact ties are rounded up, not to even
+        self.assertEqual(m._round_5cents(Decimal("27.025")), Decimal("27.05"))
+        self.assertEqual(m._round_5cents(Decimal("135.125")), Decimal("135.15"))
+        self.assertEqual(m._round_5cents(Decimal("-27.025")), Decimal("-27.05"))
         self.assertAlmostEqual(m.tax_amount, Decimal("1.20"))
         self.assertAlmostEqual(m.total_excl_tax, Decimal(15))
         self.assertAlmostEqual(m.total, Decimal("16.20"))
