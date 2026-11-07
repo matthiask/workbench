@@ -429,6 +429,43 @@ class ContactsAPITest(TestCase):
 
         self.assertEqual(self.client.get("/api/contacts/people/0/").status_code, 404)
 
+    def test_duplicate_details_in_one_request(self):
+        """Email addresses and phone numbers listed twice are rejected"""
+        person = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+        details = {
+            "email_addresses": [
+                {"email": "hans@example.com"},
+                {"email": "HANS@example.com"},
+            ],
+            "phone_numbers": [
+                {"phone_number": "044 111 22 33"},
+                {"phone_number": "+41 44 111 22 33"},
+            ],
+        }
+        for url, data in [
+            (
+                "/api/contacts/people/",
+                {
+                    "given_name": "Hans",
+                    "family_name": "Muster",
+                    "salutation": "Lieber Hans",
+                }
+                | details,
+            ),
+            (f"/api/contacts/people/{person.pk}/details/", details),
+        ]:
+            with self.subTest(url=url):
+                response = self.client.post(url, data, content_type="application/json")
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(
+                    [error["loc"][2:] for error in response.json()["detail"]],
+                    [
+                        ["email_addresses", 1, "email"],
+                        ["phone_numbers", 1, "phone_number"],
+                    ],
+                )
+
     def test_create(self):
         """People are created with their details and their organization"""
         user = factories.UserFactory.create()

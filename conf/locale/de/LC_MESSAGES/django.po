@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 09:11+0100\n"
+"POT-Creation-Date: 2026-11-07 12:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1014,6 +1014,10 @@ msgstr "%(person)s (ID %(id)s) existiert bereits. Erlaube Duplikate, falls es si
 #, python-format
 msgid "%(organization)s (ID %(id)s) exists already. Use its ID or allow duplicates."
 msgstr "%(organization)s (ID %(id)s) existiert bereits. Verwende ihre ID oder erlaube Duplikate."
+
+#: workbench/contacts/api.py
+msgid "Listed twice."
+msgstr "Doppelt aufgeführt."
 
 #: workbench/contacts/api.py
 msgid "Either use an existing organization or create a new one."
@@ -2087,6 +2091,12 @@ msgstr "Rechnungen ohne Projekt brauchen einen Kontakt."
 msgid "Select the services to invoice, or invoice an offer."
 msgstr "Wähle die zu verrechnenden Leistungen aus oder verrechne eine Offerte."
 
+#: workbench/invoices/api.py workbench/invoices/views.py
+#: workbench/offers/api.py workbench/offers/views.py
+#, python-brace-format
+msgid "Unable to generate the PDF: {}"
+msgstr "Konnte das PDF nicht generieren: {}"
+
 #: workbench/invoices/forms.py
 msgid "Due"
 msgstr "Fällig"
@@ -2608,11 +2618,6 @@ msgstr "Verantwortlich"
 #: workbench/invoices/tasks.py
 msgid "For your information"
 msgstr "Zur Kenntnisnahme"
-
-#: workbench/invoices/views.py workbench/offers/views.py
-#, python-brace-format
-msgid "Unable to generate the PDF: {}"
-msgstr "Konnte das PDF nicht generieren: {}"
 
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/projects/views.py workbench/services/models.py

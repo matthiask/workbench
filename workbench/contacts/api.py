@@ -450,15 +450,24 @@ def _details(data, errors):
     """Validated, unsaved email addresses, phone numbers and postal
     addresses"""
     details = []
-    for key, model, items in [
-        ("email_addresses", EmailAddress, data.email_addresses),
-        ("phone_numbers", PhoneNumber, data.phone_numbers),
-        ("postal_addresses", PostalAddress, data.postal_addresses),
+    seen = set()
+    for key, model, items, field in [
+        ("email_addresses", EmailAddress, data.email_addresses, "email"),
+        ("phone_numbers", PhoneNumber, data.phone_numbers, "phone_number"),
+        ("postal_addresses", PostalAddress, data.postal_addresses, None),
     ]:
         for index, item in enumerate(items):
             detail = model(**item.dict(exclude_none=True))
             full_clean(detail, ["body", "data", key, index], errors, exclude=["person"])
             details.append(detail)
+            # Phone numbers have been normalized by full_clean()
+            if field and (value := str(getattr(detail, field)).casefold()):
+                if (key, value) in seen:
+                    errors.append({
+                        "loc": ["body", "data", key, index, field],
+                        "msg": _("Listed twice."),
+                    })
+                seen.add((key, value))
     return details
 
 
