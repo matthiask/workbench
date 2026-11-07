@@ -397,6 +397,14 @@ class PlanningAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()["detail"][0]["loc"], ["query", "until"])
 
+        # Also the period of a project's planned work
+        work = factories.PlannedWorkFactory.create(
+            weeks=[monday(), monday(in_days(11 * 365))]
+        )
+        response = self.client.get(f"/api/planning/export/?project={work.project_id}")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["query", "until"])
+
     def test_export(self):
         """Planned work, milestones and capacity of a period or a project"""
         user = factories.UserFactory.create(_short_name="ab")

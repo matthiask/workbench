@@ -38,6 +38,17 @@ from workbench.tools.validation import monday
 EXPORT_MAX_DAYS = 3653  # Ten years
 
 
+def _check_export_period(period):
+    """Every week is listed, with the capacity of every user"""
+    if (period[1] - period[0]).days > EXPORT_MAX_DAYS:
+        raise ValidationError([
+            {
+                "loc": ["query", "until"],
+                "msg": _("The period may cover at most ten years."),
+            }
+        ])
+
+
 router = Router(tags=["planning"])
 
 
@@ -703,19 +714,14 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
         period = date_range(
             filters, default=[monday(), monday() + dt.timedelta(days=83)]
         )
-        # Every week is listed, with the capacity of every user
-        if (period[1] - period[0]).days > EXPORT_MAX_DAYS:
-            raise ValidationError([
-                {
-                    "loc": ["query", "until"],
-                    "msg": _("The period may cover at most ten years."),
-                }
-            ])
+        _check_export_period(period)
         weeks = list(_mondays(*period))
         work = work.filter(weeks__overlap=weeks)
     else:
         weeks = sorted({week for pw in work for week in pw.weeks})
         period = [weeks[0], weeks[-1] + dt.timedelta(days=6)] if weeks else [None, None]
+        if weeks:
+            _check_export_period(period)
         weeks = list(_mondays(*period)) if weeks else []
     work = list(work)
 
