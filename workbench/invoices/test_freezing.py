@@ -234,3 +234,27 @@ class FreezingTest(TestCase):
 
         invoice.refresh_from_db()
         self.assertEqual(invoice.postpone_reminders_until, in_days(14))
+
+    def test_sent_invoice_not_backdated_into_frozen_period(self):
+        """Sent invoices cannot be moved into the frozen period either"""
+        FreezeDate.objects.create(up_to=in_days(-30))
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(-10),
+            due_on=in_days(5),
+            status=Invoice.SENT,
+            subtotal=100,
+            postal_address="A\nB\nC",
+        )
+
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice)
+            | {
+                "invoiced_on": in_days(-40).isoformat(),
+                WarningsForm.ignore_warnings_id: "maybe-unintentional-invoice-change",
+            },
+        )
+        self.assertContains(response, "Cannot create an invoice with a date of")
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.invoiced_on, in_days(-10))
