@@ -228,6 +228,19 @@ class DealsAPITest(TestCase):
         deal.refresh_from_db()
         self.assertEqual(deal.probability, Deal.LOW)
 
+    def test_update_with_default_probability(self):
+        """Deals with the default probability can be updated without
+        choosing one"""
+        deal = factories.DealFactory.create()
+        self.client.force_login(deal.owned_by)
+        response = self.client.patch(
+            f"/api/deals/{deal.pk}/",
+            {"title": "Renamed"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["probability"], "low")
+
     def test_update(self):
         """Deals are changed field by field like in the web interface"""
         user = factories.UserFactory.create(_short_name="ab")

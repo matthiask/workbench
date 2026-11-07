@@ -538,7 +538,8 @@ class DealsTest(TestCase):
         def idx(**kwargs):
             return deal_group(Deal(**kwargs))[0]
 
-        self.assertEqual(idx(), 5)
+        self.assertEqual(idx(probability=Deal.UNKNOWN), 5)
+        self.assertEqual(idx(), 4)
         self.assertEqual(idx(probability=Deal.NORMAL), 4)
         self.assertEqual(idx(probability=Deal.HIGH), 3)
         self.assertEqual(

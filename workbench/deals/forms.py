@@ -288,7 +288,12 @@ class DealForm(ModelForm):
             contribution_select_fields.append(name)
         self.contribution_select_fields = ",".join(contribution_select_fields)
 
-        self.fields["probability"].choices = self.fields["probability"].choices[1:]
+        # Unknown is only kept for the history
+        self.fields["probability"].choices = [
+            choice
+            for choice in self.fields["probability"].choices
+            if choice[0] != Deal.UNKNOWN
+        ]
 
     def clean(self):
         data = super().clean()
