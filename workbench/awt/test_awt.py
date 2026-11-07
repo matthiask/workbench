@@ -1029,6 +1029,24 @@ class AWTTest(TestCase):
         absence.refresh_from_db()
         self.assertTrue(absence.needs_confirmation)
 
+        # Editing doesn't confirm, not even by people administrating personnel
+        self.client.force_login(hr)
+        response = self.client.post(
+            absence.urls["update"],
+            {
+                "modal-user": user.pk,
+                "modal-starts_on": dt.date.today().isoformat(),
+                "modal-days": 2,
+                "modal-reason": Absence.PAID,
+                "modal-description": "Typo fixed",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        absence.refresh_from_db()
+        self.assertEqual(absence.description, "Typo fixed")
+        self.assertTrue(absence.needs_confirmation)
+
     def test_vacation_days_taken_corrected(self):
         """Vacation beyond the available days doesn't count as taken"""
         year = factories.YearFactory.create(year=2018)

@@ -216,7 +216,9 @@ class Absence(Model):
         if self.reason != self.PAID:
             self.confirmed_at = self.confirmed_by = None
         elif user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
-            if not self.confirmed_at:
+            # Paid leave entered by them is confirmed, editing (e.g. fixing a
+            # typo) isn't a confirmation
+            if not self.confirmed_at and (not self.pk or "reason" in changed_fields):
                 self.confirm(user)
         elif not self.pk or set(changed_fields) & {
             "user",

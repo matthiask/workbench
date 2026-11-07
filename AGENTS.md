@@ -299,7 +299,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Descriptions of absences are optional. Paid leave counts right away but
   needs a confirmation by someone with `PERSONNEL_ADMINISTRATION`
   (`Absence.needs_confirmation`, `update_confirmation()` in the form,
-  `Absence.objects.unconfirmed()`, listed under "needs action").
+  `Absence.objects.unconfirmed()`, listed under "needs action"); paid
+  leave they enter is confirmed, editing someone's isn't a confirmation.
 - Contacts unused for five years are archived (`archive_unused_contacts()` in
   `workbench/contacts/tasks.py`, fairy tasks). Reverse relations are
   discovered with `_meta.get_fields()`; `_recent()` says which related
