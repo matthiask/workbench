@@ -250,7 +250,16 @@ class ModelForm(WarningsForm, forms.ModelForm):
             if data.get("contact") and not data.get("customer"):
                 data["customer"] = data["contact"].organization
 
-            if data.get("customer") and data.get("contact"):
+            # Existing objects stay editable when their contact moved to
+            # another organization (e.g. when merging people)
+            if (
+                data.get("customer")
+                and data.get("contact")
+                and (
+                    not self.instance.pk
+                    or {"customer", "contact"} & set(self.changed_data)
+                )
+            ):
                 if data.get("customer") != data.get("contact").organization:
                     raise forms.ValidationError({
                         "contact": gettext(

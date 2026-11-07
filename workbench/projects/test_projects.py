@@ -337,6 +337,31 @@ class ProjectsTest(TestCase):
             },
         )
 
+    def test_contact_of_another_organization(self):
+        """Existing projects whose contact moved to another organization
+        (e.g. through merging people) stay editable, changing the customer or
+        the contact checks it again"""
+        project = factories.ProjectFactory.create()
+        project.contact.organization = factories.OrganizationFactory.create()
+        project.contact.save()
+        self.client.force_login(project.owned_by)
+        data = {
+            "customer": project.customer_id,
+            "contact": project.contact_id,
+            "title": "Renamed",
+            "owned_by": project.owned_by_id,
+            "type": project.type,
+        }
+
+        response = self.client.post(project.urls["update"], data)
+        self.assertRedirects(response, project.urls["detail"])
+
+        response = self.client.post(
+            project.urls["update"],
+            {**data, "customer": factories.OrganizationFactory.create().pk},
+        )
+        self.assertContains(response, "does not belong to")
+
     def test_lists(self):
         """Filter form smoke test"""
         project = factories.ProjectFactory.create()
