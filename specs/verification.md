@@ -29,6 +29,8 @@ they're fixed or decided.
 
 All verified bugs have been fixed and the decisions implemented (see the
 commits of 2026-11-07 after "Verification: Findings of the second round").
+The untested risks have been tested and fixed or decided too (the commits
+after "Verification: The second round's bugs are fixed").
 
 ### Decided, no change
 
@@ -36,28 +38,23 @@ commits of 2026-11-07 after "Verification: Findings of the second round").
   form over to the new organization.
 - The invoiced gross margin is never negative, also when third party costs
   have been paid before invoicing (see `docs/metrics.md`).
-
-### Untested risks
-
-- Deleting accepted or invoiced offers (no status check).
-- Services invoiced from the offer without logged entries can be moved or
-  deleted, the invoice line then points elsewhere or nowhere.
-- Projected invoices check neither `FreezeDate` nor closed projects.
-- Reactivated recurring invoices create the whole backlog in past periods.
-- Milestones with `phase_starts_on` after `date`; moving milestones earlier
-  through the import doesn't warn about later work.
-- Overlapping absences aren't detected.
-- The annual working time uses the current working time model for past
-  years; absences outside employments count.
-- Merging people loses groups of the duplicate's organization.
-- Reassigning primary contacts restarts the archiving clock.
-- Turning `applies_to_organizations` on also moves archived people.
-- The notes digest and the Brevo sync ignore features and archived groups.
-- Reopened deals keep their settled offers.
-- Key data API: `accruals` and `gross_margin` of the same month may differ.
-- The project detail labels the other side of retainer offers as third
-  party costs; the budget chart adds both sides.
-- The groups API and the services API ignore all warnings of their forms
-  (`is_valid(ignore_warnings=True)`), unlike the other endpoints.
-- `/api/planning/export/` with a range of centuries builds every week (slow,
-  no crash).
+- Merging people doesn't carry over the industry groups of the duplicate's
+  organization: they describe that organization.
+- Reassigning primary contacts to active users counts as use of the contact
+  (it keeps them from being archived).
+- Overlapping absences aren't detected: a vacation day on a sickness day
+  uses up the vacation day and counts the sickness, which evens out in the
+  balance. Duplicate sickness entries don't, and the planning capacity of
+  that week is too low.
+- The annual working time uses the user's current working time model for
+  past years; changing a user's model rewrites them. Moving the model to
+  the employments waits for a real case (models changing during the year
+  complicate the computation).
+- Last month's key data are final after the fairy tasks have run in the new
+  month (documented in `docs/metrics.md`).
+- Turning `applies_to_organizations` on also moves the memberships of
+  archived people to their organizations, which keeps the rule that only
+  people without an organization are members themselves.
+- Moving milestones earlier through the planning import only warns about
+  the work in the import; the `workbench-planning` skill checks the rest.
+- The groups form has no warnings, so its API skips nothing.
