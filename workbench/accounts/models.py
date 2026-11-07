@@ -507,8 +507,9 @@ def _hash_api_token(secret):
 
 
 class APITokenQuerySet(models.QuerySet):
-    def for_secret(self, secret):
-        """The valid token of an active user, or None"""
+    def for_secret(self, secret, *, extend=True):
+        """The valid token of an active user, or None; using it extends it
+        unless ``extend`` is false (see ``extend()``)"""
         token = (
             self
             .filter(
@@ -519,13 +520,16 @@ class APITokenQuerySet(models.QuerySet):
             .select_related("user")
             .first()
         )
-        if not token:
-            return None
+        if token and extend:
+            self.extend(token)
+        return token
+
+    def extend(self, token):
+        """Each use extends the token"""
         now = timezone.now()
         self.filter(pk=token.pk).update(
             last_used_at=now, expires_at=now + API_TOKEN_LIFETIME
         )
-        return token
 
 
 class APIToken(models.Model):

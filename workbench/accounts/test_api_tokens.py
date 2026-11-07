@@ -179,11 +179,6 @@ class APITokenTest(TestCase):
             user=project.owned_by, title="CLI", access="read"
         )
         headers = {"authorization": f"Bearer {secret}"}
-
-        response = self.client.get("/api/me/", headers=headers)
-        self.assertEqual(response.json()["access"], "read")
-        response = self.client.get(f"/api/projects/{project.pk}/", headers=headers)
-        self.assertEqual(response.status_code, 200)
         response = self.client.patch(
             f"/api/projects/{project.pk}/?dry_run=true",
             {"title": "Changed"},
@@ -192,6 +187,16 @@ class APITokenTest(TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertIn("only allows reading", response.content.decode())
+        # Rejected changes aren't a use of the token
+        token = APIToken.objects.get()
+        self.assertIsNone(token.last_used_at)
+
+        response = self.client.get("/api/me/", headers=headers)
+        self.assertEqual(response.json()["access"], "read")
+        response = self.client.get(f"/api/projects/{project.pk}/", headers=headers)
+        self.assertEqual(response.status_code, 200)
+        token.refresh_from_db()
+        self.assertIsNotNone(token.last_used_at)
 
         _token, secret = APIToken.create_for(
             user=project.owned_by, title="CLI", access="write"
