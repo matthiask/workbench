@@ -1,4 +1,5 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.core import mail
 from django.test import TestCase
@@ -8,6 +9,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
+from workbench.tools.models import default_tax_rate
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
 
@@ -87,7 +89,6 @@ class RecurringTest(TestCase):
                 "subtotal": 500,
                 "discount": 0,
                 "liable_to_vat": "1",
-                "tax_rate": "7.70",
                 "third_party_costs": 0,
             },
         )
@@ -106,7 +107,6 @@ class RecurringTest(TestCase):
                 "subtotal": 500,
                 "discount": 0,
                 "liable_to_vat": "1",
-                "tax_rate": "7.70",
                 "third_party_costs": 0,
                 "postal_address": "Anything",
             },
@@ -126,7 +126,6 @@ class RecurringTest(TestCase):
                 "subtotal": 500,
                 "discount": 0,
                 "liable_to_vat": "1",
-                "tax_rate": "7.70",
                 "third_party_costs": 0,
                 "postal_address": "Anything\nStreet\nCity",
             },
@@ -329,3 +328,13 @@ class RecurringTest(TestCase):
         invoices = r.create_invoices()
         self.assertIsNotNone(invoices[0].project)
         self.assertEqual(invoices[0].type, invoices[0].DOWN_PAYMENT)
+
+    def test_current_tax_rate(self):
+        """Recurring invoices have no tax rate of their own, they and their
+        invoices use the current one"""
+        self.assertNotIn(
+            "tax_rate", {field.name for field in RecurringInvoice._meta.get_fields()}
+        )
+        ri = factories.RecurringInvoiceFactory.create(subtotal=100)
+        self.assertEqual(ri.tax_rate, default_tax_rate())
+        self.assertEqual(ri.total, Decimal("108.10"))

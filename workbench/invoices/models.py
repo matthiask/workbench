@@ -20,7 +20,12 @@ from workbench.projects.models import Project
 from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceBase
 from workbench.tools.formats import Z1, Z2, currency, local_date_format
-from workbench.tools.models import ModelWithTotal, MoneyField, SearchQuerySet
+from workbench.tools.models import (
+    ModelWithTotal,
+    MoneyField,
+    SearchQuerySet,
+    default_tax_rate,
+)
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, raise_if_errors
 
@@ -783,6 +788,13 @@ class RecurringInvoice(ModelWithTotal):
     )
     postal_address = models.TextField(_("postal address"))
 
+    @property
+    def tax_rate(self):
+        """Recurring invoices have no tax rate of their own (the attribute
+        removes the field of ``ModelWithTotal``), they and their invoices use
+        the current one"""
+        return default_tax_rate()
+
     starts_on = models.DateField(_("starts on"), default=dt.date.today)
     ends_on = models.DateField(_("cancel the auto-renewal on"), blank=True, null=True)
     periodicity = models.CharField(
@@ -879,8 +891,6 @@ class RecurringInvoice(ModelWithTotal):
             subtotal=self.subtotal,
             discount=self.discount,
             liable_to_vat=self.liable_to_vat,
-            # tax_rate=self.tax_rate,
-            # total=self.total,
             third_party_costs=self.third_party_costs,
         )
 
