@@ -146,7 +146,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (case-insensitive, `GroupForm` and a constraint) because the other
   endpoints find groups by their title. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
-  interface doesn't). Its `primary_contact` defaults to the current user and
+  interface doesn't), and archived people with the same name and
+  organization (or both without), who should rather be unarchived. Its `primary_contact` defaults to the current user and
   may be an inactive user (e.g. who used to know the person), so that imported
   contacts can be found and reassigned with the primary contact filter.
   Warnings of the web forms are errors in the API which carry their code;

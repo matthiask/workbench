@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 17:47+0100\n"
+"POT-Creation-Date: 2026-11-07 18:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1018,6 +1018,11 @@ msgstr "Wird bereits von %(person)s (ID %(id)s) verwendet."
 #, python-format
 msgid "%(person)s (ID %(id)s) exists already. Allow duplicates if this is someone else."
 msgstr "%(person)s (ID %(id)s) existiert bereits. Erlaube Duplikate, falls es sich um jemand anderes handelt."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "%(person)s (ID %(id)s) has been archived. Unarchive them instead, or allow duplicates if this is someone else."
+msgstr "%(person)s (ID %(id)s) wurde archiviert. Hole die Person aus dem Archiv, oder erlaube Duplikate, falls es sich um jemand anderes handelt."
 
 #: workbench/contacts/api.py
 #, python-format

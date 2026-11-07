@@ -437,6 +437,28 @@ def _duplicates(data, *, allow_duplicates):
             )
             % {"person": person.name_with_organization, "id": person.pk},
         )
+    # Archived people of the same organization (or without, like the new
+    # one) should rather be unarchived
+    archived = Person.objects.filter(
+        is_archived=True,
+        given_name__iexact=data.given_name,
+        family_name__iexact=data.family_name,
+    )
+    if data.organization:
+        archived = archived.filter(organization=data.organization)
+    elif data.new_organization:
+        archived = archived.filter(organization__name__iexact=data.new_organization)
+    else:
+        archived = archived.filter(organization__isnull=True)
+    for person in archived.select_related("organization"):
+        error(
+            [],
+            _(
+                "%(person)s (ID %(id)s) has been archived. Unarchive them"
+                " instead, or allow duplicates if this is someone else."
+            )
+            % {"person": person.name_with_organization, "id": person.pk},
+        )
     if data.new_organization:
         for organization in Organization.objects.active().filter(
             name__iexact=data.new_organization

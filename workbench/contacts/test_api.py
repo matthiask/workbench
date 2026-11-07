@@ -516,6 +516,50 @@ class ContactsAPITest(TestCase):
                     ],
                 )
 
+    def test_create_archived_duplicate(self):
+        """Archived people with the same name and organization (or both
+        without) are reported, they should rather be unarchived"""
+        self.client.force_login(factories.UserFactory.create())
+        organization = factories.OrganizationFactory.create(name="Beispiel AG")
+        archived = factories.PersonFactory.create(
+            given_name="Hans",
+            family_name="Muster",
+            organization=organization,
+            is_archived=True,
+        )
+        person = {
+            "given_name": "Hans",
+            "family_name": "Muster",
+            "address": "Herr",
+            "salutation": "Lieber Hans",
+        }
+
+        def create(data):
+            return self.client.post(
+                "/api/contacts/people/?dry_run=true",
+                person | data,
+                content_type="application/json",
+            )
+
+        for data in [
+            {"organization": organization.pk},
+            {"new_organization": "beispiel ag"},
+        ]:
+            response = create(data)
+            self.assertEqual(response.status_code, 422)
+            self.assertIn(f"ID {archived.pk}", response.content.decode())
+            self.assertIn("Unarchive them", response.content.decode())
+
+        # Someone else at another organization
+        other = factories.OrganizationFactory.create(name="Andere AG")
+        self.assertEqual(create({"organization": other.pk}).status_code, 200)
+        self.assertEqual(create({}).status_code, 200)
+
+        # Both without organization
+        archived.organization = None
+        archived.save()
+        self.assertEqual(create({}).status_code, 422)
+
     def test_create_with_primary_contact(self):
         """New organizations get the primary contact of the person"""
         self.client.force_login(factories.UserFactory.create())
