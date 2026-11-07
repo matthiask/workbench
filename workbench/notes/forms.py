@@ -77,7 +77,10 @@ class NoteForm(ModelForm):
 
         if self.is_new:
             self.fields["content_type"] = forms.ModelChoiceField(
-                ContentType.objects.all(),
+                # Only objects whose notes the user may see, like the API
+                ContentType.objects.filter(
+                    pk__in=visible_content_types(self.request.user)
+                ),
                 initial=ContentType.objects.get_for_model(content_object).pk
                 if content_object
                 else None,

@@ -138,6 +138,41 @@ class NotesTest(TestCase):
         note.refresh_from_db()
         self.assertEqual(note.title, "Updated")
 
+    def test_form_features_and_targets(self):
+        """Notes are only added to, changed and deleted on objects whose notes
+        the user may see"""
+        invoice = factories.InvoiceFactory.create()
+        offer = factories.OfferFactory.create()
+        note = Note.objects.create(
+            content_object=invoice, title="Payment", created_by=invoice.owned_by
+        )
+        self.client.force_login(invoice.owned_by)
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        def add(obj):
+            return self.client.post(
+                "/notes/add-note/",
+                {
+                    "content_type": ContentType.objects.get_for_model(obj).pk,
+                    "object_id": obj.pk,
+                    "title": "Test",
+                    "description": "Test",
+                },
+                headers=headers,
+            )
+
+        # Offers have no notes
+        self.assertEqual(add(offer).status_code, 200)
+
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
+            self.assertEqual(add(invoice).status_code, 200)
+            for url in [note.urls["update"], note.urls["delete"]]:
+                with self.subTest(url=url):
+                    response = self.client.get(url, headers=headers)
+                    self.assertNotIn(b"Payment", response.content)
+
+        self.assertEqual(Note.objects.count(), 1)
+
     def test_project_notes(self):
         """Projects have notes too, e.g. for debriefings"""
         project = factories.ProjectFactory.create()

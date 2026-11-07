@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:06+0100\n"
+"POT-Creation-Date: 2026-11-07 14:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3033,6 +3033,10 @@ msgstr "Konnte Objekt nicht bestimmen, wo die Notiz angehängt werden soll."
 #: workbench/notes/models.py
 msgid "note"
 msgstr "Notiz"
+
+#: workbench/notes/models.py
+msgid "You are not permitted to edit this note."
+msgstr "Du darfst diese Notiz nicht bearbeiten."
 
 #: workbench/notes/views.py workbench/templates/notes/widget.html
 msgid "Add note"

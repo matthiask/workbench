@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
@@ -96,6 +97,16 @@ class Note(Model):
 
     def __str__(self):
         return f"{self.title} - {self.content_type.name} {self.object_id} - {self.created_by.get_short_name()}"
+
+    @classmethod
+    def allow_update(cls, instance, request):
+        # Like the notes list and the notes API
+        if instance.content_type_id not in visible_content_types(request.user):
+            messages.error(request, _("You are not permitted to edit this note."))
+            return False
+        return True
+
+    allow_delete = allow_update
 
     def get_absolute_url(self):
         model = self.content_type.model_class()
