@@ -820,7 +820,7 @@ def deal_status(
     return _save_deal(form, request, dry_run=dry_run)
 
 
-class RelatedOffersRemove(Schema):
+class RelatedOffers(Schema):
     offers: list[int | str] = Field(
         min_length=1,
         description="IDs or codes of offers, e.g. 2026-0179-o02.",
@@ -902,7 +902,7 @@ def _change_related_offers(request, deal_id, data, *, remove, ignore_warnings, d
 def deal_offers_add(
     request,
     deal_id: int,
-    data: RelatedOffersRemove,
+    data: RelatedOffers,
     *,
     dry_run: bool = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
@@ -926,7 +926,7 @@ def deal_offers_add(
 
 @router.post("/deals/{deal_id}/offers/remove/", response=DealOut)
 def deal_offers_remove(
-    request, deal_id: int, data: RelatedOffersRemove, *, dry_run: bool = False
+    request, deal_id: int, data: RelatedOffers, *, dry_run: bool = False
 ):
     """Unlink offers from an open deal like in the web interface
 

@@ -5,7 +5,7 @@ import datetime as dt
 from django.utils import timezone
 
 
-SOURCES = ["project", "deal", "organization's project", "organization's deal"]
+SOURCES = ["project", "deal", "organization_project", "organization_deal"]
 # The person's own projects and deals before those of their organization,
 # the latest of each tier wins
 TIERS = [SOURCES[:2], SOURCES[2:]]
@@ -30,8 +30,8 @@ def primary_contact_suggestions(people, *, since=None):
 
     latest = {source: {} for source in SOURCES}
     for model, own, organizations in [
-        (Project, "project", "organization's project"),
-        (Deal, "deal", "organization's deal"),
+        (Project, "project", "organization_project"),
+        (Deal, "deal", "organization_deal"),
     ]:
         queryset = (
             model.objects

@@ -362,7 +362,7 @@ class ContactsAPITest(TestCase):
             suggestions(),
             {
                 "Contact": ("lead", "project"),
-                "Colleague": ("lead", "organization's project"),
+                "Colleague": ("lead", "organization_project"),
                 "Dealt": ("other", "deal"),
                 "Lonely": ("lead", "project"),
             },

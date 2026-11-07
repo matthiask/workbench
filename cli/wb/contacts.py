@@ -304,7 +304,10 @@ def reassign_suggestions(primary_contact, since, limit, offset, as_csv, as_json)
             (person["organization"] or {}).get("name", ""),
             row["primary_contact"],
             suggestion.get("short_name", ""),
-            link(f"{suggestion['source']}: {suggestion['title']}", suggestion["url"])
+            link(
+                f"{suggestion['source'].replace('_', ' ')}: {suggestion['title']}",
+                suggestion["url"],
+            )
             if suggestion
             else "",
             suggestion.get("created_at", "")[:10],

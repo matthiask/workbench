@@ -858,7 +858,7 @@ def group_update(request, group_id: int, data: GroupPatch, *, dry_run: bool = Fa
 
 class SuggestionOut(Schema):
     short_name: str
-    source: Literal["project", "deal", "organization's project", "organization's deal"]
+    source: Literal["project", "deal", "organization_project", "organization_deal"]
     title: str = Field(description="The project or deal")
     url: str
     created_at: dt.datetime

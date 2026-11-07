@@ -1,5 +1,6 @@
 """The search across projects, contacts, invoices, offers and deals"""
 
+from typing import Literal
 from urllib.parse import urlencode
 
 from django.urls import reverse
@@ -66,7 +67,7 @@ class SearchResult(Schema):
 
 
 class SearchGroup(Schema):
-    type: str
+    type: Literal[tuple(NOUNS.values())]
     label: str
     url: str
     count: int

@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import Literal
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
@@ -26,7 +27,7 @@ router = Router(tags=["notes"])
 
 
 class NoteObject(Schema):
-    type: str
+    type: Literal[tuple(TARGETS)]
     id: int
     name: str
     url: str
