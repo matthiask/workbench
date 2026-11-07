@@ -5,32 +5,32 @@ they're fixed or decided.
 
 ## Round 1 (2026-11-07)
 
-### Untested risks
+### Verified, need a decision
 
 - Moving a service without offer to another project takes its invoiced
-  hours along, without a warning (`ServiceMoveForm`).
-- Invoicing from the offer after invoicing from the logbook (or the other
-  way round) gives no warning.
+  hours along without a warning (`ServiceMoveForm`); the budget statistics
+  then show accruals on the old project and work not invoiced on the new one.
+- Invoicing a service from the offer after invoicing it from the logbook
+  gives no warning, the work is invoiced twice (the other way round may be
+  work beyond the offer).
 - Entries with `hours_for_invoicing=0` are never archived when invoicing
-  from the logbook if their service has nothing else to invoice.
-- Archived hours can still change service and hours (behind a warning).
-- Recurring invoices ignore their own `tax_rate` (commented out).
-- Rejected writes of read only tokens still extend them.
+  from the logbook if their service has nothing else to invoice (the form
+  doesn't list the service), they keep the project in `old_projects()`.
+- Archived hours can still change service and hours (behind the
+  `part-of-invoice` warning), the invoice then disagrees with the logbook.
+- Recurring invoices ignore their own `tax_rate` (commented out since
+  36c89f78, the form doesn't offer it): drop the field, or make it work?
 - Versions like `0.20.0rc1` parse to `()` and are "too old"
-  (`workbench/cli_version.py`, `cli/wb/core.py`).
-- Timestamps accept closed projects and services without logging; a
-  numeric search term is always taken as an ID.
-- Duplicate email addresses or phone numbers within one request aren't
-  detected.
+  (`workbench/cli_version.py`, `cli/wb/core.py`): only plain versions by
+  convention?
+- Timestamps accept closed projects (by ID) and services of closed projects
+  or without logging; the logbook form rejects them later.
 - `filter_users()` reports "Unknown users" for a user outside the team.
-- `SetStatusForm` reads `?status=` from the query string (API too) and
-  crashes on non-numeric values.
-- Planning import fails when an LLM echoes inactive users or declined
-  offers of the context back unchanged.
-- `clear_sickness_descriptions()` misses history of absences whose
-  description was cleared or reason changed.
-- Closing a deal preselects linked offers in preparation, which can't be
-  declined ("Offered on date missing").
+- `clear_sickness_descriptions()` misses the history of absences whose
+  description was cleared or reason changed (bounded by `prune_audit`).
+- Closing a deal preselects linked offers in preparation and service groups,
+  which fail validation ("Offered on date missing") when accepting or
+  declining; declining unsent offers could discard them instead.
 
 ### Questions (decisions)
 
