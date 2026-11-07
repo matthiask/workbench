@@ -1175,6 +1175,29 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
                 ).format(local_date_format(freeze)),
             )
 
+        if (
+            self.instance.pk
+            and "ends_on" in self.changed_data
+            and self.instance.next_period_starts_on
+            and not self.errors
+        ):
+            self.instance.ends_on = data.get("ends_on")
+            self.instance.periodicity = data.get("periodicity")
+            self.instance.create_invoice_on_day = data.get("create_invoice_on_day")
+            if len(periods := self.instance.pending_periods()) > 1:
+                self.add_warning(
+                    _(
+                        "This creates %(count)s invoices for the periods since"
+                        " %(date)s. If the time in between shouldn't be invoiced,"
+                        " leave this recurring invoice ended and create a new one."
+                    )
+                    % {
+                        "count": len(periods),
+                        "date": local_date_format(periods[0][0]),
+                    },
+                    code="recurring-invoice-backlog",
+                )
+
         return data
 
 

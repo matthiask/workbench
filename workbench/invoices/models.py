@@ -897,8 +897,10 @@ class RecurringInvoice(ModelWithTotal):
             third_party_costs=self.third_party_costs,
         )
 
-    def create_invoices(self):
-        invoices = []
+    def pending_periods(self):
+        """The periods ``(starts_on, ends_on)`` whose invoices are due to be
+        created now"""
+        periods = []
         days = recurring(
             max(filter(None, (self.next_period_starts_on, self.starts_on))),
             self.periodicity,
@@ -907,18 +909,21 @@ class RecurringInvoice(ModelWithTotal):
             filter(None, (in_days(-self.create_invoice_on_day), self.ends_on))
         )
         this_period = next(days)
-        while True:
-            if this_period > generate_until:
-                break
+        while this_period <= generate_until:
             next_period = next(days)
+            periods.append((this_period, next_period - dt.timedelta(days=1)))
+            this_period = next_period
+        return periods
+
+    def create_invoices(self):
+        invoices = []
+        for starts_on, ends_on in self.pending_periods():
             invoices.append(
                 self.create_single_invoice(
-                    period_starts_on=this_period,
-                    period_ends_on=next_period - dt.timedelta(days=1),
+                    period_starts_on=starts_on, period_ends_on=ends_on
                 )
             )
-            self.next_period_starts_on = next_period
-            this_period = next_period
+            self.next_period_starts_on = ends_on + dt.timedelta(days=1)
         self.save()
         return invoices
 

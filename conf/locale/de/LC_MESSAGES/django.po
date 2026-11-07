@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 15:07+0100\n"
+"POT-Creation-Date: 2026-11-07 15:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2329,6 +2329,11 @@ msgstr "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht
 #, python-brace-format
 msgid "Cannot create a recurring invoice with a start date of {} or earlier anymore."
 msgstr "Kann Stapelrechnung mit einem Startdatum von {} oder früher nicht mehr erstellen."
+
+#: workbench/invoices/forms.py
+#, python-format
+msgid "This creates %(count)s invoices for the periods since %(date)s. If the time in between shouldn't be invoiced, leave this recurring invoice ended and create a new one."
+msgstr "Damit werden %(count)s Rechnungen für die Perioden seit dem %(date)s erstellt. Falls die Zeit dazwischen nicht verrechnet werden soll, lass diese wiederkehrende Rechnung beendet und erstelle eine neue."
 
 #: workbench/invoices/models.py
 msgid "Sent"

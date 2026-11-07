@@ -150,6 +150,46 @@ class RecurringTest(TestCase):
         self.assertRedirects(response, ri.urls["detail"])
         self.assertEqual(messages(response), ["Created 0 invoices."])
 
+    def test_reactivation_backlog(self):
+        """Reactivating a recurring invoice which has ended warns about the
+        invoices of the past periods it would create"""
+        ri = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date(2025, 1, 1),
+            ends_on=dt.date(2025, 3, 31),
+            periodicity="monthly",
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+        )
+        with travel("2025-04-01 12:00"):
+            self.assertEqual(len(ri.create_invoices()), 3)
+        self.client.force_login(ri.owned_by)
+
+        data = {
+            "customer": ri.customer_id,
+            "contact": ri.contact_id,
+            "title": ri.title,
+            "owned_by": ri.owned_by_id,
+            "postal_address": ri.postal_address,
+            "starts_on": ri.starts_on.isoformat(),
+            "ends_on": "",
+            "periodicity": "monthly",
+            "create_invoice_on_day": -20,
+            "subtotal": 100,
+            "discount": 0,
+            "liable_to_vat": "1",
+            "third_party_costs": 0,
+        }
+        with travel("2025-07-15 12:00"):
+            response = self.client.post(ri.urls["update"], data)
+            self.assertContains(response, "recurring-invoice-backlog")
+            self.assertContains(response, "5 invoices for the periods since")
+
+            # Extending it to the current period is fine
+            response = self.client.post(
+                ri.urls["update"], data | {"ends_on": "2025-04-30"}
+            )
+            self.assertRedirects(response, ri.urls["detail"])
+
     def test_create_and_notify(self):
         """The recurring invoices task notifies owners"""
         factories.RecurringInvoiceFactory.create()
