@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 08:44+0100\n"
+"POT-Creation-Date: 2026-11-07 08:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3017,10 +3017,6 @@ msgstr "Die Offerte hat keine Leistung mit dieser ID."
 #: workbench/offers/api.py workbench/projects/api.py
 msgid "Hours or costs have been logged on this service, it cannot be deleted."
 msgstr "Auf dieser Leistung wurden bereits Stunden oder Kosten erfasst, sie kann nicht gelöscht werden."
-
-#: workbench/offers/api.py
-msgid "The last service of an offer cannot be deleted."
-msgstr "Die letzte Leistung einer Offerte kann nicht gelöscht werden."
 
 #: workbench/offers/api.py
 msgid "Expected the IDs of all services of the offer once."
@@ -6224,6 +6220,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "The last service of an offer cannot be deleted."
+#~ msgstr "Die letzte Leistung einer Offerte kann nicht gelöscht werden."
 
 #~ msgid "Only reassign logbook entries which haven't been invoiced yet"
 #~ msgstr "Nur noch nicht verrechnete Einträge umbuchen"

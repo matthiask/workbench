@@ -688,7 +688,7 @@ def offer_service_delete(
     request, offer_id: int, service_id: int, *, dry_run: bool = False
 ):
     """Delete a service of an offer in preparation, unless hours or costs have
-    been logged on it; offers keep at least one service"""
+    been logged on it"""
     offer = _changeable_offer(offer_id)
     service = get_object_or_404(offer.services.all(), pk=service_id)
     errors = []
@@ -698,11 +698,6 @@ def offer_service_delete(
             "msg": _(
                 "Hours or costs have been logged on this service, it cannot be deleted."
             ),
-        })
-    if offer.services.count() == 1:
-        errors.append({
-            "loc": ["path", "service_id"],
-            "msg": _("The last service of an offer cannot be deleted."),
         })
     if errors:
         raise ValidationError(errors)

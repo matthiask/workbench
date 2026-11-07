@@ -547,7 +547,7 @@ class OfferServicesAPITest(TestCase):
         self.assertEqual(response.json()["services"][0]["effort_rate"], "160.00")
 
     def test_delete(self):
-        """Services without logbook entries can be deleted, but not the last
+        """Services without logbook entries can be deleted, also the last
         one"""
         response = self.send("delete", f"services/{self.hosting.pk}/", dry_run=True)
         self.assertEqual(response.json()["total_excl_tax"], "2500.00")
@@ -564,9 +564,10 @@ class OfferServicesAPITest(TestCase):
         self.offer.refresh_from_db()
         self.assertEqual(self.offer.total_excl_tax, Decimal("500.00"))
 
+        self.hosting.loggedhours.all().delete()
         response = self.send("delete", f"services/{self.hosting.pk}/")
-        self.assertEqual(response.status_code, 422)
-        self.assertIn("last service", response.content.decode())
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(self.offer.services.count(), 0)
 
     def test_reorder(self):
         """Services are reordered by listing all their IDs"""
