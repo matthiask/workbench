@@ -785,12 +785,19 @@ def _service_result(service, request, *, dry_run=False, created=False):
 
 
 @router.post("/services/", response=ServiceOut)
-def service_create(request, data: ServiceCreate, *, dry_run: bool = False):
+def service_create(
+    request,
+    data: ServiceCreate,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
     """Create a service, validated with the form of the web interface, at
     the end of its offer (or of the services without offer) or after another
     service
 
-    The ID and the URL are null with ``dry_run``."""
+    Warnings of the web interface (e.g. ``unspecific-service``) are errors
+    unless they are ignored. The ID and the URL are null with ``dry_run``."""
     fields = data.model_dump(exclude_unset=True)
     if data.project:
         project = get_object_or_404(Project, pk=data.project)
@@ -808,8 +815,11 @@ def service_create(request, data: ServiceCreate, *, dry_run: bool = False):
     values = form_data(ServiceForm(project=project, request=request))
     values = _service_values(values, fields)
     form = ServiceForm(values, project=project, request=request)
-    if not form.is_valid(ignore_warnings=True):
-        raise_form_errors(form, fields={v: [k] for k, v in SERVICE_FORM_FIELDS.items()})
+    validate_form(
+        form,
+        fields={v: [k] for k, v in SERVICE_FORM_FIELDS.items()},
+        ignore_warnings=ignore_warnings,
+    )
 
     group = list(
         Service.objects.filter(
@@ -842,14 +852,20 @@ def service_create(request, data: ServiceCreate, *, dry_run: bool = False):
 
 @router.patch("/services/{int:service_id}/", response=ServiceOut)
 def service_update(
-    request, service_id: int, data: ServicePatch, *, dry_run: bool = False
+    request,
+    service_id: int,
+    data: ServicePatch,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change a service or move it to another offer, validated with the form
     of the web interface
 
     Services of offers which have been sent or accepted can't be changed
-    anymore, only their external reference can. Warnings (e.g. about
-    unspecific titles) are ignored."""
+    anymore, only their external reference can. Warnings of the web
+    interface about the changed fields (e.g. ``unspecific-service``) are
+    errors unless they are ignored."""
     service = get_object_or_404(Service.objects.select_related("offer"), pk=service_id)
     fields = data.model_dump(exclude_unset=True)
     if service.offer and service.offer.status > Offer.SERVICE_GROUP:
@@ -867,8 +883,11 @@ def service_update(
     values = form_data(ServiceForm(instance=service, request=request))
     values = _service_values(values, fields)
     form = ServiceForm(values, instance=service, request=request)
-    if not form.is_valid(ignore_warnings=True):
-        raise_form_errors(form, fields={v: [k] for k, v in SERVICE_FORM_FIELDS.items()})
+    validate_form(
+        form,
+        fields={v: [k] for k, v in SERVICE_FORM_FIELDS.items()},
+        ignore_warnings=ignore_warnings,
+    )
 
     with transaction.atomic():
         service = form.save()

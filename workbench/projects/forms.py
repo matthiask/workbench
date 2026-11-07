@@ -635,7 +635,12 @@ class ServiceForm(ModelForm):
                     " it cannot be moved to another offer."
                 ),
             )
-        if data.get("title") and not is_title_specific(data["title"]):
+        # Only warn about what's changed, not about old services
+        if (
+            "title" in self.changed_data
+            and data.get("title")
+            and not is_title_specific(data["title"])
+        ):
             self.add_warning(
                 _(
                     "This title seems awfully unspecific."
@@ -643,7 +648,11 @@ class ServiceForm(ModelForm):
                 ),
                 code="unspecific-service",
             )
-        if data.get("description") and is_only_url(data["description"]):
+        if (
+            "description" in self.changed_data
+            and data.get("description")
+            and is_only_url(data["description"])
+        ):
             self.add_warning(
                 _(
                     "The description should not only contain a URL."

@@ -562,6 +562,49 @@ class ProjectsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
 
+    def test_service_warnings(self):
+        """Warnings of the service form are errors unless they are ignored,
+        only for the fields which are changed"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        def send(method, url, data, query=""):
+            response = getattr(self.client, method)(
+                f"{url}{query}", data, content_type="application/json"
+            )
+            return response.status_code, [
+                e.get("code") for e in response.json().get("detail", [])
+            ]
+
+        data = {"project": project.pk, "title": "Allgemein"}
+        self.assertEqual(
+            send("post", "/api/services/", data), (422, ["unspecific-service"])
+        )
+        self.assertEqual(
+            send(
+                "post",
+                "/api/services/",
+                data | {"description": "https://example.com/issues/1"},
+                "?ignore_warnings=unspecific-service",
+            ),
+            (422, ["description-only-url"]),
+        )
+        self.assertEqual(
+            send(
+                "post",
+                "/api/services/",
+                data,
+                "?ignore_warnings=unspecific-service",
+            ),
+            (200, []),
+        )
+        service = project.services.get()
+        url = f"/api/services/{service.pk}/"
+        self.assertEqual(send("patch", url, {"hours": 5}), (200, []))
+        self.assertEqual(
+            send("patch", url, {"title": "Allg."}), (422, ["unspecific-service"])
+        )
+
     def test_invoiced_service(self):
         """Services which have been invoiced (e.g. from the offer, without
         logged hours) are neither deleted nor moved to another offer"""

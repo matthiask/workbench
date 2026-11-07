@@ -214,7 +214,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   references and creates milestones and service groups for each other. Single services are created, changed, moved between offers, deleted and
   reordered through `/api/services/` (`wb services create/update/delete/reorder`),
   validated with the web interface's `ServiceForm` (which also restricts the
-  offer queryset, not only the choices) and its rules: services of offers which
+  offer queryset, not only the choices; it warns only about the changed
+  title and description, the API treats those warnings like elsewhere) and
+  its rules: services of offers which
   have been sent or accepted only allow changing the external reference,
   deleting is only possible in offers in preparation or without offer and
   without logged hours or costs, invoiced services (`Service.is_invoiced`,

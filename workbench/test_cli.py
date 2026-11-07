@@ -648,6 +648,19 @@ planned_work:
         self.assertEqual(service.title, "#12 Issue")
         result = self.wb("services", "update", service.pk)
         self.assertEqual(result.exit_code, 1)
+        result = self.wb("services", "update", service.pk, "--title", "Allgemein")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning unspecific-service", result.output)
+        result = self.wb(
+            "services",
+            "update",
+            service.pk,
+            "--title",
+            "Allgemein",
+            "--ignore-warning",
+            "unspecific-service",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
         target = factories.ServiceFactory.create(project=project)
         result = self.wb("services", "reassign-logbook", service.pk, "--to", target.pk)
         self.assertEqual(result.exit_code, 0, result.output)

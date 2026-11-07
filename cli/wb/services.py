@@ -9,6 +9,7 @@ from wb.core import (
     echo_json,
     echo_more,
     format_bool,
+    ignore_warnings_option,
     link,
     load,
     make_table,
@@ -157,9 +158,20 @@ def search_services(
     help="ID of the service to add it after, at the end of its offer (or of the"
     " services without offer) by default.",
 )
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
-def create_service(file, project, offer, optional, after, dry_run, as_json, **values):
+def create_service(
+    file,
+    project,
+    offer,
+    optional,
+    after,
+    ignore_warnings,
+    dry_run,
+    as_json,
+    **values,
+):
     """Create a service of a project or of an offer
 
     The service is read from a YAML or JSON file (like a service of `wb offers
@@ -177,7 +189,10 @@ def create_service(file, project, offer, optional, after, dry_run, as_json, **va
     data = request(
         "POST",
         "services/",
-        params={"dry_run": format_bool(dry_run)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
         json=data,
     )
     _echo_service(data, dry_run=dry_run, as_json=as_json, prefix="Created ")
@@ -197,6 +212,7 @@ def create_service(file, project, offer, optional, after, dry_run, as_json, **va
 @click.option("--optional/--no-optional", default=None, help="Part of the total?")
 @click.option("--clear-hours", is_flag=True, help="Remove the hours.")
 @click.option("--clear-cost", is_flag=True, help="Remove the cost.")
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_service(
@@ -207,6 +223,7 @@ def update_service(
     optional,
     clear_hours,
     clear_cost,
+    ignore_warnings,
     dry_run,
     as_json,
     **values,
@@ -233,7 +250,10 @@ def update_service(
         "PATCH",
         f"services/{service_id}/",
         json=data,
-        params={"dry_run": format_bool(dry_run)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
     )
     _echo_service(data, dry_run=dry_run, as_json=as_json)
 
