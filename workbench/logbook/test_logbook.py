@@ -709,6 +709,23 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
 
+    def test_logged_hours_deletion_late_logging(self):
+        """Hours of people with LATE_LOGGING can be deleted in past weeks,
+        like they can be changed there"""
+        user = factories.UserFactory.create()
+        user._features.append(FEATURES.LATE_LOGGING)
+        user.save()
+        hours = factories.LoggedHoursFactory.create(
+            rendered_by=user, rendered_on=in_days(-21)
+        )
+        # Whoever deletes them, the person's feature counts
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post(
+            hours.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(LoggedHours.objects.filter(pk=hours.pk).exists())
+
     def test_logged_cost_deletion(self):
         """Deleting archived logged costs is not allowed"""
         costs = factories.LoggedCostFactory.create(archived_at=timezone.now())

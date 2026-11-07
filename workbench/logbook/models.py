@@ -9,6 +9,7 @@ from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.projects.models import Service
 from workbench.tools.formats import (
@@ -82,7 +83,12 @@ class LoggedHours(Model):
         if instance.invoice_service_id or instance.archived_at:
             messages.error(request, _("Cannot delete archived logged hours."))
             return False
-        if instance.rendered_on < logbook_lock():
+        # Like changing them: The hours of people with LATE_LOGGING may be
+        # corrected late
+        if (
+            instance.rendered_on < logbook_lock()
+            and not instance.rendered_by.features[FEATURES.LATE_LOGGING]
+        ):
             messages.error(request, _("Cannot delete logged hours from past weeks."))
             return False
         return super().allow_delete(instance, request)

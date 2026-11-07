@@ -96,8 +96,8 @@ fixed (the commits after "Verification: Findings of the third round").
   (`rendered_by`, whoever enters them) can be logged late: logging them in
   past weeks and changing their hours and date there. Logged costs aren't
   affected and have no week lock (until they're archived or invoiced, or
-  14 days after the project was closed). Deleting hours of past weeks isn't
-  possible, also with the feature.
+  14 days after the project was closed). Deleting hours follows the same
+  rule as changing them.
 - Absences can't span the year end, so vacations across it are two
   absences.
 - Statuses and probabilities are stable keys in the API (`workbench/api_keys.py`).
