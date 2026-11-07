@@ -504,6 +504,7 @@ class PlannedWorkBatchForm(Form):
             for unit in work:
                 unit.project = project
                 unit.offer = None
+                unit.milestone = None
         if (is_provisional := data.get("provisional")) in {True, False}:
             for unit in work:
                 unit.is_provisional = is_provisional

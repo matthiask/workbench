@@ -474,6 +474,31 @@ class PlanningTest(TestCase):
         deal.save()
         self.assertIsNone(decision())
 
+    def test_batch_update_move_to_other_project(self):
+        """Moving planned work to another project resets its offer and its
+        milestone, both belong to the old project"""
+        milestone = factories.MilestoneFactory.create(date=in_days(10))
+        offer = factories.OfferFactory.create(project=milestone.project)
+        pw = factories.PlannedWorkFactory.create(
+            project=milestone.project,
+            offer=offer,
+            milestone=milestone,
+            weeks=[monday()],
+        )
+        other = factories.ProjectFactory.create()
+        self.client.force_login(pw.user)
+
+        response = self.client.post(
+            pw.project.urls["planning_batch_update"],
+            {"work": [pw.pk], "move_by_weeks": 0, "project": other.pk},
+        )
+        self.assertEqual(response.status_code, 202)
+
+        pw.refresh_from_db()
+        self.assertEqual(pw.project, other)
+        self.assertIsNone(pw.offer)
+        self.assertIsNone(pw.milestone)
+
 
 class CapacityTest(TestCase):
     def test_capacity(self):
