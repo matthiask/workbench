@@ -1,4 +1,5 @@
 import datetime as dt
+from unittest.mock import ANY
 
 from django.core import mail
 from django.test import TestCase
@@ -152,6 +153,7 @@ class InvoicesAPITest(TestCase):
             data,
             [
                 {
+                    "id": ANY,
                     "project": {
                         "id": project.pk,
                         "code": project.code,

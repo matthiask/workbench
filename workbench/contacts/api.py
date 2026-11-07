@@ -275,7 +275,11 @@ def organization_detail(request, organization_id: int):
 
 
 class ContactDetail(Schema):
-    type: str
+    id: int
+    type: str = Field(
+        description="Free text like work, mobile or private; the web interface"
+        " suggests a localized default."
+    )
     value: str
 
 
@@ -307,15 +311,15 @@ def person_out(person, request):
         "primary_contact": person.primary_contact.get_short_name(),
         "groups": [group.title for group in person.all_groups()],
         "email_addresses": [
-            {"type": detail.type, "value": detail.email}
+            {"id": detail.id, "type": detail.type, "value": detail.email}
             for detail in person.emailaddresses.all()
         ],
         "phone_numbers": [
-            {"type": detail.type, "value": detail.phone_number}
+            {"id": detail.id, "type": detail.type, "value": detail.phone_number}
             for detail in person.phonenumbers.all()
         ],
         "postal_addresses": [
-            {"type": detail.type, "value": detail.postal_address}
+            {"id": detail.id, "type": detail.type, "value": detail.postal_address}
             for detail in person.postaladdresses.all()
         ],
     }

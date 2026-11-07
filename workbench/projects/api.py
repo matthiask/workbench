@@ -286,6 +286,7 @@ class PlannedHoursStats(Schema):
 
 
 class InvoiceStats(Schema):
+    id: int
     code: str
     title: str
     type: InvoiceType
@@ -443,6 +444,7 @@ def project_stats(request, filters: Query[StatsFilter]):
             ],
             "invoices": [
                 {
+                    "id": invoice.id,
                     "code": invoice.code,
                     "title": invoice.title,
                     "type": invoice.type,

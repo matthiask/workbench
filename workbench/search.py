@@ -57,7 +57,9 @@ router = Router(tags=["search"])
 
 class SearchFilter(Schema):
     q: str = Field(min_length=1)
-    limit: int = Field(10, ge=1, le=100)
+    limit: int = Field(
+        10, ge=1, le=100, description="Results per type, not a page of results."
+    )
 
 
 class SearchResult(Schema):

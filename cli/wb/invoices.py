@@ -233,12 +233,13 @@ def invoice_pdf(invoice_id, output):
 @click.option("--description", help="The text, or - to read it from stdin.")
 @click.option(
     "--subtotal",
+    type=float,
     help="Fixed amount, down payment and credit invoices, excl. tax.",
 )
-@click.option("--third-party-costs")
-@click.option("--discount")
+@click.option("--third-party-costs", type=float)
+@click.option("--discount", type=float, help="Amount excl. tax.")
 @click.option("--vat/--no-vat", "liable_to_vat", default=True, show_default=True)
-@click.option("--tax-rate", help="Defaults to the current tax rate.")
+@click.option("--tax-rate", type=float, help="Defaults to the current tax rate.")
 @click.option("--service-period-from", type=click.DateTime(formats=["%Y-%m-%d"]))
 @click.option("--service-period-until", type=click.DateTime(formats=["%Y-%m-%d"]))
 @click.option(

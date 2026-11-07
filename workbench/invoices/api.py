@@ -684,6 +684,7 @@ def invoice_pdf(request, invoice_id: str):
 
 
 class ProjectedInvoiceOut(Schema):
+    id: int
     project: ProjectSummary
     invoiced_on: dt.date
     gross_margin: Decimal
@@ -692,6 +693,7 @@ class ProjectedInvoiceOut(Schema):
 
 def _projected_invoice_out(projected_invoice, request):
     return {
+        "id": projected_invoice.id,
         "project": project_summary(projected_invoice.project, request),
         "invoiced_on": projected_invoice.invoiced_on,
         "gross_margin": projected_invoice.gross_margin,

@@ -1,4 +1,5 @@
 import datetime as dt
+from unittest.mock import ANY
 
 from django.test import TestCase
 from django.utils import timezone
@@ -474,7 +475,8 @@ class ContactsAPITest(TestCase):
         self.assertEqual(data["full_name"], "Hans Muster")
         self.assertEqual(data["organization"]["id"], person.organization_id)
         self.assertEqual(
-            data["email_addresses"], [{"type": "work", "value": "hans@example.com"}]
+            data["email_addresses"],
+            [{"id": ANY, "type": "work", "value": "hans@example.com"}],
         )
         self.assertEqual(data["phone_numbers"][0]["value"], "+41 44 123 45 67")
         self.assertEqual(data["url"], f"http://testserver{person.get_absolute_url()}")
