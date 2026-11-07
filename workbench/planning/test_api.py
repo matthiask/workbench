@@ -235,6 +235,30 @@ class PlanningAPITest(TestCase):
         pw.refresh_from_db()
         self.assertEqual(pw.weeks, [week])
 
+    def test_null_for_required_fields(self):
+        """Fields which can't be empty reject null"""
+        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
+        self.client.force_login(pw.user)
+        for field in [
+            "title",
+            "user",
+            "service_type",
+            "weeks",
+            "planned_hours",
+            "is_provisional",
+        ]:
+            with self.subTest(field=field):
+                response = self.client.patch(
+                    f"/api/planning/work/{pw.pk}/",
+                    {field: None},
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(
+                    response.json()["detail"][0]["msg"],
+                    "This field cannot be null.",
+                )
+
     def test_export(self):
         """Planned work, milestones and capacity of a period or a project"""
         user = factories.UserFactory.create(_short_name="ab")

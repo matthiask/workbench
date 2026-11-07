@@ -271,11 +271,24 @@ def _lookups(project):
     }
 
 
+# Fields of planned work which can be left out but not set to null
+NOT_NULL = {"title", "user", "service_type", "weeks", "planned_hours", "is_provisional"}
+
+
 def _apply_planned_work(  # noqa: C901
     pw, values, lookups, *, new_milestones, loc, errors, warnings
 ):
     """Set the given fields of planned work, shared by the import and the
     endpoints changing single planned work"""
+    if "notes" in values and values["notes"] is None:
+        values = {**values, "notes": ""}
+    for field in [field for field in values if field in NOT_NULL]:
+        if values[field] is None:
+            errors.append({
+                "loc": [*loc, field],
+                "msg": _("This field cannot be null."),
+            })
+            values = {key: value for key, value in values.items() if key != field}
     for field in ["title", "notes", "is_provisional"]:
         if field in values:
             setattr(pw, field, values[field])
