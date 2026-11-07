@@ -189,6 +189,7 @@ From `workbench/reporting/green_hours.py:green_hours_by_month` (SQL), all logged
 
 #### Caveats from code
 - Accruals are snapshots: the fairy tasks recompute (`update_or_create`) the stored accruals of every month-end of the last two years on each run (`reporting/tasks.py:create_accruals_for_last_month`), with current data (current invoice status, current project types). Older stored records stay as they were.
+- Last month's figures are final only after the fairy tasks have run in the new month. Before, last month has no stored record: its Umsatz bereinigt lacks the accrual delta, the current month's delta (live, cutoff today) is taken against the month before last instead, and the key data API's `accruals` (computed live at the month end) doesn't match the delta in its `gross_margin`. Months before the first stored record behave the same way. Computing the missing record live would cost another run of the project budget statistics for every request, for a gap of a few hours a month.
 - Projections not invoiced in time stay in their original month (AGENTS.md; `projected_gross_margin`).
 
 ---
