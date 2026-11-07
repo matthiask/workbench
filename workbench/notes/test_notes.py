@@ -287,6 +287,22 @@ class NotesTest(TestCase):
         send_notes_digest(day=dt.date.today())
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_notes_digest_features(self):
+        """Owners only get the notes of objects they may see"""
+        deal = factories.DealFactory.create()
+        project = factories.ProjectFactory.create(owned_by=deal.owned_by)
+        colleague = factories.UserFactory.create()
+        set_user_name(colleague)
+        Note.objects.create(content_object=deal, created_by=colleague, title="Deal")
+        Note.objects.create(content_object=project, created_by=colleague, title="P")
+
+        with override_settings(FEATURES={FEATURES.DEALS: F.NEVER}):
+            send_notes_digest(day=dt.date.today())
+
+        [message] = mail.outbox
+        self.assertIn(project.get_absolute_url(), message.body)
+        self.assertNotIn(deal.get_absolute_url(), message.body)
+
     def test_content_object_url(self):
         """The content_object_url admin helper works"""
         # Has URL
