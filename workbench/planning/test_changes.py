@@ -85,6 +85,29 @@ class ChangesTest(TestCase):
             self.assertNotIn("Created: ", message.body)
 
     @travel("2021-10-18")
+    def test_moved_work(self):
+        """Work moved to another project is reported there, the owners of both
+        projects are told"""
+        self.set_current_user()
+        pw = factories.PlannedWorkFactory.create(weeks=[in_days(0)])
+        old_project = pw.project
+        new_project = factories.ProjectFactory.create()
+        LoggedAction.objects.all().update(
+            created_at=timezone.now() - dt.timedelta(days=14)
+        )
+
+        pw.project = new_project
+        pw.save()
+
+        c = updates.changes(since=timezone.now() - dt.timedelta(days=1))
+        self.assertEqual(set(c), {pw.user, old_project.owned_by, new_project.owned_by})
+        for user in c:
+            self.assertEqual(set(c[user]), {new_project})
+        [work] = c[new_project.owned_by][new_project]["objects"]
+        changed = {row["field"]: (row["old"], row["new"]) for row in work["changes"]}
+        self.assertEqual(changed["project_id"], (old_project, new_project))
+
+    @travel("2021-10-18")
     def test_absence_changes(self):
         """Absences of people one shares projects with land in the updates"""
         self.set_current_user()

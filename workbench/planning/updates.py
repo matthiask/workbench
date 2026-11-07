@@ -132,7 +132,7 @@ def _weeks(weeks):
     return f"{local_date_format(start)} - {local_date_format(end)}"
 
 
-def pretty_changes_work(*, users, milestones):
+def pretty_changes_work(*, users, milestones, projects):
     def prettifier(changes):
         def _row(row):
             try:
@@ -145,6 +145,10 @@ def pretty_changes_work(*, users, milestones):
             if row["field"] == "user_id":
                 row["old"] = users.get(int(row["old"]), row["old"])
                 row["new"] = users.get(int(row["new"]), row["new"])
+
+            elif row["field"] == "project_id":
+                row["old"] = projects.get(int(row["old"]), row["old"])
+                row["new"] = projects.get(int(row["new"]), row["new"])
 
             elif row["field"] == "weeks":
                 row["old"] = _weeks(row["old"])
@@ -183,16 +187,28 @@ def changes(*, since):
     queryset = LoggedAction.objects.filter(
         created_at__gte=since,
         table_name__in=["planning_milestone", "planning_plannedwork"],
-    )
+    ).order_by("created_at", "event_id")
     projects = {
         project.id: project
         for project in Project.objects.filter(
             id__in={action.row_data["project_id"] for action in queryset}
+            | {
+                action.changed_fields["project_id"]
+                for action in queryset
+                if action.changed_fields and "project_id" in action.changed_fields
+            }
         ).select_related("owned_by")
     }
 
-    def project_for_action(action):
-        project_id = int(action.row_data["project_id"])
+    def project_for_action(action, *, current=False):
+        """The project of the row before the action, or after it"""
+        project_id = int(
+            action.changed_fields["project_id"]
+            if current
+            and action.changed_fields
+            and "project_id" in action.changed_fields
+            else action.row_data["project_id"]
+        )
         if project_id not in projects:
             projects[project_id] = Project(
                 id=int(project_id),
@@ -234,7 +250,8 @@ def changes(*, since):
 
     for key, actions in actions_by_object.items():
         type = change_type(actions)
-        project = project_for_action(actions[0])
+        # Work moved to another project is reported there
+        project = project_for_action(actions[-1], current=True)
         if project.suppress_planning_update_mails:
             continue
         by = {users.get(audit_user_id(a.user_name)) for a in actions}
@@ -260,7 +277,7 @@ def changes(*, since):
                 actions,
                 aux={"object": work_by_id.get(key[1]), "by": by},
                 pretty_changes=pretty_changes_work(
-                    users=users, milestones=project_milestones
+                    users=users, milestones=project_milestones, projects=projects
                 ),
                 pretty_deleted_object=partial(pretty_deleted_object_work, users=users),
             )
@@ -272,6 +289,8 @@ def changes(*, since):
                     if a.changed_fields and "user_id" in a.changed_fields
                 }
                 | {project.owned_by}
+                # The owners of the projects it has been moved from
+                | {project_for_action(a).owned_by for a in actions}
             )
             for user in affected:
                 if user.id:
