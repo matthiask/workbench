@@ -105,6 +105,17 @@ class ContactsTest(TestCase):
         )
 
         factories.Project.objects.all().delete()
+        # Deals too
+        factories.DealFactory.create(customer=person.organization, contact=person)
+        response = self.client.post(
+            person.urls["update"], person_to_dict(person, organization="")
+        )
+        self.assertContains(
+            response,
+            "This person is the contact of the following related objects: 1 deal.",
+        )
+
+        Deal.objects.all().delete()
         response = self.client.post(
             person.urls["update"], person_to_dict(person, organization="")
         )

@@ -541,18 +541,13 @@ class PersonForm(ModelForm):
                 code="short-salutation",
             )
         if self.instance.pk and "organization" in self.changed_data:
+            from workbench.deals.models import Deal
             from workbench.invoices.models import Invoice
             from workbench.projects.models import Project
 
             related = []
-            invoices = Invoice.objects.filter(contact=self.instance).count()
-            projects = Project.objects.filter(contact=self.instance).count()
-
-            for model, count in [
-                (Invoice, invoices),
-                (Project, projects),
-            ]:
-                if count:
+            for model in [Invoice, Project, Deal]:
+                if count := model.objects.filter(contact=self.instance).count():
                     related.append(
                         "{} {}".format(
                             count,
