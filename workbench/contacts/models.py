@@ -61,6 +61,14 @@ class Group(Model):
         )
         memberships.delete()
 
+    def move_organizations_to_people(self):
+        """Groups which don't apply to organizations anymore keep their
+        members: the people of the organizations join them"""
+        self.person_set.add(
+            *Person.objects.filter(organization__groups=self).exclude(groups=self)
+        )
+        self.organization_set.clear()
+
     def get_absolute_url(self):
         # Groups are lists of people
         return Person.urls["list"] + f"?g={self.pk}"

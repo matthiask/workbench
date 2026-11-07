@@ -315,7 +315,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   use these instead of `person.groups`). The person form still offers them
   but saves them on the organization; only people without an organization
   are members themselves. Turning the flag on moves existing memberships to
-  the organizations (`Group.move_people_to_organizations()`).
+  the organizations (`Group.move_people_to_organizations()`), turning it off
+  makes their people members (`move_organizations_to_people()`).
 - Offers are only linked to and unlinked from open deals, and only offers
   which aren't closed yet (in preparation, service group, offered): closing a
   deal settles its offers. Offers of other customers' projects are a warning

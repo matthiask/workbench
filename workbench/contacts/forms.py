@@ -128,11 +128,11 @@ class GroupForm(ModelForm):
 
     def save(self, *, commit=True):
         instance = super().save()
-        if (
-            "applies_to_organizations" in self.changed_data
-            and instance.applies_to_organizations
-        ):
-            instance.move_people_to_organizations()
+        if "applies_to_organizations" in self.changed_data:
+            if instance.applies_to_organizations:
+                instance.move_people_to_organizations()
+            else:
+                instance.move_organizations_to_people()
         return instance
 
 

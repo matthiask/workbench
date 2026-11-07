@@ -933,6 +933,25 @@ class OrganizationGroupsTest(TestCase):
         self.assertEqual(set(self.organization.groups.all()), {self.industry, group})
         self.assertEqual(set(alone.groups.all()), {group})
 
+    def test_flag_off_moves_memberships_back(self):
+        """Groups which don't apply to organizations anymore keep their
+        members: the people of the organizations join them"""
+        alone = factories.PersonFactory.create()
+        alone.groups.add(self.industry)
+
+        self.client.force_login(self.person.primary_contact)
+        response = self.client.post(
+            self.industry.urls["update"],
+            {"modal-title": "Industry"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(
+            set(self.person.groups.all()), {self.newsletter, self.industry}
+        )
+        self.assertEqual(set(self.organization.groups.all()), set())
+        self.assertEqual(set(alone.groups.all()), {self.industry})
+
     def test_person_form(self):
         """The person form shows the groups of the organization too, changes
         to groups which apply to organizations go to the organization"""

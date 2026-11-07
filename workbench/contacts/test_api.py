@@ -257,6 +257,9 @@ class ContactsAPITest(TestCase):
         response = send("patch", f"{mailing.pk}/", {"applies_to_organizations": True})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(list(person.organization.groups.all()), [mailing])
+        # null leaves fields alone
+        response = send("patch", f"{mailing.pk}/", {"applies_to_organizations": None})
+        self.assertTrue(response.json()["applies_to_organizations"])
         response = send("patch", f"{mailing.pk}/", {"is_archived": True})
         self.assertTrue(response.json()["is_archived"])
         response = send("patch", f"{mailing.pk}/", {"title": "Christmas"})

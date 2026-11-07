@@ -798,7 +798,9 @@ def group_create(request, data: GroupIn, *, dry_run: bool = False):
 def group_update(request, group_id: int, data: GroupPatch, *, dry_run: bool = False):
     """Rename or archive a group, or let it apply to organizations"""
     group = get_object_or_404(Group, pk=group_id)
-    values = _group_values(group, request) | data.dict(exclude_unset=True)
+    values = _group_values(group, request) | data.dict(
+        exclude_unset=True, exclude_none=True
+    )
     return _save_group(request, group, values, dry_run=dry_run)
 
 
