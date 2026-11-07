@@ -283,6 +283,15 @@ def _apply_planned_work(  # noqa: C901
     endpoints changing single planned work"""
     if "notes" in values and values["notes"] is None:
         values = {**values, "notes": ""}
+    if (
+        "user" in values
+        and values["user"] is None
+        and pw.pk
+        and not pw.user._short_name
+    ):
+        # The context has null for users without a short name (people are
+        # only identified by their short name), sending it back is unchanged
+        values = {key: value for key, value in values.items() if key != "user"}
     for field in [field for field in values if field in NOT_NULL]:
         if values[field] is None:
             errors.append({

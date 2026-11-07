@@ -222,6 +222,39 @@ class PlanningAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 422)
 
+    def test_import_unchanged_user_without_short_name(self):
+        """Planned work of users without a short name has a null user in the
+        context, sending it back unchanged works but null never sets a user"""
+        project = factories.ProjectFactory.create()
+        anonymous = factories.UserFactory.create(_short_name="")
+        pw = factories.PlannedWorkFactory.create(
+            project=project, user=anonymous, weeks=[monday()]
+        )
+        other = factories.PlannedWorkFactory.create(project=project, weeks=[monday()])
+        self.client.force_login(project.owned_by)
+
+        context = self.client.get(
+            f"/api/projects/{project.pk}/planning/context/"
+        ).json()
+        work = {item["id"]: item for item in context["planned_work"]}
+        self.assertIsNone(work[pw.pk]["user"])
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/import/",
+            {"milestones": [], "planned_work": context["planned_work"]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        pw.refresh_from_db()
+        self.assertEqual(pw.user, anonymous)
+
+        # Null doesn't remove the user of other planned work
+        response = self.client.patch(
+            f"/api/planning/work/{other.pk}/",
+            {"user": None},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+
     def test_import_page(self):
         """The import page contains the prompt and is linked from the planning"""
         project = factories.ProjectFactory.create(title="Relaunch für Kunde")
