@@ -1,11 +1,14 @@
 import importlib
 import inspect
 from pathlib import Path
+from unittest.mock import ANY
 
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import override_settings
 from ninja import Schema
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.api import api
 
 
@@ -106,3 +109,28 @@ class CodesTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 200, response.content)
+
+
+class ErrorsTest(TestCase):
+    def test_error_shape(self):
+        """All errors are lists of locations and messages, like validation
+        errors, and documented"""
+        response = self.client.get("/api/me/")
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json(), {"detail": [{"loc": [], "msg": ANY}]})
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.get("/api/offers/999999/")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {"detail": [{"loc": [], "msg": ANY}]})
+
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
+            response = self.client.get("/api/invoices/")
+        self.assertEqual(response.status_code, 403)
+        [error] = response.json()["detail"]
+        self.assertIn("feature", error["msg"])
+
+        schema = api.get_openapi_schema(path_prefix="/api/")
+        responses = schema["paths"]["/api/offers/"]["get"]["responses"]
+        self.assertIn("4XX", responses)
+        self.assertIn("Error", schema["components"]["schemas"])

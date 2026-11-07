@@ -444,11 +444,7 @@ def request(method, path, *, optional=False, raw=False, **kwargs):
     if response.status_code == 403 and optional:
         return None
     if response.status_code == 422:
-        detail = response.json()["detail"]
-        # Validation errors are lists, other errors (HttpError) messages
-        if isinstance(detail, str):
-            terminate(detail)
-        terminate("\n".join(format_error(error) for error in detail))
+        terminate(_error_message(response))
     if response.status_code >= 500:
         raise _ServerError(
             response.status_code,
@@ -457,12 +453,20 @@ def request(method, path, *, optional=False, raw=False, **kwargs):
             f"{response.text[:2000]}",
         )
     if not response.ok:
-        try:
-            detail = response.json()["detail"]
-        except ValueError, KeyError, TypeError:
-            detail = response.text
-        terminate(f"{response.status_code}: {detail}")
+        terminate(f"{response.status_code}: {_error_message(response)}")
     return response if raw else response.json()
+
+
+def _error_message(response):
+    """Errors are lists of locations and messages; older servers sent some as
+    plain messages"""
+    try:
+        detail = response.json()["detail"]
+    except ValueError, KeyError, TypeError:
+        return response.text
+    if isinstance(detail, str):
+        return detail
+    return "\n".join(format_error(error) for error in detail)
 
 
 def _filename(response):

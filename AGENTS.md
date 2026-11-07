@@ -176,6 +176,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   stored as strings (invoice types, absence reasons, …) are their own keys.
   Outputs never use display strings for choices: main objects have the key
   and a localized `*_label`, and `/api/choices/` lists all of them.
+  All errors are `{"detail": [{"loc": [...], "msg": ..., "code": ...}]}` like
+  validation errors (`HttpError` and 404 too, `WorkbenchAPI` in
+  `workbench/api.py` documents them as `4XX`); only the upgrade notice for
+  outdated CLIs stays a plain message, which old versions can show.
   Schema classes have unique names across all routers (ninja names the
   OpenAPI components by class, duplicates overwrite each other; a test in
   `workbench/test_api_schema.py` checks it), and query parameters have
