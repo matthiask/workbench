@@ -425,12 +425,12 @@ class SetStatusForm(ModelForm):
                     else _("Decline offers"),
                     required=False,
                     widget=forms.CheckboxSelectMultiple,
-                    # Offers in preparation and service groups haven't been
-                    # sent, they aren't accepted or declined by default
+                    # Customers may have received drafts of offers in
+                    # preparation; service groups are never sent
                     initial=[
                         offer.id
                         for offer in related_offers
-                        if offer.status == offer.OFFERED
+                        if offer.status in {offer.IN_PREPARATION, offer.OFFERED}
                     ],
                 )
                 self.fields["related_offers"].choices = [
@@ -461,13 +461,25 @@ class SetStatusForm(ModelForm):
         if data.get("status") in {Deal.ACCEPTED, Deal.DECLINED}:
             self.offers_to_update = data.get("related_offers", ())
             for offer in self.offers_to_update:
-                if data.get("status") == Deal.ACCEPTED:
-                    offer.status = offer.ACCEPTED
-                elif offer.status < offer.OFFERED and not offer.offered_on:
+                if (
+                    data.get("status") == Deal.DECLINED
+                    and offer.status == offer.SERVICE_GROUP
+                    and not offer.offered_on
+                ):
                     # Never sent, so the customer didn't decline it
                     offer.status = offer.DISCARDED
                 else:
-                    offer.status = offer.DECLINED
+                    offer.status = (
+                        offer.ACCEPTED
+                        if data.get("status") == Deal.ACCEPTED
+                        else offer.DECLINED
+                    )
+                    # Drafts are settled with the deal
+                    if closed_on := data.get("closed_on"):
+                        offer.offered_on = offer.offered_on or closed_on
+                        offer.valid_until = offer.valid_until or max(
+                            offer.offered_on, closed_on
+                        )
                 try:
                     offer.full_clean()
                 except ValidationError as exc:

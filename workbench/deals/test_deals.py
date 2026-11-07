@@ -274,42 +274,65 @@ class DealsTest(TestCase):
         self.assertContains(response, "This field is required when closing a deal.")
 
     def test_closing_with_unsent_offers(self):
-        """Only offers which have been sent are preselected, declining unsent
-        offers discards them"""
-        deal = factories.DealFactory.create()
+        """Offers in preparation may have been sent as drafts, they are
+        preselected and settled like offers which have been sent, dated
+        with the closing of the deal; declining service groups discards
+        them"""
+        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
         factories.ClosingTypeFactory.create(title="Lost", represents_a_win=False)
         details = {"title": "Offer", "postal_address": "A\nStreet\nCity"}
-        offered = factories.OfferFactory.create(
-            status=Offer.OFFERED,
-            offered_on=in_days(-10),
-            valid_until=in_days(20),
-            **details,
-        )
-        draft = factories.OfferFactory.create(**details)
-        deal.related_offers.add(offered, draft)
-        self.client.force_login(deal.owned_by)
-        url = f"/api/deals/{deal.pk}/status/"
 
+        for status, closing_type, offer_status in [
+            ("declined", "Lost", Offer.DECLINED),
+            ("accepted", "Won", Offer.ACCEPTED),
+        ]:
+            with self.subTest(status=status):
+                deal = factories.DealFactory.create()
+                offered = factories.OfferFactory.create(
+                    status=Offer.OFFERED,
+                    offered_on=in_days(-10),
+                    valid_until=in_days(20),
+                    **details,
+                )
+                draft = factories.OfferFactory.create(**details)
+                group = factories.OfferFactory.create(
+                    status=Offer.SERVICE_GROUP, **details
+                )
+                deal.related_offers.add(offered, draft, group)
+                self.client.force_login(deal.owned_by)
+
+                response = self.client.post(
+                    f"/api/deals/{deal.pk}/status/",
+                    {
+                        "status": status,
+                        "closing_type": closing_type,
+                        "closed_on": in_days(-2).isoformat(),
+                    },
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, 200, response.content)
+                for offer in [offered, draft, group]:
+                    offer.refresh_from_db()
+                self.assertEqual(
+                    (offered.status, draft.status, group.status),
+                    (offer_status, offer_status, Offer.SERVICE_GROUP),
+                )
+                self.assertEqual(offered.offered_on, in_days(-10))
+                self.assertEqual(
+                    (draft.offered_on, draft.valid_until), (in_days(-2), in_days(-2))
+                )
+
+        deal = factories.DealFactory.create()
+        group = factories.OfferFactory.create(status=Offer.SERVICE_GROUP, **details)
+        deal.related_offers.add(group)
         response = self.client.post(
-            url,
-            {"status": "declined", "closing_type": "Lost"},
+            f"/api/deals/{deal.pk}/status/",
+            {"status": "declined", "closing_type": "Lost", "offers": [group.pk]},
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 200, response.content)
-        offered.refresh_from_db()
-        draft.refresh_from_db()
-        self.assertEqual(
-            (offered.status, draft.status), (Offer.DECLINED, Offer.IN_PREPARATION)
-        )
-
-        response = self.client.post(
-            url,
-            {"status": "declined", "closing_type": "Lost", "offers": [draft.pk]},
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, 200, response.content)
-        draft.refresh_from_db()
-        self.assertEqual(draft.status, Offer.DISCARDED)
+        group.refresh_from_db()
+        self.assertEqual(group.status, Offer.DISCARDED)
 
     def test_status_api_ignores_the_query_string(self):
         """The API takes the status from the body only"""
