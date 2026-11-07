@@ -264,7 +264,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   the logged ones (`third_party_costs()` in `workbench/reporting/squeeze.py`).
   Logged costs can't be linked to fixed amount invoices, so adding up both
   would count them twice. This applies to squeeze and to the invoiced gross
-  margin which uses up projected invoices alike.
+  margin which uses up projected invoices alike. The offered gross margin
+  deducts the larger of the offers' third party costs and the logged ones.
 - Projected invoices (`ProjectedInvoice.gross_margin`) are gross margin, third
   party costs are not included. Invoiced gross margin uses up a project's
   oldest projections first. Projections which haven't been invoiced in time

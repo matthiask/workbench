@@ -118,7 +118,8 @@ def gross_margin_components(projects, *, invoiced_until=None):
     date. Offers and projections aren't versioned, they are always today's.
 
     Projections are only taken into account for open projects. Third party
-    costs are deducted from offers and invoices."""
+    costs are deducted from offers and invoices: the larger of those on
+    offers (or invoices) and the logged ones."""
     accepted = accepted_offers_by_project(projects)
     offered = {project: row["total"] for project, row in accepted.items()}
     projected = sum_by(
@@ -132,15 +133,25 @@ def gross_margin_components(projects, *, invoiced_until=None):
     if invoiced_until:
         invoices = invoices.filter(invoiced_on__lte=invoiced_until)
     invoiced = sum_by(invoices, key="project")
-    invoiced_costs = third_party_costs(projects, until=invoiced_until)
+    invoiced_tpc, logged_tpc = third_party_costs_components(
+        projects, until=invoiced_until
+    )
+    invoiced_costs = {
+        project: max(invoiced_tpc[project], logged_tpc[project])
+        for project in {*invoiced_tpc, *logged_tpc}
+    }
     return defaultdict(
         lambda: {"offered": Z2, "projected": Z2, "invoiced": Z2},
         {
             project: {
+                # Third party costs logged beyond the offered ones are
+                # deducted too, rather underestimate
                 "offered": accepted[project]["total"]
-                - accepted[project]["third_party_costs"],
+                - max(accepted[project]["third_party_costs"], logged_tpc[project])
+                if project in offered
+                else Z2,
                 "projected": projected[project],
-                "invoiced": invoiced[project] - invoiced_costs[project],
+                "invoiced": invoiced[project] - invoiced_costs.get(project, Z2),
             }
             for project in {*offered, *projected, *invoiced, *invoiced_costs}
         },

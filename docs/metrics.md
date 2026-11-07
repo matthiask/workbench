@@ -91,7 +91,7 @@ Contents:
 | Helper | Computes |
 |---|---|
 | `third_party_costs(projects)` | per project max(invoiced, Σ `LoggedCost.third_party_costs`), all time, with invoiced = max(Σ `Invoice.third_party_costs` of invoiced down payment invoices, Σ of the other invoiced invoices). Logged costs can't be linked to fixed amount invoices, so adding both would count them twice; final invoices repeat the third party costs of down payments, which may also be the only invoices (recurring invoices). `third_party_costs_components()` returns invoiced and logged separately. |
-| `gross_margin_components(projects, invoiced_until=None)` | `offered` = total − third party costs of the non-optional services of the accepted offers per project (retainer or other offers, see `accepted_offers_by_project()`); `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time, or invoices and third party costs up to `invoiced_until` (the budget statistics' cutoff date). |
+| `gross_margin_components(projects, invoiced_until=None)` | `offered` = total − max(third party costs of the non-optional services of the accepted offers, logged third party costs) per project (retainer or other offers, see `accepted_offers_by_project()`; 0 without accepted offers), so costs logged beyond the offered ones are deducted too; `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time, or invoices and third party costs up to `invoiced_until` (the budget statistics' cutoff date). |
 | `hours_components(projects)` | `hours_offered` = Σ `service_hours` of budgeted services; `hours_logged` = Σ `hours`; `hours_logged_budgeted` = Σ `hours` on budgeted services. |
 | `relevant_hours(offered, logged, logged_budgeted)` | max(offered, logged_budgeted) + (logged − logged_budgeted): hours on unbudgeted services are added on top, so rates rather underestimate. |
 | `BudgetTransfer.objects.adjustments(projects)` | per project Σ transfers in − Σ transfers out. A transfer without target project leaves the source immediately and arrives nowhere. Only money moves, hours stay. |
@@ -478,7 +478,7 @@ Anna: `4'000 / 7'000 × 6'000 = 3'428.57` (171.43/h); Ben: `3'000 / 7'000 ×
 | UI label (de) | Computation |
 |---|---|
 | Projekt | project |
-| Offeriert | `offered` (accepted offers per project − their service third party costs, see `accepted_offers_by_project()`); 0 for closed projects |
+| Offeriert | `offered` (accepted offers per project − the larger of their service third party costs and the logged ones, see `accepted_offers_by_project()`); 0 for closed projects |
 | Geplant *offen* | `projected` = Σ `ProjectedInvoice.gross_margin`, open projects only |
 | Verrechnet | `invoiced` = SENT/PAID invoices `total_excl_tax` − `third_party_costs()` (max of invoice vs. logged third party costs) |
 | Umsatz bereinigt *geschätzt* | `gross_margin` (formula above; incl. budget transfers, floored at 0) |
@@ -599,7 +599,7 @@ and counting accepted offers only.
 | UI label (de) | Computation |
 |---|---|
 | **Umsatz bereinigt** section | |
-| Akzeptierte Offerten | `offered` (accepted offers − their service third party costs); shown also for closed projects with "(bei geschlossenen Projekten nicht verwendet)" |
+| Akzeptierte Offerten | `offered` (accepted offers − the larger of their service third party costs and the logged ones); shown also for closed projects with "(bei geschlossenen Projekten nicht verwendet)" |
 | Geplante Rechnungen | `projected` (0 for closed projects) |
 | Verrechnet | `invoiced` (SENT/PAID − `third_party_costs()`) |
 | Budgetverschiebungen | `budget_adjustment` (only shown if ≠ 0) |

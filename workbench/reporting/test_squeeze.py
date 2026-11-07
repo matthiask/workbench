@@ -91,6 +91,31 @@ class SqueezeTest(TestCase):
 
         self.assertEqual(project_gross_margin(project)["offered"], 500)
 
+    def test_offered_gross_margin_deducts_logged_third_party_costs(self):
+        """Third party costs logged beyond the offered ones are deducted from
+        the offered gross margin too"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        service = factories.ServiceFactory.create(
+            project=project, offer=offer, cost=1000, third_party_costs=500
+        )
+        offer.status = Offer.ACCEPTED
+        offer.save()
+        factories.LoggedCostFactory.create(
+            service=service, cost=800, third_party_costs=800
+        )
+
+        self.assertEqual(project_gross_margin(project)["offered"], 200)
+
+        # Projects without accepted offers have no offered gross margin
+        other = factories.ProjectFactory.create()
+        factories.LoggedCostFactory.create(
+            service=factories.ServiceFactory.create(project=other),
+            cost=100,
+            third_party_costs=100,
+        )
+        self.assertEqual(project_gross_margin(other)["offered"], 0)
+
     def test_offered_rate_uses_logged_hours(self):
         """Hours logged beyond the accepted offers' hours lower their rate"""
         project = factories.ProjectFactory.create()
