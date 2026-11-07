@@ -232,12 +232,18 @@ class Planning:
             )
 
     def add_absences(self, queryset):
-        for absence in queryset.filter(
-            Q(user__in=self._user_ids),
-            Q(starts_on__lte=max(self.weeks) + dt.timedelta(days=6)),
-            Q(ends_on__isnull=False, ends_on__gte=min(self.weeks))
-            | Q(ends_on__isnull=True, starts_on__gte=min(self.weeks)),
-        ).select_related("user"):
+        # Corrections of the working time aren't absences
+        for absence in (
+            queryset
+            .exclude(reason=Absence.CORRECTION)
+            .filter(
+                Q(user__in=self._user_ids),
+                Q(starts_on__lte=max(self.weeks) + dt.timedelta(days=6)),
+                Q(ends_on__isnull=False, ends_on__gte=min(self.weeks))
+                | Q(ends_on__isnull=True, starts_on__gte=min(self.weeks)),
+            )
+            .select_related("user")
+        ):
             date_from = monday(absence.starts_on)
             # If absence starts on weekend move it to the next monday
             if absence.starts_on.weekday() in {5, 6}:
@@ -268,6 +274,7 @@ class Planning:
 
     def add_public_holidays(self):
         ud = {user.id: user for user in User.objects.filter(id__in=self._user_ids)}
+        free = defaultdict(int)
 
         for (
             id,
@@ -275,7 +282,7 @@ class Planning:
             name,
             user_id,
             planning_hours_per_day,
-            fraction,
+            holiday_fraction,
             percentage,
         ) in query(
             """
@@ -313,15 +320,19 @@ order by ph.date
             if date.weekday() >= 5:
                 continue
 
+            # A public and a company holiday on the same day free it only
+            # once, like in the annual working time
+            fraction = min(holiday_fraction or 0, 1 - free[user_id, date])
+            if fraction <= 0:
+                continue
+            free[user_id, date] += fraction
+
             week = monday(date)
             idx = self.weeks.index(week)
 
             user = ud[user_id]
             ph_hours = (
-                (planning_hours_per_day or 0)
-                * (fraction or 0)
-                * (percentage or 0)
-                / 100
+                (planning_hours_per_day or 0) * fraction * (percentage or 0) / 100
             )
             detail = " × ".join((
                 f"{hours(planning_hours_per_day)}/d",
@@ -546,11 +557,16 @@ join lateral (
                 )
             )
             - coalesce((
-                select sum(fraction)
-                from awt_holiday
-                where working_time_model_id = users.working_time_model_id
-                  and date between greatest(week::date, date_from)
-                      and least((week + interval '4 days')::date, date_until)
+                -- A public and a company holiday on the same day free it
+                -- only once, like in the annual working time
+                select sum(day_fraction) from (
+                    select least(sum(fraction), 1) as day_fraction
+                    from awt_holiday
+                    where working_time_model_id = users.working_time_model_id
+                      and date between greatest(week::date, date_from)
+                          and least((week + interval '4 days')::date, date_until)
+                    group by date
+                ) as holiday_days
             ), 0)
         )
     ) as working_days
@@ -599,6 +615,8 @@ left outer join lateral(
             ) as weeks
           from awt_absence
           where awt_absence.user_id = users.user_id
+            -- Corrections of the working time aren't absences
+            and reason <> 'correction'
     )
     --
     -- Calculate the planning hours for each absence and distribute the hours

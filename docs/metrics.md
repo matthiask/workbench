@@ -859,16 +859,16 @@ Per user and week (Monday to Friday), over all employments touching the week (`d
 
 ```
 working_days = Σ percentage / 100 × (weekdays of the week within the employment
-                                     − Σ holiday.fraction on those days)
+                                     − Σ min(Σ holiday.fraction per day, 1) on those days)
 capacity = working_days × planning_hours_per_day
          − Σ planned_hours / cardinality(weeks)              (all PlannedWork of the user with that week)
-         − Σ absence.days × planning_hours_per_day / n_weeks (absences touching that week)
+         − Σ absence.days × planning_hours_per_day / n_weeks (absences touching that week, no corrections)
 ```
 
 - `planning_hours_per_day` is a per-user field (default 8), separate from the WTM's `working_time_per_day`.
 - Planned work counts whether it is provisional or not and whatever state the project has, distributed evenly over its weeks.
-- Absences of **all** reasons count (including `other`). Their days are not scaled by the percentage (days as entered) and are distributed evenly over the calendar weeks from `date_trunc('week', starts_on)` (moved to the next week if the absence starts on a weekend) to `date_trunc('week', ends_on)` (`starts_on` if there is no end date).
-- Holidays: those of the user's WTM on the weekdays of an employment (both kinds), scaled by that employment's percentage.
+- Absences of all reasons count (including `other`) except working time corrections (`correction`), which aren't absences. Their days are not scaled by the percentage (days as entered) and are distributed evenly over the calendar weeks from `date_trunc('week', starts_on)` (moved to the next week if the absence starts on a weekend) to `date_trunc('week', ends_on)` (`starts_on` if there is no end date).
+- Holidays: those of the user's WTM on the weekdays of an employment (both kinds), scaled by that employment's percentage. A public and a company holiday on the same day free it only once, like in the annual working time.
 - Weeks without an employment yield no capacity row (shown as 0). Employments starting or ending during a week count for their weekdays only, e.g. a change from 50% to 100% on Wednesday gives 2 days at 50% and 3 at 100%.
 - `total` = sum over users per week.
 

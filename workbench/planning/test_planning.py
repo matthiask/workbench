@@ -510,6 +510,45 @@ class CapacityTest(TestCase):
         planning.add_absences(Absence.objects.all())
         self.assertEqual(len(planning._absences[user][0]), 1)
 
+    def test_capacity_public_and_company_holiday_on_the_same_day(self):
+        """A day is free at most once, like in the annual working time"""
+        week = dt.date(2026, 12, 21)
+        user = factories.UserFactory.create(planning_hours_per_day=8)
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2020, 1, 1), percentage=100
+        )
+        for kind in [Holiday.Kind.PUBLIC, Holiday.Kind.COMPANY]:
+            Holiday.objects.create(
+                working_time_model=user.working_time_model,
+                date=dt.date(2026, 12, 25),
+                name=kind,
+                fraction=1,
+                kind=kind,
+            )
+
+        planning = reporting.Planning(weeks=[week], users=[user])
+        self.assertEqual(planning.capacity()["total"], [32])
+
+        planning.add_public_holidays()
+        self.assertEqual(sum(row[0] for row in planning._absences[user][0]), 8)
+
+    def test_capacity_corrections(self):
+        """Working time corrections aren't absences"""
+        week = dt.date(2026, 11, 2)
+        user = factories.UserFactory.create(planning_hours_per_day=8)
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2020, 1, 1), percentage=100
+        )
+        Absence.objects.create(
+            user=user, starts_on=week, days=3, reason=Absence.CORRECTION
+        )
+
+        planning = reporting.Planning(weeks=[week], users=[user])
+        self.assertEqual(planning.capacity()["total"], [40])
+
+        planning.add_absences(Absence.objects.all())
+        self.assertEqual(planning._absences[user], [[]])
+
     def test_absence_reasons(self):
         """The planning colors absences by their reason, the external view
         shows neither the reason nor the description"""
