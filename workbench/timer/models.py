@@ -27,9 +27,15 @@ def timestamp_project(user, value):
 
     Uses the full text search of projects, also for numbers which aren't the
     ID of a project (e.g. a year). A unique match among the pinned projects
-    wins, otherwise the match among all open projects has to be unique."""
+    wins, otherwise the match among all open projects has to be unique.
+    Projects closed too long ago are rejected like in the logbook form, which
+    the timestamp pre-fills."""
     if isinstance(value, int) or value.isdigit():
         if project := Project.objects.filter(pk=value).first():
+            if project.is_logbook_locked:
+                raise ValidationError(
+                    gettext("This project has been closed too long ago.")
+                )
             return project
         if isinstance(value, int):
             raise ValidationError(gettext("This project doesn't exist."))

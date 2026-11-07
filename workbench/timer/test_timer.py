@@ -107,6 +107,17 @@ class TimestampsTest(TestCase):
         )
         self.assertContains(response, "intranet", status_code=400)
 
+    def test_timestamp_with_locked_project(self):
+        """Projects closed too long ago are rejected, like in the API"""
+        project = factories.ProjectFactory.create(closed_on=dt.date(2020, 1, 1))
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            "/create-timestamp/", {"type": "start", "project": str(project.pk)}
+        )
+        self.assertContains(response, "closed too long ago", status_code=400)
+        self.assertFalse(Timestamp.objects.exists())
+
     def test_timestamps_scenario(self):
         """Test a scenario with a break in the middle"""
         today = localtime(timezone.now()).replace(
