@@ -206,8 +206,8 @@ class DealsAPITest(TestCase):
         )
         self.assertFalse(Deal.objects.exists())
 
-    def test_update_force(self):
-        """Warnings of the web interface are errors unless forced"""
+    def test_update_ignore_warnings(self):
+        """Warnings of the web interface are errors unless ignored"""
         deal = factories.DealFactory.create(contact=None, probability=Deal.NORMAL)
         deal.contributions.create(user=deal.owned_by, weight=100)
         self.client.force_login(deal.owned_by)
@@ -220,7 +220,9 @@ class DealsAPITest(TestCase):
         self.assertEqual(response.json()["detail"][0]["msg"], "No contact selected.")
 
         response = self.client.patch(
-            f"{url}?force=true", {"probability": "low"}, content_type="application/json"
+            f"{url}?ignore_warnings=no-contact",
+            {"probability": "low"},
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, 200, response.content)
         deal.refresh_from_db()
@@ -397,7 +399,7 @@ class DealsAPITest(TestCase):
         response = post(url, {"offers": [declined.pk]})
         self.assertIn("is Declined, only offers", errors(response)[0][1])
 
-        # Offers of other customers need force, nothing is saved before
+        # Offers of other customers are a warning, nothing is saved before
         other = factories.OfferFactory.create()
         response = post(url, {"offers": [other.pk]})
         self.assertEqual(
@@ -413,7 +415,7 @@ class DealsAPITest(TestCase):
                 )
             ],
         )
-        response = post(url, {"offers": [other.pk], "force": True})
+        response = post(f"{url}?ignore_warnings=other-customer", {"offers": [other.pk]})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(set(deal.related_offers.all()), {offer, other})
 

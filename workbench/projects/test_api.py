@@ -10,7 +10,8 @@ from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, Project
-from workbench.tools.validation import monday
+from workbench.reporting.models import FreezeDate
+from workbench.tools.validation import in_days, monday
 
 
 class ProjectsAPITest(TestCase):
@@ -178,7 +179,13 @@ class ProjectsAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(
             response.json()["detail"],
-            [{"loc": ["body", "data"], "msg": "No contact selected."}],
+            [
+                {
+                    "loc": ["body", "data"],
+                    "msg": "No contact selected.",
+                    "code": "no-contact",
+                }
+            ],
         )
 
         response = self.client.post(
@@ -232,26 +239,55 @@ class ProjectsAPITest(TestCase):
                     [["body", "data", "customer"]],
                 )
 
-    def test_update_force(self):
-        """Warnings of the web interface are errors unless forced"""
+    def test_ignore_warnings(self):
+        """Warnings of the web interface are errors unless ignored by their
+        code"""
         project = factories.ProjectFactory.create(contact=None)
         self.client.force_login(project.owned_by)
         url = f"/api/projects/{project.pk}/"
-        data = {"closed_on": dt.date.today().isoformat()}
+        data = {"closed_on": in_days(-10).isoformat()}
 
         response = self.client.patch(url, data, content_type="application/json")
         self.assertEqual(response.status_code, 422)
-        self.assertEqual(response.json()["detail"][0]["msg"], "No contact selected.")
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data"],
+                    "msg": "No contact selected.",
+                    "code": "no-contact",
+                }
+            ],
+        )
 
         response = self.client.patch(
-            f"{url}?force=true", data, content_type="application/json"
+            f"{url}?ignore_warnings=no-contact", data, content_type="application/json"
         )
         self.assertEqual(response.status_code, 200, response.content)
         project.refresh_from_db()
-        self.assertEqual(project.closed_on, dt.date.today())
+        self.assertEqual(project.closed_on, in_days(-10))
+
+        # Ignoring one warning doesn't ignore the others
+        FreezeDate.objects.create(up_to=in_days(-5))
+        response = self.client.patch(
+            f"{url}?ignore_warnings=no-contact",
+            {"closed_on": None},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["code"] for error in response.json()["detail"]],
+            ["reopen-frozen-project"],
+        )
+        response = self.client.patch(
+            f"{url}?ignore_warnings=no-contact&ignore_warnings=reopen-frozen-project",
+            {"closed_on": None},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
 
         response = self.client.post(
-            "/api/projects/?force=true",
+            "/api/projects/?ignore_warnings=no-contact",
             {"title": "Without contact", "customer": project.customer_id},
             content_type="application/json",
         )

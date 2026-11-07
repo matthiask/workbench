@@ -95,7 +95,11 @@ the `--team` option of reports:
 
 Find the customer and the contact, then create the project. Projects are
 validated like in the web interface; where the web interface would show a
-warning, the CLI fails and you have to use the web interface.
+warning, the CLI fails and shows the warning's code. Ignore exactly the
+warnings you checked with `--ignore-warning CODE` (may be repeated), a
+different warning still fails:
+
+    wb projects update 1234 --close --ignore-warning no-contact
 
     wb contacts search beispiel
     wb projects create --title "Online Marketing 2027" --contact 345 --dry-run
@@ -371,10 +375,11 @@ them with `--offer` or pass `--keep-offers`:
 
 Link offers to open deals and unlink them, by ID or code. Only offers which
 are in preparation, service groups or offered can be linked; offers of other
-customers' projects need `--force` (e.g. when the deal is with an agency):
+customers' projects are a warning which has to be ignored explicitly (e.g.
+when the deal is with an agency):
 
     wb deals offers add 1234 2026-0179-o02 2026-0179-o03 --dry-run
-    wb deals offers add 1234 5678 --force
+    wb deals offers add 1234 5678 --ignore-warning other-customer
     wb deals offers remove 1234 2026-0179-o02
 
 Deals accepted and declined in a period (this week by default), and who

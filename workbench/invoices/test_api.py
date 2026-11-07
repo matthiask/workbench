@@ -471,6 +471,7 @@ class InvoicesAPITest(TestCase):
         response = create({"project": project.pk, "subtotal": 100} | address)
         self.assertEqual(response.status_code, 422)
         response = create(
-            {"project": project.pk, "subtotal": 100} | address, "?force=true"
+            {"project": project.pk, "subtotal": 100} | address,
+            "?ignore_warnings=short-postal-address",
         )
         self.assertEqual(response.status_code, 200, response.content)

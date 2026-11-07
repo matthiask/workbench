@@ -58,8 +58,8 @@ create`. Offers are given by ID or code (`wb deals show` prints codes):
   groups and offered offers can be linked. Linking an offer twice or removing
   one which isn't linked is an error.
 - Offers of another customer's projects (agencies and their clients,
-  departments of the same city) are rejected; add `--force` only after the
-  user confirmed the link.
+  departments of the same city) are rejected; add `--ignore-warning
+  other-customer` only after the user confirmed the link.
 - Ask the user which deal an offer belongs to when the customer has several
   open deals.
 

@@ -145,9 +145,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   interface doesn't). Its `primary_contact` defaults to the current user and
   may be an inactive user (e.g. who used to know the person), so that imported
   contacts can be found and reassigned with the primary contact filter.
-  Warnings of the web forms are errors in the API; creating and updating
-  projects and deals ignores them with `force` (a query parameter like
-  `dry_run`, `--force` in `wb`). Shared validation helpers for the APIs are in
+  Warnings of the web forms are errors in the API which carry their code;
+  like in the web interface, only the warnings whose codes are given in
+  `ignore_warnings` are ignored (a query parameter like `dry_run`,
+  `--ignore-warning CODE` in `wb`; `validate_form()` in
+  `workbench/tools/api.py`), so ignoring one never ignores a new one. Shared validation helpers for the APIs are in
   `workbench/tools/api.py`, also `DateRangeFilter` (`period` like `2026-Q3` or
   `last-month`, `since`, `until`) with `date_range()` and `filter_date_range()`
   for reports and searches, and `UsersFilter` with `filter_users()` for
@@ -326,7 +328,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - Offers are only linked to and unlinked from open deals, and only offers
   which aren't closed yet (in preparation, service group, offered): closing a
   deal settles its offers. Offers of other customers' projects are a warning
-  (agencies and their clients, departments of a city), `force` in the API.
+  (agencies and their clients, departments of a city), `other-customer` in
+  `ignore_warnings` in the API.
   Web views and API share `RelatedOfferForm` in `workbench/deals/forms.py`.
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by

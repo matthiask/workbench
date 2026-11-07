@@ -24,6 +24,7 @@ from workbench.deals.models import AttributeGroup, Contribution, Deal, ValueType
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.offers.models import Offer
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     Amount,
     DateRangeFilter,
     Serialized,
@@ -33,6 +34,7 @@ from workbench.tools.api import (
     filter_users,
     form_data,
     raise_form_errors,
+    validate_form,
 )
 from workbench.tools.formats import Z2
 from workbench.tools.validation import monday
@@ -449,12 +451,18 @@ def _values_and_attributes(data, form_data, error):
 
 
 @router.post("/deals/", response=DealCreated)
-def deal_create(request, data: DealIn, *, dry_run: bool = False, force: bool = False):
+def deal_create(
+    request,
+    data: DealIn,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
     """Create a deal, validated like in the web interface
 
     You are its main driving force. Warnings of the web interface are errors
-    here unless ``force``; nothing is saved if anything is invalid or with
-    ``dry_run``."""
+    here unless ignored by their code; nothing is saved if anything is
+    invalid or with ``dry_run``."""
     errors = []
 
     def error(loc, msg):
@@ -489,8 +497,7 @@ def deal_create(request, data: DealIn, *, dry_run: bool = False, force: bool = F
         raise ValidationError(errors)
 
     form = DealForm(form_data, request=request)
-    if not form.is_valid(ignore_warnings=force):
-        raise_form_errors(form, fields=fields, force=force)
+    validate_form(form, fields=fields, ignore_warnings=ignore_warnings)
 
     with transaction.atomic():
         deal = form.save()
@@ -550,12 +557,12 @@ def deal_update(
     data: DealPatch,
     *,
     dry_run: bool = False,
-    force: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change a deal, validated like in the web interface
 
-    Warnings of the web interface are errors here unless ``force``; nothing is
-    saved if anything is invalid or with ``dry_run``. Use the status endpoint
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``. Use the status endpoint
     to close or reopen deals."""
     deal = get_object_or_404(Deal, pk=deal_id)
     errors = []
@@ -584,8 +591,7 @@ def deal_update(
         raise ValidationError(errors)
 
     form = DealForm(values, instance=deal, request=request)
-    if not form.is_valid(ignore_warnings=force):
-        raise_form_errors(form, fields=fields, force=force)
+    validate_form(form, fields=fields, ignore_warnings=ignore_warnings)
     return _save_deal(form, request, dry_run=dry_run)
 
 
@@ -666,14 +672,6 @@ class RelatedOffersRemove(Schema):
     )
 
 
-class RelatedOffersAdd(RelatedOffersRemove):
-    force: bool = Field(
-        default=False,
-        description="Also link offers of other customers' projects, e.g. of"
-        " the end client when the deal is with an agency.",
-    )
-
-
 OFFER_CODE = re.compile(r"^(?P<year>\d{4})-(?P<project>\d+)-o(?P<offer>\d+)$")
 
 
@@ -694,7 +692,7 @@ def _offer(value):
     return next((offer for offer in candidates if offer.code == value), None)
 
 
-def _change_related_offers(request, deal_id, data, *, remove, force, dry_run):
+def _change_related_offers(request, deal_id, data, *, remove, ignore_warnings, dry_run):
     deal = get_object_or_404(Deal, pk=deal_id)
     errors = []
     forms = []
@@ -715,7 +713,9 @@ def _change_related_offers(request, deal_id, data, *, remove, force, dry_run):
         form = RelatedOfferForm(
             {"modal-offer": offer.pk}, deal=deal, remove=remove, request=request
         )
-        if form.is_valid(ignore_warnings=force):
+        if form.is_valid(ignore_warnings=True) and not (
+            set(form.warnings) - set(ignore_warnings)
+        ):
             forms.append(form)
             continue
         for field, messages in form.errors.items():
@@ -726,10 +726,11 @@ def _change_related_offers(request, deal_id, data, *, remove, force, dry_run):
                 }
                 if error not in errors:
                     errors.append(error)
-        if not force:
-            errors.extend(
-                {"loc": loc, "msg": str(warning)} for warning in form.warnings.values()
-            )
+        errors.extend(
+            {"loc": loc, "msg": str(warning), "code": code}
+            for code, warning in form.warnings.items()
+            if code not in ignore_warnings
+        )
     if errors:
         raise ValidationError(errors)
 
@@ -744,16 +745,27 @@ def _change_related_offers(request, deal_id, data, *, remove, force, dry_run):
 
 @router.post("/deals/{deal_id}/offers/", response=DealOut)
 def deal_offers_add(
-    request, deal_id: int, data: RelatedOffersAdd, *, dry_run: bool = False
+    request,
+    deal_id: int,
+    data: RelatedOffersRemove,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Link offers to an open deal like in the web interface
 
     Only offers which are in preparation, service groups or offered can be
-    linked. Offers of other customers' projects are rejected unless ``force``
-    is given (a warning in the web interface). Nothing is saved if anything is
-    invalid or with ``dry_run``."""
+    linked. Offers of other customers' projects are a warning in the web
+    interface (``other-customer``, e.g. of the end client when the deal is
+    with an agency). Nothing is saved if anything is invalid or with
+    ``dry_run``."""
     return _change_related_offers(
-        request, deal_id, data, remove=False, force=data.force, dry_run=dry_run
+        request,
+        deal_id,
+        data,
+        remove=False,
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
     )
 
 
@@ -766,5 +778,5 @@ def deal_offers_remove(
     Offers which aren't linked are rejected. Nothing is saved if anything is
     invalid or with ``dry_run``."""
     return _change_related_offers(
-        request, deal_id, data, remove=True, force=False, dry_run=dry_run
+        request, deal_id, data, remove=True, ignore_warnings=(), dry_run=dry_run
     )

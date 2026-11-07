@@ -156,7 +156,7 @@ After the user confirmed the deal:
 
 Only open deals accept offers. An offer of another customer's project (e.g.
 the deal is with an agency, the project with its client) is rejected; only
-add `--force` if the user confirms the link is right.
+add `--ignore-warning other-customer` if the user confirms the link is right.
 
 ## Revising an offer
 

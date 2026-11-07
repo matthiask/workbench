@@ -12,9 +12,9 @@ from wb.core import (
     echo_json,
     echo_more,
     echo_period,
-    force_option,
     format_amount,
     format_bool,
+    ignore_warnings_option,
     link,
     make_table,
     page_options,
@@ -157,7 +157,7 @@ def _echo_saved_deal(data, *, dry_run, as_json):
 )
 @click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
-@force_option
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_deal(
@@ -171,7 +171,7 @@ def update_deal(
     values,
     attributes,
     owned_by,
-    force,
+    ignore_warnings,
     dry_run,
     as_json,
 ):
@@ -203,7 +203,10 @@ def update_deal(
     data = request(
         "PATCH",
         f"deals/{deal_id}/",
-        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
         json=data,
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
@@ -300,24 +303,24 @@ def deal_offers():
 @deal_offers.command("add")
 @click.argument("deal_id", type=int)
 @click.argument("offers", nargs=-1, required=True)
-@click.option(
-    "--force",
-    is_flag=True,
-    help="Also link offers of other customers' projects, e.g. of the end"
-    " client when the deal is with an agency.",
-)
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
-def add_deal_offers(deal_id, offers, force, dry_run, as_json):
+def add_deal_offers(deal_id, offers, ignore_warnings, dry_run, as_json):
     """Link offers to an open deal
 
     Only offers in preparation, service groups and offered offers can be
-    linked; closing the deal accepts or declines them."""
+    linked; closing the deal accepts or declines them. Offers of other
+    customers' projects are a warning (other-customer), e.g. of the end
+    client when the deal is with an agency."""
     data = request(
         "POST",
         f"deals/{deal_id}/offers/",
-        params={"dry_run": format_bool(dry_run)},
-        json={"offers": list(offers), "force": force},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
+        json={"offers": list(offers)},
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
 
@@ -479,7 +482,7 @@ def deal_history(period, since, until, users, team, as_json):
     shell_complete=complete_short_names,
 )
 @click.option("--description", default="")
-@force_option
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def create_deal(
@@ -492,7 +495,7 @@ def create_deal(
     attributes,
     owned_by,
     description,
-    force,
+    ignore_warnings,
     dry_run,
     as_json,
 ):
@@ -503,7 +506,10 @@ def create_deal(
     data = request(
         "POST",
         "deals/",
-        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
         json={
             "title": title,
             "description": description,

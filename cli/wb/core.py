@@ -399,10 +399,14 @@ def _check_version(latest, upgrade):
 
 
 def format_error(error):
-    """A validation error, prefixed with the field if there is one"""
+    """A validation error, prefixed with the field if there is one; warnings
+    of the web interface tell how to ignore them"""
+    message = error["msg"]
+    if code := error.get("code"):
+        message = f"{message} (warning, ignore with --ignore-warning {code})"
     if loc := ".".join(str(part) for part in error["loc"][2:]):
-        return f"{loc}: {error['msg']}"
-    return error["msg"]
+        return f"{loc}: {message}"
+    return message
 
 
 def _send(method, url, path, token, **kwargs):
@@ -702,10 +706,13 @@ def echo_invoice_list(invoices, *, title="Invoices"):
     console.print(table)
 
 
-force_option = click.option(
-    "--force",
-    is_flag=True,
-    help="Ignore the warnings of the web interface, e.g. a missing contact.",
+ignore_warnings_option = click.option(
+    "--ignore-warning",
+    "ignore_warnings",
+    multiple=True,
+    metavar="CODE",
+    help="Ignore this warning of the web interface (the code is shown with"
+    " the warning), may be repeated.",
 )
 
 

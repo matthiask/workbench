@@ -189,7 +189,10 @@ class CLITest(TestCase):
             "projects", "create", "--title", "Second", "--customer", project.customer_id
         )
         self.assertEqual(result.exit_code, 1)
-        self.assertIn("No contact selected.\n", result.output)
+        self.assertIn(
+            "No contact selected. (warning, ignore with --ignore-warning no-contact)\n",
+            result.output,
+        )
         result = self.wb(
             "projects",
             "create",
@@ -197,7 +200,8 @@ class CLITest(TestCase):
             "Second",
             "--customer",
             project.customer_id,
-            "--force",
+            "--ignore-warning",
+            "no-contact",
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertTrue(Project.objects.filter(title="Second").exists())
@@ -1006,7 +1010,14 @@ planned_work:
         self.assertIn("not of the deal's customer", result.output)
         self.assertFalse(deal.related_offers.exists())
         result = self.wb(
-            "deals", "offers", "add", deal.pk, offer.code, other.pk, "--force"
+            "deals",
+            "offers",
+            "add",
+            deal.pk,
+            offer.code,
+            other.pk,
+            "--ignore-warning",
+            "other-customer",
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(set(deal.related_offers.all()), {offer, other})

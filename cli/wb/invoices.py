@@ -13,8 +13,8 @@ from wb.core import (
     echo_invoice_list,
     echo_json,
     echo_more,
-    force_option,
     format_bool,
+    ignore_warnings_option,
     link,
     make_table,
     page_options,
@@ -210,7 +210,7 @@ def _echo_invoice(data):
     help="Short name, defaults to you.",
     shell_complete=complete_short_names,
 )
-@force_option
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def create_invoice(
@@ -232,7 +232,7 @@ def create_invoice(
     service_period_until,
     postal_address,
     owned_by,
-    force,
+    ignore_warnings,
     dry_run,
     as_json,
 ):
@@ -275,7 +275,10 @@ def create_invoice(
     data = request(
         "POST",
         "invoices/",
-        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
         json=data,
     )
     if as_json:

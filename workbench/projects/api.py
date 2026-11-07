@@ -37,7 +37,13 @@ from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
-from workbench.tools.api import Serialized, form_data, raise_form_errors
+from workbench.tools.api import (
+    IGNORE_WARNINGS,
+    Serialized,
+    form_data,
+    raise_form_errors,
+    validate_form,
+)
 from workbench.tools.formats import Z1, Z2
 
 
@@ -205,12 +211,16 @@ def _internal_type(name):
 
 @router.post("/projects/", response=ProjectCreated)
 def project_create(
-    request, data: ProjectIn, *, dry_run: bool = False, force: bool = False
+    request,
+    data: ProjectIn,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create a project, validated like in the web interface
 
-    Warnings of the web interface are errors here unless ``force``; nothing
-    is saved if anything is invalid or with ``dry_run``."""
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``."""
     owned_by = request.user
     if data.owned_by is not None:
         owned_by = User.objects.filter(
@@ -237,8 +247,7 @@ def project_create(
         },
         request=request,
     )
-    if not form.is_valid(ignore_warnings=force):
-        raise_form_errors(form, force=force)
+    validate_form(form, ignore_warnings=ignore_warnings)
 
     with transaction.atomic():
         project = form.save()
@@ -283,12 +292,12 @@ def project_update(
     data: ProjectPatch,
     *,
     dry_run: bool = False,
-    force: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change or close a project, validated like in the web interface
 
-    Warnings of the web interface are errors here unless ``force``; nothing
-    is saved if anything is invalid or with ``dry_run``."""
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``."""
     project = get_object_or_404(Project, pk=project_id)
     values = form_data(ProjectForm(instance=project, request=request))
     patch = data.model_dump(exclude_unset=True)
@@ -315,8 +324,7 @@ def project_update(
         values["delete_planned_work"] = int(data.delete_planned_work)
 
     form = ProjectForm(values, instance=project, request=request)
-    if not form.is_valid(ignore_warnings=force):
-        raise_form_errors(form, force=force)
+    validate_form(form, ignore_warnings=ignore_warnings)
 
     with transaction.atomic():
         project = form.save()

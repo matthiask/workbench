@@ -6,7 +6,7 @@ from typing import Annotated
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from ninja import Schema
+from ninja import Query, Schema
 from ninja.errors import ValidationError as NinjaValidationError
 from ninja.pagination import LimitOffsetPagination
 from pydantic import PlainSerializer
@@ -28,9 +28,9 @@ def full_clean(instance, loc, errors, *, exclude=()):
         )
 
 
-def form_errors(form, *, fields=None, force=False):
+def form_errors(form, *, fields=None, ignore_warnings=()):
     """Errors of the invalid form; warnings of the web interface are errors
-    too unless ``force``
+    too unless their code is in ``ignore_warnings``, they carry their code
 
     ``fields`` maps form fields to their location in the request body."""
     fields = fields or {}
@@ -43,9 +43,26 @@ def form_errors(form, *, fields=None, force=False):
         for field, messages in form.errors.items()
         for message in messages
     ] + [
-        {"loc": ["body", "data"], "msg": str(warning)}
-        for warning in ({} if force else form.warnings).values()
+        {"loc": ["body", "data"], "msg": str(warning), "code": code}
+        for code, warning in form.warnings.items()
+        if code not in ignore_warnings
     ]
+
+
+def validate_form(form, *, fields=None, ignore_warnings=()):
+    """Raise the errors of the form and its warnings which haven't been
+    ignored explicitly, like the web interface does"""
+    if not form.is_valid(ignore_warnings=True) or (
+        set(form.warnings) - set(ignore_warnings)
+    ):
+        raise_form_errors(form, fields=fields, ignore_warnings=ignore_warnings)
+
+
+IGNORE_WARNINGS = Query(
+    [],
+    description="Codes of warnings of the web interface to ignore, warnings"
+    " are errors with their code otherwise.",
+)
 
 
 def form_data(form):
@@ -58,8 +75,10 @@ def form_data(form):
     }
 
 
-def raise_form_errors(form, *, fields=None, force=False):
-    raise NinjaValidationError(form_errors(form, fields=fields, force=force))
+def raise_form_errors(form, *, fields=None, ignore_warnings=()):
+    raise NinjaValidationError(
+        form_errors(form, fields=fields, ignore_warnings=ignore_warnings)
+    )
 
 
 PERIOD = re.compile(

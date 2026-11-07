@@ -32,11 +32,12 @@ from workbench.offers.models import Offer
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     DateRangeFilter,
     Serialized,
     filter_date_range,
     form_data,
-    raise_form_errors,
+    validate_form,
 )
 from workbench.tools.formats import Z2, local_date_format
 from workbench.tools.validation import in_days
@@ -590,13 +591,17 @@ class InvoiceCreated(InvoiceDetailOut):
 
 @router.post("/invoices/", response=InvoiceCreated)
 def invoice_create(
-    request, data: InvoiceIn, *, dry_run: bool = False, force: bool = False
+    request,
+    data: InvoiceIn,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create an invoice in preparation (a draft), validated like in the web
     interface
 
-    Warnings of the web interface are errors here unless ``force``; nothing is
-    saved if anything is invalid or with ``dry_run``."""
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``."""
     errors = []
 
     def error(loc, msg):
@@ -605,8 +610,11 @@ def invoice_create(
     form = _invoice_form(request, data, error)
     if errors:
         raise ValidationError(errors)
-    if not form.is_valid(ignore_warnings=force):
-        raise_form_errors(form, fields={"selected_services": ["services"]}, force=force)
+    validate_form(
+        form,
+        fields={"selected_services": ["services"]},
+        ignore_warnings=ignore_warnings,
+    )
 
     with transaction.atomic():
         invoice = form.save()
