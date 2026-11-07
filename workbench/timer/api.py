@@ -81,8 +81,10 @@ class TimestampIn(Schema):
     )
     minutes: int | None = Field(
         default=None,
+        ge=-1440,
+        le=1440,
         description="Minutes relative to now instead of now, e.g. -5 for five"
-        " minutes ago.",
+        " minutes ago, at most a day.",
     )
     project: int | str | None = Field(
         default=None,

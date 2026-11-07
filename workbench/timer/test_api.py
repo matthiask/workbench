@@ -39,6 +39,10 @@ class TimestampsAPITest(TestCase):
 
         self.assertEqual(create(type="split").status_code, 422)
         self.assertEqual(create(type="stop", time="13:30", minutes=5).status_code, 422)
+        # At most a day away, like times (today at the given time)
+        self.assertEqual(create(type="stop", minutes=-1440).status_code, 200)
+        for minutes in [-1441, 1441, 10**12]:
+            self.assertEqual(create(type="start", minutes=minutes).status_code, 422)
 
     @travel("2026-10-30T12:00:00+01:00", tick=False)
     def test_project_and_service(self):
