@@ -133,7 +133,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   web interface when deleting a person; `merge_people()` in
   `workbench/contacts/merge.py`): reverse relations move with
   `substitute_with()`, groups are added with `add_to_group()`, details the
-  person kept has already are dropped, notes are appended; people who are
+  person kept has already are dropped, notes are appended, the person kept
+  is archived only if both were; people who are
   both linked to a user can't be merged. Projects, deals and invoices
   `SET_NULL` their contact, so deleting a person without merging loses
   those links. `wb groups` lists, creates

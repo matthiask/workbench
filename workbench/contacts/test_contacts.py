@@ -444,6 +444,18 @@ class ContactsTest(TestCase):
         self.assertEqual(keep.date_of_birth, dt.date(1980, 1, 1))
         self.assertIn("other@example.com", keep._fts)
 
+    def test_merge_into_archived_person(self):
+        """The person kept is only archived if both were archived"""
+        for duplicate_archived, archived in [(False, False), (True, True)]:
+            with self.subTest(duplicate_archived=duplicate_archived):
+                keep = factories.PersonFactory.create(is_archived=True)
+                duplicate = factories.PersonFactory.create(
+                    is_archived=duplicate_archived
+                )
+                merge_people(duplicate=duplicate, keep=keep)
+                keep.refresh_from_db()
+                self.assertEqual(keep.is_archived, archived)
+
     def test_merge_people_linked_to_users(self):
         """People who are both linked to a user cannot be merged"""
         keep = factories.UserFactory.create(
