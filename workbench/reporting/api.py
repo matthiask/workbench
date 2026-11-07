@@ -33,6 +33,7 @@ from workbench.reporting.views import (
     ProjectBudgetStatisticsForm,
 )
 from workbench.tools.api import (
+    DATES,
     Amount,
     DateRangeFilter,
     Days,
@@ -40,6 +41,7 @@ from workbench.tools.api import (
     Percentage,
     UsersFilter,
     date_range,
+    dates_error,
     filter_users,
     form_errors,
 )
@@ -89,6 +91,8 @@ def key_data(request, month: str | None = None):
             raise ValidationError([
                 {"loc": ["query", "month"], "msg": _("Expected a month like 2026-09.")}
             ]) from None
+        if not DATES[0] <= first <= DATES[1]:
+            raise dates_error(["query", "month"])
     else:
         first = last_month_range()[0]
     return jsonable(key_data_for_month(first))

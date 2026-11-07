@@ -41,6 +41,23 @@ class ReportsAPITest(TestCase):
         response = self.client.get(url, {"period": "2026-09", "since": "2026-10-01"})
         self.assertEqual(response.status_code, 422)
 
+    def test_dates_out_of_range(self):
+        """Dates far away are validation errors, not crashes"""
+        for url, params in [
+            ("/api/reports/hours-per-customer/", {"period": "0000"}),
+            ("/api/reports/hours-per-customer/", {"period": "9999-12"}),
+            ("/api/reports/hours-per-customer/", {"period": "9999-Q4"}),
+            ("/api/reports/hours-per-customer/", {"since": "0001-01-01"}),
+            ("/api/reports/squeeze/", {"since": "9999-12-20", "until": "9999-12-31"}),
+            ("/api/planning/export/", {"since": "9999-12-20", "until": "9999-12-31"}),
+            ("/api/reports/key-data/", {"month": "0001-01"}),
+            ("/api/reports/working-time/", {"year": "99999"}),
+            ("/api/reports/working-time/", {"year": "0"}),
+        ]:
+            with self.subTest(url=url, params=params):
+                response = self.client.get(url, params)
+                self.assertEqual(response.status_code, 422, response.content)
+
     @travel("2026-02-11 12:00")
     def test_relative_periods(self):
         """Periods relative to today"""

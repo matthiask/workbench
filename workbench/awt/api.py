@@ -20,6 +20,7 @@ from workbench.awt.reporting import (
     working_time_by_week,
 )
 from workbench.tools.api import (
+    DATES,
     IGNORE_WARNINGS,
     DateRangeFilter,
     Days,
@@ -148,7 +149,12 @@ def absence_create(
 
 
 class WorkingTimeFilter(Schema):
-    year: int | None = None
+    year: int | None = Field(
+        default=None,
+        ge=DATES[0].year,
+        le=DATES[1].year,
+        description="This year by default.",
+    )
     user: str | None = None
     all: bool = False
     weekly: bool = False

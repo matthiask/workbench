@@ -95,6 +95,21 @@ RELATIVE_PERIOD = re.compile(
 OFFSETS = {"last": -1, "this": 0, "next": 1}
 
 
+# Dates far away crash computations (and are mistakes anyway)
+DATES = (dt.date(1900, 1, 1), dt.date(2999, 12, 31))
+
+
+def dates_error(loc):
+    """The validation error for dates outside of ``DATES``"""
+    return NinjaValidationError([
+        {
+            "loc": loc,
+            "msg": _("Dates have to be between %(min)s and %(max)s.")
+            % {"min": DATES[0], "max": DATES[1]},
+        }
+    ])
+
+
 class DateRangeFilter(Schema):
     """``period`` is a year (2026), a month (2026-09), a quarter (2026-Q3) or
     relative like last-week, this-month, next-quarter or last-year;
@@ -145,6 +160,8 @@ def _period(value):
             )
         )
     year = int(match["year"])
+    if not DATES[0].year <= year <= DATES[1].year:
+        raise dates_error(["query", "filters", "period"])
     if match["month"]:
         if not 1 <= int(match["month"]) <= 12:
             raise error(_("Invalid month."))
@@ -158,6 +175,9 @@ def date_range(filters, *, default=(None, None)):
     """The date range of a ``DateRangeFilter``, ``default`` without filters;
     the start or the end is ``None`` if open"""
     since, until = _period(filters.period) if filters.period else default
+    for field in ["since", "until"]:
+        if (day := getattr(filters, field)) and not DATES[0] <= day <= DATES[1]:
+            raise dates_error(["query", "filters", field])
     since = filters.since or since
     until = filters.until or until
     if since and until and since > until:

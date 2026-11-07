@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:10+0100\n"
+"POT-Creation-Date: 2026-11-07 14:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6112,6 +6112,11 @@ msgstr "Die Zeitmarke wurde erfolgreich geteilt."
 #: workbench/timer/views.py
 msgid "Split timestamp"
 msgstr "Zeitmarke teilen"
+
+#: workbench/tools/api.py
+#, python-format
+msgid "Dates have to be between %(min)s and %(max)s."
+msgstr "Das Datum muss zwischen %(min)s und %(max)s liegen."
 
 #: workbench/tools/api.py
 msgid "Expected a year, a month or a quarter like 2026-Q3, or a relative period like last-month."
