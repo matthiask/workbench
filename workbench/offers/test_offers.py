@@ -196,7 +196,7 @@ class OffersTest(TestCase):
         response = self.client.get(offer.urls["update"])
         self.assertContains(
             response,
-            "This offer is not in preparation anymore. I assume you know what you",
+            "This offer is not in preparation anymore. Put it back into preparation",
         )
 
         offer.refresh_from_db()
@@ -537,6 +537,61 @@ class OffersTest(TestCase):
         # - updated only once because of skip_related_model
         actions = LoggedAction.objects.for_model(offer).with_data(id=offer.id)
         self.assertEqual([action.action for action in actions], ["I", "U", "U"])
+
+    def test_no_changes_to_services_of_sent_offers(self):
+        """The services of offers which have been sent or accepted can't be
+        repriced, added or removed (put them back into preparation first)"""
+        offer = factories.OfferFactory.create(
+            status=Offer.ACCEPTED,
+            offered_on=in_days(-10),
+            valid_until=in_days(20),
+            title="Accepted",
+            postal_address="A\nStreet\nCity",
+        )
+        service = factories.ServiceFactory.create(
+            offer=offer, project=offer.project, effort_rate=100, effort_hours=10
+        )
+        unoffered = factories.ServiceFactory.create(project=offer.project, cost=500)
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.post(
+            offer.urls["pricing"],
+            {
+                "discount": 0,
+                "services-TOTAL_FORMS": 1,
+                "services-INITIAL_FORMS": 1,
+                "services-MAX_NUM_FORMS": 1000,
+                "services-0-id": service.id,
+                "services-0-offer": offer.id,
+                "services-0-title": service.title,
+                "services-0-effort_type": "Programming",
+                "services-0-effort_rate": 250,
+                "services-0-effort_hours": 10,
+                "services-0-cost": 0,
+            },
+        )
+        self.assertContains(response, "Only offers in preparation can be changed.")
+        service.refresh_from_db()
+        self.assertEqual(service.effort_rate, 100)
+
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "offered_on": offer.offered_on.isoformat(),
+                "valid_until": offer.valid_until.isoformat(),
+                "title": offer.title,
+                "owned_by": offer.owned_by_id,
+                "status": offer.status,
+                "postal_address": offer.postal_address,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "services": [service.id, unoffered.id],
+                WarningsForm.ignore_warnings_id: "on",
+            },
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        self.assertEqual(list(offer.services.all()), [service])
 
     def test_offer_pricing_with_flat_rate(self):
         """Pricing with flat rates does not allow editing effort rates"""

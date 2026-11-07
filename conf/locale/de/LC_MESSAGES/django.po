@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:03+0100\n"
+"POT-Creation-Date: 2026-11-07 14:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3069,7 +3069,7 @@ msgstr "Nur Offerten in Vorbereitung können ersetzt werden."
 msgid "Services of this offer already have logged hours or costs, they cannot be replaced."
 msgstr "Auf Leistungen dieser Offerte wurden bereits Stunden oder Kosten erfasst, sie können nicht ersetzt werden."
 
-#: workbench/offers/api.py
+#: workbench/offers/api.py workbench/offers/forms.py
 msgid "Only offers in preparation can be changed."
 msgstr "Nur Offerten in Vorbereitung können geändert werden."
 
@@ -3096,8 +3096,8 @@ msgid "offers"
 msgstr "Offerten"
 
 #: workbench/offers/forms.py
-msgid "This offer is not in preparation anymore. I assume you know what you're doing and wont stand in the way."
-msgstr "Diese Offerte befindet sich nicht mehr in Vorbereitung. Ich gehe davon aus, dass Du weisst was Du tust und werde nicht im Weg stehen."
+msgid "This offer is not in preparation anymore. Put it back into preparation to change its services."
+msgstr "Diese Offerte befindet sich nicht mehr in Vorbereitung. Setze sie zurück in Vorbereitung, um ihre Leistungen zu ändern."
 
 #: workbench/offers/forms.py
 msgid "This offer has planning entries linked to it. Delete them now that the offer is being declined?"

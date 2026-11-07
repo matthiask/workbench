@@ -90,8 +90,8 @@ def warn_if_not_in_preparation(form):
         messages.warning(
             form.request,
             _(
-                "This offer is not in preparation anymore."
-                " I assume you know what you're doing and wont stand in the way."
+                "This offer is not in preparation anymore. Put it back into"
+                " preparation to change its services."
             ),
         )
 
@@ -151,6 +151,11 @@ class OfferForm(PostalAddressSelectionForm):
                 if self.instance.pk
                 else []
             ),
+        )
+        # Services of offers which have been sent can't be added or removed
+        self.fields["services"].disabled = bool(
+            self.instance.pk
+            and self.instance.status not in {Offer.IN_PREPARATION, Offer.SERVICE_GROUP}
         )
         self.fields["services"].choices = [
             (
@@ -288,6 +293,13 @@ class OfferPricingForm(ModelForm):
         self.formsets = (
             {"services": ServiceFormset(*args, **kwargs)} if self.instance.pk else {}
         )
+
+    def clean(self):
+        data = super().clean()
+        # Like the API and the service form of the project
+        if self.instance.status not in {Offer.IN_PREPARATION, Offer.SERVICE_GROUP}:
+            raise forms.ValidationError(_("Only offers in preparation can be changed."))
+        return data
 
     def is_valid(self):
         return all(
