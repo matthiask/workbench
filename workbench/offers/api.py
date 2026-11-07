@@ -519,6 +519,14 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = Fals
                 " they cannot be replaced."
             ),
         })
+    if any(service.is_invoiced for service in existing):
+        errors.append({
+            "loc": ["path", "offer_id"],
+            "msg": _(
+                "Services of this offer have been invoiced already,"
+                " they cannot be replaced."
+            ),
+        })
 
     offer.title = data.title
     offer.description = data.description
@@ -740,6 +748,11 @@ def offer_service_delete(
             "msg": _(
                 "Hours or costs have been logged on this service, it cannot be deleted."
             ),
+        })
+    if service.is_invoiced:
+        errors.append({
+            "loc": ["path", "service_id"],
+            "msg": _("This service has been invoiced already, it cannot be deleted."),
         })
     if errors:
         raise ValidationError(errors)

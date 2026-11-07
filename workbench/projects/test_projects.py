@@ -579,6 +579,41 @@ class ProjectsTest(TestCase):
         service.refresh_from_db()
         self.assertNotEqual(service.project, other)
 
+    def test_invoiced_service(self):
+        """Services which have been invoiced (e.g. from the offer, without
+        logged hours) are neither deleted nor moved to another project"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_offer([service])
+        other = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(service.urls["delete"])
+        self.assertRedirects(response, service.get_absolute_url())
+        self.assertEqual(
+            messages(response),
+            ["This service has been invoiced already, it cannot be deleted."],
+        )
+
+        response = self.client.post(
+            service.urls["move"],
+            {"modal-project": other.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(
+            response,
+            "This service has been invoiced already,"
+            " it cannot be moved to another project.",
+        )
+        service.refresh_from_db()
+        self.assertEqual(service.project, project)
+
     def test_external_reference_of_service_bound_to_offer(self):
         """The external reference of services stays editable when their offer
         has been sent or accepted, the other fields don't"""

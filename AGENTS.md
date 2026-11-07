@@ -217,7 +217,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   offer queryset, not only the choices) and its rules: services of offers which
   have been sent or accepted only allow changing the external reference,
   deleting is only possible in offers in preparation or without offer and
-  without logged hours or costs, reordering takes all services of one offer
+  without logged hours or costs, invoiced services (`Service.is_invoiced`,
+  also from the offer) are neither deleted nor moved to another offer or
+  project, reordering takes all services of one offer
   (or the services without offer of one project). `POST
   /api/services/<id>/reassign-logbook/` (`wb services reassign-logbook`)
   reassigns logged hours and costs with `ReassignLogbookForm`; invoiced

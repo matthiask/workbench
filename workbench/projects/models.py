@@ -955,6 +955,12 @@ class Service(ServiceBase):
                 ),
             )
             return False
+        if instance.is_invoiced:
+            messages.error(
+                request,
+                _("This service has been invoiced already, it cannot be deleted."),
+            )
+            return False
         return super().allow_delete(instance, request)
 
     @classmethod
@@ -962,6 +968,12 @@ class Service(ServiceBase):
         if not request.is_ajax():
             return instance.get_absolute_url() if instance else "projects_project_list"
         return None
+
+    @property
+    def is_invoiced(self):
+        """Invoiced from the logbook or from the offer: the invoice's lines
+        point to the service, so it stays where it is"""
+        return self.pk is not None and self.invoice_services.exists()
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)

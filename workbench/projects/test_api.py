@@ -562,6 +562,45 @@ class ProjectsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
 
+    def test_invoiced_service(self):
+        """Services which have been invoiced (e.g. from the offer, without
+        logged hours) are neither deleted nor moved to another offer"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        service = factories.ServiceFactory.create(project=project, title="Design")
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_offer([service])
+        self.client.force_login(project.owned_by)
+        url = f"/api/services/{service.pk}/"
+
+        response = self.client.patch(
+            url, {"offer": offer.pk}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(
+            response.json()["detail"][0]["msg"],
+            "This service has been invoiced already,"
+            " it cannot be moved to another offer.",
+        )
+
+        response = self.client.patch(
+            url, {"title": "Design and concept"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(
+            response.json()["detail"][0]["msg"],
+            "This service has been invoiced already, it cannot be deleted.",
+        )
+        self.assertTrue(Service.objects.filter(pk=service.pk).exists())
+
     def test_service_description(self):
         """Descriptions of services which aren't bound to sent offers can be
         changed, e.g. to move URLs into the external reference"""

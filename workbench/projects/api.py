@@ -902,6 +902,11 @@ def service_delete(request, service_id: int, *, dry_run: bool = False):
                 "Hours or costs have been logged on this service, it cannot be deleted."
             ),
         })
+    if service.is_invoiced:
+        errors.append({
+            "loc": ["path", "service_id"],
+            "msg": _("This service has been invoiced already, it cannot be deleted."),
+        })
     if errors:
         raise ValidationError(errors)
     result = _service_result(service, request)

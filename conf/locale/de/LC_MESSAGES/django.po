@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:59+0100\n"
+"POT-Creation-Date: 2026-11-07 15:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3078,6 +3078,10 @@ msgstr "Nur Offerten in Vorbereitung können ersetzt werden."
 msgid "Services of this offer already have logged hours or costs, they cannot be replaced."
 msgstr "Auf Leistungen dieser Offerte wurden bereits Stunden oder Kosten erfasst, sie können nicht ersetzt werden."
 
+#: workbench/offers/api.py
+msgid "Services of this offer have been invoiced already, they cannot be replaced."
+msgstr "Leistungen dieser Offerte wurden bereits verrechnet, sie können nicht ersetzt werden."
+
 #: workbench/offers/api.py workbench/offers/forms.py
 msgid "Only offers in preparation can be changed."
 msgstr "Nur Offerten in Vorbereitung können geändert werden."
@@ -3093,6 +3097,11 @@ msgstr "Die Offerte hat keine Leistung mit dieser ID."
 #: workbench/offers/api.py workbench/projects/api.py
 msgid "Hours or costs have been logged on this service, it cannot be deleted."
 msgstr "Auf dieser Leistung wurden bereits Stunden oder Kosten erfasst, sie kann nicht gelöscht werden."
+
+#: workbench/offers/api.py workbench/projects/api.py
+#: workbench/projects/models.py
+msgid "This service has been invoiced already, it cannot be deleted."
+msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht gelöscht werden."
 
 #: workbench/offers/api.py
 msgid "Expected the IDs of all services of the offer once."
@@ -3721,6 +3730,10 @@ msgid "Most fields are disabled because service is bound to an offer which is no
 msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
 
 #: workbench/projects/forms.py
+msgid "This service has been invoiced already, it cannot be moved to another offer."
+msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht in eine andere Offerte verschoben werden."
+
+#: workbench/projects/forms.py
 msgid "Also reassign invoiced logbook entries"
 msgstr "Auch verrechnete Einträge umbuchen"
 
@@ -3743,6 +3756,10 @@ msgstr "Dieses Projekt wurde schon geschlossen."
 #: workbench/projects/forms.py
 msgid "Logged hours or costs of this service have been invoiced already, it cannot be moved to another project."
 msgstr "Erfasste Stunden oder Kosten dieser Leistung wurden bereits verrechnet, sie kann nicht in ein anderes Projekt verschoben werden."
+
+#: workbench/projects/forms.py
+msgid "This service has been invoiced already, it cannot be moved to another project."
+msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht in ein anderes Projekt verschoben werden."
 
 #: workbench/projects/forms.py
 #, python-format
@@ -6329,9 +6346,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "You are canceling this invoice. It may be cleaner to delete the invoice instead."
 #~ msgstr "Du versuchst, die Rechnung zu storieren. Es könnte sauberer sein, die Rechnung zu löschen."
-
-#~ msgid "The last service of an offer cannot be deleted."
-#~ msgstr "Die letzte Leistung einer Offerte kann nicht gelöscht werden."
 
 #~ msgid "Only reassign logbook entries which haven't been invoiced yet"
 #~ msgstr "Nur noch nicht verrechnete Einträge umbuchen"

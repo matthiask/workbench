@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Service
 
@@ -627,6 +628,31 @@ class OfferServicesAPITest(TestCase):
         response = self.send("delete", f"services/{self.hosting.pk}/")
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(self.offer.services.count(), 0)
+
+    def test_invoiced_services(self):
+        """Services which have been invoiced are neither deleted nor
+        replaced"""
+        project = self.offer.project
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_offer([self.hosting])
+
+        response = self.send("delete", f"services/{self.hosting.pk}/")
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("invoiced", response.content.decode())
+
+        response = self.client.put(
+            f"/api/offers/{self.offer.pk}/",
+            {"title": "Website", "services": [{"title": "Concept", "hours": 2}]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("invoiced", response.content.decode())
+        self.assertEqual(self.offer.services.count(), 2)
 
     def test_reorder(self):
         """Services are reordered by listing all their IDs"""

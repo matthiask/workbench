@@ -375,9 +375,11 @@ class OfferDeleteForm(ModelForm):
         except ProtectedError:
             pass
         else:
-            self.fields["delete_services"] = forms.BooleanField(
-                label=_("Delete offers' services?"), required=False
-            )
+            # Invoice lines point to invoiced services, they stay
+            if not any(service.is_invoiced for service in self.instance.services.all()):
+                self.fields["delete_services"] = forms.BooleanField(
+                    label=_("Delete offers' services?"), required=False
+                )
 
         if self.instance.planned_work.exists():
             self.fields["delete_planned_work"] = forms.BooleanField(

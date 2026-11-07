@@ -627,6 +627,14 @@ class ServiceForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        if "offer" in self.changed_data and self.instance.is_invoiced:
+            self.add_error(
+                "offer",
+                _(
+                    "This service has been invoiced already,"
+                    " it cannot be moved to another offer."
+                ),
+            )
         if data.get("title") and not is_title_specific(data["title"]):
             self.add_warning(
                 _(
@@ -749,6 +757,18 @@ class ServiceMoveForm(ModelForm):
                 _(
                     "Logged hours or costs of this service have been invoiced"
                     " already, it cannot be moved to another project."
+                ),
+            )
+        elif (
+            data.get("project")
+            and data["project"] != self.instance.project
+            and self.instance.is_invoiced
+        ):
+            self.add_error(
+                "project",
+                _(
+                    "This service has been invoiced already,"
+                    " it cannot be moved to another project."
                 ),
             )
 
