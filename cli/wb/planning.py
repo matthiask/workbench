@@ -39,7 +39,7 @@ def planning(ctx):
 
 @planning.command("export")
 @click.option("--project", type=int, help="Project ID.")
-@click.option("--campaign", type=int, help="Campaign ID, find it with `wb search`.")
+@click.option("--campaign", type=int, help="Campaign ID, see `wb campaigns`.")
 @period_options(
     "defaults to the whole planning of projects and campaigns, otherwise"
     " to the next twelve weeks"

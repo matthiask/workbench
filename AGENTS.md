@@ -104,7 +104,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Nouns without a verb show the most common list (`invoke_without_command`):
   `wb projects` your open projects, `wb hours` your hours of this week, `wb
   offers`/`invoices`/`deals` yours which may need action (like `wb me`), `wb
-  users`, `wb teams`, `wb auth` the installations; nouns which need a search
+  users`, `wb teams`, `wb campaigns`, `wb auth` the installations; nouns which need a search
   term show the help. `wb search` searches everything like the search field
   of the web interface (`/api/search/`, sources shared with the web view in
   `workbench/search.py`).

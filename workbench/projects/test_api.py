@@ -309,6 +309,30 @@ class ProjectsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
 
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
+    def test_campaigns(self):
+        """Campaigns with open projects are listed, the closed ones too if
+        wanted; projects have their campaign"""
+        user = factories.UserFactory.create(_short_name="ab")
+        campaign = factories.CampaignFactory.create(title="Relaunch", owned_by=user)
+        project = factories.ProjectFactory.create(campaign=campaign)
+        old = factories.CampaignFactory.create(title="Old")
+        factories.ProjectFactory.create(campaign=old, closed_on=in_days(-10))
+        self.client.force_login(user)
+
+        def titles(**params):
+            return [
+                row["title"]
+                for row in self.client.get("/api/campaigns/", params).json()["items"]
+            ]
+
+        self.assertEqual(titles(), ["Relaunch"])
+        self.assertEqual(titles(include_closed=True), ["Old", "Relaunch"])
+        self.assertEqual(titles(q="relaunch", owned_by="ab"), ["Relaunch"])
+
+        data = self.client.get(f"/api/projects/{project.pk}/").json()
+        self.assertEqual(data["campaign"]["id"], campaign.pk)
+
     def test_service_types(self):
         """Service types are listed with the titles services take"""
         service_types = factories.service_types()

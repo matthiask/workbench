@@ -3,6 +3,7 @@
 from wb import (  # noqa: F401 Register the commands
     absences,
     auth,
+    campaigns,
     contacts,
     deals,
     invoices,

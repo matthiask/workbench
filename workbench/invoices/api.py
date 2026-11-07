@@ -167,7 +167,9 @@ class InvoiceFilter(DateRangeFilter):
     q: SearchQuery = ""
     project: ProjectID = None
     customer: OrganizationID = None
-    status: Literal["in_preparation", "sent", "paid", "canceled"] | None = None
+    owned_by: ShortName = None
+    type: InvoiceType | None = None
+    status: InvoiceStatus | None = None
     open: bool = False
     overdue: bool = False
 
@@ -184,6 +186,12 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
         invoices = invoices.filter(project=filters.project)
     if filters.customer:
         invoices = invoices.filter(customer=filters.customer)
+    if filters.owned_by:
+        invoices = invoices.filter(
+            owned_by=user_by_short_name(filters.owned_by, param="owned_by")
+        )
+    if filters.type:
+        invoices = invoices.filter(type=filters.type)
     if filters.status:
         invoices = invoices.filter(status=STATUSES[filters.status])
     if filters.open:

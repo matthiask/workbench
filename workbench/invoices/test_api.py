@@ -15,6 +15,25 @@ class InvoicesAPITest(TestCase):
     def tearDown(self):
         deactivate_all()
 
+    def test_list_owned_by_and_type(self):
+        """Invoices are filtered by their owner and their type"""
+        user = factories.UserFactory.create(_short_name="ab")
+        mine = factories.InvoiceFactory.create(owned_by=user, type=Invoice.FIXED)
+        factories.InvoiceFactory.create(type=Invoice.FIXED)
+        credit = factories.InvoiceFactory.create(
+            owned_by=user, type=Invoice.CREDIT, subtotal=-10
+        )
+        self.client.force_login(user)
+
+        def ids(**params):
+            return [
+                row["id"]
+                for row in self.client.get("/api/invoices/", params).json()["items"]
+            ]
+
+        self.assertEqual(sorted(ids(owned_by="AB")), sorted([mine.pk, credit.pk]))
+        self.assertEqual(ids(owned_by="ab", type="credit"), [credit.pk])
+
     def test_list(self):
         """Invoices can be filtered"""
         project = factories.ProjectFactory.create()

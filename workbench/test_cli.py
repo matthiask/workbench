@@ -1084,6 +1084,32 @@ planned_work:
         walk(wb.cli, [])
         self.assertEqual(checked, set(server.values()))
 
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
+    def test_campaigns(self):
+        campaign = factories.CampaignFactory.create(title="Relaunch")
+        factories.ProjectFactory.create(campaign=campaign)
+        result = self.wb("campaigns")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Relaunch", result.output)
+        result = self.wb("campaigns", "search", "nothing", "--include-closed")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertNotIn("Relaunch", result.output)
+
+    def test_invoices_owned_by_and_type(self):
+        factories.InvoiceFactory.create(
+            owned_by=self.user, type="credit", subtotal=-10, title="Refund"
+        )
+        result = self.wb(
+            "invoices",
+            "search",
+            "--owned-by",
+            self.user.get_short_name(),
+            "--type",
+            "credit",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Refund", result.output)
+
     def test_deal_value_types_and_attributes(self):
         factories.ValueTypeFactory.create(title="Design")
         group = AttributeGroup.objects.create(title="Source")

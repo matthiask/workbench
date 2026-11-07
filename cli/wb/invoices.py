@@ -42,6 +42,12 @@ def invoices(ctx):
 @click.argument("query", nargs=-1)
 @click.option("--project", type=int, help="Project ID.")
 @click.option("--customer", type=int, help="Organization ID.")
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@click.option(
+    "--type",
+    "type_",
+    type=click.Choice(["fixed", "down-payment", "services", "credit"]),
+)
 @click.option(
     "--status", type=click.Choice(["in_preparation", "sent", "paid", "canceled"])
 )
@@ -55,6 +61,8 @@ def search_invoices(
     query,
     project,
     customer,
+    owned_by,
+    type_,
     status,
     open_,
     overdue,
@@ -76,6 +84,10 @@ def search_invoices(
         params["project"] = project
     if customer:
         params["customer"] = customer
+    if owned_by:
+        params["owned_by"] = owned_by
+    if type_:
+        params["type"] = type_
     if status:
         params["status"] = status
     params |= period_params(period, since, until)

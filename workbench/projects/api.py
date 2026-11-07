@@ -34,7 +34,7 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import ProjectForm, ReassignLogbookForm, ServiceForm
-from workbench.projects.models import InternalType, Project, Service
+from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
@@ -73,6 +73,12 @@ def project_summary(project, request):
     }
 
 
+class CampaignSummary(Schema):
+    id: int
+    code: str
+    title: str
+
+
 class ProjectOut(Schema):
     id: int
     code: str
@@ -84,6 +90,7 @@ class ProjectOut(Schema):
     owned_by: str
     type: ProjectType
     type_label: str
+    campaign: CampaignSummary | None
     flat_rate: Decimal | None
     internal_type: str | None
     created_at: dt.datetime
@@ -104,6 +111,13 @@ def project_out(project, request):
         "owned_by": project.owned_by.get_short_name(),
         "type": project.type,
         "type_label": project.get_type_display(),
+        "campaign": {
+            "id": project.campaign.id,
+            "code": project.campaign.code,
+            "title": project.campaign.title,
+        }
+        if project.campaign
+        else None,
         "internal_type": project.internal_type.name if project.internal_type else None,
         "flat_rate": project.flat_rate,
         "created_at": project.created_at,
@@ -116,6 +130,59 @@ class ProjectFilter(Schema):
     customer: OrganizationID = None
     owned_by: ShortName = None
     include_closed: bool = False
+
+
+class CampaignOut(Schema):
+    id: int
+    code: str
+    url: str
+    title: str
+    description: str
+    customer: OrganizationOut
+    owned_by: str
+
+
+class CampaignFilter(Schema):
+    q: SearchQuery = ""
+    customer: OrganizationID = None
+    owned_by: ShortName = None
+    include_closed: bool = Field(
+        default=False, description="Also campaigns without open projects."
+    )
+
+
+@router.get(
+    "/campaigns/",
+    response=list[CampaignOut],
+    auth=user_auth(feature=FEATURES.CAMPAIGNS),
+)
+@paginate
+def campaign_list(request, filters: Query[CampaignFilter]):
+    """Campaigns group projects, those with open projects by default, newest
+    first; the planning export takes their ID"""
+    campaigns = Campaign.objects.select_related("customer", "owned_by")
+    if not filters.include_closed:
+        campaigns = campaigns.open()
+    if filters.customer:
+        campaigns = campaigns.filter(customer=filters.customer)
+    if filters.owned_by:
+        campaigns = campaigns.filter(
+            owned_by=user_by_short_name(filters.owned_by, param="owned_by")
+        )
+    if filters.q:
+        campaigns = campaigns.search(filters.q)
+    return Serialized(
+        campaigns.order_by("-pk"),
+        lambda campaign: {
+            "id": campaign.id,
+            "code": campaign.code,
+            "url": request.build_absolute_uri(campaign.get_absolute_url()),
+            "title": campaign.title,
+            "description": campaign.description,
+            "customer": organization_out(campaign.customer, request),
+            "owned_by": campaign.owned_by.get_short_name(),
+        },
+    )
 
 
 class InternalTypeOut(Schema):
@@ -148,7 +215,7 @@ def internal_type_list(request):
 def project_list(request, filters: Query[ProjectFilter]):
     """Search projects, open projects only by default, newest first"""
     projects = Project.objects.select_related(
-        "customer", "contact", "owned_by", "internal_type"
+        "customer", "contact", "owned_by", "internal_type", "campaign"
     ).order_by("-pk")
     if not filters.include_closed:
         projects = projects.open()
@@ -168,7 +235,7 @@ def project_detail(request, project_id: int):
     return project_out(
         get_object_or_404(
             Project.objects.select_related(
-                "customer", "contact", "owned_by", "internal_type"
+                "customer", "contact", "owned_by", "internal_type", "campaign"
             ),
             pk=project_id,
         ),
@@ -457,7 +524,7 @@ def project_stats(request, filters: Query[StatsFilter]):
     projects = list(
         Project.objects
         .filter(q)
-        .select_related("customer", "contact", "owned_by", "internal_type")
+        .select_related("customer", "contact", "owned_by", "internal_type", "campaign")
         .order_by("pk")
     )
     budget = {
