@@ -461,6 +461,9 @@ class SetStatusForm(ModelForm):
                             " that the offers are being declined?"
                         )
                     )
+                    # Only required if declined offers have planned work,
+                    # see clean()
+                    self.fields["delete_planned_work"].required = False
 
     def clean(self):
         data = super().clean()
@@ -470,6 +473,16 @@ class SetStatusForm(ModelForm):
             )
         if data.get("status") in {Deal.ACCEPTED, Deal.DECLINED}:
             self.offers_to_update = data.get("related_offers", ())
+            field = self.fields.get("delete_planned_work")
+            if (
+                field
+                and data.get("delete_planned_work") in {None, ""}
+                and any(
+                    offer.planned_work.all().after_this_week()
+                    for offer in self.offers_to_update
+                )
+            ):
+                self.add_error("delete_planned_work", field.error_messages["required"])
             for offer in self.offers_to_update:
                 if (
                     data.get("status") == Deal.DECLINED

@@ -9,7 +9,7 @@ from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
 from workbench.deals.models import Deal, Value
 from workbench.offers.models import Offer
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, monday
 
 
 class DealsAPITest(TestCase):
@@ -298,6 +298,43 @@ class DealsAPITest(TestCase):
             [e["loc"] for e in response.json()["detail"]],
             [["body", "data", "owned_by"], ["body", "data", "values", "Nope"]],
         )
+
+    def test_decline_without_offers_and_planned_work(self):
+        """Declining a deal without declining its offers doesn't ask about
+        their planned work"""
+        user = factories.UserFactory.create()
+        deal = factories.DealFactory.create(owned_by=user)
+        offer = factories.OfferFactory.create(
+            title="Relaunch",
+            postal_address="Customer\nStreet\nCity",
+            status=Offer.OFFERED,
+            offered_on=dt.date.today(),
+            valid_until=in_days(30),
+        )
+        deal.related_offers.add(offer)
+        factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, weeks=[monday(in_days(14))]
+        )
+        factories.ClosingTypeFactory.create(title="Too expensive")
+        self.client.force_login(user)
+        url = f"/api/deals/{deal.pk}/status/"
+
+        response = self.client.post(
+            url,
+            {"status": "declined", "closing_type": "Too expensive", "offers": []},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
+        # Declining the offer asks
+        self.client.post(url, {"status": "open"}, content_type="application/json")
+        response = self.client.post(
+            url,
+            {"status": "declined", "closing_type": "Too expensive"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("delete_planned_work", response.content.decode())
 
     def test_status(self):
         """Deals are closed and reopened, their offers accepted or declined"""
