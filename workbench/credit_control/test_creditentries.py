@@ -13,8 +13,10 @@ from workbench.credit_control.parsers import (
     postfinance_preprocess_notice,
     postfinance_reference_number,
 )
+from workbench.invoices.models import Invoice
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days
 
 
 class CreditEntriesTest(TestCase):
@@ -25,6 +27,8 @@ class CreditEntriesTest(TestCase):
                 subtotal=10 + i,
                 liable_to_vat=False,
                 archived_at=timezone.now(),
+                status=Invoice.SENT,
+                due_on=in_days(30),
             )
 
         entry_0 = factories.CreditEntryFactory.create(total=12)
@@ -100,7 +104,12 @@ class CreditEntriesTest(TestCase):
             messages(response), ["Found 2 credit entries.", "Created 0 credit entries."]
         )
 
-        invoice = factories.InvoiceFactory.create(subtotal=Decimal(4000), _code="00001")
+        invoice = factories.InvoiceFactory.create(
+            subtotal=Decimal(4000),
+            _code="00001",
+            status=Invoice.SENT,
+            due_on=in_days(30),
+        )
         self.assertAlmostEqual(invoice.total, Decimal("4308.00"))
         response = self.client.get("/credit-control/assign/")
         self.assertContains(response, "<strong><small>00001</small>")
@@ -154,6 +163,44 @@ class CreditEntriesTest(TestCase):
         self.assertEqual(response.status_code, 302)
         entry = CreditEntry.objects.get()
         self.assertRedirects(response, entry.urls["list"])
+
+    def test_only_sent_invoices(self):
+        """Payments are only assigned to sent invoices"""
+        canceled = factories.InvoiceFactory.create(
+            subtotal=100, liable_to_vat=False, status=Invoice.CANCELED
+        )
+        in_preparation = factories.InvoiceFactory.create(
+            subtotal=100, liable_to_vat=False, invoiced_on=None
+        )
+        entry = factories.CreditEntryFactory.create(total=100)
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.post(
+            "/credit-control/assign/",
+            {f"entry_{entry.pk}_invoice": in_preparation.pk},
+        )
+        self.assertContains(response, "Select a valid choice.")
+        in_preparation.refresh_from_db()
+        self.assertEqual(in_preparation.status, Invoice.IN_PREPARATION)
+
+        for invoice in [canceled, in_preparation]:
+            response = self.client.post(
+                "/credit-control/create/",
+                {
+                    "ledger": entry.ledger_id,
+                    "reference_number": f"unique-{invoice.pk}",
+                    "value_date": dt.date.today().isoformat(),
+                    "total": "100.00",
+                    "payment_notice": "paid",
+                    "invoice": invoice.pk,
+                },
+            )
+            self.assertContains(
+                response, "Payments can only be assigned to sent invoices."
+            )
+            status = invoice.status
+            invoice.refresh_from_db()
+            self.assertEqual(invoice.status, status)
 
     def test_postfinance_utilities(self):
         """Utilities for the PostFinance CSV export"""
@@ -223,6 +270,8 @@ class CreditEntriesTest(TestCase):
         invoice = factories.InvoiceFactory.create(
             subtotal=10,
             liable_to_vat=False,
+            status=Invoice.SENT,
+            due_on=in_days(30),
         )
 
         entry_0 = factories.CreditEntryFactory.create(total=10)

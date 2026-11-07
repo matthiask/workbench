@@ -65,6 +65,21 @@ class CreditEntryForm(ModelForm):
         ]
         widgets = {"invoice": Autocomplete(model=Invoice), "notes": Textarea}
 
+    def clean(self):
+        data = super().clean()
+        invoice = data.get("invoice")
+        if (
+            invoice
+            and "invoice" in self.changed_data
+            and invoice.status not in {Invoice.SENT, Invoice.PAID}
+        ):
+            # Cancelled invoices have released their logged entries and down
+            # payments, invoices in preparation have no dates yet
+            self.add_error(
+                "invoice", _("Payments can only be assigned to sent invoices.")
+            )
+        return data
+
     def save(self):
         instance = super().save()
         if instance.invoice and instance.invoice.status != instance.invoice.PAID:
@@ -208,10 +223,9 @@ class AssignCreditEntriesForm(forms.Form):
                             ))
                         ),
                     )
-                    for invoice in Invoice.objects
-                    .open()
-                    .filter(total=entry.total)
-                    .select_related(
+                    for invoice in Invoice.objects.filter(
+                        status=Invoice.SENT, total=entry.total
+                    ).select_related(
                         "contact__organization", "customer", "owned_by", "project"
                     )[:100]
                 ],
