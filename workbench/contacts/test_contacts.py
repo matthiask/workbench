@@ -55,6 +55,19 @@ class ContactsTest(TestCase):
     def setUp(self):
         deactivate_all()
 
+    def test_search_details(self):
+        """People are found by their organization and their details"""
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create(name="Gammaorg")
+        )
+        person.emailaddresses.create(email="zeta@example.com", type="work")
+        person.phonenumbers.create(phone_number="+41 79 555 12 34", type="work")
+        person.save()
+
+        for term in ["Gammaorg", "zeta"]:
+            with self.subTest(term=term):
+                self.assertEqual(list(Person.objects.search(term)), [person])
+
     def test_update(self):
         """A single-word salutation does not look right"""
         person = factories.PersonFactory.create()
