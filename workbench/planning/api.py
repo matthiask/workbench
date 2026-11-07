@@ -10,6 +10,7 @@ from ninja import Query, Router, Schema
 from ninja.errors import ValidationError
 
 from workbench.accounts.models import User
+from workbench.api_keys import OfferStatus, key
 from workbench.awt.models import Absence
 from workbench.offers.models import Offer
 from workbench.planning.models import ExternalWork, Milestone, PlannedWork
@@ -73,7 +74,7 @@ class OfferOut(Schema):
     code: str
     title: str
     description: str
-    status: str
+    status: OfferStatus
     services: list[ServiceOut]
 
 
@@ -173,7 +174,7 @@ def project_planning_context(project):
                 "code": offer.code,
                 "title": offer.title,
                 "description": offer.description,
-                "status": offer.get_status_display(),
+                "status": key("offer_status", offer.status),
                 "services": list(offer.services.all()),
             }
             for offer in offers

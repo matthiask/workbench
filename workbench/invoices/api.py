@@ -15,6 +15,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.api_keys import KEYS, InvoiceStatus, key
 from workbench.contacts.api import (
     OrganizationOut,
     PersonSummary,
@@ -47,12 +48,7 @@ from workbench.tools.validation import in_days
 # Same as in the web interface
 router = Router(auth=user_auth(feature=FEATURES.CONTROLLING), tags=["invoices"])
 
-STATUSES = {
-    "in_preparation": Invoice.IN_PREPARATION,
-    "sent": Invoice.SENT,
-    "paid": Invoice.PAID,
-    "canceled": Invoice.CANCELED,
-}
+STATUSES = KEYS["invoice_status"]
 
 
 class InvoiceOut(Schema):
@@ -62,7 +58,8 @@ class InvoiceOut(Schema):
     title: str
     description: str
     type: str
-    status: str
+    status: InvoiceStatus
+    status_label: str
     project: ProjectSummary | None
     customer: OrganizationOut
     owned_by: str
@@ -85,7 +82,8 @@ def invoice_out(invoice, request):
         "title": invoice.title,
         "description": invoice.description,
         "type": invoice.get_type_display(),
-        "status": invoice.get_status_display(),
+        "status": key("invoice_status", invoice.status),
+        "status_label": invoice.get_status_display(),
         "project": project_summary(invoice.project, request)
         if invoice.project
         else None,

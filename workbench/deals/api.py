@@ -17,6 +17,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.api_keys import KEYS, DealProbability, DealStatus, key
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm, RelatedOfferForm, SetStatusForm
@@ -42,12 +43,10 @@ from workbench.tools.validation import monday
 # Same as in the web interface
 router = Router(auth=user_auth(feature=FEATURES.DEALS), tags=["deals"])
 
-STATUSES = {"open": Deal.OPEN, "accepted": Deal.ACCEPTED, "declined": Deal.DECLINED}
+STATUSES = KEYS["deal_status"]
 # Unknown isn't offered in the web interface
 PROBABILITIES = {
-    "low": Deal.LOW,
-    "normal": Deal.NORMAL,
-    "high": Deal.HIGH,
+    k: value for k, value in KEYS["deal_probability"].items() if k != "unknown"
 }
 
 
@@ -64,8 +63,10 @@ class DealOut(Schema):
     description: str
     customer: OrganizationOut
     owned_by: str
-    status: str
-    probability: str
+    status: DealStatus
+    status_label: str
+    probability: DealProbability
+    probability_label: str
     decision_expected_on: dt.date | None
     value: Decimal
     values: list[ValueOut]
@@ -85,8 +86,10 @@ def deal_out(deal, request):
         "description": deal.description,
         "customer": organization_out(deal.customer, request),
         "owned_by": deal.owned_by.get_short_name(),
-        "status": deal.get_status_display(),
-        "probability": deal.get_probability_display(),
+        "status": key("deal_status", deal.status),
+        "status_label": deal.get_status_display(),
+        "probability": key("deal_probability", deal.probability),
+        "probability_label": deal.get_probability_display(),
         "decision_expected_on": deal.decision_expected_on,
         "value": deal.value,
         "values": [

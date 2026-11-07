@@ -545,7 +545,7 @@ def echo_offer(offer):
         f"{offer['code'] or '(new offer)'} {offer['title']}",
         [
             ("ID", offer["id"]),
-            ("Status", offer["status"]),
+            ("Status", offer["status_label"]),
             ("Offered on", offer.get("offered_on")),
             ("Valid until", offer.get("valid_until")),
             ("Closed on", offer.get("closed_on")),
@@ -591,7 +591,7 @@ def echo_offer_list(offers, *, title=None):
             link(offer["id"], offer["url"]),
             link(offer["code"], offer["url"]),
             offer["title"],
-            offer["status"],
+            offer["status_label"],
             offer["total"],
         )
     console.print(table)
@@ -724,7 +724,7 @@ def echo_invoice_list(invoices, *, title="Invoices"):
             link(invoice["code"], invoice["url"]),
             invoice["title"],
             link(invoice["customer"]["name"], invoice["customer"]["url"]),
-            invoice["status"],
+            invoice["status_label"],
             invoice["invoiced_on"] or "",
             invoice["due_on"] or "",
             invoice["total_excl_tax"],

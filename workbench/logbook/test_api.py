@@ -92,7 +92,7 @@ class LogbookAPITest(TestCase):
         data = rows()
         self.assertEqual(
             data[invoiced.pk]["invoice"],
-            {"id": invoice.pk, "code": invoice.code, "status": "In preparation"},
+            {"id": invoice.pk, "code": invoice.code, "status": "in_preparation"},
         )
         self.assertIsNotNone(data[invoiced.pk]["archived_at"])
         self.assertIsNone(data[not_invoiced.pk]["invoice"])

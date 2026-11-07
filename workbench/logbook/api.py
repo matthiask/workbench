@@ -6,6 +6,7 @@ from django.db.models import Sum
 from ninja import Field, Query, Router, Schema
 from ninja.pagination import paginate
 
+from workbench.api_keys import InvoiceStatus, key
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.tools.api import (
@@ -24,7 +25,7 @@ router = Router(tags=["logbook"])
 class InvoiceSummary(Schema):
     id: int
     code: str
-    status: str
+    status: InvoiceStatus
 
 
 class LoggedHoursOut(Schema):
@@ -106,7 +107,7 @@ def _entry_out(entry, request):
         "invoice": {
             "id": invoice.id,
             "code": invoice.code,
-            "status": invoice.get_status_display(),
+            "status": key("invoice_status", invoice.status),
         }
         if (invoice := entry.invoice_service and entry.invoice_service.invoice)
         else None,

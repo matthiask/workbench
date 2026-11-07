@@ -22,6 +22,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.api_keys import InvoiceStatus, OfferStatus, key
 from workbench.contacts.api import (
     OrganizationOut,
     PersonSummary,
@@ -369,7 +370,7 @@ class ServiceStats(Schema):
     id: int
     title: str
     offer: str | None
-    offer_status: str | None
+    offer_status: OfferStatus | None
     effort_type: str
     effort_rate: Decimal | None
     service_hours: Decimal
@@ -393,7 +394,7 @@ class InvoiceStats(Schema):
     code: str
     title: str
     type: str
-    status: str
+    status: InvoiceStatus
     invoiced_on: dt.date | None
     total_excl_tax: Decimal
     third_party_costs: Decimal | None
@@ -518,7 +519,7 @@ def project_stats(request, filters: Query[StatsFilter]):
                     "id": service.id,
                     "title": service.title,
                     "offer": service.offer.code if service.offer else None,
-                    "offer_status": service.offer.get_status_display()
+                    "offer_status": key("offer_status", service.offer.status)
                     if service.offer
                     else None,
                     "effort_type": service.effort_type,
@@ -550,7 +551,7 @@ def project_stats(request, filters: Query[StatsFilter]):
                     "code": invoice.code,
                     "title": invoice.title,
                     "type": invoice.get_type_display(),
-                    "status": invoice.get_status_display(),
+                    "status": key("invoice_status", invoice.status),
                     "invoiced_on": invoice.invoiced_on,
                     "total_excl_tax": invoice.total_excl_tax,
                     "third_party_costs": invoice.third_party_costs,
@@ -568,7 +569,8 @@ class ServiceOut(Schema):
     project: ProjectSummary
     offer_id: int | None
     offer: str | None
-    offer_status: str | None
+    offer_status: OfferStatus | None
+    offer_status_label: str | None
     title: str
     description: str
     external_reference: str
@@ -631,7 +633,12 @@ def _service_out(service, request, *, controlling):
         "project": project_summary(service.project, request),
         "offer_id": service.offer_id,
         "offer": service.offer.code if service.offer else None,
-        "offer_status": service.offer.get_status_display() if service.offer else None,
+        "offer_status": key("offer_status", service.offer.status)
+        if service.offer
+        else None,
+        "offer_status_label": service.offer.get_status_display()
+        if service.offer
+        else None,
         "title": service.title,
         "description": service.description,
         "external_reference": service.external_reference,

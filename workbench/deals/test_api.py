@@ -327,7 +327,7 @@ class DealsAPITest(TestCase):
 
         response = post({"status": "accepted", "closing_type": "won"}, "?dry_run=true")
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response.json()["status"], "Accepted")
+        self.assertEqual(response.json()["status"], "accepted")
         deal.refresh_from_db()
         offer.refresh_from_db()
         self.assertEqual((deal.status, offer.status), (Deal.OPEN, Offer.OFFERED))

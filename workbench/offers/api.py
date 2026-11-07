@@ -14,6 +14,7 @@ from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
+from workbench.api_keys import KEYS, OfferStatus, key
 from workbench.contacts.models import postal_address_choices
 from workbench.offers.models import (
     Offer,
@@ -137,7 +138,8 @@ class OfferOut(Schema):
     url: str | None
     title: str
     description: str
-    status: str
+    status: OfferStatus
+    status_label: str
     created_at: dt.datetime
     offered_on: dt.date | None
     closed_on: dt.date | None = Field(description="Date of acceptance or decline.")
@@ -192,7 +194,8 @@ def offer_out(offer, services, request):
         else None,
         "title": offer.title,
         "description": offer.description,
-        "status": offer.get_status_display(),
+        "status": key("offer_status", offer.status),
+        "status_label": offer.get_status_display(),
         "created_at": offer.created_at,
         "offered_on": offer.offered_on,
         "closed_on": offer.closed_on,
@@ -235,14 +238,7 @@ def offer_context(request, project_id: int):
     }
 
 
-OFFER_STATUSES = {
-    "in_preparation": Offer.IN_PREPARATION,
-    "service_group": Offer.SERVICE_GROUP,
-    "offered": Offer.OFFERED,
-    "accepted": Offer.ACCEPTED,
-    "declined": Offer.DECLINED,
-    "discarded": Offer.DISCARDED,
-}
+OFFER_STATUSES = KEYS["offer_status"]
 
 
 class OfferFilter(DateRangeFilter):

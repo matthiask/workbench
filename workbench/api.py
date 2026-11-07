@@ -3,6 +3,7 @@ from ninja import NinjaAPI
 
 from workbench.accounts.api import router as accounts_router
 from workbench.accounts.api_auth import user_auth
+from workbench.api_keys import router as choices_router
 from workbench.awt.api import router as awt_router
 from workbench.contacts.api import router as contacts_router
 from workbench.deals.api import router as deals_router
@@ -25,6 +26,7 @@ api = NinjaAPI(
 )
 api.add_router("/", accounts_router)
 api.add_router("/", awt_router)
+api.add_router("/", choices_router)
 api.add_router("/", contacts_router)
 api.add_router("/", deals_router)
 api.add_router("/", invoices_router)

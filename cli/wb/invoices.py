@@ -114,7 +114,7 @@ def _echo_invoice(data):
         [
             ("ID", data["id"]),
             ("Type", data["type"]),
-            ("Status", data["status"]),
+            ("Status", data["status_label"]),
             ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             (
                 "Project",
