@@ -600,6 +600,36 @@ class CapacityTest(TestCase):
         planning.add_absences(Absence.objects.all())
         self.assertEqual(len(planning._absences[user][0]), 1)
 
+    def test_weekend_absences(self):
+        """Absences on weekends count in their week, in the capacity and the
+        shown absences alike; longer absences starting on a weekend start
+        with the following week"""
+        week = dt.date(2026, 11, 2)
+        next_week = week + dt.timedelta(days=7)
+        user = factories.UserFactory.create(planning_hours_per_day=8)
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2020, 1, 1), percentage=100
+        )
+        saturday = week + dt.timedelta(days=5)
+
+        def check(absences, capacity, shown):
+            Absence.objects.all().delete()
+            for starts_on, ends_on, days in absences:
+                factories.AbsenceFactory.create(
+                    user=user, starts_on=starts_on, ends_on=ends_on, days=days
+                )
+            planning = reporting.Planning(weeks=[week, next_week], users=[user])
+            self.assertEqual(planning.capacity()["total"], capacity)
+            planning.add_absences(Absence.objects.all())
+            self.assertEqual(
+                [sum(row[0] for row in cell) for cell in planning._absences[user]],
+                shown,
+            )
+
+        check([(saturday, None, 1)], [32, 40], [8, 0])
+        check([(saturday, saturday + dt.timedelta(days=1), 1)], [32, 40], [8, 0])
+        check([(saturday, next_week + dt.timedelta(days=4), 5)], [40, 0], [0, 40])
+
     def test_capacity_public_and_company_holiday_on_the_same_day(self):
         """A day is free at most once, like in the annual working time"""
         week = dt.date(2026, 12, 21)

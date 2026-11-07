@@ -245,10 +245,14 @@ class Planning:
             .select_related("user")
         ):
             date_from = monday(absence.starts_on)
-            # If absence starts on weekend move it to the next monday
-            if absence.starts_on.weekday() in {5, 6}:
+            # Absences starting on a weekend and continuing into the next
+            # week start with the next monday, those on a weekend only count
+            # in their week (the capacity below uses the same rule)
+            if absence.starts_on.weekday() in {5, 6} and (
+                absence.ends_on or absence.starts_on
+            ) >= date_from + dt.timedelta(days=7):
                 date_from += dt.timedelta(days=7)
-            date_until = monday(absence.ends_on or date_from)
+            date_until = monday(absence.ends_on or absence.starts_on)
             # Spread over all weeks of the absence, also those not shown
             hours = (
                 absence.days
@@ -611,9 +615,14 @@ left outer join lateral(
               select array_agg(w::date) from generate_series(
                 date_trunc('week', starts_on) + (
                     --
-                    -- If absence starts on weekend move it to the next monday
+                    -- Absences starting on a weekend and continuing into the
+                    -- next week start with the next monday, those on a
+                    -- weekend only count in their week
                     --
-                    case when extract('isodow' from starts_on) >= 6 then '7 days'::interval else '0 days'::interval end
+                    case when extract('isodow' from starts_on) >= 6
+                        and coalesce(ends_on, starts_on)
+                            >= date_trunc('week', starts_on) + '7 days'::interval
+                    then '7 days'::interval else '0 days'::interval end
                 ),
                 date_trunc('week', coalesce(ends_on, starts_on)),
                 '7 days'
