@@ -160,6 +160,22 @@ class SqueezeTest(TestCase):
         self.assertContains(self.client.get(url), "Hours for invoicing")
         self.assertEqual(self.client.get(f"{url}&export=xlsx").status_code, 200)
 
+    def test_work_worth_nothing_still_gets_the_share_of_the_period(self):
+        """Without any value of the work in the period, the share of the
+        period is split by hours"""
+        project = factories.ProjectFactory.create()
+        service = self.offer(project, status=Offer.ACCEPTED, hours=10)
+        factories.LoggedHoursFactory.create(
+            service=service, hours=5, rendered_on=in_days(-30)
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, hours=5, hours_for_invoicing=0
+        )
+
+        data = squeeze_data((in_days(-1), in_days(1)))
+        row = next(p for p in data["projects"] if p["project"] == project)
+        self.assertAlmostEqual(row["gross_margin_in_range"], 1000)  # 5/10 × 2000
+
     def test_third_party_costs_are_not_subtracted_twice(self):
         """Logged third party costs invoiced with a fixed amount invoice count once"""
         project = factories.ProjectFactory.create()

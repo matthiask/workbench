@@ -449,6 +449,8 @@ weight(row)          = HOURS_FOR_INVOICING × COALESCE(NULLIF(service.effort_rat
 hours_in_range_total = Σ hours logged on the project in the period (all people)
 period_margin        = hours_in_range_total / hours × gross_margin          (0 if hours == 0)
 person's margin      = Σ weight(person, period) / Σ weight(all, period) × period_margin
+                       (by hours instead if Σ weight(all, period) == 0, e.g. all
+                       hours for invoicing are 0)
 person's rate        = person's margin / person's hours on the project
 hours_rate_unknown   = person's period hours on services with effort_rate NULL or 0
 ```

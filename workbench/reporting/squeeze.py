@@ -433,12 +433,16 @@ def squeeze_data(date_range):  # noqa: C901
         # how that slice is divided between users.
         period_margin = hours_in_range_total / hours * margin if hours else Z2
 
+        # Work which is worth nothing (hours for invoicing of 0) still gets
+        # the period's share; without any value, split it by hours.
+        weight = "weighted_hours" if total_weighted_in_range else "hours"
+        total_weight = total_weighted_in_range or hours_in_range_total
+
         by_user = {}
-        if total_weighted_in_range and hours:
+        if total_weight and hours:
             for u, user_data in p["hours_in_range_by_user"].items():
                 user_hours = user_data["hours"]
-                user_weighted = user_data["weighted_hours"]
-                user_margin = user_weighted / total_weighted_in_range * period_margin
+                user_margin = user_data[weight] / total_weight * period_margin
                 contrib = {
                     "hours": user_hours,
                     "hours_for_invoicing": user_data["hours_for_invoicing"],
