@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 16:30+0100\n"
+"POT-Creation-Date: 2026-11-07 16:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1362,8 +1362,8 @@ msgid "All ledgers"
 msgstr "Alle Konten"
 
 #: workbench/credit_control/forms.py
-msgid "Payments can only be assigned to sent invoices."
-msgstr "Zahlungen können nur versendeten Rechnungen zugewiesen werden."
+msgid "Payments can only be assigned to sent invoices and to invoices in preparation with an invoice date."
+msgstr "Zahlungen können nur versendeten Rechnungen und Rechnungen in Vorbereitung mit Rechnungsdatum zugewiesen werden."
 
 #: workbench/credit_control/forms.py
 msgid "Account statement"

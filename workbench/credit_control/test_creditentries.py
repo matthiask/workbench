@@ -14,6 +14,7 @@ from workbench.credit_control.parsers import (
     postfinance_reference_number,
 )
 from workbench.invoices.models import Invoice
+from workbench.reporting.models import FreezeDate
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -164,26 +165,33 @@ class CreditEntriesTest(TestCase):
         entry = CreditEntry.objects.get()
         self.assertRedirects(response, entry.urls["list"])
 
-    def test_only_sent_invoices(self):
-        """Payments are only assigned to sent invoices"""
+    def test_payable_invoices(self):
+        """Payments are assigned to sent invoices and to invoices in
+        preparation with a date after the freeze date, never to cancelled
+        ones"""
+        FreezeDate.objects.create(up_to=in_days(-30))
         canceled = factories.InvoiceFactory.create(
             subtotal=100, liable_to_vat=False, status=Invoice.CANCELED
         )
-        in_preparation = factories.InvoiceFactory.create(
+        without_date = factories.InvoiceFactory.create(
             subtotal=100, liable_to_vat=False, invoiced_on=None
+        )
+        frozen = factories.InvoiceFactory.create(
+            subtotal=100, liable_to_vat=False, invoiced_on=in_days(-40)
+        )
+        in_preparation = factories.InvoiceFactory.create(
+            subtotal=100, liable_to_vat=False
         )
         entry = factories.CreditEntryFactory.create(total=100)
         self.client.force_login(factories.UserFactory.create())
 
-        response = self.client.post(
-            "/credit-control/assign/",
-            {f"entry_{entry.pk}_invoice": in_preparation.pk},
-        )
-        self.assertContains(response, "Select a valid choice.")
-        in_preparation.refresh_from_db()
-        self.assertEqual(in_preparation.status, Invoice.IN_PREPARATION)
+        for invoice in [canceled, without_date, frozen]:
+            response = self.client.post(
+                "/credit-control/assign/",
+                {f"entry_{entry.pk}_invoice": invoice.pk},
+            )
+            self.assertContains(response, "Select a valid choice.")
 
-        for invoice in [canceled, in_preparation]:
             response = self.client.post(
                 "/credit-control/create/",
                 {
@@ -196,11 +204,19 @@ class CreditEntriesTest(TestCase):
                 },
             )
             self.assertContains(
-                response, "Payments can only be assigned to sent invoices."
+                response, "Payments can only be assigned to sent invoices"
             )
             status = invoice.status
             invoice.refresh_from_db()
             self.assertEqual(invoice.status, status)
+
+        response = self.client.post(
+            "/credit-control/assign/",
+            {f"entry_{entry.pk}_invoice": in_preparation.pk},
+        )
+        self.assertEqual(response.status_code, 302)
+        in_preparation.refresh_from_db()
+        self.assertEqual(in_preparation.status, Invoice.PAID)
 
     def test_postfinance_utilities(self):
         """Utilities for the PostFinance CSV export"""

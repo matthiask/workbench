@@ -3,11 +3,13 @@ import re
 
 from django import forms
 from django.contrib import messages
+from django.db.models import Q
 from django.utils.html import format_html, mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
+from workbench.reporting.models import FreezeDate
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
 
@@ -51,6 +53,20 @@ class CreditEntrySearchForm(Form):
         )
 
 
+def payable_invoices():
+    """Sent invoices, and invoices in preparation which have a date after the
+    freeze date (they become paid without being marked as sent first).
+    Cancelled invoices have released their logged entries and down
+    payments."""
+    return Invoice.objects.filter(
+        Q(status=Invoice.SENT)
+        | Q(
+            status=Invoice.IN_PREPARATION,
+            invoiced_on__gt=FreezeDate.objects.up_to(),
+        )
+    )
+
+
 class CreditEntryForm(ModelForm):
     class Meta:
         model = CreditEntry
@@ -71,12 +87,15 @@ class CreditEntryForm(ModelForm):
         if (
             invoice
             and "invoice" in self.changed_data
-            and invoice.status not in {Invoice.SENT, Invoice.PAID}
+            and invoice.status != Invoice.PAID
+            and not payable_invoices().filter(pk=invoice.pk).exists()
         ):
-            # Cancelled invoices have released their logged entries and down
-            # payments, invoices in preparation have no dates yet
             self.add_error(
-                "invoice", _("Payments can only be assigned to sent invoices.")
+                "invoice",
+                _(
+                    "Payments can only be assigned to sent invoices and to"
+                    " invoices in preparation with an invoice date."
+                ),
             )
         return data
 
@@ -223,9 +242,9 @@ class AssignCreditEntriesForm(forms.Form):
                             ))
                         ),
                     )
-                    for invoice in Invoice.objects.filter(
-                        status=Invoice.SENT, total=entry.total
-                    ).select_related(
+                    for invoice in payable_invoices()
+                    .filter(total=entry.total)
+                    .select_related(
                         "contact__organization", "customer", "owned_by", "project"
                     )[:100]
                 ],
