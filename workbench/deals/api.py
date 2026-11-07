@@ -172,7 +172,7 @@ def deal_list(request, filters: Query[DealFilter]):
     return Serialized(deals, lambda deal: deal_out(deal, request))
 
 
-class StatsFilter(DateRangeFilter, UsersFilter):
+class DealStatsFilter(DateRangeFilter, UsersFilter):
     pass
 
 
@@ -272,7 +272,7 @@ class DealHistory(Schema):
 
 
 @router.get("/deals/stats/", response=DealStats)
-def deal_stats(request, filters: Query[StatsFilter]):
+def deal_stats(request, filters: Query[DealStatsFilter]):
     """Deals accepted and declined in the period (this week by default), with
     accepted deals per user (split by contributions), month and value type,
     compared to the value types' weekly targets. Users filter the deals'
@@ -346,7 +346,7 @@ def deal_stats(request, filters: Query[StatsFilter]):
 
 
 @router.get("/deals/history/", response=DealHistory)
-def deal_history_api(request, filters: Query[StatsFilter]):
+def deal_history_api(request, filters: Query[DealStatsFilter]):
     """Changes of deals in the period (this week by default), oldest first;
     users filter who made the changes"""
     period = date_range(filters, default=_this_week())

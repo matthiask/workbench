@@ -58,7 +58,7 @@ def _check_export_period(period):
 router = Router(tags=["planning"])
 
 
-class ProjectOut(Schema):
+class PlanningProjectOut(Schema):
     id: int
     code: str
     title: str
@@ -67,7 +67,7 @@ class ProjectOut(Schema):
     owned_by: str | None
 
 
-class ServiceOut(Schema):
+class PlanningServiceOut(Schema):
     title: str
     description: str
     effort_type: str
@@ -75,15 +75,15 @@ class ServiceOut(Schema):
     is_optional: bool
 
 
-class OfferOut(Schema):
+class PlanningOfferOut(Schema):
     code: str
     title: str
     description: str
     status: OfferStatus
-    services: list[ServiceOut]
+    services: list[PlanningServiceOut]
 
 
-class UserOut(Schema):
+class PlanningUserOut(Schema):
     short_name: str
     planning_hours_per_day: Decimal
 
@@ -109,7 +109,7 @@ class PlannedWorkOut(Schema):
     notes: str
 
 
-class AbsenceOut(Schema):
+class PlanningAbsenceOut(Schema):
     user: str
     starts_on: dt.date
     ends_on: dt.date | None
@@ -117,13 +117,13 @@ class AbsenceOut(Schema):
 
 
 class PlanningContext(Schema):
-    project: ProjectOut
-    offers: list[OfferOut]
-    users: list[UserOut]
+    project: PlanningProjectOut
+    offers: list[PlanningOfferOut]
+    users: list[PlanningUserOut]
     service_types: list[str]
     milestones: list[MilestoneOut]
     planned_work: list[PlannedWorkOut]
-    absences: list[AbsenceOut]
+    absences: list[PlanningAbsenceOut]
     import_schema: dict
 
 

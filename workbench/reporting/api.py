@@ -573,7 +573,7 @@ def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
     }
 
 
-class LoggedHoursStats(Schema):
+class ReportLoggedHours(Schema):
     count: int
     sum: Hours
     avg: Hours | None
@@ -592,14 +592,14 @@ class InsufficientBreaks(Schema):
 
 class UserLogging(Schema):
     user: str
-    logged_hours: LoggedHoursStats
+    logged_hours: ReportLoggedHours
     mean_logging_delay_hours: Hours
     logging: str
     insufficient_breaks: InsufficientBreaks
 
 
 class Logging(Period):
-    logged_hours: LoggedHoursStats
+    logged_hours: ReportLoggedHours
     insufficient_breaks: InsufficientBreaksTotal
     users: list[UserLogging]
 

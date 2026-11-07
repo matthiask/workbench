@@ -108,7 +108,7 @@ def offer_import_schema(*, service_types):
     return schema
 
 
-class ServiceOut(Schema):
+class OfferServiceOut(Schema):
     id: int | None
     position: int
     title: str
@@ -152,7 +152,7 @@ class OfferOut(Schema):
     liable_to_vat: bool
     tax_rate: Decimal
     total: Decimal
-    services: list[ServiceOut]
+    services: list[OfferServiceOut]
     warnings: list[OfferWarning] = Field(
         default=[],
         description="Things to look at in the services which were just written,"
@@ -684,7 +684,7 @@ def offer_service_add(
     )
 
 
-class ServicePatch(Schema):
+class OfferServicePatch(Schema):
     """Fields which aren't given are left alone, ``null`` clears values"""
 
     title: str | None = Field(default=None, min_length=1, max_length=200)
@@ -707,7 +707,7 @@ def offer_service_update(
     request,
     offer_id: int,
     service_id: int,
-    data: ServicePatch,
+    data: OfferServicePatch,
     *,
     dry_run: bool = False,
 ):
@@ -755,7 +755,7 @@ def offer_service_delete(
     return _save(offer, [], request, dry_run=dry_run, delete=[service])
 
 
-class ServiceOrder(Schema):
+class OfferServiceOrder(Schema):
     services: list[int] = Field(
         description="The IDs of all services of the offer in the new order."
     )
@@ -763,7 +763,7 @@ class ServiceOrder(Schema):
 
 @router.post("/offers/{offer_id}/services/reorder/", response=OfferOut)
 def offer_service_reorder(
-    request, offer_id: int, data: ServiceOrder, *, dry_run: bool = False
+    request, offer_id: int, data: OfferServiceOrder, *, dry_run: bool = False
 ):
     """Reorder the services of an offer in preparation"""
     offer = _changeable_offer(offer_id)
