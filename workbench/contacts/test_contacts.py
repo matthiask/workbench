@@ -161,7 +161,9 @@ class ContactsTest(TestCase):
             family_name="Muster",
             organization=factories.OrganizationFactory.create(name="Beispiel AG"),
         )
-        person.groups.add(group)
+        # Archived groups are left out
+        archived = Group.objects.create(title="Newsletter 2015", is_archived=True)
+        person.groups.add(group, archived)
         person.postaladdresses.create(
             street="Hauptstrasse",
             house_number="1",
@@ -830,6 +832,20 @@ class ArchiveContactsTest(TestCase):
         post.assert_called_once()
         self.assertEqual(post.call_args.kwargs["json"]["email"], "test@example.com")
         self.assertEqual(post.call_args.kwargs["json"]["created_at"], "")
+
+    def test_brevo_archived_groups(self):
+        """Archived groups aren't sent to Brevo"""
+        person = factories.PersonFactory.create()
+        person.groups.add(
+            Group.objects.create(title="Newsletter"),
+            Group.objects.create(title="Newsletter 2015", is_archived=True),
+        )
+        person.emailaddresses.create(email="test@example.com")
+
+        with mock.patch("workbench.contacts.tasks.api.post") as post:
+            tasks.upload_contacts_to_brevo()
+
+        self.assertEqual(post.call_args.kwargs["json"]["groups"], "Newsletter")
 
     def test_all_relations_known(self):
         """New relations to contacts keep them active until it's decided

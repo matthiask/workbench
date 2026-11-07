@@ -73,7 +73,9 @@ def upload_contacts_to_brevo():
             "full_salutation": person.salutation,
             "primary_contact": person.primary_contact.get_full_name(),
             "created_at": str(logged_action.created_at) if logged_action else "",
-            "groups": ", ".join([g.title for g in person.all_groups()]),
+            "groups": ", ".join(
+                g.title for g in person.all_groups() if not g.is_archived
+            ),
             "organization": person.organization.name if person.organization else "",
         }
 
