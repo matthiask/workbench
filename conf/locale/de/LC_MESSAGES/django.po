@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 15:04+0100\n"
+"POT-Creation-Date: 2026-11-07 15:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -597,6 +597,11 @@ msgstr "Abwesenheiten in vergangenen Jahren erstellen hat Konsequenzen auf Jahre
 #: workbench/awt/forms.py
 msgid "Impressive planning skills or wrong date? Absence starts in more than one year."
 msgstr "Beeindruckende Planungsfähigkeiten oder falsches Datum? Abwesenheit beginnt in mehr als einem Jahr."
+
+#: workbench/awt/forms.py
+#, python-format
+msgid "%(user)s isn't employed during the whole absence. Absences outside employments count as working time anyway."
+msgstr "%(user)s ist nicht während der ganzen Abwesenheit angestellt. Abwesenheiten ausserhalb von Anstellungen zählen trotzdem als Arbeitszeit."
 
 #: workbench/awt/forms.py workbench/reporting/views.py
 #: workbench/templates/_needs_action.html

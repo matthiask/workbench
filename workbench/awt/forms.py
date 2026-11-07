@@ -62,6 +62,23 @@ class AbsenceSearchForm(Form):
         return None
 
 
+def employed(user, starts_on, ends_on):
+    """Whether the user's employments cover all days from starts_on to
+    ends_on; users without employments aren't in the annual working time"""
+    if not user.employments.exists():
+        return True
+    day = starts_on
+    for employment in user.employments.filter(
+        date_from__lte=ends_on, date_until__gte=starts_on
+    ).order_by("date_from"):
+        if employment.date_from > day:
+            return False
+        day = max(day, employment.date_until + dt.timedelta(days=1))
+        if day > ends_on:
+            return True
+    return False
+
+
 @add_prefix("modal")
 class AbsenceForm(ModelForm, WarningsForm):
     user_fields = default_to_current_user = ("user",)
@@ -120,6 +137,22 @@ class AbsenceForm(ModelForm, WarningsForm):
                     ),
                     code="impressive-planning-skills",
                 )
+
+        if (
+            (starts_on := data.get("starts_on"))
+            and (user := data.get("user"))
+            and data.get("reason") != Absence.CORRECTION
+            and {"user", "starts_on", "ends_on"} & set(self.changed_data)
+            and not employed(user, starts_on, data.get("ends_on") or starts_on)
+        ):
+            self.add_warning(
+                _(
+                    "%(user)s isn't employed during the whole absence. Absences"
+                    " outside employments count as working time anyway."
+                )
+                % {"user": user},
+                code="outside-employment",
+            )
 
         return data
 

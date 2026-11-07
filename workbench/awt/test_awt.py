@@ -400,6 +400,35 @@ class AWTTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
+    def test_absence_outside_employment(self):
+        """Absences outside employments are a warning, they would count as
+        working time against a target of zero"""
+        user = factories.UserFactory.create()
+        factories.EmploymentFactory.create(
+            user=user, date_from=in_days(-10), date_until=in_days(10)
+        )
+        self.client.force_login(user)
+
+        def post(starts_on, days):
+            return self.client.post(
+                "/absences/create/",
+                {
+                    "modal-user": user.pk,
+                    "modal-starts_on": starts_on.isoformat(),
+                    "modal-ends_on": (starts_on + dt.timedelta(days=days)).isoformat(),
+                    "modal-days": days,
+                    "modal-reason": "vacation",
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        response = post(in_days(5), 10)
+        self.assertContains(response, "outside-employment")
+        response = post(in_days(-15), 1)
+        self.assertContains(response, "outside-employment")
+        response = post(in_days(-5), 10)
+        self.assertEqual(response.status_code, 201)
+
     def test_employment_model(self):
         """Exercise the employment model"""
         factories.UserFactory.create()  # Additional instance for active_users()
