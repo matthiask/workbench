@@ -3064,8 +3064,12 @@ msgid "Only offers in preparation can be changed."
 msgstr "Nur Offerten in Vorbereitung können geändert werden."
 
 #: workbench/offers/api.py
-msgid "Only the title and the description of service groups can be changed."
-msgstr "Bei Leistungsgruppen lassen sich nur Titel und Beschreibung ändern."
+msgid ""
+"Only the title, the description and the external reference of service "
+"groups can be changed."
+msgstr ""
+"Bei Leistungsgruppen lassen sich nur Titel, Beschreibung und externe "
+"Referenz ändern."
 
 #: workbench/offers/api.py
 msgid "The offer has no service with this ID."

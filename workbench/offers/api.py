@@ -578,7 +578,8 @@ def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: bool = Fa
             raise HttpError(
                 409,
                 _(
-                    "Only the title and the description of service groups can be changed."
+                    "Only the title, the description and the external reference"
+                    " of service groups can be changed."
                 ),
             )
         if "external_reference" in fields:

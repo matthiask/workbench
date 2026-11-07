@@ -204,7 +204,12 @@ class OffersAPITest(TestCase):
             {"discount": 100},
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 409)
+        self.assertContains(
+            response,
+            "Only the title, the description and the external reference"
+            " of service groups can be changed.",
+            status_code=409,
+        )
 
     def test_effort_type(self):
         """Service types only suggest the effort type and the hourly rate"""
