@@ -3771,7 +3771,7 @@ msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte ver
 
 #: workbench/projects/forms.py
 msgid "This service has been invoiced already, its effort type and rate cannot be changed."
-msgstr "Diese Leistung wurde bereits verrechnet, ihre Aufwandart und ihr Stundensatz können nicht geändert werden."
+msgstr "Diese Leistung wurde bereits verrechnet, ihr Aufwandtyp und ihr Stundensatz können nicht geändert werden."
 
 #: workbench/projects/forms.py
 msgid "This service has been invoiced already, it cannot be moved to another offer."
