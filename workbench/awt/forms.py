@@ -114,6 +114,13 @@ class AbsenceForm(ModelForm, WarningsForm):
 
     def clean(self):
         data = super().clean()
+        if (days := data.get("days")) is not None and (
+            days == 0 or (days < 0 and data.get("reason") != Absence.CORRECTION)
+        ):
+            self.add_error(
+                "days",
+                _("Absences need days, only corrections may be negative."),
+            )
         if (starts_on := data.get("starts_on")) and (user := data.get("user")):
             today = dt.date.today()
             if not user.features[FEATURES.LATE_LOGGING] and starts_on.year < today.year:
