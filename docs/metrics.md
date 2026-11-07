@@ -384,7 +384,9 @@ Per offer (service list): `service_hours`, `logged_hours`, `service_cost` (Σ `S
 
 Caveats: Budget retainer offers hold budget, real services are added later ("services have to be created later when rendering actual work", `Offer.is_budget_retainer` help text); retainment is the part of the retainer not yet released into services. Released services are usually services without an offer of their own; if they sit on accepted offers, those are not added to the retainer (see `accepted_offers_by_project()`).
 
-Chart (CONTROLLING, `workbench/projects/charts.py:budget_chart`): cumulative per week (per month if the project spans more than 26 weeks) from the first logged entry, invoice or accepted offer until today or the closing date: logbook value (Σ `LoggedCost.cost` + Σ `effort_rate × HOURS_FOR_INVOICING`, hours without effort rate not valued, like the tiles), invoiced (Σ `total_excl_tax` of invoiced invoices by `invoiced_on`) and accepted offers (Σ `total_excl_tax` by `closed_on`, else `offered_on`). Not shown if nothing valued has been logged.
+Chart (CONTROLLING, `workbench/projects/charts.py:budget_chart`): cumulative per week (per month if the project spans more than 26 weeks) from the first logged entry, invoice or accepted offer until today or the closing date: logbook value (Σ `LoggedCost.cost` + Σ `effort_rate × HOURS_FOR_INVOICING`, hours without effort rate not valued, like the tiles), invoiced (Σ `total_excl_tax` of invoiced invoices by `invoiced_on`) and accepted offers (Σ `total_excl_tax` by `closed_on`, else `offered_on`; only the budget retainers or the other offers, whichever counts in `accepted_offers_by_project()`). Not shown if nothing valued has been logged.
+
+Warning "Projected invoices exceed the accepted offer total": Σ `ProjectedInvoice.gross_margin` exceeds `project_gross_margin(project)["offered"]` by more than 1,000 (`PROJECTED_INVOICE_LEEWAY`); the third party costs it shows are the total of the counting side of `accepted_offers_by_project()` minus `offered`.
 
 ---
 

@@ -18,6 +18,7 @@ from workbench.projects.charts import budget_chart, projected_vs_invoiced_chart
 from workbench.projects.forms import OffersRenumberForm, ProjectAutocompleteForm
 from workbench.projects.models import Project, Service
 from workbench.reporting.squeeze import project_gross_margin
+from workbench.reporting.utils import accepted_offers_by_project
 from workbench.services.models import ServiceType
 from workbench.templatetags.workbench import h
 from workbench.tools.formats import Z1, Z2, local_date_format
@@ -81,6 +82,8 @@ class ProjectDetailView(generic.DetailView):
         grouped_services = self.object.grouped_services
 
         squeeze = project_gross_margin(self.object)
+        # The budget retainers or the other offers, like squeeze
+        accepted_offers = accepted_offers_by_project([self.object.id])[self.object.id]
 
         # Projected invoices are entered as gross margin, that is, without
         # third party costs. Compare them to the gross margin of services and
@@ -102,7 +105,7 @@ class ProjectDetailView(generic.DetailView):
             ):
                 projected_warning = "incomplete"
             elif (
-                grouped_services["accepted_offers_total_excl_tax"]
+                accepted_offers["total"]
                 and projected_invoices_total - squeeze["offered"]
                 > PROJECTED_INVOICE_LEEWAY
             ):
@@ -128,9 +131,8 @@ class ProjectDetailView(generic.DetailView):
             projected_invoices_total=projected_invoices_total,
             projected_warning=projected_warning,
             services_gross_margin=services_gross_margin,
-            accepted_offers_third_party_costs=grouped_services[
-                "accepted_offers_total_excl_tax"
-            ]
+            accepted_offers_total=accepted_offers["total"],
+            accepted_offers_third_party_costs=accepted_offers["total"]
             - squeeze["offered"],
             gs=grouped_services,
             **kwargs,

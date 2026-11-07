@@ -146,6 +146,50 @@ class StatisticsTest(TestCase):
         response = self.client.get(project.get_absolute_url())
         self.assertContains(response, "Logbook, invoiced and accepted offers")
 
+    def test_budget_retainer_and_other_offers(self):
+        """Projects with an accepted budget retainer and other accepted offers
+        count the larger side only, on the project page like in the reports"""
+        from django.utils.translation import activate, deactivate_all
+
+        from workbench.projects.charts import budget_chart
+
+        activate("en")
+        self.addCleanup(deactivate_all)
+        project = factories.ProjectFactory.create()
+        retainer = factories.OfferFactory.create(
+            project=project,
+            status=factories.Offer.ACCEPTED,
+            closed_on=in_days(-14),
+            is_budget_retainer=True,
+        )
+        factories.ServiceFactory.create(
+            project=project, offer=retainer, effort_rate=100, effort_hours=100
+        )
+        retainer.save()
+        offer = factories.OfferFactory.create(
+            project=project, status=factories.Offer.ACCEPTED, closed_on=in_days(-14)
+        )
+        service = factories.ServiceFactory.create(
+            project=project, offer=offer, effort_rate=100, effort_hours=40
+        )
+        offer.save()
+        factories.ServiceFactory.create(
+            project=project, effort_rate=100, effort_hours=90
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=2)
+        factories.ProjectedInvoiceFactory.create(
+            project=project, gross_margin=12000, invoiced_on=in_days(30)
+        )
+
+        chart = budget_chart(project)
+        self.assertIn("accepted offers: 10’000.00", chart["columns"][-1]["title"])
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.get_absolute_url())
+        self.assertContains(response, "Projected invoices exceed the accepted offer")
+        self.assertContains(response, "accepted offers gross margin: 10’000.00")
+        self.assertNotContains(response, "third party costs")
+
     def test_surcharge(self):
         """Hours for invoicing above the hours use up the budget too, the
         progress bars show them separately"""

@@ -3,6 +3,7 @@ from decimal import Decimal
 from itertools import accumulate
 
 from workbench.invoices.models import Invoice
+from workbench.reporting.utils import accepted_offers_by_project
 from workbench.tools.charts import nice_step
 from workbench.tools.formats import Z2, currency, local_date_format
 
@@ -156,13 +157,18 @@ def budget_chart(project, *, today=None):
         (invoice.invoiced_on, invoice.total_excl_tax)
         for invoice in Invoice.objects.invoiced().filter(project=project)
     ]
+    # Only the side which counts if there are budget retainers and other
+    # offers, like in the reports
+    retainer = accepted_offers_by_project([project.id])[project.id][
+        "is_budget_retainer"
+    ]
     offers = [
         (
             offer.closed_on or offer.offered_on or project.created_at.date(),
             offer.total_excl_tax,
         )
         for offer in project.offers.all()
-        if offer.is_accepted
+        if offer.is_accepted and offer.is_budget_retainer == retainer
     ]
 
     days = [day for day, _amount in (*logged, *invoiced, *offers)]

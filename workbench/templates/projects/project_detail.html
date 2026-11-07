@@ -325,7 +325,7 @@
                     {% translate "Projected" %}: {{ projected_invoices_total|currency }},
                     {% translate "accepted offers gross margin" %}: {{ squeeze.offered|currency }}
                     {% if accepted_offers_third_party_costs %}
-                      ({{ gs.accepted_offers_total_excl_tax|currency }} &minus;
+                      ({{ accepted_offers_total|currency }} &minus;
                       {{ accepted_offers_third_party_costs|currency }} {% translate "third party costs" %})
                     {% endif %}
                   </small>
