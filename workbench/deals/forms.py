@@ -426,10 +426,12 @@ class SetStatusForm(ModelForm):
                     else _("Decline offers"),
                     required=False,
                     widget=forms.CheckboxSelectMultiple,
+                    # Offers in preparation and service groups haven't been
+                    # sent, they aren't accepted or declined by default
                     initial=[
                         offer.id
                         for offer in related_offers
-                        if offer.status < offer.ACCEPTED
+                        if offer.status == offer.OFFERED
                     ],
                 )
                 self.fields["related_offers"].choices = [
@@ -460,11 +462,13 @@ class SetStatusForm(ModelForm):
         if data.get("status") in {Deal.ACCEPTED, Deal.DECLINED}:
             self.offers_to_update = data.get("related_offers", ())
             for offer in self.offers_to_update:
-                offer.status = (
-                    offer.ACCEPTED
-                    if data.get("status") == Deal.ACCEPTED
-                    else offer.DECLINED
-                )
+                if data.get("status") == Deal.ACCEPTED:
+                    offer.status = offer.ACCEPTED
+                elif offer.status < offer.OFFERED and not offer.offered_on:
+                    # Never sent, so the customer didn't decline it
+                    offer.status = offer.DISCARDED
+                else:
+                    offer.status = offer.DECLINED
                 try:
                     offer.full_clean()
                 except ValidationError as exc:

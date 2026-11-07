@@ -610,8 +610,9 @@ class DealStatusIn(Schema):
     offers: list[int] | None = Field(
         default=None,
         description="IDs of related offers to accept or decline with the deal,"
-        " defaults to those which haven't been accepted yet (like the web"
-        " interface). Pass [] to leave the offers alone.",
+        " defaults to those which have been offered (like the web interface);"
+        " declining offers which haven't been sent discards them. Pass [] to"
+        " leave the offers alone.",
     )
     delete_planned_work: bool | None = Field(
         default=None,

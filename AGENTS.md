@@ -333,7 +333,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   makes their people members (`move_organizations_to_people()`).
 - Offers are only linked to and unlinked from open deals, and only offers
   which aren't closed yet (in preparation, service group, offered): closing a
-  deal settles its offers. Offers of other customers' projects are a warning
+  deal settles its offers (offered ones are preselected; declining offers
+  which have never been sent discards them). Offers of other customers' projects are a warning
   (agencies and their clients, departments of a city), `other-customer` in
   `ignore_warnings` in the API.
   Web views and API share `RelatedOfferForm` in `workbench/deals/forms.py`.

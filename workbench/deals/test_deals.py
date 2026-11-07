@@ -273,6 +273,44 @@ class DealsTest(TestCase):
         response = self.client.post(deal.urls["set_status"] + "?status=20")
         self.assertContains(response, "This field is required when closing a deal.")
 
+    def test_closing_with_unsent_offers(self):
+        """Only offers which have been sent are preselected, declining unsent
+        offers discards them"""
+        deal = factories.DealFactory.create()
+        factories.ClosingTypeFactory.create(title="Lost", represents_a_win=False)
+        details = {"title": "Offer", "postal_address": "A\nStreet\nCity"}
+        offered = factories.OfferFactory.create(
+            status=Offer.OFFERED,
+            offered_on=in_days(-10),
+            valid_until=in_days(20),
+            **details,
+        )
+        draft = factories.OfferFactory.create(**details)
+        deal.related_offers.add(offered, draft)
+        self.client.force_login(deal.owned_by)
+        url = f"/api/deals/{deal.pk}/status/"
+
+        response = self.client.post(
+            url,
+            {"status": "declined", "closing_type": "Lost"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        offered.refresh_from_db()
+        draft.refresh_from_db()
+        self.assertEqual(
+            (offered.status, draft.status), (Offer.DECLINED, Offer.IN_PREPARATION)
+        )
+
+        response = self.client.post(
+            url,
+            {"status": "declined", "closing_type": "Lost", "offers": [draft.pk]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        draft.refresh_from_db()
+        self.assertEqual(draft.status, Offer.DISCARDED)
+
     def test_status_api_ignores_the_query_string(self):
         """The API takes the status from the body only"""
         deal = factories.DealFactory.create()
