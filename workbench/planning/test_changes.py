@@ -247,6 +247,45 @@ class ChangesTest(TestCase):
         self.assertNotIn("is_vacation", changed)
 
     @travel("2021-10-18")
+    def test_absence_no_longer_sickness_hides_description(self):
+        """The description of an absence which was a sickness absence may be
+        health data, also when the reason has been changed since"""
+        self.set_current_user()
+
+        pw = factories.PlannedWorkFactory.create(weeks=[in_days(d) for d in (7, 14)])
+        absence = factories.AbsenceFactory.create(
+            user=pw.user,
+            starts_on=in_days(7),
+            days=1,
+            reason=factories.Absence.SICKNESS,
+            description="Operation",
+        )
+        deleted = factories.AbsenceFactory.create(
+            user=pw.user,
+            starts_on=in_days(8),
+            days=1,
+            reason=factories.Absence.SICKNESS,
+            description="Arzttermin",
+        )
+        LoggedAction.objects.all().update(
+            created_at=timezone.now() - dt.timedelta(days=14)
+        )
+
+        absence.reason = factories.Absence.VACATION
+        absence.save()
+        deleted.reason = factories.Absence.VACATION
+        deleted.save()
+        deleted.delete()
+
+        c = updates.absence_changes(since=timezone.now() - dt.timedelta(days=1))
+        objects = [change["object"] for change in c[pw.project.owned_by]]
+        self.assertEqual(len(objects), 2)
+        for obj in objects:
+            self.assertIn("vacation", obj)
+            self.assertNotIn("Operation", obj)
+            self.assertNotIn("Arzttermin", obj)
+
+    @travel("2021-10-18")
     def test_absences_of_project_owners(self):
         """Owners are part of their projects' audience in both directions"""
         self.set_current_user()

@@ -354,7 +354,7 @@ def pretty_changes_absence(*, users):
     return prettifier
 
 
-def pretty_absence(x, *, users):
+def pretty_absence(x, *, users, hide_description=False):
     user = users.get(int(x["user_id"]))
     user = user.get_short_name() if user else x["user_id"]
     starts_on, ends_on = parse_date(x["starts_on"]), parse_date(x["ends_on"] or "")
@@ -365,7 +365,8 @@ def pretty_absence(x, *, users):
     )
     reason = _public_reasons().get(x["reason"], x["reason"])
     absence = f"{user}: {reason}, {period} ({days_format(Decimal(x['days']))})"
-    if x["description"] and x["reason"] != Absence.SICKNESS:
+    # The description of sickness absences may be health data
+    if x["description"] and x["reason"] != Absence.SICKNESS and not hide_description:
         return f"{absence} {x['description']}"
     return absence
 
@@ -459,11 +460,19 @@ def absence_changes(*, since):
         if not absence_touches_future(actions, today=today):
             continue
 
+        # Also if the reason has been changed from sickness to another reason
+        was_sickness = any(
+            data["reason"] == Absence.SICKNESS
+            for action in actions
+            for data in (action.row_data, action.new_row_data)
+        )
         obj = change_obj(
             change_type(actions),
             actions,
             aux={
-                "object": pretty_absence(final, users=users),
+                "object": pretty_absence(
+                    final, users=users, hide_description=was_sickness
+                ),
                 "by": sorted(
                     filter(
                         None, (users.get(audit_user_id(a.user_name)) for a in actions)
@@ -471,7 +480,9 @@ def absence_changes(*, since):
                 ),
             },
             pretty_changes=pretty_changes_absence(users=users),
-            pretty_deleted_object=partial(pretty_absence, users=users),
+            pretty_deleted_object=partial(
+                pretty_absence, users=users, hide_description=was_sickness
+            ),
         )
 
         # The absence may have been moved from one user to the other.
