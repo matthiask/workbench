@@ -35,6 +35,23 @@ register_fonts_from_paths(font_name="Rep", **settings.WORKBENCH.FONTS)
 Z = D("0.00")
 
 
+def rounding_difference(instance):
+    """The difference between the total rounded to 5 cents and the sum of
+    the lines printed above it (each rounded to cents)"""
+    printed = instance.subtotal.quantize(Z) - instance.discount.quantize(Z)
+    if getattr(instance, "down_payment_total", None):
+        printed -= sum(
+            (
+                invoice.total_excl_tax.quantize(Z)
+                for invoice in instance.down_payment_invoices.all()
+            ),
+            Z,
+        )
+    if instance.liable_to_vat:
+        printed += instance.tax_amount.quantize(Z)
+    return instance.total.quantize(Z) - printed
+
+
 class Empty:
     pass
 
@@ -437,6 +454,8 @@ class PDFDocument(_PDFDocument):
                 "{:0.1f}% {}".format(instance.tax_rate, _("tax")),
                 currency(transform(instance.tax_amount).quantize(Z)),
             ))
+        if difference := rounding_difference(instance):
+            total.append((_("rounding difference"), currency(transform(difference))))
 
         if len(total) > 1:
             self.table(total, self.style.tableColumns, self.style.tableHead)
