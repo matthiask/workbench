@@ -34,6 +34,11 @@ class MeOut(Schema):
         description="Whether the API token only allows reading; sessions can"
         " always read and write."
     )
+    features: list[str] = Field(
+        description="The features of the user, e.g. controlling, deals,"
+        " bookkeeping or productivity; endpoints require the same features as"
+        " the web interface."
+    )
 
 
 @router.get("/me/", response=MeOut)
@@ -49,6 +54,11 @@ def me(request):
         "access": token.access
         if (token := getattr(request, "api_token", None))
         else "write",
+        "features": sorted(
+            name.lower()
+            for name, feature in FEATURES.__members__.items()
+            if user.features[feature]
+        ),
     }
 
 

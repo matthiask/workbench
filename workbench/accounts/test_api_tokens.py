@@ -1,11 +1,14 @@
 import datetime as dt
+from unittest.mock import ANY
 
 import time_machine
 from django.test import Client, TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import API_TOKEN_LIFETIME, APIToken
 from workbench.accounts.tasks import prune_api_tokens
 from workbench.audit.models import LoggedAction
@@ -86,8 +89,19 @@ class APITokenTest(TestCase):
                 "email": user.email,
                 "url": "http://testserver/",
                 "access": "write",
+                "features": ANY,
             },
         )
+
+    @override_settings(
+        FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.DEALS: F.NEVER}
+    )
+    def test_me_features(self):
+        """The user's features tell what's accessible"""
+        self.client.force_login(factories.UserFactory.create())
+        features = self.client.get("/api/me/").json()["features"]
+        self.assertIn("controlling", features)
+        self.assertNotIn("deals", features)
 
     def test_token_page(self):
         """Users create and delete their own tokens"""

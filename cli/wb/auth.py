@@ -163,6 +163,7 @@ def me(as_json):
             ("Email", user["email"]),
             ("Workbench", user["url"]),
             ("Access", "read only" if user["access"] == "read" else "read and write"),
+            ("Features", ", ".join(user.get("features", []))),
         ],
         url=user["url"],
     )
