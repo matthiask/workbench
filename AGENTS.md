@@ -143,7 +143,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Its `primary_contact` defaults to the current user and
   may be an inactive user (e.g. who used to know the person), so that imported
-  contacts can be found and reassigned with the primary contact filter. Shared validation helpers for the APIs are in
+  contacts can be found and reassigned with the primary contact filter.
+  Warnings of the web forms are errors in the API; creating and updating
+  projects and deals ignores them with `force` (a query parameter like
+  `dry_run`, `--force` in `wb`). Shared validation helpers for the APIs are in
   `workbench/tools/api.py`, also `DateRangeFilter` (`period` like `2026-Q3` or
   `last-month`, `since`, `until`) with `date_range()` and `filter_date_range()`
   for reports and searches, and `UsersFilter` with `filter_users()` for

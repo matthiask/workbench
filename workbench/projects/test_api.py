@@ -232,6 +232,31 @@ class ProjectsAPITest(TestCase):
                     [["body", "data", "customer"]],
                 )
 
+    def test_update_force(self):
+        """Warnings of the web interface are errors unless forced"""
+        project = factories.ProjectFactory.create(contact=None)
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/"
+        data = {"closed_on": dt.date.today().isoformat()}
+
+        response = self.client.patch(url, data, content_type="application/json")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["msg"], "No contact selected.")
+
+        response = self.client.patch(
+            f"{url}?force=true", data, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        project.refresh_from_db()
+        self.assertEqual(project.closed_on, dt.date.today())
+
+        response = self.client.post(
+            "/api/projects/?force=true",
+            {"title": "Without contact", "customer": project.customer_id},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     @override_settings(FEATURES={FEATURES.INTERNAL_TYPES: F.ALWAYS})
     def test_internal_type(self):
         """Internal projects get their internal type by name"""

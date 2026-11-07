@@ -12,6 +12,7 @@ from wb.core import (
     echo_json,
     echo_more,
     echo_period,
+    force_option,
     format_amount,
     format_bool,
     link,
@@ -156,6 +157,7 @@ def _echo_saved_deal(data, *, dry_run, as_json):
 )
 @click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@force_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_deal(
@@ -169,6 +171,7 @@ def update_deal(
     values,
     attributes,
     owned_by,
+    force,
     dry_run,
     as_json,
 ):
@@ -200,7 +203,7 @@ def update_deal(
     data = request(
         "PATCH",
         f"deals/{deal_id}/",
-        params={"dry_run": format_bool(dry_run)},
+        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
         json=data,
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
@@ -476,6 +479,7 @@ def deal_history(period, since, until, users, team, as_json):
     shell_complete=complete_short_names,
 )
 @click.option("--description", default="")
+@force_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def create_deal(
@@ -488,6 +492,7 @@ def create_deal(
     attributes,
     owned_by,
     description,
+    force,
     dry_run,
     as_json,
 ):
@@ -498,7 +503,7 @@ def create_deal(
     data = request(
         "POST",
         "deals/",
-        params={"dry_run": format_bool(dry_run)},
+        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
         json={
             "title": title,
             "description": description,

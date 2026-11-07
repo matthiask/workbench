@@ -190,6 +190,17 @@ class CLITest(TestCase):
         )
         self.assertEqual(result.exit_code, 1)
         self.assertIn("No contact selected.\n", result.output)
+        result = self.wb(
+            "projects",
+            "create",
+            "--title",
+            "Second",
+            "--customer",
+            project.customer_id,
+            "--force",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertTrue(Project.objects.filter(title="Second").exists())
 
         result = self.wb("projects", "update", project.pk, "--title", "Relaunch 2027")
         self.assertEqual(result.exit_code, 0, result.output)

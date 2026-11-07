@@ -449,11 +449,12 @@ def _values_and_attributes(data, form_data, error):
 
 
 @router.post("/deals/", response=DealCreated)
-def deal_create(request, data: DealIn, *, dry_run: bool = False):
+def deal_create(request, data: DealIn, *, dry_run: bool = False, force: bool = False):
     """Create a deal, validated like in the web interface
 
     You are its main driving force. Warnings of the web interface are errors
-    here; nothing is saved if anything is invalid or with ``dry_run``."""
+    here unless ``force``; nothing is saved if anything is invalid or with
+    ``dry_run``."""
     errors = []
 
     def error(loc, msg):
@@ -488,8 +489,8 @@ def deal_create(request, data: DealIn, *, dry_run: bool = False):
         raise ValidationError(errors)
 
     form = DealForm(form_data, request=request)
-    if not form.is_valid():
-        raise_form_errors(form, fields=fields)
+    if not form.is_valid(ignore_warnings=force):
+        raise_form_errors(form, fields=fields, force=force)
 
     with transaction.atomic():
         deal = form.save()
@@ -543,12 +544,19 @@ class DealPatch(Schema):
 
 
 @router.patch("/deals/{deal_id}/", response=DealOut)
-def deal_update(request, deal_id: int, data: DealPatch, *, dry_run: bool = False):
+def deal_update(
+    request,
+    deal_id: int,
+    data: DealPatch,
+    *,
+    dry_run: bool = False,
+    force: bool = False,
+):
     """Change a deal, validated like in the web interface
 
-    Warnings of the web interface are errors here; nothing is saved if
-    anything is invalid or with ``dry_run``. Use the status endpoint to close
-    or reopen deals."""
+    Warnings of the web interface are errors here unless ``force``; nothing is
+    saved if anything is invalid or with ``dry_run``. Use the status endpoint
+    to close or reopen deals."""
     deal = get_object_or_404(Deal, pk=deal_id)
     errors = []
 
@@ -576,8 +584,8 @@ def deal_update(request, deal_id: int, data: DealPatch, *, dry_run: bool = False
         raise ValidationError(errors)
 
     form = DealForm(values, instance=deal, request=request)
-    if not form.is_valid():
-        raise_form_errors(form, fields=fields)
+    if not form.is_valid(ignore_warnings=force):
+        raise_form_errors(form, fields=fields, force=force)
     return _save_deal(form, request, dry_run=dry_run)
 
 

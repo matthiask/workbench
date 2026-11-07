@@ -15,6 +15,7 @@ from wb.core import (
     echo_offer_list,
     echo_stats,
     echo_stats_csv,
+    force_option,
     format_bool,
     link,
     make_table,
@@ -162,6 +163,7 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
     shell_complete=complete_short_names,
 )
 @click.option("--description", default="")
+@force_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def create_project(
@@ -172,6 +174,7 @@ def create_project(
     internal_type,
     owned_by,
     description,
+    force,
     dry_run,
     as_json,
 ):
@@ -181,7 +184,7 @@ def create_project(
     data = request(
         "POST",
         "projects/",
-        params={"dry_run": format_bool(dry_run)},
+        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
         json={
             "title": title,
             "description": description,
@@ -242,6 +245,7 @@ def _echo_saved_project(data, *, dry_run, as_json):
     help="Required when closing a project whose offers in preparation (which"
     " are discarded) have planned work.",
 )
+@force_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_project(
@@ -257,6 +261,7 @@ def update_project(
     closed_on,
     reopen,
     delete_planned_work,
+    force,
     dry_run,
     as_json,
 ):
@@ -291,7 +296,7 @@ def update_project(
     data = request(
         "PATCH",
         f"projects/{project_id}/",
-        params={"dry_run": format_bool(dry_run)},
+        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
         json=data,
     )
     _echo_saved_project(data, dry_run=dry_run, as_json=as_json)

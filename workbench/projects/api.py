@@ -181,11 +181,13 @@ def _internal_type(name):
 
 
 @router.post("/projects/", response=ProjectCreated)
-def project_create(request, data: ProjectIn, *, dry_run: bool = False):
+def project_create(
+    request, data: ProjectIn, *, dry_run: bool = False, force: bool = False
+):
     """Create a project, validated like in the web interface
 
-    Warnings of the web interface are errors here; nothing is saved if anything
-    is invalid or with ``dry_run``."""
+    Warnings of the web interface are errors here unless ``force``; nothing
+    is saved if anything is invalid or with ``dry_run``."""
     owned_by = request.user
     if data.owned_by is not None:
         owned_by = User.objects.filter(
@@ -212,8 +214,8 @@ def project_create(request, data: ProjectIn, *, dry_run: bool = False):
         },
         request=request,
     )
-    if not form.is_valid():
-        raise_form_errors(form)
+    if not form.is_valid(ignore_warnings=force):
+        raise_form_errors(form, force=force)
 
     with transaction.atomic():
         project = form.save()
@@ -253,12 +255,17 @@ class ProjectPatch(Schema):
 
 @router.patch("/projects/{int:project_id}/", response=ProjectOut)
 def project_update(
-    request, project_id: int, data: ProjectPatch, *, dry_run: bool = False
+    request,
+    project_id: int,
+    data: ProjectPatch,
+    *,
+    dry_run: bool = False,
+    force: bool = False,
 ):
     """Change or close a project, validated like in the web interface
 
-    Warnings of the web interface are errors here; nothing is saved if anything
-    is invalid or with ``dry_run``."""
+    Warnings of the web interface are errors here unless ``force``; nothing
+    is saved if anything is invalid or with ``dry_run``."""
     project = get_object_or_404(Project, pk=project_id)
     values = form_data(ProjectForm(instance=project, request=request))
     patch = data.model_dump(exclude_unset=True)
@@ -285,8 +292,8 @@ def project_update(
         values["delete_planned_work"] = int(data.delete_planned_work)
 
     form = ProjectForm(values, instance=project, request=request)
-    if not form.is_valid():
-        raise_form_errors(form)
+    if not form.is_valid(ignore_warnings=force):
+        raise_form_errors(form, force=force)
 
     with transaction.atomic():
         project = form.save()

@@ -206,6 +206,26 @@ class DealsAPITest(TestCase):
         )
         self.assertFalse(Deal.objects.exists())
 
+    def test_update_force(self):
+        """Warnings of the web interface are errors unless forced"""
+        deal = factories.DealFactory.create(contact=None, probability=Deal.NORMAL)
+        deal.contributions.create(user=deal.owned_by, weight=100)
+        self.client.force_login(deal.owned_by)
+        url = f"/api/deals/{deal.pk}/"
+
+        response = self.client.patch(
+            url, {"probability": "low"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["msg"], "No contact selected.")
+
+        response = self.client.patch(
+            f"{url}?force=true", {"probability": "low"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        deal.refresh_from_db()
+        self.assertEqual(deal.probability, Deal.LOW)
+
     def test_update(self):
         """Deals are changed field by field like in the web interface"""
         user = factories.UserFactory.create(_short_name="ab")

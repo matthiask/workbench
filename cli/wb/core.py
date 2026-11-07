@@ -702,6 +702,13 @@ def echo_invoice_list(invoices, *, title="Invoices"):
     console.print(table)
 
 
+force_option = click.option(
+    "--force",
+    is_flag=True,
+    help="Ignore the warnings of the web interface, e.g. a missing contact.",
+)
+
+
 def page_options(fn):
     fn = click.option(
         "--offset",
