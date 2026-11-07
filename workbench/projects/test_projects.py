@@ -674,6 +674,23 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.service_cost, 200)
 
         project = service.project
+        # Services of service groups can still be changed, those of offers
+        # which have been sent can't
+        grouped, sent = [
+            factories.ServiceFactory.create(
+                project=project,
+                offer=factories.OfferFactory.create(
+                    project=project,
+                    status=status,
+                    offered_on=in_days(0),
+                    valid_until=in_days(30),
+                ),
+                effort_type="Hello",
+                effort_rate=200,
+                effort_hours=1,
+            )
+            for status in [Offer.SERVICE_GROUP, Offer.OFFERED]
+        ]
         self.client.force_login(project.owned_by)
 
         response = self.client.post(
@@ -707,6 +724,10 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.effort_rate, 250)
         self.assertEqual(service.effort_type, "Pauschalsatz")
         self.assertEqual(service.service_cost, 250)
+        grouped.refresh_from_db()
+        self.assertEqual(grouped.effort_rate, 250)
+        sent.refresh_from_db()
+        self.assertEqual(sent.effort_rate, 200)
 
     def test_no_flat_rate(self):
         """Uses without CONTROLLING do not see the flat rate field"""

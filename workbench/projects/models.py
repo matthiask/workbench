@@ -888,7 +888,8 @@ class ServiceQuerySet(SearchQuerySet):
         from workbench.offers.models import Offer
 
         return self.filter(
-            Q(offer__isnull=True) | Q(offer__status=Offer.IN_PREPARATION)
+            Q(offer__isnull=True)
+            | Q(offer__status__in=[Offer.IN_PREPARATION, Offer.SERVICE_GROUP])
         )
 
 
