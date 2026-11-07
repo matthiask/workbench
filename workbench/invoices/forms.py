@@ -18,6 +18,10 @@ from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.projects.forms import (
+    add_delete_planned_work_field,
+    discard_offers_in_preparation,
+)
 from workbench.reporting.models import FreezeDate
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, hours, local_date_format
@@ -597,6 +601,8 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 ),
                 required=False,
             )
+            if self.is_bound and self.data.get(self.add_prefix("close_project")):
+                add_delete_planned_work_field(self, self.project)
 
     def add_services_field(self):
         source = self.request.GET.get("source")
@@ -732,6 +738,11 @@ class CreateProjectInvoiceForm(InvoiceForm):
         if self.cleaned_data.get("close_project"):
             self.project.closed_on = dt.date.today()
             self.project.save()
+            discard_offers_in_preparation(
+                self.project,
+                request=self.request,
+                delete_planned_work=self.cleaned_data.get("delete_planned_work"),
+            )
 
         return instance
 

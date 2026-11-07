@@ -380,20 +380,8 @@ class ProjectForm(ModelForm):
             and not self.instance.closed_on
             and self.is_bound
             and self.data.get(self.add_prefix("closed_on"))
-            and self._planned_work_of_offers_in_preparation().exists()
         ):
-            self.fields["delete_planned_work"] = delete_planned_work_field(
-                _(
-                    "Closing the project discards its offers in preparation,"
-                    " some of them have planning entries linked to them."
-                    " Delete them?"
-                )
-            )
-
-    def _planned_work_of_offers_in_preparation(self):
-        from workbench.offers.models import Offer
-
-        return self.instance.planned_work.filter(offer__status=Offer.IN_PREPARATION)
+            add_delete_planned_work_field(self, self.instance)
 
     def clean(self):
         data = super().clean()
@@ -488,27 +476,51 @@ class ProjectForm(ModelForm):
         if "customer" in self.changed_data:
             instance.invoices.update(customer=instance.customer)
         if closing:
-            self.discard_offers_in_preparation(instance)
+            discard_offers_in_preparation(
+                instance,
+                request=self.request,
+                delete_planned_work=self.cleaned_data.get("delete_planned_work"),
+            )
         return instance
 
-    def discard_offers_in_preparation(self, instance):
-        """Offers in preparation can't lead anywhere once the project is
-        closed. They have never been sent, so they aren't declined."""
-        from workbench.offers.models import Offer
 
-        if self.cleaned_data.get("delete_planned_work"):
-            self._planned_work_of_offers_in_preparation().delete()
-        offers = list(instance.offers.filter(status=Offer.IN_PREPARATION))
-        for offer in offers:
-            offer.status = Offer.DISCARDED
-            offer.closed_on = instance.closed_on
-            offer.save()
-        if offers:
-            messages.info(
-                self.request,
-                _("Offers in preparation have been discarded: %(offers)s.")
-                % {"offers": ", ".join(str(offer) for offer in offers)},
+def _planned_work_of_offers_in_preparation(project):
+    from workbench.offers.models import Offer
+
+    return project.planned_work.filter(offer__status=Offer.IN_PREPARATION)
+
+
+def add_delete_planned_work_field(form, project):
+    """Asks about the planned work of the offers in preparation of a project
+    which is being closed"""
+    if _planned_work_of_offers_in_preparation(project).exists():
+        form.fields["delete_planned_work"] = delete_planned_work_field(
+            _(
+                "Closing the project discards its offers in preparation,"
+                " some of them have planning entries linked to them."
+                " Delete them?"
             )
+        )
+
+
+def discard_offers_in_preparation(project, *, request, delete_planned_work):
+    """Offers in preparation can't lead anywhere once the project is
+    closed. They have never been sent, so they aren't declined."""
+    from workbench.offers.models import Offer
+
+    if delete_planned_work:
+        _planned_work_of_offers_in_preparation(project).delete()
+    offers = list(project.offers.filter(status=Offer.IN_PREPARATION))
+    for offer in offers:
+        offer.status = Offer.DISCARDED
+        offer.closed_on = project.closed_on
+        offer.save()
+    if offers:
+        messages.info(
+            request,
+            _("Offers in preparation have been discarded: %(offers)s.")
+            % {"offers": ", ".join(str(offer) for offer in offers)},
+        )
 
 
 class ServiceForm(ModelForm):

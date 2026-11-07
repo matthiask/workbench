@@ -12,6 +12,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedHours
+from workbench.offers.models import Offer
 from workbench.reporting.utils import effort_cost_by_project
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
@@ -94,6 +95,43 @@ class InvoicesTest(TestCase):
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
         self.assertAlmostEqual(invoice.subtotal, Decimal(2500))
+
+    def test_final_invoice_closes_the_project(self):
+        """Closing the project with its final invoice discards its offers in
+        preparation and asks about their planned work"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        factories.PlannedWorkFactory.create(
+            project=project, offer=offer, weeks=[in_days(7)]
+        )
+        self.client.force_login(project.owned_by)
+
+        url = project.urls["createinvoice"] + "?type=fixed"
+        data = {
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "discount": 0,
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            "postal_address": "Anything\nStreet\nCity",
+            "subtotal": 2500,
+            "third_party_costs": 0,
+            "close_project": "on",
+        }
+        response = self.client.post(url, data)
+        self.assertContains(
+            response,
+            "Please decide whether the linked planning entries should be deleted.",
+        )
+
+        response = self.client.post(url, {**data, "delete_planned_work": "1"})
+        self.assertRedirects(response, Invoice.objects.get().urls["detail"])
+        project.refresh_from_db()
+        self.assertTrue(project.closed_on)
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.DISCARDED)
+        self.assertEqual(project.planned_work.count(), 0)
 
     def test_create_service_invoice_for_one_offer(self):
         """The menu of an offer creates invoices with its title, description and
