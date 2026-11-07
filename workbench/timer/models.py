@@ -30,7 +30,7 @@ def timestamp_project(user, value):
     wins, otherwise the match among all open projects has to be unique.
     Projects closed too long ago are rejected like in the logbook form, which
     the timestamp pre-fills."""
-    if isinstance(value, int) or value.isdigit():
+    if isinstance(value, int) or (value.isascii() and value.isdigit()):
         if project := Project.objects.filter(pk=value).first():
             if project.is_logbook_locked:
                 raise ValidationError(

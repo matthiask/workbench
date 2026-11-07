@@ -607,7 +607,8 @@ class CreateProjectInvoiceForm(InvoiceForm):
         self.offer = None
         if (
             type == Invoice.SERVICES
-            and (offer := kwargs["request"].GET.get("offer", "")).isdigit()
+            and (offer := kwargs["request"].GET.get("offer", "")).isascii()
+            and offer.isdigit()
         ):
             self.offer = self.project.offers.filter(pk=offer).first()
         kwargs["instance"] = Invoice(

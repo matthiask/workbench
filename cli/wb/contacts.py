@@ -117,7 +117,7 @@ def people():
 @click.option("--organization", type=int, help="Organization ID.")
 @click.option(
     "--group",
-    help="ID or title of a group, also people in it through their organization.",
+    help="Title or ID of a group, also people in it through their organization.",
 )
 @click.option("--without-groups", is_flag=True, help="Only people in no active group.")
 @click.option(
@@ -210,14 +210,14 @@ def show_person(person_id, as_json):
     "--add-group",
     "add_groups",
     multiple=True,
-    help="ID or title of a group; repeat it for several. Groups which apply to"
+    help="Title or ID of a group; repeat it for several. Groups which apply to"
     " organizations are added to the organization.",
 )
 @click.option(
     "--remove-group",
     "remove_groups",
     multiple=True,
-    help="ID or title of a group; repeat it for several.",
+    help="Title or ID of a group; repeat it for several.",
 )
 @click.option(
     "--archive/--unarchive", "is_archived", default=None, help="E.g. who left."

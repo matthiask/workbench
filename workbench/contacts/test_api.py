@@ -100,6 +100,37 @@ class ContactsAPITest(TestCase):
         data = self.client.get("/api/contacts/people/", {"group": "Industry"}).json()
         self.assertEqual(data["items"][0]["groups"], ["Industry"])
 
+    def test_groups_by_id_or_title(self):
+        """Groups are found by their title first, then by their ID"""
+        first = Group.objects.create(title="First")
+        numeric = Group.objects.create(title=str(first.pk))
+        year = Group.objects.create(title="2026")
+        factories.PersonFactory.create(given_name="Anna").groups.add(first)
+        factories.PersonFactory.create(given_name="Bea").groups.add(numeric)
+        factories.PersonFactory.create(given_name="Cleo").groups.add(year)
+        person = factories.PersonFactory.create(given_name="Dora")
+        self.client.force_login(factories.UserFactory.create())
+
+        def names(group):
+            response = self.client.get("/api/contacts/people/", {"group": group})
+            self.assertEqual(response.status_code, 200, response.content)
+            return [p["full_name"].split()[0] for p in response.json()["items"]]
+
+        self.assertEqual(names("First"), ["Anna"])
+        self.assertEqual(names(str(first.pk)), ["Bea"])
+        self.assertEqual(names(str(numeric.pk)), ["Bea"])
+        self.assertEqual(names("2026"), ["Cleo"])
+
+        for value in ["²", "99999999999999999999"]:
+            response = self.client.get("/api/contacts/people/", {"group": value})
+            self.assertEqual(response.status_code, 422, value)
+            response = self.client.patch(
+                f"/api/contacts/people/{person.pk}/",
+                {"add_groups": [value]},
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 422, value)
+
     def test_people_postal_address(self):
         """The list has the postal address like the XLSX export: the one with
         the highest weight, e.g. work before home"""

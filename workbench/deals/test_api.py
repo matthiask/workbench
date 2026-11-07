@@ -450,6 +450,9 @@ class DealsAPITest(TestCase):
             )
 
         self.assertEqual(post(url, {"offers": []}).status_code, 422)
+        for value in ["²", 10**20]:
+            response = post(url, {"offers": [value]})
+            self.assertIn("Unknown offer", errors(response)[0][1])
         self.assertEqual(
             post("/api/deals/0/offers/", {"offers": [offer.pk]}).status_code, 404
         )

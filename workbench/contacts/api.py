@@ -153,7 +153,7 @@ class PersonFilter(OrganizationFilter):
     organization: int | None = None
     group: str | None = Field(
         default=None,
-        description="ID or title of a group; also people who are in it through"
+        description="Title or ID of a group; also people who are in it through"
         " their organization",
     )
     without_groups: bool = Field(
@@ -173,13 +173,17 @@ class PersonFilter(OrganizationFilter):
 
 
 def _group(value):
-    """A group by its ID or title"""
+    """The group with this title (titles are unique), otherwise the group
+    with this ID, or ``None``
+
+    Titles come first so that groups with numeric titles (e.g. 2026) can be
+    found, every group can be found by its title."""
     groups = Group.objects.all()
-    return (
-        groups.filter(pk=value).first()
-        if value.isdigit()
-        else groups.filter(title__iexact=value).first()
-    )
+    if group := groups.filter(title__iexact=value).first():
+        return group
+    if value.isascii() and value.isdigit():
+        return groups.filter(pk=value).first()
+    return None
 
 
 def _query_error(field, msg):
@@ -602,12 +606,12 @@ class PersonPatch(Schema):
     )
     add_groups: list[str] = Field(
         default=[],
-        description="IDs or titles of active groups. Groups which apply to"
+        description="Titles or IDs of active groups. Groups which apply to"
         " organizations are added to the organization, like in the person form.",
     )
     remove_groups: list[str] = Field(
         default=[],
-        description="IDs or titles of groups. Groups which apply to"
+        description="Titles or IDs of groups. Groups which apply to"
         " organizations are removed from the organization too.",
     )
     is_archived: bool | None = None

@@ -272,7 +272,7 @@ class InvoicesTest(TestCase):
         self.assertFalse(f["selected_services"].value())
 
         # Offers of other projects and garbage are ignored
-        for value in [factories.OfferFactory.create().pk, "abc"]:
+        for value in [factories.OfferFactory.create().pk, "abc", "%C2%B2"]:
             f = form(f"?type=services&source=logbook&offer={value}")
             self.assertEqual(f["title"].value(), project.title)
             self.assertFalse(f["selected_services"].value())

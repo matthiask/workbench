@@ -689,7 +689,7 @@ OFFER_CODE = re.compile(r"^(?P<year>\d{4})-(?P<project>\d+)-o(?P<offer>\d+)$")
 def _offer(value):
     """The offer with this ID or code, or ``None``"""
     offers = Offer.objects.select_related("project")
-    if value.isdigit():
+    if value.isascii() and value.isdigit():
         return offers.filter(pk=value).first()
     if not (match := OFFER_CODE.match(value.casefold())):
         return None

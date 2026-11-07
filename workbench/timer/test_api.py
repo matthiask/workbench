@@ -77,6 +77,7 @@ class TimestampsAPITest(TestCase):
         response = create(type="start", project=other.pk, service=service.pk)
         self.assertEqual(response.status_code, 422)
         self.assertEqual(create(type="start", project=0).status_code, 422)
+        self.assertEqual(create(type="start", project="²").status_code, 422)
 
     def test_pinned_project_by_name(self):
         """Pinned projects can be passed as words of their code, title or
