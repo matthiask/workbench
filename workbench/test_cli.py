@@ -1097,6 +1097,22 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Website 2027", result.output)
         self.assertIn("Dry run", result.output)
+        other = factories.UserFactory.create(_short_name="zz")
+        result = self.wb(
+            "deals",
+            "update",
+            open_deal.pk,
+            "--contribution",
+            "zz=50",
+            "--contribution",
+            f"{self.user.get_short_name()}=100",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("zz (50)", result.output)
+        self.assertEqual(open_deal.contributions.get(user=other).weight, 50)
+        result = self.wb("deals", "update", open_deal.pk, "--contribution", "zz=30")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("0, 50 or 100", result.output)
         factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
         result = self.wb(
             "deals", "close", open_deal.pk, "accepted", "--closing-type", "x"

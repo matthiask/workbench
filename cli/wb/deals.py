@@ -156,7 +156,18 @@ def _echo_saved_deal(data, *, dry_run, as_json):
     help="TYPE=AMOUNT, e.g. Design=5000; TYPE= removes the value.",
 )
 @click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
-@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@click.option(
+    "--owned-by",
+    help="Short name, the new owner is added to the contributions.",
+    shell_complete=complete_short_names,
+)
+@click.option(
+    "--contribution",
+    "contributions",
+    multiple=True,
+    help="SHORT_NAME=WEIGHT: 100 main driving force, 50 contributing force,"
+    " 0 removes the contribution.",
+)
 @ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
@@ -171,6 +182,7 @@ def update_deal(
     values,
     attributes,
     owned_by,
+    contributions,
     ignore_warnings,
     dry_run,
     as_json,
@@ -198,6 +210,14 @@ def update_deal(
         }
     if attributes:
         data["attributes"] = _key_values(attributes, "--attribute")
+    if contributions:
+        data["contributions"] = {}
+        for key, value in _key_values(contributions, "--contribution").items():
+            if value not in {"0", "50", "100"}:
+                terminate(
+                    f"--contribution expects a weight of 0, 50 or 100, got {value!r}."
+                )
+            data["contributions"][key] = int(value)
     if not data:
         terminate("Nothing to change.")
     data = request(
@@ -540,7 +560,12 @@ def _echo_deal(data):
             ("ID", data["id"]),
             ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
-            ("Contributors", ", ".join(data["contributors"])),
+            (
+                "Contributions",
+                ", ".join(
+                    f"{row['user']} ({row['weight']})" for row in data["contributions"]
+                ),
+            ),
             ("Status", data["status_label"]),
             ("Probability", data["probability_label"]),
             ("Decision expected on", data["decision_expected_on"]),

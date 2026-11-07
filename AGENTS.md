@@ -366,7 +366,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating or updating
-  deals.
+  deals; changing the owner adds the new one, the old owner stays until
+  removed (`contributions` by short name, `wb deals update --contribution
+  ab=0`).
 - The audit log (`LoggedAction`, filled by a database trigger) stores
   `row_data` and `changed_fields` as hstore keyed by column name. Renaming a
   field or column loses its history: old entries keep the old key. Only

@@ -241,6 +241,46 @@ class DealsAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["probability"], "normal")
 
+    def test_update_contributions(self):
+        """Contributions are changed by the short names of the users, a
+        new owner is added to them"""
+        owner = factories.UserFactory.create(_short_name="ab")
+        other = factories.UserFactory.create(_short_name="cd")
+        deal = factories.DealFactory.create(owned_by=owner)
+        deal.contributions.create(user=owner, weight=100)
+        self.client.force_login(owner)
+        url = f"/api/deals/{deal.pk}/"
+
+        def patch(data):
+            return self.client.patch(url, data, content_type="application/json")
+
+        response = patch({"owned_by": "cd"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["contributions"],
+            [{"user": "ab", "weight": 100}, {"user": "cd", "weight": 100}],
+        )
+
+        response = patch({"contributions": {"AB": 0, "cd": 50}})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["contributions"], [{"user": "cd", "weight": 50}]
+        )
+
+        # The owner has to contribute, unknown users are errors
+        response = patch({"contributions": {"cd": 0}})
+        self.assertEqual(response.status_code, 422)
+        response = patch({"contributions": {"xy": 50}})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "contributions", "xy"]
+        )
+        response = patch({"contributions": {"ab": 30}})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            dict(deal.contributions.values_list("user", "weight")), {other.pk: 50}
+        )
+
     def test_update(self):
         """Deals are changed field by field like in the web interface"""
         user = factories.UserFactory.create(_short_name="ab")

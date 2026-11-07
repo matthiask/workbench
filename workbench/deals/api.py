@@ -55,6 +55,11 @@ class ValueOut(Schema):
     value: Decimal
 
 
+class ContributionOut(Schema):
+    user: str
+    weight: int
+
+
 class DealOut(Schema):
     id: int
     code: str
@@ -74,6 +79,7 @@ class DealOut(Schema):
     closing_type: str | None
     closing_notice: str
     contributors: list[str]
+    contributions: list[ContributionOut]
     related_offers: list[str]
 
 
@@ -100,6 +106,16 @@ def deal_out(deal, request):
         "closing_type": deal.closing_type.title if deal.closing_type else None,
         "closing_notice": deal.closing_notice,
         "contributors": [user.get_short_name() for user in deal.contributors.all()],
+        "contributions": sorted(
+            (
+                {
+                    "user": contribution.user.get_short_name(),
+                    "weight": contribution.weight,
+                }
+                for contribution in deal.contributions.all()
+            ),
+            key=lambda row: row["user"],
+        ),
         "related_offers": [offer.code for offer in deal.related_offers.all()],
     }
 
@@ -108,7 +124,12 @@ def with_related(deals):
     """Fetches what ``deal_out()`` needs"""
     return deals.select_related(
         "customer", "owned_by", "closing_type"
-    ).prefetch_related("values__type", "contributors", "related_offers__project")
+    ).prefetch_related(
+        "values__type",
+        "contributors",
+        "contributions__user",
+        "related_offers__project",
+    )
 
 
 class DealFilter(DateRangeFilter):
@@ -550,6 +571,12 @@ class DealPatch(Schema):
         description="Attributes by the title of their group, groups which"
         " aren't given are left alone.",
     )
+    contributions: dict[str, Literal[0, 50, 100]] = Field(
+        default={},
+        description="Weights by short name: 100 main driving force, 50"
+        " contributing force, 0 removes the contribution. Users who aren't"
+        " given are left alone; the owner has to contribute.",
+    )
 
 
 @router.patch("/deals/{deal_id}/", response=DealOut)
@@ -572,8 +599,11 @@ def deal_update(
     def error(loc, msg):
         errors.append({"loc": ["body", "data", *loc], "msg": msg})
 
-    values = form_data(DealForm(instance=deal, request=request))
-    patch = data.model_dump(exclude_unset=True, exclude={"values", "attributes"})
+    initial_form = DealForm(instance=deal, request=request)
+    values = form_data(initial_form)
+    patch = data.model_dump(
+        exclude_unset=True, exclude={"values", "attributes", "contributions"}
+    )
     for field in ["title", "description", "customer", "contact"]:
         if field in patch:
             values[field] = patch[field] or ""
@@ -588,6 +618,15 @@ def deal_update(
     # this rule
     field = f"user_{values['owned_by']}_contribution"
     values[field] = values.get(field) or 100
+    for short_name, weight in data.contributions.items():
+        user = User.objects.filter(_short_name__iexact=short_name).first()
+        # Active users and those contributing already, like in the form
+        if not user or (field := f"user_{user.pk}_contribution") not in (
+            initial_form.fields
+        ):
+            error(["contributions", short_name], _("Unknown user %r.") % short_name)
+            continue
+        values[field] = weight
     fields = _values_and_attributes(data, values, error)
     if errors:
         raise ValidationError(errors)
