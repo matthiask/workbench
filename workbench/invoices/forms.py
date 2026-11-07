@@ -6,7 +6,7 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
@@ -769,20 +769,38 @@ class CreateProjectInvoiceForm(InvoiceForm):
     def clean(self):
         data = super().clean()
         if selected := data.get("selected_services"):
-            invoiced = self.project.services.filter(
-                id__in=selected,
-                invoice_services__invoice__status__in=[
+            # Invoicing new work from the logbook again is the normal case,
+            # the danger is switching between the offer and the logbook
+            lines = Service.objects.filter(
+                invoice__status__in=[
                     Invoice.IN_PREPARATION,
                     Invoice.SENT,
                     Invoice.PAID,
                 ],
+            )
+            from_logbook = self.request.GET.get("source") == "logbook"
+            if from_logbook:
+                lines = lines.exclude(
+                    Exists(LoggedHours.objects.filter(invoice_service=OuterRef("pk")))
+                    | Exists(LoggedCost.objects.filter(invoice_service=OuterRef("pk")))
+                )
+            invoiced = self.project.services.filter(
+                id__in=selected, invoice_services__in=lines
             ).distinct()
             if invoiced:
-                self.add_warning(
+                message = (
                     _(
+                        "Some services have been invoiced from the offer already:"
+                        " %(services)s. Make sure the same work isn't invoiced twice."
+                    )
+                    if from_logbook
+                    else _(
                         "Some services have been invoiced already: %(services)s."
                         " Make sure the same work isn't invoiced twice."
                     )
+                )
+                self.add_warning(
+                    message
                     % {"services": ", ".join(service.title for service in invoiced)},
                     code="services-invoiced-already",
                 )

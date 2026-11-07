@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 13:19+0100\n"
+"POT-Creation-Date: 2026-11-07 13:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2283,6 +2283,11 @@ msgstr "Nein, bitte nichts ändern"
 
 #: workbench/invoices/forms.py
 #, python-format
+msgid "Some services have been invoiced from the offer already: %(services)s. Make sure the same work isn't invoiced twice."
+msgstr "Einige Leistungen wurden bereits aus der Offerte verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird."
+
+#: workbench/invoices/forms.py
+#, python-format
 msgid "Some services have been invoiced already: %(services)s. Make sure the same work isn't invoiced twice."
 msgstr "Einige Leistungen wurden bereits verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird."
 
@@ -3064,12 +3069,8 @@ msgid "Only offers in preparation can be changed."
 msgstr "Nur Offerten in Vorbereitung können geändert werden."
 
 #: workbench/offers/api.py
-msgid ""
-"Only the title, the description and the external reference of service "
-"groups can be changed."
-msgstr ""
-"Bei Leistungsgruppen lassen sich nur Titel, Beschreibung und externe "
-"Referenz ändern."
+msgid "Only the title, the description and the external reference of service groups can be changed."
+msgstr "Bei Leistungsgruppen lassen sich nur Titel, Beschreibung und externe Referenz ändern."
 
 #: workbench/offers/api.py
 msgid "The offer has no service with this ID."

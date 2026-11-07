@@ -186,6 +186,27 @@ class InvoicesTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
 
+        from_offer = Invoice.objects.latest("pk")
+
+        # Invoicing new work from the logbook again is the normal case
+        from_offer.delete()
+        factories.LoggedHoursFactory.create(service=service, hours=2)
+        logbook_url = project.urls["createinvoice"] + "?type=services&source=logbook"
+        response = self.client.post(logbook_url, data)
+        self.assertEqual(response.status_code, 302)
+
+        # Invoicing from the logbook what has been invoiced from the offer
+        response = self.client.post(
+            url,
+            data | {WarningsForm.ignore_warnings_id: "services-invoiced-already"},
+        )
+        self.assertEqual(response.status_code, 302)
+        factories.LoggedHoursFactory.create(service=service, hours=1)
+        response = self.client.post(logbook_url, data)
+        self.assertContains(
+            response, "Some services have been invoiced from the offer already: Design"
+        )
+
     def test_create_service_invoice_for_one_offer(self):
         """The menu of an offer creates invoices with its title, description and
         services, the latter only if there's something to invoice when
