@@ -25,6 +25,7 @@ from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     DateRangeFilter,
+    Number,
     Serialized,
     filter_date_range,
     full_clean,
@@ -49,22 +50,22 @@ class ServiceIn(Schema):
         max_length=50,
         description="Type of the effort shown on the offer, e.g. Design.",
     )
-    hours: float | None = Field(
+    hours: Number | None = Field(
         default=None,
         ge=0,
         description="Estimated hours, require an effort type and an hourly rate.",
     )
-    hourly_rate: float | None = Field(
+    hourly_rate: Number | None = Field(
         default=None,
         ge=0,
         description="Leave this out to use the rate of the service type unless"
         " the specification explicitly asks for a different rate.",
     )
-    cost: float | None = Field(
+    cost: Number | None = Field(
         default=None,
         description="Fixed costs in addition to the hours, e.g. licenses or hosting.",
     )
-    third_party_costs: float | None = Field(
+    third_party_costs: Number | None = Field(
         default=None,
         ge=0,
         description="Total incl. tax for third-party services contained in the cost.",
@@ -550,7 +551,7 @@ class OfferPatch(Schema):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     description: str | None = None
     postal_address: str | None = None
-    discount: float | None = Field(
+    discount: Number | None = Field(
         default=None, ge=0, description="Amount excl. tax, null removes it."
     )
     external_reference: str | None = Field(
@@ -690,10 +691,10 @@ class ServicePatch(Schema):
         " hourly rate unless they are given too.",
     )
     effort_type: str | None = Field(default=None, max_length=50)
-    hours: float | None = Field(default=None, ge=0)
-    hourly_rate: float | None = Field(default=None, ge=0)
-    cost: float | None = None
-    third_party_costs: float | None = Field(default=None, ge=0)
+    hours: Number | None = Field(default=None, ge=0)
+    hourly_rate: Number | None = Field(default=None, ge=0)
+    cost: Number | None = None
+    third_party_costs: Number | None = Field(default=None, ge=0)
     is_optional: bool | None = None
 
 

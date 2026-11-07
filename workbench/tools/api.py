@@ -9,10 +9,15 @@ from django.utils.translation import gettext as _
 from ninja import Query, Schema
 from ninja.errors import ValidationError as NinjaValidationError
 from ninja.pagination import LimitOffsetPagination
-from pydantic import PlainSerializer
+from pydantic import Field, PlainSerializer
 
 from workbench.accounts.models import Team, User
 from workbench.tools.validation import monday
+
+
+# Numbers of request bodies: JSON allows Infinity and NaN, and the decimal
+# fields of the database have ten digits at most
+Number = Annotated[float, Field(allow_inf_nan=False, gt=-1e10, lt=1e10)]
 
 
 def full_clean(instance, loc, errors, *, exclude=()):

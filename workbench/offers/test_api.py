@@ -390,6 +390,44 @@ class OfferServicesAPITest(TestCase):
         data = self.client.get(self.url).json()
         self.assertIsNone(data["services"][0]["service_type"])
 
+    def test_numbers_out_of_range(self):
+        """Infinity, NaN and numbers too large for the database are rejected"""
+        services = f"/api/projects/{self.project.pk}/offers/"
+        for value in [float("inf"), float("nan"), 1e30, -1e30, 5e9, -5e9]:
+            for method, url, data in [
+                (
+                    "post",
+                    services,
+                    {
+                        "title": "X",
+                        "services": [
+                            {
+                                "title": "Concept",
+                                "service_type": "consulting",
+                                "hours": value,
+                            }
+                        ],
+                    },
+                ),
+                (
+                    "post",
+                    services,
+                    {"title": "X", "services": [{"title": "Hosting", "cost": value}]},
+                ),
+                ("patch", self.url, {"discount": value}),
+                ("patch", f"{self.url}services/{self.hosting.pk}/", {"cost": value}),
+                ("patch", f"/api/services/{self.hosting.pk}/", {"cost": value}),
+                (
+                    "post",
+                    "/api/services/",
+                    {"offer": self.offer.pk, "title": "X", "hourly_rate": value},
+                ),
+            ]:
+                response = getattr(self.client, method)(
+                    url, data, content_type="application/json"
+                )
+                self.assertEqual(response.status_code, 422, (method, url, data))
+
     def test_update_offer(self):
         """The title, the description and the postal address are changed
         separately"""

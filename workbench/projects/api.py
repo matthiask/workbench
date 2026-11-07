@@ -39,6 +39,7 @@ from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     IGNORE_WARNINGS,
+    Number,
     Serialized,
     form_data,
     raise_form_errors,
@@ -686,12 +687,12 @@ class ServiceFields(Schema):
         " hourly rate unless they are given too.",
     )
     effort_type: str | None = Field(default=None, max_length=50)
-    hours: float | None = Field(default=None, ge=0)
-    hourly_rate: float | None = Field(default=None, ge=0)
-    cost: float | None = Field(
+    hours: Number | None = Field(default=None, ge=0)
+    hourly_rate: Number | None = Field(default=None, ge=0)
+    cost: Number | None = Field(
         default=None, description="Fixed costs in addition to hours."
     )
-    third_party_costs: float | None = Field(
+    third_party_costs: Number | None = Field(
         default=None,
         ge=0,
         description="Total incl. tax for third parties contained in the cost.",
