@@ -256,6 +256,11 @@ class DealsAPITest(TestCase):
             self.client.get("/api/deals/value-types/").json(),
             [{"id": design.pk, "title": "Design"}],
         )
+        won = factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
+        self.assertEqual(
+            self.client.get("/api/deals/closing-types/").json(),
+            [{"id": won.pk, "title": "Won", "represents_a_win": True}],
+        )
         self.assertEqual(
             self.client.get("/api/deals/attributes/").json(),
             [

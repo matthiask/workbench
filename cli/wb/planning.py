@@ -280,7 +280,10 @@ def _work_options(fn):
     for option in reversed([
         click.option("--title"),
         click.option("--user", help="Short name.", shell_complete=complete_short_names),
-        click.option("--service-type", help="Title of the service type."),
+        click.option(
+            "--service-type",
+            help="Title of the service type, see `wb services types`.",
+        ),
         click.option("--offer", help="Offer code, e.g. 2026-0042-o01."),
         click.option("--milestone", type=int, help="Milestone ID."),
         click.option(

@@ -21,7 +21,7 @@ from workbench.offers.models import (
     normalize_external_reference,
     validate_external_reference,
 )
-from workbench.projects.api import ProjectOut, project_out
+from workbench.projects.api import ProjectOut, ServiceTypeOut, project_out
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
@@ -159,11 +159,6 @@ class OfferOut(Schema):
         " e.g. services without hours or a cost (allowed, like in the web"
         " interface).",
     )
-
-
-class ServiceTypeOut(Schema):
-    title: str
-    hourly_rate: Decimal
 
 
 class OfferContext(Schema):

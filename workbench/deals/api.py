@@ -21,7 +21,13 @@ from workbench.api_keys import KEYS, DealProbability, DealStatus, key
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm, RelatedOfferForm, SetStatusForm
-from workbench.deals.models import AttributeGroup, Contribution, Deal, ValueType
+from workbench.deals.models import (
+    AttributeGroup,
+    ClosingType,
+    Contribution,
+    Deal,
+    ValueType,
+)
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.offers.models import Offer
 from workbench.tools.api import (
@@ -371,6 +377,23 @@ def deal_history_api(request, filters: Query[DealStatsFilter]):
     }
 
 
+class ClosingTypeOut(Schema):
+    id: int
+    title: str
+    represents_a_win: bool = Field(
+        description="For accepted deals, the others for declined deals."
+    )
+
+
+@router.get("/deals/closing-types/", response=list[ClosingTypeOut])
+def closing_type_list(request):
+    """The closing types of deals; closing a deal takes their titles"""
+    return [
+        {"id": ct.id, "title": ct.title, "represents_a_win": ct.represents_a_win}
+        for ct in ClosingType.objects.all()
+    ]
+
+
 class ValueTypeOut(Schema):
     id: int
     title: str
@@ -687,8 +710,8 @@ class DealStatusIn(Schema):
     status: Literal["open", "accepted", "declined"]
     closing_type: str | None = Field(
         default=None,
-        description="Title of the award of contract or the reason for losing,"
-        " required when closing deals.",
+        description="Title of the award of contract or the reason for losing"
+        " (see /api/deals/closing-types/), required when closing deals.",
     )
     closing_notice: str = ""
     closed_on: dt.date | None = Field(

@@ -1,5 +1,6 @@
 import datetime as dt
 from decimal import Decimal
+from unittest.mock import ANY
 
 from django.test import TestCase
 from django.utils.translation import deactivate_all
@@ -55,7 +56,8 @@ class OffersAPITest(TestCase):
         self.assertEqual(data["offers"][0]["code"], offer.code)
         self.assertEqual(data["offers"][0]["services"][0]["title"], "Design")
         self.assertEqual(
-            data["service_types"][0], {"title": "consulting", "hourly_rate": "250.00"}
+            data["service_types"][0],
+            {"id": ANY, "title": "consulting", "hourly_rate": "250.00"},
         )
         self.assertNotIn("@", str(data))
 

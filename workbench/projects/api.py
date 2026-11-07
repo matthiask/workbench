@@ -672,6 +672,22 @@ def _service_out(service, request, *, controlling):
     }
 
 
+class ServiceTypeOut(Schema):
+    id: int
+    title: str
+    hourly_rate: Decimal
+
+
+@router.get("/service-types/", response=list[ServiceTypeOut])
+def service_type_list(request):
+    """The service types; services and planned work take their titles, they
+    suggest the effort type (their title) and the hourly rate of services"""
+    return [
+        {"id": st.id, "title": st.title, "hourly_rate": st.hourly_rate}
+        for st in ServiceType.objects.all()
+    ]
+
+
 @router.get("/services/", response=list[ServiceOut])
 @paginate
 def service_list(request, filters: Query[ServiceFilter]):

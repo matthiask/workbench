@@ -309,6 +309,20 @@ class ProjectsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
 
+    def test_service_types(self):
+        """Service types are listed with the titles services take"""
+        service_types = factories.service_types()
+        self.client.force_login(factories.UserFactory.create())
+        data = self.client.get("/api/service-types/").json()
+        self.assertIn(
+            {
+                "id": service_types.consulting.pk,
+                "title": service_types.consulting.title,
+                "hourly_rate": "250.00",
+            },
+            data,
+        )
+
     def test_internal_types(self):
         """Internal types are listed in their order"""
         outreach = InternalType.objects.create(

@@ -37,8 +37,8 @@ def _service_options(fn):
         ),
         click.option(
             "--service-type",
-            help="Fills in the effort type and the hourly rate unless they are"
-            " given too.",
+            help="Title of the service type (see `wb services types`), fills in"
+            " the effort type and the hourly rate unless they are given too.",
         ),
         click.option("--effort-type"),
         click.option("--hours", type=float),
@@ -77,6 +77,20 @@ def _echo_service(data, *, dry_run, as_json, prefix=""):
         f" | offer: {data['offer'] or '(none)'}{hours}{cost}"
         f" | external reference: {data['external_reference'] or '(none)'}"
     )
+
+
+@services.command("types")
+@click.option("--json", "as_json", is_flag=True)
+def list_service_types(as_json):
+    """List the service types, `--service-type` takes their titles"""
+    data = request("GET", "service-types/")
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("ID>", "Title", "Hourly rate>")
+    for row in data:
+        table.add_row(str(row["id"]), row["title"], row["hourly_rate"])
+    console.print(table)
 
 
 @services.command("search")

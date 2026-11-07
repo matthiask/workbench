@@ -244,8 +244,8 @@ def update_deal(
 @click.option(
     "--closing-type",
     required=True,
-    help="Award of contract or reason for losing, unknown ones are rejected"
-    " with a list of the choices.",
+    help="Title of the award of contract or the reason for losing, see `wb"
+    " deals closing-types`.",
 )
 @click.option("--notice", default="", help="The text, or - to read it from stdin.")
 @click.option(
@@ -322,6 +322,25 @@ def reopen_deal(deal_id, dry_run, as_json):
         json={"status": "open"},
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
+@deals.command("closing-types")
+@click.option("--json", "as_json", is_flag=True)
+def list_closing_types(as_json):
+    """List the closing types, `wb deals close --closing-type` takes their
+    titles"""
+    data = request("GET", "deals/closing-types/")
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("ID>", "Title", "For")
+    for row in data:
+        table.add_row(
+            str(row["id"]),
+            row["title"],
+            "accepted" if row["represents_a_win"] else "declined",
+        )
+    console.print(table)
 
 
 @deals.command("value-types")

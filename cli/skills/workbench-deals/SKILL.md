@@ -73,8 +73,8 @@ or declines its related offers which haven't been accepted yet.
     wb deals close <deal_id> declined --closing-type "<reason>" --notice "<why>" --dry-run
     wb deals reopen <deal_id>
 
-- Unknown closing types are rejected with a list of the choices; ask the user
-  which one applies, especially the reason for losing.
+- `wb deals closing-types` lists the closing types; ask the user which one
+  applies, especially the reason for losing.
 - `--offer <offer_id>` (repeatable) picks the offers to accept or decline,
   `--keep-offers` leaves them alone. Show the user which offers would change.
 - Declining offers with planned work needs `--delete-planned-work` or

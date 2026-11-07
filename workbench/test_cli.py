@@ -1062,6 +1062,15 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Source", result.output)
         self.assertIn("Referral", result.output)
+        factories.ClosingTypeFactory.create(title="Too expensive")
+        result = self.wb("deals", "closing-types")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Too expensive", result.output)
+        self.assertIn("declined", result.output)
+        factories.service_types()
+        result = self.wb("services", "types")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("consulting", result.output)
 
     def test_deals(self):
         """Searching, creating, updating, closing and reopening deals"""
@@ -1748,7 +1757,15 @@ planned_work:
         self.assertNotIn("services", complete(["offers"], ""))
         self.assertEqual(
             complete(["services"], ""),
-            ["create", "delete", "reassign-logbook", "reorder", "search", "update"],
+            [
+                "create",
+                "delete",
+                "reassign-logbook",
+                "reorder",
+                "search",
+                "types",
+                "update",
+            ],
         )
         self.assertIn("--clear-cost", complete(["services", "update"], "--"))
         # Host names only: bash splits words at the colon of https://
