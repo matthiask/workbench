@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 12:54+0100\n"
+"POT-Creation-Date: 2026-11-07 12:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2749,11 +2749,11 @@ msgstr "Dieses Feld wird benötigt, ausser Du erstellst eine neue Leistung."
 msgid "Deselect the existing service if you want to create a new service."
 msgstr "Falls Du eine neue Leistung erstellen willst, darfst Du keine existierende Leistung wählen."
 
-#: workbench/logbook/forms.py
+#: workbench/logbook/forms.py workbench/timer/api.py
 msgid "Logging is not allowed on this service anymore."
 msgstr "Auf dieser Leistung kann nicht mehr erfasst werden."
 
-#: workbench/logbook/forms.py
+#: workbench/logbook/forms.py workbench/timer/api.py
 msgid "This project has been closed too long ago."
 msgstr "Dieses Projekt ist schon zu lange geschlossen."
 
@@ -6114,6 +6114,11 @@ msgstr "Unbekanntes Team."
 #, python-format
 msgid "Unknown users: %s"
 msgstr "Unbekannte Benutzer:innen: %s"
+
+#: workbench/tools/api.py
+#, python-format
+msgid "Not in the team %(team)s: %(users)s"
+msgstr "Nicht im Team %(team)s: %(users)s"
 
 #: workbench/tools/csv.py
 msgid "Export selected items as CSV"

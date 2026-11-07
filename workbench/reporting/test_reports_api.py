@@ -93,6 +93,13 @@ class ReportsAPITest(TestCase):
         self.assertIn("xy", response.content.decode())
         self.assertEqual(self.client.get(url, {"team": "nope"}).status_code, 422)
 
+        # Users have to be in the team
+        response = self.client.get(url, {"team": "design", "user": ["ab", "cd"]})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["msg"], "Not in the team Design: ab"
+        )
+
     def test_hours(self):
         """Hours per customer and type, green hours, planning and logging"""
         service = factories.ServiceFactory.create()

@@ -187,6 +187,7 @@ def filter_users(filters):
     if not filters.user and not filters.team:
         return None
     users = User.objects.all()
+    team = None
     if filters.team:
         try:
             team = Team.objects.get(name__iexact=filters.team)
@@ -201,11 +202,21 @@ def filter_users(filters):
             q |= Q(_short_name__iexact=short_name)
         users = users.filter(q)
         found = {user.get_short_name().casefold() for user in users}
-        if unknown := [name for name in filters.user if name.casefold() not in found]:
+        if missing := [name for name in filters.user if name.casefold() not in found]:
+            q = Q()
+            for short_name in missing:
+                q |= Q(_short_name__iexact=short_name)
+            existing = {
+                user.get_short_name().casefold() for user in User.objects.filter(q)
+            }
+            unknown = [name for name in missing if name.casefold() not in existing]
             raise NinjaValidationError([
                 {
                     "loc": ["query", "filters", "user"],
-                    "msg": _("Unknown users: %s") % ", ".join(unknown),
+                    "msg": _("Unknown users: %s") % ", ".join(unknown)
+                    if unknown
+                    else _("Not in the team %(team)s: %(users)s")
+                    % {"team": team, "users": ", ".join(missing)},
                 }
             ])
     return users
