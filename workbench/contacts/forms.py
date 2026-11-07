@@ -418,9 +418,10 @@ class OrganizationDeleteForm(ModelForm):
 
     def delete(self):
         if "substitute_with" in self.fields:
-            substitute_with(
-                to_delete=self.instance, keep=self.cleaned_data["substitute_with"]
-            )
+            keep = self.cleaned_data["substitute_with"]
+            # Groups (e.g. industries) aren't moved by substitute_with()
+            keep.groups.add(*self.instance.groups.all())
+            substitute_with(to_delete=self.instance, keep=keep)
         else:
             self.instance.delete()
 

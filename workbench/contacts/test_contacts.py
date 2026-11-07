@@ -410,7 +410,8 @@ class ContactsTest(TestCase):
 
         person.refresh_from_db()
         self.assertEqual(person.organization, new)
-        self.assertEqual(new.groups.count(), 0)  # Group (m2m) not assigned
+        # The groups (e.g. industries) of the organization move too
+        self.assertEqual(list(new.groups.all()), [group])
 
     def test_merge_people(self):
         """Merging moves relations, details and groups to the person to keep
