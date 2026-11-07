@@ -369,9 +369,17 @@ class DealsTest(TestCase):
 
         # Reopening and closing again only settles them when asked to
         self.assertEqual(close("open", None), Offer.ACCEPTED)
-        self.assertEqual(close("declined", "Lost", offers=[offer.pk]), Offer.DECLINED)
+        self.assertEqual(close("declined", "Lost", offers=[offer.code]), Offer.DECLINED)
         self.assertEqual(close("open", None), Offer.DECLINED)
         self.assertEqual(close("accepted", "Won"), Offer.DECLINED)
+
+        # Unknown offers are errors
+        response = self.client.post(
+            f"/api/deals/{deal.pk}/status/",
+            {"status": "accepted", "closing_type": "Won", "offers": ["nope"]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
 
     def test_settled_offers_are_closed_with_the_deal(self):
         """Offers settled with a deal are closed on the deal's closing date"""

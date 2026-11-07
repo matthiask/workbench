@@ -17,7 +17,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.api_keys import KEYS, DealProbability, DealStatus, key
+from workbench.api_keys import KEYS, DealProbability, DealStatus, OfferStatus, key
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
 from workbench.deals.forms import DealForm, RelatedOfferForm, SetStatusForm
@@ -61,6 +61,13 @@ class ValueOut(Schema):
     value: Decimal
 
 
+class RelatedOfferOut(Schema):
+    id: int
+    code: str
+    title: str
+    status: OfferStatus
+
+
 class ContributionOut(Schema):
     user: str
     weight: int
@@ -86,7 +93,7 @@ class DealOut(Schema):
     closing_notice: str
     contributors: list[str]
     contributions: list[ContributionOut]
-    related_offers: list[str]
+    related_offers: list[RelatedOfferOut]
 
 
 def deal_out(deal, request):
@@ -122,7 +129,15 @@ def deal_out(deal, request):
             ),
             key=lambda row: row["user"],
         ),
-        "related_offers": [offer.code for offer in deal.related_offers.all()],
+        "related_offers": [
+            {
+                "id": offer.id,
+                "code": offer.code,
+                "title": offer.title,
+                "status": key("offer_status", offer.status),
+            }
+            for offer in deal.related_offers.all()
+        ],
     }
 
 
@@ -718,9 +733,10 @@ class DealStatusIn(Schema):
         default=None,
         description="Defaults to today, or the date the deal has been closed on.",
     )
-    offers: list[int] | None = Field(
+    offers: list[int | str] | None = Field(
         default=None,
-        description="IDs of related offers to accept or decline with the deal,"
+        description="IDs or codes of related offers to accept or decline with"
+        " the deal,"
         " defaults to those in preparation or offered (like the web"
         " interface; settled offers only when given, e.g. after reopening the"
         " deal), offers without dates get the closing date; declining"
@@ -776,7 +792,16 @@ def deal_status(
         if data.closed_on:
             values["closed_on"] = data.closed_on
     if "related_offers" in form.fields and data.offers is not None:
-        values["related_offers"] = data.offers
+        values["related_offers"] = []
+        for index, value in enumerate(data.offers):
+            if offer := _offer(str(value).strip().casefold()):
+                values["related_offers"].append(offer.pk)
+            else:
+                errors.append({
+                    "loc": ["body", "data", "offers", index],
+                    "msg": _("Unknown offer %r, expected an ID or a code like %s.")
+                    % (value, "2026-0179-o02"),
+                })
     if "delete_planned_work" in form.fields and data.delete_planned_work is not None:
         values["delete_planned_work"] = int(data.delete_planned_work)
     if errors:

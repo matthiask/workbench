@@ -485,7 +485,9 @@ class DealsAPITest(TestCase):
 
         response = post(url, {"offers": [offer.code]}, "?dry_run=true")
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response.json()["related_offers"], [offer.code])
+        self.assertEqual(
+            [o["code"] for o in response.json()["related_offers"]], [offer.code]
+        )
         self.assertFalse(deal.related_offers.exists())
 
         response = post(url, {"offers": [offer.code.upper()]})
@@ -543,10 +545,14 @@ class DealsAPITest(TestCase):
 
         remove = f"{url}remove/"
         response = post(remove, {"offers": [other.code]}, "?dry_run=true")
-        self.assertEqual(response.json()["related_offers"], [offer.code])
+        self.assertEqual(
+            [o["code"] for o in response.json()["related_offers"]], [offer.code]
+        )
         self.assertEqual(deal.related_offers.count(), 2)
         response = post(remove, {"offers": [other.code, other.pk]})
-        self.assertEqual(response.json()["related_offers"], [offer.code])
+        self.assertEqual(
+            [o["code"] for o in response.json()["related_offers"]], [offer.code]
+        )
         response = post(remove, {"offers": [other.code]})
         self.assertEqual(
             errors(response),

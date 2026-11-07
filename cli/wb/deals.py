@@ -256,9 +256,9 @@ def update_deal(
 @click.option(
     "--offer",
     "offers",
-    type=int,
     multiple=True,
-    help="Related offer to accept or decline too, can be repeated. Defaults to"
+    help="ID or code of a related offer to accept or decline too, can be"
+    " repeated. Defaults to"
     " those in preparation or offered; settled offers (e.g. before reopening"
     " the deal) only when given.",
 )
@@ -640,7 +640,13 @@ def _echo_deal(data):
             ("Decision expected on", data["decision_expected_on"]),
             ("Closed on", data["closed_on"]),
             ("Closing type", data["closing_type"]),
-            ("Related offers", ", ".join(data["related_offers"])),
+            (
+                "Related offers",
+                ", ".join(
+                    f"{offer['code']} (ID {offer['id']}, {offer['status']})"
+                    for offer in data["related_offers"]
+                ),
+            ),
             ("URL", data["url"]),
         ],
         url=data["url"],
