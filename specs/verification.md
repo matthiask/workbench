@@ -61,73 +61,28 @@ after "Verification: The second round's bugs are fixed").
 
 ## Round 3 (2026-11-07)
 
-Four agents (invoices, reports, time, contacts/deals/API). Bugs were shown
-with throwaway tests; the cited code has been checked unless marked
-"unchecked".
+Four agents (invoices, reports, time, contacts/deals/API). The verified bugs
+have been fixed (the commits after "Verification: Findings of the third
+round"), except the one below.
 
-### Verified bugs
+### Decided
 
-Invoices and payments:
+- Closing a deal only preselects offers in preparation or offered; settled
+  offers (also of reopened deals) only when selected.
+- Squeeze deducts absence days as full days from the employment's working
+  days (like the annual working time).
+- Invoicing an offer doesn't preselect optional services (from the logbook
+  they are, work has been logged on them).
+- The key data API leaves out deals and squeeze without their features.
+- Payments may be assigned to invoices in preparation with a date after the
+  freeze date (useful, see 06fb06cd); recurring invoices may mark their
+  invoices as sent directly (`mark_as_sent`, off by default).
 
-- Assigning a payment (`CreditEntryForm.save()`,
-  `AssignCreditEntriesForm.save()`, `credit_control/forms.py`) sets
-  cancelled invoices to PAID; their released entries and down payments can
-  be invoiced again.
-- `AssignCreditEntriesForm` offers invoices in preparation
-  (`Invoice.objects.open()`) and sets them PAID without `invoiced_on`.
-- Sent invoices which aren't frozen can be backdated into the frozen period
-  (`invoices/forms.py`, freeze check only for `_orig_status < SENT`).
-- `Invoice.objects.overdue()` includes credits: sent credits go to dunning,
-  autodunning and "needs action".
-- `_round_5cents()` (`tools/models.py`) rounds half to even: 25.00 + 8.1%
-  = 27.025 gives 27.00 instead of 27.05.
-- Invoicing an offer preselects its optional services, also in the API
-  (`invoices/forms.py` `selected = ...`). Unchecked; maybe a decision.
+### Open bug
 
-Reports:
-
-- Key data view: the `defaultdict` lambda uses the loop variable `month`;
-  500 on empty data, and in early January without a row for the current
-  month the year rows are labelled wrong (`reporting/views.py`).
-- Team filters with an empty team show everyone: `green_hours.py`
-  (`users or ...`), `projects/reporting.py` `hours_per_customer` and
-  `hours_per_type` (`if users:`), `reporting/api.py` planning vs logbook.
-- Squeeze scales absence days with the employment percentage
-  (`(working_days - absence_days) * employment%`), unlike the annual working
-  time and planning (`working_days * employment% - absence_days`). Doc
-  matches the code; maybe a decision.
-
-Time:
-
-- `LoggedCost.allow_delete` shows the expense report error but doesn't
-  return `False`.
-- Copying a missing logged cost (`?copy=999999`) crashes: catches
-  `LoggedHours.DoesNotExist` (`logbook/forms.py`).
-- Planning import: updating a milestone resets `phase_starts_on` and
-  `estimated_total_hours` when they're omitted (`planning/api.py`).
-- External planning shows employment percentages in the text of public
-  holidays (`planning/reporting.py` `add_public_holidays`).
-- `delete_future_planned_work()` can leave planned work with 0.0 hours.
-  Unchecked.
-- Planned work more than ~77 weeks ahead can't be saved in the web form
-  (week choices, `planning/forms.py`, also `ExternalWorkForm`). Unchecked.
-- Planning update mails report moved planned work under the old project
-  (`planning/updates.py` `project_for_action(actions[0])`). Unchecked.
 - Logged hours without timestamp created a day after `rendered_on` produce a
-  ~15h detected slice (`timer/models.py`). Unchecked.
-
-Contacts, deals, offers:
-
-- Closing a deal preselects offers with the opposite status (e76cbe35) even
-  if another deal or the offer form settled them (`deals/forms.py`
-  `SetStatusForm`).
-- Closing a deal with a past `closed_on` dates the offers' `closed_on`
-  today (`Offer.clean_fields`); reopened and settled again keeps the old
-  date.
-- Deleting an organization cascades to its `ExternalWork.provided_by`
-  without offering a substitute (`planning/models.py`). Unchecked.
-- `Offer.copy_to()` ignores the target project's flat rate and doesn't copy
-  `postal_address` (the copy then fails `full_clean` in the offers API).
+  ~15h detected slice on that day (`timer/models.py`, entries are placed at
+  their `created_at`). Needs a decision where they belong in the timeline.
 
 ### Untested risks
 
@@ -161,8 +116,6 @@ Contacts, deals, offers:
 - Third party costs of frozen invoices and projections in frozen periods
   stay editable.
 - Unassigning a payment leaves the invoice PAID.
-- Key data API returns accepted deals, funnel and squeeze gross margin with
-  CONTROLLING only.
 - Green hours: projects whose budgeted services add up to 0h count all
   hours as overdrawn.
 - Team filters use the current membership for past periods.
