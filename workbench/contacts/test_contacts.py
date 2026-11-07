@@ -24,8 +24,10 @@ from workbench.contacts.urls import autocomplete_filter
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
+from workbench.planning.models import ExternalWork
 from workbench.projects.models import Project
 from workbench.tools.testing import messages
+from workbench.tools.validation import monday
 from workbench.tools.vcard import person_to_vcard
 
 
@@ -442,6 +444,30 @@ class ContactsTest(TestCase):
         self.assertEqual(person.organization, new)
         # The groups (e.g. industries) of the organization move too
         self.assertEqual(list(new.groups.all()), [group])
+
+    def test_organization_delete_with_external_work(self):
+        """External work an organization provides moves to the substitute"""
+        organization = factories.OrganizationFactory.create()
+        project = factories.ProjectFactory.create()
+        work = ExternalWork.objects.create(
+            project=project,
+            provided_by=organization,
+            created_by=project.owned_by,
+            title="Printing",
+            weeks=[monday()],
+        )
+        self.client.force_login(organization.primary_contact)
+
+        response = self.client.get(organization.urls["delete"])
+        self.assertContains(response, "substitute_with")
+
+        new = factories.OrganizationFactory.create()
+        response = self.client.post(
+            organization.urls["delete"], {"substitute_with": new.pk}
+        )
+        self.assertRedirects(response, organization.urls["list"])
+        work.refresh_from_db()
+        self.assertEqual(work.provided_by, new)
 
     def test_search_after_renaming_and_merging(self):
         """Renaming and merging contacts updates the search of related

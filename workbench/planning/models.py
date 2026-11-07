@@ -155,7 +155,7 @@ class ExternalWork(AbstractPlannedWork):
     )
     provided_by = models.ForeignKey(
         Organization,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         verbose_name=_("provided by"),
         related_name="external_work",
     )
