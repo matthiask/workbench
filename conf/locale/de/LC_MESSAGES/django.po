@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 13:45+0100\n"
+"POT-Creation-Date: 2026-11-07 13:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3692,6 +3692,11 @@ msgstr "Beim Schliessen des Projekts werden seine Offerten in Vorbereitung verwo
 #, python-format
 msgid "Offers in preparation have been discarded: %(offers)s."
 msgstr "Offerten in Vorbereitung wurden verworfen: %(offers)s."
+
+#: workbench/projects/forms.py
+#, python-format
+msgid "Offers in preparation which have been sent before have been declined: %(offers)s."
+msgstr "Offerten in Vorbereitung, welche bereits verschickt wurden, wurden abgelehnt: %(offers)s."
 
 #: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."

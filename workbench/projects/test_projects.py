@@ -849,9 +849,17 @@ class ProjectsTest(TestCase):
 
     def test_closing_discards_offers_in_preparation(self):
         """Offers in preparation of closed projects are discarded, they can't
-        lead anywhere anymore; offers which have been sent are left alone"""
+        lead anywhere anymore, or declined if they have been sent before;
+        offers which have been sent are left alone"""
         project = factories.ProjectFactory.create()
         preparing = factories.OfferFactory.create(project=project)
+        revised = factories.OfferFactory.create(
+            project=project,
+            offered_on=in_days(-30),
+            valid_until=None,
+            title="Revised",
+            postal_address="A\nStreet\nCity",
+        )
         offered = factories.OfferFactory.create(
             project=project,
             status=Offer.OFFERED,
@@ -888,6 +896,15 @@ class ProjectsTest(TestCase):
         self.assertEqual(offered.status, Offer.OFFERED)
         # Discarded offers don't count, like declined ones
         self.assertTrue(preparing.is_declined)
+
+        revised.refresh_from_db()
+        self.assertEqual(revised.status, Offer.DECLINED)
+        self.assertEqual(revised.valid_until, in_days(-1))
+        revised.full_clean()
+        self.assertIn(
+            f"Offers in preparation which have been sent before have been declined: {revised}.",
+            messages(response),
+        )
 
     def test_closing_with_planned_work_of_offers_in_preparation(self):
         """Closing a project discards its offers in preparation, the planned

@@ -505,21 +505,39 @@ def add_delete_planned_work_field(form, project):
 
 def discard_offers_in_preparation(project, *, request, delete_planned_work):
     """Offers in preparation can't lead anywhere once the project is
-    closed. They have never been sent, so they aren't declined."""
+    closed. Those which have never been sent are discarded, those which
+    have been sent before (and put back into preparation) are declined."""
     from workbench.offers.models import Offer
 
     if delete_planned_work:
         _planned_work_of_offers_in_preparation(project).delete()
-    offers = list(project.offers.filter(status=Offer.IN_PREPARATION))
-    for offer in offers:
-        offer.status = Offer.DISCARDED
+    discarded, declined = [], []
+    for offer in project.offers.filter(status=Offer.IN_PREPARATION):
+        if offer.offered_on:
+            offer.status = Offer.DECLINED
+            offer.valid_until = offer.valid_until or max(
+                offer.offered_on, project.closed_on
+            )
+            declined.append(offer)
+        else:
+            offer.status = Offer.DISCARDED
+            discarded.append(offer)
         offer.closed_on = project.closed_on
         offer.save()
-    if offers:
+    if discarded:
         messages.info(
             request,
             _("Offers in preparation have been discarded: %(offers)s.")
-            % {"offers": ", ".join(str(offer) for offer in offers)},
+            % {"offers": ", ".join(str(offer) for offer in discarded)},
+        )
+    if declined:
+        messages.info(
+            request,
+            _(
+                "Offers in preparation which have been sent before have been"
+                " declined: %(offers)s."
+            )
+            % {"offers": ", ".join(str(offer) for offer in declined)},
         )
 
 
