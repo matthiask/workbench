@@ -878,7 +878,7 @@ capacity = working_days × planning_hours_per_day
 Worked example (made-up): 80%, `planning_hours_per_day` 8. In this week there is a public holiday on Monday (fraction 1), a vacation from Tuesday to Wednesday (`days = 2`, `ends_on` set), and planned work of 30 h spread over 3 weeks.
 working days `0.8 × (5 − 1) = 3.2`, `3.2 × 8 = 25.6` − `30 / 3 = 10` − `2 × 8 = 16` = **−0.4 h** (slightly overbooked).
 
-The display rows "absences" and "by week" in the same planning (`add_absences`, `add_public_holidays`) are computed in Python and differ slightly: absences spanning beyond the shown range put all their hours into the visible weeks.
+The display rows "absences" and "by week" in the same planning (`add_absences`, `add_public_holidays`) are computed in Python and spread absences over their weeks the same way, also over the weeks which aren't shown.
 Code: `workbench/planning/reporting.py:Planning.capacity`, `Planning.add_absences`, `Planning.add_public_holidays`, `user_planning`, `team_planning`. API: `workbench/planning/api.py:planning_export`.
 
 ## Deals

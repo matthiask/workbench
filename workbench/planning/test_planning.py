@@ -549,6 +549,26 @@ class CapacityTest(TestCase):
         planning.add_absences(Absence.objects.all())
         self.assertEqual(planning._absences[user], [[]])
 
+    def test_absences_spanning_more_weeks_than_shown(self):
+        """Absences are spread over all their weeks, also those not shown"""
+        week = dt.date(2026, 11, 9)
+        user = factories.UserFactory.create(planning_hours_per_day=8)
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2020, 1, 1), percentage=100
+        )
+        Absence.objects.create(
+            user=user,
+            starts_on=week - dt.timedelta(days=7),
+            ends_on=week + dt.timedelta(days=4),
+            days=10,
+            reason=Absence.VACATION,
+        )
+
+        planning = reporting.Planning(weeks=[week], users=[user])
+        self.assertEqual(planning.capacity()["total"], [0])
+        planning.add_absences(Absence.objects.all())
+        self.assertEqual(sum(row[0] for row in planning._absences[user][0]), 40)
+
     def test_absence_reasons(self):
         """The planning colors absences by their reason, the external view
         shows neither the reason nor the description"""

@@ -249,7 +249,12 @@ class Planning:
             if absence.starts_on.weekday() in {5, 6}:
                 date_from += dt.timedelta(days=7)
             date_until = monday(absence.ends_on or date_from)
-            hours = absence.days * absence.user.planning_hours_per_day
+            # Spread over all weeks of the absence, also those not shown
+            hours = (
+                absence.days
+                * absence.user.planning_hours_per_day
+                / max(1, (date_until - date_from).days // 7 + 1)
+            )
             weeks = [
                 (idx, week)
                 for idx, week in enumerate(self.weeks)
@@ -265,12 +270,12 @@ class Planning:
             )
             for idx, week in weeks:
                 self._absences[absence.user][idx].append((
-                    hours / len(weeks),
+                    hours,
                     text,
                     absence.urls["detail"],
                     reason,
                 ))
-                self._by_week[week] += hours / len(weeks)
+                self._by_week[week] += hours
 
     def add_public_holidays(self):
         ud = {user.id: user for user in User.objects.filter(id__in=self._user_ids)}
