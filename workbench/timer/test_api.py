@@ -6,6 +6,7 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.timer.models import Timestamp
+from workbench.tools.validation import in_days
 
 
 class TimestampsAPITest(TestCase):
@@ -116,6 +117,34 @@ class TimestampsAPITest(TestCase):
         # Numbers which aren't the ID of a project are searched
         kampagne = factories.ProjectFactory.create(title="Kampagne 99999")
         self.assertEqual(project("99999"), kampagne.pk)
+
+    def test_projects_and_services_for_logging(self):
+        """Timestamps only accept projects and services which accept logged
+        hours, like the logbook form"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        def post(data):
+            return self.client.post(
+                "/api/timestamps/",
+                {"type": "start"} | data,
+                content_type="application/json",
+            )
+
+        closed = factories.ProjectFactory.create(closed_on=in_days(-30))
+        self.assertContains(
+            post({"project": closed.pk}),
+            "This project has been closed too long ago.",
+            status_code=422,
+        )
+        recently = factories.ProjectFactory.create(closed_on=in_days(-1))
+        self.assertEqual(post({"project": recently.pk}).status_code, 200)
+        service = factories.ServiceFactory.create(allow_logging=False)
+        self.assertContains(
+            post({"service": service.pk}),
+            "Logging is not allowed on this service anymore.",
+            status_code=422,
+        )
 
     def test_project_words(self):
         """Every word has to match, a unique pinned project wins over the other

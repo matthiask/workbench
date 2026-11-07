@@ -145,7 +145,17 @@ def _project_and_service(user, data):
             raise _error("service", _("This service doesn't exist."))
         if project and project != service.project:
             raise _error("service", _("This service belongs to a different project."))
+        if not Service.objects.logging().filter(pk=service.pk).exists():
+            raise _error(
+                "service", _("Logging is not allowed on this service anymore.")
+            )
         project = service.project
+    # Like the logbook form, which the timestamp pre-fills
+    if project and project.is_logbook_locked:
+        raise _error(
+            "service" if data.service is not None else "project",
+            _("This project has been closed too long ago."),
+        )
     return project, service
 
 
