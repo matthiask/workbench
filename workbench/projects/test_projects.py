@@ -3,11 +3,13 @@ import datetime as dt
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.contacts.models import Organization
 from workbench.invoices.models import Invoice
+from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.charts import projected_vs_invoiced_chart
 from workbench.projects.models import InternalType, Project, Service
@@ -528,6 +530,28 @@ class ProjectsTest(TestCase):
         self.assertContains(
             response, "The offer must belong to the same project as the service."
         )
+
+    def test_move_service_with_invoiced_entries(self):
+        """Services whose logged hours or costs have been invoiced stay with
+        the project of the invoice"""
+        service = factories.ServiceFactory.create()
+        other = factories.ProjectFactory.create()
+        hours = factories.LoggedHoursFactory.create(service=service)
+        self.client.force_login(service.project.owned_by)
+
+        LoggedHours.objects.filter(pk=hours.pk).update(archived_at=timezone.now())
+        response = self.client.post(
+            service.urls["move"],
+            {"modal-project": other.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(
+            response,
+            "Logged hours or costs of this service have been invoiced already,"
+            " it cannot be moved to another project.",
+        )
+        service.refresh_from_db()
+        self.assertNotEqual(service.project, other)
 
     def test_external_reference_of_service_bound_to_offer(self):
         """The external reference of services stays editable when their offer
