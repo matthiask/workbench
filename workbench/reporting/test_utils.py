@@ -60,7 +60,12 @@ class UtilsTest(TestCase):
 
         self.assertEqual(
             accepted_offers_by_project([project.id])[project.id],
-            {"total": 990, "discount": 10, "third_party_costs": 100},
+            {
+                "total": 990,
+                "discount": 10,
+                "third_party_costs": 100,
+                "is_budget_retainer": True,
+            },
         )
         self.assertEqual(
             gross_margin_components([project.id])[project.id]["offered"], 890
@@ -75,7 +80,12 @@ class UtilsTest(TestCase):
         offer(800, retainer=False)
         self.assertEqual(
             accepted_offers_by_project([project.id])[project.id],
-            {"total": 1080, "discount": 20, "third_party_costs": 50},
+            {
+                "total": 1080,
+                "discount": 20,
+                "third_party_costs": 50,
+                "is_budget_retainer": False,
+            },
         )
         regular.delete()
         self.assertEqual(

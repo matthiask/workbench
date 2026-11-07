@@ -612,8 +612,8 @@ and counting accepted offers only.
 | Ansatz (overall rate) | `gross_margin / hours` |
 | **Nur akzeptierte Offerten** (shown if `offered` ≠ 0) | |
 | Umsatz bereinigt | `offered` (no budget adjustment, no max(); also for closed projects) |
-| Offerierte Stunden | `hours_accepted_offered` = Σ `service_hours` of budgeted services of accepted offers |
-| Erfasste Stunden | `hours_accepted_logged` = Σ hours logged on services of accepted offers (optional services included) |
+| Offerierte Stunden | `hours_accepted_offered` = Σ `service_hours` of budgeted services of accepted offers; if the accepted budget retainer offers count (see `accepted_offers_by_project()`), also of the services without offer, which their budget pays for (retainer services themselves are never budgeted) |
+| Erfasste Stunden | `hours_accepted_logged` = Σ hours logged on services of accepted offers (optional services included; with a retainer also on services without offer) |
 | Relevante Stunden | `relevant_hours(hours_accepted_offered, hours_accepted_logged, hours logged on budgeted services of accepted offers)` |
 | Ansatz (rate on accepted offers) | `offered / hours_accepted` |
 

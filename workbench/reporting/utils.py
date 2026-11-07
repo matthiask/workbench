@@ -132,10 +132,15 @@ def accepted_offers_by_project(projects):
     from workbench.offers.models import Offer
     from workbench.projects.models import Service
 
-    def side():
-        return {"total": Z2, "discount": Z2, "third_party_costs": Z2}
+    def side(*, retainer=False):
+        return {
+            "total": Z2,
+            "discount": Z2,
+            "third_party_costs": Z2,
+            "is_budget_retainer": retainer,
+        }
 
-    sides = defaultdict(lambda: {True: side(), False: side()})
+    sides = defaultdict(lambda: {True: side(retainer=True), False: side()})
     offers = Offer.objects.accepted().filter(project__in=projects)
     for project, retainer, total, discount in (
         offers
