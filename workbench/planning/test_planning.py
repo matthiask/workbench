@@ -82,6 +82,18 @@ class PlanningTest(TestCase):
         (c,) = report["per_customer"]
         self.assertEqual(len(c["per_week"]), 1)
 
+    def test_milestone_phase_after_date(self):
+        """The phase of a milestone doesn't start after the milestone"""
+        milestone = factories.MilestoneFactory.create(
+            date=in_days(10), phase_starts_on=in_days(11)
+        )
+        with self.assertRaises(ValidationError) as cm:
+            milestone.full_clean()
+        self.assertEqual(list(cm.exception.message_dict), ["phase_starts_on"])
+
+        milestone.phase_starts_on = milestone.date
+        milestone.full_clean()
+
     def test_milestone_color(self):
         """The milestone color overrides the service type color of its work"""
         milestone = factories.MilestoneFactory.create(

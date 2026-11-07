@@ -58,6 +58,13 @@ class Milestone(Model):
     def __str__(self):
         return f"{self.title} ({local_date_format(self.date, fmt='l, j.n.')})"
 
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        errors = {}
+        if self.date and self.phase_starts_on and self.phase_starts_on > self.date:
+            errors["phase_starts_on"] = _("The phase cannot start after the milestone.")
+        raise_if_errors(errors, exclude)
+
 
 class AbstractPlannedWork(Model):
     created_by = models.ForeignKey(

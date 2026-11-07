@@ -181,6 +181,28 @@ class PlanningAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 422)
 
+    def test_import_milestone_phase_after_date(self):
+        """The phase of a milestone doesn't start after the milestone"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/import/",
+            {
+                "milestones": [
+                    {
+                        "key": "golive",
+                        "title": "Go-Live",
+                        "date": in_days(60).isoformat(),
+                        "phase_starts_on": in_days(61).isoformat(),
+                    }
+                ],
+                "planned_work": [],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(project.milestones.count(), 0)
+
     def test_import_unchanged_context(self):
         """Planned work sent back unchanged is accepted, also with users who
         left and offers which have been declined since"""

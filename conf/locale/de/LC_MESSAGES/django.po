@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 15:01+0100\n"
+"POT-Creation-Date: 2026-11-07 15:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3412,6 +3412,10 @@ msgstr "geplante Stunden"
 #: workbench/templates/planning/planning_import.html
 msgid "milestones"
 msgstr "Meilensteine"
+
+#: workbench/planning/models.py
+msgid "The phase cannot start after the milestone."
+msgstr "Die Phase kann nicht nach dem Meilenstein beginnen."
 
 #: workbench/planning/models.py
 #: workbench/templates/planning/planning_import.html
