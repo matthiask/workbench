@@ -784,6 +784,13 @@ def complete_short_names(ctx, param, incomplete):
     return _complete(_completion_values("users", "users/", "short_name"), incomplete)
 
 
+def complete_internal_types(ctx, param, incomplete):
+    return _complete(
+        _completion_values("internal-types", "projects/internal-types/", "name"),
+        incomplete,
+    )
+
+
 def _complete_teams(ctx, param, incomplete):
     return _complete(_completion_values("teams", "teams/", "name"), incomplete)
 

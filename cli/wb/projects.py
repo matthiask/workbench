@@ -6,6 +6,7 @@ import click
 
 from wb.core import (
     cli,
+    complete_internal_types,
     complete_short_names,
     console,
     echo_csv,
@@ -141,6 +142,25 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
         echo_stats(data)
 
 
+@projects.command("internal-types")
+@click.option("--json", "as_json", is_flag=True)
+def list_internal_types(as_json):
+    """List the internal types of internal projects"""
+    data = request("GET", "projects/internal-types/", params={"limit": 1000})
+    if as_json:
+        echo_json(data["items"])
+        return
+    table = make_table("Name", "Description", "Percentage>", "Outreach")
+    for row in data["items"]:
+        table.add_row(
+            row["name"],
+            row["description"],
+            f"{row['percentage']}%",
+            "yes" if row["is_outreach"] else "",
+        )
+    console.print(table)
+
+
 @projects.command("create")
 @click.option("--title", required=True)
 @click.option(
@@ -155,7 +175,10 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
     show_default=True,
 )
 @click.option(
-    "--internal-type", help="Name of the internal type, for internal projects."
+    "--internal-type",
+    help="Name of the internal type, for internal projects (see `wb projects"
+    " internal-types`).",
+    shell_complete=complete_internal_types,
 )
 @click.option(
     "--owned-by",
@@ -230,6 +253,7 @@ def _echo_saved_project(data, *, dry_run, as_json):
 @click.option(
     "--internal-type",
     help="Name of the internal type, projects which aren't internal lose it.",
+    shell_complete=complete_internal_types,
 )
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option("--close", is_flag=True, help="Close the project today.")

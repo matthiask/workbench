@@ -255,6 +255,10 @@ class CLITest(TestCase):
         project = Project.objects.get(title="Bookkeeping")
         self.assertEqual(project.internal_type.name, "Administration")
 
+        result = self.wb("projects", "internal-types")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Administration", result.output)
+
         result = self.wb("projects", "update", project.pk, "--type", "order")
         self.assertEqual(result.exit_code, 0, result.output)
         project.refresh_from_db()

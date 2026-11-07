@@ -257,6 +257,39 @@ class ProjectsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
 
+    def test_internal_types(self):
+        """Internal types are listed in their order"""
+        InternalType.objects.create(
+            name="Outreach", percentage=50, is_outreach=True, ordering=20
+        )
+        InternalType.objects.create(
+            name="Administration",
+            description="Bookkeeping",
+            percentage=100,
+            ordering=10,
+        )
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.get("/api/projects/internal-types/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["items"],
+            [
+                {
+                    "name": "Administration",
+                    "description": "Bookkeeping",
+                    "percentage": "100.00",
+                    "is_outreach": False,
+                },
+                {
+                    "name": "Outreach",
+                    "description": "",
+                    "percentage": "50.00",
+                    "is_outreach": True,
+                },
+            ],
+        )
+
     @override_settings(FEATURES={FEATURES.INTERNAL_TYPES: F.ALWAYS})
     def test_internal_type(self):
         """Internal projects get their internal type by name"""

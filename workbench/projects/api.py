@@ -101,6 +101,29 @@ class ProjectFilter(Schema):
     include_closed: bool = False
 
 
+class InternalTypeOut(Schema):
+    name: str
+    description: str
+    percentage: Decimal
+    is_outreach: bool
+
+
+@router.get("/projects/internal-types/", response=list[InternalTypeOut])
+@paginate
+def internal_type_list(request):
+    """The internal types of internal projects, by their name in
+    ``internal_type``"""
+    return Serialized(
+        InternalType.objects.order_by("ordering", "pk"),
+        lambda internal_type: {
+            "name": internal_type.name,
+            "description": internal_type.description,
+            "percentage": internal_type.percentage,
+            "is_outreach": internal_type.is_outreach,
+        },
+    )
+
+
 @router.get("/projects/", response=list[ProjectOut])
 @paginate
 def project_list(request, filters: Query[ProjectFilter]):
