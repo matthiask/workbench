@@ -13,10 +13,11 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import (
     GroupForm,
     GroupSearchForm,
+    PersonDeleteForm,
     PersonForm,
     recent_projects_or_deals,
 )
-from workbench.contacts.merge import merge_errors, merge_people
+from workbench.contacts.merge import merge_people
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -681,21 +682,37 @@ class MergeIn(Schema):
 
 
 @router.post("/contacts/people/{int:person_id}/merge/", response=PersonDetailOut)
-def person_merge(request, person_id: int, data: MergeIn, *, dry_run: bool = False):
+def person_merge(
+    request,
+    person_id: int,
+    data: MergeIn,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
     """Merge a duplicate into the person to keep, like deleting a person in
     the web interface: projects, deals, invoices, the linked user, contact
     details (except those the person to keep has already) and groups move,
-    notes are appended; the duplicate is deleted"""
+    notes are appended; the duplicate is deleted
+
+    Merging into someone of another organization is a warning
+    (``other-organization``) if the duplicate is the contact of projects,
+    deals or invoices."""
     duplicate = get_object_or_404(Person, pk=person_id)
     keep = Person.objects.filter(pk=data.into).first()
     if not keep:
-        errors = [_("Unknown person %r.") % data.into]
-    else:
-        errors = merge_errors(duplicate=duplicate, keep=keep)
-    if errors:
         raise ValidationError([
-            {"loc": ["body", "data", "into"], "msg": str(error)} for error in errors
+            {
+                "loc": ["body", "data", "into"],
+                "msg": _("Unknown person %r.") % data.into,
+            }
         ])
+    form = PersonDeleteForm(
+        {"merge_into": keep.pk}, instance=duplicate, request=request
+    )
+    validate_form(
+        form, fields={"merge_into": ["into"]}, ignore_warnings=ignore_warnings
+    )
     with transaction.atomic():
         merge_people(duplicate=duplicate, keep=keep)
         keep = Person.objects.select_related("organization", "primary_contact").get(

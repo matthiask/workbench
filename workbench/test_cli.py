@@ -938,6 +938,21 @@ planned_work:
         )
         self.assertEqual(result.exit_code, 0, result.output)
 
+        # Their deals, projects and invoices would need a new contact
+        duplicate = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        factories.DealFactory.create(customer=duplicate.organization, contact=duplicate)
+        keep = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        merge = ["people", "merge", duplicate.pk, "--into", keep.pk]
+        result = self.wb(*merge)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning other-organization", result.output)
+        result = self.wb(*merge, "--ignore-warning", "other-organization")
+        self.assertEqual(result.exit_code, 0, result.output)
+
     def test_invoices(self):
         """Invoices, projected and recurring invoices, and pagination"""
         project = factories.ProjectFactory.create(owned_by=self.user)

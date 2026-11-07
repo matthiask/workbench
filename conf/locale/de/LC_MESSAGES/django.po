@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:18+0100\n"
+"POT-Creation-Date: 2026-11-07 14:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1168,6 +1168,11 @@ msgstr "Eine Person kann nicht mit sich selbst zusammengeführt werden."
 #: workbench/contacts/merge.py
 msgid "Both people are linked to a user, unlink one of them in the user's profile first."
 msgstr "Beide Personen sind mit einem:r Benutzer:in verknüpft, entferne zuerst eine der Verknüpfungen im Profil."
+
+#: workbench/contacts/merge.py
+#, python-format
+msgid "%(keep)s doesn't belong to the organization of %(duplicate)s. The %(related)s of %(duplicate)s will need a new contact when changing their customer or contact."
+msgstr "%(keep)s gehört nicht zur Organisation von %(duplicate)s. Die %(related)s von %(duplicate)s brauchen einen neuen Kontakt, wenn ihr Kunde oder Kontakt geändert wird."
 
 #: workbench/contacts/models.py workbench/deals/models.py
 msgid "is archived"

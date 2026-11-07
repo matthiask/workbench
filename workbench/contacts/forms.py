@@ -14,7 +14,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.accounts.models import User
-from workbench.contacts.merge import merge_errors, merge_people
+from workbench.contacts.merge import merge_errors, merge_people, merge_warnings
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -468,6 +468,8 @@ class PersonDeleteForm(ModelForm):
         if keep := data.get("merge_into"):
             for error in merge_errors(duplicate=self.instance, keep=keep):
                 self.add_error("merge_into", error)
+            for message, code in merge_warnings(duplicate=self.instance, keep=keep):
+                self.add_warning(message, code=code)
         return data
 
     def delete(self):

@@ -26,6 +26,34 @@ def merge_errors(*, duplicate, keep):
     return []
 
 
+def merge_warnings(*, duplicate, keep):
+    """``(message, code)`` of things to confirm before merging"""
+    from workbench.deals.models import Deal
+    from workbench.invoices.models import Invoice
+    from workbench.projects.models import Project
+
+    if duplicate.organization_id == keep.organization_id:
+        return []
+    related = [
+        f"{count} {model._meta.verbose_name_plural}"
+        for model in [Project, Deal, Invoice]
+        if (count := model.objects.filter(contact=duplicate).count())
+    ]
+    if not related:
+        return []
+    return [
+        (
+            _(
+                "%(keep)s doesn't belong to the organization of %(duplicate)s."
+                " The %(related)s of %(duplicate)s will need a new contact when"
+                " changing their customer or contact."
+            )
+            % {"keep": keep, "duplicate": duplicate, "related": ", ".join(related)},
+            "other-organization",
+        )
+    ]
+
+
 def _detail_keys(details, fields):
     return {
         tuple(str(getattr(detail, field)).strip().casefold() for field in fields)
