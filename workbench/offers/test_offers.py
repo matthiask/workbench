@@ -495,6 +495,28 @@ class OffersTest(TestCase):
 
         self.assertEqual(offer.project.services.count(), 1)
 
+    def test_offer_deletion_offered_or_accepted(self):
+        """Offers which have been sent or accepted cannot be deleted"""
+        offer = factories.OfferFactory.create(
+            offered_on=dt.date.today(), valid_until=dt.date.today()
+        )
+        self.client.force_login(offer.owned_by)
+
+        for status in [Offer.OFFERED, Offer.ACCEPTED]:
+            Offer.objects.filter(pk=offer.pk).update(status=status)
+            response = self.client.post(offer.urls["delete"])
+            self.assertRedirects(response, offer.get_absolute_url())
+            self.assertTrue(Offer.objects.filter(pk=offer.pk).exists())
+            self.assertEqual(
+                messages(response),
+                ["Offers which have been sent or accepted cannot be deleted."],
+            )
+
+        Offer.objects.filter(pk=offer.pk).update(status=Offer.DECLINED)
+        response = self.client.post(offer.urls["delete"])
+        self.assertRedirects(response, offer.project.urls["detail"])
+        self.assertFalse(Offer.objects.filter(pk=offer.pk).exists())
+
     def test_offer_pricing(self):
         """Offer total calculation works"""
         offer = factories.OfferFactory.create()

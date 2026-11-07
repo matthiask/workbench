@@ -371,6 +371,12 @@ class Offer(ModelWithTotal):
 
     @classmethod
     def allow_delete(cls, instance, request):
+        if instance.status in {cls.OFFERED, cls.ACCEPTED}:
+            messages.error(
+                request,
+                _("Offers which have been sent or accepted cannot be deleted."),
+            )
+            return False
         if instance.planned_work.exists():
             return None
         return super().allow_delete(instance, request)

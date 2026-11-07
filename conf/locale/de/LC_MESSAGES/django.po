@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:24+0100\n"
+"POT-Creation-Date: 2026-11-07 14:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3236,6 +3236,10 @@ msgstr "Total %(currency)s für optionale Leistungen"
 #: workbench/offers/models.py
 msgid "Offers can only be created from projects. Go to the project and add services first, then you'll be able to create the offer itself."
 msgstr "Offerten können nur aus Projekten erstellt werden. Gehe zuerst zum Projekt, füge Leistungen hinzu, und dann kannst Du die eigentliche Offerte erstellen."
+
+#: workbench/offers/models.py
+msgid "Offers which have been sent or accepted cannot be deleted."
+msgstr "Versandte oder angenommene Offerten können nicht gelöscht werden."
 
 #: workbench/offers/views.py
 msgid "No offers in project."
