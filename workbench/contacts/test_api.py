@@ -516,6 +516,26 @@ class ContactsAPITest(TestCase):
                     ],
                 )
 
+    def test_create_with_primary_contact(self):
+        """New organizations get the primary contact of the person"""
+        self.client.force_login(factories.UserFactory.create())
+        other = factories.UserFactory.create(_short_name="xy")
+        response = self.client.post(
+            "/api/contacts/people/",
+            {
+                "given_name": "Hans",
+                "family_name": "Muster",
+                "address": "Herr",
+                "salutation": "Lieber Hans",
+                "new_organization": "Beispiel AG",
+                "primary_contact": "xy",
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(Person.objects.get().primary_contact, other)
+        self.assertEqual(Organization.objects.get().primary_contact, other)
+
     def test_create(self):
         """People are created with their details and their organization"""
         user = factories.UserFactory.create()

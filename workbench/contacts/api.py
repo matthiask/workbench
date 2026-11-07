@@ -524,7 +524,10 @@ def person_create(
     with transaction.atomic():
         organization = data.organization
         if data.new_organization:
-            new = Organization(name=data.new_organization, primary_contact=request.user)
+            new = Organization(
+                name=data.new_organization,
+                primary_contact=primary_contact or request.user,
+            )
             full_clean(new, ["body", "data", "new_organization"], errors)
             if not errors:
                 new.save()
