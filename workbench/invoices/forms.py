@@ -23,6 +23,7 @@ from workbench.projects.forms import (
     discard_offers_in_preparation,
 )
 from workbench.reporting.models import FreezeDate
+from workbench.reporting.utils import accepted_offers_by_project
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, hours, local_date_format
 from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
@@ -624,13 +625,9 @@ class CreateProjectInvoiceForm(InvoiceForm):
             self.fields.pop("service_period_until")
 
         if self.instance.type in {self.instance.DOWN_PAYMENT, self.instance.FIXED}:
-            accepted = sum(
-                (
-                    offer.total_excl_tax
-                    for offer in self.instance.project.offers.accepted()
-                ),
-                Z2,
-            )
+            # The budget retainer offers or the others, like the reports
+            project = self.instance.project
+            accepted = accepted_offers_by_project([project.pk])[project.pk]["total"]
             self.fields["subtotal"].help_text = mark_safe(
                 _(
                     "Total excl. tax of accepted offers: {accepted}. Use {percentages}."

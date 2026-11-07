@@ -133,6 +133,20 @@ class InvoicesTest(TestCase):
         self.assertEqual(offer.status, Offer.DISCARDED)
         self.assertEqual(project.planned_work.count(), 0)
 
+    def test_accepted_offers_help_text(self):
+        """The help text uses the accepted offers like the reports, either the
+        budget retainer offers or the others"""
+        project = factories.ProjectFactory.create()
+        for total, retainer in [(10000, True), (3000, False)]:
+            offer = factories.OfferFactory.create(
+                project=project, status=Offer.ACCEPTED, is_budget_retainer=retainer
+            )
+            factories.ServiceFactory.create(project=project, offer=offer, cost=total)
+            offer.save()
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.urls["createinvoice"] + "?type=fixed")
+        self.assertContains(response, "Total excl. tax of accepted offers: 10’000.00")
+
     def test_create_service_invoice_for_one_offer(self):
         """The menu of an offer creates invoices with its title, description and
         services, the latter only if there's something to invoice when
