@@ -4,7 +4,7 @@ from typing import Literal
 
 from django.conf import settings
 from django.utils.translation import gettext as _
-from ninja import Query, Router, Schema
+from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
 from ninja.security import HttpBearer
 
@@ -38,11 +38,13 @@ from workbench.tools.api import (
     Days,
     Hours,
     Percentage,
+    ShortName,
     UsersFilter,
     date_range,
     dates_error,
     filter_users,
     form_errors,
+    user_by_short_name,
 )
 from workbench.tools.validation import last_month_range, monday
 
@@ -191,16 +193,26 @@ def projected_gross_margin(request):
 
 
 class BudgetFilter(Schema):
-    date: dt.date | None = None
-    owned_by: str | None = None
-    internal: bool = False
-    closed: bool = False
+    date: dt.date | None = Field(default=None, description="Today by default.")
+    owned_by: ShortName = None
+    inactive_owners: bool = Field(
+        default=False, description="Projects of users who are inactive."
+    )
+    internal: bool = Field(default=False, description="Internal projects only.")
+    closed_during_last_year: bool = Field(
+        default=False,
+        description="Projects closed during the last year instead of open ones.",
+    )
     filter: (
         Literal[
             "no-invoices", "maintenance", "old-projects", "no-projected-gross-margin"
         ]
         | None
-    ) = None
+    ) = Field(
+        default=None,
+        description="For cleaning up open projects, not with closed projects or"
+        " other cutoff dates.",
+    )
 
 
 class BudgetFigures(Schema):
@@ -242,16 +254,21 @@ class Budget(Schema):
 def budget(request, filters: Query[BudgetFilter]):
     """Project budget statistics: Logged effort and costs compared to what has
     been offered and invoiced, per open project on the cutoff ``date`` (today
-    by default), or per project ``closed`` during the last year. ``owned_by``
-    is a short name, or ``inactive`` for projects of inactive users.
+    by default), or per project closed during the last year.
     ``delta`` is the logbook minus the invoiced amount: work which hasn't been
     invoiced yet if positive, accruals if negative."""
     owned_by = None
-    if filters.owned_by == "inactive":
+    if filters.owned_by and filters.inactive_owners:
+        raise ValidationError([
+            {
+                "loc": ["query", "filters", "inactive_owners"],
+                "msg": _("Either a user or the inactive users."),
+            }
+        ])
+    if filters.inactive_owners:
         owned_by = 0
     elif filters.owned_by:
-        user = User.objects.filter(_short_name__iexact=filters.owned_by).first()
-        owned_by = user.id if user else -2
+        owned_by = user_by_short_name(filters.owned_by, param="owned_by").id
     form = _form(
         ProjectBudgetStatisticsForm,
         request,
@@ -259,7 +276,7 @@ def budget(request, filters: Query[BudgetFilter]):
             "cutoff_date": filters.date,
             "owned_by": owned_by,
             "internal": filters.internal or None,
-            "closed_during_the_last_year": filters.closed or None,
+            "closed_during_the_last_year": filters.closed_during_last_year or None,
             "s": filters.filter,
         },
     )
@@ -280,7 +297,9 @@ def budget(request, filters: Query[BudgetFilter]):
 
 
 class ThirdPartyCostsFilter(Schema):
-    this_year: bool = False
+    include_closed_this_year: bool = Field(
+        default=False, description="Also projects closed during the current year."
+    )
 
 
 class LoggedThirdPartyCosts(Schema):
@@ -312,7 +331,9 @@ def third_party_costs_api(request, filters: Query[ThirdPartyCostsFilter]):
     during the current year); ``delta`` is positive for costs which haven't
     been invoiced yet. Logged costs are split into the past and the future."""
     form = _form(
-        PlayingBankForm, request, {"s": "this-year" if filters.this_year else ""}
+        PlayingBankForm,
+        request,
+        {"s": "this-year" if filters.include_closed_this_year else ""},
     )
     statistics = third_party_costs.playing_bank(projects=form.queryset())
     return {

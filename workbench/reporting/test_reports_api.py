@@ -209,11 +209,18 @@ class ReportsAPITest(TestCase):
         response = self.client.get("/api/reports/budget/", {"owned_by": "xy"})
         self.assertEqual(response.status_code, 422)
         self.assertIn("owned_by", response.content.decode())
+        self.assertEqual(
+            self.get("/api/reports/budget/", inactive_owners=True)["projects"], []
+        )
+        response = self.client.get(
+            "/api/reports/budget/", {"owned_by": "ab", "inactive_owners": True}
+        )
+        self.assertEqual(response.status_code, 422)
 
         # The cleanup filters look at today's open projects, they don't
         # combine with a cutoff date or the closed projects
         for params in [
-            {"filter": "old-projects", "closed": True},
+            {"filter": "old-projects", "closed_during_last_year": True},
             {"filter": "no-projected-gross-margin", "date": in_days(-30)},
         ]:
             response = self.client.get("/api/reports/budget/", params)
@@ -236,7 +243,7 @@ class ReportsAPITest(TestCase):
                 hours=hours,
             )
             closed.append(other.pk)
-        data = self.get("/api/reports/budget/", closed=True)
+        data = self.get("/api/reports/budget/", closed_during_last_year=True)
         self.assertEqual(
             [row["project"]["id"] for row in data["projects"]], closed[::-1]
         )

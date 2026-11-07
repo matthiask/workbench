@@ -354,13 +354,14 @@ def projected_gross_margin(as_csv, as_json):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="Cutoff date, defaults to today.",
 )
-@click.option(
-    "--owned-by",
-    help="Short name, or 'inactive' for inactive users.",
-    shell_complete=complete_short_names,
-)
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@click.option("--inactive-owners", is_flag=True, help="Projects of inactive users.")
 @click.option("--internal", is_flag=True, help="Internal projects only.")
-@click.option("--closed", is_flag=True, help="Projects closed during the last year.")
+@click.option(
+    "--closed-during-last-year",
+    is_flag=True,
+    help="Projects closed during the last year instead of open ones.",
+)
 @click.option(
     "--filter",
     "filter_",
@@ -373,7 +374,16 @@ def projected_gross_margin(as_csv, as_json):
 )
 @click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def budget(date, owned_by, internal, closed, filter_, as_csv, as_json):
+def budget(
+    date,
+    owned_by,
+    inactive_owners,
+    internal,
+    closed_during_last_year,
+    filter_,
+    as_csv,
+    as_json,
+):
     """Project budget statistics: Logged work compared to offers and invoices
 
     Delta is the logbook minus the invoiced amount, positive for work which
@@ -381,7 +391,10 @@ def budget(date, owned_by, internal, closed, filter_, as_csv, as_json):
     params = {
         "owned_by": owned_by,
         "internal": format_bool(internal) if internal else None,
-        "closed": format_bool(closed) if closed else None,
+        "inactive_owners": format_bool(inactive_owners) if inactive_owners else None,
+        "closed_during_last_year": format_bool(closed_during_last_year)
+        if closed_during_last_year
+        else None,
         "filter": filter_,
     }
     if date:
@@ -444,20 +457,22 @@ def budget(date, owned_by, internal, closed, filter_, as_csv, as_json):
 
 @reports.command("third-party-costs")
 @click.option(
-    "--this-year",
+    "--include-closed-this-year",
     is_flag=True,
     help="Also projects closed during the current year.",
 )
 @click.option("--csv", "as_csv", is_flag=True, help="The rows of the main table.")
 @click.option("--json", "as_json", is_flag=True)
-def third_party_costs(this_year, as_csv, as_json):
+def third_party_costs(include_closed_this_year, as_csv, as_json):
     """Third party costs logged and invoiced per project
 
     Delta is positive for costs which haven't been invoiced yet."""
     data = request(
         "GET",
         "reports/third-party-costs/",
-        params={"this_year": format_bool(this_year)} if this_year else {},
+        params={"include_closed_this_year": format_bool(include_closed_this_year)}
+        if include_closed_this_year
+        else {},
     )
     if as_csv:
         echo_csv(data["projects"])
