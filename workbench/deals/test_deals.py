@@ -372,6 +372,34 @@ class DealsTest(TestCase):
         self.assertEqual(close("open", None), Offer.DECLINED)
         self.assertEqual(close("accepted", "Won"), Offer.DECLINED)
 
+    def test_settled_offers_are_closed_with_the_deal(self):
+        """Offers settled with a deal are closed on the deal's closing date"""
+        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
+        deal = factories.DealFactory.create()
+        offer = factories.OfferFactory.create(
+            status=Offer.OFFERED,
+            offered_on=in_days(-60),
+            valid_until=in_days(20),
+            title="Offer",
+            postal_address="A\nStreet\nCity",
+        )
+        deal.related_offers.add(offer)
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.post(
+            f"/api/deals/{deal.pk}/status/",
+            {
+                "status": "accepted",
+                "closing_type": "Won",
+                "closed_on": in_days(-30).isoformat(),
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.ACCEPTED)
+        self.assertEqual(offer.closed_on, in_days(-30))
+
     def test_update_ignores_initial_customer_and_contact(self):
         """Query parameters for initial values only apply to new deals"""
         deal = factories.DealFactory.create()

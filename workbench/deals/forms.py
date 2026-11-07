@@ -489,6 +489,9 @@ class SetStatusForm(ModelForm):
                         offer.valid_until = offer.valid_until or max(
                             offer.offered_on, closed_on
                         )
+                # Settled with the deal, also when settled before reopening it
+                if closed_on := data.get("closed_on"):
+                    offer.closed_on = closed_on
                 try:
                     offer.full_clean()
                 except ValidationError as exc:
