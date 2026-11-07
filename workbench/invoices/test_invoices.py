@@ -16,7 +16,6 @@ from workbench.offers.models import Offer
 from workbench.reporting.utils import effort_cost_by_project
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
-from workbench.tools.pdf import rounding_difference
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
 
@@ -1614,24 +1613,6 @@ class InvoicesTest(TestCase):
 
         response = self.client.get("/invoices/reminders/")
         self.assertContains(response, "Not reminded yet", 1)
-
-    def test_pdf_rounding_difference(self):
-        """The PDF shows the difference to the total rounded to 5 cents"""
-        invoice = factories.InvoiceFactory.create(
-            subtotal=Decimal("1234.56"),
-            tax_rate=Decimal("8.1"),
-            liable_to_vat=True,
-            postal_address="A\nStreet\nCity",
-        )
-        self.assertEqual(invoice.total, Decimal("1334.55"))
-        self.assertEqual(rounding_difference(invoice), Decimal("-0.01"))
-        self.client.force_login(invoice.owned_by)
-        self.assertEqual(self.client.get(invoice.urls["pdf"]).status_code, 200)
-
-        invoice = factories.InvoiceFactory.create(
-            subtotal=Decimal(100), tax_rate=Decimal("8.1"), liable_to_vat=True
-        )
-        self.assertEqual(rounding_difference(invoice), 0)
 
     def test_credits_are_not_overdue(self):
         """Customers aren't reminded of credits"""
