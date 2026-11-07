@@ -32,6 +32,7 @@ from workbench.services.models import ServiceType
 from workbench.tools.api import (
     DateRangeFilter,
     Hours,
+    ProjectID,
     UsersFilter,
     date_range,
     filter_users,
@@ -631,7 +632,7 @@ def planned_work_delete(request, work_id: int, *, dry_run: bool = False):
 
 
 class PlanningExportFilter(DateRangeFilter, UsersFilter):
-    project: int | None = None
+    project: ProjectID = None
     campaign: int | None = None
 
 

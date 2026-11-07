@@ -1,6 +1,5 @@
 import datetime as dt
 from decimal import Decimal
-from typing import Literal
 
 from django.db import transaction
 from django.db.models import Q
@@ -28,6 +27,7 @@ from workbench.tools.api import (
     Hours,
     Percentage,
     Serialized,
+    ShortName,
     date_range,
     user_by_short_name,
     validate_form,
@@ -53,10 +53,8 @@ class AbsenceOut(Schema):
 
 
 class AbsenceFilter(DateRangeFilter):
-    user: str | None = None
-    reason: (
-        Literal["vacation", "sickness", "paid", "school", "other", "correction"] | None
-    ) = None
+    user: ShortName = None
+    reason: AbsenceReason | None = None
 
 
 @router.get("/absences/", response=list[AbsenceOut])
@@ -106,7 +104,7 @@ class AbsenceIn(Schema):
         default=None, description="In the same year, empty for a single day."
     )
     days: Decimal = Field(gt=0, description="Working days, e.g. 0.5.")
-    reason: Literal["vacation", "sickness", "paid", "school", "other", "correction"]
+    reason: AbsenceReason
     description: str = ""
 
 
@@ -159,7 +157,7 @@ class WorkingTimeFilter(Schema):
         le=DATES[1].year,
         description="This year by default.",
     )
-    user: str | None = None
+    user: ShortName = None
     all: bool = False
     weekly: bool = False
 

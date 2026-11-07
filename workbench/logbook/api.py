@@ -11,7 +11,11 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.tools.api import (
     DateRangeFilter,
+    OrganizationID,
+    ProjectID,
+    SearchQuery,
     Serialized,
+    ShortName,
     TotalsPagination,
     filter_date_range,
     user_by_short_name,
@@ -57,12 +61,12 @@ class LoggedHoursPagination(TotalsPagination):
 
 
 class LoggedHoursFilter(DateRangeFilter):
-    q: str = ""
-    project: int | None = None
-    customer: int | None = None
+    q: SearchQuery = ""
+    project: ProjectID = None
+    customer: OrganizationID = None
     offer: int | None = None
     service: int | None = None
-    rendered_by: str | None = None
+    rendered_by: ShortName = None
     invoiced: bool | None = Field(
         default=None, description="Only entries which are (not) on an invoice"
     )

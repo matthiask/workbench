@@ -33,7 +33,11 @@ from workbench.services.models import ServiceType
 from workbench.tools.api import (
     DateRangeFilter,
     Number,
+    OrganizationID,
+    ProjectID,
+    SearchQuery,
     Serialized,
+    ShortName,
     filter_date_range,
     full_clean,
     user_by_short_name,
@@ -248,11 +252,11 @@ OFFER_STATUSES = KEYS["offer_status"]
 
 
 class OfferFilter(DateRangeFilter):
-    q: str = ""
+    q: SearchQuery = ""
     status: Literal[tuple(OFFER_STATUSES)] | None = None
-    project: int | None = None
-    customer: int | None = None
-    owned_by: str | None = None
+    project: ProjectID = None
+    customer: OrganizationID = None
+    owned_by: ShortName = None
     external_reference: str | None = Field(
         default=None, description="Exact match of one of the references"
     )

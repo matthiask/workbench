@@ -12,7 +12,10 @@ from workbench.notes.forms import NoteForm
 from workbench.notes.models import TARGETS, Note, visible_content_types
 from workbench.tools.api import (
     DateRangeFilter,
+    ProjectID,
+    SearchQuery,
     Serialized,
+    ShortName,
     filter_date_range,
     form_errors,
     user_by_short_name,
@@ -55,12 +58,12 @@ def note_out(note, request, *, types):
 
 
 class NoteFilter(DateRangeFilter):
-    q: str = ""
+    q: SearchQuery = ""
     deal: int | None = None
     invoice: int | None = None
     recurring_invoice: int | None = None
-    project: int | None = None
-    created_by: str | None = None
+    project: ProjectID = None
+    created_by: ShortName = None
 
 
 @router.get("/notes/", response=list[NoteOut])
@@ -102,7 +105,7 @@ class NoteIn(Schema):
     deal: int | None = None
     invoice: int | None = None
     recurring_invoice: int | None = None
-    project: int | None = None
+    project: ProjectID = None
 
 
 @router.post("/notes/", response=NoteOut)

@@ -35,7 +35,11 @@ from workbench.projects.models import Project
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     DateRangeFilter,
+    OrganizationID,
+    ProjectID,
+    SearchQuery,
     Serialized,
+    ShortName,
     filter_date_range,
     form_data,
     user_by_short_name,
@@ -160,9 +164,9 @@ def _invoice_services(invoice):
 
 
 class InvoiceFilter(DateRangeFilter):
-    q: str = ""
-    project: int | None = None
-    customer: int | None = None
+    q: SearchQuery = ""
+    project: ProjectID = None
+    customer: OrganizationID = None
     status: Literal["in_preparation", "sent", "paid", "canceled"] | None = None
     open: bool = False
     overdue: bool = False
@@ -686,8 +690,8 @@ def _projected_invoice_out(projected_invoice, request):
 
 
 class ProjectedInvoiceFilter(DateRangeFilter):
-    project: int | None = None
-    customer: int | None = None
+    project: ProjectID = None
+    customer: OrganizationID = None
 
 
 @router.get(
@@ -729,9 +733,9 @@ class RecurringInvoiceOut(Schema):
 
 
 class RecurringInvoiceFilter(Schema):
-    q: str = ""
-    customer: int | None = None
-    owned_by: str | None = None
+    q: SearchQuery = ""
+    customer: OrganizationID = None
+    owned_by: ShortName = None
     status: Literal["open", "closed", "all"] = "open"
 
 

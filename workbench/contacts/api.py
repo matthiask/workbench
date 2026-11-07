@@ -29,6 +29,7 @@ from workbench.contacts.models import (
 from workbench.contacts.reassign import primary_contact_suggestions
 from workbench.tools.api import (
     IGNORE_WARNINGS,
+    SearchQuery,
     Serialized,
     full_clean,
     raise_form_errors,
@@ -132,7 +133,7 @@ def person_list_out(person, request):
 
 
 class OrganizationFilter(Schema):
-    q: str = ""
+    q: SearchQuery = ""
     include_archived: bool = False
 
 
@@ -764,7 +765,7 @@ class GroupOut(Schema):
 
 
 class GroupFilter(Schema):
-    q: str = ""
+    q: SearchQuery = ""
     s: Literal["", "archived", "all"] = Field(
         default="", description="Active groups by default"
     )

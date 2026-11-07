@@ -37,6 +37,15 @@ class APISchemaTest(SimpleTestCase):
         schema = api.get_openapi_schema(path_prefix="/api/")
         self.assertIn("/api/offers/{offer_id}/", schema["paths"])
 
+        # Shared filters are described
+        parameters = {
+            parameter["name"]: parameter
+            for parameter in schema["paths"]["/api/offers/"]["get"]["parameters"]
+        }
+        for name in ["q", "owned_by", "customer", "project", "period", "since"]:
+            with self.subTest(name=name):
+                self.assertTrue(parameters[name].get("description"), parameters[name])
+
 
 class UnknownShortNamesTest(TestCase):
     def test_unknown_short_names(self):

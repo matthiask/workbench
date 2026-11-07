@@ -41,7 +41,11 @@ from workbench.services.models import ServiceType
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     Number,
+    OrganizationID,
+    ProjectID,
+    SearchQuery,
     Serialized,
+    ShortName,
     form_data,
     raise_form_errors,
     user_by_short_name,
@@ -108,9 +112,9 @@ def project_out(project, request):
 
 
 class ProjectFilter(Schema):
-    q: str = ""
-    customer: int | None = None
-    owned_by: str | None = None
+    q: SearchQuery = ""
+    customer: OrganizationID = None
+    owned_by: ShortName = None
     include_closed: bool = False
 
 
@@ -609,8 +613,8 @@ class ServiceOut(Schema):
 
 
 class ServiceFilter(Schema):
-    q: str = ""
-    project: int | None = None
+    q: SearchQuery = ""
+    project: ProjectID = None
     offer: int | None = None
     external_reference: str | None = Field(default=None, description="Exact match")
 

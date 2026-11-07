@@ -17,7 +17,10 @@ from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project
-from workbench.tools.api import Serialized
+from workbench.tools.api import (
+    SearchQuery,
+    Serialized,
+)
 from workbench.tools.validation import monday
 
 
@@ -73,7 +76,7 @@ class UserOut(Schema):
 
 
 class UserFilter(Schema):
-    q: str = ""
+    q: SearchQuery = ""
     include_inactive: bool = False
 
 
@@ -185,7 +188,7 @@ class TeamOut(Schema):
 
 
 class TeamFilter(Schema):
-    q: str = ""
+    q: SearchQuery = ""
 
 
 @router.get("/teams/", response=list[TeamOut])

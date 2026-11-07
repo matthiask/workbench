@@ -110,14 +110,34 @@ def dates_error(loc):
     ])
 
 
+# Common filters, with descriptions for the OpenAPI document
+SearchQuery = Annotated[
+    str, Field(description="Full text search like the web interface's lists.")
+]
+ShortName = Annotated[
+    str | None,
+    Field(description="Short name of a user, case-insensitive (see /api/users/)."),
+]
+OrganizationID = Annotated[int | None, Field(description="ID of the organization.")]
+ProjectID = Annotated[int | None, Field(description="ID of the project.")]
+
+
 class DateRangeFilter(Schema):
     """``period`` is a year (2026), a month (2026-09), a quarter (2026-Q3) or
     relative like last-week, this-month, next-quarter or last-year;
     ``since`` and ``until`` override its start and end"""
 
-    period: str | None = None
-    since: dt.date | None = None
-    until: dt.date | None = None
+    period: str | None = Field(
+        default=None,
+        description="A year (2026), a month (2026-09), a quarter (2026-Q3) or"
+        " relative like last-week, this-month, next-quarter or last-year.",
+    )
+    since: dt.date | None = Field(
+        default=None, description="Overrides the start of the period."
+    )
+    until: dt.date | None = Field(
+        default=None, description="Overrides the end of the period."
+    )
 
 
 def _months(first, count):
@@ -203,8 +223,12 @@ def filter_date_range(queryset, filters, field):
 class UsersFilter(Schema):
     """Short names of users or the name of a team, everyone by default"""
 
-    user: list[str] = []
-    team: str | None = None
+    user: list[str] = Field(
+        default=[], description="Short names of users, can be repeated."
+    )
+    team: str | None = Field(
+        default=None, description="Name of a team (see /api/teams/)."
+    )
 
 
 def user_by_short_name(short_name, *, param):

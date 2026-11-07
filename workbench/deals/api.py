@@ -34,7 +34,10 @@ from workbench.tools.api import (
     IGNORE_WARNINGS,
     Amount,
     DateRangeFilter,
+    OrganizationID,
+    SearchQuery,
     Serialized,
+    ShortName,
     UsersFilter,
     date_range,
     filter_date_range,
@@ -155,10 +158,10 @@ def with_related(deals):
 
 
 class DealFilter(DateRangeFilter):
-    q: str = ""
+    q: SearchQuery = ""
     status: Literal["open", "accepted", "declined"] | None = None
-    customer: int | None = None
-    owned_by: str | None = None
+    customer: OrganizationID = None
+    owned_by: ShortName = None
     contributor: str | None = Field(
         None, description="Short name of someone contributing to the deal"
     )
