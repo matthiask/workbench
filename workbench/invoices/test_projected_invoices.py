@@ -156,6 +156,19 @@ class ProjectedInvoicesTest(TestCase):
         self.assertIn("Verrechneter bereinigter Umsatz: 700.00", message.body)
         self.assertIn("Delta: 300.00", message.body)
 
+        # Third party costs exceeding the invoiced amount
+        factories.LoggedCostFactory.create(
+            service=service, cost=1200, third_party_costs=1200
+        )
+        mail.outbox.clear()
+        send_unsent_projected_invoices_reminders()
+        [message] = mail.outbox
+        self.assertIn(
+            "Fremdkosten: 1’500.00 (auf Rechnungen: 100.00, erfasst: 1’500.00)",
+            message.body,
+        )
+        self.assertIn("Verrechneter bereinigter Umsatz: 0.00", message.body)
+
     def test_projected_warning_third_party_costs(self):
         """Projected invoices are compared to the gross margin of services"""
         service = factories.ServiceFactory.create(

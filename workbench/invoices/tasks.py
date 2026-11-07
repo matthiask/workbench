@@ -107,8 +107,12 @@ def send_unsent_projected_invoices_reminders():
                     )
                 ),
                 invoiced=currency(invoiced[project["project"].id]),
+                # The larger of both, like the gross margin
                 costs=currency(
-                    invoiced[project["project"].id] - project["gross_margin"]
+                    max(
+                        invoiced_costs[project["project"].id],
+                        logged_costs[project["project"].id],
+                    )
                 ),
                 invoiced_costs=currency(invoiced_costs[project["project"].id]),
                 logged_costs=currency(logged_costs[project["project"].id]),
