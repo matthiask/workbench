@@ -361,7 +361,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   edited on their deals, invoices and projects the day before, found in the
   audit log (`send_notes_digest()` in `workbench/notes/tasks.py`).
 - Planning does not care about `Service.is_optional`; planned work has its own
-  `is_provisional` flag for definitive vs. provisional work.
+  `is_provisional` flag for definitive vs. provisional work. Closed projects
+  get no new planned work or milestones (web and API); closing a project
+  offers to delete its planned work after the current week (entries
+  spanning it are shortened, their hours reduced accordingly).
 - Page layout (see `projects/project_detail.html` and the contacts detail
   pages): `.wb-page-header` with the title, `.wb-meta` below it and
   `.wb-page-actions` (one primary action, `btn-quiet` buttons, a "New"

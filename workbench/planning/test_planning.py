@@ -232,6 +232,38 @@ class PlanningTest(TestCase):
             html=True,
         )
 
+    def test_no_planning_on_closed_projects(self):
+        """Planned work and milestones can't be added to closed projects"""
+        project = factories.ProjectFactory.create(closed_on=in_days(-1))
+        self.client.force_login(project.owned_by)
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.post(
+            project.urls["creatework"],
+            {
+                "modal-user": project.owned_by.id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [monday().isoformat()],
+            },
+            headers=headers,
+        )
+        self.assertContains(response, "The project is closed.")
+
+        response = self.client.post(
+            project.urls["createmilestone"],
+            {"modal-date": in_days(30).isoformat(), "modal-title": "Launch"},
+            headers=headers,
+        )
+        self.assertContains(response, "The project is closed.")
+
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/import/",
+            {"milestones": [{"title": "Launch", "date": in_days(30).isoformat()}]},
+            content_type="application/json",
+        )
+        self.assertContains(response, "The project is closed.", status_code=422)
+
     def test_planned_work_crud(self):
         """Create, update and delete planned work"""
         service_types = factories.service_types()

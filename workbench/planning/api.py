@@ -418,7 +418,7 @@ def _existing(objects, ids, loc, errors, what):
 
 
 @router.post("/projects/{project_id}/planning/import/", response=ImportResult)
-def planning_import(
+def planning_import(  # noqa: C901
     request, project_id: int, data: PlanningImport, *, dry_run: bool = False
 ):
     """Add, update and delete milestones and planned work of the project
@@ -432,6 +432,13 @@ def planning_import(
     existing_work = {pw.pk: pw for pw in project.planned_work.all()}
     errors = []
     warnings = []
+    if project.closed_on and any(
+        item.id is None for item in [*data.milestones, *data.planned_work]
+    ):
+        errors.append({
+            "loc": ["path", "project_id"],
+            "msg": _("The project is closed."),
+        })
 
     milestones = []
     new_milestones = {}

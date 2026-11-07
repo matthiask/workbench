@@ -74,6 +74,8 @@ class MilestoneForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        if not self.instance.pk and self.project.closed_on:
+            raise forms.ValidationError(_("The project is closed."))
 
         if (
             self.instance.pk
@@ -257,6 +259,8 @@ class PlannedWorkForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        if not self.instance.pk and self.project.closed_on:
+            raise forms.ValidationError(_("The project is closed."))
 
         if (weeks := data.get("weeks")) and (milestone := data.get("milestone")):
             if after := [week for week in weeks if week >= monday(milestone.date)]:
