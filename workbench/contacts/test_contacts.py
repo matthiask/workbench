@@ -1,9 +1,12 @@
 import datetime as dt
+import importlib
 import io
 from unittest import mock
 
+from django.apps import apps
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.db import connection
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -790,6 +793,35 @@ class GroupsTest(TestCase):
         self.assertNotContains(response, "Newsletter 2015")
         response = self.client.get(person.urls["update"])
         self.assertContains(response, "Newsletter 2015")
+
+    def test_group_titles_are_unique(self):
+        """Titles of groups are unique, also archived ones, case-insensitive"""
+        Group.objects.create(title="Christmas", is_archived=True)
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post(
+            Group.urls["create"],
+            {"modal-title": "CHRISTMAS"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "A group with this title exists already.")
+        self.assertEqual(Group.objects.count(), 1)
+
+    def test_unique_titles_migration(self):
+        """Existing duplicates get a suffix, the oldest group keeps its title"""
+        migration = importlib.import_module(
+            "workbench.contacts.migrations.0018_unique_group_titles"
+        )
+        with connection.cursor() as cursor:
+            cursor.execute("DROP INDEX contacts_group_unique_title")
+        first = Group.objects.create(title="Christmas")
+        Group.objects.create(title="christmas", is_archived=True)
+        Group.objects.create(title="Newsletter")
+        migration.rename_duplicates(apps, None)
+        first.refresh_from_db()
+        self.assertEqual(first.title, "Christmas")
+        [renamed] = Group.objects.filter(is_archived=True)
+        self.assertRegex(renamed.title, r"^christmas \([0-9a-f]{6}\)$")
+        self.assertTrue(Group.objects.filter(title="Newsletter").exists())
 
     def test_group_filter(self):
         """Archived groups are offered separately in the filters"""

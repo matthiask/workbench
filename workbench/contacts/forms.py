@@ -126,6 +126,13 @@ class GroupForm(ModelForm):
         model = Group
         fields = ["title", "applies_to_organizations", "is_archived"]
 
+    def clean_title(self):
+        """The APIs find groups by their title"""
+        title = self.cleaned_data["title"]
+        if Group.objects.filter(title__iexact=title).exclude(pk=self.instance.pk):
+            raise forms.ValidationError(_("A group with this title exists already."))
+        return title
+
     def save(self, *, commit=True):
         instance = super().save()
         if "applies_to_organizations" in self.changed_data:

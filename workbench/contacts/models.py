@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 import phonenumbers
 from django.db import models
 from django.db.models import Exists, OuterRef, Q, Sum
+from django.db.models.functions import Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
 from django_countries.fields import CountryField
@@ -41,6 +42,10 @@ class Group(Model):
     )
 
     class Meta:
+        constraints = [
+            # The APIs find groups by their title, GroupForm validates it
+            models.UniqueConstraint(Lower("title"), name="contacts_group_unique_title")
+        ]
         ordering = ("title",)
         verbose_name = _("group")
         verbose_name_plural = _("groups")

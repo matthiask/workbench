@@ -139,8 +139,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `SET_NULL` their contact, so deleting a person without merging loses
   those links. `wb groups` lists, creates
   and archives groups (`/api/contacts/groups/`, with `GroupSearchForm` and
-  `GroupForm` of the web interface); the API rejects duplicate titles
-  because the other endpoints find groups by their title. `wb people create` is mostly fed by
+  `GroupForm` of the web interface); titles of groups are unique
+  (case-insensitive, `GroupForm` and a constraint) because the other
+  endpoints find groups by their title. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't). Its `primary_contact` defaults to the current user and
   may be an inactive user (e.g. who used to know the person), so that imported

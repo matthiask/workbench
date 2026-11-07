@@ -758,8 +758,8 @@ class GroupPatch(Schema):
 
 
 def _save_group(request, group, values, *, dry_run):
-    """Validate with the group form of the web interface; titles are unique
-    because the APIs find groups by their title"""
+    """Validate with the group form of the web interface, which also keeps
+    titles unique because the APIs find groups by their title"""
     # The form has a prefix (it's shown in modals)
     prefix = GroupForm(request=request).add_prefix
     form = GroupForm(
@@ -769,18 +769,6 @@ def _save_group(request, group, values, *, dry_run):
     )
     if not form.is_valid(ignore_warnings=True):
         raise_form_errors(form)
-    if (
-        Group.objects
-        .filter(title__iexact=form.cleaned_data["title"])
-        .exclude(pk=group.pk)
-        .exists()
-    ):
-        raise ValidationError([
-            {
-                "loc": ["body", "data", "title"],
-                "msg": _("A group with this title exists already."),
-            }
-        ])
     with transaction.atomic():
         group = form.save()
         result = _group_out(group, request)
