@@ -204,7 +204,7 @@ Answers: the key figures of one month for integrations.
 | `green_hours_percentage` | grün % of the month (null if no hours). |
 | `previous_months[3]` | For each of the 3 preceding months: `green_hours_percentage`, `canceled_invoices_total_excl_tax`. |
 | `open_invoices_total_excl_tax` | Σ total_excl_tax of invoices outstanding on the last day of the month (current status: later canceled ones excluded). |
-| `canceled_invoices_total_excl_tax` | Σ total_excl_tax of invoices with status `CANCELED` and `closed_on` in the month. |
+| `canceled_invoices_total_excl_tax` | Σ total_excl_tax of invoices with status `CANCELED` and `closed_on` in the month. Invoices in preparation can't be cancelled (they are deleted) since November 2026; older data may contain invoices cancelled before they were sent. |
 | `accruals` | Stored `Accruals` with `cutoff_date` = last day of month, else computed live (`delta_negative` of external projects, with today's data). |
 | `full_time_equivalents` | FTE of the month (see above). |
 | `squeeze_gross_margin` | `squeeze_data(month)["totals"]["gross_margin"]` (see squeeze documentation). |

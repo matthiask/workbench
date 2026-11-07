@@ -456,18 +456,6 @@ class InvoiceForm(PostalAddressSelectionForm):
                 )
 
         if (
-            has_status
-            and not self.instance.is_freezed
-            and data["status"] == Invoice.CANCELED
-        ):
-            self.add_warning(
-                _(
-                    "You are canceling this invoice. It may be cleaner to delete the invoice instead."
-                ),
-                code="discourage-cancellations",
-            )
-
-        if (
             data.get("liable_to_vat")
             and (tax_rate := data["tax_rate"])
             and (service_period_until := data.get("service_period_until"))
@@ -490,6 +478,17 @@ class InvoiceForm(PostalAddressSelectionForm):
                     ),
                     code="tax-rate",
                 )
+
+        if (
+            has_status
+            and self.instance._orig_status == Invoice.IN_PREPARATION
+            and data["status"] == Invoice.CANCELED
+        ):
+            # They would count as cancelled in the key data
+            self.add_error(
+                "status",
+                _("Invoices which haven't been sent are deleted, not cancelled."),
+            )
 
         if (
             final := self.instance.down_payment_applied_to

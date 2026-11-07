@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 12:58+0100\n"
+"POT-Creation-Date: 2026-11-07 13:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2207,16 +2207,16 @@ msgid "You are attempting to set status to '%(to)s', but the invoice has already
 msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde schon am %(closed)s geschlossen. Bist Du sicher?"
 
 #: workbench/invoices/forms.py
-msgid "You are canceling this invoice. It may be cleaner to delete the invoice instead."
-msgstr "Du versuchst, die Rechnung zu storieren. Es könnte sauberer sein, die Rechnung zu löschen."
-
-#: workbench/invoices/forms.py
 msgid "Are you sure the tax rate is correct? The service period extends into 2024 but you have selected the old tax rate."
 msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistungserbringung reicht ins 2024 aber Du hast den alten MwSt-Satz gewählt."
 
 #: workbench/invoices/forms.py
 msgid "Are you sure the tax rate is correct? The service period ends before 2024 but you have selected the new tax rate."
 msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistungserbringung endet vor 2024 aber Du hast den neuen MwSt-Satz gewählt."
+
+#: workbench/invoices/forms.py
+msgid "Invoices which haven't been sent are deleted, not cancelled."
+msgstr "Rechnungen, die nicht versendet wurden, werden gelöscht, nicht storniert."
 
 #: workbench/invoices/forms.py
 msgid "This down payment has been applied to an invoice, cancel that invoice first:"
@@ -6290,6 +6290,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "You are canceling this invoice. It may be cleaner to delete the invoice instead."
+#~ msgstr "Du versuchst, die Rechnung zu storieren. Es könnte sauberer sein, die Rechnung zu löschen."
 
 #~ msgid "The last service of an offer cannot be deleted."
 #~ msgstr "Die letzte Leistung einer Offerte kann nicht gelöscht werden."

@@ -1283,7 +1283,6 @@ class InvoicesTest(TestCase):
                 down_payment,
                 status=Invoice.CANCELED,
                 payment_notice="Wrong amount",
-                **{WarningsForm.ignore_warnings_id: "discourage-cancellations"},
             ),
         )
         self.assertRedirects(response, down_payment.urls["detail"])
@@ -1332,7 +1331,7 @@ class InvoicesTest(TestCase):
                 subtotal=200,
                 **{
                     WarningsForm.ignore_warnings_id: (
-                        "maybe-unintentional-invoice-change discourage-cancellations"
+                        "maybe-unintentional-invoice-change"
                     )
                 },
             ),
@@ -1351,7 +1350,7 @@ class InvoicesTest(TestCase):
                 payment_notice="Wrong amount",
                 **{
                     WarningsForm.ignore_warnings_id: (
-                        "maybe-unintentional-invoice-change discourage-cancellations"
+                        "maybe-unintentional-invoice-change"
                     )
                 },
             ),
@@ -1392,6 +1391,27 @@ class InvoicesTest(TestCase):
         down_payment.refresh_from_db()
         self.assertIsNone(down_payment.down_payment_applied_to)
 
+    def test_invoices_in_preparation_are_deleted(self):
+        """Invoices which haven't been sent are deleted, not cancelled"""
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=dt.date.today(),
+            due_on=dt.date.today(),
+            postal_address="Test\nStreet\nCity",
+        )
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(
+                invoice, status=Invoice.CANCELED, payment_notice="Wrong customer"
+            ),
+        )
+        self.assertContains(
+            response,
+            "Invoices which haven&#x27;t been sent are deleted, not cancelled.",
+        )
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
+
     def test_cancellation_with_payment_notice(self):
         """Canceling invoices requires entering a payment notice"""
         invoice = factories.InvoiceFactory.create(
@@ -1400,13 +1420,6 @@ class InvoicesTest(TestCase):
             postal_address="Test\nStreet\nCity",
             status=Invoice.CANCELED,
         )
-
-        self.client.force_login(invoice.owned_by)
-        response = self.client.post(
-            invoice.urls["update"],
-            invoice_to_dict(invoice),
-        )
-        self.assertContains(response, "discourage-cancellations")
 
         msg = [
             (
