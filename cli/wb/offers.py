@@ -158,16 +158,16 @@ def search_offers(
 
 
 @offers.command()
-@click.argument("offer_id", type=int)
+@click.argument("offer_id")
 @click.option("--json", "as_json", is_flag=True)
 def show(offer_id, as_json):
-    """Show an offer"""
+    """Show an offer, by ID or code (2026-0042-o01)"""
     data = request("GET", f"offers/{offer_id}/")
     echo_json(data) if as_json else echo_offer(data)
 
 
 @offers.command()
-@click.argument("offer_id", type=int)
+@click.argument("offer_id")
 @click.option(
     "-o",
     "--output",
@@ -180,7 +180,7 @@ def show(offer_id, as_json):
     help="Add a signature line for the customer's agreement.",
 )
 def pdf(offer_id, output, signature_line):
-    """Save the PDF of an offer"""
+    """Save the PDF of an offer, by ID or code"""
     download(
         f"offers/{offer_id}/pdf/",
         output,

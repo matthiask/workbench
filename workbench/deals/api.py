@@ -17,6 +17,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, DealProbability, DealStatus, OfferStatus, key
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
@@ -463,12 +464,10 @@ def attribute_group_list(request):
 
 
 @router.get("/deals/{deal_id}/", response=DealOut)
-def deal_detail(request, deal_id: int):
+def deal_detail(request, deal_id: str):
+    """A deal by its ID or code (00042)"""
     return deal_out(
-        get_object_or_404(
-            with_related(Deal.objects.all()),
-            pk=deal_id,
-        ),
+        by_id_or_code(with_related(Deal.objects.all()), deal_id),
         request,
     )
 

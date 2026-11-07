@@ -99,6 +99,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - The `wb` command line interface lives in `cli/` (separate package, installed
   with `uv tool install`). It is a thin client of the JSON API, keep the logic
   on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`.
+  `show` (and `pdf`) take the ID or the code of projects, offers, invoices
+  and deals (`by_id_or_code()` in `workbench/api_codes.py`, detail endpoints
+  take both).
   Verbs: `search` (optional terms plus filters like `--project`, `--customer`,
   `--owned-by`; the API supports the same filters; what's left out by default
   is included with `--include-closed`, `--include-archived` or

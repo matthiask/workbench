@@ -71,3 +71,38 @@ class UnknownShortNamesTest(TestCase):
                 self.assertEqual(
                     response.json()["detail"][0]["loc"], ["query", "filters", param]
                 )
+
+
+class CodesTest(TestCase):
+    def test_detail_by_code(self):
+        """Projects, offers, invoices and deals are found by their ID or code"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        invoice = factories.InvoiceFactory.create(
+            project=project, customer=project.customer, contact=project.contact
+        )
+        without_project = factories.InvoiceFactory.create()
+        deal = factories.DealFactory.create()
+        self.client.force_login(project.owned_by)
+
+        for url, obj in [
+            ("/api/projects/{}/", project),
+            ("/api/offers/{}/", offer),
+            ("/api/invoices/{}/", invoice),
+            ("/api/invoices/{}/", without_project),
+            ("/api/deals/{}/", deal),
+        ]:
+            for value in [obj.pk, obj.code]:
+                with self.subTest(url=url, value=value):
+                    response = self.client.get(url.format(value))
+                    self.assertEqual(response.status_code, 200, response.content)
+                    self.assertEqual(response.json()["id"], obj.pk)
+        self.assertEqual(self.client.get("/api/projects/1999-9999/").status_code, 404)
+        self.assertEqual(self.client.get("/api/offers/nope/").status_code, 404)
+        # Changing still works
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/",
+            {"title": "Renamed"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)

@@ -104,10 +104,10 @@ def search_invoices(
 
 
 @invoices.command("show")
-@click.argument("invoice_id", type=int)
+@click.argument("invoice_id")
 @click.option("--json", "as_json", is_flag=True)
 def show_invoice(invoice_id, as_json):
-    """Show an invoice"""
+    """Show an invoice, by ID or code (2026-0042-0001, 00042 without project)"""
     data = request("GET", f"invoices/{invoice_id}/")
     if as_json:
         echo_json(data)
@@ -174,7 +174,7 @@ def _echo_invoice(data):
 
 
 @invoices.command("pdf")
-@click.argument("invoice_id", type=int)
+@click.argument("invoice_id")
 @click.option(
     "-o",
     "--output",
@@ -182,7 +182,7 @@ def _echo_invoice(data):
     help="File or directory, defaults to the invoice's file name here.",
 )
 def invoice_pdf(invoice_id, output):
-    """Save the PDF of an invoice"""
+    """Save the PDF of an invoice, by ID or code"""
     download(f"invoices/{invoice_id}/pdf/", output)
 
 

@@ -1084,6 +1084,17 @@ planned_work:
         walk(wb.cli, [])
         self.assertEqual(checked, set(server.values()))
 
+    def test_show_by_code(self):
+        project = factories.ProjectFactory.create(title="Relaunch")
+        offer = factories.OfferFactory.create(project=project, title="Phase 1")
+        result = self.wb("projects", "show", project.code)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Relaunch", result.output)
+        self.assertIn("Phase 1", result.output)
+        result = self.wb("offers", "show", offer.code)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Phase 1", result.output)
+
     @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
     def test_campaigns(self):
         campaign = factories.CampaignFactory.create(title="Relaunch")

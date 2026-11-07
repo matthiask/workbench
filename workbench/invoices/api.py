@@ -15,6 +15,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, InvoiceStatus, InvoiceType, Periodicity, key
 from workbench.contacts.api import (
     OrganizationOut,
@@ -659,18 +660,19 @@ def invoice_create(
 
 
 @router.get("/invoices/{invoice_id}/", response=InvoiceDetailOut)
-def invoice_detail(request, invoice_id: int):
-    invoice = get_object_or_404(
+def invoice_detail(request, invoice_id: str):
+    """An invoice by its ID or code (2026-0042-0001, or 00042 without project)"""
+    invoice = by_id_or_code(
         Invoice.objects.select_related("project", "customer", "owned_by"),
-        pk=invoice_id,
+        invoice_id,
     )
     return invoice_out(invoice, request) | {"services": _invoice_services(invoice)}
 
 
 @router.get("/invoices/{invoice_id}/pdf/")
-def invoice_pdf(request, invoice_id: int):
-    """The invoice as PDF, like in the web interface"""
-    invoice = get_object_or_404(Invoice, pk=invoice_id)
+def invoice_pdf(request, invoice_id: str):
+    """The invoice (by ID or code) as PDF, like in the web interface"""
+    invoice = by_id_or_code(Invoice.objects.all(), invoice_id)
     pdf, response = pdf_response(invoice_filename(invoice))
     try:
         pdf.init_invoice_letter()

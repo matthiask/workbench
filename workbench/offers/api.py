@@ -14,6 +14,7 @@ from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
+from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, OfferStatus, key
 from workbench.contacts.models import postal_address_choices
 from workbench.offers.models import (
@@ -298,18 +299,17 @@ def offer_list_search(request, filters: Query[OfferFilter]):
 
 
 @router.get("/offers/{offer_id}/", response=OfferOut)
-def offer_detail(request, offer_id: int):
-    offer = get_object_or_404(
-        Offer.objects.select_related("project", "owned_by"), pk=offer_id
-    )
+def offer_detail(request, offer_id: str):
+    """An offer by its ID or code (2026-0042-o01)"""
+    offer = by_id_or_code(Offer.objects.select_related("project", "owned_by"), offer_id)
     return offer_out(offer, list(offer.services.all()), request)
 
 
 @router.get("/offers/{offer_id}/pdf/")
-def offer_pdf(request, offer_id: int, *, signature_line: bool = False):
-    """The offer as PDF, like in the web interface, optionally with a
-    signature line for the customer's agreement"""
-    offer = get_object_or_404(Offer, pk=offer_id)
+def offer_pdf(request, offer_id: str, *, signature_line: bool = False):
+    """The offer (by ID or code) as PDF, like in the web interface, optionally
+    with a signature line for the customer's agreement"""
+    offer = by_id_or_code(Offer.objects.all(), offer_id)
     pdf, response = pdf_response(offer_filename(offer))
     try:
         pdf.init_letter()

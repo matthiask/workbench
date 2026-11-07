@@ -77,14 +77,17 @@ def search(query, customer, owned_by, include_closed, limit, offset, as_csv, as_
 
 
 @projects.command("show")
-@click.argument("project_id", type=int)
+@click.argument("project_id")
 @click.option("--json", "as_json", is_flag=True)
 def show_project(project_id, as_json):
-    """Show a project and its offers"""
+    """Show a project and its offers, by ID or code (2026-0042)"""
     project = request("GET", f"projects/{project_id}/")
     # Offers require the controlling feature
     offers = request(
-        "GET", "offers/", params={"project": project_id, "limit": 1000}, optional=True
+        "GET",
+        "offers/",
+        params={"project": project["id"], "limit": 1000},
+        optional=True,
     )
     offers = offers["items"] if offers else None
     if as_json:

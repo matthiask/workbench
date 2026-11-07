@@ -109,10 +109,10 @@ def search_deals(
 
 
 @deals.command("show")
-@click.argument("deal_id", type=int)
+@click.argument("deal_id")
 @click.option("--json", "as_json", is_flag=True)
 def show_deal(deal_id, as_json):
-    """Show a deal"""
+    """Show a deal, by ID or code (00042)"""
     data = request("GET", f"deals/{deal_id}/")
     echo_json(data) if as_json else _echo_deal(data)
 

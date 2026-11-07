@@ -22,6 +22,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.api_codes import by_id_or_code
 from workbench.api_keys import InvoiceStatus, InvoiceType, OfferStatus, ProjectType, key
 from workbench.contacts.api import (
     OrganizationOut,
@@ -228,203 +229,6 @@ def project_list(request, filters: Query[ProjectFilter]):
     if q := filters.q:
         projects = projects.search(q)
     return Serialized(projects, lambda project: project_out(project, request))
-
-
-@router.get("/projects/{int:project_id}/", response=ProjectOut)
-def project_detail(request, project_id: int):
-    return project_out(
-        get_object_or_404(
-            Project.objects.select_related(
-                "customer", "contact", "owned_by", "internal_type", "campaign"
-            ),
-            pk=project_id,
-        ),
-        request,
-    )
-
-
-class ProjectIn(Schema):
-    title: str = Field(min_length=1, max_length=200)
-    description: str = ""
-    customer: int | None = Field(
-        default=None,
-        description="ID of the customer organization, defaults to the contact's"
-        " organization.",
-    )
-    contact: int | None = Field(
-        default=None, description="ID of the contact person at the customer."
-    )
-    type: Literal["order", "maintenance", "internal"] = "order"
-    internal_type: str | None = Field(
-        default=None,
-        description="Name or ID of the internal type, required for internal"
-        " projects if the installation uses internal types.",
-    )
-    owned_by: str | None = Field(
-        default=None,
-        description="Short name of the person responsible, defaults to the"
-        " authenticated user.",
-    )
-
-
-class ProjectCreated(ProjectOut):
-    id: int | None
-    url: str | None
-
-
-def _internal_type(name):
-    """The internal type's ID for the project form"""
-    if not name:
-        return ""
-    types = {it.name.casefold(): it for it in InternalType.objects.all()}
-    if internal_type := types.get(name.casefold()):
-        return internal_type.pk
-    # Names first, then IDs (only ASCII digits)
-    if (
-        name.isascii()
-        and name.isdigit()
-        and (
-            internal_type := next(
-                (it for it in types.values() if it.pk == int(name)), None
-            )
-        )
-    ):
-        return internal_type.pk
-    raise ValidationError([
-        {
-            "loc": ["body", "data", "internal_type"],
-            "msg": _("Unknown internal type %(name)r, use one of %(types)s.")
-            % {
-                "name": name,
-                "types": ", ".join(sorted(it.name for it in types.values())),
-            },
-        }
-    ])
-
-
-@router.post("/projects/", response=ProjectCreated)
-def project_create(
-    request,
-    data: ProjectIn,
-    *,
-    dry_run: bool = False,
-    ignore_warnings: list[str] = IGNORE_WARNINGS,
-):
-    """Create a project, validated like in the web interface
-
-    Warnings of the web interface are errors here unless ignored by their
-    code; nothing is saved if anything is invalid or with ``dry_run``."""
-    owned_by = request.user
-    if data.owned_by is not None:
-        owned_by = User.objects.filter(
-            is_active=True, _short_name__iexact=data.owned_by
-        ).first()
-        if not owned_by:
-            raise ValidationError([
-                {
-                    "loc": ["body", "data", "owned_by"],
-                    "msg": _("Unknown or inactive user %r.") % data.owned_by,
-                }
-            ])
-
-    form = ProjectForm(
-        {
-            "title": data.title,
-            "description": data.description,
-            # The form uses the contact's organization if empty
-            "customer": "" if data.customer is None else data.customer,
-            "contact": data.contact or "",
-            "type": data.type,
-            "internal_type": _internal_type(data.internal_type),
-            "owned_by": owned_by.pk,
-        },
-        request=request,
-    )
-    validate_form(form, ignore_warnings=ignore_warnings)
-
-    with transaction.atomic():
-        project = form.save()
-        result = project_out(project, request)
-        if dry_run:
-            transaction.set_rollback(True)
-            result |= {"id": None, "url": None}
-    return result
-
-
-class ProjectPatch(Schema):
-    """Fields which aren't given are left alone"""
-
-    title: str | None = Field(default=None, min_length=1, max_length=200)
-    description: str | None = None
-    customer: int | None = Field(default=None, description="Organization ID.")
-    contact: int | None = Field(
-        default=None, description="ID of the contact person, null removes it."
-    )
-    type: Literal["order", "maintenance", "internal"] | None = None
-    internal_type: str | None = Field(
-        default=None,
-        description="Name or ID of the internal type. Projects which aren't internal"
-        " anymore lose it.",
-    )
-    owned_by: str | None = Field(default=None, description="Short name.")
-    closed_on: dt.date | None = Field(
-        default=None, description="Closes the project, null reopens it."
-    )
-    delete_planned_work: bool | None = Field(
-        default=None,
-        description="Required when closing a project whose offers in"
-        " preparation (which are discarded) have planned work: delete it or"
-        " keep it.",
-    )
-
-
-@router.patch("/projects/{int:project_id}/", response=ProjectOut)
-def project_update(
-    request,
-    project_id: int,
-    data: ProjectPatch,
-    *,
-    dry_run: bool = False,
-    ignore_warnings: list[str] = IGNORE_WARNINGS,
-):
-    """Change or close a project, validated like in the web interface
-
-    Warnings of the web interface are errors here unless ignored by their
-    code; nothing is saved if anything is invalid or with ``dry_run``."""
-    project = get_object_or_404(Project, pk=project_id)
-    values = form_data(ProjectForm(instance=project, request=request))
-    patch = data.model_dump(exclude_unset=True)
-    for field in ["title", "description", "customer", "contact", "type", "closed_on"]:
-        if field in patch:
-            values[field] = "" if patch[field] is None else patch[field]
-    if patch.get("owned_by"):
-        owned_by = User.objects.filter(
-            is_active=True, _short_name__iexact=patch["owned_by"]
-        ).first()
-        if not owned_by:
-            raise ValidationError([
-                {
-                    "loc": ["body", "data", "owned_by"],
-                    "msg": _("Unknown or inactive user %r.") % patch["owned_by"],
-                }
-            ])
-        values["owned_by"] = owned_by.pk
-    if "internal_type" in patch:
-        values["internal_type"] = _internal_type(patch["internal_type"])
-    elif patch.get("type") and patch["type"] != Project.INTERNAL:
-        values["internal_type"] = ""
-    if data.delete_planned_work is not None:
-        values["delete_planned_work"] = int(data.delete_planned_work)
-
-    form = ProjectForm(values, instance=project, request=request)
-    validate_form(form, ignore_warnings=ignore_warnings)
-
-    with transaction.atomic():
-        project = form.save()
-        result = project_out(project, request)
-        if dry_run:
-            transaction.set_rollback(True)
-    return result
 
 
 class StatsFilter(Schema):
@@ -652,6 +456,204 @@ def project_stats(request, filters: Query[StatsFilter]):
         }
 
     return [project_stats(project) for project in projects]
+
+
+@router.get("/projects/{project_id}/", response=ProjectOut)
+def project_detail(request, project_id: str):
+    """A project by its ID or code (2026-0042)"""
+    return project_out(
+        by_id_or_code(
+            Project.objects.select_related(
+                "customer", "contact", "owned_by", "internal_type", "campaign"
+            ),
+            project_id,
+        ),
+        request,
+    )
+
+
+class ProjectIn(Schema):
+    title: str = Field(min_length=1, max_length=200)
+    description: str = ""
+    customer: int | None = Field(
+        default=None,
+        description="ID of the customer organization, defaults to the contact's"
+        " organization.",
+    )
+    contact: int | None = Field(
+        default=None, description="ID of the contact person at the customer."
+    )
+    type: Literal["order", "maintenance", "internal"] = "order"
+    internal_type: str | None = Field(
+        default=None,
+        description="Name or ID of the internal type, required for internal"
+        " projects if the installation uses internal types.",
+    )
+    owned_by: str | None = Field(
+        default=None,
+        description="Short name of the person responsible, defaults to the"
+        " authenticated user.",
+    )
+
+
+class ProjectCreated(ProjectOut):
+    id: int | None
+    url: str | None
+
+
+def _internal_type(name):
+    """The internal type's ID for the project form"""
+    if not name:
+        return ""
+    types = {it.name.casefold(): it for it in InternalType.objects.all()}
+    if internal_type := types.get(name.casefold()):
+        return internal_type.pk
+    # Names first, then IDs (only ASCII digits)
+    if (
+        name.isascii()
+        and name.isdigit()
+        and (
+            internal_type := next(
+                (it for it in types.values() if it.pk == int(name)), None
+            )
+        )
+    ):
+        return internal_type.pk
+    raise ValidationError([
+        {
+            "loc": ["body", "data", "internal_type"],
+            "msg": _("Unknown internal type %(name)r, use one of %(types)s.")
+            % {
+                "name": name,
+                "types": ", ".join(sorted(it.name for it in types.values())),
+            },
+        }
+    ])
+
+
+@router.post("/projects/", response=ProjectCreated)
+def project_create(
+    request,
+    data: ProjectIn,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Create a project, validated like in the web interface
+
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``."""
+    owned_by = request.user
+    if data.owned_by is not None:
+        owned_by = User.objects.filter(
+            is_active=True, _short_name__iexact=data.owned_by
+        ).first()
+        if not owned_by:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "owned_by"],
+                    "msg": _("Unknown or inactive user %r.") % data.owned_by,
+                }
+            ])
+
+    form = ProjectForm(
+        {
+            "title": data.title,
+            "description": data.description,
+            # The form uses the contact's organization if empty
+            "customer": "" if data.customer is None else data.customer,
+            "contact": data.contact or "",
+            "type": data.type,
+            "internal_type": _internal_type(data.internal_type),
+            "owned_by": owned_by.pk,
+        },
+        request=request,
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+
+    with transaction.atomic():
+        project = form.save()
+        result = project_out(project, request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "url": None}
+    return result
+
+
+class ProjectPatch(Schema):
+    """Fields which aren't given are left alone"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    customer: int | None = Field(default=None, description="Organization ID.")
+    contact: int | None = Field(
+        default=None, description="ID of the contact person, null removes it."
+    )
+    type: Literal["order", "maintenance", "internal"] | None = None
+    internal_type: str | None = Field(
+        default=None,
+        description="Name or ID of the internal type. Projects which aren't internal"
+        " anymore lose it.",
+    )
+    owned_by: str | None = Field(default=None, description="Short name.")
+    closed_on: dt.date | None = Field(
+        default=None, description="Closes the project, null reopens it."
+    )
+    delete_planned_work: bool | None = Field(
+        default=None,
+        description="Required when closing a project whose offers in"
+        " preparation (which are discarded) have planned work: delete it or"
+        " keep it.",
+    )
+
+
+@router.patch("/projects/{project_id}/", response=ProjectOut)
+def project_update(
+    request,
+    project_id: int,
+    data: ProjectPatch,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change or close a project, validated like in the web interface
+
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``."""
+    project = get_object_or_404(Project, pk=project_id)
+    values = form_data(ProjectForm(instance=project, request=request))
+    patch = data.model_dump(exclude_unset=True)
+    for field in ["title", "description", "customer", "contact", "type", "closed_on"]:
+        if field in patch:
+            values[field] = "" if patch[field] is None else patch[field]
+    if patch.get("owned_by"):
+        owned_by = User.objects.filter(
+            is_active=True, _short_name__iexact=patch["owned_by"]
+        ).first()
+        if not owned_by:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "owned_by"],
+                    "msg": _("Unknown or inactive user %r.") % patch["owned_by"],
+                }
+            ])
+        values["owned_by"] = owned_by.pk
+    if "internal_type" in patch:
+        values["internal_type"] = _internal_type(patch["internal_type"])
+    elif patch.get("type") and patch["type"] != Project.INTERNAL:
+        values["internal_type"] = ""
+    if data.delete_planned_work is not None:
+        values["delete_planned_work"] = int(data.delete_planned_work)
+
+    form = ProjectForm(values, instance=project, request=request)
+    validate_form(form, ignore_warnings=ignore_warnings)
+
+    with transaction.atomic():
+        project = form.save()
+        result = project_out(project, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
 
 
 class ServiceOut(Schema):
