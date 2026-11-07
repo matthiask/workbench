@@ -25,13 +25,14 @@ TIMESTAMPS_DETECT_GAP = 120  # seconds
 def timestamp_project(user, value):
     """The project with this ID, or the open project matching the text
 
-    Uses the full text search of projects. A unique match among the pinned
-    projects wins, otherwise the match among all open projects has to be
-    unique."""
+    Uses the full text search of projects, also for numbers which aren't the
+    ID of a project (e.g. a year). A unique match among the pinned projects
+    wins, otherwise the match among all open projects has to be unique."""
     if isinstance(value, int) or value.isdigit():
         if project := Project.objects.filter(pk=value).first():
             return project
-        raise ValidationError(gettext("This project doesn't exist."))
+        if isinstance(value, int):
+            raise ValidationError(gettext("This project doesn't exist."))
     projects = list(
         Project.objects
         .open()

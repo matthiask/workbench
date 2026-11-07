@@ -113,6 +113,10 @@ class TimestampsAPITest(TestCase):
             project("archive"), "No open project matches", status_code=422
         )
 
+        # Numbers which aren't the ID of a project are searched
+        kampagne = factories.ProjectFactory.create(title="Kampagne 99999")
+        self.assertEqual(project("99999"), kampagne.pk)
+
     def test_project_words(self):
         """Every word has to match, a unique pinned project wins over the other
         open projects"""
