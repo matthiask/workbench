@@ -44,6 +44,7 @@ from workbench.tools.api import (
     Serialized,
     form_data,
     raise_form_errors,
+    user_by_short_name,
     validate_form,
 )
 from workbench.tools.formats import Z1, Z2
@@ -150,7 +151,9 @@ def project_list(request, filters: Query[ProjectFilter]):
     if filters.customer:
         projects = projects.filter(customer=filters.customer)
     if filters.owned_by:
-        projects = projects.filter(owned_by___short_name__iexact=filters.owned_by)
+        projects = projects.filter(
+            owned_by=user_by_short_name(filters.owned_by, param="owned_by")
+        )
     if q := filters.q:
         projects = projects.search(q)
     return Serialized(projects, lambda project: project_out(project, request))

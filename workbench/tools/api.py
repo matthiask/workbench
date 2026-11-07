@@ -207,6 +207,19 @@ class UsersFilter(Schema):
     team: str | None = None
 
 
+def user_by_short_name(short_name, *, param):
+    """The user with this short name (case-insensitive) for a filter, unknown
+    ones are errors instead of finding nothing"""
+    if user := User.objects.filter(_short_name__iexact=short_name).first():
+        return user
+    raise NinjaValidationError([
+        {
+            "loc": ["query", "filters", param],
+            "msg": _("Unknown user %r.") % short_name,
+        }
+    ])
+
+
 def filter_users(filters):
     """The users of a ``UsersFilter``, ``None`` without filters"""
     if not filters.user and not filters.team:

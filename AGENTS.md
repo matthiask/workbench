@@ -252,7 +252,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   pinned projects wins, otherwise the match among all open projects has to
   be unique (`timestamp_project()` in `workbench/timer/models.py`).
 - Short names (`User._short_name`) are unique when case folding, unless blank.
-  APIs identify people by their short name and match it case-insensitively.
+  APIs identify people by their short name and match it case-insensitively;
+  filters reject unknown ones (`user_by_short_name()` in
+  `workbench/tools/api.py`) instead of finding nothing.
 - The planning import (`wb planning import`) adds entries without an `id`,
   updates those with one (only the given fields) and deletes the IDs listed
   in `delete_milestones` and `delete_planned_work`; the context has the IDs.

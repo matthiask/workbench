@@ -40,6 +40,7 @@ from workbench.tools.api import (
     filter_date_range,
     filter_users,
     form_data,
+    user_by_short_name,
     validate_form,
 )
 from workbench.tools.formats import Z2
@@ -175,11 +176,13 @@ def deal_list(request, filters: Query[DealFilter]):
     if filters.customer:
         deals = deals.filter(customer=filters.customer)
     if filters.owned_by:
-        deals = deals.filter(owned_by___short_name__iexact=filters.owned_by)
+        deals = deals.filter(
+            owned_by=user_by_short_name(filters.owned_by, param="owned_by")
+        )
     if filters.contributor:
         deals = deals.filter(
             id__in=Contribution.objects.filter(
-                user___short_name__iexact=filters.contributor
+                user=user_by_short_name(filters.contributor, param="contributor")
             ).values("deal")
         )
     if filters.q:

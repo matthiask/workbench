@@ -14,6 +14,7 @@ from workbench.tools.api import (
     Serialized,
     TotalsPagination,
     filter_date_range,
+    user_by_short_name,
 )
 from workbench.tools.formats import Z1, Z2
 
@@ -84,7 +85,9 @@ def _filter(queryset, filters):
     if filters.service:
         queryset = queryset.filter(service=filters.service)
     if filters.rendered_by:
-        queryset = queryset.filter(rendered_by___short_name__iexact=filters.rendered_by)
+        queryset = queryset.filter(
+            rendered_by=user_by_short_name(filters.rendered_by, param="rendered_by")
+        )
     if filters.invoiced is not None:
         queryset = queryset.filter(invoice_service__isnull=not filters.invoiced)
     queryset = filter_date_range(queryset, filters, "rendered_on")

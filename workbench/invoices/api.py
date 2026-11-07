@@ -38,6 +38,7 @@ from workbench.tools.api import (
     Serialized,
     filter_date_range,
     form_data,
+    user_by_short_name,
     validate_form,
 )
 from workbench.tools.formats import Z2, local_date_format
@@ -747,7 +748,9 @@ def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
     if filters.customer:
         invoices = invoices.filter(customer=filters.customer)
     if filters.owned_by:
-        invoices = invoices.filter(owned_by___short_name__iexact=filters.owned_by)
+        invoices = invoices.filter(
+            owned_by=user_by_short_name(filters.owned_by, param="owned_by")
+        )
     if filters.q:
         invoices = invoices.search(filters.q)
     return Serialized(

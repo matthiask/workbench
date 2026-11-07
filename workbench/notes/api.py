@@ -15,6 +15,7 @@ from workbench.tools.api import (
     Serialized,
     filter_date_range,
     form_errors,
+    user_by_short_name,
 )
 
 
@@ -83,7 +84,9 @@ def note_list(request, filters: Query[NoteFilter]):
     if objects:
         notes = notes.filter(objects)
     if filters.created_by:
-        notes = notes.filter(created_by___short_name__iexact=filters.created_by)
+        notes = notes.filter(
+            created_by=user_by_short_name(filters.created_by, param="created_by")
+        )
     if filters.q:
         notes = notes.search(filters.q)
     notes = filter_date_range(notes, filters, "created_at__date")

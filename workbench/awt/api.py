@@ -29,6 +29,7 @@ from workbench.tools.api import (
     Percentage,
     Serialized,
     date_range,
+    user_by_short_name,
     validate_form,
 )
 
@@ -65,7 +66,7 @@ def absence_list(request, filters: Query[AbsenceFilter]):
     first"""
     absences = Absence.objects.select_related("user")
     if filters.user:
-        absences = absences.filter(user___short_name__iexact=filters.user)
+        absences = absences.filter(user=user_by_short_name(filters.user, param="user"))
     if filters.reason:
         absences = absences.filter(reason=filters.reason)
     since, until = date_range(filters)

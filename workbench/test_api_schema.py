@@ -2,9 +2,10 @@ import importlib
 import inspect
 from pathlib import Path
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from ninja import Schema
 
+from workbench import factories
 from workbench.api import api
 
 
@@ -35,3 +36,29 @@ class APISchemaTest(SimpleTestCase):
         """The OpenAPI document is generated without errors"""
         schema = api.get_openapi_schema(path_prefix="/api/")
         self.assertIn("/api/offers/{offer_id}/", schema["paths"])
+
+
+class UnknownShortNamesTest(TestCase):
+    def test_unknown_short_names(self):
+        """Filters by short name reject unknown ones instead of finding
+        nothing"""
+        user = factories.UserFactory.create(_short_name="ab")
+        self.client.force_login(user)
+        for url, param in [
+            ("/api/projects/", "owned_by"),
+            ("/api/offers/", "owned_by"),
+            ("/api/recurring-invoices/", "owned_by"),
+            ("/api/deals/", "owned_by"),
+            ("/api/deals/", "contributor"),
+            ("/api/notes/", "created_by"),
+            ("/api/absences/", "user"),
+            ("/api/logbook/hours/", "rendered_by"),
+        ]:
+            with self.subTest(url=url, param=param):
+                response = self.client.get(url, {param: "AB"})
+                self.assertEqual(response.status_code, 200, response.content)
+                response = self.client.get(url, {param: "xy"})
+                self.assertEqual(response.status_code, 422, response.content)
+                self.assertEqual(
+                    response.json()["detail"][0]["loc"], ["query", "filters", param]
+                )

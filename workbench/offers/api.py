@@ -36,6 +36,7 @@ from workbench.tools.api import (
     Serialized,
     filter_date_range,
     full_clean,
+    user_by_short_name,
 )
 from workbench.tools.pdf import offer_filename, pdf_response
 
@@ -274,7 +275,9 @@ def offer_list_search(request, filters: Query[OfferFilter]):
     if filters.status:
         offers = offers.filter(status=OFFER_STATUSES[filters.status])
     if filters.owned_by:
-        offers = offers.filter(owned_by___short_name__iexact=filters.owned_by)
+        offers = offers.filter(
+            owned_by=user_by_short_name(filters.owned_by, param="owned_by")
+        )
     if url := filters.external_reference:
         offers = offers.filter(
             Q(external_reference=url)
