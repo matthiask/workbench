@@ -126,7 +126,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (`Person.add_to_group()`, `remove_from_group()`). `wb people
   reassign-suggestions` and `wb people reassign` move the people of users who
   left (`/api/contacts/people/reassign/`): suggestions are the lead of the
-  latest project or the owner of the latest deal, the person's own before
+  latest project or the owner of the latest deal (whichever is newer), the person's own before
   their organization's, only active users (`primary_contact_suggestions()` in
   `workbench/contacts/reassign.py`); people without a suggestion stay. `wb people merge ID --into ID`
   merges duplicates (`POST /api/contacts/people/<id>/merge/`, also in the

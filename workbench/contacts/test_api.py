@@ -265,6 +265,25 @@ class ContactsAPITest(TestCase):
         response = send("patch", f"{mailing.pk}/", {"title": "Christmas"})
         self.assertEqual(response.status_code, 422)
 
+    def test_reassign_newer_deal(self):
+        """The newer of the person's own project and deal wins"""
+        former = factories.UserFactory.create(_short_name="old", is_active=False)
+        lead = factories.UserFactory.create(_short_name="lead")
+        person = factories.PersonFactory.create(primary_contact=former)
+        project = factories.ProjectFactory.create(contact=person, owned_by=lead)
+        Project.objects.filter(pk=project.pk).update(
+            created_at=timezone.now() - dt.timedelta(days=200)
+        )
+        factories.DealFactory.create(
+            contact=person, owned_by=factories.UserFactory.create(_short_name="new")
+        )
+        self.client.force_login(lead)
+        [row] = self.client.get("/api/contacts/people/reassign/").json()["items"]
+        self.assertEqual(
+            (row["suggestion"]["short_name"], row["suggestion"]["source"]),
+            ("new", "deal"),
+        )
+
     def test_reassign(self):
         """People of users who left get suggestions from their projects and
         deals (as their contact first, then of their organization) and are

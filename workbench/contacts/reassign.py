@@ -5,16 +5,18 @@ import datetime as dt
 from django.utils import timezone
 
 
-# In this order: the strongest signal first
 SOURCES = ["project", "deal", "organization's project", "organization's deal"]
+# The person's own projects and deals before those of their organization,
+# the latest of each tier wins
+TIERS = [SOURCES[:2], SOURCES[2:]]
 
 
 def primary_contact_suggestions(people, *, since=None):
     """``{person_id: suggestion}`` for the people with a suggestion
 
     The suggestion is the lead of the latest project or the owner of the
-    latest deal, the person's own (as their contact) before those of their
-    organization; only active users, only projects and deals created since
+    latest deal, whichever is newer, the person's own (as their contact)
+    before those of their organization; only active users, only projects and deals created since
     the date if given."""
     from workbench.deals.models import Deal
     from workbench.projects.models import Project
@@ -46,9 +48,20 @@ def primary_contact_suggestions(people, *, since=None):
 
     suggestions = {}
     for person in people:
-        for source in SOURCES:
-            key = person.pk if source in {"project", "deal"} else person.organization_id
-            if item := latest[source].get(key):
+        for tier in TIERS:
+            candidates = [
+                (item, source)
+                for source in tier
+                if (
+                    item := latest[source].get(
+                        person.pk
+                        if source in {"project", "deal"}
+                        else person.organization_id
+                    )
+                )
+            ]
+            if candidates:
+                item, source = max(candidates, key=lambda c: c[0].created_at)
                 suggestions[person.pk] = {
                     "user": item.owned_by,
                     "source": source,
