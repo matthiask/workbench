@@ -228,13 +228,11 @@ with date_from_until as (
     select
         user_id,
         date_from,
-        case
-            when date_until='9999-12-31' then current_date
-            else date_until
-        end as date_until
+        -- Only the past part of employments counts
+        least(date_until, current_date) as date_until
     from awt_employment e
     left join accounts_user u on e.user_id=u.id
-    where u.is_active=TRUE
+    where u.is_active=TRUE and date_from <= current_date
 ),
 durations as (
 select user_id, sum(date_until - date_from) as duration
@@ -252,11 +250,10 @@ with date_from_until as (
     select
         user_id,
         date_from,
-        case
-            when date_until='9999-12-31' then current_date
-            else date_until
-        end as date_until
+        -- Only the past part of employments counts
+        least(date_until, current_date) as date_until
     from awt_employment
+    where date_from <= current_date
 ),
 durations as (
 select user_id, sum(date_until - date_from) as duration

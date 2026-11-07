@@ -15,7 +15,11 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.forms import TeamForm, TeamSearchForm
 from workbench.accounts.models import UnknownFeature, User
-from workbench.accounts.reporting import birthdays, work_anniversaries
+from workbench.accounts.reporting import (
+    average_employment_duration,
+    birthdays,
+    work_anniversaries,
+)
 from workbench.projects.models import Project
 from workbench.tools.testing import messages
 
@@ -296,6 +300,25 @@ class AccountsTest(TestCase):
 
         user.refresh_from_db()
         self.assertEqual(user._features, [FEATURES.BOOKKEEPING])
+
+
+class EmploymentDurationTest(TestCase):
+    def test_average_employment_duration(self):
+        """Only the past part of employments counts, future employments
+        don't count at all"""
+        today = dt.date.today()
+        factories.EmploymentFactory.create(
+            user=factories.UserFactory.create(),
+            date_from=today - dt.timedelta(days=365),
+            date_until=today + dt.timedelta(days=365),
+        )
+        factories.EmploymentFactory.create(
+            user=factories.UserFactory.create(),
+            date_from=today + dt.timedelta(days=30),
+        )
+        stats = average_employment_duration()
+        self.assertAlmostEqual(stats["current_users"], Decimal(365 / 365.24), 3)
+        self.assertAlmostEqual(stats["all_users"], Decimal(365 / 365.24), 3)
 
 
 class HoursSinceLatestTest(TestCase):

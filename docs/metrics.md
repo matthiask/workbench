@@ -148,7 +148,7 @@ Period: 1 Jan of (current year − 3) to 31 Dec of the current year. `workbench/
 | Total exkl. MwSt aller offenen Rechnungen (EN "Sent invoices total excl. tax") | Σ Invoice.total_excl_tax with status `SENT` (any invoiced_on, any project/none). `key_data.py:sent_invoices_total` |
 | Total exkl. MwSt aller fälligen Rechnungen | Σ Invoice.total_excl_tax with status `SENT` and `due_on <= today`. `key_data.py:due_invoices_total` |
 | Total exkl. MwSt aller offenen Offerten | Σ Offer.total_excl_tax with status `OFFERED` on open projects (no valid_until check, internal projects not excluded). `key_data.py:open_offers_total`, `OfferQuerySet.offered` |
-| Durchschnittliche Anstellungsdauer der aktuellen Mitarbeiter:innen | SQL: per active user Σ (date_until − date_from) over their `Employment` rows (open end `9999-12-31` → current_date); average over users / 365.24, in years, 2 decimals. `workbench/accounts/reporting.py:average_employment_duration` |
+| Durchschnittliche Anstellungsdauer der aktuellen Mitarbeiter:innen | SQL: per active user Σ (min(date_until, current_date) − date_from) over their `Employment` rows which have started (only the past part counts, open ends included); average over users / 365.24, in years, 2 decimals. `workbench/accounts/reporting.py:average_employment_duration` |
 | Durchschnittliche Anstellungsdauer aller Mitarbeiter:innen | Same over all users (active or not). |
 
 #### Monthly table (and the two charts)
