@@ -281,6 +281,31 @@ class AWTTest(TestCase):
             response, "Creating absences for past years is not allowed."
         )
 
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
+    def test_absences_of_others(self):
+        """Only the person and people administrating personnel change
+        absences"""
+        absence = factories.AbsenceFactory.create(reason=Absence.VACATION)
+        hr = factories.UserFactory.create()
+        hr._features.append(FEATURES.PERSONNEL_ADMINISTRATION)
+        hr.save()
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        self.client.force_login(factories.UserFactory.create())
+        for url in [absence.urls["update"], absence.urls["delete"]]:
+            with self.subTest(url=url):
+                response = self.client.get(url, headers=headers)
+                self.assertContains(
+                    response, "You are not permitted to edit the absences of others."
+                )
+
+        for user in [absence.user, hr]:
+            self.client.force_login(user)
+            response = self.client.get(absence.urls["update"], headers=headers)
+            self.assertNotContains(
+                response, "You are not permitted to edit the absences of others."
+            )
+
     def test_no_data_no_crash(self):
         """POSTing the absence form without any data does not crash the backend"""
         user = factories.UserFactory.create()

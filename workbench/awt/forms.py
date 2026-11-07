@@ -85,6 +85,9 @@ class AbsenceForm(ModelForm, WarningsForm):
             hours=_("Enter hours"),
         )
         if not self.request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
+            # Absences can't be handed over to others, see Absence.allow_update
+            if self.instance.pk:
+                self.fields["user"].disabled = True
             self.fields["reason"].choices = [
                 choice
                 for choice in self.fields["reason"].choices

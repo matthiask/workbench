@@ -259,7 +259,13 @@ class Absence(Model):
 
     @classmethod
     def allow_update(cls, instance, request):
-        if not instance.details_visible_to(request.user):
+        # Absences may be entered for others (paid leave then needs a
+        # confirmation), but only the person and people administrating
+        # personnel change them
+        if (
+            instance.user_id != request.user.id
+            and not request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
+        ):
             messages.error(
                 request, _("You are not permitted to edit the absences of others.")
             )
