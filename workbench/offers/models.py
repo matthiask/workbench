@@ -11,7 +11,7 @@ from django.db.models.expressions import RawSQL
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.models import User
 from workbench.projects.models import Project, Service
@@ -428,6 +428,10 @@ class Offer(ModelWithTotal):
                 cost=service.cost,
                 third_party_costs=service.third_party_costs,
             )
+            if project.flat_rate is not None:
+                with override(settings.WORKBENCH.PDF_LANGUAGE):
+                    new.effort_type = gettext("flat rate")
+                new.effort_rate = project.flat_rate
             new.save(skip_related_model=True)
         offer.save()
         return offer

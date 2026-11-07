@@ -416,6 +416,21 @@ class OffersTest(TestCase):
         self.assertEqual(project.offers.count(), 1)
         self.assertEqual(project.services.count(), 1)
 
+    def test_offer_copying_applies_flat_rate(self):
+        """Copies of offers get the flat rate of their new project"""
+        offer = factories.OfferFactory.create()
+        factories.ServiceFactory.create(
+            project=offer.project, offer=offer, effort_type="Any", effort_rate=140
+        )
+        project = factories.ProjectFactory.create(flat_rate=160)
+
+        self.client.force_login(offer.owned_by)
+        response = self.client.post(offer.urls["copy"], {"modal-project": project.pk})
+        self.assertEqual(response.status_code, 299)
+        service = project.services.get()
+        self.assertEqual(service.effort_rate, 160)
+        self.assertEqual(service.effort_type, "Pauschalsatz")
+
     def test_no_offers_on_closed_projects(self):
         """Offers can't be created on or copied to closed projects"""
         project = factories.ProjectFactory.create(closed_on=in_days(-1))
