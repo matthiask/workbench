@@ -662,6 +662,30 @@ class CapacityTest(TestCase):
         [(_hours, text, _url, reason)] = planning._absences[user][0]
         self.assertEqual((text, reason), ("Absence", "absence"))
 
+    def test_public_holidays_external_view(self):
+        """The external view doesn't show the employment of people"""
+        user = factories.UserFactory.create(planning_hours_per_day=8)
+        week = dt.date(2026, 11, 2)
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2026, 1, 1), percentage=80
+        )
+        Holiday.objects.create(
+            working_time_model=user.working_time_model,
+            date=week,
+            name="Some holiday",
+            fraction=1,
+        )
+
+        planning = reporting.Planning(weeks=[week], users=[user])
+        planning.add_public_holidays()
+        [(_hours, text, _url, _reason)] = planning._absences[user][0]
+        self.assertIn("80%", text)
+
+        planning = reporting.Planning(weeks=[week], users=[user], external_view=True)
+        planning.add_public_holidays()
+        [(_hours, text, _url, _reason)] = planning._absences[user][0]
+        self.assertEqual(text, "Some holiday")
+
     def test_capacity_employment_changes_during_the_week(self):
         """Employments starting or ending during a week count for the days
         they cover, holidays only within the employment"""

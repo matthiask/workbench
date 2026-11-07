@@ -346,7 +346,8 @@ order by ph.date
             ))
             self._absences[user][idx].append((
                 ph_hours,
-                f"{name} ({detail} = {hours(ph_hours)})",
+                # The external view is shown to customers: not the employment
+                name if self.external else f"{name} ({detail} = {hours(ph_hours)})",
                 reverse("awt_holiday_detail", kwargs={"pk": id}),
                 "holiday",
             ))
