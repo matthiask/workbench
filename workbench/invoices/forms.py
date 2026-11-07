@@ -619,23 +619,18 @@ class CreateProjectInvoiceForm(InvoiceForm):
             def amount(row):
                 if row["service"].effort_rate is not None:
                     return currency(row["not_archived"])
-                if row["logged_hours"]:
+                if row["not_archived_logged_hours"]:
                     return format_html(
                         '{} <small class="bg-warning px-1">{}</small>',
                         currency(row["not_archived"]),
                         _("%s logged but no hourly rate defined.")
-                        % hours(row["logged_hours"]),
+                        % hours(row["not_archived_logged_hours"]),
                     )
-                return currency(row["logged_cost"])
+                return currency(row["not_archived"])
 
             def filter(services):
                 for row in services:
-                    if (
-                        row["service"].effort_rate is not None
-                        and row["not_archived"]
-                        or row["logged_hours"]
-                        or row["logged_cost"]
-                    ):
+                    if row["not_archived"] or row["not_archived_logged_hours"]:
                         yield row
 
         else:

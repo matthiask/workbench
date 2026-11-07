@@ -583,7 +583,6 @@ class Project(Model):
             LoggedHours.objects.filter(
                 service__project=self,
                 archived_at__isnull=True,
-                service__effort_rate__isnull=False,
             ),
             key="service",
             field=HOURS_FOR_INVOICING,

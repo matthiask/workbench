@@ -385,6 +385,13 @@ class InvoicesTest(TestCase):
         self.assertEqual(service3.invoice_services.get().invoice, invoice)
         self.assertEqual(service4.invoice_services.count(), 0)
 
+        # Invoiced entries aren't offered again
+        response = self.client.get(url)
+        self.assertNotContains(response, f'value="{service1.pk}"')
+        self.assertNotContains(response, "1.0h logged but no hourly rate defined.")
+        self.assertContains(response, "2.0h logged but no hourly rate defined.")
+        self.assertNotContains(response, f'value="{service3.pk}"')
+
         response = self.client.post(
             cost.urls["update"],
             {
