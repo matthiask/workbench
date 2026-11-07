@@ -73,9 +73,10 @@ def employed(user, starts_on, ends_on):
     ).order_by("date_from"):
         if employment.date_from > day:
             return False
-        day = max(day, employment.date_until + dt.timedelta(days=1))
-        if day > ends_on:
+        # Open-ended employments end on dt.date.max, don't add to it
+        if employment.date_until >= ends_on:
             return True
+        day = max(day, employment.date_until + dt.timedelta(days=1))
     return False
 
 

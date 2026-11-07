@@ -429,6 +429,23 @@ class AWTTest(TestCase):
         response = post(in_days(-5), 10)
         self.assertEqual(response.status_code, 201)
 
+    def test_absence_in_open_ended_employment(self):
+        """Employments without an end cover all absences after their start"""
+        user = factories.UserFactory.create()
+        factories.EmploymentFactory.create(user=user, date_from=in_days(-10))
+        self.client.force_login(user)
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "modal-user": user.pk,
+                "modal-starts_on": in_days(5).isoformat(),
+                "modal-days": 1,
+                "modal-reason": "vacation",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 201)
+
     def test_employment_model(self):
         """Exercise the employment model"""
         factories.UserFactory.create()  # Additional instance for active_users()
