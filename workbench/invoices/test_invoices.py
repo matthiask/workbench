@@ -1250,6 +1250,66 @@ class InvoicesTest(TestCase):
             " cancelled, create a new invoice instead.",
         )
 
+    def test_change_down_payment_of_invoice_in_preparation(self):
+        """Final invoices in preparation follow changes of their down
+        payments"""
+        project = factories.ProjectFactory.create()
+        kwargs = {
+            "project": project,
+            "customer": project.customer,
+            "contact": project.contact,
+            "postal_address": "Anything\nStreet\nCity",
+            "invoiced_on": in_days(0),
+            "due_on": in_days(15),
+        }
+        down_payment = factories.InvoiceFactory.create(
+            type=Invoice.DOWN_PAYMENT, subtotal=100, status=Invoice.SENT, **kwargs
+        )
+        final = factories.InvoiceFactory.create(subtotal=2500, **kwargs)
+        down_payment.down_payment_applied_to = final
+        down_payment.save()
+        final.down_payment_total = down_payment.total_excl_tax
+        final.save()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            down_payment.urls["update"],
+            invoice_to_dict(
+                down_payment,
+                subtotal=200,
+                **{
+                    WarningsForm.ignore_warnings_id: (
+                        "maybe-unintentional-invoice-change discourage-cancellations"
+                    )
+                },
+            ),
+        )
+        self.assertRedirects(response, down_payment.urls["detail"])
+        final.refresh_from_db()
+        self.assertEqual(final.down_payment_total, 200)
+        self.assertEqual(final.total_excl_tax, 2300)
+
+        down_payment.refresh_from_db()
+        response = self.client.post(
+            down_payment.urls["update"],
+            invoice_to_dict(
+                down_payment,
+                status=Invoice.CANCELED,
+                payment_notice="Wrong amount",
+                **{
+                    WarningsForm.ignore_warnings_id: (
+                        "maybe-unintentional-invoice-change discourage-cancellations"
+                    )
+                },
+            ),
+        )
+        self.assertRedirects(response, down_payment.urls["detail"])
+        down_payment.refresh_from_db()
+        self.assertIsNone(down_payment.down_payment_applied_to)
+        final.refresh_from_db()
+        self.assertEqual(final.down_payment_total, 0)
+        self.assertEqual(final.total_excl_tax, 2500)
+
     def test_cancellation_with_payment_notice(self):
         """Canceling invoices requires entering a payment notice"""
         invoice = factories.InvoiceFactory.create(

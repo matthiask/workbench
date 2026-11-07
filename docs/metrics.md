@@ -51,7 +51,8 @@ Contents:
   applied down payments (so down payment invoices count as revenue when
   invoiced and the final invoice deducts them; applied down payments can only
   be cancelled or change their amount after the final invoice has been
-  cancelled, which releases them). `total` adds VAT if
+  cancelled, which releases them, or while it is in preparation, which
+  then deducts the new amount). `total` adds VAT if
   `liable_to_vat`, rounded to 5 cents.
   `workbench/tools/models.py:ModelWithTotal._calculate_total`
 - **Invoiced** invoices: `Invoice.objects.invoiced()`, status SENT or PAID.

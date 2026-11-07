@@ -490,9 +490,12 @@ class InvoiceForm(PostalAddressSelectionForm):
                     code="tax-rate",
                 )
 
-        if final := self.instance.down_payment_applied_to:
+        if (
+            final := self.instance.down_payment_applied_to
+        ) and final.status > Invoice.IN_PREPARATION:
             # The final invoice deducts the down payment, it can neither be
-            # cancelled nor change its amount
+            # cancelled nor change its amount (final invoices in preparation
+            # follow, see save())
             fields = {"subtotal", "discount"} & set(self.changed_data)
             if has_status and data["status"] in {
                 Invoice.IN_PREPARATION,
@@ -553,6 +556,21 @@ class InvoiceForm(PostalAddressSelectionForm):
                 ),
                 Z2,
             )
+
+        if final := instance.down_payment_applied_to:
+            # Only final invoices in preparation, see clean()
+            if instance.status in {Invoice.IN_PREPARATION, Invoice.CANCELED}:
+                instance.down_payment_applied_to = None
+            instance.save()
+            final.down_payment_total = sum(
+                (
+                    invoice.total_excl_tax
+                    for invoice in final.down_payment_invoices.all()
+                ),
+                Z2,
+            )
+            final.save()
+            return instance
 
         instance.save()
         return instance
