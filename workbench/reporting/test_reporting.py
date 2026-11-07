@@ -58,6 +58,28 @@ class ReportingTest(TestCase):
             [2026, 2027],
         )
 
+    @travel("2026-07-01 12:00")
+    def test_key_data_projection(self):
+        """The planned gross margin of the year is the gross margin so far
+        and the projections which haven't been invoiced yet, not the
+        extrapolation plus projections"""
+        self.client.force_login(factories.UserFactory.create())
+        factories.InvoiceFactory.create(
+            invoiced_on=dt.date(2026, 1, 10),
+            due_on=dt.date(2026, 1, 31),
+            subtotal=400,
+            status=Invoice.SENT,
+        )
+        factories.ProjectedInvoiceFactory.create(
+            invoiced_on=dt.date(2026, 10, 15), gross_margin=1000
+        )
+        response = self.client.get("/report/key-data/")
+        projection = response.context["gross_margin_projection"]
+        self.assertAlmostEqual(
+            projection["gross_margin"], Decimal(400) * Decimal("365.24") / 182, 2
+        )
+        self.assertEqual(projection["gross_margin_incl_projected"], 1400)
+
     def test_labor_costs(self):
         """The labor costs report does a few things"""
         user1 = factories.EmploymentFactory.create().user

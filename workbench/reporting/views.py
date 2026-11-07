@@ -323,17 +323,15 @@ def key_data_view(request):
         1 + Decimal((today - dt.date(today.year, 1, 1)).days)
     )
     gm = gross_margin_by_years[today.year]
+    # Planned: The gross margin so far and the projections which haven't been
+    # invoiced yet. The extrapolation covers the whole year already, adding
+    # the projections to it would count the rest of the year twice.
+    planned = gm["gross_margin"] + gm["projected_gross_margin"]
     gross_margin_projection = {
         "gross_profit": gm["gross_profit"] * gmp_factor,
         "gross_margin": gm["gross_margin"] * gmp_factor,
-        "gross_margin_incl_projected": gm["gross_margin"] * gmp_factor
-        + gm["projected_gross_margin"],
-        "margin_per_fte": (
-            gm["gross_margin"] * gmp_factor + gm["projected_gross_margin"]
-        )
-        / gm["fte"]
-        if gm["fte"]
-        else None,
+        "gross_margin_incl_projected": planned,
+        "margin_per_fte": planned / gm["fte"] if gm["fte"] else None,
     }
 
     gh = [

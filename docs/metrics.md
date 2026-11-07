@@ -173,8 +173,8 @@ One row per month (`key_data.py:gross_margin_by_month`); a month is **left out**
 **Hochrechnung row** (current year extrapolation), factor f = 365.24 / (1 + days since 1 Jan):
 - Umsatz: year Umsatz × f
 - Umsatz bereinigt: year gross margin × f
-- Geplant column: year gross margin × f + Σ projected gross margin of the current year's months
-- Umsatz / FTE: (year gross margin × f + projected) / mean FTE of the year
+- Geplant column: year gross margin (not extrapolated) + Σ projected gross margin of the current year's months (projections not invoiced yet). Adding the projections to the extrapolation would count the rest of the year twice.
+- Umsatz / FTE: Geplant / mean FTE of the year
 
 **Chart "Umsatz minus Fremdkosten minus Abgrenzungen"**: Umsatz bereinigt per calendar month; current year as bars plus the current year's projected gross margin as an extra bar series ("geplanter Umsatz"), the three earlier years as lines. `views.py:_years_chart`
 **Chart "… pro FTE"**: per quarter, Σ of the monthly Umsatz/FTE values (months not displayed contribute 0); current year bars, earlier years lines.
