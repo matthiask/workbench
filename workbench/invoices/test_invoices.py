@@ -304,6 +304,19 @@ class InvoicesTest(TestCase):
             ],
         )
 
+    def test_invoice_offer_discount(self):
+        """Invoicing an offer starts with its discount"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, discount=100)
+        factories.ServiceFactory.create(project=project, offer=offer, cost=1000)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            project.urls["createinvoice"]
+            + f"?type=services&source=offer&offer={offer.pk}"
+        )
+        self.assertEqual(response.context["form"]["discount"].value(), 100)
+
     def test_create_service_invoice_from_offer(self):
         """Service invoice creation from offers (services) works and results in
         the expected invoice total"""

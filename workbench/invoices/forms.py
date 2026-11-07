@@ -630,6 +630,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
             third_party_costs=Z2
             if type in {Invoice.SERVICES, Invoice.CREDIT}
             else None,
+            discount=self.offer.discount if self.offer else Z2,
         )
 
         super().__init__(*args, **kwargs)
