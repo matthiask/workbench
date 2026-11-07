@@ -984,6 +984,12 @@ class LogbookTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)  # No crash
 
+        response = self.client.get(
+            cost.service.project.urls["createcost"] + "?copy=999999",
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 200)  # No crash
+
     def test_pre_form(self):
         """Test the project selection modal"""
         project = factories.ProjectFactory.create()

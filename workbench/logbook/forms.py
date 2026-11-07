@@ -692,7 +692,7 @@ class LoggedCostForm(ModelForm):
             if pk := request.GET.get("copy"):
                 try:
                     cost = LoggedCost.objects.get(pk=pk)
-                except LoggedHours.DoesNotExist, TypeError, ValueError:
+                except LoggedCost.DoesNotExist, TypeError, ValueError:
                     pass
                 else:
                     initial.update({
