@@ -1166,6 +1166,57 @@ class InvoicesTest(TestCase):
         response = self.client.get(invoice.urls["pdf"])
         self.assertEqual(response.status_code, 200)
 
+    def test_cancel_applied_down_payment(self):
+        """Down payments applied to an invoice are cancelled after it"""
+        project = factories.ProjectFactory.create()
+        kwargs = {
+            "project": project,
+            "customer": project.customer,
+            "contact": project.contact,
+            "postal_address": "Anything\nStreet\nCity",
+            "invoiced_on": in_days(0),
+            "due_on": in_days(15),
+            "status": Invoice.SENT,
+        }
+        down_payment = factories.InvoiceFactory.create(
+            type=Invoice.DOWN_PAYMENT, subtotal=100, **kwargs
+        )
+        final = factories.InvoiceFactory.create(subtotal=2500, **kwargs)
+        down_payment.down_payment_applied_to = final
+        down_payment.save()
+        self.client.force_login(project.owned_by)
+
+        for status in [Invoice.CANCELED, Invoice.IN_PREPARATION]:
+            with self.subTest(status=status):
+                response = self.client.post(
+                    down_payment.urls["update"],
+                    invoice_to_dict(
+                        down_payment,
+                        status=status,
+                        payment_notice="Wrong amount",
+                        **{WarningsForm.ignore_warnings_id: "on"},
+                    ),
+                )
+                self.assertContains(
+                    response,
+                    "This down payment has been applied to an invoice, cancel"
+                    " that invoice first:",
+                )
+
+        final.status = Invoice.CANCELED
+        final.payment_notice = "Wrong down payment"
+        final.save()
+        response = self.client.post(
+            down_payment.urls["update"],
+            invoice_to_dict(
+                down_payment,
+                status=Invoice.CANCELED,
+                payment_notice="Wrong amount",
+                **{WarningsForm.ignore_warnings_id: "discourage-cancellations"},
+            ),
+        )
+        self.assertRedirects(response, down_payment.urls["detail"])
+
     def test_cancellation_with_payment_notice(self):
         """Canceling invoices requires entering a payment notice"""
         invoice = factories.InvoiceFactory.create(

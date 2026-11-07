@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 08:58+0100\n"
+"POT-Creation-Date: 2026-11-07 09:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2203,6 +2203,10 @@ msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistun
 #: workbench/invoices/forms.py
 msgid "Are you sure the tax rate is correct? The service period ends before 2024 but you have selected the new tax rate."
 msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistungserbringung endet vor 2024 aber Du hast den neuen MwSt-Satz gewählt."
+
+#: workbench/invoices/forms.py
+msgid "This down payment has been applied to an invoice, cancel that invoice first:"
+msgstr "Diese Anzahlung wurde bereits mit einer Rechnung verrechnet, storniere zuerst diese Rechnung:"
 
 #: workbench/invoices/forms.py
 #, python-brace-format

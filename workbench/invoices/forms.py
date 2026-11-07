@@ -327,7 +327,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                 code="postpone-reminders-far-out",
             )
 
-    def clean(self):
+    def clean(self):  # noqa: C901
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
 
@@ -489,6 +489,24 @@ class InvoiceForm(PostalAddressSelectionForm):
                     ),
                     code="tax-rate",
                 )
+
+        if (
+            has_status
+            and self.instance.down_payment_applied_to
+            and data["status"] in {Invoice.IN_PREPARATION, Invoice.CANCELED}
+        ):
+            # The final invoice still deducts the down payment
+            self.add_error(
+                "status",
+                format_html(
+                    "{} {}",
+                    _(
+                        "This down payment has been applied to an invoice,"
+                        " cancel that invoice first:"
+                    ),
+                    self.instance.down_payment_applied_to,
+                ),
+            )
 
         return data
 
