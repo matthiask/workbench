@@ -181,6 +181,47 @@ class PlanningAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 422)
 
+    def test_import_unchanged_context(self):
+        """Planned work sent back unchanged is accepted, also with users who
+        left and offers which have been declined since"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        left = factories.UserFactory.create(_short_name="zz")
+        factories.PlannedWorkFactory.create(
+            project=project, user=left, weeks=[monday()]
+        )
+        factories.PlannedWorkFactory.create(
+            project=project, offer=offer, weeks=[monday()]
+        )
+        left.is_active = False
+        left.save()
+        offer.status = Offer.DECLINED
+        offer.save()
+        self.client.force_login(project.owned_by)
+
+        context = self.client.get(
+            f"/api/projects/{project.pk}/planning/context/"
+        ).json()
+        self.assertEqual(
+            {pw["user"] for pw in context["planned_work"]},
+            {"zz", project.planned_work.exclude(user=left).get().user._short_name},
+        )
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/import/",
+            {"milestones": [], "planned_work": context["planned_work"]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
+        # Changing to them isn't possible
+        pw = project.planned_work.exclude(user=left).get()
+        response = self.client.patch(
+            f"/api/planning/work/{pw.pk}/",
+            {"user": "zz"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+
     def test_import_page(self):
         """The import page contains the prompt and is linked from the planning"""
         project = factories.ProjectFactory.create(title="Relaunch für Kunde")
@@ -242,7 +283,6 @@ class PlanningAPITest(TestCase):
         for field in [
             "title",
             "user",
-            "service_type",
             "weeks",
             "planned_hours",
             "is_provisional",

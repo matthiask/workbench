@@ -177,7 +177,8 @@ def project_planning_context(project):
             {
                 "id": pw.id,
                 "title": pw.title,
-                "user": short_names.get(pw.user_id),
+                # Also users who left, sending it back unchanged works
+                "user": pw.user._short_name or None,
                 "service_type": pw.service_type.title if pw.service_type else None,
                 "offer": pw.offer.code if pw.offer else None,
                 "milestone": pw.milestone_id,
@@ -187,7 +188,7 @@ def project_planning_context(project):
                 "notes": pw.notes,
             }
             for pw in project.planned_work.select_related(
-                "service_type", "offer__project"
+                "service_type", "offer__project", "user"
             )
         ],
         "absences": [
@@ -272,7 +273,7 @@ def _lookups(project):
 
 
 # Fields of planned work which can be left out but not set to null
-NOT_NULL = {"title", "user", "service_type", "weeks", "planned_hours", "is_provisional"}
+NOT_NULL = {"title", "user", "weeks", "planned_hours", "is_provisional"}
 
 
 def _apply_planned_work(  # noqa: C901
@@ -298,7 +299,9 @@ def _apply_planned_work(  # noqa: C901
         pw.planned_hours = _hours(values["planned_hours"])
 
     if "user" in values:
-        if user := lookups["users"].get(values["user"].casefold()):
+        if pw.pk and values["user"].casefold() == pw.user._short_name.casefold():
+            pass  # Unchanged, also users who left
+        elif user := lookups["users"].get(values["user"].casefold()):
             pw.user = user
         else:
             errors.append({
@@ -307,7 +310,9 @@ def _apply_planned_work(  # noqa: C901
             })
 
     if "service_type" in values:
-        if service_type := lookups["service_types"].get(values["service_type"]):
+        if values["service_type"] is None:
+            pw.service_type = None
+        elif service_type := lookups["service_types"].get(values["service_type"]):
             pw.service_type = service_type
         else:
             errors.append({
@@ -318,6 +323,8 @@ def _apply_planned_work(  # noqa: C901
     if "offer" in values:
         if values["offer"] is None:
             pw.offer = None
+        elif pw.offer and values["offer"] == pw.offer.code:
+            pass  # Unchanged, also offers which have been declined since
         elif offer := lookups["offers"].get(values["offer"]):
             pw.offer = offer
         else:
