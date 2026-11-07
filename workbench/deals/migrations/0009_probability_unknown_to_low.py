@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             name="probability",
             field=models.IntegerField(
                 choices=[(10, "unknown"), (15, "low"), (20, "normal"), (30, "high")],
-                default=15,
+                default=20,
                 verbose_name="probability",
             ),
         ),

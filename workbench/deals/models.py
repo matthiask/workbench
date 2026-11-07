@@ -151,7 +151,7 @@ class Deal(Model):
         _("status"), choices=STATUS_CHOICES, default=OPEN
     )
     probability = models.IntegerField(
-        _("probability"), choices=PROBABILITY_CHOICES, default=LOW
+        _("probability"), choices=PROBABILITY_CHOICES, default=NORMAL
     )
     decision_expected_on = models.DateField(
         _("decision expected on"), blank=True, null=True

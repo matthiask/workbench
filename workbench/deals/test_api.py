@@ -239,7 +239,7 @@ class DealsAPITest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response.json()["probability"], "low")
+        self.assertEqual(response.json()["probability"], "normal")
 
     def test_update(self):
         """Deals are changed field by field like in the web interface"""
