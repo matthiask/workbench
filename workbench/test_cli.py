@@ -345,6 +345,15 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertTrue(target.read_bytes().startswith(b"%PDF"))
 
+        with patch(
+            "workbench.tools.pdf.PDFDocument.process_invoice",
+            side_effect=ValueError("Broken"),
+        ):
+            result = self.wb("invoices", "pdf", invoice.pk, "-o", target)
+        self.assertEqual(result.exit_code, 1)
+        # The user's language
+        self.assertEqual(result.output, "Konnte das PDF nicht generieren: Broken\n")
+
     def test_people(self):
         """People are created from YAML files"""
         person = self.file(

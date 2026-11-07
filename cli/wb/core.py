@@ -444,7 +444,11 @@ def request(method, path, *, optional=False, raw=False, **kwargs):
     if response.status_code == 403 and optional:
         return None
     if response.status_code == 422:
-        terminate("\n".join(format_error(error) for error in response.json()["detail"]))
+        detail = response.json()["detail"]
+        # Validation errors are lists, other errors (HttpError) messages
+        if isinstance(detail, str):
+            terminate(detail)
+        terminate("\n".join(format_error(error) for error in detail))
     if response.status_code >= 500:
         raise _ServerError(
             response.status_code,
