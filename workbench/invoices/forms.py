@@ -767,6 +767,28 @@ class CreateProjectInvoiceForm(InvoiceForm):
             widget=forms.RadioSelect,
         )
 
+    def clean(self):
+        data = super().clean()
+        if selected := data.get("selected_services"):
+            invoiced = self.project.services.filter(
+                id__in=selected,
+                invoice_services__invoice__status__in=[
+                    Invoice.IN_PREPARATION,
+                    Invoice.SENT,
+                    Invoice.PAID,
+                ],
+            ).distinct()
+            if invoiced:
+                self.add_warning(
+                    _(
+                        "Some services have been invoiced already: %(services)s."
+                        " Make sure the same work isn't invoiced twice."
+                    )
+                    % {"services": ", ".join(service.title for service in invoiced)},
+                    code="services-invoiced-already",
+                )
+        return data
+
     def save(self):
         if self.request.GET.get("type") == "services":
             instance = super().save()

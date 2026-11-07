@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 12:53+0100\n"
+"POT-Creation-Date: 2026-11-07 12:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2280,6 +2280,11 @@ msgstr "Ja, die Erfassung ab sofort verbieten"
 #: workbench/invoices/forms.py
 msgid "No, do not change anything"
 msgstr "Nein, bitte nichts ändern"
+
+#: workbench/invoices/forms.py
+#, python-format
+msgid "Some services have been invoiced already: %(services)s. Make sure the same work isn't invoiced twice."
+msgstr "Einige Leistungen wurden bereits verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird."
 
 #: workbench/invoices/forms.py
 msgid "Other invoice types must be created directly on a project."

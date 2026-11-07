@@ -147,6 +147,45 @@ class InvoicesTest(TestCase):
         response = self.client.get(project.urls["createinvoice"] + "?type=fixed")
         self.assertContains(response, "Total excl. tax of accepted offers: 10’000.00")
 
+    def test_services_invoiced_already(self):
+        """Invoicing services again is a warning"""
+        service = factories.ServiceFactory.create(
+            title="Design", effort_type="Design", effort_rate=100, effort_hours=10
+        )
+        project = service.project
+        factories.LoggedHoursFactory.create(service=service, hours=4)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook(project.services.all())
+        self.client.force_login(project.owned_by)
+
+        data = {
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "discount": "0",
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            "postal_address": "Anything\nStreet\nCity",
+            "selected_services": [service.pk],
+            "disable_logging": 0,
+        }
+        url = project.urls["createinvoice"] + "?type=services&source=offer"
+        response = self.client.post(url, data)
+        self.assertContains(response, 'value="services-invoiced-already"')
+        self.assertContains(
+            response, "Some services have been invoiced already: Design"
+        )
+        response = self.client.post(
+            url,
+            data | {WarningsForm.ignore_warnings_id: "services-invoiced-already"},
+        )
+        self.assertEqual(response.status_code, 302)
+
     def test_create_service_invoice_for_one_offer(self):
         """The menu of an offer creates invoices with its title, description and
         services, the latter only if there's something to invoice when
