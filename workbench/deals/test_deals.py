@@ -266,9 +266,9 @@ class DealsTest(TestCase):
         self.assertContains(response, "Reason for losing")
 
         response = self.client.get(deal.urls["set_status"] + "?status=40")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
         response = self.client.get(deal.urls["set_status"] + "?status=abc")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
         response = self.client.post(deal.urls["set_status"] + "?status=20")
         self.assertContains(response, "This field is required when closing a deal.")

@@ -3,9 +3,8 @@ import datetime as dt
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import BadRequest, ValidationError
 from django.db.models import Q
-from django.http import Http404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
@@ -375,7 +374,7 @@ class SetStatusForm(ModelForm):
             try:
                 status = int(kwargs["request"].GET.get("status", instance.status))
             except (TypeError, ValueError) as exc:
-                raise Http404 from exc
+                raise BadRequest from exc
         instance.status = status
         if instance.status in {Deal.ACCEPTED, Deal.DECLINED}:
             # Closed deals keep their date when changing the closing
@@ -412,7 +411,7 @@ class SetStatusForm(ModelForm):
             ].queryset.filter(represents_a_win=False)
 
         else:
-            raise Http404
+            raise BadRequest
 
         if instance.status != Deal.OPEN:
             related_offers = instance.related_offers.select_related(
