@@ -27,6 +27,30 @@ activities in local storage, fresh browser contexts start empty.
 4. Run it again and make sure it still fails.
 5. Only then implement the fix and confirm the test passes.
 
+# Verification rounds
+
+From time to time (or when asked what we're missing), look for behaviour
+the tests don't cover, above all scenarios combining features over time:
+offers, services and their logged hours and costs, invoices (fixed amount,
+services, down payments, credits, recurring), projected invoices, archiving,
+closing projects and deals, the reports and key figures (`docs/metrics.md`),
+absences and the annual working time, planning, contacts (merging,
+archiving, groups), the audit log, the API and `wb`.
+
+1. A fresh agent reads this file, `docs/metrics.md`, the specs in
+   `specs/`, the code and the tests, read-only and without our hypotheses.
+   Tell it what's covered already (the tests, `git log --grep=Test:`, the
+   findings of earlier rounds in `specs/verification.md`) and to separate
+   verified bugs (shown with a throwaway test it deletes afterwards) from
+   untested risks. Split large areas between several agents.
+2. Check its findings against the code before relying on them.
+3. Ask the user where the behaviour is a decision rather than a bug.
+4. Fix bugs as above (failing test first), one commit each, docs included
+   (`docs/metrics.md` for computations). Tests go into the app's tests,
+   API and CLI round trips into `workbench/test_cli.py`.
+5. Keep the open findings in `specs/verification.md` until they're done,
+   so that the next session continues there.
+
 # Translations
 
 Update and compile the translation catalog with:
