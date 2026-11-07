@@ -559,6 +559,10 @@ def _invoice_form(request, data, error):  # noqa: C901
         "logbook_cutoff_date",
     ]:
         if (value := getattr(data, field)) is not None:
+            # The form drops fields which don't apply to the type (e.g.
+            # discounts of credits), don't ignore them silently
+            if field not in form.fields:
+                error([field], _("Not available for this type of invoice."))
             values[field] = value
     values["liable_to_vat"] = data.liable_to_vat or ""
     if data.contact is not None:

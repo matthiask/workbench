@@ -466,6 +466,20 @@ class InvoicesAPITest(TestCase):
         response = create({"contact": project.contact.pk, "type": "credit"})
         self.assertEqual(response.status_code, 422)
 
+        # Fields which don't apply to the type are errors, not ignored
+        response = create({
+            "project": project.pk,
+            "type": "credit",
+            "subtotal": 100,
+            "discount": 10,
+            "third_party_costs": 5,
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "third_party_costs"], ["body", "data", "discount"]],
+        )
+
         # Warnings are errors unless forced
         address = {"postal_address": "Short\nAddress"}
         response = create({"project": project.pk, "subtotal": 100} | address)
