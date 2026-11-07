@@ -616,6 +616,13 @@ class AWTTest(TestCase):
             Employment(**kw, hourly_labor_costs=20).full_clean()
         self.assertEqual(list(cm.exception), msg)
 
+        # The labor costs report divides by the green hours target
+        with self.assertRaises(ValidationError) as cm:
+            Employment(
+                **kw, green_hours_target=0, hourly_labor_costs=Decimal(20)
+            ).full_clean()
+        self.assertIn("green_hours_target", dict(cm.exception))
+
         msg = [("date_until", ["Employments cannot end before they began."])]
 
         with self.assertRaises(ValidationError) as cm:

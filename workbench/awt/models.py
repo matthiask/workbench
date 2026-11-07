@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django.contrib import messages
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.text import capfirst
@@ -101,7 +102,10 @@ class Employment(Model):
     notes = models.CharField(_("notes"), blank=True, max_length=500)
     hourly_labor_costs = MoneyField(_("hourly labor costs"), blank=True, null=True)
     green_hours_target = models.SmallIntegerField(
-        _("green hours target"), blank=True, null=True
+        _("green hours target"),
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(1)],
     )
 
     class Meta:
