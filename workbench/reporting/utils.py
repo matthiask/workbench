@@ -148,7 +148,7 @@ def accepted_offers_by_project(projects):
         sides[project][retainer]["discount"] += discount
     for project, retainer, costs in (
         Service.objects
-        .filter(offer__in=offers, third_party_costs__isnull=False)
+        .filter(offer__in=offers, is_optional=False, third_party_costs__isnull=False)
         .order_by()
         .values("project", "offer__is_budget_retainer")
         .annotate(s=Sum("third_party_costs"))

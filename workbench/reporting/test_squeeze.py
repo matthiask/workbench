@@ -72,6 +72,25 @@ class SqueezeTest(TestCase):
         row = next(p for p in data["projects"] if p["project"] == project)
         self.assertEqual(row["hours"], 10)
 
+    def test_third_party_costs_of_optional_services(self):
+        """Optional services aren't in the offer total, nor their costs"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        factories.ServiceFactory.create(
+            project=project, offer=offer, cost=1000, third_party_costs=500
+        )
+        factories.ServiceFactory.create(
+            project=project,
+            offer=offer,
+            cost=10000,
+            third_party_costs=8000,
+            is_optional=True,
+        )
+        offer.status = Offer.ACCEPTED
+        offer.save()
+
+        self.assertEqual(project_gross_margin(project)["offered"], 500)
+
     def test_offered_rate_uses_logged_hours(self):
         """Hours logged beyond the accepted offers' hours lower their rate"""
         project = factories.ProjectFactory.create()
