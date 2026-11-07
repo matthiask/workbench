@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 13:57+0100\n"
+"POT-Creation-Date: 2026-11-07 13:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3685,8 +3685,10 @@ msgid "Cannot close a project with a date of {} or earlier anymore."
 msgstr "Kann Projekte nicht mehr mit einem Datum von {} oder früher schliessen."
 
 #: workbench/projects/forms.py
-msgid "Closing the project discards its offers in preparation, some of them have planning entries linked to them. Delete them?"
-msgstr "Beim Schliessen des Projekts werden seine Offerten in Vorbereitung verworfen, einige davon haben Planungseinträge. Sollen diese gelöscht werden?"
+msgid "This project has planning entries after the current week. Delete them?"
+msgstr ""
+"Dieses Projekt hat Planungseinträge nach der aktuellen Woche. Sollen diese "
+"gelöscht werden?"
 
 #: workbench/projects/forms.py
 #, python-format
@@ -6300,6 +6302,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Closing the project discards its offers in preparation, some of them have planning entries linked to them. Delete them?"
+#~ msgstr "Beim Schliessen des Projekts werden seine Offerten in Vorbereitung verworfen, einige davon haben Planungseinträge. Sollen diese gelöscht werden?"
 
 #~ msgid "You are canceling this invoice. It may be cleaner to delete the invoice instead."
 #~ msgstr "Du versuchst, die Rechnung zu storieren. Es könnte sauberer sein, die Rechnung zu löschen."

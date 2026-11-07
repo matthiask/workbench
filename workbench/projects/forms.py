@@ -16,7 +16,7 @@ from workbench.reporting.models import FreezeDate
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.reporting.utils import accepted_offers_by_project
 from workbench.services.models import ServiceType
-from workbench.tools.formats import Z2, currency, local_date_format
+from workbench.tools.formats import Z1, Z2, currency, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     DateInput,
@@ -26,7 +26,7 @@ from workbench.tools.forms import (
     add_prefix,
     delete_planned_work_field,
 )
-from workbench.tools.validation import in_days, is_only_url, is_title_specific
+from workbench.tools.validation import in_days, is_only_url, is_title_specific, monday
 
 
 class CampaignSearchForm(Form):
@@ -484,22 +484,37 @@ class ProjectForm(ModelForm):
         return instance
 
 
-def _planned_work_of_offers_in_preparation(project):
-    from workbench.offers.models import Offer
+def _future_planned_work(project):
+    """Planned work of the project in the weeks after the current one"""
+    this_week = monday()
+    return [
+        work
+        for work in project.planned_work.all()
+        if any(week > this_week for week in work.weeks)
+    ]
 
-    return project.planned_work.filter(offer__status=Offer.IN_PREPARATION)
+
+def delete_future_planned_work(project):
+    """Removes the weeks after the current one, the hours of the remaining
+    weeks stay the same"""
+    this_week = monday()
+    for work in _future_planned_work(project):
+        if past := [week for week in work.weeks if week <= this_week]:
+            work.planned_hours = (
+                work.planned_hours * len(past) / len(work.weeks)
+            ).quantize(Z1)
+            work.weeks = past
+            work.save()
+        else:
+            work.delete()
 
 
 def add_delete_planned_work_field(form, project):
-    """Asks about the planned work of the offers in preparation of a project
-    which is being closed"""
-    if _planned_work_of_offers_in_preparation(project).exists():
+    """Asks about the future planned work of a project which is being
+    closed"""
+    if _future_planned_work(project):
         form.fields["delete_planned_work"] = delete_planned_work_field(
-            _(
-                "Closing the project discards its offers in preparation,"
-                " some of them have planning entries linked to them."
-                " Delete them?"
-            )
+            _("This project has planning entries after the current week. Delete them?")
         )
 
 
@@ -510,7 +525,7 @@ def discard_offers_in_preparation(project, *, request, delete_planned_work):
     from workbench.offers.models import Offer
 
     if delete_planned_work:
-        _planned_work_of_offers_in_preparation(project).delete()
+        delete_future_planned_work(project)
     discarded, declined = [], []
     for offer in project.offers.filter(status=Offer.IN_PREPARATION):
         if offer.offered_on:

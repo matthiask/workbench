@@ -11,13 +11,14 @@ from workbench.contacts.models import Organization
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
+from workbench.planning.models import PlannedWork
 from workbench.projects.charts import projected_vs_invoiced_chart
 from workbench.projects.models import InternalType, Project, Service
 from workbench.projects.views import projected_invoices_timeline
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, monday
 
 
 class ProjectsTest(TestCase):
@@ -906,16 +907,25 @@ class ProjectsTest(TestCase):
             messages(response),
         )
 
-    def test_closing_with_planned_work_of_offers_in_preparation(self):
-        """Closing a project discards its offers in preparation, the planned
-        work of those offers needs a decision"""
+    def test_closing_with_future_planned_work(self):
+        """Closing a project asks whether its planned work after the current
+        week should be deleted, whatever its offer"""
         project = factories.ProjectFactory.create()
         preparing = factories.OfferFactory.create(project=project)
-        factories.PlannedWorkFactory.create(
-            project=project, offer=preparing, weeks=[in_days(7)]
+        accepted = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        this_week = monday()
+        future = factories.PlannedWorkFactory.create(
+            project=project, offer=preparing, weeks=[this_week + dt.timedelta(days=7)]
         )
-        # Planned work without offer is left alone
-        factories.PlannedWorkFactory.create(project=project, weeks=[in_days(7)])
+        spanning = factories.PlannedWorkFactory.create(
+            project=project,
+            offer=accepted,
+            weeks=[this_week + dt.timedelta(days=days) for days in [-7, 0, 7, 14]],
+            planned_hours=40,
+        )
+        past = factories.PlannedWorkFactory.create(
+            project=project, weeks=[this_week - dt.timedelta(days=7)]
+        )
         self.client.force_login(project.owned_by)
         data = {
             "customer": project.customer_id,
@@ -946,8 +956,12 @@ class ProjectsTest(TestCase):
         self.assertRedirects(response, project.urls["detail"])
         preparing.refresh_from_db()
         self.assertEqual(preparing.status, Offer.DISCARDED)
-        self.assertEqual(preparing.planned_work.count(), 0)
-        self.assertEqual(project.planned_work.count(), 1)
+        self.assertFalse(PlannedWork.objects.filter(pk=future.pk).exists())
+        spanning.refresh_from_db()
+        self.assertEqual(spanning.weeks, [this_week - dt.timedelta(days=7), this_week])
+        self.assertEqual(spanning.planned_hours, 20)
+        past.refresh_from_db()
+        self.assertEqual(past.weeks, [this_week - dt.timedelta(days=7)])
 
     def test_initialize_customer_contact(self):
         """Initialize customer and/or contact using query parameters"""
