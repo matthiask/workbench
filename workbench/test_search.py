@@ -46,6 +46,17 @@ class SearchTest(TestCase):
                     response, f'<span class="nav-link disabled">{label}</span>'
                 )
 
+    def test_deals_require_the_deals_feature(self):
+        """Deals are searched with the deals feature, like their views"""
+        project = factories.ProjectFactory.create(title="Test")
+        self.client.force_login(project.owned_by)
+        deals = '<span class="nav-link disabled">Deals</span>'
+
+        with override_settings(FEATURES={"CONTROLLING": F.ALWAYS, "DEALS": F.NEVER}):
+            self.assertNotContains(self.client.get("/search/?q=Test"), deals)
+        with override_settings(FEATURES={"CONTROLLING": F.NEVER, "DEALS": F.ALWAYS}):
+            self.assertContains(self.client.get("/search/?q=Test"), deals)
+
     def test_search_more(self):
         """Types show a few results right away, the others on request; the
         jump links lead to the types with results"""

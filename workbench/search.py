@@ -41,8 +41,9 @@ def search_sources(user):
             Invoice.objects.select_related("project", "owned_by"),
             RecurringInvoice.objects.all(),
             Offer.objects.select_related("project", "owned_by").order_by("-pk"),
-            Deal.objects.order_by("-pk"),
         ])
+    if user.features[FEATURES.DEALS]:
+        sources.append(Deal.objects.order_by("-pk"))
     return sources
 
 
