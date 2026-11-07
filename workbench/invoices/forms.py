@@ -536,13 +536,18 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         if instance.type in {instance.FIXED, instance.DOWN_PAYMENT}:
             instance.subtotal = self.cleaned_data["subtotal"]
-            instance.down_payment_total = Z2
 
         elif instance.type == instance.CREDIT:
             instance.subtotal = -self.cleaned_data["subtotal"]
+
+        if "apply_down_payment" not in self.cleaned_data:
+            # No down payments can be applied (anymore), release those which
+            # aren't sent or paid anymore
+            if instance.pk:
+                instance.down_payment_invoices.update(down_payment_applied_to=None)
             instance.down_payment_total = Z2
 
-        if "apply_down_payment" in self.cleaned_data:
+        else:
             if not instance.pk:
                 instance.save()
 

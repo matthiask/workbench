@@ -1310,6 +1310,35 @@ class InvoicesTest(TestCase):
         self.assertEqual(final.down_payment_total, 0)
         self.assertEqual(final.total_excl_tax, 2500)
 
+    def test_services_invoice_with_ineligible_down_payment(self):
+        """Saving releases down payments which can't be applied anymore"""
+        project = factories.ProjectFactory.create()
+        kwargs = {
+            "project": project,
+            "customer": project.customer,
+            "contact": project.contact,
+            "postal_address": "Anything\nStreet\nCity",
+        }
+        down_payment = factories.InvoiceFactory.create(
+            type=Invoice.DOWN_PAYMENT, subtotal=100, **kwargs
+        )
+        invoice = factories.InvoiceFactory.create(
+            type=Invoice.SERVICES, down_payment_total=100, **kwargs
+        )
+        Invoice.objects.filter(pk=down_payment.pk).update(
+            down_payment_applied_to=invoice
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"], invoice_to_dict(invoice, title="Changed")
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.down_payment_total, 0)
+        down_payment.refresh_from_db()
+        self.assertIsNone(down_payment.down_payment_applied_to)
+
     def test_cancellation_with_payment_notice(self):
         """Canceling invoices requires entering a payment notice"""
         invoice = factories.InvoiceFactory.create(
