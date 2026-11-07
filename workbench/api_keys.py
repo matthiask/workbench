@@ -1,16 +1,20 @@
-"""Stable keys for choices which are stored as numbers
+"""Stable keys of choices for the API
 
-The numbers give the statuses and probabilities a natural ordering, but
-they aren't nice in the API. The API outputs and accepts these keys (with
-a localized label next to them), ``/api/choices/`` lists them."""
+Statuses and probabilities are stored as numbers which give them a natural
+ordering, but they aren't nice in the API, they have keys here. Other
+choices are stored as strings which are their keys. The API outputs and
+accepts the keys (with a localized label next to them), ``/api/choices/``
+lists them."""
 
 from typing import Literal
 
 from ninja import Router, Schema
 
+from workbench.awt.models import Absence
 from workbench.deals.models import Deal
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
+from workbench.projects.models import Project
 
 
 # Which model field each set of keys belongs to, for the labels and the tests
@@ -19,6 +23,11 @@ FIELDS = {
     "deal_probability": (Deal, "probability"),
     "offer_status": (Offer, "status"),
     "invoice_status": (Invoice, "status"),
+    # Stored as their keys
+    "invoice_type": (Invoice, "type"),
+    "recurring_invoice_periodicity": (RecurringInvoice, "periodicity"),
+    "absence_reason": (Absence, "reason"),
+    "project_type": (Project, "type"),
 }
 
 KEYS = {
@@ -49,6 +58,12 @@ KEYS = {
     },
 }
 
+KEYS |= {
+    name: {value: value for value, _label in model._meta.get_field(field).choices}
+    for name, (model, field) in FIELDS.items()
+    if name not in KEYS
+}
+
 _VALUES = {
     name: {value: key for key, value in keys.items()} for name, keys in KEYS.items()
 }
@@ -57,6 +72,10 @@ DealStatus = Literal[tuple(KEYS["deal_status"])]
 DealProbability = Literal[tuple(KEYS["deal_probability"])]
 OfferStatus = Literal[tuple(KEYS["offer_status"])]
 InvoiceStatus = Literal[tuple(KEYS["invoice_status"])]
+InvoiceType = Literal[tuple(KEYS["invoice_type"])]
+Periodicity = Literal[tuple(KEYS["recurring_invoice_periodicity"])]
+AbsenceReason = Literal[tuple(KEYS["absence_reason"])]
+ProjectType = Literal[tuple(KEYS["project_type"])]
 
 
 def key(name, value):

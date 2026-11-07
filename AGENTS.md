@@ -167,8 +167,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   data which use `jsonable()` for the integrations. Statuses and
   probabilities are stored as numbers for their natural ordering; the APIs
   output and accept stable keys instead (`KEYS` in `workbench/api_keys.py`,
-  a test checks that they are a bijection with the model's choices), main
-  objects also a localized `*_label`, and `/api/choices/` lists them.
+  a test checks that they are a bijection with the model's choices). Choices
+  stored as strings (invoice types, absence reasons, …) are their own keys.
+  Outputs never use display strings for choices: main objects have the key
+  and a localized `*_label`, and `/api/choices/` lists all of them.
   Search endpoints use ninja's `@paginate` (limit and offset, 100 per page,
   at most 10000; responses are `{items, count}`) and return a `Serialized`
   queryset from `workbench/tools/api.py` so that only the page is serialized,

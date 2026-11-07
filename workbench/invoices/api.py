@@ -15,7 +15,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.api_keys import KEYS, InvoiceStatus, key
+from workbench.api_keys import KEYS, InvoiceStatus, InvoiceType, Periodicity, key
 from workbench.contacts.api import (
     OrganizationOut,
     PersonSummary,
@@ -57,7 +57,8 @@ class InvoiceOut(Schema):
     url: str
     title: str
     description: str
-    type: str
+    type: InvoiceType
+    type_label: str
     status: InvoiceStatus
     status_label: str
     project: ProjectSummary | None
@@ -81,7 +82,8 @@ def invoice_out(invoice, request):
         "url": request.build_absolute_uri(invoice.get_absolute_url()),
         "title": invoice.title,
         "description": invoice.description,
-        "type": invoice.get_type_display(),
+        "type": invoice.type,
+        "type_label": invoice.get_type_display(),
         "status": key("invoice_status", invoice.status),
         "status_label": invoice.get_status_display(),
         "project": project_summary(invoice.project, request)
@@ -715,7 +717,8 @@ class RecurringInvoiceOut(Schema):
     description: str
     customer: OrganizationOut
     owned_by: str
-    periodicity: str
+    periodicity: Periodicity
+    periodicity_label: str
     starts_on: dt.date
     ends_on: dt.date | None
     next_period_starts_on: dt.date | None
@@ -756,7 +759,8 @@ def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
             "description": invoice.description,
             "customer": organization_out(invoice.customer, request),
             "owned_by": invoice.owned_by.get_short_name(),
-            "periodicity": invoice.get_periodicity_display(),
+            "periodicity": invoice.periodicity,
+            "periodicity_label": invoice.get_periodicity_display(),
             "starts_on": invoice.starts_on,
             "ends_on": invoice.ends_on,
             "next_period_starts_on": invoice.next_period_starts_on,

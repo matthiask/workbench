@@ -98,7 +98,15 @@ def show_project(project_id, as_json):
                 "Customer",
                 link(project["customer"]["name"], project["customer"]["url"]),
             ),
+            (
+                "Contact",
+                link(project["contact"]["full_name"], project["contact"]["url"])
+                if project["contact"]
+                else None,
+            ),
             ("Owned by", project["owned_by"]),
+            ("Type", project["type_label"]),
+            ("Internal type", project["internal_type"]),
             ("Flat rate", project["flat_rate"]),
             ("Closed on", project["closed_on"]),
             ("URL", project["url"]),
@@ -235,6 +243,7 @@ def _echo_saved_project(data, *, dry_run, as_json):
             ("ID", data["id"]),
             ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
+            ("Type", data["type_label"]),
             ("Internal type", data.get("internal_type")),
             ("Closed on", data["closed_on"]),
             ("URL", data["url"]),

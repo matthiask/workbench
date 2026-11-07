@@ -12,6 +12,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import check_feature
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.api_keys import AbsenceReason
 from workbench.awt.forms import AbsenceForm
 from workbench.awt.models import Absence
 from workbench.awt.reporting import (
@@ -42,7 +43,8 @@ class AbsenceOut(Schema):
     starts_on: dt.date
     ends_on: dt.date | None
     days: Decimal
-    reason: str
+    reason: AbsenceReason
+    reason_label: str
     description: str
     is_confirmed: bool = Field(
         description="False for paid leave not checked yet, it counts anyway."
@@ -87,7 +89,8 @@ def _absence_out(absence, request):
         "starts_on": absence.starts_on,
         "ends_on": absence.ends_on,
         "days": absence.days,
-        "reason": absence.get_reason_display(),
+        "reason": absence.reason,
+        "reason_label": absence.get_reason_display(),
         "description": absence.description_for(request.user),
         "is_confirmed": not absence.needs_confirmation,
     }

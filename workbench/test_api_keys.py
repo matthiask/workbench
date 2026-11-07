@@ -22,7 +22,7 @@ class APIKeysTest(TestCase):
                     self.assertEqual(key(name, value), k)
                 # Keys are stable identifiers
                 for k in keys:
-                    self.assertRegex(k, r"^[a-z_]+$")
+                    self.assertRegex(k, r"^[a-z_-]+$")
 
     def test_choices(self):
         """The keys are listed with their labels in their natural order"""
@@ -62,8 +62,19 @@ class APIKeysTest(TestCase):
             ("in_preparation", "In Vorbereitung"),
         )
 
+        absence = factories.AbsenceFactory.create(user=user)
+        [data] = self.client.get(
+            "/api/absences/",
+            {"user": user.get_short_name(), "year": absence.starts_on.year},
+        ).json()["items"]
+        self.assertEqual(data["reason"], absence.reason)
+
+        data = self.client.get(f"/api/projects/{offer.project_id}/").json()
+        self.assertEqual((data["type"], data["type_label"]), ("order", "Auftrag"))
+
         data = self.client.get(f"/api/invoices/{invoice.pk}/").json()
         self.assertEqual(
             (data["status"], data["status_label"]),
             ("in_preparation", "In Vorbereitung"),
         )
+        self.assertEqual((data["type"], data["type_label"]), ("fixed", "Fixbetrag"))

@@ -22,7 +22,7 @@ from ninja.pagination import paginate
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
-from workbench.api_keys import InvoiceStatus, OfferStatus, key
+from workbench.api_keys import InvoiceStatus, InvoiceType, OfferStatus, ProjectType, key
 from workbench.contacts.api import (
     OrganizationOut,
     PersonSummary,
@@ -77,6 +77,8 @@ class ProjectOut(Schema):
     customer: OrganizationOut
     contact: PersonSummary | None
     owned_by: str
+    type: ProjectType
+    type_label: str
     flat_rate: Decimal | None
     internal_type: str | None
     created_at: dt.datetime
@@ -95,6 +97,8 @@ def project_out(project, request):
         if project.contact
         else None,
         "owned_by": project.owned_by.get_short_name(),
+        "type": project.type,
+        "type_label": project.get_type_display(),
         "internal_type": project.internal_type.name if project.internal_type else None,
         "flat_rate": project.flat_rate,
         "created_at": project.created_at,
@@ -406,7 +410,7 @@ class PlannedHoursStats(Schema):
 class InvoiceStats(Schema):
     code: str
     title: str
-    type: str
+    type: InvoiceType
     status: InvoiceStatus
     invoiced_on: dt.date | None
     total_excl_tax: Decimal
@@ -563,7 +567,7 @@ def project_stats(request, filters: Query[StatsFilter]):
                 {
                     "code": invoice.code,
                     "title": invoice.title,
-                    "type": invoice.get_type_display(),
+                    "type": invoice.type,
                     "status": key("invoice_status", invoice.status),
                     "invoiced_on": invoice.invoiced_on,
                     "total_excl_tax": invoice.total_excl_tax,

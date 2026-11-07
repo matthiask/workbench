@@ -113,7 +113,7 @@ def _echo_invoice(data):
         f"{data['code']} {data['title']}",
         [
             ("ID", data["id"]),
-            ("Type", data["type"]),
+            ("Type", data["type_label"]),
             ("Status", data["status_label"]),
             ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             (
@@ -528,7 +528,7 @@ def search_recurring_invoices(
             link(invoice["title"], invoice["url"]),
             link(invoice["customer"]["name"], invoice["customer"]["url"]),
             invoice["owned_by"],
-            invoice["periodicity"],
+            invoice["periodicity_label"],
             invoice["next_period_starts_on"] or invoice["starts_on"],
             invoice["ends_on"] or "",
             invoice["total_excl_tax"],
