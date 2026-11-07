@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 13:59+0100\n"
+"POT-Creation-Date: 2026-11-07 14:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3048,7 +3048,7 @@ msgstr "Stunden benötigen eine Aufwandsart und einen Stundensatz, z.B. von eine
 msgid "%s: Neither hours nor a cost have been given yet."
 msgstr "%s: Es wurden noch weder Stunden noch Kosten angegeben."
 
-#: workbench/offers/api.py
+#: workbench/offers/api.py workbench/offers/forms.py
 msgid "The project is closed."
 msgstr "Das Projekt ist geschlossen."
 
@@ -3686,9 +3686,7 @@ msgstr "Kann Projekte nicht mehr mit einem Datum von {} oder früher schliessen.
 
 #: workbench/projects/forms.py
 msgid "This project has planning entries after the current week. Delete them?"
-msgstr ""
-"Dieses Projekt hat Planungseinträge nach der aktuellen Woche. Sollen diese "
-"gelöscht werden?"
+msgstr "Dieses Projekt hat Planungseinträge nach der aktuellen Woche. Sollen diese gelöscht werden?"
 
 #: workbench/projects/forms.py
 #, python-format

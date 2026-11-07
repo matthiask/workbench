@@ -221,6 +221,9 @@ class OfferForm(PostalAddressSelectionForm):
         data = super().clean()
         s_dict = dict(Offer.STATUS_CHOICES)
 
+        if not self.instance.pk and self.project.closed_on:
+            raise forms.ValidationError(_("The project is closed."))
+
         if self.instance.closed_on and data["status"] < Offer.ACCEPTED:
             self.add_warning(
                 _(
@@ -328,7 +331,7 @@ ServiceFormset = inlineformset_factory(
 @add_prefix("modal")
 class OfferCopyForm(Form):
     project = forms.ModelChoiceField(
-        queryset=Project.objects.all(),
+        queryset=Project.objects.open(),
         widget=Autocomplete(model=Project, params={"only_open": "on"}),
         label="",
     )

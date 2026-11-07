@@ -416,6 +416,29 @@ class OffersTest(TestCase):
         self.assertEqual(project.offers.count(), 1)
         self.assertEqual(project.services.count(), 1)
 
+    def test_no_offers_on_closed_projects(self):
+        """Offers can't be created on or copied to closed projects"""
+        project = factories.ProjectFactory.create(closed_on=in_days(-1))
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            project.urls["createoffer"],
+            {
+                "title": "Stuff",
+                "owned_by": project.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "postal_address": "A\nStreet\nCity",
+                "status": Offer.IN_PREPARATION,
+            },
+        )
+        self.assertContains(response, "The project is closed.")
+
+        offer = factories.OfferFactory.create()
+        response = self.client.post(offer.urls["copy"], {"modal-project": project.pk})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(project.offers.count(), 0)
+
     def test_postal_address_validation(self):
         """Postal addresses are validated (a bit)"""
         project = factories.ProjectFactory.create()
