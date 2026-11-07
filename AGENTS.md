@@ -171,6 +171,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   stored as strings (invoice types, absence reasons, …) are their own keys.
   Outputs never use display strings for choices: main objects have the key
   and a localized `*_label`, and `/api/choices/` lists all of them.
+  Schema classes have unique names across all routers (ninja names the
+  OpenAPI components by class, duplicates overwrite each other; a test in
+  `workbench/test_api_schema.py` checks it), and query parameters have
+  descriptions (`SearchQuery`, `ShortName`, … in `workbench/tools/api.py`).
   Search endpoints use ninja's `@paginate` (limit and offset, 100 per page,
   at most 10000; responses are `{items, count}`) and return a `Serialized`
   queryset from `workbench/tools/api.py` so that only the page is serialized,
