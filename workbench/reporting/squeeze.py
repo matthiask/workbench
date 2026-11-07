@@ -151,7 +151,11 @@ def gross_margin_components(projects, *, invoiced_until=None):
                 if project in offered
                 else Z2,
                 "projected": projected[project],
-                "invoiced": invoiced[project] - invoiced_costs.get(project, Z2),
+                # Third party costs are rarely paid before invoicing, never
+                # below zero so that the remaining gross margin isn't inflated
+                "invoiced": max(
+                    invoiced[project] - invoiced_costs.get(project, Z2), Z2
+                ),
             }
             for project in {*offered, *projected, *invoiced, *invoiced_costs}
         },

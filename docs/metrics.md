@@ -91,7 +91,7 @@ Contents:
 | Helper | Computes |
 |---|---|
 | `third_party_costs(projects)` | per project max(invoiced, Σ `LoggedCost.third_party_costs`), all time, with invoiced = max(Σ `Invoice.third_party_costs` of invoiced down payment invoices, Σ of the other invoiced invoices). Logged costs can't be linked to fixed amount invoices, so adding both would count them twice; final invoices repeat the third party costs of down payments, which may also be the only invoices (recurring invoices). `third_party_costs_components()` returns invoiced and logged separately. |
-| `gross_margin_components(projects, invoiced_until=None)` | `offered` = total − max(third party costs of the non-optional services of the accepted offers, logged third party costs) per project (retainer or other offers, see `accepted_offers_by_project()`; 0 without accepted offers), so costs logged beyond the offered ones are deducted too; `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`. All time, or invoices and third party costs up to `invoiced_until` (the budget statistics' cutoff date). |
+| `gross_margin_components(projects, invoiced_until=None)` | `offered` = total − max(third party costs of the non-optional services of the accepted offers, logged third party costs) per project (retainer or other offers, see `accepted_offers_by_project()`; 0 without accepted offers), so costs logged beyond the offered ones are deducted too; `projected` = Σ `ProjectedInvoice.gross_margin` (open projects only); `invoiced` = max(Σ `total_excl_tax` of invoiced invoices − `third_party_costs()`, 0), so third party costs logged before anything has been invoiced don't inflate the remaining gross margin (cash data's `not_in_planned_invoicing_excl_tax`, the projected gross margin's delta). All time, or invoices and third party costs up to `invoiced_until` (the budget statistics' cutoff date). |
 | `hours_components(projects)` | `hours_offered` = Σ `service_hours` of budgeted services; `hours_logged` = Σ `hours`; `hours_logged_budgeted` = Σ `hours` on budgeted services. |
 | `relevant_hours(offered, logged, logged_budgeted)` | max(offered, logged_budgeted) + (logged − logged_budgeted): hours on unbudgeted services are added on top, so rates rather underestimate. |
 | `BudgetTransfer.objects.adjustments(projects)` | per project Σ transfers in − Σ transfers out. A transfer without target project leaves the source immediately and arrives nowhere. Only money moves, hours stay. |
@@ -934,4 +934,6 @@ fixed or decided to be intended. Entries marked *(checked)* were confirmed
 against the code or the database; the others were found by reading the code
 and not checked a second time.
 
-None at the moment.
+- The invoiced gross margin is never negative, also when third party costs
+  have really been paid before invoicing (rare: they are paid once the
+  customer has paid). Accepted, decided in November 2026.

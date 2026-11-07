@@ -239,6 +239,25 @@ class CashDataAPITest(TestCase):
             {"total_excl_tax": 10000.0, "not_in_planned_invoicing_excl_tax": 0.0},
         )
 
+    def test_logged_third_party_costs_before_invoicing(self):
+        """Third party costs logged before anything has been invoiced don't
+        make the invoiced gross margin negative"""
+        project = factories.ProjectFactory.create()
+        accepted = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        service = factories.ServiceFactory.create(
+            project=project, offer=accepted, cost=10000, third_party_costs=2000
+        )
+        accepted.save()
+        factories.LoggedCostFactory.create(
+            service=service, cost=2000, third_party_costs=2000
+        )
+
+        data = self.client.get("/api/reports/cash-data/", headers=AUTH).json()
+        self.assertEqual(
+            data["accepted_offers_not_invoiced"],
+            {"total_excl_tax": 10000.0, "not_in_planned_invoicing_excl_tax": 8000.0},
+        )
+
     @travel("2026-10-28 08:00")
     def test_missed_planned_invoicing(self):
         """Planned invoicing from past months which hasn't happened is overdue"""
