@@ -2,6 +2,7 @@ import datetime as dt
 from decimal import Decimal
 
 from django.test import RequestFactory, TestCase
+from time_machine import travel
 
 from workbench import factories
 from workbench.invoices.models import Invoice
@@ -35,6 +36,27 @@ class ReportingTest(TestCase):
                 due_on=dt.date.today(),
             )
         self.assertEqual(Accruals.objects.accruals(dt.date.today()), -100)
+
+    def test_key_data_without_data(self):
+        """The key data view doesn't crash without any data"""
+        self.client.force_login(factories.UserFactory.create())
+        self.assertEqual(self.client.get("/report/key-data/").status_code, 200)
+
+    @travel("2027-01-03 12:00")
+    def test_key_data_new_year(self):
+        """The current year has its own row before anything happened in it"""
+        self.client.force_login(factories.UserFactory.create())
+        factories.InvoiceFactory.create(
+            invoiced_on=dt.date(2026, 12, 10),
+            due_on=dt.date(2026, 12, 31),
+            subtotal=100,
+            status=Invoice.SENT,
+        )
+        response = self.client.get("/report/key-data/")
+        self.assertEqual(
+            [row["year"] for row in response.context["gross_margin_by_years"]],
+            [2026, 2027],
+        )
 
     def test_labor_costs(self):
         """The labor costs report does a few things"""

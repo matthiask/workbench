@@ -286,9 +286,9 @@ def key_data_view(request):
 
     projected_gross_margin = key_data.projected_gross_margin()
 
-    gross_margin_by_years = defaultdict(
-        lambda: {
-            "year": month["date"].year,
+    def year_row(year):
+        return {
+            "year": year,
             "gross_profit": Z2,
             "third_party_costs": Z2,
             "accruals": Z2,
@@ -298,10 +298,13 @@ def key_data_view(request):
             "margin_per_fte": [],
             "months": [],
         }
-    )
 
+    # The current year has a row even before anything happened in it
+    gross_margin_by_years = {today.year: year_row(today.year)}
     for month in gross_margin_by_month:
-        year = gross_margin_by_years[month["date"].year]
+        year = gross_margin_by_years.setdefault(
+            month["date"].year, year_row(month["date"].year)
+        )
         year["months"].append(month)
         year["gross_profit"] += month["gross_profit"]
         year["third_party_costs"] += month["third_party_costs"]
@@ -311,7 +314,7 @@ def key_data_view(request):
         year["fte"].append(month["fte"])
 
     for year in gross_margin_by_years.values():
-        year["fte"] = sum(year["fte"]) / len(year["fte"])
+        year["fte"] = sum(year["fte"]) / len(year["fte"]) if year["fte"] else 0
         year["margin_per_fte"] = (
             year["gross_margin"] / year["fte"] if year["fte"] else None
         )
