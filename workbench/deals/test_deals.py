@@ -334,9 +334,10 @@ class DealsTest(TestCase):
         group.refresh_from_db()
         self.assertEqual(group.status, Offer.DISCARDED)
 
-    def test_reopened_deals_settle_their_offers_again(self):
-        """Closing a reopened deal also preselects the offers it settled
-        before"""
+    def test_closing_deals_leaves_settled_offers_alone(self):
+        """Closing a deal only preselects offers which aren't settled yet:
+        Offers settled elsewhere (another deal, the offer form) or before
+        reopening the deal have to be selected explicitly"""
         factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
         factories.ClosingTypeFactory.create(title="Lost", represents_a_win=False)
         deal = factories.DealFactory.create()
@@ -350,21 +351,26 @@ class DealsTest(TestCase):
         deal.related_offers.add(offer)
         self.client.force_login(deal.owned_by)
 
-        for status, closing_type, offer_status in [
-            ("declined", "Lost", Offer.DECLINED),
-            ("open", None, Offer.DECLINED),
-            ("accepted", "Won", Offer.ACCEPTED),
-            ("open", None, Offer.ACCEPTED),
-            ("declined", "Lost", Offer.DECLINED),
-        ]:
+        def close(status, closing_type, **kwargs):
             response = self.client.post(
                 f"/api/deals/{deal.pk}/status/",
-                {"status": status, "closing_type": closing_type},
+                {"status": status, "closing_type": closing_type} | kwargs,
                 content_type="application/json",
             )
             self.assertEqual(response.status_code, 200, response.content)
             offer.refresh_from_db()
-            self.assertEqual(offer.status, offer_status, (status, closing_type))
+            return offer.status
+
+        # Accepted directly, the customer said yes after all
+        offer.status = Offer.ACCEPTED
+        offer.save()
+        self.assertEqual(close("declined", "Lost"), Offer.ACCEPTED)
+
+        # Reopening and closing again only settles them when asked to
+        self.assertEqual(close("open", None), Offer.ACCEPTED)
+        self.assertEqual(close("declined", "Lost", offers=[offer.pk]), Offer.DECLINED)
+        self.assertEqual(close("open", None), Offer.DECLINED)
+        self.assertEqual(close("accepted", "Won"), Offer.DECLINED)
 
     def test_update_ignores_initial_customer_and_contact(self):
         """Query parameters for initial values only apply to new deals"""

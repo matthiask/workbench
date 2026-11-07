@@ -609,9 +609,9 @@ class DealStatusIn(Schema):
     offers: list[int] | None = Field(
         default=None,
         description="IDs of related offers to accept or decline with the deal,"
-        " defaults to those in preparation or offered and those with the"
-        " opposite status, e.g. after reopening the deal (like the web"
-        " interface), offers without dates get the closing date; declining"
+        " defaults to those in preparation or offered (like the web"
+        " interface; settled offers only when given, e.g. after reopening the"
+        " deal), offers without dates get the closing date; declining"
         " service groups discards them. Pass [] to leave the offers alone.",
     )
     delete_planned_work: bool | None = Field(

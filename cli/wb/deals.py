@@ -233,7 +233,8 @@ def update_deal(
     type=int,
     multiple=True,
     help="Related offer to accept or decline too, can be repeated. Defaults to"
-    " those which haven't been accepted yet.",
+    " those in preparation or offered; settled offers (e.g. before reopening"
+    " the deal) only when given.",
 )
 @click.option("--keep-offers", is_flag=True, help="Leave the related offers alone.")
 @click.option(
