@@ -311,10 +311,10 @@ class ProjectsAPITest(TestCase):
 
     def test_internal_types(self):
         """Internal types are listed in their order"""
-        InternalType.objects.create(
+        outreach = InternalType.objects.create(
             name="Outreach", percentage=50, is_outreach=True, ordering=20
         )
-        InternalType.objects.create(
+        administration = InternalType.objects.create(
             name="Administration",
             description="Bookkeeping",
             percentage=100,
@@ -328,12 +328,14 @@ class ProjectsAPITest(TestCase):
             response.json()["items"],
             [
                 {
+                    "id": administration.pk,
                     "name": "Administration",
                     "description": "Bookkeeping",
                     "percentage": "100.00",
                     "is_outreach": False,
                 },
                 {
+                    "id": outreach.pk,
                     "name": "Outreach",
                     "description": "",
                     "percentage": "50.00",
@@ -367,6 +369,16 @@ class ProjectsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 422)
         self.assertIn("Administration", response.json()["detail"][0]["msg"])
+
+        # By ID too
+        administration = InternalType.objects.get()
+        response = self.client.post(
+            "/api/projects/?dry_run=true",
+            data | {"internal_type": str(administration.pk)},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["internal_type"], "Administration")
 
         response = self.client.post(
             "/api/projects/",

@@ -7,7 +7,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
-from workbench.deals.models import Deal, Value
+from workbench.deals.models import AttributeGroup, Deal, Value
 from workbench.offers.models import Offer
 from workbench.tools.validation import in_days, monday
 
@@ -240,6 +240,33 @@ class DealsAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["probability"], "normal")
+
+    def test_value_types_and_attributes(self):
+        """Value types and attribute groups are listed with the titles the
+        other endpoints take, archived ones are left out"""
+        design = factories.ValueTypeFactory.create(title="Design", position=1)
+        factories.ValueTypeFactory.create(title="Old", is_archived=True)
+        group = AttributeGroup.objects.create(title="Source", is_required=True)
+        referral = group.attributes.create(title="Referral")
+        group.attributes.create(title="Fax", is_archived=True)
+        AttributeGroup.objects.create(title="Gone", is_archived=True)
+        self.client.force_login(factories.UserFactory.create())
+
+        self.assertEqual(
+            self.client.get("/api/deals/value-types/").json(),
+            [{"id": design.pk, "title": "Design"}],
+        )
+        self.assertEqual(
+            self.client.get("/api/deals/attributes/").json(),
+            [
+                {
+                    "id": group.pk,
+                    "title": "Source",
+                    "is_required": True,
+                    "attributes": [{"id": referral.pk, "title": "Referral"}],
+                }
+            ],
+        )
 
     def test_update_contributions(self):
         """Contributions are changed by the short names of the users, a

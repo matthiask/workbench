@@ -38,7 +38,8 @@ Change only what the user told you, one command per deal, first with
     wb deals update <deal_id> --value Design=6000 --value Hosting= --dry-run
 
 - `--value TYPE=AMOUNT` sets the value of a value type, `TYPE=` removes it.
-  Unknown value types are rejected with a list of the choices.
+  `wb deals value-types` lists the value types, `wb deals attributes` the
+  attribute groups and attributes `--attribute GROUP=ATTRIBUTE` takes.
 - High probability requires an expected decision date.
 - Add what you learned as a note so others see it:
   `wb notes create --deal <deal_id> --title "<title>" --description "<text>"`.

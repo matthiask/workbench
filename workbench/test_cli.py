@@ -20,7 +20,7 @@ from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
 from workbench.contacts.models import Group, Person
-from workbench.deals.models import Deal
+from workbench.deals.models import AttributeGroup, Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, Project
@@ -263,6 +263,7 @@ class CLITest(TestCase):
         result = self.wb("projects", "internal-types")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Administration", result.output)
+        self.assertIn(str(project.internal_type.pk), result.output)
 
         result = self.wb("projects", "update", project.pk, "--type", "order")
         self.assertEqual(result.exit_code, 0, result.output)
@@ -1049,6 +1050,18 @@ planned_work:
             "billing@example.com",
         )
         self.assertIn("The reminder has been sent.", result.output)
+
+    def test_deal_value_types_and_attributes(self):
+        factories.ValueTypeFactory.create(title="Design")
+        group = AttributeGroup.objects.create(title="Source")
+        group.attributes.create(title="Referral")
+        result = self.wb("deals", "value-types")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Design", result.output)
+        result = self.wb("deals", "attributes")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Source", result.output)
+        self.assertIn("Referral", result.output)
 
     def test_deals(self):
         """Searching, creating, updating, closing and reopening deals"""

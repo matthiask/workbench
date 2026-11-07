@@ -150,9 +150,10 @@ def list_internal_types(as_json):
     if as_json:
         echo_json(data["items"])
         return
-    table = make_table("Name", "Description", "Percentage>", "Outreach")
+    table = make_table("ID>", "Name", "Description", "Percentage>", "Outreach")
     for row in data["items"]:
         table.add_row(
+            str(row["id"]),
             row["name"],
             row["description"],
             f"{row['percentage']}%",
@@ -176,8 +177,8 @@ def list_internal_types(as_json):
 )
 @click.option(
     "--internal-type",
-    help="Name of the internal type, for internal projects (see `wb projects"
-    " internal-types`).",
+    help="Name or ID of the internal type, for internal projects (see `wb"
+    " projects internal-types`).",
     shell_complete=complete_internal_types,
 )
 @click.option(
@@ -255,7 +256,8 @@ def _echo_saved_project(data, *, dry_run, as_json):
 )
 @click.option(
     "--internal-type",
-    help="Name of the internal type, projects which aren't internal lose it.",
+    help="Name or ID of the internal type (see `wb projects internal-types`),"
+    " projects which aren't internal lose it.",
     shell_complete=complete_internal_types,
 )
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)

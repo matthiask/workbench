@@ -371,6 +371,53 @@ def deal_history_api(request, filters: Query[StatsFilter]):
     }
 
 
+class ValueTypeOut(Schema):
+    id: int
+    title: str
+
+
+@router.get("/deals/value-types/", response=list[ValueTypeOut])
+def value_type_list(request):
+    """The value types of deals; ``values`` of deals take their titles"""
+    return [
+        {"id": vt.id, "title": vt.title}
+        for vt in ValueType.objects.filter(is_archived=False)
+    ]
+
+
+class AttributeOut(Schema):
+    id: int
+    title: str
+
+
+class AttributeGroupOut(Schema):
+    id: int
+    title: str
+    is_required: bool = Field(description="New deals need an attribute of the group.")
+    attributes: list[AttributeOut]
+
+
+@router.get("/deals/attributes/", response=list[AttributeGroupOut])
+def attribute_group_list(request):
+    """The attribute groups of deals and their attributes; ``attributes`` of
+    deals take the titles of both"""
+    return [
+        {
+            "id": group.id,
+            "title": group.title,
+            "is_required": group.is_required,
+            "attributes": [
+                {"id": attribute.id, "title": attribute.title}
+                for attribute in group.attributes.all()
+                if not attribute.is_archived
+            ],
+        }
+        for group in AttributeGroup.objects.filter(is_archived=False).prefetch_related(
+            "attributes"
+        )
+    ]
+
+
 @router.get("/deals/{deal_id}/", response=DealOut)
 def deal_detail(request, deal_id: int):
     return deal_out(

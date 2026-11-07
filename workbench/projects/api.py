@@ -110,6 +110,7 @@ class ProjectFilter(Schema):
 
 
 class InternalTypeOut(Schema):
+    id: int
     name: str
     description: str
     percentage: Decimal
@@ -119,11 +120,12 @@ class InternalTypeOut(Schema):
 @router.get("/projects/internal-types/", response=list[InternalTypeOut])
 @paginate
 def internal_type_list(request):
-    """The internal types of internal projects, by their name in
-    ``internal_type``"""
+    """The internal types of internal projects; ``internal_type`` of
+    projects takes their name or ID"""
     return Serialized(
         InternalType.objects.order_by("ordering", "pk"),
         lambda internal_type: {
+            "id": internal_type.id,
             "name": internal_type.name,
             "description": internal_type.description,
             "percentage": internal_type.percentage,
@@ -177,8 +179,8 @@ class ProjectIn(Schema):
     type: Literal["order", "maintenance", "internal"] = "order"
     internal_type: str | None = Field(
         default=None,
-        description="Name of the internal type, required for internal projects"
-        " if the installation uses internal types.",
+        description="Name or ID of the internal type, required for internal"
+        " projects if the installation uses internal types.",
     )
     owned_by: str | None = Field(
         default=None,
@@ -198,6 +200,17 @@ def _internal_type(name):
         return ""
     types = {it.name.casefold(): it for it in InternalType.objects.all()}
     if internal_type := types.get(name.casefold()):
+        return internal_type.pk
+    # Names first, then IDs (only ASCII digits)
+    if (
+        name.isascii()
+        and name.isdigit()
+        and (
+            internal_type := next(
+                (it for it in types.values() if it.pk == int(name)), None
+            )
+        )
+    ):
         return internal_type.pk
     raise ValidationError([
         {
@@ -272,7 +285,7 @@ class ProjectPatch(Schema):
     type: Literal["order", "maintenance", "internal"] | None = None
     internal_type: str | None = Field(
         default=None,
-        description="Name of the internal type. Projects which aren't internal"
+        description="Name or ID of the internal type. Projects which aren't internal"
         " anymore lose it.",
     )
     owned_by: str | None = Field(default=None, description="Short name.")

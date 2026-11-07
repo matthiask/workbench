@@ -153,9 +153,15 @@ def _echo_saved_deal(data, *, dry_run, as_json):
     "--value",
     "values",
     multiple=True,
-    help="TYPE=AMOUNT, e.g. Design=5000; TYPE= removes the value.",
+    help="TYPE=AMOUNT by the title of the value type (see `wb deals"
+    " value-types`), e.g. Design=5000; TYPE= removes the value.",
 )
-@click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
+@click.option(
+    "--attribute",
+    "attributes",
+    multiple=True,
+    help="GROUP=ATTRIBUTE by their titles, see `wb deals attributes`.",
+)
 @click.option(
     "--owned-by",
     help="Short name, the new owner is added to the contributions.",
@@ -316,6 +322,39 @@ def reopen_deal(deal_id, dry_run, as_json):
         json={"status": "open"},
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
+@deals.command("value-types")
+@click.option("--json", "as_json", is_flag=True)
+def list_value_types(as_json):
+    """List the value types of deals, `--value` takes their titles"""
+    data = request("GET", "deals/value-types/")
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("ID>", "Title")
+    for row in data:
+        table.add_row(str(row["id"]), row["title"])
+    console.print(table)
+
+
+@deals.command("attributes")
+@click.option("--json", "as_json", is_flag=True)
+def list_attributes(as_json):
+    """List the attribute groups of deals and their attributes, `--attribute`
+    takes their titles"""
+    data = request("GET", "deals/attributes/")
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("Group", "Required", "Attributes")
+    for group in data:
+        table.add_row(
+            group["title"],
+            "yes" if group["is_required"] else "",
+            ", ".join(attribute["title"] for attribute in group["attributes"]),
+        )
+    console.print(table)
 
 
 @deals.group("offers")
@@ -500,8 +539,19 @@ def deal_history(period, since, until, users, team, as_json):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="Required for a high probability.",
 )
-@click.option("--value", "values", multiple=True, help="TYPE=AMOUNT, e.g. Design=5000.")
-@click.option("--attribute", "attributes", multiple=True, help="GROUP=ATTRIBUTE.")
+@click.option(
+    "--value",
+    "values",
+    multiple=True,
+    help="TYPE=AMOUNT by the title of the value type (see `wb deals"
+    " value-types`), e.g. Design=5000.",
+)
+@click.option(
+    "--attribute",
+    "attributes",
+    multiple=True,
+    help="GROUP=ATTRIBUTE by their titles, see `wb deals attributes`.",
+)
 @click.option(
     "--owned-by",
     help="Short name, defaults to you.",

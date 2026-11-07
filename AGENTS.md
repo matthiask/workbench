@@ -201,6 +201,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
   query parameters of the web views) and their defaults; sending them stays
   in the web interface.
+  Values given by name have a listing which shows them with their ID
+  (`wb projects internal-types`, `wb deals value-types`, `wb deals
+  attributes`); internal types are taken by name or ID.
   `wb invoices pdf` and `wb offers pdf` save the PDFs of the web interface
   (`/api/invoices/<id>/pdf/`, `/api/offers/<id>/pdf/`; `download()` in
   `wb/core.py` keeps the file name of the response).
