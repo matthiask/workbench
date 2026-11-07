@@ -10,6 +10,7 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.expenses.models import ExpenseReport
 from workbench.logbook.forms import hours_for_invoicing_much_higher
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
@@ -726,6 +727,26 @@ class LogbookTest(TestCase):
             costs.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertEqual(response.status_code, 204)
+
+    def test_logged_cost_in_expense_report_deletion(self):
+        """Expenses which are part of an expense report cannot be deleted"""
+        costs = factories.LoggedCostFactory.create(
+            are_expenses=True, third_party_costs=10
+        )
+        costs.expense_report = ExpenseReport.objects.create(
+            created_by=costs.rendered_by, owned_by=costs.rendered_by
+        )
+        costs.save()
+        self.client.force_login(costs.created_by)
+
+        response = self.client.post(
+            costs.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(
+            messages(response),
+            ["Expenses are part of an expense report, cannot delete entry."],
+        )
+        self.assertTrue(LoggedCost.objects.filter(pk=costs.pk).exists())
 
     def test_logged_hours_list(self):
         """Filter form smoke test"""

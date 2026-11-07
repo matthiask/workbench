@@ -182,6 +182,7 @@ class LoggedCost(Model):
                 request,
                 _("Expenses are part of an expense report, cannot delete entry."),
             )
+            return False
         return super().allow_delete(instance, request)
 
     @classmethod
