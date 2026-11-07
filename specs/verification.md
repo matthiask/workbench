@@ -61,9 +61,9 @@ after "Verification: The second round's bugs are fixed").
 
 ## Round 3 (2026-11-07)
 
-Four agents (invoices, reports, time, contacts/deals/API). The verified bugs
-have been fixed (the commits after "Verification: Findings of the third
-round"), except the one below.
+Four agents (invoices, reports, time, contacts/deals/API), then two agents
+testing the untested risks. The verified bugs and the real risks have been
+fixed (the commits after "Verification: Findings of the third round").
 
 ### Decided
 
@@ -72,61 +72,54 @@ round"), except the one below.
 - Squeeze deducts absence days as full days from the employment's working
   days (like the annual working time).
 - Invoicing an offer doesn't preselect optional services (from the logbook
-  they are, work has been logged on them).
+  they are, work has been logged on them) and starts with its discount.
 - The key data API leaves out deals and squeeze without their features.
 - Payments may be assigned to invoices in preparation with a date after the
   freeze date (useful, see 06fb06cd); recurring invoices may mark their
-  invoices as sent directly (`mark_as_sent`, off by default).
+  invoices as sent directly (`mark_as_sent`, off by default, never the
+  standard behaviour).
+- Hours logged on another day than they were rendered on are listed at the
+  end of the day, outside the timeline.
+- Declining offers and deals deletes only the planned work after the current
+  week, like closing projects (full-year reservations may have to be redone).
+- Third party costs stay editable in frozen invoices and projections:
+  incorrect third party costs make the reporting incorrect.
+- Recurring invoices with `create_project` stay accruals as long as their
+  projects are open; people should close them, this will be fixed another
+  way.
+- Unassigning a payment leaves the invoice paid (bookkeeping notices), the
+  form warns.
+- Green hours: projects whose budgeted services add up to 0h count all hours
+  as overdrawn. Taking invoiced hours into account would rebuild squeeze.
+- Team filters use the current membership, also for past periods.
+- `LATE_LOGGING` doesn't treat logged costs and logged hours differently, by
+  design.
+- Absences can't span the year end, so vacations across it are two
+  absences.
+- Statuses and probabilities are stable keys in the API (`workbench/api_keys.py`).
+- The tax amount is the total minus the total excl. tax, so it absorbs the
+  rounding to 5 cents (no rounding line).
 
-### Open bug
+### To decide (need more information first)
 
-- Logged hours without timestamp created a day after `rendered_on` produce a
-  ~15h detected slice on that day (`timer/models.py`, entries are placed at
-  their `created_at`). Needs a decision where they belong in the timeline.
-
-### Untested risks
-
-- Services without offer (or in preparation) can be repriced after being
-  invoiced from the logbook (flat rate, `ServiceForm`), changing past
-  budget statistics and accruals.
-- Unsent projections mail: "Fremdkosten" = invoiced − gross margin is wrong
-  since the invoiced gross margin is clamped at 0 (`invoices/tasks.py`).
-- Credits through the API silently drop `discount`, `third_party_costs`.
-- PDF totals have no rounding line (up to 0.04 difference).
-- Annual working time: short partial months can give a negative target.
-- Planning display vs capacity disagree about absences on weekends.
-- Absence web form accepts zero or negative days (API requires > 0).
-- Planning import deleting a milestone referenced by work in the same
-  import nulls the milestone silently.
-- Planning export with only `project`/`campaign` skips the ten-year check.
-- Accepting a deal accepts offers on closed projects.
-- `project_update` with `closed_on` adds `messages.info` (also `dry_run`).
-- `person_create` duplicate checks ignore archived contacts; new
-  organizations get the current user as primary contact.
-- Changing a deal's owner keeps the old owner's weight.
-- `labor_costs.py` divides by `green_hours_target` (0 possible in admin).
-- Average employment duration: future and fixed-term employments skew it.
-- Budget statistics `old-projects`/`no-projected-gross-margin` use today's
-  `open()` with past cutoffs and `closed`; API sorts closed by delta.
-
-### To decide
-
-- Recurring invoices with `create_project` stay accruals forever.
-- The offer's discount isn't carried over when invoicing an offer.
-- Third party costs of frozen invoices and projections in frozen periods
-  stay editable.
-- Unassigning a payment leaves the invoice PAID.
-- Green hours: projects whose budgeted services add up to 0h count all
-  hours as overdrawn.
-- Team filters use the current membership for past periods.
-- Hochrechnung "Geplant" adds projections to the extrapolated year.
-- Past years' absences are locked by the absent person's `LATE_LOGGING`.
+- Hochrechnung "Geplant" adds the year's projected gross margin to the
+  extrapolated year.
+- Past years' absences are locked by the absent person's `LATE_LOGGING`, not
+  the editor's.
 - `hours_for_invoicing` isn't editable on projects closed > 14 days ago.
-- Logged costs have no week lock when deleting; logged hours of past weeks
-  can't be deleted by `LATE_LOGGING` users.
-- Declining offers / closing deals delete all planned work, closing
-  projects only the future.
 - Planned work on closed projects can still be moved.
-- Vacations across the year end can't meet the two weeks check.
-- API outputs localized `status`/`probability`, inputs take codes.
-- `delete_planned_work` is required when declining with `offers: []`.
+- `delete_planned_work` is required when declining a deal with `offers: []`.
+- Accepting a deal (or the offer form) accepts offers of closed projects.
+- `wb people create` doesn't report archived people and organizations with
+  the same name (they could be unarchived instead).
+- Changing a deal's owner keeps the old owner's contribution (handing over
+  vs. adding a contributor); the API can't change contributions.
+- Budget statistics filters `old-projects` and `no-projected-gross-margin`
+  use today's state with past cutoff dates and the closed filter.
+- Weekend-only absences: planning shows a single day without `ends_on` in
+  the following week, the capacity drops it; Saturday to Sunday appears in
+  neither.
+- Annual working time: partial months scale the target by calendar days but
+  subtract holidays in full, so short partial months can be negative
+  (employment January 1–2 with two holidays). Scaling by weekdays would fix
+  it but changes the balances of people who started or left mid-month.
