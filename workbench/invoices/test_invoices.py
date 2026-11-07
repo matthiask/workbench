@@ -1574,6 +1574,18 @@ class InvoicesTest(TestCase):
         response = self.client.get("/invoices/reminders/")
         self.assertContains(response, "Not reminded yet", 1)
 
+    def test_credits_are_not_overdue(self):
+        """Customers aren't reminded of credits"""
+        credit = factories.InvoiceFactory.create(
+            type=Invoice.CREDIT,
+            subtotal=Decimal(-100),
+            invoiced_on=in_days(-40),
+            due_on=in_days(-30),
+            status=Invoice.SENT,
+        )
+        self.assertNotIn(credit, Invoice.objects.overdue())
+        self.assertNotIn(credit, Invoice.objects.maybe_actionable(user=credit.owned_by))
+
     def test_postpone_reminders_limit(self):
         """Reminders cannot be postponed indefinitely"""
         invoice = factories.InvoiceFactory.create(

@@ -55,7 +55,7 @@ class InvoiceQuerySet(SearchQuerySet):
             status=Invoice.SENT,
             due_on__isnull=False,
             due_on__lte=in_days(-15),
-        )
+        ).exclude(type=Invoice.CREDIT)
 
     def autodunning(self):
         return self.overdue().filter(
@@ -67,8 +67,13 @@ class InvoiceQuerySet(SearchQuerySet):
             self
             .filter(
                 Q(status=Invoice.IN_PREPARATION)
-                | Q(
-                    status=Invoice.SENT, due_on__isnull=False, due_on__lte=in_days(-15)
+                | (
+                    Q(
+                        status=Invoice.SENT,
+                        due_on__isnull=False,
+                        due_on__lte=in_days(-15),
+                    )
+                    & ~Q(type=Invoice.CREDIT)
                 ),
                 Q(owned_by=user)
                 | Q(owned_by__is_active=False, project__isnull=True)
