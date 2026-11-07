@@ -413,7 +413,11 @@ class ProjectedInvoiceFilter(DateRangeFilter):
     customer: int | None = None
 
 
-@router.get("/projected-invoices/", response=list[ProjectedInvoiceOut])
+@router.get(
+    "/projected-invoices/",
+    response=list[ProjectedInvoiceOut],
+    auth=user_auth(feature=FEATURES.PROJECTED_GROSS_MARGIN),
+)
 @paginate
 def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter]):
     """Planned invoicing (gross margin, third party costs are not included),

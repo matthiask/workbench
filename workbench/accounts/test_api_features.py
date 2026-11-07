@@ -25,7 +25,6 @@ class APIFeaturesTest(TestCase):
             ("get", f"/api/offers/{offer.pk}/"),
             ("put", f"/api/offers/{offer.pk}/"),
             ("get", f"/api/projects/stats/?ids={project.pk}"),
-            ("get", "/api/projected-invoices/"),
             ("get", "/api/invoices/"),
             ("get", "/api/recurring-invoices/"),
             ("get", f"/api/invoices/{invoice.pk}/"),
@@ -51,3 +50,23 @@ class APIFeaturesTest(TestCase):
         ]:
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_projected_gross_margin(self):
+        """Projected invoices require the feature of their web view"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        url = "/api/projected-invoices/"
+        with override_settings(
+            FEATURES={
+                FEATURES.CONTROLLING: F.ALWAYS,
+                FEATURES.PROJECTED_GROSS_MARGIN: F.NEVER,
+            }
+        ):
+            self.assertEqual(self.client.get(url).status_code, 403)
+        with override_settings(
+            FEATURES={
+                FEATURES.CONTROLLING: F.NEVER,
+                FEATURES.PROJECTED_GROSS_MARGIN: F.ALWAYS,
+            }
+        ):
+            self.assertEqual(self.client.get(url).status_code, 200)
