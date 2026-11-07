@@ -267,9 +267,25 @@ class DealsTest(TestCase):
 
         response = self.client.get(deal.urls["set_status"] + "?status=40")
         self.assertEqual(response.status_code, 404)
+        response = self.client.get(deal.urls["set_status"] + "?status=abc")
+        self.assertEqual(response.status_code, 404)
 
         response = self.client.post(deal.urls["set_status"] + "?status=20")
         self.assertContains(response, "This field is required when closing a deal.")
+
+    def test_status_api_ignores_the_query_string(self):
+        """The API takes the status from the body only"""
+        deal = factories.DealFactory.create()
+        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
+        self.client.force_login(deal.owned_by)
+        response = self.client.post(
+            f"/api/deals/{deal.pk}/status/?status={Deal.DECLINED}",
+            {"status": "accepted", "closing_type": "Won"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        deal.refresh_from_db()
+        self.assertEqual(deal.status, Deal.ACCEPTED)
 
     def test_closed_deals_keep_their_closing_date(self):
         """Editing the closing of a closed deal keeps its date"""

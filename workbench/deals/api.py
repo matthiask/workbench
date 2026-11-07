@@ -626,7 +626,7 @@ def deal_status(request, deal_id: int, data: DealStatusIn, *, dry_run: bool = Fa
     which also accepts or declines the related offers"""
     deal = get_object_or_404(Deal, pk=deal_id)
     deal.status = STATUSES[data.status]
-    form = SetStatusForm(instance=deal, request=request)
+    form = SetStatusForm(instance=deal, request=request, status=deal.status)
     values = form_data(form)
     errors = []
 
@@ -659,7 +659,7 @@ def deal_status(request, deal_id: int, data: DealStatusIn, *, dry_run: bool = Fa
     if errors:
         raise ValidationError(errors)
 
-    form = SetStatusForm(values, instance=deal, request=request)
+    form = SetStatusForm(values, instance=deal, request=request, status=deal.status)
     if not form.is_valid():
         raise_form_errors(form, fields={"related_offers": ["offers"]})
     return _save_deal(form, request, dry_run=dry_run)

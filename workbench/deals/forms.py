@@ -367,9 +367,16 @@ class SetStatusForm(ModelForm):
             "closing_notice": Textarea,
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, status=None, **kwargs):
+        """The web interface passes the new status in the query string, the
+        API as ``status``"""
         instance = kwargs["instance"]
-        instance.status = int(kwargs["request"].GET.get("status", instance.status))
+        if status is None:
+            try:
+                status = int(kwargs["request"].GET.get("status", instance.status))
+            except (TypeError, ValueError) as exc:
+                raise Http404 from exc
+        instance.status = status
         if instance.status in {Deal.ACCEPTED, Deal.DECLINED}:
             # Closed deals keep their date when changing the closing
             instance.closed_on = instance.closed_on or dt.date.today()
