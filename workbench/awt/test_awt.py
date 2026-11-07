@@ -5,6 +5,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
 from django.utils.translation import deactivate_all
 from time_machine import travel
 
@@ -305,6 +306,55 @@ class AWTTest(TestCase):
             self.assertNotContains(
                 response, "You are not permitted to edit the absences of others."
             )
+
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
+    def test_absences_of_others_undo(self):
+        """Whoever entered an absence for someone else may change and delete
+        it on the same day, as long as nobody else changed it"""
+        user = factories.UserFactory.create()
+        other = factories.UserFactory.create()
+        headers = {"x-requested-with": "XMLHttpRequest"}
+        forbidden = "You are not permitted to edit the absences of others."
+
+        self.client.force_login(user)
+        response = self.client.post(
+            "/absences/create/",
+            {
+                "modal-user": other.pk,
+                "modal-starts_on": dt.date.today().isoformat(),
+                "modal-days": 1,
+                "modal-reason": "vacation",
+            },
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 201)
+        absence = Absence.objects.get()
+        response = self.client.get(absence.urls["delete"], headers=headers)
+        self.assertNotContains(response, forbidden)
+
+        # Not on the next day
+        actions = LoggedAction.objects.for_model(Absence).with_data(id=absence.id)
+        actions.update(created_at=timezone.now() - dt.timedelta(days=1))
+        response = self.client.get(absence.urls["delete"], headers=headers)
+        self.assertContains(response, forbidden)
+        actions.update(created_at=timezone.now())
+
+        # Not after someone else changed it
+        self.client.force_login(other)
+        response = self.client.post(
+            absence.urls["update"],
+            {
+                "modal-user": other.pk,
+                "modal-starts_on": dt.date.today().isoformat(),
+                "modal-days": 2,
+                "modal-reason": "vacation",
+            },
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 202)
+        self.client.force_login(user)
+        response = self.client.get(absence.urls["delete"], headers=headers)
+        self.assertContains(response, forbidden)
 
     def test_no_data_no_crash(self):
         """POSTing the absence form without any data does not crash the backend"""

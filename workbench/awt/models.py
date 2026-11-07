@@ -8,6 +8,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.audit.models import LoggedAction, audit_user_id
 from workbench.tools.formats import days, hours, local_date_format
 from workbench.tools.models import HoursField, Model, MoneyField
 from workbench.tools.urls import model_urls
@@ -257,14 +258,34 @@ class Absence(Model):
 
     save.alters_data = True
 
+    def only_changed_today_by(self, user):
+        """Has the absence been created today and changed by ``user`` only?"""
+        actions = list(
+            LoggedAction.objects
+            .for_model(Absence)
+            .with_data(id=self.pk)
+            .values_list("action", "user_name", "created_at")
+        )
+        return (
+            bool(actions)
+            and actions[0][0] == "I"
+            and timezone.localdate(actions[0][2]) == dt.date.today()
+            and all(
+                audit_user_id(user_name or "") == user.id
+                for _a, user_name, _c in actions
+            )
+        )
+
     @classmethod
     def allow_update(cls, instance, request):
         # Absences may be entered for others (paid leave then needs a
         # confirmation), but only the person and people administrating
-        # personnel change them
+        # personnel change them; whoever entered them may still undo their
+        # mistakes on the same day
         if (
             instance.user_id != request.user.id
             and not request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]
+            and not instance.only_changed_today_by(request.user)
         ):
             messages.error(
                 request, _("You are not permitted to edit the absences of others.")
