@@ -210,6 +210,22 @@ class ReportsAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertIn("owned_by", response.content.decode())
 
+        # The cleanup filters look at today's open projects, they don't
+        # combine with a cutoff date or the closed projects
+        for params in [
+            {"filter": "old-projects", "closed": True},
+            {"filter": "no-projected-gross-margin", "date": in_days(-30)},
+        ]:
+            response = self.client.get("/api/reports/budget/", params)
+            self.assertEqual(response.status_code, 422, params)
+        self.assertEqual(
+            self.client.get(
+                "/api/reports/budget/",
+                {"filter": "old-projects", "date": dt.date.today()},
+            ).status_code,
+            200,
+        )
+
         # Closed projects are sorted by their closing date, like in the web
         # interface
         closed = []

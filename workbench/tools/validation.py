@@ -32,6 +32,13 @@ def filter_form(form_class):
             form = form_class(request.GET, request=request)
             if not form.is_valid():
                 messages.warning(request, _("Form was invalid."))
+                for error in form.non_field_errors() + [
+                    error
+                    for name, errors in form.errors.items()
+                    if name != "__all__"
+                    for error in errors
+                ]:
+                    messages.warning(request, error)
                 return redirect(".")
             return view(request, form, *args, **kwargs)
 

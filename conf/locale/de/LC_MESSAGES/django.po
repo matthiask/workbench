@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 18:13+0100\n"
+"POT-Creation-Date: 2026-11-07 18:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1004,7 +1004,7 @@ msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: %(comman
 msgid "Unknown group %r."
 msgstr "Unbekannte Gruppe %r."
 
-#: workbench/contacts/api.py
+#: workbench/contacts/api.py workbench/deals/api.py
 #, python-format
 msgid "Unknown user %r."
 msgstr "Unbekannte:r Benutzer:in %r."
@@ -4292,6 +4292,10 @@ msgstr "Hat aktuell offene Kundenprojekte"
 #: workbench/reporting/views.py
 msgid "Other active users"
 msgstr "Andere aktive Nutzer:innen"
+
+#: workbench/reporting/views.py
+msgid "This filter is for open projects as of today, not for closed projects or other cutoff dates."
+msgstr "Dieser Filter ist für heute offene Projekte, nicht für geschlossene Projekte oder andere Stichtage."
 
 #: workbench/reporting/views.py
 msgid "Still open or closed during the current year"

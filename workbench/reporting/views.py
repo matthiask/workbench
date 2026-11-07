@@ -480,6 +480,23 @@ class ProjectBudgetStatisticsForm(Form):
             ),
         ]
 
+    def clean(self):
+        data = super().clean()
+        # The cleanup filters look at the projects which are open today,
+        # the cutoff date is for the reporting
+        if data.get("s") in {"old-projects", "no-projected-gross-margin"} and (
+            data.get("closed_during_the_last_year")
+            or (data.get("cutoff_date") or dt.date.today()) != dt.date.today()
+        ):
+            self.add_error(
+                "s",
+                _(
+                    "This filter is for open projects as of today, not for"
+                    " closed projects or other cutoff dates."
+                ),
+            )
+        return data
+
     def queryset(self):
         data = self.cleaned_data
         if data.get("closed_during_the_last_year"):

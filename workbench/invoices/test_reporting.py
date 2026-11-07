@@ -30,7 +30,9 @@ class ReportingTest(TestCase):
         self.client.force_login(factories.UserFactory.create())
         response = self.client.get("/report/open-items-list/?cutoff_date=bla")
         self.assertRedirects(response, "/report/open-items-list/")
-        self.assertEqual(messages(response), ["Form was invalid."])
+        self.assertEqual(
+            messages(response), ["Form was invalid.", "Enter a valid date."]
+        )
         response = self.client.get("/report/open-items-list/")
         self.assertContains(response, '<div class="wb-stat-value">300.00</div>')
         # Nothing overdue, all due in the week in 15 days
