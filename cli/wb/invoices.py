@@ -13,6 +13,7 @@ from wb.core import (
     echo_invoice_list,
     echo_json,
     echo_more,
+    force_option,
     format_bool,
     link,
     make_table,
@@ -22,13 +23,14 @@ from wb.core import (
     period_params,
     request,
     terminate,
+    text_or_stdin,
 )
 
 
 @cli.group(invoke_without_command=True)
 @click.pass_context
 def invoices(ctx):
-    """Look at invoices
+    """Look at invoices and create drafts
 
     Without a command, lists your invoices which may need action."""
     if ctx.invoked_subcommand is None:
@@ -97,6 +99,10 @@ def show_invoice(invoice_id, as_json):
     if as_json:
         echo_json(data)
         return
+    _echo_invoice(data)
+
+
+def _echo_invoice(data):
     period = (
         f"{data['service_period_from']} – {data['service_period_until']}"
         if data["service_period_from"]
@@ -145,6 +151,144 @@ def show_invoice(invoice_id, as_json):
             )
         console.print()
         console.print(table)
+
+
+@invoices.command("create")
+@click.option("--project", type=int, help="Project ID.")
+@click.option(
+    "--offer",
+    type=int,
+    help="Offer ID: invoice its services, with its title and description.",
+)
+@click.option(
+    "--contact",
+    type=int,
+    help="Person ID, defaults to the project's contact. Required without project.",
+)
+@click.option(
+    "--type",
+    "type_",
+    type=click.Choice(["fixed", "down-payment", "services", "credit"]),
+    help="Defaults to services with --offer or --service, else fixed.",
+)
+@click.option(
+    "--from-logbook",
+    is_flag=True,
+    help="Services invoices: the logged work which hasn't been invoiced yet"
+    " instead of the offered services.",
+)
+@click.option(
+    "--service",
+    "services",
+    type=int,
+    multiple=True,
+    help="ID of a service to invoice, defaults to the offer's services.",
+)
+@click.option(
+    "--logbook-cutoff-date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Only logged work up to this date.",
+)
+@click.option("--title", help="Defaults to the project's (and the offer's).")
+@click.option("--description", help="The text, or - to read it from stdin.")
+@click.option(
+    "--subtotal",
+    help="Fixed amount, down payment and credit invoices, excl. tax.",
+)
+@click.option("--third-party-costs")
+@click.option("--discount")
+@click.option("--vat/--no-vat", "liable_to_vat", default=True, show_default=True)
+@click.option("--tax-rate", help="Defaults to the current tax rate.")
+@click.option("--service-period-from", type=click.DateTime(formats=["%Y-%m-%d"]))
+@click.option("--service-period-until", type=click.DateTime(formats=["%Y-%m-%d"]))
+@click.option(
+    "--postal-address",
+    help="Defaults to the billing address of the contact or the customer.",
+)
+@click.option(
+    "--owned-by",
+    help="Short name, defaults to you.",
+    shell_complete=complete_short_names,
+)
+@force_option
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_invoice(
+    project,
+    offer,
+    contact,
+    type_,
+    from_logbook,
+    services,
+    logbook_cutoff_date,
+    title,
+    description,
+    subtotal,
+    third_party_costs,
+    discount,
+    liable_to_vat,
+    tax_rate,
+    service_period_from,
+    service_period_until,
+    postal_address,
+    owned_by,
+    force,
+    dry_run,
+    as_json,
+):
+    """Create an invoice in preparation, to be checked and sent in the web
+    interface
+
+    Invoice an offer (--offer), selected services of a project (--service,
+    as offered or --from-logbook), a fixed amount, down payment or credit of
+    a project (--project --subtotal) or a fixed amount for a contact without
+    project (--contact --title --subtotal)."""
+    data = {
+        key: value
+        for key, value in [
+            ("project", project),
+            ("offer", offer),
+            ("contact", contact),
+            ("type", type_),
+            ("title", title),
+            ("description", text_or_stdin(description)),
+            ("subtotal", subtotal),
+            ("third_party_costs", third_party_costs),
+            ("discount", discount),
+            ("tax_rate", tax_rate),
+            ("postal_address", postal_address),
+            ("owned_by", owned_by),
+        ]
+        if value is not None
+    }
+    data["liable_to_vat"] = liable_to_vat
+    data["source"] = "logbook" if from_logbook else "offer"
+    if services:
+        data["services"] = list(services)
+    for key, value in [
+        ("logbook_cutoff_date", logbook_cutoff_date),
+        ("service_period_from", service_period_from),
+        ("service_period_until", service_period_until),
+    ]:
+        if value:
+            data[key] = value.date().isoformat()
+    data = request(
+        "POST",
+        "invoices/",
+        params={"dry_run": format_bool(dry_run), "force": format_bool(force)},
+        json=data,
+    )
+    if as_json:
+        echo_json(data)
+        return
+    if data["id"]:
+        _echo_invoice(data)
+    else:
+        console.print(
+            f"{data['title']}: {data['total_excl_tax']} excl. tax"
+            f" ({len(data['services'])} services)"
+        )
+        console.print("Dry run, nothing has been saved.")
 
 
 @invoices.command("reminders")

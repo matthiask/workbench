@@ -260,6 +260,46 @@ class CLITest(TestCase):
         project.refresh_from_db()
         self.assertIsNone(project.internal_type)
 
+    def test_invoices_create(self):
+        """Invoices in preparation are created from offers or with amounts"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.PostalAddressFactory.create(person=project.contact)
+        offer = factories.OfferFactory.create(project=project, title="Phase 1")
+        factories.ServiceFactory.create(
+            project=project, offer=offer, title="Design", cost=1000
+        )
+
+        result = self.wb("invoices", "create", "--offer", offer.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertFalse(Invoice.objects.exists())
+
+        result = self.wb("invoices", "create", "--offer", offer.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Design", result.output)
+        invoice = Invoice.objects.get()
+        self.assertEqual(
+            (invoice.status, invoice.total_excl_tax), (Invoice.IN_PREPARATION, 1000)
+        )
+
+        result = self.wb(
+            "invoices", "create", "--project", project.pk, "--type", "down-payment"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("subtotal", result.output)
+        result = self.wb(
+            "invoices",
+            "create",
+            "--project",
+            project.pk,
+            "--type",
+            "down-payment",
+            "--subtotal",
+            "500",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Down payment", result.output)
+
     def test_people(self):
         """People are created from YAML files"""
         person = self.file(

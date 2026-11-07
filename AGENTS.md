@@ -185,6 +185,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `wb invoices send-reminder CONTACT --to EMAIL` sends dunning letters like
   the web interface (`SendReminderForm`, bookkeeping feature); without
   `--to` it only shows the addresses and invoices.
+  `wb invoices create` (`POST /api/invoices/`) only creates invoices in
+  preparation, validated with the web interface's creation forms
+  (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
+  query parameters of the web views) and their defaults; sending them stays
+  in the web interface.
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only changes offers
   in preparation: create, replace and update, with the rules of

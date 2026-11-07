@@ -1,9 +1,11 @@
+import copy
 import datetime as dt
 from decimal import Decimal
 from typing import Literal
 
 from django.db import transaction
 from django.db.models import F
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
@@ -12,17 +14,30 @@ from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
+from workbench.accounts.models import User
 from workbench.contacts.api import (
     OrganizationOut,
     PersonSummary,
     organization_out,
     person_summary,
 )
-from workbench.contacts.models import Person
-from workbench.invoices.forms import SendReminderForm
+from workbench.contacts.models import Person, postal_address_choices
+from workbench.invoices.forms import (
+    CreatePersonInvoiceForm,
+    CreateProjectInvoiceForm,
+    SendReminderForm,
+)
 from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
+from workbench.offers.models import Offer
 from workbench.projects.api import ProjectSummary, project_summary
-from workbench.tools.api import DateRangeFilter, Serialized, filter_date_range
+from workbench.projects.models import Project
+from workbench.tools.api import (
+    DateRangeFilter,
+    Serialized,
+    filter_date_range,
+    form_data,
+    raise_form_errors,
+)
 from workbench.tools.formats import Z2, local_date_format
 from workbench.tools.validation import in_days
 
@@ -381,6 +396,227 @@ def postpone_reminders(request, invoice_id: int, data: PostponeReminders):
     invoice.postpone_reminders_until = data.until
     invoice.save(update_fields=["postpone_reminders_until"])
     return invoice_out(invoice, request)
+
+
+TYPES = {
+    "fixed": Invoice.FIXED,
+    "down-payment": Invoice.DOWN_PAYMENT,
+    "services": Invoice.SERVICES,
+    "credit": Invoice.CREDIT,
+}
+
+
+class InvoiceIn(Schema):
+    project: int | None = Field(
+        default=None,
+        description="Project ID; invoices without project are fixed amount"
+        " invoices for a contact.",
+    )
+    offer: int | None = Field(
+        default=None,
+        description="Offer ID: a services invoice of the offer's project with"
+        " the offer's title, description and services.",
+    )
+    contact: int | None = Field(
+        default=None,
+        description="Person ID, defaults to the project's contact. Required"
+        " for invoices without project.",
+    )
+    type: Literal["fixed", "down-payment", "services", "credit"] | None = Field(
+        default=None,
+        description="Defaults to services with an offer or services, else fixed.",
+    )
+    source: Literal["offer", "logbook"] = Field(
+        default="offer",
+        description="Services invoices: the services as offered, or the"
+        " logged hours and costs which haven't been invoiced yet.",
+    )
+    services: list[int] | None = Field(
+        default=None,
+        description="Services invoices: IDs of the project's services to"
+        " invoice, defaults to the offer's services (with something to"
+        " invoice if from the logbook). Required without offer.",
+    )
+    logbook_cutoff_date: dt.date | None = Field(
+        default=None,
+        description="Services invoices from the logbook: only entries up to this date.",
+    )
+    title: str | None = Field(
+        default=None,
+        max_length=200,
+        description="Defaults to the project's (and the offer's) title,"
+        " required without project.",
+    )
+    description: str | None = Field(
+        default=None,
+        description="Defaults to the offer's or the project's description.",
+    )
+    subtotal: Decimal | None = Field(
+        default=None,
+        description="Required for fixed amount, down payment and credit"
+        " invoices, calculated from the services otherwise.",
+    )
+    third_party_costs: Decimal = Field(
+        default=Z2, description="Fixed amount and down payment invoices."
+    )
+    discount: Decimal = Z2
+    liable_to_vat: bool = True
+    tax_rate: Decimal | None = Field(
+        default=None, description="Defaults to the current tax rate."
+    )
+    service_period_from: dt.date | None = None
+    service_period_until: dt.date | None = None
+    postal_address: str | None = Field(
+        default=None,
+        description="Defaults to the billing address of the contact, or else"
+        " of the customer.",
+    )
+    owned_by: str | None = Field(
+        default=None, description="Short name, defaults to you."
+    )
+
+
+def _query(request, params):
+    """The request with the query parameters of the web interface's invoice
+    creation"""
+    request = copy.copy(request)
+    request.GET = QueryDict(mutable=True)
+    request.GET.update(params)
+    return request
+
+
+def _invoice_form(request, data, error):  # noqa: C901
+    """The bound invoice creation form of the web interface"""
+    project = offer = None
+    if data.offer is not None:
+        offer = Offer.objects.select_related("project").filter(pk=data.offer).first()
+        if not offer:
+            error(["offer"], _("Unknown offer %r.") % data.offer)
+            return None
+        if data.project is not None and data.project != offer.project_id:
+            error(["project"], _("The offer belongs to a different project."))
+            return None
+        project = offer.project
+    elif data.project is not None:
+        project = Project.objects.filter(pk=data.project).first()
+        if not project:
+            error(["project"], _("Unknown project %r.") % data.project)
+            return None
+
+    type = TYPES[
+        data.type or ("services" if offer or data.services is not None else "fixed")
+    ]
+    if offer and type != Invoice.SERVICES:
+        error(["type"], _("Invoices of an offer are services invoices."))
+        return None
+    if type != Invoice.SERVICES and data.subtotal is None:
+        error(["subtotal"], _("This field is required."))
+
+    if project:
+        params = {"type": type}
+        if type == Invoice.SERVICES:
+            params["source"] = data.source
+            if offer:
+                params["offer"] = str(offer.pk)
+        request = _query(request, params)
+
+        def make_form(*args):
+            return CreateProjectInvoiceForm(*args, project=project, request=request)
+
+    else:
+        if type != Invoice.FIXED:
+            error(["type"], _("Invoices without project are fixed amount invoices."))
+        if data.contact is None:
+            error(["contact"], _("Invoices without project need a contact."))
+            return None
+        if not (contact := Person.objects.filter(pk=data.contact).first()):
+            error(["contact"], _("Unknown person %r.") % data.contact)
+            return None
+        request = _query(request, {"contact": str(contact.pk)})
+
+        def make_form(*args):
+            return CreatePersonInvoiceForm(*args, request=request)
+
+    form = make_form()
+    values = form_data(form)
+    values["disable_logging"] = 0
+    for field in ["title", "description", "postal_address", "tax_rate"]:
+        if (value := getattr(data, field)) is not None:
+            values[field] = value
+    for field in [
+        "subtotal",
+        "third_party_costs",
+        "discount",
+        "service_period_from",
+        "service_period_until",
+        "logbook_cutoff_date",
+    ]:
+        if (value := getattr(data, field)) is not None:
+            values[field] = value
+    values["liable_to_vat"] = data.liable_to_vat or ""
+    if data.contact is not None:
+        values["contact"] = data.contact
+    if data.owned_by is not None:
+        if user := User.objects.filter(
+            is_active=True, _short_name__iexact=data.owned_by
+        ).first():
+            values["owned_by"] = user.pk
+        else:
+            error(["owned_by"], _("Unknown or inactive user %r.") % data.owned_by)
+    if not values.get("postal_address"):
+        contact = Person.objects.filter(pk=values.get("contact") or None).first()
+        if choices := postal_address_choices(
+            person=contact,
+            organization=contact.organization if contact else project.customer,
+            for_billing=True,
+        ):
+            values["postal_address"] = choices[0][1]
+    if "selected_services" in form.fields:
+        if data.services is not None:
+            values["selected_services"] = data.services
+        elif not offer:
+            error(
+                ["services"],
+                _("Select the services to invoice, or invoice an offer."),
+            )
+    return make_form(values)
+
+
+class InvoiceCreated(InvoiceDetailOut):
+    id: int | None
+    code: str | None
+    url: str | None
+
+
+@router.post("/invoices/", response=InvoiceCreated)
+def invoice_create(
+    request, data: InvoiceIn, *, dry_run: bool = False, force: bool = False
+):
+    """Create an invoice in preparation (a draft), validated like in the web
+    interface
+
+    Warnings of the web interface are errors here unless ``force``; nothing is
+    saved if anything is invalid or with ``dry_run``."""
+    errors = []
+
+    def error(loc, msg):
+        errors.append({"loc": ["body", "data", *loc], "msg": msg})
+
+    form = _invoice_form(request, data, error)
+    if errors:
+        raise ValidationError(errors)
+    if not form.is_valid(ignore_warnings=force):
+        raise_form_errors(form, fields={"selected_services": ["services"]}, force=force)
+
+    with transaction.atomic():
+        invoice = form.save()
+        result = invoice_out(invoice, request) | {
+            "services": _invoice_services(invoice)
+        }
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "code": None, "url": None}
+    return result
 
 
 @router.get("/invoices/{invoice_id}/", response=InvoiceDetailOut)

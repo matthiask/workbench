@@ -387,3 +387,90 @@ class InvoicesAPITest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 403)
+
+    def test_create_drafts(self):
+        """Invoices in preparation are created like in the web interface,
+        with its defaults"""
+        project = factories.ProjectFactory.create(title="Relaunch")
+        factories.PostalAddressFactory.create(person=project.contact)
+        self.client.force_login(project.owned_by)
+
+        def create(data, query=""):
+            return self.client.post(
+                f"/api/invoices/{query}", data, content_type="application/json"
+            )
+
+        response = create({"project": project.pk, "subtotal": 2500}, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], None)
+        self.assertEqual(Invoice.objects.count(), 0)
+
+        response = create({"project": project.pk, "subtotal": 2500})
+        self.assertEqual(response.status_code, 200, response.content)
+        invoice = Invoice.objects.get(pk=response.json()["id"])
+        self.assertEqual(
+            (invoice.status, invoice.type, invoice.title, invoice.subtotal),
+            (Invoice.IN_PREPARATION, Invoice.FIXED, "Relaunch", 2500),
+        )
+        self.assertEqual(invoice.contact, project.contact)
+        self.assertEqual(invoice.owned_by, project.owned_by)
+        self.assertIn(project.contact.family_name, invoice.postal_address)
+
+        # The offer's services
+        offer = factories.OfferFactory.create(project=project, title="Phase 1")
+        factories.ServiceFactory.create(
+            project=project, offer=offer, title="Design", cost=1000
+        )
+        factories.ServiceFactory.create(
+            project=project, offer=offer, title="Hosting", cost=500
+        )
+        response = create({"offer": offer.pk})
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(data["title"], "Relaunch - Phase 1")
+        self.assertEqual(data["total_excl_tax"], "1500.00")
+        self.assertEqual([s["title"] for s in data["services"]], ["Design", "Hosting"])
+
+        # Logged work which hasn't been invoiced yet
+        consulting = factories.ServiceFactory.create(
+            project=project, effort_type="Consulting", effort_rate=200
+        )
+        hours = factories.LoggedHoursFactory.create(service=consulting, hours=3)
+        response = create({
+            "project": project.pk,
+            "source": "logbook",
+            "services": [consulting.pk],
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["total_excl_tax"], "600.00")
+        hours.refresh_from_db()
+        self.assertTrue(hours.invoice_service)
+
+        # Services invoices without offer need the services
+        response = create({"project": project.pk, "type": "services"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "services"]
+        )
+        response = create({"project": project.pk, "subtotal": None})
+        self.assertEqual(response.status_code, 422)
+
+        # Invoices without project
+        response = create({
+            "contact": project.contact.pk,
+            "subtotal": 300,
+            "title": "Workshop",
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(Invoice.objects.get(pk=response.json()["id"]).project)
+        response = create({"contact": project.contact.pk, "type": "credit"})
+        self.assertEqual(response.status_code, 422)
+
+        # Warnings are errors unless forced
+        address = {"postal_address": "Short\nAddress"}
+        response = create({"project": project.pk, "subtotal": 100} | address)
+        self.assertEqual(response.status_code, 422)
+        response = create(
+            {"project": project.pk, "subtotal": 100} | address, "?force=true"
+        )
+        self.assertEqual(response.status_code, 200, response.content)

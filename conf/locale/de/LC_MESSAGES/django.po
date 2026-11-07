@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 08:50+0100\n"
+"POT-Creation-Date: 2026-11-07 08:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1029,13 +1029,13 @@ msgstr "%(person)s hat diese Telefonnummer bereits."
 msgid "The group %r is archived."
 msgstr "Die Gruppe %r ist archiviert."
 
-#: workbench/contacts/api.py workbench/deals/api.py workbench/planning/api.py
-#: workbench/projects/api.py
+#: workbench/contacts/api.py workbench/deals/api.py workbench/invoices/api.py
+#: workbench/planning/api.py workbench/projects/api.py
 #, python-format
 msgid "Unknown or inactive user %r."
 msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
 
-#: workbench/contacts/api.py
+#: workbench/contacts/api.py workbench/invoices/api.py
 #, python-format
 msgid "Unknown person %r."
 msgstr "Unbekannte Person %r."
@@ -1048,7 +1048,8 @@ msgstr "Eine Gruppe mit diesem Titel gibt es schon."
 msgid "Either reassign to someone or to the suggestions."
 msgstr "Entweder einer Person oder gemäss den Vorschlägen zuweisen."
 
-#: workbench/contacts/api.py workbench/projects/forms.py
+#: workbench/contacts/api.py workbench/invoices/api.py
+#: workbench/projects/forms.py
 msgid "This field is required."
 msgstr "Dieses Feld ist zwingend erforderlich."
 
@@ -2055,6 +2056,36 @@ msgstr "Zahlungserinnerungen können höchstens %(days)s Tage aufgeschoben werde
 #, python-format
 msgid "You are postponing reminders until %(date)s, which is more than %(days)s days from now. Are you sure?"
 msgstr "Du schiebst die Zahlungserinnerungen bis am %(date)s auf, das sind mehr als %(days)s Tage ab heute. Bist Du sicher?"
+
+#: workbench/invoices/api.py
+#, python-format
+msgid "Unknown offer %r."
+msgstr "Unbekannte Offerte %r."
+
+#: workbench/invoices/api.py
+msgid "The offer belongs to a different project."
+msgstr "Die Offerte gehört zu einem anderen Projekt."
+
+#: workbench/invoices/api.py
+#, python-format
+msgid "Unknown project %r."
+msgstr "Unbekanntes Projekt %r."
+
+#: workbench/invoices/api.py
+msgid "Invoices of an offer are services invoices."
+msgstr "Rechnungen einer Offerte verrechnen Leistungen."
+
+#: workbench/invoices/api.py
+msgid "Invoices without project are fixed amount invoices."
+msgstr "Rechnungen ohne Projekt sind Rechnungen mit Fixbetrag."
+
+#: workbench/invoices/api.py
+msgid "Invoices without project need a contact."
+msgstr "Rechnungen ohne Projekt brauchen einen Kontakt."
+
+#: workbench/invoices/api.py
+msgid "Select the services to invoice, or invoice an offer."
+msgstr "Wähle die zu verrechnenden Leistungen aus oder verrechne eine Offerte."
 
 #: workbench/invoices/forms.py
 msgid "Due"
