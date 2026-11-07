@@ -99,27 +99,23 @@ fixed (the commits after "Verification: Findings of the third round").
 - Statuses and probabilities are stable keys in the API (`workbench/api_keys.py`).
 - The tax amount is the total minus the total excl. tax, so it absorbs the
   rounding to 5 cents (no rounding line).
-
-### To decide (need more information first)
-
-- Hochrechnung "Geplant" adds the year's projected gross margin to the
-  extrapolated year.
-- Past years' absences are locked by the absent person's `LATE_LOGGING`, not
-  the editor's.
+- The planned gross margin of the year (Hochrechnung "Geplant") is the
+  gross margin so far plus the projections not invoiced yet.
+- Past years' absences are locked by the absent person's `LATE_LOGGING`:
+  the feature is for people who don't log themselves, someone else is
+  responsible; personnel administration doesn't matter.
 - `hours_for_invoicing` isn't editable on projects closed > 14 days ago.
-- Planned work on closed projects can still be moved.
-- `delete_planned_work` is required when declining a deal with `offers: []`.
-- Accepting a deal (or the offer form) accepts offers of closed projects.
-- `wb people create` doesn't report archived people and organizations with
-  the same name (they could be unarchived instead).
-- Changing a deal's owner keeps the old owner's contribution (handing over
-  vs. adding a contributor); the API can't change contributions.
-- Budget statistics filters `old-projects` and `no-projected-gross-margin`
-  use today's state with past cutoff dates and the closed filter.
-- Weekend-only absences: planning shows a single day without `ends_on` in
-  the following week, the capacity drops it; Saturday to Sunday appears in
-  neither.
-- Annual working time: partial months scale the target by calendar days but
-  subtract holidays in full, so short partial months can be negative
-  (employment January 1–2 with two holidays). Scaling by weekdays would fix
-  it but changes the balances of people who started or left mid-month.
+- Planned work of closed projects doesn't get weeks after the current one.
+- Declining a deal only asks about planned work of the offers declined.
+- Accepting offers of closed projects (through deals or the offer form) is
+  fine.
+- `wb people create` reports archived people with the same name and
+  organization (or both without).
+- Changing a deal's owner adds the new one to the contributions; the API
+  and `wb deals update --contribution` change them.
+- The budget statistics' cleanup filters don't combine with the closed
+  projects or other cutoff dates (cleanup vs. reporting).
+- Absences on a weekend count in their week.
+- The annual working time keeps scaling partial months by calendar days:
+  changing balances needs a lot of consideration (short partial months
+  with holidays can have a negative target).
