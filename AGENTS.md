@@ -221,7 +221,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   deleting is only possible in offers in preparation or without offer and
   without logged hours or costs, invoiced services (`Service.is_invoiced`,
   also from the offer) are neither deleted nor moved to another offer or
-  project, reordering takes all services of one offer
+  project and keep their effort type and rate (also when the project gets a
+  flat rate), reordering takes all services of one offer
   (or the services without offer of one project). `POST
   /api/services/<id>/reassign-logbook/` (`wb services reassign-logbook`)
   reassigns logged hours and costs with `ReassignLogbookForm`; invoiced

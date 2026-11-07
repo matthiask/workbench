@@ -616,6 +616,54 @@ class ProjectsTest(TestCase):
         service.refresh_from_db()
         self.assertEqual(service.project, project)
 
+    def test_invoiced_service_keeps_its_rate(self):
+        """Services invoiced from the logbook keep their rate, the logbook of
+        invoiced work would be valued differently afterwards"""
+        service = factories.ServiceFactory.create(
+            effort_type="Programming", effort_rate=100
+        )
+        project = service.project
+        factories.LoggedHoursFactory.create(service=service, hours=10)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            service.urls["update"],
+            {
+                "modal-title": service.title,
+                "modal-effort_type": "Programming",
+                "modal-effort_rate": 200,
+                "modal-allow_logging": True,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "This service has been invoiced already")
+        service.refresh_from_db()
+        self.assertEqual(service.effort_rate, 100)
+
+        # Flat rates leave them alone too
+        response = self.client.post(
+            project.urls["update"],
+            {
+                "customer": project.customer_id,
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "type": project.type,
+                "flat_rate": 250,
+                WarningsForm.ignore_warnings_id: "flat-rate-but-already-services",
+            },
+        )
+        self.assertRedirects(response, project.urls["detail"])
+        service.refresh_from_db()
+        self.assertEqual(service.effort_rate, 100)
+
     def test_external_reference_of_service_bound_to_offer(self):
         """The external reference of services stays editable when their offer
         has been sent or accepted, the other fields don't"""

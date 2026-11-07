@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 17:38+0100\n"
+"POT-Creation-Date: 2026-11-07 17:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3768,6 +3768,10 @@ msgstr "Offerten in Vorbereitung, welche bereits verschickt wurden, wurden abgel
 #: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."
 msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
+
+#: workbench/projects/forms.py
+msgid "This service has been invoiced already, its effort type and rate cannot be changed."
+msgstr "Diese Leistung wurde bereits verrechnet, ihre Aufwandart und ihr Stundensatz können nicht geändert werden."
 
 #: workbench/projects/forms.py
 msgid "This service has been invoiced already, it cannot be moved to another offer."

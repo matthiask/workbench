@@ -468,7 +468,10 @@ class ProjectForm(ModelForm):
         closing = "closed_on" in self.changed_data and instance.closed_on
         if self.instance.pk and self.instance.flat_rate is not None:
             with override(settings.WORKBENCH.PDF_LANGUAGE):
-                for service in self.instance.services.editable():
+                # Invoiced services keep their rate
+                for service in self.instance.services.editable().exclude(
+                    invoice_services__isnull=False
+                ):
                     service.effort_type = gettext("flat rate")
                     service.effort_rate = self.instance.flat_rate
                     service.save(skip_related_model=True)
@@ -607,6 +610,17 @@ class ServiceForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        if {"effort_type", "effort_rate"} & set(
+            self.changed_data
+        ) and self.instance.is_invoiced:
+            # The logbook of invoiced work would be valued differently
+            self.add_error(
+                "effort_rate",
+                _(
+                    "This service has been invoiced already,"
+                    " its effort type and rate cannot be changed."
+                ),
+            )
         if "offer" in self.changed_data and self.instance.is_invoiced:
             self.add_error(
                 "offer",
