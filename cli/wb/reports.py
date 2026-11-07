@@ -45,7 +45,12 @@ def key_data(month, as_json):
         f"Key data {data['month']}",
         [
             ("Gross margin", format_amount(data["gross_margin"])),
-            ("Squeeze gross margin", format_amount(data["squeeze_gross_margin"])),
+            # Squeeze and deals require their features
+            *(
+                [("Squeeze gross margin", format_amount(data["squeeze_gross_margin"]))]
+                if "squeeze_gross_margin" in data
+                else []
+            ),
             ("Full-time equivalents", format_number(data["full_time_equivalents"], 2)),
             ("Green hours", format_percentage(data["green_hours_percentage"])),
             (
@@ -67,6 +72,8 @@ def key_data(month, as_json):
             format_amount(row["canceled_invoices_total_excl_tax"]),
         )
     console.print(table)
+    if "deals_funnel" not in data:
+        return
     funnel = data["deals_funnel"]
     table = make_table("Deals", "Value>", title="Deals funnel")
     for label, key in [

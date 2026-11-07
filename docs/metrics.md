@@ -199,6 +199,10 @@ From `workbench/reporting/green_hours.py:green_hours_by_month` (SQL), all logged
 `GET /api/reports/key-data/?month=YYYY-MM` (also `/api/key-data/`, hidden). Auth: static `ReportingToken` (settings.KEY_DATA_API_TOKEN) or user with CONTROLLING. Default month: last month. Decimals as floats (`jsonable()`). `workbench/reporting/api.py:key_data`, `workbench/reporting/key_data_api.py:key_data_for_month`
 Answers: the key figures of one month for integrations.
 
+Users get `squeeze_gross_margin` only with the productivity feature and
+`deals_funnel` and `accepted_deals` only with the deals feature, like in the
+web interface; the static reporting token gets everything.
+
 | Field | Computation |
 |---|---|
 | `gross_margin` | "Umsatz bereinigt" of the month exactly as in the web view (0.00 if the month row is left out). |

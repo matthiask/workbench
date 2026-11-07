@@ -95,7 +95,16 @@ def key_data(request, month: str | None = None):
             raise dates_error(["query", "month"])
     else:
         first = last_month_range()[0]
-    return jsonable(key_data_for_month(first))
+    # The static token gets everything, users only the figures their
+    # features allow (deals and squeeze aren't controlling)
+    user = request.auth if isinstance(request.auth, User) else None
+    return jsonable(
+        key_data_for_month(
+            first,
+            deals=not user or user.features[FEATURES.DEALS],
+            squeeze_data=not user or user.features[FEATURES.PRODUCTIVITY],
+        )
+    )
 
 
 @router.get("/cash-data/", include_in_schema=False)

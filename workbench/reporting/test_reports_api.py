@@ -339,6 +339,29 @@ class ReportsAPITest(TestCase):
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
 
+    @override_settings(
+        FEATURES={
+            FEATURES.CONTROLLING: F.ALWAYS,
+            FEATURES.DEALS: F.NEVER,
+            FEATURES.PRODUCTIVITY: F.NEVER,
+        },
+        KEY_DATA_API_TOKEN="secret",
+    )
+    def test_key_data_features(self):
+        """Key data leave out deals and squeeze without their features, the
+        static token gets everything"""
+        data = self.get("/api/reports/key-data/")
+        self.assertIn("gross_margin", data)
+        for key in ["deals_funnel", "accepted_deals", "squeeze_gross_margin"]:
+            self.assertNotIn(key, data)
+
+        self.client.logout()
+        data = self.client.get(
+            "/api/reports/key-data/", headers={"Authorization": "Bearer secret"}
+        ).json()
+        for key in ["deals_funnel", "accepted_deals", "squeeze_gross_margin"]:
+            self.assertIn(key, data)
+
     @override_settings(KEY_DATA_API_TOKEN="secret")
     def test_reporting_token(self):
         """The static token is only for key data and cash data"""

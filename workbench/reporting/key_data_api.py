@@ -70,7 +70,9 @@ def accepted_deals(date_range):
     ]
 
 
-def key_data_for_month(first_of_month):
+def key_data_for_month(first_of_month, *, deals=True, squeeze_data=True):
+    """Key data of a month; ``deals`` and ``squeeze_data`` add the fields
+    which require the deals and productivity features"""
     date_range = month_range(first_of_month)
     last_of_month = date_range[1]
     month = (first_of_month.year, first_of_month.month)
@@ -94,7 +96,7 @@ def key_data_for_month(first_of_month):
             "canceled_invoices_total_excl_tax": canceled_invoices_total([day, end]),
         })
 
-    return {
+    data = {
         "month": f"{first_of_month:%Y-%m}",
         "generated_at": dt.datetime.now().isoformat(timespec="seconds"),
         "green_hours_percentage": green_hours.get(first_of_month),
@@ -106,9 +108,12 @@ def key_data_for_month(first_of_month):
         "full_time_equivalents": full_time_equivalents_by_month().get(
             first_of_month, Z1
         ),
-        "squeeze_gross_margin": squeeze.squeeze_data(date_range)["totals"][
-            "gross_margin"
-        ],
-        "deals_funnel": deals_funnel(),
-        "accepted_deals": accepted_deals(date_range),
     }
+    if squeeze_data:
+        data["squeeze_gross_margin"] = squeeze.squeeze_data(date_range)["totals"][
+            "gross_margin"
+        ]
+    if deals:
+        data["deals_funnel"] = deals_funnel()
+        data["accepted_deals"] = accepted_deals(date_range)
+    return data

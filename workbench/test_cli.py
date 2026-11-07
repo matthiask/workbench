@@ -1463,6 +1463,19 @@ planned_work:
         result = self.wb("reports", "key-data", "--month", "2026-01", "--json")
         self.assertIn('"month": "2026-01"', result.output)
 
+        with override_settings(
+            FEATURES={
+                FEATURES.CONTROLLING: F.ALWAYS,
+                FEATURES.DEALS: F.NEVER,
+                FEATURES.PRODUCTIVITY: F.NEVER,
+            }
+        ):
+            result = self.wb("reports", "key-data", "--month", "2026-01")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Gross margin", result.output)
+        self.assertNotIn("Squeeze", result.output)
+        self.assertNotIn("Deals funnel", result.output)
+
         result = self.wb("reports", "cash-data", "--date", dt.date.today())
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Open invoices excl. tax", result.output)
