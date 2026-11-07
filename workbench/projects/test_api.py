@@ -11,6 +11,7 @@ from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.models import FreezeDate
+from workbench.tools.testing import messages
 from workbench.tools.validation import in_days, monday
 
 
@@ -132,6 +133,21 @@ class ProjectsAPITest(TestCase):
         ).json()
         self.assertEqual(len(data), 2)
         self.assertEqual(Decimal(data[1]["hours"]["logged"]), 0)
+
+    def test_no_messages_for_the_web_interface(self):
+        """Messages added during API requests don't show up later in the web
+        interface"""
+        project = factories.ProjectFactory.create()
+        factories.OfferFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/?dry_run=true",
+            {"closed_on": dt.date.today().isoformat()},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        response = self.client.get(project.urls["detail"])
+        self.assertEqual(messages(response), [])
 
     def test_create(self):
         """Projects are validated like in the web interface"""

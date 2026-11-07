@@ -91,6 +91,7 @@ MIDDLEWARE = [
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
+        "workbench.middleware.api_messages_middleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "workbench.accounts.middleware.user_middleware",
         "workbench.middleware.history_fallback",

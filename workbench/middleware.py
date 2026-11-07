@@ -1,5 +1,6 @@
 import re
 
+from django.contrib.messages.storage.base import BaseStorage
 from django.http import HttpRequest
 from django.shortcuts import render
 from django.urls import reverse
@@ -60,5 +61,25 @@ def history_fallback(get_response):
                     )
 
         return response
+
+    return middleware
+
+
+class DiscardedMessages(BaseStorage):
+    """Messages of forms used by the JSON APIs would show up later in the web
+    interface, those requests drop them"""
+
+    def _get(self, *args, **kwargs):
+        return [], True
+
+    def _store(self, messages, response, *args, **kwargs):
+        return []
+
+
+def api_messages_middleware(get_response):
+    def middleware(request):
+        if request.path.startswith("/api/"):
+            request._messages = DiscardedMessages(request)
+        return get_response(request)
 
     return middleware

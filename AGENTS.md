@@ -226,8 +226,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   /api/services/<id>/reassign-logbook/` (`wb services reassign-logbook`)
   reassigns logged hours and costs with `ReassignLogbookForm`; invoiced
   entries only with `include_invoiced`. It doesn't delete the old service:
-  the form reports that through Django's messages, which would show up later
-  in the web interface. `wb offers
+  the form reports that through Django's messages, and messages added during
+  API requests are dropped (`api_messages_middleware` in
+  `workbench/middleware.py`), they would show up later in the web interface. `wb offers
   guidelines` prints a private file configured per installation in the wb
   configuration (`offer_guidelines`), which the `workbench-offer` skill
   follows; the guidelines contain confidential figures, so they don't live in
