@@ -21,6 +21,7 @@ from workbench.contacts.forms import GroupSearchForm
 from workbench.contacts.merge import merge_people
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
+from workbench.deals.models import Deal
 from workbench.tools.testing import messages
 from workbench.tools.vcard import person_to_vcard
 
@@ -717,6 +718,24 @@ class ArchiveContactsTest(TestCase):
         self.assertTrue(organization.is_archived)
         self.assertFalse(Person.objects.get(pk=contact.pk).is_archived)
         self.assertFalse(Person.objects.get(pk=user.person.pk).is_archived)
+
+    def test_deals_closed_recently_keep_contacts(self):
+        """Deals count by their closing date, like projects"""
+        cutoff = timezone.now() - dt.timedelta(days=5 * 365)
+        deal = factories.DealFactory.create(
+            status=Deal.DECLINED, closed_on=dt.date.today() - dt.timedelta(days=4 * 365)
+        )
+        Deal.objects.filter(pk=deal.pk).update(
+            created_at=timezone.now() - dt.timedelta(days=6 * 365)
+        )
+        LoggedAction.objects.update(
+            created_at=timezone.now() - dt.timedelta(days=6 * 365)
+        )
+        self.assertNotIn(deal.contact, set(tasks.unused_people(cutoff)))
+        Deal.objects.filter(pk=deal.pk).update(
+            closed_on=dt.date.today() - dt.timedelta(days=6 * 365)
+        )
+        self.assertIn(deal.contact, set(tasks.unused_people(cutoff)))
 
     def test_groups_keep_people_only(self):
         """Groups don't keep organizations without active people"""

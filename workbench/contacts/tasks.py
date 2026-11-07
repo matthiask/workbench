@@ -113,7 +113,9 @@ def _recent(cutoff):
                 Project.objects.filter(projects, campaign=OuterRef("pk")),
             )
         ),
-        Deal: Q(closed_on__isnull=True) | Q(created_at__gte=cutoff),
+        Deal: Q(closed_on__isnull=True)
+        | Q(closed_on__gte=cutoff)
+        | Q(created_at__gte=cutoff),
         Invoice: Q(created_at__gte=cutoff),
         RecurringInvoice: Q(ends_on__isnull=True) | Q(ends_on__gte=cutoff),
         ExternalWork: Q(created_at__gte=cutoff),
