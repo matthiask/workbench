@@ -169,6 +169,15 @@ class ExternalWork(AbstractPlannedWork):
         return f"{self.title} ({self.provided_by})"
 
 
+def future_weeks_on_closed_project(project, old_weeks, new_weeks):
+    """Whether planned work of a closed project would get weeks after the
+    current one it didn't have before"""
+    if not project.closed_on:
+        return False
+    this_week = monday()
+    return any(week > this_week and week not in old_weeks for week in new_weeks)
+
+
 class PlannedWorkQuerySet(SearchQuerySet):
     def after_this_week(self):
         """Planned work in weeks after the current one"""

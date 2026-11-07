@@ -378,7 +378,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   objects their features let them see (`visible_content_types()`).
 - Planning does not care about `Service.is_optional`; planned work has its own
   `is_provisional` flag for definitive vs. provisional work. Closed projects
-  get no new planned work or milestones (web and API); closing a project,
+  get no new planned work or milestones (web and API), and their planned
+  work doesn't get weeks after the current one
+  (`future_weeks_on_closed_project()`); closing a project,
   declining or discarding an offer and declining a deal offer to delete the
   planned work after the current week (entries spanning it are shortened,
   their hours reduced accordingly; `PlannedWorkQuerySet.delete_after_this_week()`).

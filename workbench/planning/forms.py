@@ -10,7 +10,12 @@ from django.utils.translation import gettext_lazy as _
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.invoices.utils import recurring
-from workbench.planning.models import ExternalWork, Milestone, PlannedWork
+from workbench.planning.models import (
+    ExternalWork,
+    Milestone,
+    PlannedWork,
+    future_weeks_on_closed_project,
+)
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
 from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_prefix
@@ -272,6 +277,10 @@ class PlannedWorkForm(ModelForm):
         data = super().clean()
         if not self.instance.pk and self.project.closed_on:
             raise forms.ValidationError(_("The project is closed."))
+        if (weeks := data.get("weeks")) and future_weeks_on_closed_project(
+            self.project, self.instance.weeks or [], weeks
+        ):
+            self.add_error("weeks", _("The project is closed."))
 
         if (weeks := data.get("weeks")) and (milestone := data.get("milestone")):
             if after := [week for week in weeks if week >= monday(milestone.date)]:
@@ -502,6 +511,26 @@ class PlannedWorkBatchForm(Form):
             label=_("Delete planned work entries?"),
             required=False,
         )
+
+    def clean(self):
+        data = super().clean()
+        if (
+            (move_by_weeks := data.get("move_by_weeks"))
+            and not data.get("project")
+            and any(
+                future_weeks_on_closed_project(
+                    unit.project,
+                    unit.weeks,
+                    [
+                        week + dt.timedelta(days=7 * move_by_weeks)
+                        for week in unit.weeks
+                    ],
+                )
+                for unit in data.get("work", ())
+            )
+        ):
+            self.add_error("move_by_weeks", _("The project is closed."))
+        return data
 
     def process(self):
         data = self.cleaned_data

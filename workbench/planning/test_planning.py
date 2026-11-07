@@ -297,6 +297,54 @@ class PlanningTest(TestCase):
         )
         self.assertEqual(response.status_code, 202)
 
+    def test_no_future_weeks_on_closed_projects(self):
+        """Planned work of closed projects isn't moved into future weeks"""
+        service_types = factories.service_types()
+        this_week = monday()
+        pw = factories.PlannedWorkFactory.create(
+            weeks=[this_week - dt.timedelta(days=7)],
+            service_type=service_types.consulting,
+        )
+        project = pw.project
+        project.closed_on = dt.date.today()
+        project.save()
+        self.client.force_login(project.owned_by)
+
+        def update(weeks):
+            return self.client.post(
+                pw.urls["update"],
+                {
+                    "modal-user": pw.user_id,
+                    "modal-title": "bla",
+                    "modal-planned_hours": 20,
+                    "modal-weeks": [week.isoformat() for week in weeks],
+                    "modal-service_type": service_types.consulting.pk,
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        response = update([this_week + dt.timedelta(days=7)])
+        self.assertContains(response, "The project is closed.")
+        # Past weeks are fine
+        response = update([this_week - dt.timedelta(days=14)])
+        self.assertEqual(response.status_code, 202)
+
+        response = self.client.post(
+            project.urls["planning_batch_update"],
+            {"work": [pw.pk], "move_by_weeks": 3},
+        )
+        self.assertContains(response, "The project is closed.", status_code=200)
+
+        response = self.client.patch(
+            f"/api/planning/work/{pw.pk}/",
+            {"weeks": [(this_week + dt.timedelta(days=7)).isoformat()]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+
+        pw.refresh_from_db()
+        self.assertEqual(pw.weeks, [this_week - dt.timedelta(days=14)])
+
     def test_planned_work_crud(self):
         """Create, update and delete planned work"""
         service_types = factories.service_types()

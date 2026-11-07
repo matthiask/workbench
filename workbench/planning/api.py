@@ -13,7 +13,12 @@ from workbench.accounts.models import User
 from workbench.api_keys import OfferStatus, key
 from workbench.awt.models import Absence
 from workbench.offers.models import Offer
-from workbench.planning.models import ExternalWork, Milestone, PlannedWork
+from workbench.planning.models import (
+    ExternalWork,
+    Milestone,
+    PlannedWork,
+    future_weeks_on_closed_project,
+)
 from workbench.planning.reporting import Planning
 from workbench.planning.schemas import (
     PlannedWorkIn,
@@ -318,7 +323,15 @@ def _apply_planned_work(  # noqa: C901
         if field in values:
             setattr(pw, field, values[field])
     if "weeks" in values:
-        pw.weeks = sorted({monday(week) for week in values["weeks"]})
+        weeks = sorted({monday(week) for week in values["weeks"]})
+        if pw.project_id and future_weeks_on_closed_project(
+            pw.project, pw.weeks or [], weeks
+        ):
+            errors.append({
+                "loc": [*loc, "weeks"],
+                "msg": _("The project is closed."),
+            })
+        pw.weeks = weeks
     if "planned_hours" in values:
         pw.planned_hours = _hours(values["planned_hours"])
 
