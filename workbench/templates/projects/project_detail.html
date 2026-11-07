@@ -533,8 +533,10 @@
 
       <div
         class="list-group list-group-flush wb-services {% if offer.should_collapse %}offer-{{ offer.id }}-collapsed collapse{% endif %}"
-        data-sortable-container
-        data-sortable-url="{% url 'projects_service_set_order' %}"
+        {% if not offer or offer.services_changeable %}
+          data-sortable-container
+          data-sortable-url="{% url 'projects_service_set_order' %}"
+        {% endif %}
       >
         {% for row in offer_data.services %}
           <div
@@ -594,7 +596,7 @@
             </div>
 
             <div class="wb-row-actions">
-              {% if row.service.pk %}
+              {% if row.service.pk and not offer or row.service.pk and offer.services_changeable %}
                 <span
                   class="btn btn-quiet btn-sm btn-icon wb-grabber"
                   title="{% translate 'Sort' %}"

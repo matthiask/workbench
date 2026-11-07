@@ -9,7 +9,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
-from workbench.projects.models import InternalType, Project
+from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.models import FreezeDate
 from workbench.tools.validation import in_days, monday
 
@@ -758,6 +758,20 @@ class ProjectsAPITest(TestCase):
             [s["id"] for s in response.json()], [second.pk, created, first.pk]
         )
         self.assertEqual(order(), [second.pk, created, first.pk])
+
+        # Services of offers which have been sent stay in their order
+        Offer.objects.filter(pk=offer.pk).update(status=Offer.OFFERED)
+        response = post(
+            "/api/services/reorder/", {"services": [first.pk, created, second.pk]}
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(order(), [second.pk, created, first.pk])
+        response = self.client.post(
+            Service.urls["set_order"], {"ids": [first.pk, created, second.pk]}
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(order(), [second.pk, created, first.pk])
+        Offer.objects.filter(pk=offer.pk).update(status=Offer.IN_PREPARATION)
 
         # Delete, not with logged hours and not out of sent offers
         response = self.client.delete(f"/api/services/{created}/?dry_run=true")

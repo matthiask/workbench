@@ -242,7 +242,19 @@ def assign_service_type(request, pk):
 
 
 def set_order(request):
-    for index, id in enumerate(request.POST.getlist("ids")):
+    ids = request.POST.getlist("ids")
+    # Services of offers which have been sent stay as they were sent
+    if (
+        Service.objects
+        .filter(id__in=ids)
+        .exclude(id__in=Service.objects.editable())
+        .exists()
+    ):
+        return HttpResponse(
+            _("Services of offers which have been sent can't be reordered."),
+            status=403,
+        )
+    for index, id in enumerate(ids):
         Service.objects.filter(id=id).update(position=10 * (index + 1))
     return HttpResponse("OK", status=202)  # Accepted
 

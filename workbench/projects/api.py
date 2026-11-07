@@ -940,7 +940,10 @@ def service_reorder(request, data: ServiceOrder, *, dry_run: bool = False):
     """Reorder the services of an offer, or the services without offer of a
     project, like in the web interface (where services are reordered by
     dragging them)"""
-    services = {s.pk: s for s in Service.objects.filter(pk__in=data.services)}
+    services = {
+        s.pk: s
+        for s in Service.objects.filter(pk__in=data.services).select_related("offer")
+    }
     first = services.get(data.services[0]) if data.services else None
     group = (
         set(
@@ -959,6 +962,13 @@ def service_reorder(request, data: ServiceOrder, *, dry_run: bool = False):
                     "Expected the IDs of all services of one offer, or of all"
                     " services without offer of one project, once."
                 ),
+            }
+        ])
+    if first.offer and not first.offer.services_changeable:
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "services"],
+                "msg": _("Services of offers which have been sent can't be reordered."),
             }
         ])
     controlling = request.user.features[FEATURES.CONTROLLING]

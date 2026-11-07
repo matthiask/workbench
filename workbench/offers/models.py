@@ -379,6 +379,11 @@ class Offer(ModelWithTotal):
         return super().allow_delete(instance, request)
 
     @property
+    def services_changeable(self):
+        """Services of offers which have been sent stay as they were sent"""
+        return self.status in {self.IN_PREPARATION, self.SERVICE_GROUP}
+
+    @property
     def is_accepted(self):
         return self.status == self.ACCEPTED
 
