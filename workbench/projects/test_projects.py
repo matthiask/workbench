@@ -1,4 +1,5 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -13,6 +14,7 @@ from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.charts import projected_vs_invoiced_chart
+from workbench.projects.forms import delete_future_planned_work
 from workbench.projects.models import InternalType, Project, Service
 from workbench.projects.views import projected_invoices_timeline
 from workbench.tools.formats import local_date_format
@@ -1022,6 +1024,18 @@ class ProjectsTest(TestCase):
         self.assertEqual(spanning.planned_hours, 20)
         past.refresh_from_db()
         self.assertEqual(past.weeks, [this_week - dt.timedelta(days=7)])
+
+    def test_closing_keeps_some_planned_hours(self):
+        """Shortened planned work keeps at least the minimum of hours"""
+        this_week = monday()
+        work = factories.PlannedWorkFactory.create(
+            planned_hours=1,
+            weeks=[this_week + dt.timedelta(days=7 * i) for i in range(20)],
+        )
+        delete_future_planned_work(work.project)
+        work.refresh_from_db()
+        self.assertEqual(work.weeks, [this_week])
+        self.assertEqual(work.planned_hours, Decimal("0.1"))
 
     def test_initialize_customer_contact(self):
         """Initialize customer and/or contact using query parameters"""

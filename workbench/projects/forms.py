@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -500,9 +502,11 @@ def delete_future_planned_work(project):
     this_week = monday()
     for work in _future_planned_work(project):
         if past := [week for week in work.weeks if week <= this_week]:
-            work.planned_hours = (
-                work.planned_hours * len(past) / len(work.weeks)
-            ).quantize(Z1)
+            # At least the minimum of planned work
+            work.planned_hours = max(
+                Decimal("0.1"),
+                (work.planned_hours * len(past) / len(work.weeks)).quantize(Z1),
+            )
             work.weeks = past
             work.save()
         else:
