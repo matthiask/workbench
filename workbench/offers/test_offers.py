@@ -431,6 +431,36 @@ class OffersTest(TestCase):
         self.assertEqual(service.effort_rate, 160)
         self.assertEqual(service.effort_type, "Pauschalsatz")
 
+    def test_offer_copying_postal_address(self):
+        """Copies keep the postal address for the same customer, otherwise
+        they get one of the new project's contact, and can be changed
+        through the API"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
+        factories.ServiceFactory.create(project=offer.project, offer=offer)
+        same_customer = factories.ProjectFactory.create(
+            customer=offer.project.customer, contact=offer.project.contact
+        )
+        other = factories.ProjectFactory.create()
+        factories.PostalAddressFactory.create(person=other.contact)
+
+        self.client.force_login(offer.owned_by)
+        for project in [same_customer, other]:
+            response = self.client.post(
+                offer.urls["copy"], {"modal-project": project.pk}
+            )
+            self.assertEqual(response.status_code, 299)
+        copy = same_customer.offers.get()
+        self.assertEqual(copy.postal_address, "A\nStreet\nCity")
+        self.assertNotEqual(other.offers.get().postal_address, "")
+        self.assertNotEqual(other.offers.get().postal_address, "A\nStreet\nCity")
+
+        response = self.client.patch(
+            f"/api/offers/{copy.pk}/",
+            {"title": "Renamed"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_no_offers_on_closed_projects(self):
         """Offers can't be created on or copied to closed projects"""
         project = factories.ProjectFactory.create(closed_on=in_days(-1))

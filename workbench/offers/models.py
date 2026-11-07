@@ -14,6 +14,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.models import User
+from workbench.contacts.models import postal_address_choices
 from workbench.projects.models import Project, Service
 from workbench.tools.formats import Z2, local_date_format
 from workbench.tools.models import ModelWithTotal, SearchQuerySet
@@ -404,8 +405,17 @@ class Offer(ModelWithTotal):
         )
 
     def copy_to(self, *, project, owned_by):
+        if project.customer_id == self.project.customer_id:
+            postal_address = self.postal_address
+        elif choices := postal_address_choices(
+            person=project.contact, organization=project.customer
+        ):
+            postal_address = choices[0][1]
+        else:
+            postal_address = ""
         offer = Offer.objects.create(
             project=project,
+            postal_address=postal_address,
             title=self.title,
             description=self.description,
             owned_by=owned_by,
