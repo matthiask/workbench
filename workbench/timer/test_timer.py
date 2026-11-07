@@ -185,6 +185,52 @@ class TimestampsTest(TestCase):
             ],
         )
 
+    def test_hours_logged_on_another_day(self):
+        """Hours logged on another day than the day they were rendered on are
+        listed at the end, outside the timeline"""
+        user = factories.UserFactory.create()
+        today = localtime(timezone.now()).replace(
+            hour=9, minute=0, second=0, microsecond=0
+        )
+        yesterday = today - dt.timedelta(days=1)
+        stop = user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=yesterday.replace(hour=17)
+        )
+        later = factories.LoggedHoursFactory.create(
+            rendered_by=user, rendered_on=yesterday.date(), hours=1
+        )
+        later.created_at = today
+        later.save()
+
+        slices = Timestamp.objects.slices(user, day=yesterday.date())
+        self.assertEqual(
+            [
+                (
+                    slice.get("timestamp_id"),
+                    slice.get("logged_hours"),
+                    slice.get("starts_at"),
+                    slice.get("ends_at") and localtime(slice["ends_at"]).hour,
+                )
+                for slice in slices
+            ],
+            [(stop.pk, None, None, 17), (None, later, None, None)],
+        )
+        self.assertEqual(slices[-1].elapsed_hours, 1)
+
+        # Hours logged in advance for today come last, the timeline keeps
+        # running since the last timestamp
+        user.timestamp_set.create(type=Timestamp.STOP, created_at=today)
+        advance = factories.LoggedHoursFactory.create(
+            rendered_by=user, rendered_on=today.date(), hours=2
+        )
+        advance.created_at = yesterday
+        advance.save()
+        self.client.force_login(user)
+        with travel(today + dt.timedelta(hours=1)):
+            data = self.client.get("/api/timestamps/").json()
+        self.assertEqual([slice["hours"] for slice in data["slices"]], ["0", "2.0"])
+        self.assertEqual(dt.datetime.fromisoformat(data["running_since"]), today)
+
     def test_split_timestamp(self):
         """Unassigned timestamp slices can be split into decimal hour parts"""
         today = localtime(timezone.now()).replace(

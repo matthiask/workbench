@@ -247,8 +247,11 @@ def timestamp_list(request, day: dt.date | None = None):
     slices = Timestamp.objects.slices(request.user, day=day)
     codes = _codes(request.user, day)
     running_since = None
-    if day == localdate(now) and slices:
-        running_since = slices[-1].get("ends_at") or slices[-1].get("starts_at")
+    # Hours logged on another day are listed without times at the end
+    if day == localdate(now) and (
+        timed := [s for s in slices if s.get("ends_at") or s.get("starts_at")]
+    ):
+        running_since = timed[-1].get("ends_at") or timed[-1].get("starts_at")
         if running_since > now:
             running_since = None
     return {

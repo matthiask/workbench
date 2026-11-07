@@ -169,7 +169,8 @@ class TimestampQuerySet(models.QuerySet):
             d. Breaks have a start and an end so those values are used directly
             e. Logged hours without a timestamp are treated as STOP timestamps,
                the ``created_at`` field of logged hours is treated as timestamp
-               creation date.
+               creation date. Those created on another day are added at the
+               end, without times.
         2. Merge overlapping slices or generate slices from gaps.
             a. A START timestamp opening a slice is merged with the next slice
                if the next timestamp wasn't a START and the START timestamp does
@@ -193,16 +194,36 @@ class TimestampQuerySet(models.QuerySet):
             )
         )
         known_logged_hours = {entry.logged_hours for entry in entries}
-        logged_hours = user.loggedhours.filter(rendered_on=day).select_related(
-            "service__project__owned_by"
-        )
+        logged_hours = [
+            entry
+            for entry in user.loggedhours.filter(rendered_on=day).select_related(
+                "service__project__owned_by"
+            )
+            if entry not in known_logged_hours
+        ]
         entries.extend(
             self.model(
                 created_at=entry.created_at, type=self.model.LOGBOOK, logged_hours=entry
             )
             for entry in logged_hours
-            if entry not in known_logged_hours
+            if timezone.localdate(entry.created_at) == day
         )
+        # Hours logged on another day don't say anything about the timeline
+        # of this day, they are listed at the end
+        logged_elsewhen = [
+            Slice(
+                day=day,
+                description=entry,
+                logged_hours=entry,
+                logged_break=None,
+                timestamp_id=None,
+                is_start=False,
+                project=entry.service.project,
+                service=None,
+            )
+            for entry in logged_hours
+            if timezone.localdate(entry.created_at) != day
+        ]
         known_breaks = {entry.logged_break for entry in entries}
         breaks = user.breaks.filter(starts_at__date=day)
         entries.extend(
@@ -328,7 +349,7 @@ class TimestampQuerySet(models.QuerySet):
             boundary = previous.get("ends_at") or slice.get("starts_at")
             slice["starts_at"] = previous["ends_at"] = boundary
 
-        return result
+        return result + logged_elsewhen
 
 
 class Timestamp(models.Model):
