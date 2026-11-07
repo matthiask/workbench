@@ -121,6 +121,9 @@ class PlanningAPITest(TestCase):
         result = response.json()
         self.assertEqual(result["milestones"][0]["id"], None)
         self.assertEqual(result["planned_work"][0]["milestone"], "Go-Live")
+        self.assertEqual(
+            result["planned_work"][0]["milestone_id"], result["milestones"][0]["id"]
+        )
         self.assertEqual(result["planned_work"][0]["weeks"], [start.isoformat()])
         self.assertEqual(result["planned_work"][0]["planned_hours"], "12.2")
         self.assertEqual(result["warnings"], [])

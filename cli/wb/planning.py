@@ -78,6 +78,7 @@ def _echo_planning_csv(data):
         "project_title",
         "offer",
         "milestone",
+        "milestone_id",
         "work_id",
         "title",
         "user",
@@ -100,6 +101,7 @@ def _echo_planning_csv(data):
             project["title"],
             work["offer"]["code"] if work["offer"] else "",
             work["milestone"] or "",
+            work["milestone_id"] or "",
             work["id"],
             work["title"],
             work["user"],
@@ -115,8 +117,10 @@ def _echo_planning(data):
         return
     echo_period(data)
     table = make_table(
+        "ID>",
         "Project",
         "Offer",
+        "Milestone",
         "Title",
         "User",
         "First week",
@@ -128,8 +132,12 @@ def _echo_planning(data):
     for work in data["planned_work"]:
         project = work["project"]
         table.add_row(
+            str(work["id"]),
             link(project["code"], project["url"]),
             work["offer"]["code"] if work["offer"] else "",
+            f"{work['milestone']} ({work['milestone_id']})"
+            if work["milestone"]
+            else "",
             link(work["title"], work["url"]),
             work["user"],
             work["weeks"][0],
@@ -142,9 +150,12 @@ def _echo_planning(data):
     if any(work["is_provisional"] for work in data["planned_work"]):
         console.print("Provisional work is dimmed.", style="dim")
     if data["milestones"]:
-        table = make_table("Date", "Project", "Milestone", "Hours>", title="Milestones")
+        table = make_table(
+            "ID>", "Date", "Project", "Milestone", "Hours>", title="Milestones"
+        )
         for milestone in data["milestones"]:
             table.add_row(
+                str(milestone["id"]),
                 milestone["date"],
                 link(milestone["project"]["code"], milestone["project"]["url"]),
                 link(milestone["title"], milestone["url"]),
@@ -153,6 +164,7 @@ def _echo_planning(data):
         console.print(table)
     if data["external_work"]:
         table = make_table(
+            "ID>",
             "Project",
             "Title",
             "Provided by",
@@ -162,6 +174,7 @@ def _echo_planning(data):
         )
         for work in data["external_work"]:
             table.add_row(
+                str(work["id"]),
                 link(work["project"]["code"], work["project"]["url"]),
                 link(work["title"], work["url"]),
                 work["provided_by"],
@@ -203,6 +216,7 @@ def _echo_planned_work(planned_work):
         "User",
         "Service type",
         "Offer",
+        "Milestone",
         "Weeks",
         "Hours>",
         "Provisional",
@@ -215,6 +229,7 @@ def _echo_planned_work(planned_work):
             pw["user"],
             pw["service_type"] or "",
             pw["offer"] or "",
+            f"{pw['milestone']} ({pw['milestone_id']})" if pw.get("milestone") else "",
             f"{weeks[0]} – {weeks[-1]} ({len(weeks)})" if len(weeks) > 1 else weeks[0],
             pw["planned_hours"],
             "yes" if pw["is_provisional"] else "",
@@ -227,9 +242,12 @@ def _echo_import_result(data, *, dry_run, as_json):
         echo_json(data)
         return
     if data["milestones"]:
-        table = make_table("Milestone", "Date", "Phase starts on", "Estimated hours>")
+        table = make_table(
+            "ID>", "Milestone", "Date", "Phase starts on", "Estimated hours>"
+        )
         for milestone in data["milestones"]:
             table.add_row(
+                str(milestone["id"] or "(new)"),
                 milestone["title"],
                 milestone["date"],
                 milestone["phase_starts_on"] or "",

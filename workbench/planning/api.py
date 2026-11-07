@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
-from ninja import Query, Router, Schema
+from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
 
 from workbench.accounts.models import User
@@ -251,7 +251,8 @@ class ImportedPlannedWork(Schema):
     user: str
     service_type: str | None
     offer: str | None
-    milestone: str | None
+    milestone: str | None = Field(description="Title of the milestone.")
+    milestone_id: int | None
     weeks: list[dt.date]
     planned_hours: Decimal
     is_provisional: bool
@@ -419,6 +420,7 @@ def _import_result(*, milestones=(), planned_work=(), warnings=(), **deleted):
                 "service_type": pw.service_type.title if pw.service_type else None,
                 "offer": pw.offer.code if pw.offer else None,
                 "milestone": pw.milestone.title if pw.milestone else None,
+                "milestone_id": pw.milestone.pk if pw.milestone else None,
                 "weeks": pw.weeks,
                 "planned_hours": pw.planned_hours,
                 "is_provisional": pw.is_provisional,
@@ -651,7 +653,8 @@ class ExportedPlannedWork(Schema):
     url: str
     project: ProjectSummary
     offer: ExportedOffer | None
-    milestone: str | None
+    milestone: str | None = Field(description="Title of the milestone.")
+    milestone_id: int | None
     user: str
     title: str
     service_type: str | None
@@ -679,7 +682,8 @@ class ExportedExternalWork(Schema):
     title: str
     provided_by: str
     service_type: str | None
-    milestone: str | None
+    milestone: str | None = Field(description="Title of the milestone.")
+    milestone_id: int | None
     weeks: list[dt.date]
 
 
@@ -781,6 +785,7 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
             if pw.offer
             else None,
             "milestone": pw.milestone.title if pw.milestone else None,
+            "milestone_id": pw.milestone_id,
             "user": pw.user.get_short_name(),
             "title": pw.title,
             "service_type": pw.service_type.title if pw.service_type else None,
@@ -833,6 +838,7 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
                 "provided_by": ew.provided_by.name,
                 "service_type": ew.service_type.title if ew.service_type else None,
                 "milestone": ew.milestone.title if ew.milestone else None,
+                "milestone_id": ew.milestone_id,
                 "weeks": sorted(ew.weeks),
             }
             for ew in sorted(external_work, key=lambda ew: (min(ew.weeks), ew.pk))
