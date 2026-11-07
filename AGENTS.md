@@ -247,6 +247,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `workbench/planning/api.py`), and absences have no reason.
 - Offered amounts and offered hours only count for open projects; for closed
   projects the invoiced amount and the logged hours are ground truth.
+- Known gap, left alone on purpose: services can still be created on closed
+  projects (web and API; offers can't), although closed projects don't
+  offer their services and logbook prominently. Logging stays possible for
+  14 days after closing (`Project.is_logbook_locked`). Not a problem in
+  practice, so don't "fix" it without asking.
 - `docs/metrics.md` documents how every report and key figure is computed.
   Update it in the same commit when you change a computation, and remove
   entries from its "Known inconsistencies" when you fix them.

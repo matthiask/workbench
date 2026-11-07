@@ -5,18 +5,6 @@ they're fixed or decided.
 
 ## Round 1 (2026-11-07)
 
-### Questions (decisions)
-
-- Cancelled invoices in key data include those cancelled while still in
-  preparation (never sent). The form only warns that deleting may be
-  cleaner (`discourage-cancellations`); should cancelling unsent invoices
-  be impossible (delete them instead)?
-- Logged costs which have been invoiced can still change their service and
-  amounts behind the `part-of-invoice` warning (invoiced hours are locked
-  since 82584a0a). Lock them too?
-- Services can be created on closed projects (offers can't): needed for
-  late costs and the few days of logging after closing?
-
 ### Decided, no change
 
 - Reopening a project doesn't restore its discarded offers.
@@ -28,6 +16,8 @@ they're fixed or decided.
 - CLI versions are plain numbers (`0.29.0`), no pre-releases.
 - The history of sickness absences is only visible with
   `PERSONNEL_ADMINISTRATION` and pruned after three years.
+- Services can still be created on closed projects (documented as a known
+  gap in `AGENTS.md`).
 
 ### Data
 
