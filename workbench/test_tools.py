@@ -53,8 +53,17 @@ class ToolsTest(TestCase):
         self.assertAlmostEqual(m.tax_amount, Decimal("1.20"))
         self.assertAlmostEqual(m.total_excl_tax, Decimal(15))
         self.assertAlmostEqual(m.total, Decimal("16.20"))
-
         self.assertEqual(m.pretty_total_excl, "15.00 excl. tax (5.00 discount)")
+
+        # The tax amount absorbs the rounding of the total to 5 cents, so
+        # that the printed lines add up
+        m = CalculationModel(
+            subtotal=Decimal("1234.56"), discount=Decimal(0), tax_rate=Decimal("8.1")
+        )
+        m._calculate_total()
+        self.assertEqual(m.total, Decimal("1334.55"))
+        self.assertEqual(m.tax_amount, Decimal("99.99"))
+        self.assertEqual(m.total_excl_tax + m.tax_amount, m.total)
 
     def test_create_absence_redirect(self):
         """The create view uses the get_redirect_url of models"""

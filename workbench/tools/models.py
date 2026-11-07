@@ -149,7 +149,9 @@ class ModelWithTotal(Model):
 
     @property
     def tax_amount(self):
-        return self.total_excl_tax * self.tax_rate / 100 if self.liable_to_vat else Z2
+        # Absorbs the rounding of the total to 5 cents, so that the total
+        # excl. tax and the tax amount add up to the total
+        return self.total - self.total_excl_tax if self.liable_to_vat else Z2
 
     @property
     def pretty_total_excl(self):

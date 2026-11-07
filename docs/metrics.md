@@ -53,7 +53,9 @@ Contents:
   be cancelled or change their amount after the final invoice has been
   cancelled, which releases them, or while it is in preparation, which
   then deducts the new amount). `total` adds VAT if
-  `liable_to_vat`, rounded to 5 cents.
+  `liable_to_vat`, rounded to 5 cents (exact halves up); the tax amount
+  is `total − total_excl_tax`, so it absorbs the rounding and the printed
+  lines add up.
   `workbench/tools/models.py:ModelWithTotal._calculate_total`
 - **Invoiced** invoices: `Invoice.objects.invoiced()`, status SENT or PAID.
   This is the *current* status: canceled invoices never count, also not for
