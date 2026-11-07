@@ -1205,6 +1205,22 @@ class InvoicesTest(TestCase):
                     " that invoice first:",
                 )
 
+        # The amount deducted can't change either
+        for field, value in [("subtotal", 200), ("discount", 10)]:
+            with self.subTest(field=field):
+                response = self.client.post(
+                    down_payment.urls["update"],
+                    invoice_to_dict(
+                        down_payment,
+                        **{field: value, WarningsForm.ignore_warnings_id: "on"},
+                    ),
+                )
+                self.assertContains(
+                    response,
+                    "This down payment has been applied to an invoice, cancel"
+                    " that invoice first:",
+                )
+
         final.status = Invoice.CANCELED
         final.payment_notice = "Wrong down payment"
         final.save()

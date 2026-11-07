@@ -490,23 +490,27 @@ class InvoiceForm(PostalAddressSelectionForm):
                     code="tax-rate",
                 )
 
-        if (
-            has_status
-            and self.instance.down_payment_applied_to
-            and data["status"] in {Invoice.IN_PREPARATION, Invoice.CANCELED}
-        ):
-            # The final invoice still deducts the down payment
-            self.add_error(
-                "status",
-                format_html(
-                    "{} {}",
-                    _(
-                        "This down payment has been applied to an invoice,"
-                        " cancel that invoice first:"
+        if final := self.instance.down_payment_applied_to:
+            # The final invoice deducts the down payment, it can neither be
+            # cancelled nor change its amount
+            fields = {"subtotal", "discount"} & set(self.changed_data)
+            if has_status and data["status"] in {
+                Invoice.IN_PREPARATION,
+                Invoice.CANCELED,
+            }:
+                fields.add("status")
+            for field in sorted(fields):
+                self.add_error(
+                    field,
+                    format_html(
+                        "{} {}",
+                        _(
+                            "This down payment has been applied to an invoice,"
+                            " cancel that invoice first:"
+                        ),
+                        final,
                     ),
-                    self.instance.down_payment_applied_to,
-                ),
-            )
+                )
 
         if (
             "status" in data

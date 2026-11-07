@@ -7,9 +7,9 @@ they're fixed or decided.
 
 ### Untested risks
 
-- Editing an applied down payment doesn't update the final invoice's
-  `down_payment_total`; services invoices keep a stale value when their
-  down payments become ineligible.
+- Services invoices keep a stale `down_payment_total` when their down
+  payments become ineligible (`InvoiceForm.save()` only resets it for fixed
+  and down payment invoices).
 - Moving a service without offer to another project takes its invoiced
   hours along, without a warning (`ServiceMoveForm`).
 - Invoicing from the offer after invoicing from the logbook (or the other
