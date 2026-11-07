@@ -218,6 +218,38 @@ class CreditEntriesTest(TestCase):
         in_preparation.refresh_from_db()
         self.assertEqual(in_preparation.status, Invoice.PAID)
 
+    def test_unassign_warning(self):
+        """Removing the invoice of a credit entry warns that the invoice stays
+        paid"""
+        invoice = factories.InvoiceFactory.create(
+            subtotal=100,
+            liable_to_vat=False,
+            status=Invoice.PAID,
+            due_on=in_days(30),
+            closed_on=in_days(0),
+        )
+        entry = factories.CreditEntryFactory.create(total=100, invoice=invoice)
+        self.client.force_login(factories.UserFactory.create())
+        data = {
+            "ledger": entry.ledger_id,
+            "reference_number": entry.reference_number,
+            "value_date": entry.value_date,
+            "total": entry.total,
+            "payment_notice": entry.payment_notice,
+            "invoice": "",
+            "notes": "",
+        }
+        response = self.client.post(entry.urls["update"], data)
+        self.assertContains(response, "invoice-stays-paid")
+
+        response = self.client.post(
+            entry.urls["update"],
+            data | {WarningsForm.ignore_warnings_id: "invoice-stays-paid"},
+        )
+        self.assertRedirects(response, entry.urls["detail"])
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.PAID)
+
     def test_postfinance_utilities(self):
         """Utilities for the PostFinance CSV export"""
         self.assertEqual(

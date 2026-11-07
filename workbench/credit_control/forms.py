@@ -85,6 +85,19 @@ class CreditEntryForm(ModelForm):
         data = super().clean()
         invoice = data.get("invoice")
         if (
+            "invoice" in self.changed_data
+            and (previous := self.instance.invoice)
+            and previous.status == Invoice.PAID
+        ):
+            self.add_warning(
+                _(
+                    "The invoice %(invoice)s stays paid. Change its status"
+                    " if it hasn't been paid."
+                )
+                % {"invoice": previous},
+                code="invoice-stays-paid",
+            )
+        if (
             invoice
             and "invoice" in self.changed_data
             and invoice.status != Invoice.PAID

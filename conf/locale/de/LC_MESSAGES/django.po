@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 17:33+0100\n"
+"POT-Creation-Date: 2026-11-07 17:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1360,6 +1360,11 @@ msgstr "Verarbeitet"
 #: workbench/credit_control/forms.py
 msgid "All ledgers"
 msgstr "Alle Konten"
+
+#: workbench/credit_control/forms.py
+#, python-format
+msgid "The invoice %(invoice)s stays paid. Change its status if it hasn't been paid."
+msgstr "Die Rechnung %(invoice)s bleibt bezahlt. Ändere ihren Status, falls sie nicht bezahlt wurde."
 
 #: workbench/credit_control/forms.py
 msgid "Payments can only be assigned to sent invoices and to invoices in preparation with an invoice date."
