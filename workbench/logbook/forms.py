@@ -420,6 +420,9 @@ class LoggedHoursForm(ModelForm):
             self.project = kwargs["instance"].service.project
 
         super().__init__(*args, **kwargs)
+        # The choices contain the services which allow logging, the
+        # queryset (which validates) at least only those of the project
+        self.fields["service"].queryset = self.project.services.all()
         self.fields["service"].widget = ComboboxSelect()
         self.fields[
             "service"
@@ -713,6 +716,9 @@ class LoggedCostForm(ModelForm):
         if not self.instance.pk:
             self.instance.created_by = self.request.user
 
+        # The choices contain the services which allow logging, the
+        # queryset (which validates) at least only those of the project
+        self.fields["service"].queryset = self.project.services.all()
         self.fields["service"].widget = ComboboxSelect()
         self.fields["service"].choices = self.project.services.logging().choices()
         self.fields["cost"].help_text = mark_safe(
@@ -766,6 +772,12 @@ class LoggedCostForm(ModelForm):
     def clean(self):
         data = super().clean()
         errors = {}
+        if (
+            data.get("service")
+            and "service" in self.changed_data
+            and not data["service"].is_logging_allowed()
+        ):
+            errors["service"] = _("Logging is not allowed on this service anymore.")
         if self.project.closed_on:
             if self.project.closed_on < in_days(-14):
                 errors["__all__"] = _("This project has been closed too long ago.")

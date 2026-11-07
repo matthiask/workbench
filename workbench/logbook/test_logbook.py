@@ -138,6 +138,47 @@ class LogbookTest(TestCase):
         response = send()
         self.assertContains(response, "This project has been closed too long ago.")
 
+    def test_only_services_of_the_project(self):
+        """Hours and costs are only logged on services of the project which
+        allow logging"""
+        project = factories.ProjectFactory.create()
+        other = factories.ServiceFactory.create(
+            project=factories.ProjectFactory.create(closed_on=in_days(-100))
+        )
+        locked = factories.ServiceFactory.create(project=project, allow_logging=False)
+        self.client.force_login(project.owned_by)
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        for service in [other, locked]:
+            with self.subTest(service=service):
+                response = self.client.post(
+                    project.urls["createhours"],
+                    {
+                        "modal-rendered_by": project.owned_by_id,
+                        "modal-rendered_on": dt.date.today().isoformat(),
+                        "modal-service": service.id,
+                        "modal-hours": "0.5",
+                        "modal-description": "Test",
+                    },
+                    headers=headers,
+                )
+                self.assertEqual(response.status_code, 200)
+                response = self.client.post(
+                    project.urls["createcost"],
+                    {
+                        "modal-service": service.id,
+                        "modal-rendered_by": project.owned_by_id,
+                        "modal-rendered_on": dt.date.today().isoformat(),
+                        "modal-cost": "10",
+                        "modal-description": "Anything",
+                    },
+                    headers=headers,
+                )
+                self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(LoggedHours.objects.count(), 0)
+        self.assertEqual(LoggedCost.objects.count(), 0)
+
     def test_logging_not_allowed_on_service(self):
         """Hours cannot be logged on services which do not allow logging"""
         service = factories.ServiceFactory.create(allow_logging=False)
