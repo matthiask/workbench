@@ -604,3 +604,14 @@ class OfferServicesAPITest(TestCase):
         ]:
             with self.subTest(method=method, path=path):
                 self.assertEqual(self.send(method, path, data).status_code, 409)
+
+    def test_pdf(self):
+        """Offers are downloaded as PDF like in the web interface"""
+        response = self.client.get(f"/api/offers/{self.offer.pk}/pdf/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+        self.assertTrue(b"".join(response).startswith(b"%PDF"))
+        response = self.client.get(
+            f"/api/offers/{self.offer.pk}/pdf/?signature_line=true"
+        )
+        self.assertEqual(response.status_code, 200)

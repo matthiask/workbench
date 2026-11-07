@@ -35,7 +35,8 @@ class Response:
         self.status_code = response.status_code
         self.ok = response.status_code < 400
         self.headers = response.headers
-        self.text = response.content.decode()
+        self.content = response.content
+        self.text = response.content.decode(errors="replace")
         self._response = response
 
     def json(self):
@@ -307,6 +308,26 @@ class CLITest(TestCase):
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Down payment", result.output)
+
+    def test_pdfs(self):
+        """Invoices and offers are saved as PDF"""
+        invoice = factories.InvoiceFactory.create(
+            owned_by=self.user, title="Relaunch", postal_address="A\nStreet\nCity"
+        )
+        offer = factories.OfferFactory.create(owned_by=self.user, title="Phase 1")
+        self.addCleanup(os.chdir, Path.cwd())
+        os.chdir(self.directory)
+
+        result = self.wb("invoices", "pdf", invoice.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        [path] = self.directory.glob("*.pdf")
+        self.assertIn(f"Saved {path.name}", result.output)
+        self.assertTrue(path.read_bytes().startswith(b"%PDF"))
+
+        target = self.directory / "offer.pdf"
+        result = self.wb("offers", "pdf", offer.pk, "-o", target, "--signature-line")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertTrue(target.read_bytes().startswith(b"%PDF"))
 
     def test_people(self):
         """People are created from YAML files"""

@@ -10,6 +10,7 @@ from wb.core import (
     cli,
     complete_short_names,
     current_installation,
+    download,
     echo_actionable,
     echo_csv,
     echo_json,
@@ -163,6 +164,28 @@ def show(offer_id, as_json):
     """Show an offer"""
     data = request("GET", f"offers/{offer_id}/")
     echo_json(data) if as_json else echo_offer(data)
+
+
+@offers.command()
+@click.argument("offer_id", type=int)
+@click.option(
+    "-o",
+    "--output",
+    type=click.Path(),
+    help="File or directory, defaults to the offer's file name here.",
+)
+@click.option(
+    "--signature-line",
+    is_flag=True,
+    help="Add a signature line for the customer's agreement.",
+)
+def pdf(offer_id, output, signature_line):
+    """Save the PDF of an offer"""
+    download(
+        f"offers/{offer_id}/pdf/",
+        output,
+        params={"signature_line": format_bool(signature_line)},
+    )
 
 
 @offers.command()

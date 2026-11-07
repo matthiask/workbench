@@ -5,6 +5,7 @@ import datetime as dt
 import json
 import os
 import platform
+import re
 import secrets
 import shlex
 import socket
@@ -19,7 +20,7 @@ from functools import cache
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from importlib.metadata import version
 from pathlib import Path
-from urllib.parse import parse_qs, urlencode, urljoin, urlsplit
+from urllib.parse import parse_qs, unquote, urlencode, urljoin, urlsplit
 
 import click
 import requests
@@ -422,12 +423,12 @@ def _send(method, url, path, token, **kwargs):
         terminate(str(exc))
 
 
-def request(method, path, *, optional=False, **kwargs):
+def request(method, path, *, optional=False, raw=False, **kwargs):
     """Request the API, terminate on errors
 
     ``optional`` requests return ``None`` if access is denied, e.g. because
-    a feature is missing. Expired tokens are replaced and the request is
-    sent again."""
+    a feature is missing. ``raw`` requests return the response instead of
+    its JSON. Expired tokens are replaced and the request is sent again."""
     url, token = _config()
     response = _send(method, url, path, token, **kwargs)
     if response.status_code == 401 and (access := _can_login_again(url)):
@@ -457,7 +458,28 @@ def request(method, path, *, optional=False, **kwargs):
         except ValueError, KeyError, TypeError:
             detail = response.text
         terminate(f"{response.status_code}: {detail}")
-    return response.json()
+    return response if raw else response.json()
+
+
+def _filename(response):
+    """The file name of the Content-Disposition header"""
+    header = response.headers.get("content-disposition", "")
+    if match := re.search(r"filename\*=utf-8''([^;]+)", header, re.IGNORECASE):
+        return unquote(match[1])
+    if match := re.search(r'filename="([^"]+)"', header):
+        return match[1]
+    return None
+
+
+def download(path, output, *, params=None):
+    """Save a file of the API under its own name in the current directory or
+    as ``output`` (a file or a directory), and print where"""
+    response = request("GET", path, params=params, raw=True)
+    target = Path(output) if output else Path()
+    if not output or target.is_dir():
+        target /= _filename(response) or Path(path.rstrip("/")).name
+    target.write_bytes(response.content)
+    console.print(f"Saved {target}")
 
 
 class _Loader(yaml.SafeLoader):

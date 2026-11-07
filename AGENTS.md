@@ -192,6 +192,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
   query parameters of the web views) and their defaults; sending them stays
   in the web interface.
+  `wb invoices pdf` and `wb offers pdf` save the PDFs of the web interface
+  (`/api/invoices/<id>/pdf/`, `/api/offers/<id>/pdf/`; `download()` in
+  `wb/core.py` keeps the file name of the response).
   Hours are not logged through the CLI on purpose: the warnings of the web
   interface's logbook forms are useful. The offers API (`workbench/offers/api.py`) only changes offers
   in preparation: create, replace and update, with the rules of

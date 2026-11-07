@@ -29,6 +29,7 @@ from workbench.tools.api import (
     filter_date_range,
     full_clean,
 )
+from workbench.tools.pdf import offer_filename, pdf_response
 
 
 # Same as in the web interface
@@ -291,6 +292,23 @@ def offer_list_search(request, filters: Query[OfferFilter]):
 def offer_detail(request, offer_id: int):
     offer = get_object_or_404(Offer.objects.select_related("project"), pk=offer_id)
     return offer_out(offer, list(offer.services.all()), request)
+
+
+@router.get("/offers/{offer_id}/pdf/")
+def offer_pdf(request, offer_id: int, *, signature_line: bool = False):
+    """The offer as PDF, like in the web interface, optionally with a
+    signature line for the customer's agreement"""
+    offer = get_object_or_404(Offer, pk=offer_id)
+    pdf, response = pdf_response(offer_filename(offer))
+    try:
+        pdf.init_letter()
+        pdf.process_offer(offer)
+        if signature_line:
+            pdf.add_agreement(offer)
+        pdf.generate()
+    except Exception as exc:
+        raise HttpError(422, _("Unable to generate the PDF: {}").format(exc)) from exc
+    return response
 
 
 def _decimal(value, exp):

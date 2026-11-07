@@ -247,6 +247,7 @@ created in preparation; review and send them in Workbench.
     wb offers search --project 1234
     wb offers search relaunch --status offered
     wb offers show 5678
+    wb offers pdf 5678 --signature-line -o ~/Downloads
     wb offers update 5678 --title "Relaunch 2027" --description - < text.txt
     wb offers update 5678 --discount 500 --dry-run
 
@@ -316,16 +317,26 @@ milestones which are linked already unless you pass `--force`.
 
 ## Invoices
 
-Invoices are read-only in the CLI:
+Search and show invoices, and save their PDF (under the invoice's file name
+here, or `-o FILE_OR_DIRECTORY`):
 
     wb invoices search --open
     wb invoices search --overdue
     wb invoices search --project 1234 --since 2026-01-01
     wb invoices search hosting --customer 345
     wb invoices show 5678
+    wb invoices pdf 5678
 
 `wb invoices show` lists the services of the invoice with their offers
 (fixed amount and down payment invoices have none).
+
+The CLI only creates invoices in preparation, they are checked and sent in
+the web interface:
+
+    wb invoices create --offer 5678
+    wb invoices create --project 1234 --type down-payment --subtotal 5000
+    wb invoices create --project 1234 --service 11 --service 12 --from-logbook
+    wb invoices create --contact 345 --title Workshop --subtotal 1200
 
 Overdue invoices to remind customers of, per customer and contact, like the
 reminders in the web interface (without postponed reminders):

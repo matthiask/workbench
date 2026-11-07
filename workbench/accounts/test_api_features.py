@@ -29,6 +29,8 @@ class APIFeaturesTest(TestCase):
             ("post", "/api/invoices/"),
             ("get", "/api/recurring-invoices/"),
             ("get", f"/api/invoices/{invoice.pk}/"),
+            ("get", f"/api/invoices/{invoice.pk}/pdf/"),
+            ("get", f"/api/offers/{offer.pk}/pdf/"),
             ("get", "/api/reports/key-data/"),
             ("get", "/api/reports/cash-data/"),
         ]:

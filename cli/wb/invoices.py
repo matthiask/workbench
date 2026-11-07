@@ -7,6 +7,7 @@ from wb.core import (
     cli,
     complete_short_names,
     console,
+    download,
     echo_actionable,
     echo_csv,
     echo_fields,
@@ -151,6 +152,19 @@ def _echo_invoice(data):
             )
         console.print()
         console.print(table)
+
+
+@invoices.command("pdf")
+@click.argument("invoice_id", type=int)
+@click.option(
+    "-o",
+    "--output",
+    type=click.Path(),
+    help="File or directory, defaults to the invoice's file name here.",
+)
+def invoice_pdf(invoice_id, output):
+    """Save the PDF of an invoice"""
+    download(f"invoices/{invoice_id}/pdf/", output)
 
 
 @invoices.command("create")

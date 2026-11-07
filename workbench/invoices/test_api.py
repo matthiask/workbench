@@ -475,3 +475,15 @@ class InvoicesAPITest(TestCase):
             "?ignore_warnings=short-postal-address",
         )
         self.assertEqual(response.status_code, 200, response.content)
+
+    def test_pdf(self):
+        """Invoices are downloaded as PDF like in the web interface"""
+        invoice = factories.InvoiceFactory.create(
+            title="Relaunch", postal_address="Anything\nStreet\nCity"
+        )
+        self.client.force_login(invoice.owned_by)
+        response = self.client.get(f"/api/invoices/{invoice.pk}/pdf/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["content-type"], "application/pdf")
+        self.assertIn("attachment", response["content-disposition"])
+        self.assertTrue(b"".join(response).startswith(b"%PDF"))

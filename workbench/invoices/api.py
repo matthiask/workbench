@@ -40,6 +40,7 @@ from workbench.tools.api import (
     validate_form,
 )
 from workbench.tools.formats import Z2, local_date_format
+from workbench.tools.pdf import invoice_filename, pdf_response
 from workbench.tools.validation import in_days
 
 
@@ -634,6 +635,20 @@ def invoice_detail(request, invoice_id: int):
         pk=invoice_id,
     )
     return invoice_out(invoice, request) | {"services": _invoice_services(invoice)}
+
+
+@router.get("/invoices/{invoice_id}/pdf/")
+def invoice_pdf(request, invoice_id: int):
+    """The invoice as PDF, like in the web interface"""
+    invoice = get_object_or_404(Invoice, pk=invoice_id)
+    pdf, response = pdf_response(invoice_filename(invoice))
+    try:
+        pdf.init_invoice_letter()
+        pdf.process_invoice(invoice)
+        pdf.generate()
+    except Exception as exc:
+        raise HttpError(422, _("Unable to generate the PDF: {}").format(exc)) from exc
+    return response
 
 
 class ProjectedInvoiceOut(Schema):
