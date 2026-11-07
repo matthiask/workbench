@@ -208,9 +208,16 @@ def split_timestamp(request, pk):
                     notes=timestamp.notes,
                     created_at=slice["starts_at"]
                     + dt.timedelta(seconds=accumulated_tenths * 360),
+                    project=slice["project"],
+                    service=slice["service"],
                 )
             )
         Timestamp.objects.bulk_create(new_timestamps)
+        # The last part is the timestamp itself, keep the slice's project too
+        if not timestamp.project and slice["project"]:
+            timestamp.project = slice["project"]
+            timestamp.service = slice["service"]
+            timestamp.save()
         messages.success(request, _("The timestamp has been split successfully."))
         if request.is_ajax():
             return HttpResponse("Thanks", status=201)

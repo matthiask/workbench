@@ -216,6 +216,35 @@ class TimestampsTest(TestCase):
             ["09:12", "09:24", "09:40"],
         )
 
+    def test_split_timestamp_keeps_the_project(self):
+        """All parts keep the project and the service"""
+        today = localtime(timezone.now()).replace(
+            hour=9, minute=0, second=0, microsecond=0
+        )
+        service = factories.ServiceFactory.create()
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        user.timestamp_set.create(
+            type=Timestamp.START,
+            created_at=today,
+            project=service.project,
+            service=service,
+        )
+        stop = user.timestamp_set.create(
+            type=Timestamp.STOP, created_at=today + dt.timedelta(minutes=60)
+        )
+
+        self.client.post(
+            reverse("split_timestamp", args=(stop.pk,)),
+            {"parts": 3},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        slices = Timestamp.objects.slices(user)
+        self.assertEqual(
+            [(slice["project"], slice["service"]) for slice in slices],
+            [(service.project, service)] * 3,
+        )
+
     def test_split_timestamp_rejects_associated_log(self):
         """Timestamps which are already linked to hours cannot be split"""
         hours = factories.LoggedHoursFactory.create()
