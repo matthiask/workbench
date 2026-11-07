@@ -9,6 +9,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
+from workbench.reporting.models import FreezeDate
 from workbench.tools.models import default_tax_rate
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -368,6 +369,32 @@ class RecurringTest(TestCase):
         invoices = r.create_invoices()
         self.assertIsNotNone(invoices[0].project)
         self.assertEqual(invoices[0].type, invoices[0].DOWN_PAYMENT)
+
+    def test_mark_as_sent(self):
+        """Recurring invoices may optionally create sent invoices, but not in
+        the frozen period"""
+        r = factories.RecurringInvoiceFactory.create(
+            starts_on=in_days(-70),
+            periodicity="monthly",
+            create_invoice_on_day=0,
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+        )
+        self.assertFalse(r.mark_as_sent)
+        [invoice, *_rest] = r.create_invoices()
+        self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
+        Invoice.objects.all().delete()
+
+        FreezeDate.objects.create(up_to=in_days(-50))
+        r.mark_as_sent = True
+        r.next_period_starts_on = None
+        r.save()
+        invoices = r.create_invoices()
+        self.assertEqual(
+            [invoice.status for invoice in invoices],
+            [Invoice.IN_PREPARATION, Invoice.SENT, Invoice.SENT],
+        )
+        self.assertTrue(all(invoice.due_on for invoice in invoices))
 
     def test_current_tax_rate(self):
         """Recurring invoices have no tax rate of their own, they and their

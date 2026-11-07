@@ -824,6 +824,14 @@ class RecurringInvoice(ModelWithTotal):
         help_text=_("Invoices are created without projects by default."),
         default=False,
     )
+    mark_as_sent = models.BooleanField(
+        _("Mark invoices as sent?"),
+        help_text=_(
+            "Invoices are created in preparation by default. Only if they are"
+            " sent another way, not in the frozen period."
+        ),
+        default=False,
+    )
 
     objects = RecurringInvoiceQuerySet.as_manager()
 
@@ -893,7 +901,9 @@ class RecurringInvoice(ModelWithTotal):
             service_period_from=period_starts_on,
             service_period_until=period_ends_on,
             owned_by=self.owned_by,
-            status=Invoice.IN_PREPARATION,
+            status=Invoice.SENT
+            if self.mark_as_sent and period_starts_on > FreezeDate.objects.up_to()
+            else Invoice.IN_PREPARATION,
             type=Invoice.DOWN_PAYMENT if self.create_project else Invoice.FIXED,
             postal_address=self.postal_address,
             subtotal=self.subtotal,

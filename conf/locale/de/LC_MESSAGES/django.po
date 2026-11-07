@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 16:37+0100\n"
+"POT-Creation-Date: 2026-11-07 16:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2604,6 +2604,14 @@ msgid "Invoices are created without projects by default."
 msgstr "Standardmässig werden Rechnungen ohne eine Projektzuordnung erstellt."
 
 #: workbench/invoices/models.py
+msgid "Mark invoices as sent?"
+msgstr "Rechnungen als versendet markieren?"
+
+#: workbench/invoices/models.py
+msgid "Invoices are created in preparation by default. Only if they are sent another way, not in the frozen period."
+msgstr "Standardmässig werden Rechnungen in Vorbereitung erstellt. Nur wenn sie anderweitig versendet werden, nicht im eingefrorenen Zeitraum."
+
+#: workbench/invoices/models.py
 msgid "recurring invoice"
 msgstr "Stapelrechnung"
 
@@ -2830,7 +2838,8 @@ msgid "This seems to be a duplicate. Is it?"
 msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
 
 #: workbench/logbook/forms.py workbench/offers/api.py
-#: workbench/projects/forms.py workbench/projects/models.py
+#: workbench/offers/models.py workbench/projects/forms.py
+#: workbench/projects/models.py
 msgid "flat rate"
 msgstr "Pauschalsatz"
 

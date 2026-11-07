@@ -73,6 +73,8 @@
             <dd>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</dd>
             <dt>{{ object|label:'create_project' }}</dt>
             <dd>{{ object.create_project|yesno:_('yes,no') }}</dd>
+            <dt>{{ object|label:'mark_as_sent' }}</dt>
+            <dd>{{ object.mark_as_sent|yesno:_('yes,no') }}</dd>
           </dl>
         </div>
       </section>

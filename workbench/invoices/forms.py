@@ -1094,6 +1094,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "discount",
             "liable_to_vat",
             "create_project",
+            "mark_as_sent",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
