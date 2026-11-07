@@ -29,7 +29,13 @@ they're fixed or decided.
 
 Fixed so far: invalid deal statuses are a 400 (c6cbe2f1), absences beyond
 the shown weeks of the planning (3d76263d), the creator may undo absences
-on the same day (57db358c).
+on the same day (57db358c), closing deals settles offers in preparation
+too (810805b8), `services-invoiced-already` only when switching between
+offer and logbook (10d17679), invoiced gross margin never below zero
+(cafa2f86).
+
+Decided, no change: changing a person's organization carries the industry
+groups shown in the form over to the new organization.
 
 ### Verified bugs
 
@@ -50,10 +56,6 @@ Invoices, offers, services, logbook:
 
 Reports:
 
-- Invoiced gross margin is negative when third party costs are logged
-  before anything is invoiced; `not_in_planned_invoicing_excl_tax` (cash
-  data) and the projected gross margin's delta then exceed the offered
-  gross margin.
 - The rate "only accepted offers" of `project_gross_margin()` takes the
   amount of budget retainer offers but the hours of the other offers.
 
@@ -94,13 +96,7 @@ API and wb:
 
 ### Need a decision
 
-- `services-invoiced-already` (ea95a99f) fires on every regular invoice
-  from the logbook; the danger is switching between offer and logbook.
-- Invoiced gross margin with logged third party costs and nothing invoiced
-  (see above): deduct only up to what has been invoiced?
 - Budget retainers in the rate "only accepted offers".
-- Changing a person's organization moves the old organization's industry
-  groups to the new one (`_save_organization_groups()`).
 - The offer pricing form and `OfferForm` change the services of sent and
   accepted offers (only a warning), the project's `ServiceForm` and the
   API don't allow it.
