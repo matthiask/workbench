@@ -354,6 +354,20 @@ class PlanningAPITest(TestCase):
                     "This field cannot be null.",
                 )
 
+    def test_export_at_most_ten_years(self):
+        """Exports cover at most ten years, they list every week"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.get(
+            "/api/planning/export/?since=2020-01-01&until=2029-12-31"
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(
+            "/api/planning/export/?since=2020-01-01&until=2030-01-07"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["query", "until"])
+
     def test_export(self):
         """Planned work, milestones and capacity of a period or a project"""
         user = factories.UserFactory.create(_short_name="ab")

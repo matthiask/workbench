@@ -35,6 +35,9 @@ from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
 
 
+EXPORT_MAX_DAYS = 3653  # Ten years
+
+
 router = Router(tags=["planning"])
 
 
@@ -668,7 +671,7 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
     campaign, users or a team
 
     The period is the whole planning of projects and campaigns, otherwise
-    the current and the next eleven weeks by default. Planned hours are
+    the current and the next eleven weeks by default, at most ten years. Planned hours are
     distributed evenly over the weeks of the planned work. Milestones and
     external work are those of the projects with planned work, or of the
     project or campaign. The capacity (hours not planned yet, less absences
@@ -697,6 +700,14 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
         period = date_range(
             filters, default=[monday(), monday() + dt.timedelta(days=83)]
         )
+        # Every week is listed, with the capacity of every user
+        if (period[1] - period[0]).days > EXPORT_MAX_DAYS:
+            raise ValidationError([
+                {
+                    "loc": ["query", "until"],
+                    "msg": _("The period may cover at most ten years."),
+                }
+            ])
         weeks = list(_mondays(*period))
         work = work.filter(weeks__overlap=weeks)
     else:
