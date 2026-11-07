@@ -54,6 +54,8 @@ class OffersAPITest(TestCase):
         data = self.client.get(url).json()
         self.assertEqual(data["project"]["code"], project.code)
         self.assertEqual(data["offers"][0]["code"], offer.code)
+        self.assertEqual(data["offers"][0]["project"]["id"], offer.project_id)
+        self.assertEqual(data["offers"][0]["owned_by"], offer.owned_by.get_short_name())
         self.assertEqual(data["offers"][0]["services"][0]["title"], "Design")
         self.assertEqual(
             data["service_types"][0],

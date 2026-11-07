@@ -545,6 +545,16 @@ def echo_offer(offer):
         f"{offer['code'] or '(new offer)'} {offer['title']}",
         [
             ("ID", offer["id"]),
+            (
+                "Project",
+                link(
+                    f"{offer['project']['code']} {offer['project']['title']}",
+                    offer["project"]["url"],
+                )
+                if offer.get("project")
+                else None,
+            ),
+            ("Owned by", offer.get("owned_by")),
             ("Status", offer["status_label"]),
             ("Offered on", offer.get("offered_on")),
             ("Valid until", offer.get("valid_until")),

@@ -21,7 +21,13 @@ from workbench.offers.models import (
     normalize_external_reference,
     validate_external_reference,
 )
-from workbench.projects.api import ProjectOut, ServiceTypeOut, project_out
+from workbench.projects.api import (
+    ProjectOut,
+    ProjectSummary,
+    ServiceTypeOut,
+    project_out,
+    project_summary,
+)
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
@@ -138,6 +144,8 @@ class OfferOut(Schema):
     url: str | None
     title: str
     description: str
+    project: ProjectSummary
+    owned_by: str = Field(description="Short name.")
     status: OfferStatus
     status_label: str
     created_at: dt.datetime
@@ -189,6 +197,8 @@ def offer_out(offer, services, request):
         else None,
         "title": offer.title,
         "description": offer.description,
+        "project": project_summary(offer.project, request),
+        "owned_by": offer.owned_by.get_short_name(),
         "status": key("offer_status", offer.status),
         "status_label": offer.get_status_display(),
         "created_at": offer.created_at,
@@ -210,9 +220,9 @@ def offer_out(offer, services, request):
 def _project_offers(project, request):
     return [
         offer_out(offer, list(offer.services.all()), request)
-        for offer in project.offers.select_related("project").prefetch_related(
-            "services"
-        )
+        for offer in project.offers.select_related(
+            "project", "owned_by"
+        ).prefetch_related("services")
     ]
 
 
@@ -253,7 +263,7 @@ def offer_list_search(request, filters: Query[OfferFilter]):
     """Search offers, newest first; the period filters the offer date"""
     offers = (
         Offer.objects
-        .select_related("project")
+        .select_related("project", "owned_by")
         .prefetch_related("services")
         .order_by("-pk")
     )
@@ -282,7 +292,9 @@ def offer_list_search(request, filters: Query[OfferFilter]):
 
 @router.get("/offers/{offer_id}/", response=OfferOut)
 def offer_detail(request, offer_id: int):
-    offer = get_object_or_404(Offer.objects.select_related("project"), pk=offer_id)
+    offer = get_object_or_404(
+        Offer.objects.select_related("project", "owned_by"), pk=offer_id
+    )
     return offer_out(offer, list(offer.services.all()), request)
 
 
@@ -479,7 +491,9 @@ def offer_create(
 
 def _offer_in_preparation(offer_id, message):
     offer = get_object_or_404(
-        Offer.objects.select_related("project__customer", "project__contact"),
+        Offer.objects.select_related(
+            "project__customer", "project__contact", "owned_by"
+        ),
         pk=offer_id,
     )
     if offer.status != Offer.IN_PREPARATION:
@@ -610,7 +624,9 @@ def _update_external_reference(request, offer_id, value, *, dry_run):
     """Only the external references, also of offers which have been sent or
     accepted (like in the web interface, which only warns)"""
     offer = get_object_or_404(
-        Offer.objects.select_related("project__customer", "project__contact"),
+        Offer.objects.select_related(
+            "project__customer", "project__contact", "owned_by"
+        ),
         pk=offer_id,
     )
     try:
