@@ -276,6 +276,27 @@ class PlanningTest(TestCase):
         )
         self.assertContains(response, "The project is closed.", status_code=422)
 
+    def test_planned_work_far_ahead(self):
+        """Planned work far ahead (e.g. imported) can be edited too"""
+        service_types = factories.service_types()
+        far = monday() + dt.timedelta(days=7 * 90)
+        pw = factories.PlannedWorkFactory.create(
+            weeks=[far], service_type=service_types.consulting
+        )
+        self.client.force_login(pw.project.owned_by)
+        response = self.client.post(
+            pw.urls["update"],
+            {
+                "modal-user": pw.user_id,
+                "modal-title": "bla",
+                "modal-planned_hours": 50,
+                "modal-weeks": [far.isoformat()],
+                "modal-service_type": service_types.consulting.pk,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+
     def test_planned_work_crud(self):
         """Create, update and delete planned work"""
         service_types = factories.service_types()

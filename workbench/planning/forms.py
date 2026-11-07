@@ -17,6 +17,14 @@ from workbench.tools.forms import Autocomplete, Form, ModelForm, Textarea, add_p
 from workbench.tools.validation import monday
 
 
+def _week_count(date_from, weeks):
+    """80 weeks, or more to include all weeks of existing planned work (e.g.
+    imported far ahead)"""
+    if not weeks:
+        return 80
+    return max(80, (max(weeks) - date_from).days // 7 + 5)
+
+
 class MilestoneSearchForm(Form):
     def filter(self, queryset):
         return queryset.select_related("project")
@@ -250,7 +258,10 @@ class PlannedWorkForm(ModelForm):
                         local_date_format(day + dt.timedelta(days=6)),
                     ),
                 )
-                for day in islice(recurring(date_from, "weekly"), 80)
+                for day in islice(
+                    recurring(date_from, "weekly"),
+                    _week_count(date_from, self.instance.weeks),
+                )
             ],
             widget=forms.SelectMultiple(attrs={"size": 20}),
             initial=self.instance.weeks or [monday()],
@@ -410,7 +421,10 @@ class ExternalWorkForm(ModelForm):
                         local_date_format(day + dt.timedelta(days=6)),
                     ),
                 )
-                for day in islice(recurring(date_from, "weekly"), 80)
+                for day in islice(
+                    recurring(date_from, "weekly"),
+                    _week_count(date_from, self.instance.weeks),
+                )
             ],
             widget=forms.SelectMultiple(attrs={"size": 20}),
             initial=self.instance.weeks or [monday()],
