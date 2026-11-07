@@ -739,7 +739,13 @@ class CreateProjectInvoiceForm(InvoiceForm):
             if offer and offer_data["services"]:
                 self.offer_filter.append((offer, offer == self.offer))
             if self.offer and offer == self.offer:
-                selected = [row["service"].id for row in rows]
+                # Optional services haven't been ordered, unless work has
+                # been logged on them
+                selected = [
+                    row["service"].id
+                    for row in rows
+                    if source == "logbook" or not row["service"].is_optional
+                ]
             elif self.offer and not show_all:
                 continue
             id = f"offer-{offer.pk if offer else 'none'}"

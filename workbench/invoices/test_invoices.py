@@ -277,6 +277,33 @@ class InvoicesTest(TestCase):
             self.assertEqual(f["title"].value(), project.title)
             self.assertFalse(f["selected_services"].value())
 
+    def test_invoice_offer_without_optional_services(self):
+        """Invoicing an offer doesn't preselect its optional services"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        service = factories.ServiceFactory.create(
+            project=project, offer=offer, cost=100
+        )
+        optional = factories.ServiceFactory.create(
+            project=project, offer=offer, cost=50, is_optional=True
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(
+            project.urls["createinvoice"]
+            + f"?type=services&source=offer&offer={offer.pk}"
+        )
+        form = response.context["form"]
+        self.assertEqual(form["selected_services"].value(), [service.pk])
+        self.assertIn(
+            optional.pk,
+            [
+                value
+                for _group, options in form.fields["selected_services"].choices
+                for value, _label in options
+            ],
+        )
+
     def test_create_service_invoice_from_offer(self):
         """Service invoice creation from offers (services) works and results in
         the expected invoice total"""
