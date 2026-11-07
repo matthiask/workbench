@@ -433,11 +433,19 @@ class SetStatusForm(ModelForm):
                     required=False,
                     widget=forms.CheckboxSelectMultiple,
                     # Customers may have received drafts of offers in
-                    # preparation; service groups are never sent
+                    # preparation; service groups are never sent. Reopened
+                    # deals settle the offers they settled before again.
                     initial=[
                         offer.id
                         for offer in related_offers
-                        if offer.status in {offer.IN_PREPARATION, offer.OFFERED}
+                        if offer.status
+                        in {
+                            offer.IN_PREPARATION,
+                            offer.OFFERED,
+                            offer.DECLINED
+                            if instance.status == Deal.ACCEPTED
+                            else offer.ACCEPTED,
+                        }
                     ],
                 )
                 self.fields["related_offers"].choices = [

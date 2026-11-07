@@ -346,7 +346,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - Offers are only linked to and unlinked from open deals, and only offers
   which aren't closed yet (in preparation, service group, offered): closing a
   deal settles its offers (those in preparation, which customers may have
-  received as drafts, and offered ones are preselected; missing offer and
+  received as drafts, and offered ones are preselected, also those with the
+  opposite status when closing a reopened deal; missing offer and
   validity dates become the deal's closing date; declining service groups
   discards them). Offers of other customers' projects are a warning
   (agencies and their clients, departments of a city), `other-customer` in
