@@ -22,7 +22,7 @@ def hours_per_customer(date_range, *, users=None):
     seen_users = set()
 
     queryset = LoggedHours.objects.order_by().filter(rendered_on__range=date_range)
-    if users:
+    if users is not None:
         queryset = queryset.filter(rendered_by__in=users)
 
     for row in queryset.values("rendered_by", "service__project__customer").annotate(
@@ -87,7 +87,7 @@ def hours_per_type(date_range, *, users=None):
     for m2m in InternalTypeUser.objects.select_related("internal_type"):
         user_internal_types[user_dict[m2m.user_id]][m2m.internal_type] = m2m
 
-    if users:
+    if users is not None:
         queryset = queryset.filter(rendered_by__in=users)
     for row in queryset.values(
         "rendered_by", "service__project__type", "service__project__internal_type"

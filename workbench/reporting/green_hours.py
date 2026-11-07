@@ -94,7 +94,8 @@ WHERE service.hours / logged.hours < 1
         )
         return ret
 
-    users = users or User.objects.filter(id__in=user_ids)
+    if users is None:
+        users = User.objects.filter(id__in=user_ids)
     ret = {}
     for user in users:
         ret[user] = data(user.id)

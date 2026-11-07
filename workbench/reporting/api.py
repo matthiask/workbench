@@ -530,8 +530,9 @@ def planning_vs_logbook_api(request, filters: Query[PeriodFilter]):
     ``allocation`` is the customer's share of the logged hours relative to its
     share of the planned hours in percent."""
     period = date_range(filters, default=_this_week())
+    users = filter_users(filters)
     stats = planning_vs_logbook(
-        period, users=filter_users(filters) or User.objects.all()
+        period, users=User.objects.all() if users is None else users
     )
 
     def _week(week):

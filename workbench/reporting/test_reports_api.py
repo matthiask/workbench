@@ -157,6 +157,19 @@ class ReportsAPITest(TestCase):
         self.assertEqual(user["logged_hours"]["sum"], "3.0")
         self.assertIsInstance(user["logging"], str)
 
+        # A team without members means nobody, not everybody
+        factories.TeamFactory.create(name="Empty")
+        data = self.get("/api/reports/hours-per-customer/", team="empty")
+        self.assertEqual(data["total_hours"], "0.0")
+        self.assertEqual(
+            self.get("/api/reports/hours-per-type/", team="empty")["users"], []
+        )
+        self.assertEqual(
+            self.get("/api/reports/green-hours/", team="empty")["users"], []
+        )
+        data = self.get("/api/reports/planning-vs-logbook/", team="empty")
+        self.assertEqual((data["planned"], data["logged"]), ("0.0", "0.0"))
+
     def test_controlling(self):
         """Budget statistics, third party costs, open items and planned
         invoicing"""
