@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 15:08+0100\n"
+"POT-Creation-Date: 2026-11-07 15:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3783,6 +3783,11 @@ msgstr "Das Projekt %(project)s hat einen Pauschalsatz, welcher auf diese Leistu
 #: workbench/projects/forms.py
 msgid "Codes must be unique."
 msgstr "Codes müssen eindeutig sein."
+
+#: workbench/projects/forms.py
+#, python-brace-format
+msgid "Cannot project invoices with a date of {} or earlier anymore."
+msgstr "Rechnungen mit einem Datum am {} oder früher können nicht mehr geplant werden."
 
 #: workbench/projects/forms.py
 #, python-format

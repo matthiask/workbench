@@ -858,9 +858,29 @@ class OffersRenumberForm(Form):
         return self.project
 
 
+class ProjectedInvoiceForm(forms.ModelForm):
+    def clean(self):
+        data = super().clean()
+        if not self.instance.pk and self.instance.project.closed_on:
+            raise forms.ValidationError(_("This project is already closed."))
+        if (
+            "invoiced_on" in self.changed_data
+            and (invoiced_on := data.get("invoiced_on"))
+            and invoiced_on <= (freeze := FreezeDate.objects.up_to())
+        ):
+            self.add_error(
+                "invoiced_on",
+                _(
+                    "Cannot project invoices with a date of {} or earlier anymore."
+                ).format(local_date_format(freeze)),
+            )
+        return data
+
+
 ProjectedInvoiceFormset = inlineformset_factory(
     Project,
     ProjectedInvoice,
+    form=ProjectedInvoiceForm,
     fields=["invoiced_on", "gross_margin", "description"],
     extra=0,
     widgets={

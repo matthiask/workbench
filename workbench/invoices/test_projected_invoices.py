@@ -1,3 +1,4 @@
+import datetime as dt
 from decimal import Decimal
 
 from django.core import mail
@@ -9,6 +10,8 @@ from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.invoices.tasks import send_unsent_projected_invoices_reminders
 from workbench.reporting.key_data import projected_gross_margin
+from workbench.reporting.models import FreezeDate
+from workbench.tools.validation import in_days
 
 
 class ProjectedInvoicesTest(TestCase):
@@ -48,6 +51,45 @@ class ProjectedInvoicesTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         # print(mail.outbox[0].__dict__)
+
+    def test_projected_invoices_form(self):
+        """Projected invoices aren't added to closed projects nor dated on or
+        before the freeze date; existing ones can still be changed"""
+        project = factories.ProjectFactory.create()
+        FreezeDate.objects.create(up_to=in_days(-30))
+        self.client.force_login(project.owned_by)
+        url = project.urls["projected_invoices"]
+
+        def post(*rows, initial=0):
+            data = {
+                "projected_invoices-TOTAL_FORMS": len(rows),
+                "projected_invoices-INITIAL_FORMS": initial,
+            }
+            for index, row in enumerate(rows):
+                data |= {f"projected_invoices-{index}-{k}": v for k, v in row.items()}
+            return self.client.post(url, data)
+
+        response = post({"invoiced_on": in_days(-30), "gross_margin": 1000})
+        self.assertContains(response, "or earlier anymore")
+        response = post({"invoiced_on": in_days(-29), "gross_margin": 1000})
+        self.assertRedirects(response, project.urls["detail"])
+        pi = project.projected_invoices.get()
+
+        project.closed_on = dt.date.today()
+        project.save()
+        response = post(
+            {"id": pi.pk, "invoiced_on": in_days(-29), "gross_margin": 500},
+            {"invoiced_on": in_days(10), "gross_margin": 1000},
+            initial=1,
+        )
+        self.assertContains(response, "This project is already closed.")
+        response = post(
+            {"id": pi.pk, "invoiced_on": in_days(-29), "gross_margin": 500},
+            initial=1,
+        )
+        self.assertRedirects(response, project.urls["detail"])
+        pi.refresh_from_db()
+        self.assertEqual(pi.gross_margin, 500)
 
     def test_logged_third_party_costs_reduce_invoiced_gross_margin(self):
         """Logged third party costs exceeding those on invoices are deducted"""

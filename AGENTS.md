@@ -283,7 +283,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   margin which uses up projected invoices alike. The offered gross margin
   deducts the larger of the offers' third party costs and the logged ones.
 - Projected invoices (`ProjectedInvoice.gross_margin`) are gross margin, third
-  party costs are not included. Invoiced gross margin uses up a project's
+  party costs are not included. They aren't added to closed projects nor
+  dated on or before the freeze date (`ProjectedInvoiceForm`). Invoiced gross margin uses up a project's
   oldest projections first. Projections which haven't been invoiced in time
   stay in their original month (key data report and cash data API alike); the
   cash data API reports their sum separately as
