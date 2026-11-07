@@ -190,6 +190,22 @@ class OffersAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 422)
 
+        # Their title and description can be changed, there's nothing else
+        response = self.client.patch(
+            f"/api/offers/{offer.pk}/",
+            {"title": "Tranche 3", "description": "Later"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        offer.refresh_from_db()
+        self.assertEqual((offer.title, offer.description), ("Tranche 3", "Later"))
+        response = self.client.patch(
+            f"/api/offers/{offer.pk}/",
+            {"discount": 100},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 409)
+
     def test_effort_type(self):
         """Service types only suggest the effort type and the hourly rate"""
         factories.service_types()

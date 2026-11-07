@@ -563,14 +563,36 @@ class OfferPatch(Schema):
 @router.patch("/offers/{offer_id}/", response=OfferOut)
 def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: bool = False):
     """Change the title, the description, the postal address or the discount
-    of an offer in preparation, or the external references of any offer;
-    fields which aren't given are left alone"""
+    of an offer in preparation, the title and the description of a service
+    group, or the external references of any offer; fields which aren't
+    given are left alone"""
     fields = data.model_dump(exclude_unset=True)
     if fields.keys() == {"external_reference"}:
         return _update_external_reference(
             request, offer_id, fields["external_reference"], dry_run=dry_run
         )
-    offer = _changeable_offer(offer_id)
+    offer = get_object_or_404(Offer, pk=offer_id)
+    if offer.status == Offer.SERVICE_GROUP:
+        # Service groups only have a title and a description
+        if fields.keys() - {"title", "description", "external_reference"}:
+            raise HttpError(
+                409,
+                _(
+                    "Only the title and the description of service groups can be changed."
+                ),
+            )
+        if "external_reference" in fields:
+            value = fields.pop("external_reference") or ""
+            try:
+                validate_external_reference(value)
+            except DjangoValidationError as exc:
+                raise ValidationError([
+                    {"loc": ["body", "data", "external_reference"], "msg": message}
+                    for message in exc.messages
+                ]) from None
+            offer.external_reference = normalize_external_reference(value)
+    else:
+        offer = _changeable_offer(offer_id)
     for field, value in fields.items():
         if field == "discount":
             offer.discount = _decimal(value or 0, "0.00")

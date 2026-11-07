@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 12:46+0100\n"
+"POT-Creation-Date: 2026-11-07 12:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3053,6 +3053,10 @@ msgstr "Auf Leistungen dieser Offerte wurden bereits Stunden oder Kosten erfasst
 #: workbench/offers/api.py
 msgid "Only offers in preparation can be changed."
 msgstr "Nur Offerten in Vorbereitung können geändert werden."
+
+#: workbench/offers/api.py
+msgid "Only the title and the description of service groups can be changed."
+msgstr "Bei Leistungsgruppen lassen sich nur Titel und Beschreibung ändern."
 
 #: workbench/offers/api.py
 msgid "The offer has no service with this ID."
