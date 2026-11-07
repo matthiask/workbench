@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:00+0100\n"
+"POT-Creation-Date: 2026-11-07 14:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2225,6 +2225,10 @@ msgstr "Diese Anzahlung wurde bereits mit einer Rechnung verrechnet, storniere z
 #: workbench/invoices/forms.py
 msgid "The down payments of this invoice have been released when it was cancelled, create a new invoice instead."
 msgstr "Die Anzahlungen dieser Rechnung wurden beim Stornieren freigegeben, erstelle stattdessen eine neue Rechnung."
+
+#: workbench/invoices/forms.py
+msgid "The logged hours and costs of this invoice have been released when it was cancelled, create a new invoice instead."
+msgstr "Die erfassten Stunden und Kosten dieser Rechnung wurden beim Stornieren freigegeben, erstelle stattdessen eine neue Rechnung."
 
 #: workbench/invoices/forms.py
 #, python-brace-format

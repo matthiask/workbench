@@ -529,6 +529,23 @@ class InvoiceForm(PostalAddressSelectionForm):
                 ),
             )
 
+        if (
+            "status" in data
+            and self.instance._orig_status == Invoice.CANCELED
+            and data["status"] != Invoice.CANCELED
+            and self.instance.type == Invoice.SERVICES
+            and self.instance.services.exists()
+        ):
+            # Which entries were released can't be told anymore
+            self.add_error(
+                "status",
+                _(
+                    "The logged hours and costs of this invoice have been"
+                    " released when it was cancelled, create a new invoice"
+                    " instead."
+                ),
+            )
+
         return data
 
     def save(self):

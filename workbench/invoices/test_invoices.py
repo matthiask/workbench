@@ -1324,6 +1324,41 @@ class InvoicesTest(TestCase):
             " cancelled, create a new invoice instead.",
         )
 
+    def test_reopen_cancelled_services_invoice(self):
+        """Cancelling a services invoice releases its logged entries, it
+        can't be reopened anymore"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        hours = factories.LoggedHoursFactory.create(service=service, hours=4)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+            postal_address="Anything\nStreet\nCity",
+        )
+        invoice.create_services_from_logbook(project.services.all())
+        invoice.status = Invoice.CANCELED
+        invoice.payment_notice = "Oops"
+        invoice.save()
+        hours.refresh_from_db()
+        self.assertIsNone(hours.invoice_service)
+
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(
+                invoice,
+                status=Invoice.SENT,
+                **{WarningsForm.ignore_warnings_id: "on"},
+            ),
+        )
+        self.assertContains(
+            response,
+            "The logged hours and costs of this invoice have been released when"
+            " it was cancelled, create a new invoice instead.",
+        )
+
     def test_change_down_payment_of_invoice_in_preparation(self):
         """Final invoices in preparation follow changes of their down
         payments"""
