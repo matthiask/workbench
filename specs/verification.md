@@ -5,19 +5,8 @@ they're fixed or decided.
 
 ## Round 1 (2026-11-07)
 
-### Verified bugs
-
-- **Cancelling an applied down payment** keeps it deducted from the final
-  invoice (`down_payment_applied_to` and the final invoice's
-  `down_payment_total` stay, `Invoice.save()`); the amount vanishes from
-  revenue. Moving it back to "in preparation" likely the same. Needs a
-  decision about the process (forbid while applied, or fix up the final
-  invoice, which may be sent or frozen already).
-
 ### Untested risks
 
-- Un-cancelling an invoice keeps `down_payment_total` while its down
-  payments may have been applied elsewhere since.
 - Editing an applied down payment doesn't update the final invoice's
   `down_payment_total`; services invoices keep a stale value when their
   down payments become ineligible.

@@ -1184,6 +1184,8 @@ class InvoicesTest(TestCase):
         final = factories.InvoiceFactory.create(subtotal=2500, **kwargs)
         down_payment.down_payment_applied_to = final
         down_payment.save()
+        final.down_payment_total = down_payment.total_excl_tax
+        final.save()
         self.client.force_login(project.owned_by)
 
         for status in [Invoice.CANCELED, Invoice.IN_PREPARATION]:
@@ -1216,6 +1218,21 @@ class InvoicesTest(TestCase):
             ),
         )
         self.assertRedirects(response, down_payment.urls["detail"])
+
+        # The final invoice doesn't deduct the down payment anymore
+        response = self.client.post(
+            final.urls["update"],
+            invoice_to_dict(
+                final,
+                status=Invoice.SENT,
+                **{WarningsForm.ignore_warnings_id: "status-unexpected"},
+            ),
+        )
+        self.assertContains(
+            response,
+            "The down payments of this invoice have been released when it was"
+            " cancelled, create a new invoice instead.",
+        )
 
     def test_cancellation_with_payment_notice(self):
         """Canceling invoices requires entering a payment notice"""

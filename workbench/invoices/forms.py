@@ -508,6 +508,20 @@ class InvoiceForm(PostalAddressSelectionForm):
                 ),
             )
 
+        if (
+            "status" in data
+            and self.instance._orig_status == Invoice.CANCELED
+            and data["status"] != Invoice.CANCELED
+            and self.instance.down_payment_total
+        ):
+            self.add_error(
+                "status",
+                _(
+                    "The down payments of this invoice have been released when"
+                    " it was cancelled, create a new invoice instead."
+                ),
+            )
+
         return data
 
     def save(self):
