@@ -154,6 +154,9 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
     show_default=True,
 )
 @click.option(
+    "--internal-type", help="Name of the internal type, for internal projects."
+)
+@click.option(
     "--owned-by",
     help="Short name, defaults to you.",
     shell_complete=complete_short_names,
@@ -162,7 +165,15 @@ def stats(project_ids, open_, closed_since, as_json, as_csv):
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def create_project(
-    title, customer, contact, type_, owned_by, description, dry_run, as_json
+    title,
+    customer,
+    contact,
+    type_,
+    internal_type,
+    owned_by,
+    description,
+    dry_run,
+    as_json,
 ):
     """Create a project
 
@@ -177,6 +188,7 @@ def create_project(
             "customer": customer,
             "contact": contact,
             "type": type_,
+            "internal_type": internal_type,
             "owned_by": owned_by,
         },
     )
@@ -193,6 +205,7 @@ def _echo_saved_project(data, *, dry_run, as_json):
             ("ID", data["id"]),
             ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             ("Owned by", data["owned_by"]),
+            ("Internal type", data.get("internal_type")),
             ("Closed on", data["closed_on"]),
             ("URL", data["url"]),
         ],
@@ -210,6 +223,10 @@ def _echo_saved_project(data, *, dry_run, as_json):
 @click.option("--contact", type=int, help="Person ID.")
 @click.option(
     "--type", "type_", type=click.Choice(["order", "maintenance", "internal"])
+)
+@click.option(
+    "--internal-type",
+    help="Name of the internal type, projects which aren't internal lose it.",
 )
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option("--close", is_flag=True, help="Close the project today.")
@@ -234,6 +251,7 @@ def update_project(
     customer,
     contact,
     type_,
+    internal_type,
     owned_by,
     close,
     closed_on,
@@ -255,6 +273,7 @@ def update_project(
             ("customer", customer),
             ("contact", contact),
             ("type", type_),
+            ("internal_type", internal_type),
             ("owned_by", owned_by),
         ]
         if value is not None

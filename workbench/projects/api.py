@@ -33,7 +33,7 @@ from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import ProjectForm, ReassignLogbookForm, ServiceForm
-from workbench.projects.models import Project, Service
+from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
@@ -70,6 +70,7 @@ class ProjectOut(Schema):
     contact: PersonSummary | None
     owned_by: str
     flat_rate: Decimal | None
+    internal_type: str | None
     created_at: dt.datetime
     closed_on: dt.date | None
 
@@ -86,6 +87,7 @@ def project_out(project, request):
         if project.contact
         else None,
         "owned_by": project.owned_by.get_short_name(),
+        "internal_type": project.internal_type.name if project.internal_type else None,
         "flat_rate": project.flat_rate,
         "created_at": project.created_at,
         "closed_on": project.closed_on,
@@ -104,7 +106,7 @@ class ProjectFilter(Schema):
 def project_list(request, filters: Query[ProjectFilter]):
     """Search projects, open projects only by default, newest first"""
     projects = Project.objects.select_related(
-        "customer", "contact", "owned_by"
+        "customer", "contact", "owned_by", "internal_type"
     ).order_by("-pk")
     if not filters.include_closed:
         projects = projects.open()
@@ -121,7 +123,9 @@ def project_list(request, filters: Query[ProjectFilter]):
 def project_detail(request, project_id: int):
     return project_out(
         get_object_or_404(
-            Project.objects.select_related("customer", "contact", "owned_by"),
+            Project.objects.select_related(
+                "customer", "contact", "owned_by", "internal_type"
+            ),
             pk=project_id,
         ),
         request,
@@ -140,6 +144,11 @@ class ProjectIn(Schema):
         default=None, description="ID of the contact person at the customer."
     )
     type: Literal["order", "maintenance", "internal"] = "order"
+    internal_type: str | None = Field(
+        default=None,
+        description="Name of the internal type, required for internal projects"
+        " if the installation uses internal types.",
+    )
     owned_by: str | None = Field(
         default=None,
         description="Short name of the person responsible, defaults to the"
@@ -150,6 +159,25 @@ class ProjectIn(Schema):
 class ProjectCreated(ProjectOut):
     id: int | None
     url: str | None
+
+
+def _internal_type(name):
+    """The internal type's ID for the project form"""
+    if not name:
+        return ""
+    types = {it.name.casefold(): it for it in InternalType.objects.all()}
+    if internal_type := types.get(name.casefold()):
+        return internal_type.pk
+    raise ValidationError([
+        {
+            "loc": ["body", "data", "internal_type"],
+            "msg": _("Unknown internal type %(name)r, use one of %(types)s.")
+            % {
+                "name": name,
+                "types": ", ".join(sorted(it.name for it in types.values())),
+            },
+        }
+    ])
 
 
 @router.post("/projects/", response=ProjectCreated)
@@ -179,6 +207,7 @@ def project_create(request, data: ProjectIn, *, dry_run: bool = False):
             "customer": "" if data.customer is None else data.customer,
             "contact": data.contact or "",
             "type": data.type,
+            "internal_type": _internal_type(data.internal_type),
             "owned_by": owned_by.pk,
         },
         request=request,
@@ -205,6 +234,11 @@ class ProjectPatch(Schema):
         default=None, description="ID of the contact person, null removes it."
     )
     type: Literal["order", "maintenance", "internal"] | None = None
+    internal_type: str | None = Field(
+        default=None,
+        description="Name of the internal type. Projects which aren't internal"
+        " anymore lose it.",
+    )
     owned_by: str | None = Field(default=None, description="Short name.")
     closed_on: dt.date | None = Field(
         default=None, description="Closes the project, null reopens it."
@@ -243,6 +277,10 @@ def project_update(
                 }
             ])
         values["owned_by"] = owned_by.pk
+    if "internal_type" in patch:
+        values["internal_type"] = _internal_type(patch["internal_type"])
+    elif patch.get("type") and patch["type"] != Project.INTERNAL:
+        values["internal_type"] = ""
     if data.delete_planned_work is not None:
         values["delete_planned_work"] = int(data.delete_planned_work)
 
@@ -355,7 +393,7 @@ def project_stats(request, filters: Query[StatsFilter]):
     projects = list(
         Project.objects
         .filter(q)
-        .select_related("customer", "contact", "owned_by")
+        .select_related("customer", "contact", "owned_by", "internal_type")
         .order_by("pk")
     )
     budget = {

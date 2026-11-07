@@ -220,6 +220,35 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertFalse(offer.planned_work.exists())
 
+    @override_settings(FEATURES={FEATURES.INTERNAL_TYPES: F.ALWAYS})
+    def test_internal_projects(self):
+        """Internal projects get their internal type by name"""
+        InternalType.objects.create(name="Administration", percentage=100)
+        contact = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        result = self.wb(
+            "projects",
+            "create",
+            "--title",
+            "Bookkeeping",
+            "--contact",
+            contact.pk,
+            "--type",
+            "internal",
+            "--internal-type",
+            "administration",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Internal type  Administration", result.output)
+        project = Project.objects.get(title="Bookkeeping")
+        self.assertEqual(project.internal_type.name, "Administration")
+
+        result = self.wb("projects", "update", project.pk, "--type", "order")
+        self.assertEqual(result.exit_code, 0, result.output)
+        project.refresh_from_db()
+        self.assertIsNone(project.internal_type)
+
     def test_people(self):
         """People are created from YAML files"""
         person = self.file(

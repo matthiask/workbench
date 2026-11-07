@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 16:43+0100\n"
+"POT-Creation-Date: 2026-11-07 08:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2781,7 +2781,7 @@ msgstr "Pausen müssen zeitnah erfasst werden."
 msgid "Cannot move archived logbook entries."
 msgstr "Kann archivierte Logbucheinträge nicht verschieben."
 
-#: workbench/logbook/forms.py
+#: workbench/logbook/forms.py workbench/projects/views.py
 msgid "Cannot move logbook entries of closed projects."
 msgstr "Kann Logbucheinträge von geschlossenen Projekten nicht verschieben."
 
@@ -3175,6 +3175,10 @@ msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
 #: workbench/planning/api.py
+msgid "This field cannot be null."
+msgstr "Dieses Feld darf nicht leer sein."
+
+#: workbench/planning/api.py
 #, python-format
 msgid "Unknown or declined offer %r."
 msgstr "Unbekannte oder abgelehnte Offerte %r."
@@ -3470,6 +3474,11 @@ msgid "Total Capacity"
 msgstr "Gesamtkapazität"
 
 #: workbench/projects/api.py
+#, python-format
+msgid "Unknown internal type %(name)r, use one of %(types)s."
+msgstr "Unbekannter interner Typ %(name)r, verwende einen von %(types)s."
+
+#: workbench/projects/api.py
 msgid "Select projects using ids, open or closed_since."
 msgstr "Wähle Projekte mit ids, open oder closed_since aus."
 
@@ -3588,10 +3597,6 @@ msgid "Set predefined value:"
 msgstr "Vordefinierten Wert setzen:"
 
 #: workbench/projects/forms.py
-msgid "Closing the project discards its offers in preparation, some of them have planning entries linked to them. Delete them?"
-msgstr "Beim Schliessen des Projekts werden seine Offerten in Vorbereitung verworfen, einige davon haben Planungseinträge. Sollen diese gelöscht werden?"
-
-#: workbench/projects/forms.py
 msgid "Selecting an internal type is required for internal projects."
 msgstr "Bei internen Projekten muss ein interner Typ ausgewählt werden."
 
@@ -3616,6 +3621,10 @@ msgstr "Dieses Projekt wurde am oder vor dem {} geschlossen. Wenn Du es wieder �
 #, python-brace-format
 msgid "Cannot close a project with a date of {} or earlier anymore."
 msgstr "Kann Projekte nicht mehr mit einem Datum von {} oder früher schliessen."
+
+#: workbench/projects/forms.py
+msgid "Closing the project discards its offers in preparation, some of them have planning entries linked to them. Delete them?"
+msgstr "Beim Schliessen des Projekts werden seine Offerten in Vorbereitung verworfen, einige davon haben Planungseinträge. Sollen diese gelöscht werden?"
 
 #: workbench/projects/forms.py
 #, python-format

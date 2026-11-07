@@ -9,7 +9,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
-from workbench.projects.models import Project
+from workbench.projects.models import InternalType, Project
 from workbench.tools.validation import monday
 
 
@@ -231,6 +231,55 @@ class ProjectsAPITest(TestCase):
                     [e["loc"] for e in response.json()["detail"]],
                     [["body", "data", "customer"]],
                 )
+
+    @override_settings(FEATURES={FEATURES.INTERNAL_TYPES: F.ALWAYS})
+    def test_internal_type(self):
+        """Internal projects get their internal type by name"""
+        InternalType.objects.create(name="Administration", percentage=100)
+        contact = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        self.client.force_login(factories.UserFactory.create())
+        data = {"title": "Bookkeeping", "contact": contact.pk, "type": "internal"}
+
+        response = self.client.post(
+            "/api/projects/", data, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "internal_type"]
+        )
+
+        response = self.client.post(
+            "/api/projects/",
+            data | {"internal_type": "Unknown"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("Administration", response.json()["detail"][0]["msg"])
+
+        response = self.client.post(
+            "/api/projects/",
+            data | {"internal_type": "administration"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.json()["internal_type"], "Administration")
+        project = Project.objects.get(pk=response.json()["id"])
+
+        # Projects which aren't internal anymore lose their internal type
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/",
+            {"type": "order"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.json()["internal_type"], None)
+
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/",
+            {"type": "internal", "internal_type": "Administration"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.json()["internal_type"], "Administration")
 
     def test_services(self):
         """Services with their logged hours and costs"""
