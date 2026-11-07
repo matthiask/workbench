@@ -744,7 +744,9 @@ class RecurringInvoiceFilter(Schema):
     q: SearchQuery = ""
     customer: OrganizationID = None
     owned_by: ShortName = None
-    status: Literal["open", "closed", "all"] = "open"
+    include_closed: bool = Field(
+        default=False, description="Also those which don't renew anymore."
+    )
 
 
 @router.get("/recurring-invoices/", response=list[RecurringInvoiceOut])
@@ -753,10 +755,8 @@ def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
     """Recurring invoices by customer, open ones by default (those whose
     auto-renewal hasn't been canceled before today)"""
     invoices = RecurringInvoice.objects.select_related("customer", "owned_by")
-    if filters.status == "open":
+    if not filters.include_closed:
         invoices = invoices.open()
-    elif filters.status == "closed":
-        invoices = invoices.closed()
     if filters.customer:
         invoices = invoices.filter(customer=filters.customer)
     if filters.owned_by:

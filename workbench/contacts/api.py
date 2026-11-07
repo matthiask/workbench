@@ -766,9 +766,7 @@ class GroupOut(Schema):
 
 class GroupFilter(Schema):
     q: SearchQuery = ""
-    s: Literal["", "archived", "all"] = Field(
-        default="", description="Active groups by default"
-    )
+    include_archived: bool = Field(default=False, description="Also archived groups.")
 
 
 def _group_out(group, request):
@@ -788,7 +786,10 @@ def _group_out(group, request):
 def group_list(request, filters: Query[GroupFilter]):
     """Groups with their active members, like the list of groups in the web
     interface"""
-    form = GroupSearchForm(filters.dict(), request=request)
+    form = GroupSearchForm(
+        {"q": filters.q, "s": "all" if filters.include_archived else ""},
+        request=request,
+    )
     form.is_valid()
     return Serialized(
         form.filter(Group.objects.all()), lambda group: _group_out(group, request)

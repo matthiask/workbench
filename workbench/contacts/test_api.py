@@ -260,7 +260,9 @@ class ContactsAPITest(TestCase):
         self.assertEqual(
             [(g["title"], g["people_count"]) for g in data["items"]], [("Mailing", 1)]
         )
-        data = self.client.get("/api/contacts/groups/", {"s": "all"}).json()
+        data = self.client.get(
+            "/api/contacts/groups/", {"include_archived": True}
+        ).json()
         self.assertEqual([g["title"] for g in data["items"]], ["Mailing", "Old"])
 
         def send(method, path, data, query=""):

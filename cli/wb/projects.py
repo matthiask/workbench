@@ -43,7 +43,7 @@ def projects(ctx):
 @click.argument("query", nargs=-1)
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
-@click.option("--all", "include_closed", is_flag=True, help="Include closed projects.")
+@click.option("--include-closed", is_flag=True, help="Also closed projects.")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)

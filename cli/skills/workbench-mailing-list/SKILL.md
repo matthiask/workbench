@@ -24,7 +24,7 @@ data, and show differences to the user. Validate every change with
 ## 1. The group
 
     wb groups
-    wb groups search --all
+    wb groups search --include-archived
 
 Find the group of the mailing. If there's none, ask for the title and create
 it after the user's approval:
@@ -42,16 +42,16 @@ without asking.
 
 ## 2. Look at the current members
 
-    wb people search --group "<group>" --all --csv
+    wb people search --group "<group>" --include-archived --csv
 
-`--all` includes archived people: they usually left their organization. For
+`--include-archived` includes archived people: they usually left their organization. For
 each of them, look at the organization (`wb organizations show <id>`) and
 propose who could receive the mailing instead; ask the user.
 
 Members are listed with their primary contact (the person in the user's
 company who knows them) and their postal address. Point out members without
 a postal address and members whose primary contact isn't active anymore
-(`wb users search --all`).
+(`wb users search --include-inactive`).
 
 ## 3. Find who is missing
 
@@ -67,13 +67,13 @@ the group and archived people.
 
 Present the candidates grouped by their primary contact, so that everyone can
 decide about the people they know. For each candidate show the organization
-and the latest project or deal (`wb projects search --all --json` has the
+and the latest project or deal (`wb projects search --include-closed --json` has the
 contact, the customer, the project lead and the creation date).
 
 ## 4. Import an old list (once)
 
 If the user has a spreadsheet of an earlier mailing, match each row with
-Workbench (`wb people search <name> --all --json`, compare the organization)
+Workbench (`wb people search <name> --include-archived --json`, compare the organization)
 and sort the rows into: found, found but archived (left), several matches,
 duplicates in Workbench (the same person twice at the same organization),
 missing. Don't guess on several matches; ask.

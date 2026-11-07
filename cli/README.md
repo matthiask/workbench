@@ -79,11 +79,11 @@ your features).
 ## Users
 
 `wb users search` finds users by name, short name or email address, e.g. for
-the short names which filters like `--owned-by` expect. `--all` includes
-inactive users.
+the short names which filters like `--owned-by` expect. `--include-inactive`
+also lists inactive users.
 
     wb users search
-    wb users search hans --all
+    wb users search hans --include-inactive
 
 `wb teams search` lists teams with the short names of their members, e.g. for
 the `--team` option of reports:
@@ -195,7 +195,7 @@ short name and defaults to you.
 Find the project:
 
     wb projects search relaunch
-    wb projects search --customer 345 --owned-by mk --all
+    wb projects search --customer 345 --owned-by mk --include-closed
     wb projects show 1234
 
 Print everything needed to write the offer: the project, its existing offers,

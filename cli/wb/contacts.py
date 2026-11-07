@@ -29,7 +29,7 @@ def contacts():
 
 @contacts.command("search")
 @click.argument("query", nargs=-1, required=True)
-@click.option("--all", "include_archived", is_flag=True, help="Include archived.")
+@click.option("--include-archived", is_flag=True, help="Also archived contacts.")
 @page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_contacts(query, include_archived, limit, offset, as_json):
@@ -133,7 +133,7 @@ def people():
     type=click.DateTime(["%Y-%m-%d"]),
     help="Only contacts of projects or deals created since the date.",
 )
-@click.option("--all", "include_archived", is_flag=True, help="Include archived.")
+@click.option("--include-archived", is_flag=True, help="Also archived contacts.")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
@@ -516,13 +516,12 @@ def groups(ctx):
 
 @groups.command("search")
 @click.argument("query", nargs=-1)
-@click.option("--archived", "status", flag_value="archived", help="Only archived.")
-@click.option("--all", "status", flag_value="all", help="Include archived.")
+@click.option("--include-archived", is_flag=True, help="Also archived groups.")
 @page_options
 @click.option("--json", "as_json", is_flag=True)
-def search_groups(query, status, limit, offset, as_json):
+def search_groups(query, include_archived, limit, offset, as_json):
     """Search groups with their active people and organizations"""
-    params = {"q": " ".join(query), "s": status or ""}
+    params = {"q": " ".join(query), "include_archived": format_bool(include_archived)}
     data = request(
         "GET", "contacts/groups/", params=params | page_params(limit, offset)
     )

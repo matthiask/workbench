@@ -448,7 +448,7 @@ email_addresses:
         result = self.wb("groups", "update", christmas.pk, "--archive")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("(archived)", result.output)
-        result = self.wb("groups", "search", "--archived")
+        result = self.wb("groups", "search", "--include-archived")
         self.assertIn("Christmas", result.output)
 
     def test_offers(self):

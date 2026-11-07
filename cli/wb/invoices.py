@@ -504,19 +504,18 @@ def recurring_invoices(ctx):
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option(
-    "--status",
-    type=click.Choice(["open", "closed", "all"]),
-    default="open",
-    help="Open ones are those which still renew, the default.",
+    "--include-closed",
+    is_flag=True,
+    help="Also those which don't renew anymore.",
 )
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_recurring_invoices(
-    query, customer, owned_by, status, limit, offset, as_csv, as_json
+    query, customer, owned_by, include_closed, limit, offset, as_csv, as_json
 ):
-    """Search recurring invoices, by customer"""
-    params = {"q": " ".join(query), "status": status}
+    """Search recurring invoices which still renew, by customer"""
+    params = {"q": " ".join(query), "include_closed": format_bool(include_closed)}
     if customer:
         params["customer"] = customer
     if owned_by:

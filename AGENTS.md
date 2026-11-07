@@ -100,7 +100,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   with `uv tool install`). It is a thin client of the JSON API, keep the logic
   on the server. Commands follow `wb <noun> <verb>`, e.g. `wb projects search`.
   Verbs: `search` (optional terms plus filters like `--project`, `--customer`,
-  `--owned-by`; the API supports the same filters), `show ID`, `create`.
+  `--owned-by`; the API supports the same filters; what's left out by default
+  is included with `--include-closed`, `--include-archived` or
+  `--include-inactive`, `include_*` in the API), `show ID`, `create`.
   Nouns without a verb show the most common list (`invoke_without_command`):
   `wb projects` your open projects, `wb hours` your hours of this week, `wb
   offers`/`invoices`/`deals` yours which may need action (like `wb me`), `wb

@@ -28,7 +28,7 @@ def users(ctx):
 
 @users.command("search")
 @click.argument("query", nargs=-1)
-@click.option("--all", "include_inactive", is_flag=True, help="Include inactive.")
+@click.option("--include-inactive", is_flag=True, help="Also inactive users.")
 @page_options
 @click.option("--json", "as_json", is_flag=True)
 def search_users(query, include_inactive, limit, offset, as_json):

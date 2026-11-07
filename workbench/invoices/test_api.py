@@ -263,10 +263,11 @@ class InvoicesAPITest(TestCase):
             return [row["id"] for row in data["items"]]
 
         self.assertEqual(ids(), [hosting.pk])
-        self.assertEqual(ids("?status=closed"), [ended.pk])
-        self.assertEqual(set(ids("?status=all")), {hosting.pk, ended.pk})
-        self.assertEqual(ids("?status=all&owned_by=AB"), [hosting.pk])
-        self.assertEqual(ids(f"?status=all&customer={ended.customer_id}"), [ended.pk])
+        self.assertEqual(set(ids("?include_closed=true")), {hosting.pk, ended.pk})
+        self.assertEqual(ids("?include_closed=true&owned_by=AB"), [hosting.pk])
+        self.assertEqual(
+            ids(f"?include_closed=true&customer={ended.customer_id}"), [ended.pk]
+        )
         self.assertEqual(ids("?q=hosting"), [hosting.pk])
 
         data = self.client.get("/api/recurring-invoices/").json()["items"][0]
