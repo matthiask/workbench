@@ -9,6 +9,7 @@ import urllib.request
 from pathlib import Path
 from unittest.mock import patch
 
+import click
 import wb
 from click.shell_completion import get_completion_class
 from click.testing import CliRunner
@@ -19,6 +20,7 @@ from django.utils.translation import deactivate_all
 from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
+from workbench.api_keys import KEYS
 from workbench.contacts.models import Group, Person
 from workbench.deals.models import AttributeGroup, Deal
 from workbench.invoices.models import Invoice
@@ -1050,6 +1052,37 @@ planned_work:
             "billing@example.com",
         )
         self.assertIn("The reminder has been sent.", result.output)
+
+    def test_choices_match_the_server(self):
+        """Choices the CLI offers are keys of the server, they don't drift
+        apart unnoticed"""
+        server = {
+            ("absences", "reason"): "absence_reason",
+            ("invoices", "status"): "invoice_status",
+            ("invoices", "type"): "invoice_type",
+            ("deals", "status"): "deal_status",
+            ("deals", "probability"): "deal_probability",
+            ("offers", "status"): "offer_status",
+            ("projects", "type"): "project_type",
+        }
+        checked = set()
+
+        def walk(command, path):
+            for param in command.params:
+                if isinstance(param.type, click.Choice) and (
+                    name := server.get((
+                        path[0] if path else "",
+                        param.name.rstrip("_"),
+                    ))
+                ):
+                    with self.subTest(command=" ".join(path), param=param.name):
+                        self.assertLessEqual(set(param.type.choices), set(KEYS[name]))
+                    checked.add(name)
+            for name, sub in getattr(command, "commands", {}).items():
+                walk(sub, [*path, name])
+
+        walk(wb.cli, [])
+        self.assertEqual(checked, set(server.values()))
 
     def test_deal_value_types_and_attributes(self):
         factories.ValueTypeFactory.create(title="Design")
