@@ -503,17 +503,24 @@ class ProjectBudgetStatisticsForm(Form):
         queryset = self.apply_owned_by(queryset)
         return queryset.select_related("owned_by")
 
+    def statistics(self):
+        """The statistics, recently closed projects first when looking at
+        those"""
+        statistics = project_budget_statistics.project_budget_statistics(
+            self.queryset(), cutoff_date=self.cleaned_data.get("cutoff_date")
+        )
+        if self.cleaned_data.get("closed_during_the_last_year"):
+            statistics["statistics"] = sorted(
+                statistics["statistics"],
+                key=lambda s: s["project"].closed_on,
+                reverse=True,
+            )
+        return statistics
+
 
 @filter_form(ProjectBudgetStatisticsForm)
 def project_budget_statistics_view(request, form):
-    statistics = project_budget_statistics.project_budget_statistics(
-        form.queryset(), cutoff_date=form.cleaned_data.get("cutoff_date")
-    )
-
-    if form.cleaned_data.get("closed_during_the_last_year"):
-        statistics["statistics"] = sorted(
-            statistics["statistics"], key=lambda s: s["project"].closed_on, reverse=True
-        )
+    statistics = form.statistics()
 
     if request.GET.get("export") == "xlsx" and statistics["statistics"]:
         xlsx = WorkbenchXLSXDocument()

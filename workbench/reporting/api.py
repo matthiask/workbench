@@ -20,7 +20,6 @@ from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.reporting import hours_per_customer, hours_per_type
 from workbench.reporting import (
     key_data as key_data_module,
-    project_budget_statistics,
     squeeze,
     third_party_costs,
 )
@@ -264,9 +263,7 @@ def budget(request, filters: Query[BudgetFilter]):
             "s": filters.filter,
         },
     )
-    statistics = project_budget_statistics.project_budget_statistics(
-        form.queryset(), cutoff_date=form.cleaned_data.get("cutoff_date")
-    )
+    statistics = form.statistics()
     return {
         "date": statistics["cutoff_date"],
         "overall": statistics["overall"],

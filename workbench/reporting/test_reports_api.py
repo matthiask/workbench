@@ -210,6 +210,21 @@ class ReportsAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertIn("owned_by", response.content.decode())
 
+        # Closed projects are sorted by their closing date, like in the web
+        # interface
+        closed = []
+        for days, hours in [(-20, 10), (-10, 1)]:
+            other = factories.ProjectFactory.create(closed_on=in_days(days))
+            factories.LoggedHoursFactory.create(
+                service=factories.ServiceFactory.create(project=other, effort_rate=100),
+                hours=hours,
+            )
+            closed.append(other.pk)
+        data = self.get("/api/reports/budget/", closed=True)
+        self.assertEqual(
+            [row["project"]["id"] for row in data["projects"]], closed[::-1]
+        )
+
         data = self.get("/api/reports/third-party-costs/")
         [row] = data["projects"]
         self.assertEqual(row["logged"], {"past": "120.00", "future": "0.00"})
