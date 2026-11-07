@@ -476,6 +476,11 @@ class InvoiceIn(Schema):
     owned_by: str | None = Field(
         default=None, description="Short name, defaults to you."
     )
+    down_payments: list[int] = Field(
+        default=[],
+        description="IDs of the project's sent or paid down payment invoices"
+        " to deduct (fixed amount and services invoices).",
+    )
 
 
 def _query(request, params):
@@ -573,6 +578,11 @@ def _invoice_form(request, data, error):  # noqa: C901
             for_billing=True,
         ):
             values["postal_address"] = choices[0][1]
+    if data.down_payments:
+        if "apply_down_payment" in form.fields:
+            values["apply_down_payment"] = data.down_payments
+        else:
+            error(["down_payments"], _("No down payments can be applied."))
     if "selected_services" in form.fields:
         if data.services is not None:
             values["selected_services"] = data.services
@@ -613,7 +623,10 @@ def invoice_create(
         raise ValidationError(errors)
     validate_form(
         form,
-        fields={"selected_services": ["services"]},
+        fields={
+            "selected_services": ["services"],
+            "apply_down_payment": ["down_payments"],
+        },
         ignore_warnings=ignore_warnings,
     )
 

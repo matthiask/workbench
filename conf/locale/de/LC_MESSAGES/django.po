@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 12:47+0100\n"
+"POT-Creation-Date: 2026-11-07 12:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1045,10 +1045,6 @@ msgid "Unknown person %r."
 msgstr "Unbekannte Person %r."
 
 #: workbench/contacts/api.py
-msgid "A group with this title exists already."
-msgstr "Eine Gruppe mit diesem Titel gibt es schon."
-
-#: workbench/contacts/api.py
 msgid "Either reassign to someone or to the suggestions."
 msgstr "Entweder einer Person oder gemäss den Vorschlägen zuweisen."
 
@@ -1082,6 +1078,10 @@ msgstr "Suche"
 #: workbench/projects/forms.py workbench/reporting/views.py
 msgid "All"
 msgstr "Alle"
+
+#: workbench/contacts/forms.py
+msgid "A group with this title exists already."
+msgstr "Eine Gruppe mit diesem Titel gibt es schon."
 
 #: workbench/contacts/forms.py workbench/deals/forms.py
 #: workbench/projects/forms.py
@@ -2086,6 +2086,10 @@ msgstr "Rechnungen ohne Projekt sind Rechnungen mit Fixbetrag."
 #: workbench/invoices/api.py
 msgid "Invoices without project need a contact."
 msgstr "Rechnungen ohne Projekt brauchen einen Kontakt."
+
+#: workbench/invoices/api.py
+msgid "No down payments can be applied."
+msgstr "Es können keine Anzahlungen verrechnet werden."
 
 #: workbench/invoices/api.py
 msgid "Select the services to invoice, or invoice an offer."

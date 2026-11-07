@@ -335,6 +335,7 @@ the web interface:
 
     wb invoices create --offer 5678
     wb invoices create --project 1234 --type down-payment --subtotal 5000
+    wb invoices create --project 1234 --subtotal 20000 --down-payment 5678
     wb invoices create --project 1234 --service 11 --service 12 --from-logbook
     wb invoices create --contact 345 --title Workshop --subtotal 1200
 

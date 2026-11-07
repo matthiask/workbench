@@ -203,6 +203,13 @@ def invoice_pdf(invoice_id, output):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="Only logged work up to this date.",
 )
+@click.option(
+    "--down-payment",
+    "down_payments",
+    type=int,
+    multiple=True,
+    help="ID of a sent or paid down payment invoice of the project to deduct.",
+)
 @click.option("--title", help="Defaults to the project's (and the offer's).")
 @click.option("--description", help="The text, or - to read it from stdin.")
 @click.option(
@@ -234,6 +241,7 @@ def create_invoice(
     type_,
     from_logbook,
     services,
+    down_payments,
     logbook_cutoff_date,
     title,
     description,
@@ -279,6 +287,8 @@ def create_invoice(
     data["source"] = "logbook" if from_logbook else "offer"
     if services:
         data["services"] = list(services)
+    if down_payments:
+        data["down_payments"] = list(down_payments)
     for key, value in [
         ("logbook_cutoff_date", logbook_cutoff_date),
         ("service_period_from", service_period_from),

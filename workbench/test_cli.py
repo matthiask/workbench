@@ -308,6 +308,22 @@ class CLITest(TestCase):
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Down payment", result.output)
+        down_payment = Invoice.objects.get(type=Invoice.DOWN_PAYMENT)
+        down_payment.status = Invoice.SENT
+        down_payment.invoiced_on = in_days(0)
+        down_payment.save()
+        result = self.wb(
+            "invoices",
+            "create",
+            "--project",
+            project.pk,
+            "--subtotal",
+            "2000",
+            "--down-payment",
+            down_payment.pk,
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("1500.00", result.output)
 
     def test_pdfs(self):
         """Invoices and offers are saved as PDF"""

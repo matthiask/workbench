@@ -487,3 +487,34 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(response["content-type"], "application/pdf")
         self.assertIn("attachment", response["content-disposition"])
         self.assertTrue(b"".join(response).startswith(b"%PDF"))
+
+    def test_create_draft_with_down_payments(self):
+        """Final invoices deduct the down payments given"""
+        project = factories.ProjectFactory.create()
+        factories.PostalAddressFactory.create(person=project.contact)
+        down_payment = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=1000,
+            status=Invoice.SENT,
+        )
+        self.client.force_login(project.owned_by)
+
+        def create(data):
+            return self.client.post(
+                "/api/invoices/",
+                {"project": project.pk, "subtotal": 5000} | data,
+                content_type="application/json",
+            )
+
+        response = create({"down_payments": [down_payment.pk + 1000]})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "down_payments"]
+        )
+        response = create({"down_payments": [down_payment.pk]})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["total_excl_tax"], "4000.00")
+        down_payment.refresh_from_db()
+        self.assertEqual(down_payment.down_payment_applied_to_id, response.json()["id"])
