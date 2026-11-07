@@ -279,6 +279,44 @@ class SqueezeTest(TestCase):
         (row,) = data["users"]
         self.assertAlmostEqual(row["absence_days"], 0)
 
+    def test_expected_gross_margin_of_part_time_absences(self):
+        """Absence days are full days, also for part-time employments (like
+        the annual working time)"""
+        user = factories.UserFactory.create()
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2020, 1, 1), percentage=50
+        )
+        factories.LoggedHoursFactory.create(
+            rendered_by=user, rendered_on=dt.date(2026, 9, 20)
+        )
+        period = (dt.date(2026, 9, 1), dt.date(2026, 9, 30))
+        (row,) = squeeze_data(period)["users"]
+        full = row["expected_gross_margin"]
+
+        # Five absence days of the 50% employment's ~10 working days
+        factories.AbsenceFactory.create(
+            user=user,
+            starts_on=dt.date(2026, 9, 1),
+            ends_on=dt.date(2026, 9, 30),
+            days=5,
+        )
+        (row,) = squeeze_data(period)["users"]
+        self.assertAlmostEqual(
+            row["expected_gross_margin"],
+            full - 5 * BASE_HOURLY_RATE * 8,
+            places=2,
+        )
+
+        # Absent the whole month: Nothing expected, never less
+        factories.AbsenceFactory.create(
+            user=user,
+            starts_on=dt.date(2026, 9, 1),
+            ends_on=dt.date(2026, 9, 30),
+            days=10,
+        )
+        (row,) = squeeze_data(period)["users"]
+        self.assertEqual(row["expected_gross_margin"], 0)
+
     def test_third_party_costs_of_down_payments(self):
         """Final invoices repeat the third party costs of down payments,
         down payments of recurring invoices may be the only ones"""

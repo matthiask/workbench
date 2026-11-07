@@ -590,13 +590,18 @@ def squeeze_data(date_range):  # noqa: C901
         else:
             expected_hourly_rate = BASE_HOURLY_RATE
 
+        # Absence days are full days, also for part-time employments
         expected_gross_margin = (
             expected_hourly_rate
             * WORKING_TIME_PER_DAY
-            * (working_days_estimation(date_range) - absence_days)
+            * max(
+                Z0,
+                working_days_estimation(date_range)
+                * Decimal(employment_percentage)
+                / 100
+                - absence_days,
+            )
             * Decimal(profitable_percentage)
-            / 100
-            * Decimal(employment_percentage)
             / 100
         )
         delta = row["gross_margin"] - expected_gross_margin

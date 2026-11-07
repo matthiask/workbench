@@ -520,7 +520,7 @@ Everyone who logged hours in the period (also only on internal projects).
 | Richtwert extern % | `profitable_percentage = 100 − Σ InternalTypeUser.percentage` (per-user override, else the internal type's default percentage) |
 | Δ ext. % | `Extern % − Richtwert extern %`, red if < 0 |
 | Erwarteter Ansatz | `specialist_field.expected_hourly_rate`, else 150 |
-| Erwarteter Deckungsbeitrag | `expected_rate × 8 × (working_days − absence_days) × profitable% / 100 × employment% / 100`, with `working_days = (date_until − date_from + 1) × 250 / 365.24` |
+| Erwarteter Deckungsbeitrag | `expected_rate × 8 × max(0, working_days × employment% / 100 − absence_days) × profitable% / 100`, with `working_days = (date_until − date_from + 1) × 250 / 365.24`. Absence days are full days, also for part-time employments (like the annual working time and planning). |
 | Delta | `Umsatz bereinigt − Erwarteter Deckungsbeitrag`, red if < 0 |
 | Total row | Σ employment %, Σ absence days, Σ hours, total rate = Σ margin / Σ hours, Σ margin, total Extern % from `hours_per_type` totals, Σ expected margin, Σ delta |
 
