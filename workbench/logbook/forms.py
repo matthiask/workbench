@@ -725,6 +725,17 @@ class LoggedCostForm(ModelForm):
             )
         )
 
+        # Invoiced costs keep their values, the invoice wouldn't match anymore
+        if self.instance.archived_at:
+            for field in [
+                "service",
+                "rendered_by",
+                "rendered_on",
+                "cost",
+                "third_party_costs",
+            ]:
+                self.fields[field].disabled = True
+
         if self.instance.expense_report:
             self.fields["rendered_by"].disabled = True
             self.fields["rendered_on"].disabled = True

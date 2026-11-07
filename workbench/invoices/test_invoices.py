@@ -493,8 +493,9 @@ class InvoicesTest(TestCase):
             "Logged cost &#x27;Test&#x27; has been updated successfully.",
         )
 
+        # Invoiced costs keep their amount, like invoiced hours
         cost.refresh_from_db()
-        self.assertAlmostEqual(cost.cost, Decimal(20))
+        self.assertAlmostEqual(cost.cost, Decimal(10))
         invoice.refresh_from_db()
         self.assertAlmostEqual(invoice.subtotal, 610)  # unchanged
 
