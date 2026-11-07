@@ -205,6 +205,16 @@ class Deal(Model):
     def get_related_offers(self):
         return self.related_offers.select_related("owned_by", "project")
 
+    def fts_text(self):
+        return " ".join(
+            str(part)
+            for part in [
+                self.code,
+                self.customer.name,
+                self.contact.full_name if self.contact else "",
+            ]
+        )
+
     def save(self, *args, **kwargs):
         skip_value_calculation = kwargs.pop("skip_value_calculation", False)
 
@@ -213,14 +223,7 @@ class Deal(Model):
                 sum((v.value for v in self.values.all()), Z2) if self.pk else Z2
             )
 
-        self._fts = " ".join(
-            str(part)
-            for part in [
-                self.code,
-                self.customer.name,
-                self.contact.full_name if self.contact else "",
-            ]
-        )
+        self._fts = self.fts_text()
         super().save(*args, **kwargs)
 
     save.alters_data = True

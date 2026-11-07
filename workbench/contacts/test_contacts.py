@@ -22,6 +22,9 @@ from workbench.contacts.merge import merge_people
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
 from workbench.deals.models import Deal
+from workbench.invoices.models import Invoice
+from workbench.offers.models import Offer
+from workbench.projects.models import Project
 from workbench.tools.testing import messages
 from workbench.tools.vcard import person_to_vcard
 
@@ -426,6 +429,49 @@ class ContactsTest(TestCase):
         self.assertEqual(person.organization, new)
         # The groups (e.g. industries) of the organization move too
         self.assertEqual(list(new.groups.all()), [group])
+
+    def test_search_after_renaming_and_merging(self):
+        """Renaming and merging contacts updates the search of related
+        objects"""
+        organization = factories.OrganizationFactory.create(name="Alphaold")
+        person = factories.PersonFactory.create(
+            organization=organization, given_name="Ann", family_name="Oldname"
+        )
+        project = factories.ProjectFactory.create(customer=organization, contact=person)
+        offer = factories.OfferFactory.create(project=project)
+        deal = factories.DealFactory.create(customer=organization, contact=person)
+        invoice = factories.InvoiceFactory.create(
+            project=project, customer=organization, contact=person
+        )
+        querysets = [
+            (Person.objects.all(), person),
+            (Project.objects.all(), project),
+            (Offer.objects.all(), offer),
+            (Deal.objects.all(), deal),
+            (Invoice.objects.all(), invoice),
+        ]
+
+        organization.name = "Betanew"
+        organization.save()
+        for queryset, instance in querysets:
+            with self.subTest(model=queryset.model):
+                self.assertEqual(list(queryset.search("Betanew")), [instance])
+
+        person.family_name = "Newname"
+        person.save()
+        for queryset, instance in querysets[1:]:
+            with self.subTest(model=queryset.model):
+                self.assertEqual(list(queryset.search("Newname")), [instance])
+
+        keep = factories.OrganizationFactory.create(name="Gammakeep")
+        self.client.force_login(organization.primary_contact)
+        response = self.client.post(
+            organization.urls["delete"], {"substitute_with": keep.pk}
+        )
+        self.assertRedirects(response, organization.urls["list"])
+        for queryset, instance in querysets:
+            with self.subTest(model=queryset.model):
+                self.assertEqual(list(queryset.search("Gammakeep")), [instance])
 
     def test_merge_people(self):
         """Merging moves relations, details and groups to the person to keep

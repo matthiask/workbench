@@ -154,8 +154,11 @@ class Campaign(Model):
             self.owned_by.get_short_name(),
         )
 
+    def fts_text(self):
+        return " ".join(str(part) for part in [self.code, self.customer.name])
+
     def save(self, *args, **kwargs):
-        self._fts = " ".join(str(part) for part in [self.code, self.customer.name])
+        self._fts = self.fts_text()
         super().save(*args, **kwargs)
 
     save.alters_data = True
@@ -429,6 +432,16 @@ class Project(Model):
     def code(self):
         return "%s-%04d" % (self.created_at.year, self._code)
 
+    def fts_text(self):
+        return " ".join(
+            str(part)
+            for part in [
+                self.code,
+                self.customer.name,
+                self.contact.full_name if self.contact else "",
+            ]
+        )
+
     def save(self, *args, **kwargs):
         new = not self.pk
         if new:
@@ -440,14 +453,7 @@ class Project(Model):
             super().save(*args, **kwargs)
             self.refresh_from_db()
 
-        self._fts = " ".join(
-            str(part)
-            for part in [
-                self.code,
-                self.customer.name,
-                self.contact.full_name if self.contact else "",
-            ]
-        )
+        self._fts = self.fts_text()
         if self.budget_alert_at != self._orig_budget_alert_at:
             # A new threshold deserves a new alert.
             self.budget_alert_sent_at = None

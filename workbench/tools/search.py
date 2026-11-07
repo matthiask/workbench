@@ -99,3 +99,13 @@ def search(queryset, terms):
         if terms
         else queryset
     )
+
+
+def refresh_fts(queryset):
+    """Recompute ``_fts`` (and through the trigger the search vector) of
+    objects whose search text depends on related objects, without saving
+    them"""
+    for instance in queryset:
+        queryset.model._base_manager.filter(pk=instance.pk).update(
+            _fts=instance.fts_text()
+        )

@@ -13,6 +13,7 @@ from django_countries.fields import CountryField
 from workbench.accounts.models import User
 from workbench.tools.formats import Z2
 from workbench.tools.models import Model, SearchQuerySet
+from workbench.tools.search import refresh_fts
 from workbench.tools.urls import model_urls
 from workbench.tools.validation import raise_if_errors
 
@@ -122,6 +123,31 @@ class Organization(Model):
         if self.is_archived:
             parts.append(gettext("(archived)"))
         return " ".join(parts)
+
+    def save(self, *args, **kwargs):
+        renamed = (
+            self.pk
+            and Organization.objects.filter(pk=self.pk).exclude(name=self.name).exists()
+        )
+        super().save(*args, **kwargs)
+        if renamed:
+            self.refresh_related_fts()
+
+    save.alters_data = True
+
+    def refresh_related_fts(self):
+        """The search texts of related objects contain the name"""
+        from workbench.deals.models import Deal
+        from workbench.invoices.models import Invoice
+        from workbench.offers.models import Offer
+        from workbench.projects.models import Campaign, Project
+
+        refresh_fts(self.people.all())
+        refresh_fts(Campaign.objects.filter(customer=self))
+        refresh_fts(Project.objects.filter(customer=self))
+        refresh_fts(Offer.objects.filter(project__customer=self))
+        refresh_fts(Deal.objects.filter(customer=self))
+        refresh_fts(Invoice.objects.filter(customer=self))
 
     @classmethod
     def allow_delete(cls, instance, request):
@@ -320,17 +346,41 @@ class Person(Model):
     def recent_invoices(self):
         return self.invoice_set.select_related("owned_by")[:10]
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self._fts = " ".join(
-                itertools.chain(
-                    [self.organization.name if self.organization else ""],
-                    (detail.phone_number for detail in self.phonenumbers.all()),
-                    (detail.email for detail in self.emailaddresses.all()),
-                    (detail.postal_address for detail in self.postaladdresses.all()),
-                )
+    def fts_text(self):
+        return " ".join(
+            itertools.chain(
+                [self.organization.name if self.organization else ""],
+                (detail.phone_number for detail in self.phonenumbers.all()),
+                (detail.email for detail in self.emailaddresses.all()),
+                (detail.postal_address for detail in self.postaladdresses.all()),
             )
+        )
+
+    def refresh_related_fts(self):
+        """The search texts of related objects contain the name"""
+        from workbench.deals.models import Deal
+        from workbench.invoices.models import Invoice
+        from workbench.offers.models import Offer
+        from workbench.projects.models import Project
+
+        refresh_fts(Project.objects.filter(contact=self))
+        refresh_fts(Offer.objects.filter(project__contact=self))
+        refresh_fts(Deal.objects.filter(contact=self))
+        refresh_fts(Invoice.objects.filter(contact=self))
+
+    def save(self, *args, **kwargs):
+        renamed = (
+            self.pk
+            and Person.objects
+            .filter(pk=self.pk)
+            .exclude(given_name=self.given_name, family_name=self.family_name)
+            .exists()
+        )
+        if self.pk:
+            self._fts = self.fts_text()
         super().save(*args, **kwargs)
+        if renamed:
+            self.refresh_related_fts()
 
     save.alters_data = True
 

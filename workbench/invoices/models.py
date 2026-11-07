@@ -229,6 +229,17 @@ class Invoice(ModelWithTotal):
             self.owned_by.get_short_name(),
         )
 
+    def fts_text(self):
+        return " ".join(
+            str(part)
+            for part in [
+                self.code,
+                self.customer.name,
+                self.contact.full_name if self.contact else "",
+                self.project.title if self.project else "",
+            ]
+        )
+
     def save(self, *args, **kwargs):
         new = not self.pk
         if new:
@@ -247,15 +258,7 @@ class Invoice(ModelWithTotal):
             super().save(*args, **kwargs)
             self.refresh_from_db()
 
-        self._fts = " ".join(
-            str(part)
-            for part in [
-                self.code,
-                self.customer.name,
-                self.contact.full_name if self.contact else "",
-                self.project.title if self.project else "",
-            ]
-        )
+        self._fts = self.fts_text()
         if (
             self.invoiced_on
             and self.last_reminded_on

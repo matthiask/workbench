@@ -422,6 +422,7 @@ class OrganizationDeleteForm(ModelForm):
             # Groups (e.g. industries) aren't moved by substitute_with()
             keep.groups.add(*self.instance.groups.all())
             substitute_with(to_delete=self.instance, keep=keep)
+            keep.refresh_related_fts()
         else:
             self.instance.delete()
 

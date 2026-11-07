@@ -84,3 +84,4 @@ def merge_people(*, duplicate, keep):
         substitute_with(to_delete=duplicate, keep=keep)
         # Updates the full text search with the moved details
         keep.save()
+        keep.refresh_related_fts()

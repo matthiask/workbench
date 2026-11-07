@@ -215,6 +215,9 @@ class Offer(ModelWithTotal):
     def get_absolute_url(self):
         return f"{self.project.get_absolute_url()}#offer{self.pk}"
 
+    def fts_text(self):
+        return " ".join(str(part) for part in [self.code, self.project._fts])
+
     def save(self, *args, **kwargs):
         new = not self.pk
         if new:
@@ -226,13 +229,7 @@ class Offer(ModelWithTotal):
             super().save(*args, **kwargs)
             self.refresh_from_db()
 
-        self._fts = " ".join(
-            str(part)
-            for part in [
-                self.code,
-                self.project._fts,
-            ]
-        )
+        self._fts = self.fts_text()
 
         if new:
             super().save()
