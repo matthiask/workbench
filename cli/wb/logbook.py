@@ -96,6 +96,7 @@ def search_hours(
         echo_json(data)
         return
     table = make_table(
+        "ID>",
         "Rendered on",
         "By",
         "Project",
@@ -106,17 +107,18 @@ def search_hours(
     )
     for row in data["items"]:
         table.add_row(
-            link(row["rendered_on"], row["url"]),
+            link(row["id"], row["url"]),
+            row["rendered_on"],
             row["rendered_by"],
             link(row["project"]["code"], row["project"]["url"]),
-            row["service"],
+            f"{row['service']} ({row['service_id']})",
             row["hours"]
             if row["hours_for_invoicing"] is None
             else f"{row['hours']} → {row['hours_for_invoicing']}",
             row["description"],
         )
-    table.columns[0].footer = "Total"
-    table.columns[4].footer = data["total_hours"]
+    table.columns[1].footer = "Total"
+    table.columns[5].footer = data["total_hours"]
     console.print(table)
     echo_more(data, offset, "entries", note="The total includes all of them.")
 
@@ -175,6 +177,7 @@ def search_costs(
         echo_json(data)
         return
     table = make_table(
+        "ID>",
         "Rendered on",
         "By",
         "Project",
@@ -186,16 +189,17 @@ def search_costs(
     )
     for row in data["items"]:
         table.add_row(
-            link(row["rendered_on"], row["url"]),
+            link(row["id"], row["url"]),
+            row["rendered_on"],
             row["rendered_by"],
             link(row["project"]["code"], row["project"]["url"]),
-            row["service"],
+            f"{row['service']} ({row['service_id']})",
             row["cost"],
             row["third_party_costs"] or "",
             row["description"] + (" (expenses)" if row["are_expenses"] else ""),
         )
-    table.columns[0].footer = "Total"
-    table.columns[4].footer = data["total_cost"]
-    table.columns[5].footer = data["total_third_party_costs"]
+    table.columns[1].footer = "Total"
+    table.columns[5].footer = data["total_cost"]
+    table.columns[6].footer = data["total_third_party_costs"]
     console.print(table)
     echo_more(data, offset, "entries", note="The totals include all of them.")

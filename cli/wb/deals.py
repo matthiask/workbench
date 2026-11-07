@@ -476,6 +476,7 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
             table.add_row(row["user"], str(row["count"]), format_amount(row["sum"]))
         console.print(table)
         table = make_table(
+            "ID>",
             "Code",
             "Title",
             "Customer",
@@ -486,6 +487,7 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
         )
         for deal in accepted["deals"]:
             table.add_row(
+                link(deal["id"], deal["url"]),
                 link(deal["code"], deal["url"]),
                 deal["title"],
                 link(deal["customer"]["name"], deal["customer"]["url"]),
@@ -500,10 +502,17 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
     )
     if declined["deals"]:
         table = make_table(
-            "Code", "Title", "Customer", "Closing type", "Value>", title="Declined"
+            "ID>",
+            "Code",
+            "Title",
+            "Customer",
+            "Closing type",
+            "Value>",
+            title="Declined",
         )
         for deal in declined["deals"]:
             table.add_row(
+                link(deal["id"], deal["url"]),
                 link(deal["code"], deal["url"]),
                 deal["title"],
                 link(deal["customer"]["name"], deal["customer"]["url"]),

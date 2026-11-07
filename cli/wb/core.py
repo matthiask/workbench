@@ -609,6 +609,7 @@ def echo_offer_list(offers, *, title=None):
 
 def echo_stats(projects):
     table = make_table(
+        "ID>",
         "Code",
         "Title",
         "Closed on",
@@ -624,6 +625,7 @@ def echo_stats(projects):
     for stats in projects:
         project = stats["project"]
         table.add_row(
+            link(project["id"], project["url"]),
             link(project["code"], project["url"]),
             project["title"],
             project["closed_on"] or "",

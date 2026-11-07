@@ -139,11 +139,18 @@ def _echo_invoice(data):
         console.print(data["description"])
     if data.get("services"):
         table = make_table(
-            "Service", "Offer", "Effort type", "Hours>", "Rate>", "Cost>"
+            "Service",
+            "Project service>",
+            "Offer",
+            "Effort type",
+            "Hours>",
+            "Rate>",
+            "Cost>",
         )
         for service in data["services"]:
             table.add_row(
                 service["title"],
+                str(service["project_service_id"] or ""),
                 service["offer"] or "",
                 service["effort_type"],
                 service["effort_hours"] or "",
