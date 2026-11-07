@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -18,7 +16,7 @@ from workbench.reporting.models import FreezeDate
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.reporting.utils import accepted_offers_by_project
 from workbench.services.models import ServiceType
-from workbench.tools.formats import Z1, Z2, currency, local_date_format
+from workbench.tools.formats import Z2, currency, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     DateInput,
@@ -28,7 +26,7 @@ from workbench.tools.forms import (
     add_prefix,
     delete_planned_work_field,
 )
-from workbench.tools.validation import in_days, is_only_url, is_title_specific, monday
+from workbench.tools.validation import in_days, is_only_url, is_title_specific
 
 
 class CampaignSearchForm(Form):
@@ -486,37 +484,15 @@ class ProjectForm(ModelForm):
         return instance
 
 
-def _future_planned_work(project):
-    """Planned work of the project in the weeks after the current one"""
-    this_week = monday()
-    return [
-        work
-        for work in project.planned_work.all()
-        if any(week > this_week for week in work.weeks)
-    ]
-
-
 def delete_future_planned_work(project):
-    """Removes the weeks after the current one, the hours of the remaining
-    weeks stay the same"""
-    this_week = monday()
-    for work in _future_planned_work(project):
-        if past := [week for week in work.weeks if week <= this_week]:
-            # At least the minimum of planned work
-            work.planned_hours = max(
-                Decimal("0.1"),
-                (work.planned_hours * len(past) / len(work.weeks)).quantize(Z1),
-            )
-            work.weeks = past
-            work.save()
-        else:
-            work.delete()
+    """Removes the project's planned work after the current week"""
+    project.planned_work.all().delete_after_this_week()
 
 
 def add_delete_planned_work_field(form, project):
     """Asks about the future planned work of a project which is being
     closed"""
-    if _future_planned_work(project):
+    if project.planned_work.all().after_this_week():
         form.fields["delete_planned_work"] = delete_planned_work_field(
             _("This project has planning entries after the current week. Delete them?")
         )

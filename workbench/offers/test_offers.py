@@ -15,7 +15,7 @@ from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, monday
 
 
 class OffersTest(TestCase):
@@ -808,6 +808,47 @@ class OffersTest(TestCase):
             response, offer.get_absolute_url(), fetch_redirect_response=False
         )
         self.assertEqual(offer.planned_work.count(), 0)
+
+    def test_decline_offer_keeps_past_planned_work(self):
+        """Declining an offer only deletes its planned work after the current
+        week, like closing a project; only past work doesn't ask"""
+        offer = factories.OfferFactory.create()
+        this_week = monday()
+        past = factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, weeks=[this_week - dt.timedelta(days=7)]
+        )
+        self.client.force_login(offer.owned_by)
+        data = {
+            "title": "Stuff",
+            "owned_by": offer.owned_by_id,
+            "discount": "10",
+            "liable_to_vat": "1",
+            "tax_rate": "7.70",
+            "postal_address": "Anything\nStreet\nCity",
+            "offered_on": in_days(0).isoformat(),
+            "valid_until": in_days(60).isoformat(),
+            "status": Offer.DECLINED,
+            WarningsForm.ignore_warnings_id: "yes-please-decline",
+        }
+        response = self.client.get(offer.urls["update"])
+        self.assertNotContains(response, "delete_planned_work")
+
+        spanning = factories.PlannedWorkFactory.create(
+            project=offer.project,
+            offer=offer,
+            weeks=[this_week + dt.timedelta(days=days) for days in [0, 7, 14, 21]],
+            planned_hours=40,
+        )
+        response = self.client.post(
+            offer.urls["update"], {**data, "delete_planned_work": "1"}
+        )
+        self.assertRedirects(
+            response, offer.get_absolute_url(), fetch_redirect_response=False
+        )
+        past.refresh_from_db()
+        spanning.refresh_from_db()
+        self.assertEqual(spanning.weeks, [this_week])
+        self.assertEqual(spanning.planned_hours, 10)
 
     def test_discard_offer_with_planned_work(self):
         """Discarding an offer with linked planning entries forces a decision

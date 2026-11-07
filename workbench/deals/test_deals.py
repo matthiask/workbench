@@ -14,10 +14,11 @@ from workbench.deals.reporting import accepted_deals
 from workbench.invoices.models import Invoice
 from workbench.management.commands.analyze_deals import gross_margin_projection
 from workbench.offers.models import Offer
+from workbench.planning.models import PlannedWork
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, monday
 
 
 class DealsTest(TestCase):
@@ -885,6 +886,40 @@ class DealsTest(TestCase):
         offer.refresh_from_db()
         self.assertEqual(offer.status, offer.DECLINED)
         self.assertEqual(offer.planned_work.count(), 0)
+
+    def test_decline_deal_keeps_past_planned_work(self):
+        """Declining a deal only deletes the planned work of its offers after
+        the current week"""
+        closing_type = factories.ClosingTypeFactory.create(represents_a_win=False)
+        offer = factories.OfferFactory.create(
+            status=Offer.OFFERED,
+            title="Offer",
+            postal_address="A\nStreet\nCity",
+            offered_on=in_days(0),
+            valid_until=in_days(60),
+        )
+        deal = factories.DealFactory.create(customer=offer.project.customer)
+        deal.related_offers.add(offer)
+        this_week = monday()
+        past = factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, weeks=[this_week - dt.timedelta(days=7)]
+        )
+        future = factories.PlannedWorkFactory.create(
+            project=offer.project, offer=offer, weeks=[this_week + dt.timedelta(days=7)]
+        )
+        self.client.force_login(deal.owned_by)
+        response = self.client.post(
+            deal.urls["set_status"] + "?status=30",
+            {
+                "closed_on": dt.date.today().isoformat(),
+                "closing_type": closing_type.pk,
+                "related_offers": [offer.pk],
+                "delete_planned_work": "1",
+            },
+        )
+        self.assertRedirects(response, deal.urls["detail"])
+        self.assertEqual(list(offer.planned_work.all()), [past])
+        self.assertFalse(PlannedWork.objects.filter(pk=future.pk).exists())
 
     def test_all_contributions(self):
         """The contributions calculation works as expected"""

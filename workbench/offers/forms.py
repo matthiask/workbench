@@ -202,7 +202,7 @@ class OfferForm(PostalAddressSelectionForm):
         )
         self.fields["subtotal"].disabled = True
 
-        if self.instance.pk and self.instance.planned_work.exists():
+        if self.instance.pk and self.instance.planned_work.all().after_this_week():
             posted_status = (
                 self.data.get(self.add_prefix("status")) if self.is_bound else None
             )
@@ -210,15 +210,17 @@ class OfferForm(PostalAddressSelectionForm):
             if status == str(Offer.DECLINED):
                 self.fields["delete_planned_work"] = delete_planned_work_field(
                     _(
-                        "This offer has planning entries linked to it."
-                        " Delete them now that the offer is being declined?"
+                        "This offer has planning entries after the current"
+                        " week linked to it. Delete them now that the offer is"
+                        " being declined?"
                     )
                 )
             elif status == str(Offer.DISCARDED):
                 self.fields["delete_planned_work"] = delete_planned_work_field(
                     _(
-                        "This offer has planning entries linked to it."
-                        " Delete them now that the offer is being discarded?"
+                        "This offer has planning entries after the current"
+                        " week linked to it. Delete them now that the offer is"
+                        " being discarded?"
                     )
                 )
 
@@ -268,7 +270,7 @@ class OfferForm(PostalAddressSelectionForm):
         if instance.status in Offer.NOT_PURSUED and self.cleaned_data.get(
             "delete_planned_work"
         ):
-            instance.planned_work.all().delete()
+            instance.planned_work.all().delete_after_this_week()
         instance.project.solely_declined_offers_warning(request=self.request)
         return instance
 

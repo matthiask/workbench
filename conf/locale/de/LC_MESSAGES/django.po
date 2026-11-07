@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 16:46+0100\n"
+"POT-Creation-Date: 2026-11-07 17:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1708,8 +1708,8 @@ msgid "Decline offers"
 msgstr "Offerten ablehnen"
 
 #: workbench/deals/forms.py
-msgid "Some of these offers have planning entries linked to them. Delete them now that the offers are being declined?"
-msgstr "Einige dieser Offerten haben Planungseinträge. Sollen diese jetzt, wo die Offerten abgelehnt werden, gelöscht werden?"
+msgid "Some of these offers have planning entries after the current week linked to them. Delete them now that the offers are being declined?"
+msgstr "Einige dieser Offerten haben Planungseinträge nach der laufenden Woche. Sollen diese jetzt, wo die Offerten abgelehnt werden, gelöscht werden?"
 
 #: workbench/deals/forms.py
 msgid "This field is required when closing a deal."
@@ -3141,12 +3141,12 @@ msgid "This offer is not in preparation anymore. Put it back into preparation to
 msgstr "Diese Offerte befindet sich nicht mehr in Vorbereitung. Setze sie zurück in Vorbereitung, um ihre Leistungen zu ändern."
 
 #: workbench/offers/forms.py
-msgid "This offer has planning entries linked to it. Delete them now that the offer is being declined?"
-msgstr "Diese Offerte hat Planungseinträge. Sollen diese jetzt, wo die Offerte abgelehnt wird, gelöscht werden?"
+msgid "This offer has planning entries after the current week linked to it. Delete them now that the offer is being declined?"
+msgstr "Diese Offerte hat Planungseinträge nach der laufenden Woche. Sollen diese jetzt, wo die Offerte abgelehnt wird, gelöscht werden?"
 
 #: workbench/offers/forms.py
-msgid "This offer has planning entries linked to it. Delete them now that the offer is being discarded?"
-msgstr "Diese Offerte hat Planungseinträge. Sollen diese jetzt, wo die Offerte verworfen wird, gelöscht werden?"
+msgid "This offer has planning entries after the current week linked to it. Delete them now that the offer is being discarded?"
+msgstr "Diese Offerte hat Planungseinträge nach der laufenden Woche. Sollen diese jetzt, wo die Offerte verworfen wird, gelöscht werden?"
 
 #: workbench/offers/forms.py
 #, python-format

@@ -170,6 +170,30 @@ class ExternalWork(AbstractPlannedWork):
 
 
 class PlannedWorkQuerySet(SearchQuerySet):
+    def after_this_week(self):
+        """Planned work in weeks after the current one"""
+        this_week = monday()
+        return [work for work in self if any(week > this_week for week in work.weeks)]
+
+    def delete_after_this_week(self):
+        """Removes the weeks after the current one, the hours of the remaining
+        weeks stay the same. Work which has been done (or not) stays for the
+        comparison with the logbook."""
+        this_week = monday()
+        for work in self.after_this_week():
+            if past := [week for week in work.weeks if week <= this_week]:
+                # At least the minimum of planned work
+                work.planned_hours = max(
+                    Decimal("0.1"),
+                    (work.planned_hours * len(past) / len(work.weeks)).quantize(
+                        Decimal("0.0")
+                    ),
+                )
+                work.weeks = past
+                work.save()
+            else:
+                work.delete()
+
     def maybe_actionable(self, *, user):
         day = monday()
         weeks = [day + dt.timedelta(days=days) for days in [0, 7, 14, 21]]

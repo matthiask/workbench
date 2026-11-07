@@ -451,13 +451,14 @@ class SetStatusForm(ModelForm):
                 ]
 
                 if instance.status == Deal.DECLINED and any(
-                    offer.planned_work.exists() for offer in related_offers
+                    offer.planned_work.all().after_this_week()
+                    for offer in related_offers
                 ):
                     self.fields["delete_planned_work"] = delete_planned_work_field(
                         _(
-                            "Some of these offers have planning entries linked"
-                            " to them. Delete them now that the offers are"
-                            " being declined?"
+                            "Some of these offers have planning entries after"
+                            " the current week linked to them. Delete them now"
+                            " that the offers are being declined?"
                         )
                     )
 
@@ -529,7 +530,7 @@ class SetStatusForm(ModelForm):
                 if instance.status == Deal.DECLINED and self.cleaned_data.get(
                     "delete_planned_work"
                 ):
-                    offer.planned_work.all().delete()
+                    offer.planned_work.all().delete_after_this_week()
 
             for project in projects:
                 project.solely_declined_offers_warning(request=self.request)
