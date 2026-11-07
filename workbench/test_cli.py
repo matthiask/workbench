@@ -882,6 +882,53 @@ planned_work:
         self.assertIn("Holidays", result.output)
         self.assertNotIn("Past", result.output)
 
+    def test_ignore_warnings(self):
+        """Absences, closing deals and new people ignore warnings by code"""
+        absence = [
+            "absences",
+            "create",
+            "--starts-on",
+            in_days(400),
+            "--days",
+            1,
+            "--reason",
+            "vacation",
+        ]
+        result = self.wb(*absence)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning impressive-planning-skills", result.output)
+        result = self.wb(*absence, "--ignore-warning", "impressive-planning-skills")
+        self.assertEqual(result.exit_code, 0, result.output)
+
+        deal = factories.DealFactory.create(owned_by=self.user)
+        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
+        close = [
+            "deals",
+            "close",
+            deal.pk,
+            "accepted",
+            "--closing-type",
+            "won",
+            "--closed-on",
+            in_days(100),
+        ]
+        result = self.wb(*close)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning closed-in-future", result.output)
+        result = self.wb(*close, "--ignore-warning", "closed-in-future")
+        self.assertEqual(result.exit_code, 0, result.output)
+        deal.refresh_from_db()
+        self.assertEqual(deal.status, Deal.ACCEPTED)
+
+        person = self.file("given_name: Hans\nfamily_name: Muster\nsalutation: Hi\n")
+        result = self.wb("people", "create", person)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning short-salutation", result.output)
+        result = self.wb(
+            "people", "create", person, "--ignore-warning", "short-salutation"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+
     def test_invoices(self):
         """Invoices, projected and recurring invoices, and pagination"""
         project = factories.ProjectFactory.create(owned_by=self.user)

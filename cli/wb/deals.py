@@ -241,6 +241,7 @@ def update_deal(
     default=None,
     help="Required when declining offers with planned work.",
 )
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def close_deal(
@@ -252,6 +253,7 @@ def close_deal(
     offers,
     keep_offers,
     delete_planned_work,
+    ignore_warnings,
     dry_run,
     as_json,
 ):
@@ -271,7 +273,10 @@ def close_deal(
     data = request(
         "POST",
         f"deals/{deal_id}/status/",
-        params={"dry_run": format_bool(dry_run)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
         json=data,
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)

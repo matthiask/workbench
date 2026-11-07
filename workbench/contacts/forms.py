@@ -572,9 +572,9 @@ class PersonForm(ModelForm):
 
         return data
 
-    def is_valid(self):
+    def is_valid(self, *, ignore_warnings=False):
         return all(
-            [super().is_valid()]
+            [super().is_valid(ignore_warnings=ignore_warnings)]
             + [formset.is_valid() for formset in self.formsets.values()]
         )
 

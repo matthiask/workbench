@@ -27,10 +27,11 @@ from workbench.contacts.models import (
 )
 from workbench.contacts.reassign import primary_contact_suggestions
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     Serialized,
-    form_errors,
     full_clean,
     raise_form_errors,
+    validate_form,
 )
 
 
@@ -481,15 +482,20 @@ def _save_details(person, details):
 
 @router.post("/contacts/people/", response=PersonCreated)
 def person_create(
-    request, data: PersonIn, *, dry_run: bool = False, allow_duplicates: bool = False
+    request,
+    data: PersonIn,
+    *,
+    dry_run: bool = False,
+    allow_duplicates: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create a person with their contact details, and their organization
     if it doesn't exist yet
 
-    Validated like in the web interface, warnings are errors here. People
-    with the same name, organizations with the same name and email addresses
-    which are already in use are rejected; nothing is saved if anything is
-    invalid or with ``dry_run``."""
+    Validated like in the web interface, warnings are errors here unless
+    they are ignored. People with the same name, organizations with the same
+    name and email addresses which are already in use are rejected; nothing
+    is saved if anything is invalid or with ``dry_run``."""
     errors = []
     if data.organization and data.new_organization:
         errors.append({
@@ -532,8 +538,10 @@ def person_create(
             },
             request=request,
         )
-        if not form.is_valid():
-            errors.extend(form_errors(form))
+        try:
+            validate_form(form, ignore_warnings=ignore_warnings)
+        except ValidationError as exc:
+            errors.extend(exc.errors)
         if errors:
             # Rolls back the new organization
             raise ValidationError(errors)

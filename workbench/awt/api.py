@@ -20,13 +20,14 @@ from workbench.awt.reporting import (
     working_time_by_week,
 )
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     DateRangeFilter,
     Days,
     Hours,
     Percentage,
     Serialized,
     date_range,
-    raise_form_errors,
+    validate_form,
 )
 
 
@@ -105,11 +106,17 @@ class AbsenceIn(Schema):
 
 
 @router.post("/absences/", response=AbsenceOut)
-def absence_create(request, data: AbsenceIn, *, dry_run: bool = False):
+def absence_create(
+    request,
+    data: AbsenceIn,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
     """Create an absence, validated like in the web interface
 
-    Warnings of the web interface are errors here; nothing is saved if
-    anything is invalid or with ``dry_run``."""
+    Warnings of the web interface are errors here unless they are ignored;
+    nothing is saved if anything is invalid or with ``dry_run``."""
     user = request.user
     if data.user is not None:
         user = User.objects.filter(_short_name__iexact=data.user).first()
@@ -130,8 +137,7 @@ def absence_create(request, data: AbsenceIn, *, dry_run: bool = False):
         # The web interface shows the form in a modal
         prefix=None,
     )
-    if not form.is_valid():
-        raise_form_errors(form)
+    validate_form(form, ignore_warnings=ignore_warnings)
     with transaction.atomic():
         absence = form.save()
         result = _absence_out(absence, request)

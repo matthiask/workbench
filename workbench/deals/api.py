@@ -33,7 +33,6 @@ from workbench.tools.api import (
     filter_date_range,
     filter_users,
     form_data,
-    raise_form_errors,
     validate_form,
 )
 from workbench.tools.formats import Z2
@@ -622,9 +621,19 @@ class DealStatusIn(Schema):
 
 
 @router.post("/deals/{deal_id}/status/", response=DealOut)
-def deal_status(request, deal_id: int, data: DealStatusIn, *, dry_run: bool = False):
+def deal_status(
+    request,
+    deal_id: int,
+    data: DealStatusIn,
+    *,
+    dry_run: bool = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
     """Close (accept or decline) or reopen a deal like in the web interface,
-    which also accepts or declines the related offers"""
+    which also accepts or declines the related offers
+
+    Warnings of the web interface (e.g. ``closed-in-future``) are errors
+    unless they are ignored."""
     deal = get_object_or_404(Deal, pk=deal_id)
     deal.status = STATUSES[data.status]
     form = SetStatusForm(instance=deal, request=request, status=deal.status)
@@ -661,8 +670,9 @@ def deal_status(request, deal_id: int, data: DealStatusIn, *, dry_run: bool = Fa
         raise ValidationError(errors)
 
     form = SetStatusForm(values, instance=deal, request=request, status=deal.status)
-    if not form.is_valid():
-        raise_form_errors(form, fields={"related_offers": ["offers"]})
+    validate_form(
+        form, fields={"related_offers": ["offers"]}, ignore_warnings=ignore_warnings
+    )
     return _save_deal(form, request, dry_run=dry_run)
 
 

@@ -13,6 +13,7 @@ from wb.core import (
     echo_json,
     echo_more,
     format_bool,
+    ignore_warnings_option,
     link,
     make_table,
     me,
@@ -106,16 +107,28 @@ def search_absences(user, reason, period, since, until, limit, offset, as_csv, a
 @click.option(
     "--user", help="Short name, defaults to you.", shell_complete=complete_short_names
 )
+@ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def create_absence(
-    starts_on, ends_on, days, reason, description, user, dry_run, as_json
+    starts_on,
+    ends_on,
+    days,
+    reason,
+    description,
+    user,
+    ignore_warnings,
+    dry_run,
+    as_json,
 ):
     """Create an absence like in Workbench, e.g. your vacation"""
     data = request(
         "POST",
         "absences/",
-        params={"dry_run": format_bool(dry_run)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
         json={
             "user": user,
             "starts_on": starts_on.date().isoformat(),

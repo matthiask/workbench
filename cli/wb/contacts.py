@@ -11,6 +11,7 @@ from wb.core import (
     echo_json,
     echo_more,
     format_bool,
+    ignore_warnings_option,
     link,
     load,
     make_table,
@@ -414,8 +415,9 @@ def people_context():
     is_flag=True,
     help="Create the person (and the organization) even if the name exists already.",
 )
+@ignore_warnings_option
 @click.option("--json", "as_json", is_flag=True)
-def create_person(file, dry_run, allow_duplicates, as_json):
+def create_person(file, dry_run, allow_duplicates, ignore_warnings, as_json):
     """Create a person with their contact details from a YAML or JSON file
 
     Search for the person and their organization with `wb contacts search`
@@ -426,6 +428,7 @@ def create_person(file, dry_run, allow_duplicates, as_json):
         params={
             "dry_run": format_bool(dry_run),
             "allow_duplicates": format_bool(allow_duplicates),
+            "ignore_warnings": list(ignore_warnings),
         },
         json=load(file),
     )
