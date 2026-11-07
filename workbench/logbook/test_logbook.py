@@ -181,6 +181,39 @@ class LogbookTest(TestCase):
         hours.refresh_from_db()
         self.assertEqual(hours.description, "Updated")
 
+    def test_batch_update(self):
+        """The batch update moves entries which aren't archived, and only
+        of open projects"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        other = factories.ServiceFactory.create(project=project)
+        hours = factories.LoggedHoursFactory.create(service=service)
+        archived = factories.LoggedHoursFactory.create(service=service)
+        LoggedHours.objects.filter(pk=archived.pk).update(archived_at=timezone.now())
+        self.client.force_login(hours.rendered_by)
+        url = project.urls["logbook_batch_update_hours"]
+
+        response = self.client.post(
+            url, {"entries": [hours.pk, archived.pk], "service": other.pk}
+        )
+        self.assertEqual(response.status_code, 200)  # Archived isn't a choice
+        archived.refresh_from_db()
+        self.assertEqual(archived.service, service)
+
+        response = self.client.post(url, {"entries": [hours.pk], "service": other.pk})
+        self.assertRedirects(response, project.urls["detail"])
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, other)
+
+        Project.objects.filter(pk=project.pk).update(closed_on=in_days(0))
+        response = self.client.post(url, {"entries": [hours.pk], "service": service.pk})
+        self.assertRedirects(response, project.urls["detail"])
+        self.assertEqual(
+            messages(response), ["Cannot move logbook entries of closed projects."]
+        )
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, other)
+
     def test_move_to_past_week_forbidden(self):
         """Moving hours into the past week is not allowed"""
         hours = factories.LoggedHoursFactory.create()
