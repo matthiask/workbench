@@ -92,8 +92,12 @@ fixed (the commits after "Verification: Findings of the third round").
 - Green hours: projects whose budgeted services add up to 0h count all hours
   as overdrawn. Taking invoiced hours into account would rebuild squeeze.
 - Team filters use the current membership, also for past periods.
-- `LATE_LOGGING` doesn't treat logged costs and logged hours differently, by
-  design.
+- `LATE_LOGGING` means that the hours of the person who has the feature
+  (`rendered_by`, whoever enters them) can be logged late: logging them in
+  past weeks and changing their hours and date there. Logged costs aren't
+  affected and have no week lock (until they're archived or invoiced, or
+  14 days after the project was closed). Deleting hours of past weeks isn't
+  possible, also with the feature.
 - Absences can't span the year end, so vacations across it are two
   absences.
 - Statuses and probabilities are stable keys in the API (`workbench/api_keys.py`).
