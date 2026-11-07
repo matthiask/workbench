@@ -1359,6 +1359,24 @@ class InvoicesTest(TestCase):
             " it was cancelled, create a new invoice instead.",
         )
 
+    def test_no_new_lines_on_sent_invoices(self):
+        """Lines can only be added to invoices in preparation"""
+        invoice = factories.InvoiceFactory.create(
+            type=Invoice.SERVICES, status=Invoice.SENT
+        )
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            invoice.urls["createservice"],
+            {"title": "Extra", "cost": "500"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(
+            response,
+            "Cannot modify a service bound to an invoice which is not in"
+            " preparation anymore.",
+        )
+        self.assertEqual(invoice.services.count(), 0)
+
     def test_change_down_payment_of_invoice_in_preparation(self):
         """Final invoices in preparation follow changes of their down
         payments"""

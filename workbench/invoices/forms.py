@@ -1002,6 +1002,18 @@ class ServiceForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.instance.invoice = self.invoice
 
+    def clean(self):
+        data = super().clean()
+        # Updating and deleting is refused by Service.allow_update
+        if self.invoice.status > Invoice.IN_PREPARATION:
+            raise forms.ValidationError(
+                _(
+                    "Cannot modify a service bound to an invoice"
+                    " which is not in preparation anymore."
+                )
+            )
+        return data
+
 
 class RecurringInvoiceSearchForm(Form):
     q = forms.CharField(

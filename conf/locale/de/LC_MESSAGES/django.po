@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 14:01+0100\n"
+"POT-Creation-Date: 2026-11-07 14:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2311,6 +2311,10 @@ msgstr "Anzahlungsrechnungen wurden von dieser Rechnung abgezogen. Diese Anzahlu
 msgid "Optional, but useful for quickly filling the fields below."
 msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 
+#: workbench/invoices/forms.py workbench/invoices/models.py
+msgid "Cannot modify a service bound to an invoice which is not in preparation anymore."
+msgstr "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht mehr bearbeiten."
+
 #: workbench/invoices/forms.py
 #, python-brace-format
 msgid "Cannot create a recurring invoice with a start date of {} or earlier anymore."
@@ -2537,10 +2541,6 @@ msgid "project service"
 msgstr "Projektleistung"
 
 #: workbench/invoices/models.py
-msgid "Cannot modify a service bound to an invoice which is not in preparation anymore."
-msgstr "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht mehr bearbeiten."
-
-#: workbench/invoices/models.py
 msgid "yearly"
 msgstr "jährlich"
 
@@ -2762,7 +2762,7 @@ msgstr "Falls Du eine neue Leistung erstellen willst, darfst Du keine existieren
 msgid "Logging is not allowed on this service anymore."
 msgstr "Auf dieser Leistung kann nicht mehr erfasst werden."
 
-#: workbench/logbook/forms.py workbench/timer/api.py
+#: workbench/logbook/forms.py workbench/timer/api.py workbench/timer/models.py
 msgid "This project has been closed too long ago."
 msgstr "Dieses Projekt ist schon zu lange geschlossen."
 
@@ -3052,7 +3052,8 @@ msgstr "Stunden benötigen eine Aufwandsart und einen Stundensatz, z.B. von eine
 msgid "%s: Neither hours nor a cost have been given yet."
 msgstr "%s: Es wurden noch weder Stunden noch Kosten angegeben."
 
-#: workbench/offers/api.py workbench/offers/forms.py
+#: workbench/offers/api.py workbench/offers/forms.py workbench/planning/api.py
+#: workbench/planning/forms.py
 msgid "The project is closed."
 msgstr "Das Projekt ist geschlossen."
 
