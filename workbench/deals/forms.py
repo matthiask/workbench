@@ -176,10 +176,12 @@ class DealForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         request = kwargs["request"]
-        if not kwargs.get("instance"):
-            initial = kwargs.setdefault("initial", {})
+        initial = kwargs.setdefault("initial", {})
 
-        if pk := request.GET.get("contact"):
+        # Initial values only apply to new deals
+        if kwargs.get("instance"):
+            pass
+        elif pk := request.GET.get("contact"):
             try:
                 contact = Person.objects.get(pk=pk)
             except Person.DoesNotExist, TypeError, ValueError:

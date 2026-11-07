@@ -334,6 +334,15 @@ class DealsTest(TestCase):
         group.refresh_from_db()
         self.assertEqual(group.status, Offer.DISCARDED)
 
+    def test_update_ignores_initial_customer_and_contact(self):
+        """Query parameters for initial values only apply to new deals"""
+        deal = factories.DealFactory.create()
+        self.client.force_login(deal.owned_by)
+        for param, pk in [("contact", deal.contact_id), ("customer", deal.customer_id)]:
+            with self.subTest(param=param):
+                response = self.client.get(deal.urls["update"] + f"?{param}={pk}")
+                self.assertEqual(response.status_code, 200)
+
     def test_status_api_ignores_the_query_string(self):
         """The API takes the status from the body only"""
         deal = factories.DealFactory.create()
