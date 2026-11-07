@@ -232,6 +232,38 @@ class PlanningAPITest(TestCase):
         self.assertEqual(milestone.phase_starts_on, in_days(30))
         self.assertEqual(milestone.estimated_total_hours, 40)
 
+    def test_import_work_on_deleted_milestone(self):
+        """Work can't be put on a milestone which is deleted in the same
+        import"""
+        project = factories.ProjectFactory.create()
+        user = factories.UserFactory.create(_short_name="ab")
+        service_type = factories.service_types().consulting
+        milestone = factories.MilestoneFactory.create(project=project, date=in_days(60))
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/import/",
+            {
+                "planned_work": [
+                    {
+                        "title": "Design",
+                        "user": user.get_short_name(),
+                        "service_type": service_type.title,
+                        "planned_hours": 10,
+                        "weeks": [monday().isoformat()],
+                        "milestone": milestone.pk,
+                    }
+                ],
+                "delete_milestones": [milestone.pk],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(
+            [error["loc"][2:] for error in response.json()["detail"]],
+            [["planned_work", 0, "milestone"]],
+        )
+        self.assertTrue(project.milestones.exists())
+
     def test_import_unchanged_context(self):
         """Planned work sent back unchanged is accepted, also with users who
         left and offers which have been declined since"""

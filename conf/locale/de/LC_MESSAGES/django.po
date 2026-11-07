@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 17:41+0100\n"
+"POT-Creation-Date: 2026-11-07 17:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3292,6 +3292,10 @@ msgid "Copy %s to project"
 msgstr "%s zu Projekt kopieren"
 
 #: workbench/planning/api.py
+msgid "The period may cover at most ten years."
+msgstr "Der Zeitraum darf höchstens zehn Jahre umfassen."
+
+#: workbench/planning/api.py
 msgid "This field cannot be null."
 msgstr "Dieses Feld darf nicht leer sein."
 
@@ -3342,12 +3346,12 @@ msgid "planned work"
 msgstr "geplante Arbeit"
 
 #: workbench/planning/api.py
-msgid "Use PATCH to update work."
-msgstr "Bestehende Arbeit mit PATCH ändern."
+msgid "This milestone is being deleted."
+msgstr "Dieser Meilenstein wird gelöscht."
 
 #: workbench/planning/api.py
-msgid "The period may cover at most ten years."
-msgstr "Der Zeitraum darf höchstens zehn Jahre umfassen."
+msgid "Use PATCH to update work."
+msgstr "Bestehende Arbeit mit PATCH ändern."
 
 #: workbench/planning/forms.py
 msgid "red"

@@ -485,6 +485,7 @@ def planning_import(  # noqa: C901
         milestones.append(milestone)
 
     planned_work = []
+    milestone_locs = {}
     for index, item in enumerate(data.planned_work):
         loc = ["body", "data", "planned_work", index]
         if item.id is not None:
@@ -508,6 +509,8 @@ def planning_import(  # noqa: C901
             warnings=warnings,
         )
         planned_work.append(pw)
+        if "milestone" in item.model_fields_set:
+            milestone_locs[id(pw)] = [*loc, "milestone"]
 
     delete_milestones = _existing(
         lookups["milestones"],
@@ -523,6 +526,14 @@ def planning_import(  # noqa: C901
         errors,
         _("planned work"),
     )
+    # Deleting would silently remove the milestone of the work again
+    deleted_ids = {milestone.pk for milestone in delete_milestones}
+    for pw in planned_work:
+        if id(pw) in milestone_locs and pw.milestone_id in deleted_ids:
+            errors.append({
+                "loc": milestone_locs[id(pw)],
+                "msg": _("This milestone is being deleted."),
+            })
 
     if errors:
         raise ValidationError(errors)
