@@ -18,8 +18,12 @@ class MilestoneIn(Schema):
     )
     title: str = Field(min_length=1, max_length=200)
     date: dt.date
-    phase_starts_on: dt.date | None = None
-    estimated_total_hours: float = Field(default=0, ge=0)
+    phase_starts_on: dt.date | None = Field(
+        default=None, description="Existing milestones keep it if left out."
+    )
+    estimated_total_hours: float = Field(
+        default=0, ge=0, description="Existing milestones keep it if left out."
+    )
 
 
 class PlannedWorkIn(Schema):

@@ -465,8 +465,11 @@ def planning_import(  # noqa: C901
             new_milestones[item.key] = milestone
         milestone.title = item.title
         milestone.date = item.date
-        milestone.phase_starts_on = item.phase_starts_on
-        milestone.estimated_total_hours = _hours(item.estimated_total_hours)
+        # Existing milestones keep the optional fields which aren't given
+        if item.id is None or "phase_starts_on" in item.model_fields_set:
+            milestone.phase_starts_on = item.phase_starts_on
+        if item.id is None or "estimated_total_hours" in item.model_fields_set:
+            milestone.estimated_total_hours = _hours(item.estimated_total_hours)
         full_clean(milestone, loc, errors)
         milestones.append(milestone)
 

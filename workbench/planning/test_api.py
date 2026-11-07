@@ -203,6 +203,35 @@ class PlanningAPITest(TestCase):
         self.assertEqual(response.status_code, 422, response.content)
         self.assertEqual(project.milestones.count(), 0)
 
+    def test_import_milestone_keeps_omitted_fields(self):
+        """Updating a milestone keeps the phase and hours which aren't given"""
+        project = factories.ProjectFactory.create()
+        milestone = factories.MilestoneFactory.create(
+            project=project,
+            date=in_days(60),
+            phase_starts_on=in_days(30),
+            estimated_total_hours=40,
+        )
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/import/",
+            {
+                "milestones": [
+                    {
+                        "id": milestone.pk,
+                        "title": "Launch",
+                        "date": in_days(70).isoformat(),
+                    }
+                ],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        milestone.refresh_from_db()
+        self.assertEqual(milestone.date, in_days(70))
+        self.assertEqual(milestone.phase_starts_on, in_days(30))
+        self.assertEqual(milestone.estimated_total_hours, 40)
+
     def test_import_unchanged_context(self):
         """Planned work sent back unchanged is accepted, also with users who
         left and offers which have been declined since"""
