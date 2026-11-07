@@ -222,7 +222,7 @@ def update_deal(
 @click.option(
     "--closed-on",
     type=click.DateTime(formats=["%Y-%m-%d"]),
-    help="Defaults to today.",
+    help="Defaults to today, or the date the deal has been closed on.",
 )
 @click.option(
     "--offer",

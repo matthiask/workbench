@@ -597,7 +597,10 @@ class DealStatusIn(Schema):
         " required when closing deals.",
     )
     closing_notice: str = ""
-    closed_on: dt.date | None = Field(default=None, description="Defaults to today.")
+    closed_on: dt.date | None = Field(
+        default=None,
+        description="Defaults to today, or the date the deal has been closed on.",
+    )
     offers: list[int] | None = Field(
         default=None,
         description="IDs of related offers to accept or decline with the deal,"

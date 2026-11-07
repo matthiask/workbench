@@ -271,6 +271,28 @@ class DealsTest(TestCase):
         response = self.client.post(deal.urls["set_status"] + "?status=20")
         self.assertContains(response, "This field is required when closing a deal.")
 
+    def test_closed_deals_keep_their_closing_date(self):
+        """Editing the closing of a closed deal keeps its date"""
+        deal = factories.DealFactory.create(
+            status=Deal.ACCEPTED, closed_on=in_days(-30)
+        )
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.get(deal.urls["set_status"] + f"?status={Deal.ACCEPTED}")
+        self.assertContains(response, in_days(-30).isoformat())
+
+        factories.ClosingTypeFactory.create(
+            title="Too expensive", represents_a_win=False
+        )
+        response = self.client.post(
+            f"/api/deals/{deal.pk}/status/",
+            {"status": "declined", "closing_type": "Too expensive"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        deal.refresh_from_db()
+        self.assertEqual(deal.closed_on, in_days(-30))
+
     @travel("2020-02-18 12:00:00")
     def test_badge(self):
         """The deal badge contains expected informations"""
