@@ -59,6 +59,11 @@ does what. Then write the plan as YAML to the scratchpad, e.g.
   include them with their `id` from the context and only the fields to
   change; to remove them, list their IDs in `delete_milestones` or
   `delete_planned_work`. Nothing else is changed or deleted.
+- When you move a milestone earlier, look at its existing planned work in the
+  context: the import only warns about work after the milestone if that
+  work is part of the import. Move the work too, or tell the user which work
+  now ends after the milestone. A phase (`phase_starts_on`) cannot start
+  after its milestone.
 - Estimate the hours from the offers' services, they should add up to the
   offered hours.
 - Mark work as provisional (`is_provisional: true`) unless the user says it's
