@@ -214,6 +214,33 @@ class LogbookTest(TestCase):
         hours.refresh_from_db()
         self.assertEqual(hours.service, other)
 
+    def test_invoiced_hours_are_locked(self):
+        """Invoiced hours keep their service and hours, the description can
+        still be changed"""
+        hours = factories.LoggedHoursFactory.create(hours=2)
+        other = factories.ServiceFactory.create(project=hours.service.project)
+        LoggedHours.objects.filter(pk=hours.pk).update(archived_at=timezone.now())
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.post(
+            hours.urls["update"],
+            {
+                "modal-rendered_by": hours.rendered_by_id,
+                "modal-rendered_on": hours.rendered_on.isoformat(),
+                "modal-service": other.pk,
+                "modal-hours": "5",
+                "modal-description": "Fixed typo",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        hours.refresh_from_db()
+        self.assertEqual(
+            (hours.service_id, hours.hours, hours.description),
+            (hours.service_id, Decimal("2.0"), "Fixed typo"),
+        )
+        self.assertNotEqual(hours.service, other)
+
     def test_move_to_past_week_forbidden(self):
         """Moving hours into the past week is not allowed"""
         hours = factories.LoggedHoursFactory.create()

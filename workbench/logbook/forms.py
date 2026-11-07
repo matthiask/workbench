@@ -379,7 +379,7 @@ class LoggedHoursForm(ModelForm):
         )
         widgets = {"description": Textarea({"rows": 2})}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: C901
         self.project = kwargs.pop("project", None)
         if self.project:
             initial = kwargs.setdefault("initial", {})
@@ -447,9 +447,17 @@ class LoggedHoursForm(ModelForm):
                 self.fields["hours"].disabled = True
                 self.fields["rendered_by"].disabled = True
                 self.fields["rendered_on"].disabled = True
-            # Can be changed late, but not after invoicing
+            # Can be changed late (after the logbook has been locked), but not
+            # after invoicing: the invoice wouldn't match the logbook anymore
             if self.instance.archived_at:
-                self.fields["hours_for_invoicing"].disabled = True
+                for field in [
+                    "service",
+                    "hours",
+                    "hours_for_invoicing",
+                    "rendered_by",
+                    "rendered_on",
+                ]:
+                    self.fields[field].disabled = True
 
         else:
             if self.project.flat_rate is not None:
