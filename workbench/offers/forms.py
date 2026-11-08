@@ -250,9 +250,7 @@ class OfferForm(PostalAddressSelectionForm):
             selected = {service.pk for service in data["services"]}
             moved = [
                 service
-                for service in self.service_candidates.filter(
-                    invoice_services__isnull=False
-                ).distinct()
+                for service in self.service_candidates.invoiced()
                 if (service.pk in selected)
                 != (
                     self.instance.pk is not None

@@ -470,7 +470,7 @@ class ProjectForm(ModelForm):
             with override(settings.WORKBENCH.PDF_LANGUAGE):
                 # Invoiced services keep their rate
                 for service in self.instance.services.editable().exclude(
-                    invoice_services__isnull=False
+                    pk__in=self.instance.services.invoiced()
                 ):
                     service.effort_type = gettext("flat rate")
                     service.effort_rate = self.instance.flat_rate

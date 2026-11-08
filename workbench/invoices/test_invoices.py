@@ -1436,6 +1436,32 @@ class InvoicesTest(TestCase):
             " it was cancelled, create a new invoice instead.",
         )
 
+    def test_cancelled_invoice_releases_services(self):
+        """Services of cancelled invoices count as not invoiced: they may be
+        repriced, moved and deleted again"""
+        service = factories.ServiceFactory.create(effort_type="Design", effort_rate=100)
+        project = service.project
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_offer([service])
+        self.assertTrue(service.is_invoiced)
+
+        invoice.status = Invoice.CANCELED
+        invoice.payment_notice = "Oops"
+        invoice.save()
+        self.assertFalse(service.is_invoiced)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            service.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(project.services.exists())
+
     def test_no_new_lines_on_sent_invoices(self):
         """Lines can only be added to invoices in preparation"""
         invoice = factories.InvoiceFactory.create(

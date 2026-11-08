@@ -7,7 +7,7 @@ from admin_ordering.models import OrderableModel
 from django.contrib import messages
 from django.core.cache import cache
 from django.db import models
-from django.db.models import Count, F, Prefetch, Q, Sum
+from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q, Sum
 from django.db.models.expressions import RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -842,6 +842,19 @@ class Project(Model):
 
 
 class ServiceQuerySet(SearchQuerySet):
+    def invoiced(self):
+        """Services invoiced from the logbook or from the offer, cancelled
+        invoices don't count"""
+        from workbench.invoices.models import Invoice, Service as InvoiceService
+
+        return self.filter(
+            Exists(
+                InvoiceService.objects.filter(project_service=OuterRef("pk")).exclude(
+                    invoice__status=Invoice.CANCELED
+                )
+            )
+        )
+
     def choices_with_pins(self, *, project, user):
         choices = self.choices()
         if pinned := self.filter(id__in=user.pinned_services.filter(project=project)):
@@ -972,8 +985,12 @@ class Service(ServiceBase):
     @property
     def is_invoiced(self):
         """Invoiced from the logbook or from the offer: the invoice's lines
-        point to the service, so it stays where it is"""
-        return self.pk is not None and self.invoice_services.exists()
+        point to the service, so it stays where it is (unless the invoices
+        have been cancelled)"""
+        return (
+            self.pk is not None
+            and type(self).objects.filter(pk=self.pk).invoiced().exists()
+        )
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)

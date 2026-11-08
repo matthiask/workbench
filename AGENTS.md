@@ -247,7 +247,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   have been sent or accepted only allow changing the external reference,
   deleting is only possible in offers in preparation or without offer and
   without logged hours or costs, invoiced services (`Service.is_invoiced`,
-  also from the offer) are neither deleted nor moved to another offer or
+  also from the offer; cancelled invoices don't count, `Service.objects.invoiced()`) are neither deleted nor moved to another offer or
   project and keep their effort type and rate (also when the project gets a
   flat rate), reordering takes all services of one offer
   (or the services without offer of one project). `POST
