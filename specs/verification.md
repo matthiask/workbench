@@ -132,21 +132,23 @@ pricing form, the old offer service API and the offer form, auto dunning
 without contact, batch assignment of credit entries, blank short names in
 the APIs, malformed parameters of the annual working time, offers given when
 closing deals without related offers, recurring invoices in the merge
-warning.
+warning (the commits after "Verification: Findings of the fourth round").
+
+### Decided
+
+- Invoice lines know whether they were invoiced from the offer
+  (`from_offer`, backfilled: lines without linked entries, and lines which
+  still have the offered hours and cost and don't sum up their entries);
+  invoicing the logbook warns about them.
+- Changing the reason of a sickness absence while keeping the description
+  is a warning (`sickness-description-public`). If that's not enough: an
+  error with a link to a new absence pre-filled with the data, replacing
+  the old one.
+- The Hochrechnung only extrapolates what is dated up to today.
+- Request bodies reject unknown fields (`InputSchema`).
 
 ### Open, to decide
 
-- Invoicing the logbook after invoicing the offer doesn't warn: lines
-  invoiced from the offer which have linked entries (hours logged before)
-  count as invoiced from the logbook (`CreateProjectInvoiceForm.clean`).
-  Invoice lines don't know their source.
-- A sickness description becomes visible to everyone when the reason is
-  changed away from sickness (`Absence.details_visible_to()`,
-  `public_text()`; the planning mail already hides it).
-- Key data: future-dated logged third party costs (and invoices) of the
-  current year are extrapolated by the Hochrechnung.
-- Unknown fields in API request bodies are ignored (no `extra="forbid"`),
-  data under a wrong key is lost silently.
 - Deleting an offer with invoiced services moves them out of the offer
   (`SET_NULL`); deleting a declined offer turns its services into budgeted
   ones; deleting an offer deletes all its planned work, past weeks too.
