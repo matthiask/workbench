@@ -8,7 +8,9 @@ from workbench.invoices.forms import (
     InvoiceDeleteForm,
     InvoiceForm,
     InvoiceSearchForm,
+    PostponeRemindersForm,
     ServiceForm,
+    SettleInvoiceForm,
 )
 from workbench.invoices.models import Invoice, Service
 
@@ -58,6 +60,28 @@ urlpatterns = [
             )
         ),
         name="invoices_invoice_delete",
+    ),
+    path(
+        "<int:pk>/postpone-reminders/",
+        controlling_only(
+            generic.UpdateView.as_view(
+                form_class=PostponeRemindersForm,
+                model=Invoice,
+                template_name="modalform.html",
+            )
+        ),
+        name="invoices_invoice_postpone_reminders",
+    ),
+    path(
+        "<int:pk>/settle/",
+        controlling_only(
+            generic.UpdateView.as_view(
+                form_class=SettleInvoiceForm,
+                model=Invoice,
+                template_name="modalform.html",
+            )
+        ),
+        name="invoices_invoice_settle",
     ),
     path(
         "<int:pk>/pdf/",

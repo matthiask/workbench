@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:31+0100\n"
+"POT-Creation-Date: 2026-11-08 16:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2095,7 +2095,7 @@ msgstr "Diese Rechnungen sind nicht überfällig: %s"
 msgid "This contact has no overdue invoices."
 msgstr "Diese Kontaktperson hat keine überfälligen Rechnungen."
 
-#: workbench/invoices/api.py
+#: workbench/invoices/api.py workbench/invoices/forms.py
 msgid "Reminders can only be postponed for sent invoices."
 msgstr "Zahlungserinnerungen können nur für versendete Rechnungen aufgeschoben werden."
 
@@ -2195,6 +2195,18 @@ msgid "project"
 msgstr "Projekt"
 
 #: workbench/invoices/forms.py
+msgid "Only sent invoices can be settled here."
+msgstr "Hier können nur versendete Rechnungen abgeschlossen werden."
+
+#: workbench/invoices/forms.py
+msgid "You are setting the payment date to a value over 6 months ago. Are you sure?"
+msgstr "Du setzt das Zahlungsdatum auf einen Zeitpunkt vor über sechs Monaten. Bist Du sicher?"
+
+#: workbench/invoices/forms.py
+msgid "This down payment has been applied to an invoice, cancel that invoice first:"
+msgstr "Diese Anzahlung wurde bereits mit einer Rechnung verrechnet, storniere zuerst diese Rechnung:"
+
+#: workbench/invoices/forms.py
 msgid "Determined by project."
 msgstr "Durch Projekt bestimmt."
 
@@ -2250,10 +2262,6 @@ msgid "Attention! The invoice date is more than three months in the future!"
 msgstr "Achtung! Das Rechnungsdatum liegt mehr als drei Monate in der Zukunft!"
 
 #: workbench/invoices/forms.py
-msgid "You are setting the payment date to a value over 6 months ago. Are you sure?"
-msgstr "Du setzt das Zahlungsdatum auf einen Zeitpunkt vor über sechs Monaten. Bist Du sicher?"
-
-#: workbench/invoices/forms.py
 #, python-format
 msgid "You are attempting to set status to '%(to)s', but the invoice has already been closed on %(closed)s. Are you sure?"
 msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Rechnung wurde schon am %(closed)s geschlossen. Bist Du sicher?"
@@ -2269,10 +2277,6 @@ msgstr "Bist Du sicher, dass der MwSt-Satz korrekt ist? Der Zeitraum der Leistun
 #: workbench/invoices/forms.py
 msgid "Invoices which haven't been sent are deleted, not cancelled."
 msgstr "Rechnungen, die nicht versendet wurden, werden gelöscht, nicht storniert."
-
-#: workbench/invoices/forms.py
-msgid "This down payment has been applied to an invoice, cancel that invoice first:"
-msgstr "Diese Anzahlung wurde bereits mit einer Rechnung verrechnet, storniere zuerst diese Rechnung:"
 
 #: workbench/invoices/forms.py
 msgid "The down payments of this invoice have been released when it was cancelled, create a new invoice instead."
@@ -5089,6 +5093,18 @@ msgstr "Abbrechen"
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
 msgstr "Geschichte"
+
+#: workbench/templates/invoices/invoice_detail.html
+msgid "Mark as paid"
+msgstr "Als bezahlt markieren"
+
+#: workbench/templates/invoices/invoice_detail.html
+msgid "Cancel invoice"
+msgstr "Rechnung stornieren"
+
+#: workbench/templates/invoices/invoice_detail.html
+msgid "Postpone reminders"
+msgstr "Zahlungserinnerungen aufschieben"
 
 #: workbench/templates/invoices/invoice_detail.html
 msgid "notes of the organization"

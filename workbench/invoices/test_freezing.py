@@ -227,10 +227,12 @@ class FreezingTest(TestCase):
         )
 
         self.client.force_login(invoice.owned_by)
-        self.client.post(
-            invoice.urls["update"],
-            invoice_to_dict(invoice, postpone_reminders_until=in_days(14)),
+        response = self.client.post(
+            invoice.urls["postpone_reminders"],
+            {"modal-postpone_reminders_until": in_days(14).isoformat()},
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
+        self.assertEqual(response.status_code, 202)
 
         invoice.refresh_from_db()
         self.assertEqual(invoice.postpone_reminders_until, in_days(14))

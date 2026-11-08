@@ -26,7 +26,14 @@ from workbench.reporting.models import FreezeDate
 from workbench.reporting.utils import accepted_offers_by_project
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, hours, local_date_format
-from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
+from workbench.tools.forms import (
+    Autocomplete,
+    DateInput,
+    Form,
+    ModelForm,
+    Textarea,
+    add_prefix,
+)
 from workbench.tools.pdf import PDFDocument, pdf_response
 from workbench.tools.validation import in_days
 
@@ -133,6 +140,98 @@ class InvoiceSearchForm(Form):
         return None
 
 
+def warn_about_postponed_reminders(form, postpone):
+    if postpone and postpone > in_days(Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS):
+        form.add_warning(
+            _(
+                "You are postponing reminders until %(date)s, which is more"
+                " than %(days)s days from now. Are you sure?"
+            )
+            % {
+                "date": local_date_format(postpone),
+                "days": Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS,
+            },
+            code="postpone-reminders-far-out",
+        )
+
+
+@add_prefix("modal")
+class PostponeRemindersForm(ModelForm):
+    """Postpones the reminders of a sent invoice without the validation of
+    the whole invoice"""
+
+    class Meta:
+        model = Invoice
+        fields = ["postpone_reminders_until"]
+
+    def clean(self):
+        data = super().clean()
+        if self.instance._orig_status != Invoice.SENT:
+            raise forms.ValidationError(
+                _("Reminders can only be postponed for sent invoices.")
+            )
+        warn_about_postponed_reminders(self, data.get("postpone_reminders_until"))
+        return data
+
+
+@add_prefix("modal")
+class SettleInvoiceForm(ModelForm):
+    """Marks a sent invoice as paid or cancelled with only the fields which
+    are needed (the invoice form works too)"""
+
+    class Meta:
+        model = Invoice
+        fields = ["status", "closed_on", "payment_notice"]
+        widgets = {
+            "status": forms.RadioSelect,
+            "payment_notice": Textarea({"rows": 2}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["status"].choices = [
+            row
+            for row in Invoice.STATUS_CHOICES
+            if row[0] in {Invoice.PAID, Invoice.CANCELED}
+        ]
+        if (status := self.request.GET.get("status", "")).isdigit():
+            self.initial["status"] = int(status)
+        elif self.instance.status not in {Invoice.PAID, Invoice.CANCELED}:
+            self.initial["status"] = Invoice.PAID
+        self.initial["closed_on"] = self.instance.closed_on or dt.date.today()
+
+    def clean(self):
+        data = super().clean()
+        if self.instance._orig_status != Invoice.SENT:
+            raise forms.ValidationError(_("Only sent invoices can be settled here."))
+        if not data.get("closed_on"):
+            data["closed_on"] = dt.date.today()
+        if data.get("status") == Invoice.PAID and data["closed_on"] < in_days(-180):
+            self.add_warning(
+                _(
+                    "You are setting the payment date to a value over 6 months ago. Are you sure?"
+                ),
+                code="paid-in-past",
+            )
+        if data.get("status") == Invoice.CANCELED and (
+            final := self.instance.down_payment_applied_to
+        ):
+            # Like the invoice form: the final invoice deducts it
+            if final.status > Invoice.IN_PREPARATION:
+                self.add_error(
+                    "status",
+                    format_html(
+                        "{} {}",
+                        _(
+                            "This down payment has been applied to an invoice,"
+                            " cancel that invoice first:"
+                        ),
+                        final,
+                    ),
+                )
+        return data
+
+
 class InvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -150,7 +249,6 @@ class InvoiceForm(PostalAddressSelectionForm):
             "owned_by",
             "status",
             "closed_on",
-            "postpone_reminders_until",
             "payment_notice",
             "postal_address",
             "type",
@@ -181,10 +279,6 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         self.fields["type"].choices = Invoice.TYPE_CHOICES
         self.fields["type"].disabled = True
-
-        if self.instance.status != self.instance.SENT:
-            # Postponing reminders only makes sense for invoices which are out.
-            self.fields.pop("postpone_reminders_until")
 
         if self.instance.project:
             self.fields["customer"].disabled = True
@@ -289,7 +383,6 @@ class InvoiceForm(PostalAddressSelectionForm):
                     "third_party_costs",
                     "status",
                     "payment_notice",
-                    "postpone_reminders_until",
                 }:
                     self.fields[field].disabled = True
 
@@ -312,27 +405,9 @@ class InvoiceForm(PostalAddressSelectionForm):
             return False
         return bool(from_status > to_status or from_status >= Invoice.PAID)
 
-    def _warn_about_postponed_reminders(self, data):
-        if (postpone := data.get("postpone_reminders_until")) and postpone > in_days(
-            Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS
-        ):
-            self.add_warning(
-                _(
-                    "You are postponing reminders until %(date)s, which is more"
-                    " than %(days)s days from now. Are you sure?"
-                )
-                % {
-                    "date": local_date_format(postpone),
-                    "days": Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS,
-                },
-                code="postpone-reminders-far-out",
-            )
-
     def clean(self):  # noqa: C901
         data = super().clean()
         s_dict = dict(Invoice.STATUS_CHOICES)
-
-        self._warn_about_postponed_reminders(data)
 
         if (subtotal := data.get("subtotal")) and subtotal < 0:
             self.add_error(
@@ -367,7 +442,6 @@ class InvoiceForm(PostalAddressSelectionForm):
             "status",
             "closed_on",
             "payment_notice",
-            "postpone_reminders_until",
             "third_party_costs",
         }:
             self.add_warning(

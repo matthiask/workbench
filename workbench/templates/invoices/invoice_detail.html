@@ -46,6 +46,18 @@
           <a class="dropdown-item" href="{{ object.urls.pdf }}?disposition=attachment">
             {% translate 'Download' %}
           </a>
+          {% if object.status == object.SENT %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{{ object.urls.settle }}?status={{ object.PAID }}" data-ajaxmodal>
+              {% translate 'Mark as paid' %}
+            </a>
+            <a class="dropdown-item" href="{{ object.urls.settle }}?status={{ object.CANCELED }}" data-ajaxmodal>
+              {% translate 'Cancel invoice' %}
+            </a>
+            <a class="dropdown-item" href="{{ object.urls.postpone_reminders }}" data-ajaxmodal>
+              {% translate 'Postpone reminders' %}
+            </a>
+          {% endif %}
           <div class="dropdown-divider"></div>
           <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
         </div>

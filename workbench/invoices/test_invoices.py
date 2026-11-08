@@ -1793,7 +1793,8 @@ class InvoicesTest(TestCase):
         invoice.clean_fields(exclude={"postal_address"})
 
     def test_postpone_reminders_warning(self):
-        """Postponing reminders far out warns before saving"""
+        """Reminders are postponed in a modal of their own (not in the invoice
+        form), postponing far out warns before saving"""
         invoice = factories.InvoiceFactory.create(
             invoiced_on=in_days(-60),
             due_on=in_days(-45),
@@ -1801,26 +1802,93 @@ class InvoicesTest(TestCase):
             postal_address="Test\nStreet\nCity",
         )
         self.client.force_login(invoice.owned_by)
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.get(invoice.urls["update"])
+        self.assertNotContains(response, "postpone_reminders_until")
+        response = self.client.get(invoice.get_absolute_url())
+        self.assertContains(response, invoice.urls["postpone_reminders"])
 
         def post(days):
             return self.client.post(
-                invoice.urls["update"],
-                invoice_to_dict(
-                    invoice,
-                    postpone_reminders_until=in_days(days).isoformat(),
-                ),
+                invoice.urls["postpone_reminders"],
+                {"modal-postpone_reminders_until": in_days(days).isoformat()},
+                headers=headers,
             )
 
         response = post(Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS + 1)
         self.assertContains(response, "postpone-reminders-far-out")
+        response = post(Invoice.MAX_POSTPONE_REMINDERS_DAYS + 1)
+        self.assertContains(response, "Reminders cannot be postponed")
 
         response = post(Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS)
-        self.assertRedirects(response, invoice.get_absolute_url())
+        self.assertEqual(response.status_code, 202)
         invoice.refresh_from_db()
         self.assertEqual(
             invoice.postpone_reminders_until,
             in_days(Invoice.UNEXPECTED_POSTPONE_REMINDERS_DAYS),
         )
+
+        invoice.status = Invoice.PAID
+        invoice.closed_on = dt.date.today()
+        invoice.save()
+        response = post(10)
+        self.assertContains(
+            response, "Reminders can only be postponed for sent invoices."
+        )
+
+    def test_settle(self):
+        """Sent invoices are marked as paid or cancelled in a modal with only
+        the closing date, the status and the payment notice"""
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(-60),
+            due_on=in_days(-30),
+            subtotal=100,
+            status=Invoice.SENT,
+            postal_address="Test\nStreet\nCity",
+        )
+        self.client.force_login(invoice.owned_by)
+        headers = {"x-requested-with": "XMLHttpRequest"}
+        response = self.client.get(invoice.get_absolute_url())
+        self.assertContains(response, invoice.urls["settle"])
+
+        response = self.client.get(
+            f"{invoice.urls['settle']}?status={Invoice.CANCELED}", headers=headers
+        )
+        self.assertContains(response, 'id="id_modal-status_1" checked')
+
+        response = self.client.post(
+            invoice.urls["settle"],
+            {"modal-status": Invoice.CANCELED, "modal-closed_on": ""},
+            headers=headers,
+        )
+        self.assertContains(
+            response, "Please provide a short reason for the invoice cancellation."
+        )
+
+        response = self.client.post(
+            invoice.urls["settle"],
+            {
+                "modal-status": Invoice.PAID,
+                "modal-closed_on": "",
+                "modal-payment_notice": "Paid in cash",
+            },
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 202)
+        invoice.refresh_from_db()
+        self.assertEqual(
+            (invoice.status, invoice.closed_on, invoice.payment_notice),
+            (Invoice.PAID, dt.date.today(), "Paid in cash"),
+        )
+
+        # Only sent invoices
+        response = self.client.post(
+            invoice.urls["settle"],
+            {"modal-status": Invoice.CANCELED, "modal-payment_notice": "Oops"},
+            headers=headers,
+        )
+        self.assertContains(response, "Only sent invoices can be settled here.")
 
     def test_reset_last_invoiced_on(self):
         """last_reminded_on < invoiced_on values are silently corrected/dropped"""
