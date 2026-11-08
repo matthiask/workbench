@@ -142,7 +142,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   is archived only if both were; people who are
   both linked to a user can't be merged. Merging into someone of another
   organization is a warning (`other-organization`) if the duplicate is the
-  contact of projects, deals or invoices: forms only check that the contact
+  contact of projects, deals, invoices or recurring invoices: forms only check that the contact
   belongs to the customer when one of them changes, so those stay editable. Projects, deals and invoices
   `SET_NULL` their contact, so deleting a person without merging loses
   those links. `wb groups` lists, creates

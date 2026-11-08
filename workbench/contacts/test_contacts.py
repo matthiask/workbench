@@ -18,7 +18,7 @@ from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
 from workbench.contacts import tasks
 from workbench.contacts.forms import GroupSearchForm
-from workbench.contacts.merge import merge_people
+from workbench.contacts.merge import merge_people, merge_warnings
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
 from workbench.deals.models import Deal
@@ -546,6 +546,14 @@ class ContactsTest(TestCase):
         self.assertEqual(keep.notes, "Keep\n\nDuplicate")
         self.assertEqual(keep.date_of_birth, dt.date(1980, 1, 1))
         self.assertIn("other@example.com", keep._fts)
+
+    def test_merge_warnings_recurring_invoices(self):
+        """Recurring invoices create invoices for their contact, merging their
+        contact into someone of another organization is a warning too"""
+        recurring = factories.RecurringInvoiceFactory.create()
+        keep = factories.PersonFactory.create()
+        warnings = merge_warnings(duplicate=recurring.contact, keep=keep)
+        self.assertEqual([code for _message, code in warnings], ["other-organization"])
 
     def test_merge_into_archived_person(self):
         """The person kept is only archived if both were archived"""
