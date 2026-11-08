@@ -146,6 +146,9 @@ warning (the commits after "Verification: Findings of the fourth round").
   the old one.
 - The Hochrechnung only extrapolates what is dated up to today.
 - Request bodies reject unknown fields (`InputSchema`).
+- The offer form neither removes invoiced services from the offer nor adds
+  them to it, like the service form of the project. Revisit if adding them
+  proves to be needed.
 
 ### Open, to decide
 
