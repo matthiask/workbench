@@ -2,7 +2,7 @@ import datetime as dt
 from collections import defaultdict
 
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.utils import timezone
 
 from workbench.invoices.models import Invoice, ProjectedInvoice
@@ -26,7 +26,12 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     )
     cost_per_project = sum_by(costs, key="service__project", field="cost")
     third_party_costs_per_project = sum_by(
-        costs.filter(third_party_costs__isnull=False, invoice_service__isnull=True),
+        # Not invoiced yet on the cutoff date
+        costs.filter(
+            Q(invoice_service__isnull=True)
+            | Q(invoice_service__invoice__invoiced_on__gt=cutoff_date),
+            third_party_costs__isnull=False,
+        ),
         key="service__project",
         field="third_party_costs",
     )

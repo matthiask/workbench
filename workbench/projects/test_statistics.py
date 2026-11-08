@@ -601,3 +601,32 @@ class StatisticsTest(TestCase):
         self.assertTrue(any("Concept" in cell for cell in cells))
         self.assertTrue(any("Delivered anyway" in cell for cell in cells))
         self.assertFalse(any("Unwanted" in cell for cell in cells))
+
+    def test_third_party_costs_at_a_past_cutoff_date(self):
+        """Third party costs which have been invoiced after the cutoff date
+        weren't invoiced yet at the cutoff date"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        factories.LoggedCostFactory.create(
+            service=service,
+            cost=500,
+            third_party_costs=400,
+            rendered_on=in_days(-30),
+        )
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+            invoiced_on=in_days(-5),
+        )
+        invoice.create_services_from_logbook([service])
+
+        def third_party_costs(cutoff_date):
+            [row] = project_budget_statistics.project_budget_statistics(
+                [project], cutoff_date=cutoff_date
+            )["statistics"]
+            return row["third_party_costs"]
+
+        self.assertEqual(third_party_costs(in_days(-10)), 400)
+        self.assertEqual(third_party_costs(None), 0)
