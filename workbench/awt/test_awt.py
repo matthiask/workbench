@@ -1078,6 +1078,35 @@ class AWTTest(TestCase):
         response = self.client.get(f"{overview}&export=pdf")
         self.assertEqual(response.status_code, 200)
 
+    def test_sickness_description_when_changing_the_reason(self):
+        """Changing the reason of a sickness absence with a description is a
+        warning: the description becomes visible to everyone"""
+        absence = factories.AbsenceFactory.create(
+            reason=Absence.SICKNESS, description="Doctor's appointment"
+        )
+        self.client.force_login(absence.user)
+        data = {
+            "modal-user": absence.user.pk,
+            "modal-starts_on": absence.starts_on.isoformat(),
+            "modal-days": 1,
+            "modal-description": "Doctor's appointment",
+            "modal-reason": "paid",
+        }
+        headers = {"x-requested-with": "XMLHttpRequest"}
+        response = self.client.post(absence.urls["update"], data, headers=headers)
+        self.assertContains(response, 'value="sickness-description-public"')
+        absence.refresh_from_db()
+        self.assertEqual(absence.reason, Absence.SICKNESS)
+
+        response = self.client.post(
+            absence.urls["update"],
+            data | {"modal-description": ""},
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 202)
+        absence.refresh_from_db()
+        self.assertEqual((absence.reason, absence.description), ("paid", ""))
+
     def test_absence_without_description(self):
         """Descriptions are optional"""
         absence = Absence.objects.create(

@@ -162,6 +162,20 @@ class AbsenceForm(ModelForm, WarningsForm):
                 code="outside-employment",
             )
 
+        # Only sickness descriptions are private
+        if (
+            self.instance.reason == Absence.SICKNESS
+            and data.get("reason") not in {None, Absence.SICKNESS}
+            and data.get("description")
+        ):
+            self.add_warning(
+                _(
+                    "The description becomes visible to everyone when the reason"
+                    " isn't sickness anymore. Clear it if it contains health data."
+                ),
+                code="sickness-description-public",
+            )
+
         return data
 
     def save(self, *args, **kwargs):
