@@ -1,7 +1,9 @@
 import datetime as dt
+import io
 
 from django.test import TestCase
 from django.utils.translation import deactivate_all
+from openpyxl import load_workbook
 
 from workbench import factories
 from workbench.deals.models import Deal
@@ -31,6 +33,27 @@ class SqueezeTest(TestCase):
         )
         offer.save()  # Recalculate the total
         return service
+
+    def test_xlsx_users_totals_row(self):
+        """The labels of the totals row of the users sheet are in the right
+        columns, also with internal types"""
+        InternalType.objects.create(name="Admin", percentage=10)
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.get(
+            f"/report/squeeze/?date_from={in_days(-1)}&date_until={in_days(1)}"
+            "&export=xlsx"
+        )
+        sheet = load_workbook(io.BytesIO(response.content))["users"]
+        header, totals = (
+            [cell.value for cell in row]
+            for row in sheet.iter_rows(min_row=2, max_row=3)
+        )
+        self.assertEqual(len(header), len(totals))
+        column = header.index("Target value: gross margin")
+        self.assertEqual(totals[column], "Target value w/ 150/h")
+        self.assertEqual(totals[column + 1], "Delta")
+        self.assertIsNone(header[column + 1])
 
     def test_offered_rate_only_uses_accepted_offers(self):
         """The rate based on accepted offers only uses their hours"""

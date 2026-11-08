@@ -883,6 +883,7 @@ def build_xlsx(data):
             "",
             totals["external_percentage"],
             _("Delta"),
+            "",
             _("Target value w/ {}/h").format(BASE_HOURLY_RATE),
             _("Delta"),
             "",
