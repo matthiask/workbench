@@ -1,4 +1,5 @@
 import datetime as dt
+import json
 import os
 import re
 import tempfile
@@ -1156,6 +1157,13 @@ planned_work:
             "Big deal",
             self.wb("deals", "search", "--contributor", self.user._short_name).output,
         )
+        for key in [deal.pk, deal.code]:
+            result = self.wb("deals", "show", key)
+            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertIn("Big deal", result.output)
+            self.assertIn(f"{self.user.get_short_name()} (", result.output)
+        result = self.wb("deals", "show", deal.pk, "--json")
+        self.assertEqual(json.loads(result.output)["id"], deal.pk)
 
         factories.ValueTypeFactory.create(title="Design")
         result = self.wb(
