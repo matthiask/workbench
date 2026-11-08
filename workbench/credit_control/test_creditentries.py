@@ -1,7 +1,9 @@
 import datetime as dt
+import importlib
 import os
 from decimal import Decimal
 
+from django.apps import apps
 from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
@@ -216,6 +218,33 @@ class CreditEntriesTest(TestCase):
             "Paid in two parts\n\n"
             "03.11.2026, bank account, 10.00: ACME AG 2026-0001\nSecond part",
         )
+
+    def test_backfill_payment_notice(self):
+        """Paid invoices without a payment notice get the details of their
+        credit entry or the date of the payment"""
+        backfill = importlib.import_module(
+            "workbench.invoices.migrations.0034_backfill_payment_notice"
+        ).backfill
+        with_entry, without_entry = factories.InvoiceFactory.create_batch(
+            2,
+            subtotal=10,
+            liable_to_vat=False,
+            status=Invoice.PAID,
+            closed_on=dt.date(2026, 11, 3),
+        )
+        factories.CreditEntryFactory.create(
+            invoice=with_entry,
+            total=10,
+            value_date=dt.date(2026, 11, 2),
+            payment_notice="ACME AG",
+        )
+        backfill(apps, None)
+        with_entry.refresh_from_db()
+        without_entry.refresh_from_db()
+        self.assertEqual(
+            with_entry.payment_notice, "02.11.2026, bank account, 10.00: ACME AG"
+        )
+        self.assertEqual(without_entry.payment_notice, "Bezahlt 03.11.2026")
 
     def test_payable_invoices(self):
         """Payments are only assigned to sent invoices, not to cancelled ones

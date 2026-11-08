@@ -219,7 +219,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   preparation, validated with the web interface's creation forms
   (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
   query parameters of the web views) and their defaults; sending them stays
-  in the web interface.
+  in the web interface. Paid and cancelled invoices require a payment notice;
+  assigning a credit entry writes its date, ledger, amount, payment notice
+  and notes into it (`CreditEntry.mark_invoice_as_paid()`).
   Values given by name have a listing which shows them with their ID
   (`wb projects internal-types`, `wb deals value-types`, `wb deals
   attributes`); internal types are taken by name or ID.

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:46+0100\n"
+"POT-Creation-Date: 2026-11-08 16:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2386,13 +2386,14 @@ msgstr "Kann Stapelrechnung mit einem Startdatum von {} oder früher nicht mehr 
 msgid "This creates %(count)s invoices for the periods since %(date)s. If the time in between shouldn't be invoiced, leave this recurring invoice ended and create a new one."
 msgstr "Damit werden %(count)s Rechnungen für die Perioden seit dem %(date)s erstellt. Falls die Zeit dazwischen nicht verrechnet werden soll, lass diese wiederkehrende Rechnung beendet und erstelle eine neue."
 
-#: workbench/invoices/models.py
-msgid "Sent"
-msgstr "Versendet"
-
+#: workbench/invoices/migrations/0034_backfill_payment_notice.py
 #: workbench/invoices/models.py
 msgid "Paid"
 msgstr "Bezahlt"
+
+#: workbench/invoices/models.py
+msgid "Sent"
+msgstr "Versendet"
 
 #: workbench/invoices/models.py
 #: workbench/templates/projects/_create_invoice_items.html
@@ -2472,6 +2473,10 @@ msgstr "Rechnungen vom Typ %(type)s benötigen zwingend ein Projekt."
 #: workbench/invoices/models.py
 msgid "Please provide a short reason for the invoice cancellation."
 msgstr "Bitte gib eine kurze Begründung für die Stornierung an."
+
+#: workbench/invoices/models.py
+msgid "Please provide a short payment notice, e.g. when and how the invoice has been paid."
+msgstr "Bitte gib eine kurze Zahlungsnotiz an, z.B. wann und wie die Rechnung bezahlt wurde."
 
 #: workbench/invoices/models.py
 msgid "Either fill in both fields or none."

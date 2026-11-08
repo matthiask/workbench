@@ -846,6 +846,11 @@ class InvoicesTest(TestCase):
         response = self.client.post(
             invoice.urls["update"], invoice_to_dict(invoice, status=Invoice.PAID)
         )
+        self.assertContains(response, "Please provide a short payment notice")
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, status=Invoice.PAID, payment_notice="Cash"),
+        )
         self.assertRedirects(response, invoice.urls["detail"])
 
         invoice.refresh_from_db()
@@ -1865,6 +1870,14 @@ class InvoicesTest(TestCase):
         self.assertContains(
             response, "Please provide a short reason for the invoice cancellation."
         )
+
+        # Payments need a notice too
+        response = self.client.post(
+            invoice.urls["settle"],
+            {"modal-status": Invoice.PAID, "modal-closed_on": ""},
+            headers=headers,
+        )
+        self.assertContains(response, "Please provide a short payment notice")
 
         response = self.client.post(
             invoice.urls["settle"],

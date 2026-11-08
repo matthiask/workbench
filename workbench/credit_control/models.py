@@ -90,7 +90,8 @@ class CreditEntry(Model):
                 None,
                 [
                     (
-                        f"{local_date_format(self.value_date)}, {self.ledger},"
+                        # Like the backfill in invoices/0034
+                        f"{local_date_format(self.value_date)}, {self.ledger.name},"
                         f" {currency(self.total)}: {self.payment_notice}"
                     ),
                     self.notes,

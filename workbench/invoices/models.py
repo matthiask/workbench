@@ -349,6 +349,12 @@ class Invoice(ModelWithTotal):
             errors["payment_notice"] = _(
                 "Please provide a short reason for the invoice cancellation."
             )
+        if self.status == Invoice.PAID and not self.payment_notice:
+            # Assigning credit entries writes their details
+            errors["payment_notice"] = _(
+                "Please provide a short payment notice, e.g. when and how the"
+                " invoice has been paid."
+            )
 
         if bool(self.service_period_from) != bool(self.service_period_until):
             errors["service_period_from"] = errors["service_period_until"] = _(
