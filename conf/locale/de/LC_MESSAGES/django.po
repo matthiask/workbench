@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 18:17+0100\n"
+"POT-Creation-Date: 2026-11-08 15:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -463,6 +463,10 @@ msgstr "Erwartet"
 #: workbench/accounts/views.py
 msgid "The API token has been deleted."
 msgstr "Das API-Token wurde gelöscht."
+
+#: workbench/api.py
+msgid "Not found."
+msgstr "Nicht gefunden."
 
 #: workbench/audit/admin.py workbench/planning/updates.py
 #: workbench/tools/history.py
@@ -1004,7 +1008,7 @@ msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: %(comman
 msgid "Unknown group %r."
 msgstr "Unbekannte Gruppe %r."
 
-#: workbench/contacts/api.py workbench/deals/api.py
+#: workbench/contacts/api.py workbench/deals/api.py workbench/tools/api.py
 #, python-format
 msgid "Unknown user %r."
 msgstr "Unbekannte:r Benutzer:in %r."
@@ -1631,6 +1635,10 @@ msgstr "Unbekannter oder fehlender Abschlussgrund. Auswahl: %s"
 #, python-format
 msgid "Unknown offer %r, expected an ID or a code like %s."
 msgstr "Unbekannte Offerte %r, erwartet wird eine ID oder ein Code wie %s."
+
+#: workbench/deals/api.py
+msgid "This deal has no related offers to settle."
+msgstr "Dieser Deal hat keine verknüpften Offerten, die erledigt werden könnten."
 
 #: workbench/deals/apps.py workbench/deals/models.py
 #: workbench/templates/base.html workbench/templates/shortcuts.html
@@ -3093,6 +3101,10 @@ msgstr "Notiz hinzufügen"
 msgid "Unknown service type %r."
 msgstr "Unbekannter Leistungstyp %r."
 
+#: workbench/offers/api.py workbench/projects/forms.py
+msgid "This service has been invoiced already, its effort type and rate cannot be changed."
+msgstr "Diese Leistung wurde bereits verrechnet, ihr Aufwandtyp und ihr Stundensatz können nicht geändert werden."
+
 #: workbench/offers/api.py
 msgid "Hours require an effort type and an hourly rate, e.g. from a service type."
 msgstr "Stunden benötigen eine Aufwandsart und einen Stundensatz, z.B. von einem Leistungstyp."
@@ -3170,6 +3182,11 @@ msgstr "Diese Offerte hat Planungseinträge nach der laufenden Woche. Sollen die
 #, python-format
 msgid "You are attempting to set status to '%(to)s', but the offer has already been closed on %(closed)s. Are you sure?"
 msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde schon am %(closed)s geschlossen. Bist Du sicher?"
+
+#: workbench/offers/forms.py
+#, python-format
+msgid "Some services have been invoiced already, they cannot be moved to another offer: %(services)s."
+msgstr "Einige Leistungen wurden bereits verrechnet, sie können nicht in eine andere Offerte verschoben werden: %(services)s."
 
 #: workbench/offers/forms.py
 msgid "You are setting the offer status to 'Declined'. However, if you just want to change a few things and send the offer to the client again then you could just as well put the offer back into preparation."
@@ -3612,13 +3629,13 @@ msgid "Total Capacity"
 msgstr "Gesamtkapazität"
 
 #: workbench/projects/api.py
+msgid "Select projects using ids, open or closed_since."
+msgstr "Wähle Projekte mit ids, open oder closed_since aus."
+
+#: workbench/projects/api.py
 #, python-format
 msgid "Unknown internal type %(name)r, use one of %(types)s."
 msgstr "Unbekannter interner Typ %(name)r, verwende einen von %(types)s."
-
-#: workbench/projects/api.py
-msgid "Select projects using ids, open or closed_since."
-msgstr "Wähle Projekte mit ids, open oder closed_since aus."
 
 #: workbench/projects/api.py
 msgid "Either the project or the offer is required."
@@ -3781,10 +3798,6 @@ msgstr "Offerten in Vorbereitung, welche bereits verschickt wurden, wurden abgel
 #: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."
 msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
-
-#: workbench/projects/forms.py
-msgid "This service has been invoiced already, its effort type and rate cannot be changed."
-msgstr "Diese Leistung wurde bereits verrechnet, ihr Aufwandtyp und ihr Stundensatz können nicht geändert werden."
 
 #: workbench/projects/forms.py
 msgid "This service has been invoiced already, it cannot be moved to another offer."
@@ -4071,6 +4084,10 @@ msgstr "Logbuch-Batch-Bearbeitung"
 #: workbench/reporting/api.py
 msgid "Expected a month like 2026-09."
 msgstr "Erwartet wird ein Monat wie 2026-09."
+
+#: workbench/reporting/api.py
+msgid "Either a user or the inactive users."
+msgstr "Entweder eine Person oder die inaktiven Nutzer:innen."
 
 #: workbench/reporting/models.py workbench/reporting/views.py
 msgid "cutoff date"
