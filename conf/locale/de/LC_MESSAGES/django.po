@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 15:31+0100\n"
+"POT-Creation-Date: 2026-11-08 15:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -612,8 +612,16 @@ msgid "%(user)s isn't employed during the whole absence. Absences outside employ
 msgstr "%(user)s ist nicht während der ganzen Abwesenheit angestellt. Abwesenheiten ausserhalb von Anstellungen zählen trotzdem als Arbeitszeit."
 
 #: workbench/awt/forms.py
-msgid "The description becomes visible to everyone when the reason isn't sickness anymore. Clear it if it contains health data."
-msgstr "Die Beschreibung wird für alle sichtbar, wenn der Grund nicht mehr Krankheit ist. Lösche sie, wenn sie Gesundheitsdaten enthält."
+msgid "The description would become visible to everyone when the reason isn't sickness anymore."
+msgstr "Die Beschreibung würde für alle sichtbar, wenn der Grund nicht mehr Krankheit ist."
+
+#: workbench/awt/forms.py
+msgid "Replace the absence with a new one without the description"
+msgstr "Die Absenz durch eine neue ohne Beschreibung ersetzen"
+
+#: workbench/awt/forms.py
+msgid "You cannot replace this absence."
+msgstr "Du kannst diese Absenz nicht ersetzen."
 
 #: workbench/awt/forms.py workbench/reporting/views.py
 #: workbench/templates/_needs_action.html

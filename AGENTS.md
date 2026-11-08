@@ -346,8 +346,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (`Absence.details_visible_to()`, `description_for()`, the `absences`
   template filters; absences can't be searched, the reason filter finds
   them). Changing the reason away from sickness while keeping the
-  description is a warning (`sickness-description-public`): the
-  description becomes public. `Absence.__str__` contains neither reason nor
+  description is an error (the description would become public) with a
+  link to a new absence with the new reason and without the description,
+  which replaces the old one when saved (`replaces`, only for those who may
+  delete it). `Absence.__str__` contains neither reason nor
   description. Planning and its mails use `public_text()`. The annual
   working time summary (balance, vacation, planned absences) is for
   everyone because it helps planning; the details of others (also

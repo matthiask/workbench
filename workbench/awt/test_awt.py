@@ -1078,34 +1078,73 @@ class AWTTest(TestCase):
         response = self.client.get(f"{overview}&export=pdf")
         self.assertEqual(response.status_code, 200)
 
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
     def test_sickness_description_when_changing_the_reason(self):
-        """Changing the reason of a sickness absence with a description is a
-        warning: the description becomes visible to everyone"""
+        """Changing the reason of a sickness absence with a description is an
+        error: the description would become visible to everyone. A new
+        absence without the description replaces it."""
         absence = factories.AbsenceFactory.create(
-            reason=Absence.SICKNESS, description="Doctor's appointment"
+            reason=Absence.SICKNESS,
+            days=2,
+            description="Doctor's appointment",
         )
-        self.client.force_login(absence.user)
+        headers = {"x-requested-with": "XMLHttpRequest"}
         data = {
             "modal-user": absence.user.pk,
             "modal-starts_on": absence.starts_on.isoformat(),
-            "modal-days": 1,
+            "modal-days": 2,
             "modal-description": "Doctor's appointment",
             "modal-reason": "paid",
         }
-        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        self.client.force_login(absence.user)
         response = self.client.post(absence.urls["update"], data, headers=headers)
-        self.assertContains(response, 'value="sickness-description-public"')
+        self.assertContains(response, "would become visible to everyone")
+        replace_url = (
+            Absence.urls["create"]
+            + f"?user={absence.user.pk}&amp;starts_on={absence.starts_on.isoformat()}"
+            + f"&amp;days=2&amp;reason=paid&amp;replaces={absence.pk}"
+        )
+        self.assertContains(response, f'href="{replace_url}"')
         absence.refresh_from_db()
         self.assertEqual(absence.reason, Absence.SICKNESS)
 
+        # The new absence starts without the description
+        replace_url = replace_url.replace("&amp;", "&")
+        response = self.client.get(replace_url, headers=headers)
+        self.assertContains(response, '<option value="paid" selected>')
+        self.assertNotContains(response, "Doctor&#x27;s appointment")
+
+        # Others may not replace it
+        self.client.force_login(factories.UserFactory.create())
         response = self.client.post(
-            absence.urls["update"],
-            data | {"modal-description": ""},
+            replace_url, data | {"modal-description": ""}, headers=headers
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Absence.objects.filter(pk=absence.pk).exists())
+
+        self.client.force_login(absence.user)
+        response = self.client.post(
+            replace_url, data | {"modal-description": ""}, headers=headers
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertFalse(Absence.objects.filter(pk=absence.pk).exists())
+        replacement = Absence.objects.get()
+        self.assertEqual(
+            (replacement.user, replacement.reason, replacement.days),
+            (absence.user, "paid", 2),
+        )
+
+        # Clearing the description while changing the reason is fine
+        sick = factories.AbsenceFactory.create(
+            user=absence.user, reason=Absence.SICKNESS, description="Flu"
+        )
+        response = self.client.post(
+            sick.urls["update"],
+            data | {"modal-description": "", "modal-days": 1},
             headers=headers,
         )
         self.assertEqual(response.status_code, 202)
-        absence.refresh_from_db()
-        self.assertEqual((absence.reason, absence.description), ("paid", ""))
 
     def test_absence_without_description(self):
         """Descriptions are optional"""

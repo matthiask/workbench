@@ -1,4 +1,5 @@
 import datetime as dt
+from urllib.parse import urlencode
 
 from django import forms
 from django.utils.html import format_html
@@ -97,6 +98,13 @@ class AbsenceForm(ModelForm, WarningsForm):
                 initial[field] = value
 
         super().__init__(*args, **kwargs)
+        # A sickness absence with a description which is replaced, see clean()
+        self.replaces = (
+            Absence.objects.filter(pk=pk).first()
+            if not self.instance.pk
+            and (pk := request.GET.get("replaces", "")).isdigit()
+            else None
+        )
         self.fields["user"].choices = User.objects.choices(collapse_inactive=False)
         self.fields["days"].help_text = format_html(
             '<a href="#" data-hours-button="{hours}">{hours}</a>',
@@ -162,19 +170,40 @@ class AbsenceForm(ModelForm, WarningsForm):
                 code="outside-employment",
             )
 
-        # Only sickness descriptions are private
+        # Only sickness descriptions are private. A new absence without the
+        # description replaces the absence instead.
         if (
-            self.instance.reason == Absence.SICKNESS
+            self.instance.pk
+            and self.instance.reason == Absence.SICKNESS
             and data.get("reason") not in {None, Absence.SICKNESS}
             and data.get("description")
         ):
-            self.add_warning(
-                _(
-                    "The description becomes visible to everyone when the reason"
-                    " isn't sickness anymore. Clear it if it contains health data."
+            params = {
+                "user": self.instance.user_id,
+                "starts_on": data.get("starts_on"),
+                "ends_on": data.get("ends_on"),
+                "days": data.get("days"),
+                "reason": data["reason"],
+                "replaces": self.instance.pk,
+            }
+            self.add_error(
+                "reason",
+                format_html(
+                    '{} <a href="{}?{}" data-ajaxmodal>{}</a>',
+                    _(
+                        "The description would become visible to everyone when"
+                        " the reason isn't sickness anymore."
+                    ),
+                    Absence.urls["create"],
+                    urlencode({
+                        key: value for key, value in params.items() if value is not None
+                    }),
+                    _("Replace the absence with a new one without the description"),
                 ),
-                code="sickness-description-public",
             )
+
+        if self.replaces and not Absence.allow_delete(self.replaces, self.request):
+            raise forms.ValidationError(_("You cannot replace this absence."))
 
         return data
 
@@ -182,7 +211,10 @@ class AbsenceForm(ModelForm, WarningsForm):
         self.instance.update_confirmation(
             self.request.user, changed_fields=self.changed_data
         )
-        return super().save(*args, **kwargs)
+        instance = super().save(*args, **kwargs)
+        if self.replaces:
+            self.replaces.delete()
+        return instance
 
 
 class CalendarFilterForm(Form):

@@ -141,9 +141,8 @@ warning (the commits after "Verification: Findings of the fourth round").
   still have the offered hours and cost and don't sum up their entries);
   invoicing the logbook warns about them.
 - Changing the reason of a sickness absence while keeping the description
-  is a warning (`sickness-description-public`). If that's not enough: an
-  error with a link to a new absence pre-filled with the data, replacing
-  the old one.
+  is an error with a link to a new absence without the description, which
+  replaces the old one.
 - The Hochrechnung only extrapolates what is dated up to today.
 - Request bodies reject unknown fields (`InputSchema`).
 - The offer form neither removes invoiced services from the offer nor adds
