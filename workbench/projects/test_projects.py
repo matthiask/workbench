@@ -12,7 +12,7 @@ from workbench.contacts.models import Organization
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
-from workbench.planning.models import PlannedWork
+from workbench.planning.models import ExternalWork, PlannedWork
 from workbench.projects.charts import projected_vs_invoiced_chart
 from workbench.projects.forms import delete_future_planned_work
 from workbench.projects.models import InternalType, Project, Service
@@ -1072,6 +1072,45 @@ class ProjectsTest(TestCase):
         self.assertEqual(spanning.planned_hours, 20)
         past.refresh_from_db()
         self.assertEqual(past.weeks, [this_week - dt.timedelta(days=7)])
+
+    def test_closing_with_future_external_work(self):
+        """Closing a project asks about its external work after the current
+        week too, and shortens or deletes it like planned work"""
+        project = factories.ProjectFactory.create()
+        this_week = monday()
+
+        def external_work(weeks):
+            return ExternalWork.objects.create(
+                project=project,
+                provided_by=project.customer,
+                title="Hosting",
+                weeks=weeks,
+                created_by=project.owned_by,
+            )
+
+        future = external_work([this_week + dt.timedelta(days=7)])
+        spanning = external_work([this_week, this_week + dt.timedelta(days=7)])
+        self.client.force_login(project.owned_by)
+        data = {
+            "customer": project.customer_id,
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "type": project.type,
+            "closed_on": in_days(-1).isoformat(),
+        }
+        response = self.client.post(project.urls["update"], data)
+        self.assertContains(
+            response,
+            "Please decide whether the linked planning entries should be deleted.",
+        )
+        response = self.client.post(
+            project.urls["update"], {**data, "delete_planned_work": "1"}
+        )
+        self.assertRedirects(response, project.urls["detail"])
+        self.assertFalse(ExternalWork.objects.filter(pk=future.pk).exists())
+        spanning.refresh_from_db()
+        self.assertEqual(spanning.weeks, [this_week])
 
     def test_closing_keeps_some_planned_hours(self):
         """Shortened planned work keeps at least the minimum of hours"""

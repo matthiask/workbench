@@ -143,6 +143,23 @@ class AbstractPlannedWork(Model):
         }
 
 
+class ExternalWorkQuerySet(SearchQuerySet):
+    def after_this_week(self):
+        """External work in weeks after the current one"""
+        this_week = monday()
+        return [work for work in self if any(week > this_week for week in work.weeks)]
+
+    def delete_after_this_week(self):
+        """Removes the weeks after the current one, like planned work"""
+        this_week = monday()
+        for work in self.after_this_week():
+            if past := [week for week in work.weeks if week <= this_week]:
+                work.weeks = past
+                work.save()
+            else:
+                work.delete()
+
+
 @model_urls
 class ExternalWork(AbstractPlannedWork):
     open_in_modal = True
@@ -159,6 +176,8 @@ class ExternalWork(AbstractPlannedWork):
         verbose_name=_("provided by"),
         related_name="external_work",
     )
+
+    objects = ExternalWorkQuerySet.as_manager()
 
     class Meta:
         ordering = ["-pk"]

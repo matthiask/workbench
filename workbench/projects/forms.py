@@ -488,14 +488,19 @@ class ProjectForm(ModelForm):
 
 
 def delete_future_planned_work(project):
-    """Removes the project's planned work after the current week"""
+    """Removes the project's planned and external work after the current
+    week"""
     project.planned_work.all().delete_after_this_week()
+    project.external_work.all().delete_after_this_week()
 
 
 def add_delete_planned_work_field(form, project):
-    """Asks about the future planned work of a project which is being
-    closed"""
-    if project.planned_work.all().after_this_week():
+    """Asks about the future planned and external work of a project which is
+    being closed"""
+    if (
+        project.planned_work.all().after_this_week()
+        or project.external_work.all().after_this_week()
+    ):
         form.fields["delete_planned_work"] = delete_planned_work_field(
             _("This project has planning entries after the current week. Delete them?")
         )

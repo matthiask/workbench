@@ -442,6 +442,13 @@ class ExternalWorkForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        # Like planned work
+        if not self.instance.pk and self.project.closed_on:
+            raise forms.ValidationError(_("The project is closed."))
+        if (weeks := data.get("weeks")) and future_weeks_on_closed_project(
+            self.project, self.instance.weeks or [], weeks
+        ):
+            self.add_error("weeks", _("The project is closed."))
 
         if (weeks := data.get("weeks")) and (milestone := data.get("milestone")):
             if after := [week for week in weeks if week >= monday(milestone.date)]:

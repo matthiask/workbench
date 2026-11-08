@@ -276,6 +276,49 @@ class PlanningTest(TestCase):
         )
         self.assertContains(response, "The project is closed.", status_code=422)
 
+        response = self.client.post(
+            project.urls["createexternalwork"],
+            {
+                "modal-provided_by": project.customer_id,
+                "modal-title": "Hosting",
+                "modal-weeks": [monday().isoformat()],
+            },
+            headers=headers,
+        )
+        self.assertContains(response, "The project is closed.")
+
+    def test_no_future_weeks_of_external_work_on_closed_projects(self):
+        """External work of closed projects isn't moved into future weeks,
+        like planned work"""
+        this_week = monday()
+        project = factories.ProjectFactory.create()
+        ew = ExternalWork.objects.create(
+            project=project,
+            provided_by=project.customer,
+            title="Hosting",
+            weeks=[this_week - dt.timedelta(days=7)],
+            created_by=project.owned_by,
+        )
+        project.closed_on = dt.date.today()
+        project.save()
+        self.client.force_login(project.owned_by)
+
+        def update(weeks):
+            return self.client.post(
+                ew.urls["update"],
+                {
+                    "modal-provided_by": project.customer_id,
+                    "modal-title": "Hosting",
+                    "modal-weeks": [week.isoformat() for week in weeks],
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        response = update([this_week + dt.timedelta(days=7)])
+        self.assertContains(response, "The project is closed.")
+        response = update([this_week - dt.timedelta(days=14)])
+        self.assertEqual(response.status_code, 202)
+
     def test_planned_work_far_ahead(self):
         """Planned work far ahead (e.g. imported) can be edited too"""
         service_types = factories.service_types()
