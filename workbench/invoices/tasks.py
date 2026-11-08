@@ -188,10 +188,19 @@ def autodunning():
 
     contacts = {}
     for invoice in invoices:
-        contacts.setdefault(invoice.contact, []).append(invoice)
+        # Invoices lose their contact when the person is deleted
+        contacts.setdefault((invoice.customer, invoice.contact), []).append(invoice)
     contact_details = "\n\n".join(
-        f"{contact.organization}\n{contact}\n{currency(sum(invoice.total_excl_tax for invoice in contact_invoices))}"
-        for contact, contact_invoices in contacts.items()
+        "\n".join(
+            str(line)
+            for line in [
+                contact.organization if contact else customer,
+                contact,
+                currency(sum(invoice.total_excl_tax for invoice in contact_invoices)),
+            ]
+            if line
+        )
+        for (customer, contact), contact_invoices in contacts.items()
     )
     cc = list({
         invoice.owned_by.email for invoice in invoices if invoice.owned_by.is_active

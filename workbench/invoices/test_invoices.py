@@ -1,6 +1,7 @@
 import datetime as dt
 from decimal import Decimal
 
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db.models import ProtectedError
 from django.test import TestCase
@@ -11,6 +12,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.invoices.models import Invoice
+from workbench.invoices.tasks import autodunning
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.reporting.utils import effort_cost_by_project
@@ -1583,6 +1585,21 @@ class InvoicesTest(TestCase):
 
         response = self.client.get("/invoices/reminders/")
         self.assertContains(response, "Not reminded yet", 1)
+
+    def test_autodunning_without_contact(self):
+        """Auto dunning lists overdue invoices without a contact (e.g. after
+        the person has been deleted) under their customer"""
+        factories.UserFactory.create()
+        factories.CreditEntryFactory.create()
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(-60),
+            due_on=in_days(-40),
+            status=Invoice.SENT,
+            contact=None,
+        )
+        autodunning()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(invoice.customer.name, mail.outbox[0].body)
 
     def test_postpone_reminders(self):
         """Postponing reminders removes invoices from the reminders list"""
