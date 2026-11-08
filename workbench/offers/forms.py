@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django import forms
 from django.contrib import messages
 from django.db.models import Q
@@ -223,6 +225,13 @@ class OfferForm(PostalAddressSelectionForm):
                         " being discarded?"
                     )
                 )
+
+    def clean_work_completed_on(self):
+        # Prohibits logging right away, a future date makes no sense
+        value = self.cleaned_data.get("work_completed_on")
+        if value and value > dt.date.today():
+            raise forms.ValidationError(_("Work cannot be completed in the future."))
+        return value
 
     def clean(self):
         data = super().clean()

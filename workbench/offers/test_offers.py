@@ -681,6 +681,35 @@ class OffersTest(TestCase):
         )
         self.assertRedirects(response, offer.get_absolute_url())
 
+    def test_work_completed_on_not_in_the_future(self):
+        """Work can't be completed in the future, the date prohibits logging
+        right away"""
+        offer = factories.OfferFactory.create(
+            title="Offer", postal_address="A\nStreet\nCity"
+        )
+        self.client.force_login(offer.owned_by)
+        data = {
+            "title": offer.title,
+            "owned_by": offer.owned_by_id,
+            "status": offer.status,
+            "postal_address": offer.postal_address,
+            "discount": "0",
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            WarningsForm.ignore_warnings_id: "on",
+        }
+        response = self.client.post(
+            offer.urls["update"],
+            data | {"work_completed_on": in_days(1).isoformat()},
+        )
+        self.assertContains(response, "Work cannot be completed in the future.")
+
+        response = self.client.post(
+            offer.urls["update"],
+            data | {"work_completed_on": dt.date.today().isoformat()},
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+
     def test_no_changes_to_services_of_sent_offers(self):
         """The services of offers which have been sent or accepted can't be
         repriced, added or removed (put them back into preparation first)"""

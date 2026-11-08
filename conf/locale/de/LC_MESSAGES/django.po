@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 15:49+0100\n"
+"POT-Creation-Date: 2026-11-08 16:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3193,6 +3193,10 @@ msgstr "Diese Offerte hat Planungseinträge nach der laufenden Woche. Sollen die
 #: workbench/offers/forms.py
 msgid "This offer has planning entries after the current week linked to it. Delete them now that the offer is being discarded?"
 msgstr "Diese Offerte hat Planungseinträge nach der laufenden Woche. Sollen diese jetzt, wo die Offerte verworfen wird, gelöscht werden?"
+
+#: workbench/offers/forms.py
+msgid "Work cannot be completed in the future."
+msgstr "Die Arbeit kann nicht in der Zukunft abgeschlossen werden."
 
 #: workbench/offers/forms.py
 #, python-format
