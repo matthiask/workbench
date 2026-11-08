@@ -209,6 +209,41 @@ class InvoicesTest(TestCase):
             response, "Some services have been invoiced from the offer already: Design"
         )
 
+    def test_services_invoiced_from_offer_with_logged_hours(self):
+        """Invoicing the offer links the hours logged so far, the lines still
+        count as invoiced from the offer"""
+        service = factories.ServiceFactory.create(
+            title="Design", effort_type="Design", effort_rate=100, effort_hours=10
+        )
+        project = service.project
+        factories.LoggedHoursFactory.create(service=service, hours=3)
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        ).create_services_from_offer([service])
+        factories.LoggedHoursFactory.create(service=service, hours=7)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            project.urls["createinvoice"] + "?type=services&source=logbook",
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "postal_address": "Anything\nStreet\nCity",
+                "selected_services": [service.pk],
+                "disable_logging": 0,
+            },
+        )
+        self.assertContains(
+            response, "Some services have been invoiced from the offer already: Design"
+        )
+
     def test_create_service_invoice_for_one_offer(self):
         """The menu of an offer creates invoices with its title, description and
         services, the latter only if there's something to invoice when

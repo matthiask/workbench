@@ -611,6 +611,7 @@ class Invoice(ModelWithTotal):
                 effort_hours=ps.effort_hours,
                 cost=ps.cost,
                 third_party_costs=ps.third_party_costs,
+                from_offer=True,
             )
             service.save(skip_related_model=True)
             ps.loggedhours.filter(archived_at__isnull=True).update(
@@ -699,6 +700,11 @@ class Service(ServiceBase):
         null=True,
         related_name="invoice_services",
         verbose_name=_("project service"),
+    )
+    # Invoicing the offer links the entries logged so far too, the lines
+    # don't say where they come from otherwise
+    from_offer = models.BooleanField(
+        _("invoiced from the offer"), default=False, editable=False
     )
 
     def get_absolute_url(self):

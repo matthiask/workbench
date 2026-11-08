@@ -6,7 +6,7 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
@@ -810,10 +810,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
             )
             from_logbook = self.request.GET.get("source") == "logbook"
             if from_logbook:
-                lines = lines.exclude(
-                    Exists(LoggedHours.objects.filter(invoice_service=OuterRef("pk")))
-                    | Exists(LoggedCost.objects.filter(invoice_service=OuterRef("pk")))
-                )
+                lines = lines.filter(from_offer=True)
             invoiced = self.project.services.filter(
                 id__in=selected, invoice_services__in=lines
             ).distinct()
