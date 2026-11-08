@@ -207,7 +207,7 @@ class Invoice(ModelWithTotal):
     payment_notice = models.TextField(
         _("payment notice"),
         blank=True,
-        help_text=_("This fields' value is overridden when processing credit entries."),
+        help_text=_("Assigning a credit entry adds its details."),
     )
 
     archived_at = models.DateTimeField(_("freezed at"), blank=True, null=True)

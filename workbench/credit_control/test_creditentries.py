@@ -185,6 +185,38 @@ class CreditEntriesTest(TestCase):
         entry.refresh_from_db()
         self.assertIsNone(entry.invoice)
 
+    def test_payment_notice(self):
+        """Assigning a credit entry adds its date, ledger, amount, payment
+        notice and notes to the invoice's payment notice"""
+        invoice = factories.InvoiceFactory.create(
+            subtotal=10,
+            liable_to_vat=False,
+            status=Invoice.SENT,
+            due_on=in_days(30),
+            payment_notice="Paid in two parts",
+        )
+        entry = factories.CreditEntryFactory.create(
+            total=10,
+            value_date=dt.date(2026, 11, 3),
+            payment_notice="ACME AG 2026-0001",
+        )
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post(
+            "/credit-control/assign/",
+            {
+                f"entry_{entry.pk}_invoice": invoice.pk,
+                f"entry_{entry.pk}_notes": "Second part",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.PAID)
+        self.assertEqual(
+            invoice.payment_notice,
+            "Paid in two parts\n\n"
+            "03.11.2026, bank account, 10.00: ACME AG 2026-0001\nSecond part",
+        )
+
     def test_payable_invoices(self):
         """Payments are only assigned to sent invoices, not to cancelled ones
         or to invoices in preparation (recurring invoices may create sent

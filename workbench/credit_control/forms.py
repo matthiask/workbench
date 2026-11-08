@@ -102,11 +102,7 @@ class CreditEntryForm(ModelForm):
 
     def save(self):
         instance = super().save()
-        if instance.invoice and instance.invoice.status != instance.invoice.PAID:
-            instance.invoice.status = instance.invoice.PAID
-            instance.invoice.closed_on = instance.value_date
-            instance.invoice.payment_notice = instance.payment_notice
-            instance.invoice.save()
+        instance.mark_invoice_as_paid()
         return instance
 
 
@@ -285,12 +281,7 @@ class AssignCreditEntriesForm(forms.Form):
             entry.invoice_id = self.cleaned_data.get(invoice_field) or None
             entry.notes = self.cleaned_data.get(notes_field, "")
             entry.save()
-
-            if entry.invoice and entry.invoice.status != entry.invoice.PAID:
-                entry.invoice.status = entry.invoice.PAID
-                entry.invoice.closed_on = entry.value_date
-                entry.invoice.payment_notice = entry.payment_notice
-                entry.invoice.save()
+            entry.mark_invoice_as_paid()
 
 
 class ExportDebtorsForm(Form):

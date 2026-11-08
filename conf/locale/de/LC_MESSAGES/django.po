@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:40+0100\n"
+"POT-Creation-Date: 2026-11-08 16:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2445,8 +2445,8 @@ msgid "Only used for statistical purposes."
 msgstr "Wird nur für statistische Auswertungen verwendet."
 
 #: workbench/invoices/models.py
-msgid "This fields' value is overridden when processing credit entries."
-msgstr "Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen überschrieben."
+msgid "Assigning a credit entry adds its details."
+msgstr "Das Zuweisen eines Zahlungseingangs fügt dessen Details hinzu."
 
 #: workbench/invoices/models.py
 msgid "freezed at"
@@ -6478,6 +6478,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "This fields' value is overridden when processing credit entries."
+#~ msgstr "Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen überschrieben."
 
 #~ msgid "Payments can only be assigned to sent invoices and to invoices in preparation with an invoice date."
 #~ msgstr "Zahlungen können nur versendeten Rechnungen und Rechnungen in Vorbereitung mit Rechnungsdatum zugewiesen werden."

@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.credit_control import parsers
 from workbench.invoices.models import Invoice
+from workbench.tools.formats import currency, local_date_format
 from workbench.tools.models import Model, MoneyField, SearchQuerySet
 from workbench.tools.urls import model_urls
 
@@ -77,6 +78,31 @@ class CreditEntry(Model):
 
     def __str__(self):
         return self.reference_number
+
+    def mark_invoice_as_paid(self):
+        """Marks the invoice as paid and adds the details of the payment to
+        its payment notice, they are useful later"""
+        invoice = self.invoice
+        if not invoice or invoice.status == invoice.PAID:
+            return
+        details = "\n".join(
+            filter(
+                None,
+                [
+                    (
+                        f"{local_date_format(self.value_date)}, {self.ledger},"
+                        f" {currency(self.total)}: {self.payment_notice}"
+                    ),
+                    self.notes,
+                ],
+            )
+        )
+        invoice.status = invoice.PAID
+        invoice.closed_on = self.value_date
+        invoice.payment_notice = "\n\n".join(
+            filter(None, [invoice.payment_notice, details])
+        )
+        invoice.save()
 
     def save(self, *args, **kwargs):
         self._fts = " ".join(str(part) for part in [self.invoice or "", self.total])
