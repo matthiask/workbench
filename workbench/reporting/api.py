@@ -111,8 +111,17 @@ def key_data(request, month: str | None = None):
 @router.get("/cash-data/", include_in_schema=False)
 @router.get("/reports/cash-data/")
 def cash_data_api(request, date: dt.date | None = None):
-    """Cash data as of the given date, today by default"""
-    return jsonable(cash_data(date or dt.date.today()))
+    """Cash data as of the given date, today by default (not in the future)"""
+    today = dt.date.today()
+    if date and date > today:
+        # Open invoices, overdue projections etc. depend on what has happened
+        raise ValidationError([
+            {
+                "loc": ["query", "date"],
+                "msg": _("Cash data can't be computed for the future."),
+            }
+        ])
+    return jsonable(cash_data(date or today))
 
 
 # The reports below are for users only, with the features of the web

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:20+0100\n"
+"POT-Creation-Date: 2026-11-08 16:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4114,6 +4114,10 @@ msgstr "Logbuch-Batch-Bearbeitung"
 #: workbench/reporting/api.py
 msgid "Expected a month like 2026-09."
 msgstr "Erwartet wird ein Monat wie 2026-09."
+
+#: workbench/reporting/api.py
+msgid "Cash data can't be computed for the future."
+msgstr "Liquiditätsdaten können nicht für die Zukunft berechnet werden."
 
 #: workbench/reporting/api.py
 msgid "Either a user or the inactive users."

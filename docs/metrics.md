@@ -223,7 +223,7 @@ web interface; the static reporting token gets everything.
 
 ### Cash data API (no web UI label)
 
-`GET /api/reports/cash-data/?date=YYYY-MM-DD` (also `/api/cash-data/`, hidden). Auth: `ReportingToken` or CONTROLLING. Default today. Floats via `jsonable()`. `workbench/reporting/cash_data_api.py:cash_data`
+`GET /api/reports/cash-data/?date=YYYY-MM-DD` (also `/api/cash-data/`, hidden). Auth: `ReportingToken` or CONTROLLING. Default today; future dates are an error (open invoices and overdue projections depend on what has happened). Floats via `jsonable()`. `workbench/reporting/cash_data_api.py:cash_data`
 Answers: what money is owed to the agency and what is expected to be invoiced, as of a date.
 
 `is_current` = date ≥ Monday of the current week. Cutoff = max(date, today) if current, else date. Projections/offers/work-not-invoiced are only returned when current (null otherwise) because they aren't versioned.

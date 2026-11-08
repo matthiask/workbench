@@ -42,6 +42,16 @@ class CashDataAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
 
     @travel("2026-10-28 08:00")
+    def test_future_date(self):
+        """Cash data can't be computed for the future"""
+        url = "/api/reports/cash-data/"
+        response = self.client.get(url + "?date=2026-10-29", headers=AUTH)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["query", "date"])
+        response = self.client.get(url + "?date=2026-10-28", headers=AUTH)
+        self.assertEqual(response.status_code, 200)
+
+    @travel("2026-10-28 08:00")
     def test_open_invoices(self):
         """Open invoices are totalled and grouped by the ISO week they are due"""
         invoice(
