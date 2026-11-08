@@ -393,10 +393,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Web views and API share `RelatedOfferForm` in `workbench/deals/forms.py`.
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
-  weight. The API adds the owner with weight 100 when creating or updating
-  deals; changing the owner adds the new one, the old owner stays until
-  removed (`contributions` by short name, `wb deals update --contribution
-  ab=0`).
+  weight. The API adds the owner with weight 100 when creating deals;
+  changing the owner moves the old owner's contribution to the new one
+  (`DealForm.clean()`, web and API) unless the contributions of either are
+  changed too (`contributions` by short name, `wb deals update
+  --contribution ab=0`).
 - The audit log (`LoggedAction`, filled by a database trigger) stores
   `row_data` and `changed_fields` as hstore keyed by column name. Renaming a
   field or column loses its history: old entries keep the old key. Only

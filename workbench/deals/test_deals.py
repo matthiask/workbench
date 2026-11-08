@@ -64,6 +64,29 @@ class DealsTest(TestCase):
         response = self.client.post("/deals/create/", data)
         self.assertEqual(response.status_code, 302)
 
+    def test_changing_the_owner_moves_the_contribution(self):
+        """A new owner takes over the old owner's contribution unless the
+        contributions are changed too"""
+        old = factories.UserFactory.create()
+        new = factories.UserFactory.create()
+        deal = factories.DealFactory.create(owned_by=old, probability=Deal.NORMAL)
+        deal.contributions.create(user=old, weight=50)
+        self.client.force_login(old)
+        data = {
+            "customer": deal.customer_id,
+            "contact": deal.contact_id or "",
+            "title": deal.title,
+            "probability": deal.probability,
+            "owned_by": new.pk,
+            f"user_{old.pk}_contribution": 50,
+            f"user_{new.pk}_contribution": 0,
+        }
+        response = self.client.post(deal.urls["update"], data)
+        self.assertRedirects(response, deal.urls["detail"])
+        self.assertEqual(
+            dict(deal.contributions.values_list("user", "weight")), {new.pk: 50}
+        )
+
     def test_contributor_filter(self):
         """Deals can be filtered by their contributors, not just the owner"""
         deal = factories.DealFactory.create(title="Contributed")

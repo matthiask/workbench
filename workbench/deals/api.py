@@ -581,9 +581,9 @@ def deal_create(
 ):
     """Create a deal, validated like in the web interface
 
-    You are its main driving force. Warnings of the web interface are errors
-    here unless ignored by their code; nothing is saved if anything is
-    invalid or with ``dry_run``."""
+    Its owner (you by default) is its main driving force. Warnings of the
+    web interface are errors here unless ignored by their code; nothing is
+    saved if anything is invalid or with ``dry_run``."""
     errors = []
 
     def error(loc, msg):
@@ -713,9 +713,11 @@ def deal_update(
         if user := _user_by_short_name(patch["owned_by"], ["owned_by"], error):
             values["owned_by"] = user.pk
     # The owner contributes to the deal, also when the deal is older than
-    # this rule
-    field = f"user_{values['owned_by']}_contribution"
-    values[field] = values.get(field) or 100
+    # this rule. A new owner takes over the old owner's contribution in the
+    # form (unless contributions are given).
+    if values["owned_by"] == deal.owned_by_id:
+        field = f"user_{values['owned_by']}_contribution"
+        values[field] = values.get(field) or 100
     for short_name, weight in data.contributions.items():
         user = User.objects.by_short_name(short_name).first()
         # Active users and those contributing already, like in the form

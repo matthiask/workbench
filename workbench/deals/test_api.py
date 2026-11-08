@@ -313,7 +313,8 @@ class DealsAPITest(TestCase):
 
     def test_update_contributions(self):
         """Contributions are changed by the short names of the users, a
-        new owner is added to them"""
+        new owner takes over the contribution of the old owner unless
+        contributions are given too"""
         owner = factories.UserFactory.create(_short_name="ab")
         other = factories.UserFactory.create(_short_name="cd")
         deal = factories.DealFactory.create(owned_by=owner)
@@ -327,8 +328,18 @@ class DealsAPITest(TestCase):
         response = patch({"owned_by": "cd"})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(
+            response.json()["contributions"], [{"user": "cd", "weight": 100}]
+        )
+        response = patch({"owned_by": "ab", "contributions": {"ab": 50}})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
             response.json()["contributions"],
-            [{"user": "ab", "weight": 100}, {"user": "cd", "weight": 100}],
+            [{"user": "ab", "weight": 50}, {"user": "cd", "weight": 100}],
+        )
+        response = patch({"owned_by": "cd"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["contributions"], [{"user": "cd", "weight": 100}]
         )
 
         response = patch({"contributions": {"AB": 0, "cd": 50}})
@@ -387,13 +398,11 @@ class DealsAPITest(TestCase):
         # Contributions stay as they were
         self.assertEqual(list(deal.contributors.all()), [user])
 
-        # A new owner contributes too
+        # A new owner takes over the contribution
         factories.UserFactory.create(_short_name="cd")
         response = patch({"owned_by": "cd"})
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(
-            sorted(u._short_name for u in deal.contributors.all()), ["ab", "cd"]
-        )
+        self.assertEqual(sorted(u._short_name for u in deal.contributors.all()), ["cd"])
         response = patch({"owned_by": "ab"})
         self.assertEqual(response.status_code, 200, response.content)
 

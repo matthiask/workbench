@@ -307,6 +307,23 @@ class DealForm(ModelForm):
                 _("This field is required when probability is high."),
             )
         owner = data.get("owned_by")
+        previous = self.instance.owned_by if self.instance.pk else None
+        if owner and previous and owner != previous:
+            # The new owner takes over the old owner's contribution, unless
+            # the contributions of either of them are changed too
+            fields = {
+                f"user_{previous.pk}_contribution",
+                f"user_{owner.pk}_contribution",
+            }
+            if fields <= set(self.fields) and not fields & set(self.changed_data):
+                old_field, new_field = (
+                    f"user_{previous.pk}_contribution",
+                    f"user_{owner.pk}_contribution",
+                )
+                data[new_field] = (
+                    max(data.get(old_field) or 0, data.get(new_field) or 0) or 100
+                )
+                data[old_field] = 0
         if (
             owner
             and (field := f"user_{owner.pk}_contribution") in self.fields

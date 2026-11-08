@@ -603,7 +603,7 @@ def create_deal(
     dry_run,
     as_json,
 ):
-    """Create a deal, you are its main driving force
+    """Create a deal, its owner (you by default) is its main driving force
 
     Find the customer and the contact with `wb contacts search`. Unknown
     value types and attributes are rejected with a list of the choices."""
