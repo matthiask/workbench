@@ -1,4 +1,5 @@
 import datetime as dt
+from urllib.parse import urlencode
 
 from django.apps import apps
 from django.contrib import messages
@@ -20,7 +21,7 @@ from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.models import Project
 from workbench.search import list_url, search_sources
-from workbench.tools.history import HISTORY, changes
+from workbench.tools.history import HISTORY, changes, generic_related
 from workbench.tools.validation import in_days
 
 
@@ -237,9 +238,13 @@ def history(request, db_table, attribute, id):
         related = [
             (
                 capfirst(model._meta.verbose_name_plural),
-                reverse("history", args=(model._meta.db_table, attribute, id)),
+                reverse("history", args=(model._meta.db_table, attribute, id))
+                + (f"?{urlencode(filters[0])}" if filters else ""),
             )
-            for model, attribute in cfg.get("related", [])
+            for model, attribute, *filters in [
+                *cfg.get("related", []),
+                *generic_related(model, request.user),
+            ]
         ]
     else:
         title = _("%(model)s with %(attribute)s=%(id)s") % {
@@ -248,7 +253,17 @@ def history(request, db_table, attribute, id):
             "id": id,
         }
 
-    actions = LoggedAction.objects.for_model(model).with_data(**{attribute: id})
+    filters = {attribute: id}
+    if attribute != "id":
+        # Generic relations need the content type too
+        for key in cfg.get("generic", ()):
+            if (value := request.GET.get(key, "")).isdigit():
+                filters[key] = value
+    actions = LoggedAction.objects.for_model(model).with_data(**filters)
+    if restrict := cfg.get("actions"):
+        actions = restrict(actions)
+    if instance and (allow := cfg.get("allow")) and not allow(instance):
+        raise Http404
 
     return render(
         request,

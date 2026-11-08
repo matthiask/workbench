@@ -36,6 +36,7 @@ from workbench.invoices.models import (
     Service as InvoiceService,
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
+from workbench.notes.models import TARGETS as NOTE_TARGETS, Note, visible_content_types
 from workbench.offers.models import Offer
 from workbench.planning.models import (
     ExternalWork,
@@ -529,6 +530,40 @@ WITH_TOTAL = {
     "show_service_details",
 }
 
+
+def _notes_note_cfg(user):
+    # Only notes of objects the user may see, also of deleted notes
+    visible = visible_content_types(user)
+    types = [str(pk) for pk in visible]
+    return {
+        "allow": lambda note: note.content_type_id in visible,
+        "fields": {
+            "title",
+            "description",
+            "created_by",
+            "created_at",
+            "content_type",
+            "object_id",
+        },
+        "actions": lambda actions: actions.filter(row_data__content_type_id__in=types),
+        # The notes of an object are found by object_id and content_type_id
+        "generic": {"content_type_id"},
+    }
+
+
+def generic_related(model, user):
+    """Related objects through generic relations (notes) as
+    ``(model, attribute, filters)``"""
+    from django.contrib.contenttypes.models import ContentType
+
+    if model not in {target for target, _feature in NOTE_TARGETS.values()}:
+        return []
+    content_type = ContentType.objects.get_for_model(model)
+    if content_type.pk not in visible_content_types(user):
+        return []
+    return [(Note, "object_id", {"content_type_id": content_type.pk})]
+
+
 HISTORY = {
     User: _accounts_user_cfg,
     Team: {"fields": EVERYTHING},
@@ -586,4 +621,5 @@ HISTORY = {
     InternalType: {"fields": EVERYTHING},
     InternalTypeUser: {"fields": EVERYTHING},
     CostCenter: _reporting_costcenter_cfg,
+    Note: _notes_note_cfg,
 }

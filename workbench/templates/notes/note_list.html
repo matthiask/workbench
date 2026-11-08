@@ -2,9 +2,13 @@
 {% load workbench %}
 {% block rows %}
   {% for object in object_list %}
-    <a href="{{ object.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+    <div class="list-group-item list-group-item-action wb-row position-relative">
+      <a href="{{ object.get_absolute_url }}" class="stretched-link" aria-label="{{ object.title }}"></a>
       <div class="wb-row-main">
-        <div class="wb-row-title">{{ object.title }}</div>
+        <div class="wb-row-title">
+          {{ object.title }}
+          <span class="position-relative z-2">{% history_link object %}</span>
+        </div>
         <div class="wb-row-meta">
           <span>{{ object.content_object }}</span>
           <span>{{ object.created_by }}</span>
@@ -12,6 +16,6 @@
         <div class="wb-row-meta">{{ object.description|truncatechars:200 }}</div>
       </div>
       <div class="wb-row-aside wb-row-meta">{{ object.created_at|local_date_format }}</div>
-    </a>
+    </div>
   {% endfor %}
 {% endblock rows %}

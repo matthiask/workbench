@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import deactivate_all
 
 from workbench import factories
@@ -322,3 +323,58 @@ class NotesTest(TestCase):
             content_object_url(Note(content_type=content_type, object_id=42)),
             "service type",
         )
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.USER})
+    def test_history(self):
+        """Notes have a history, also deleted ones are found through the
+        history of their object; only with the feature of their object"""
+        project = factories.ProjectFactory.create()
+        user = project.owned_by
+        user._features.append(FEATURES.CONTROLLING)
+        user.save()
+        invoice = factories.InvoiceFactory.create()
+        note = Note.objects.create(
+            content_object=project, created_by=user, title="Kickoff"
+        )
+        secret = Note.objects.create(
+            content_object=invoice, created_by=user, title="Dunning"
+        )
+        self.client.force_login(user)
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        note_history = reverse("history", args=("notes_note", "id", note.pk))
+        for url in ["/notes/", project.get_absolute_url()]:
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), note_history)
+        response = self.client.get(note_history, headers=headers)
+        self.assertContains(response, "Kickoff")
+
+        # The project's history links to the history of its notes
+        content_type = ContentType.objects.get_for_model(project)
+        notes_history = (
+            reverse("history", args=("notes_note", "object_id", project.pk))
+            + f"?content_type_id={content_type.pk}"
+        )
+        response = self.client.get(
+            reverse("history", args=("projects_project", "id", project.pk)),
+            headers=headers,
+        )
+        self.assertContains(response, notes_history.replace("&", "&amp;"))
+        note.delete()
+        response = self.client.get(notes_history, headers=headers)
+        self.assertContains(response, "Kickoff")
+        self.assertNotContains(response, "Dunning")
+
+        # Notes of invoices only with the controlling feature
+        other = factories.UserFactory.create()
+        self.client.force_login(other)
+        response = self.client.get(
+            reverse("history", args=("notes_note", "id", secret.pk)), headers=headers
+        )
+        self.assertNotContains(response, "Dunning", status_code=response.status_code)
+        response = self.client.get(
+            reverse("history", args=("notes_note", "object_id", invoice.pk))
+            + f"?content_type_id={ContentType.objects.get_for_model(invoice).pk}",
+            headers=headers,
+        )
+        self.assertNotContains(response, "Dunning", status_code=response.status_code)

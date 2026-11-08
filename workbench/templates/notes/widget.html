@@ -17,6 +17,7 @@
         <div class="d-flex justify-content-between align-items-start gap-2">
           <div class="min-w-0">
             <strong>{{ note.title }}</strong>
+            {% history_link note %}
             <div class="wb-meta-label">{{ note.created_by }} &middot; {{ note.created_at|local_date_format }}</div>
           </div>
           <a href="{{ note.urls.update }}" class="btn btn-quiet btn-sm" data-ajaxmodal>{% translate 'Update' %}</a>
