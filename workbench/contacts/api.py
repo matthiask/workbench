@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from ninja import Field, Query, Router, Schema
+from ninja import Field, P, Query, Router, Schema
 from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
@@ -29,7 +29,9 @@ from workbench.contacts.models import (
 from workbench.contacts.reassign import primary_contact_suggestions
 from workbench.tools.api import (
     IGNORE_WARNINGS,
+    DryRun,
     InputSchema,
+    OrganizationID,
     SearchQuery,
     Serialized,
     full_clean,
@@ -135,7 +137,7 @@ def person_list_out(person, request):
 
 class OrganizationFilter(Schema):
     q: SearchQuery = ""
-    include_archived: bool = False
+    include_archived: bool = Field(default=False, description="Also archived contacts.")
 
 
 @router.get("/contacts/organizations/", response=list[OrganizationOut])
@@ -153,7 +155,7 @@ def organization_list(request, filters: Query[OrganizationFilter]):
 
 
 class PersonFilter(OrganizationFilter):
-    organization: int | None = None
+    organization: OrganizationID = None
     group: str | None = Field(
         default=None,
         description="Title or ID of a group; also people who are in it through"
@@ -518,8 +520,13 @@ def person_create(
     request,
     data: PersonIn,
     *,
-    dry_run: bool = False,
-    allow_duplicates: bool = False,
+    dry_run: DryRun = False,
+    allow_duplicates: Query[
+        bool,
+        P(
+            description="Create the person although someone with the same name or email address exists."
+        ),
+    ] = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create a person with their contact details, and their organization
@@ -596,7 +603,7 @@ def person_create(
 
 @router.post("/contacts/people/{int:person_id}/details/", response=PersonCreated)
 def person_add_details(
-    request, person_id: int, data: DetailsIn, *, dry_run: bool = False
+    request, person_id: int, data: DetailsIn, *, dry_run: DryRun = False
 ):
     """Add email addresses, phone numbers and postal addresses to a person
 
@@ -649,7 +656,9 @@ class PersonPatch(InputSchema):
 
 
 @router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
-def person_update(request, person_id: int, data: PersonPatch, *, dry_run: bool = False):
+def person_update(
+    request, person_id: int, data: PersonPatch, *, dry_run: DryRun = False
+):
     """Change the primary contact and the groups of a person or archive them,
     with the rules of the person form; contact details are added with
     ``details/``"""
@@ -720,7 +729,7 @@ def person_merge(
     person_id: int,
     data: MergeIn,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Merge a duplicate into the person to keep, like deleting a person in
@@ -847,7 +856,7 @@ def _group_values(group, request):
 
 
 @router.post("/contacts/groups/", response=GroupOut)
-def group_create(request, data: GroupIn, *, dry_run: bool = False):
+def group_create(request, data: GroupIn, *, dry_run: DryRun = False):
     """Create a group, e.g. for a mailing"""
     group = Group()
     values = _group_values(group, request) | data.dict()
@@ -855,7 +864,7 @@ def group_create(request, data: GroupIn, *, dry_run: bool = False):
 
 
 @router.patch("/contacts/groups/{int:group_id}/", response=GroupOut)
-def group_update(request, group_id: int, data: GroupPatch, *, dry_run: bool = False):
+def group_update(request, group_id: int, data: GroupPatch, *, dry_run: DryRun = False):
     """Rename or archive a group, or let it apply to organizations"""
     group = get_object_or_404(Group, pk=group_id)
     values = _group_values(group, request) | data.dict(
@@ -980,7 +989,7 @@ class ReassignOut(Schema):
 
 
 @router.post("/contacts/people/reassign/", response=ReassignOut)
-def person_reassign(request, data: ReassignIn, *, dry_run: bool = False):
+def person_reassign(request, data: ReassignIn, *, dry_run: DryRun = False):
     """Reassign the active people of a user to another active user or to the
     suggestions, e.g. when someone left"""
     if bool(data.to) == data.suggested:

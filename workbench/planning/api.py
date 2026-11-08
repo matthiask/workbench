@@ -31,6 +31,7 @@ from workbench.projects.models import Project
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     DateRangeFilter,
+    DryRun,
     Hours,
     ProjectID,
     UsersFilter,
@@ -450,7 +451,7 @@ def _existing(objects, ids, loc, errors, what):
 
 @router.post("/projects/{project_id}/planning/import/", response=ImportResult)
 def planning_import(  # noqa: C901
-    request, project_id: int, data: PlanningImport, *, dry_run: bool = False
+    request, project_id: int, data: PlanningImport, *, dry_run: DryRun = False
 ):
     """Add, update and delete milestones and planned work of the project
 
@@ -577,7 +578,7 @@ def planning_import(  # noqa: C901
 
 @router.post("/projects/{project_id}/planning/work/", response=ImportResult)
 def planned_work_create(
-    request, project_id: int, data: PlannedWorkIn, *, dry_run: bool = False
+    request, project_id: int, data: PlannedWorkIn, *, dry_run: DryRun = False
 ):
     """Add planned work to the project"""
     if data.id is not None:
@@ -599,7 +600,7 @@ def _planned_work(work_id):
 
 @router.patch("/planning/work/{int:work_id}/", response=ImportResult)
 def planned_work_update(
-    request, work_id: int, data: PlannedWorkPatch, *, dry_run: bool = False
+    request, work_id: int, data: PlannedWorkPatch, *, dry_run: DryRun = False
 ):
     """Change single fields of planned work"""
     pw = _planned_work(work_id)
@@ -623,7 +624,7 @@ def planned_work_update(
 
 
 @router.delete("/planning/work/{int:work_id}/", response=ImportResult)
-def planned_work_delete(request, work_id: int, *, dry_run: bool = False):
+def planned_work_delete(request, work_id: int, *, dry_run: DryRun = False):
     """Delete planned work"""
     pw = _planned_work(work_id)
     if not dry_run:
@@ -633,7 +634,7 @@ def planned_work_delete(request, work_id: int, *, dry_run: bool = False):
 
 class PlanningExportFilter(DateRangeFilter, UsersFilter):
     project: ProjectID = None
-    campaign: int | None = None
+    campaign: int | None = Field(default=None, description="ID of the campaign.")
 
 
 def _mondays(date_from, date_until):

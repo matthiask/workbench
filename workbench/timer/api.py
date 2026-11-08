@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import localdate, localtime, make_aware
 from django.utils.translation import gettext as _
-from ninja import Field, Router, Schema
+from ninja import Field, P, Query, Router, Schema
 from ninja.errors import HttpError, ValidationError
 
 from workbench.logbook.models import LoggedHours
@@ -206,7 +206,13 @@ def timestamp_delete_latest(request):
 
 
 @router.delete("/timestamps/{timestamp}/", response=TimestampOut)
-def timestamp_delete(request, timestamp: str, day: dt.date | None = None):
+def timestamp_delete(
+    request,
+    timestamp: str,
+    day: Query[
+        dt.date | None, P(description="The day of the timestamp, today by default.")
+    ] = None,
+):
     """Delete a timestamp by its code (T1, T2, ... of the day, today by
     default) or its ID, both are in the list of slices"""
     timestamps = Timestamp.objects.filter(user=request.user)
@@ -235,7 +241,10 @@ class TimestampList(Schema):
 
 
 @router.get("/timestamps/", response=TimestampList)
-def timestamp_list(request, day: dt.date | None = None):
+def timestamp_list(
+    request,
+    day: Query[dt.date | None, P(description="The day, today by default.")] = None,
+):
     """The slices of a day (today by default) made of timestamps, logged hours
     and breaks, like on the timestamps page
 

@@ -35,6 +35,7 @@ from workbench.tools.api import (
     IGNORE_WARNINGS,
     Amount,
     DateRangeFilter,
+    DryRun,
     InputSchema,
     OrganizationID,
     SearchQuery,
@@ -161,7 +162,9 @@ def with_related(deals):
 
 class DealFilter(DateRangeFilter):
     q: SearchQuery = ""
-    status: Literal["open", "accepted", "declined"] | None = None
+    status: Literal["open", "accepted", "declined"] | None = Field(
+        default=None, description="open (default), accepted or declined."
+    )
     customer: OrganizationID = None
     owned_by: ShortName = None
     contributor: str | None = Field(
@@ -576,7 +579,7 @@ def deal_create(
     request,
     data: DealIn,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create a deal, validated like in the web interface
@@ -683,7 +686,7 @@ def deal_update(
     deal_id: int,
     data: DealPatch,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change a deal, validated like in the web interface
@@ -770,7 +773,7 @@ def deal_status(
     deal_id: int,
     data: DealStatusIn,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Close (accept or decline) or reopen a deal like in the web interface,
@@ -918,7 +921,7 @@ def deal_offers_add(
     deal_id: int,
     data: RelatedOffers,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Link offers to an open deal like in the web interface
@@ -940,7 +943,7 @@ def deal_offers_add(
 
 @router.post("/deals/{deal_id}/offers/remove/", response=DealOut)
 def deal_offers_remove(
-    request, deal_id: int, data: RelatedOffers, *, dry_run: bool = False
+    request, deal_id: int, data: RelatedOffers, *, dry_run: DryRun = False
 ):
     """Unlink offers from an open deal like in the web interface
 

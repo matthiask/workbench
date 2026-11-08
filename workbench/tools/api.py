@@ -6,7 +6,7 @@ from typing import Annotated
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from ninja import Query, Schema
+from ninja import P, Query, Schema
 from ninja.errors import ValidationError as NinjaValidationError
 from ninja.pagination import LimitOffsetPagination
 from pydantic import ConfigDict, Field, PlainSerializer
@@ -119,6 +119,11 @@ ShortName = Annotated[
     Field(description="Short name of a user, case-insensitive (see /api/users/)."),
 ]
 OrganizationID = Annotated[int | None, Field(description="ID of the organization.")]
+# Parameters of endpoints (not of filter schemas)
+DryRun = Query[
+    bool,
+    P(description="Validate only, nothing is saved; the response shows the result."),
+]
 ProjectID = Annotated[int | None, Field(description="ID of the project.")]
 
 

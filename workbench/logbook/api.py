@@ -64,8 +64,8 @@ class LoggedHoursFilter(DateRangeFilter):
     q: SearchQuery = ""
     project: ProjectID = None
     customer: OrganizationID = None
-    offer: int | None = None
-    service: int | None = None
+    offer: int | None = Field(default=None, description="ID of the offer.")
+    service: int | None = Field(default=None, description="ID of the service.")
     rendered_by: ShortName = None
     invoiced: bool | None = Field(
         default=None, description="Only entries which are (not) on an invoice"
@@ -169,7 +169,7 @@ class LoggedCostPagination(TotalsPagination):
 
 
 class LoggedCostFilter(LoggedHoursFilter):
-    expenses: bool = False
+    expenses: bool = Field(default=False, description="Only costs which are expenses.")
 
 
 @router.get("/logbook/costs/", response=list[LoggedCostOut])

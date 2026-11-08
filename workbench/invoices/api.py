@@ -36,6 +36,7 @@ from workbench.projects.models import Project
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     DateRangeFilter,
+    DryRun,
     InputSchema,
     OrganizationID,
     ProjectID,
@@ -170,10 +171,18 @@ class InvoiceFilter(DateRangeFilter):
     project: ProjectID = None
     customer: OrganizationID = None
     owned_by: ShortName = None
-    type: InvoiceType | None = None
-    status: InvoiceStatus | None = None
-    open: bool = False
-    overdue: bool = False
+    type: InvoiceType | None = Field(
+        default=None, description="Invoice type, see /api/choices/."
+    )
+    status: InvoiceStatus | None = Field(
+        default=None, description="Invoice status, see /api/choices/."
+    )
+    open: bool = Field(
+        default=False, description="Only invoices which are in preparation or sent."
+    )
+    overdue: bool = Field(
+        default=False, description="Only sent invoices past their due date."
+    )
 
 
 @router.get("/invoices/", response=list[InvoiceOut])
@@ -275,7 +284,7 @@ class Reminded(InputSchema):
 
 
 @router.post("/invoices/reminders/", response=list[Reminders], auth=user_auth())
-def mark_reminded(request, data: Reminded, *, dry_run: bool = False):
+def mark_reminded(request, data: Reminded, *, dry_run: DryRun = False):
     """Mark invoices as reminded today like in the web interface, e.g. after
     sending a dunning letter; returns these invoices with their reminders"""
     invoices = _overdue().filter(id__in=data.invoices)
@@ -319,7 +328,7 @@ class ReminderSent(Schema):
     auth=user_auth(feature=FEATURES.BOOKKEEPING),
 )
 def send_reminder(
-    request, contact_id: int, data: SendReminder, *, dry_run: bool = False
+    request, contact_id: int, data: SendReminder, *, dry_run: DryRun = False
 ):
     """Send a dunning letter with the overdue invoices of the contact like in
     the web interface, and mark them as reminded today. Without ``to`` or with
@@ -627,7 +636,7 @@ def invoice_create(
     request,
     data: InvoiceIn,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create an invoice in preparation (a draft), validated like in the web

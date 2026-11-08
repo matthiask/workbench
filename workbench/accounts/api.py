@@ -77,7 +77,7 @@ class UserOut(Schema):
 
 class UserFilter(Schema):
     q: SearchQuery = ""
-    include_inactive: bool = False
+    include_inactive: bool = Field(default=False, description="Also users who left.")
 
 
 @router.get("/users/", response=list[UserOut])

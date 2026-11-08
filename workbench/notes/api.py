@@ -61,9 +61,11 @@ def note_out(note, request, *, types):
 
 class NoteFilter(DateRangeFilter):
     q: SearchQuery = ""
-    deal: int | None = None
-    invoice: int | None = None
-    recurring_invoice: int | None = None
+    deal: int | None = Field(default=None, description="ID of the deal.")
+    invoice: int | None = Field(default=None, description="ID of the invoice.")
+    recurring_invoice: int | None = Field(
+        default=None, description="ID of the recurring invoice."
+    )
     project: ProjectID = None
     created_by: ShortName = None
 

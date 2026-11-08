@@ -35,6 +35,21 @@ class APISchemaTest(SimpleTestCase):
                         self.assertNotIn(name, names, (module_name, names.get(name)))
                     names[name] = module_name
 
+    def test_query_parameters_have_descriptions(self):
+        """Every query parameter is described in the OpenAPI document (except
+        ninja's limit and offset of paginated endpoints)"""
+        schema = api.get_openapi_schema(path_prefix="/api/")
+        missing = [
+            f"{method.upper()} {path} {parameter['name']}"
+            for path, operations in schema["paths"].items()
+            for method, operation in operations.items()
+            for parameter in operation.get("parameters", [])
+            if parameter["in"] == "query"
+            and parameter["name"] not in {"limit", "offset"}
+            and not parameter.get("description")
+        ]
+        self.assertEqual(missing, [])
+
     def test_request_bodies_reject_unknown_fields(self):
         """Request bodies (also nested objects) reject unknown fields, data
         under a wrong key would be lost silently (``InputSchema``)"""

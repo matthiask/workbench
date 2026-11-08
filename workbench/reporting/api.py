@@ -4,7 +4,7 @@ from typing import Literal
 
 from django.conf import settings
 from django.utils.translation import gettext as _
-from ninja import Field, Query, Router, Schema
+from ninja import Field, P, Query, Router, Schema
 from ninja.errors import ValidationError
 from ninja.security import HttpBearer
 
@@ -83,7 +83,12 @@ router = Router(
 # The old URLs keep working for integrations, but aren't documented anymore
 @router.get("/key-data/", include_in_schema=False)
 @router.get("/reports/key-data/")
-def key_data(request, month: str | None = None):
+def key_data(
+    request,
+    month: Query[
+        str | None, P(description="The month like 2026-09, last month by default.")
+    ] = None,
+):
     """Key data of the given month (2026-09), the last month by default"""
     if month:
         try:
@@ -110,7 +115,13 @@ def key_data(request, month: str | None = None):
 
 @router.get("/cash-data/", include_in_schema=False)
 @router.get("/reports/cash-data/")
-def cash_data_api(request, date: dt.date | None = None):
+def cash_data_api(
+    request,
+    date: Query[
+        dt.date | None,
+        P(description="Cutoff date, today by default (not in the future)."),
+    ] = None,
+):
     """Cash data as of the given date, today by default (not in the future)"""
     today = dt.date.today()
     if date and date > today:
@@ -366,7 +377,9 @@ def third_party_costs_api(request, filters: Query[ThirdPartyCostsFilter]):
 
 
 class CutoffFilter(Schema):
-    date: dt.date | None = None
+    date: dt.date | None = Field(
+        default=None, description="Cutoff date, today by default."
+    )
 
 
 class OpenItemsWeek(Schema):

@@ -41,6 +41,7 @@ from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     IGNORE_WARNINGS,
+    DryRun,
     InputSchema,
     Number,
     OrganizationID,
@@ -131,7 +132,7 @@ class ProjectFilter(Schema):
     q: SearchQuery = ""
     customer: OrganizationID = None
     owned_by: ShortName = None
-    include_closed: bool = False
+    include_closed: bool = Field(default=False, description="Also closed projects.")
 
 
 class CampaignOut(Schema):
@@ -233,9 +234,11 @@ def project_list(request, filters: Query[ProjectFilter]):
 
 
 class StatsFilter(Schema):
-    ids: list[int] = []
-    open: bool = False
-    closed_since: dt.date | None = None
+    ids: list[int] = Field(default=[], description="IDs of projects.")
+    open: bool = Field(default=False, description="All open projects.")
+    closed_since: dt.date | None = Field(
+        default=None, description="Projects closed on or after this date."
+    )
 
 
 class HoursStats(Schema):
@@ -539,7 +542,7 @@ def project_create(
     request,
     data: ProjectIn,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create a project, validated like in the web interface
@@ -616,7 +619,7 @@ def project_update(
     project_id: int,
     data: ProjectPatch,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change or close a project, validated like in the web interface
@@ -687,7 +690,7 @@ class ServiceOut(Schema):
 class ServiceFilter(Schema):
     q: SearchQuery = ""
     project: ProjectID = None
-    offer: int | None = None
+    offer: int | None = Field(default=None, description="ID of the offer.")
     external_reference: str | None = Field(default=None, description="Exact match")
 
 
@@ -908,7 +911,7 @@ def service_create(
     request,
     data: ServiceCreate,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create a service, validated with the form of the web interface, at
@@ -975,7 +978,7 @@ def service_update(
     service_id: int,
     data: ServicePatch,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change a service or move it to another offer, validated with the form
@@ -1017,7 +1020,7 @@ def service_update(
 
 
 @router.delete("/services/{int:service_id}/", response=ServiceOut)
-def service_delete(request, service_id: int, *, dry_run: bool = False):
+def service_delete(request, service_id: int, *, dry_run: DryRun = False):
     """Delete a service like in the web interface: not when it is bound to an
     offer which isn't in preparation anymore, and not when hours or costs
     have been logged on it
@@ -1080,7 +1083,7 @@ class ServiceOrder(InputSchema):
 
 
 @router.post("/services/reorder/", response=list[ServiceOut])
-def service_reorder(request, data: ServiceOrder, *, dry_run: bool = False):
+def service_reorder(request, data: ServiceOrder, *, dry_run: DryRun = False):
     """Reorder the services of an offer, or the services without offer of a
     project, like in the web interface (where services are reordered by
     dragging them)"""
@@ -1153,7 +1156,7 @@ class ReassignLogbookOut(Schema):
     by_alias=True,
 )
 def service_reassign_logbook(
-    request, service_id: int, data: ReassignLogbookIn, *, dry_run: bool = False
+    request, service_id: int, data: ReassignLogbookIn, *, dry_run: DryRun = False
 ):
     """Reassign the logged hours and costs of a service to another service,
     validated with the form of the web interface

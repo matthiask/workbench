@@ -24,6 +24,7 @@ from workbench.tools.api import (
     IGNORE_WARNINGS,
     DateRangeFilter,
     Days,
+    DryRun,
     Hours,
     InputSchema,
     Percentage,
@@ -55,7 +56,9 @@ class AbsenceOut(Schema):
 
 class AbsenceFilter(DateRangeFilter):
     user: ShortName = None
-    reason: AbsenceReason | None = None
+    reason: AbsenceReason | None = Field(
+        default=None, description="Absence reason, see /api/choices/."
+    )
 
 
 @router.get("/absences/", response=list[AbsenceOut])
@@ -114,7 +117,7 @@ def absence_create(
     request,
     data: AbsenceIn,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Create an absence, validated like in the web interface
@@ -159,8 +162,11 @@ class WorkingTimeFilter(Schema):
         description="This year by default.",
     )
     user: ShortName = None
-    all: bool = False
-    weekly: bool = False
+    all: bool = Field(
+        default=False,
+        description="All active users (requires personnel administration for others).",
+    )
+    weekly: bool = Field(default=False, description="Add the working time per week.")
 
 
 MONTHLY_DAYS = {

@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _, override
-from ninja import Field, Query, Router, Schema
+from ninja import Field, P, Query, Router, Schema
 from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
 
@@ -33,6 +33,7 @@ from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     DateRangeFilter,
+    DryRun,
     InputSchema,
     Number,
     OrganizationID,
@@ -255,7 +256,9 @@ OFFER_STATUSES = KEYS["offer_status"]
 
 class OfferFilter(DateRangeFilter):
     q: SearchQuery = ""
-    status: Literal[tuple(OFFER_STATUSES)] | None = None
+    status: Literal[tuple(OFFER_STATUSES)] | None = Field(
+        default=None, description="Offer status, see /api/choices/."
+    )
     project: ProjectID = None
     customer: OrganizationID = None
     owned_by: ShortName = None
@@ -307,7 +310,14 @@ def offer_detail(request, offer_id: str):
 
 
 @router.get("/offers/{offer_id}/pdf/")
-def offer_pdf(request, offer_id: str, *, signature_line: bool = False):
+def offer_pdf(
+    request,
+    offer_id: str,
+    *,
+    signature_line: Query[
+        bool, P(description="Add a line for the customer's signature.")
+    ] = False,
+):
     """The offer (by ID or code) as PDF, like in the web interface, optionally
     with a signature line for the customer's agreement"""
     offer = by_id_or_code(Offer.objects.all(), offer_id)
@@ -460,7 +470,7 @@ def _save(offer, services, request, *, dry_run, delete=(), warnings=()):
 
 @router.post("/projects/{project_id}/offers/", response=OfferOut)
 def offer_create(
-    request, project_id: int, data: OfferCreateIn, *, dry_run: bool = False
+    request, project_id: int, data: OfferCreateIn, *, dry_run: DryRun = False
 ):
     """Create an offer in preparation or a service group with its services
 
@@ -525,7 +535,7 @@ def _has_logbook(service):
 
 
 @router.put("/offers/{offer_id}/", response=OfferOut)
-def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: bool = False):
+def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: DryRun = False):
     """Replace an offer in preparation and all its services
 
     Nothing is saved if anything is invalid or with ``dry_run``."""
@@ -594,7 +604,7 @@ class OfferPatch(InputSchema):
 
 
 @router.patch("/offers/{offer_id}/", response=OfferOut)
-def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: bool = False):
+def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: DryRun = False):
     """Change the title, the description, the postal address or the discount
     of an offer in preparation, the title and the description of a service
     group, or the external references of any offer; fields which aren't
@@ -680,7 +690,7 @@ class ServiceAdd(ServiceIn):
 
 @router.post("/offers/{offer_id}/services/", response=OfferOut)
 def offer_service_add(
-    request, offer_id: int, data: ServiceAdd, *, dry_run: bool = False
+    request, offer_id: int, data: ServiceAdd, *, dry_run: DryRun = False
 ):
     """Add a service to an offer in preparation, at the end or after another
     service"""
@@ -739,7 +749,7 @@ def offer_service_update(
     service_id: int,
     data: OfferServicePatch,
     *,
-    dry_run: bool = False,
+    dry_run: DryRun = False,
 ):
     """Change a service of an offer in preparation, also when hours or costs
     have already been logged on it (like in the web interface)"""
@@ -761,7 +771,7 @@ def offer_service_update(
 
 @router.delete("/offers/{offer_id}/services/{int:service_id}/", response=OfferOut)
 def offer_service_delete(
-    request, offer_id: int, service_id: int, *, dry_run: bool = False
+    request, offer_id: int, service_id: int, *, dry_run: DryRun = False
 ):
     """Delete a service of an offer in preparation, unless hours or costs have
     been logged on it"""
@@ -793,7 +803,7 @@ class OfferServiceOrder(InputSchema):
 
 @router.post("/offers/{offer_id}/services/reorder/", response=OfferOut)
 def offer_service_reorder(
-    request, offer_id: int, data: OfferServiceOrder, *, dry_run: bool = False
+    request, offer_id: int, data: OfferServiceOrder, *, dry_run: DryRun = False
 ):
     """Reorder the services of an offer in preparation"""
     offer = _changeable_offer(offer_id)
