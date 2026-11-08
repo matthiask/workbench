@@ -261,6 +261,9 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
                 % {"class": self.model._meta.verbose_name, "object": self.object},
             ),
         )
+        # Consequences of deleting which should be checked by hand
+        for message in getattr(self.object, "delete_warnings", ()):
+            messages.warning(self.request, message)
         if request.is_ajax():
             return HttpResponse(status=204)  # No content
         return redirect(getattr(form, "success_url", None) or self.get_success_url())

@@ -1493,6 +1493,41 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 204)
         self.assertFalse(project.services.exists())
 
+    def test_deleting_lines_service_period(self):
+        """Deleting lines doesn't change the service period silently, it
+        warns when the logbook's period has changed"""
+        project = factories.ProjectFactory.create()
+        early, late = factories.ServiceFactory.create_batch(2, project=project)
+        factories.LoggedHoursFactory.create(service=early, rendered_on=in_days(-20))
+        factories.LoggedHoursFactory.create(service=late, rendered_on=in_days(-2))
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([early, late])
+        self.assertEqual(
+            (invoice.service_period_from, invoice.service_period_until),
+            (in_days(-20), in_days(-2)),
+        )
+
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            invoice.services.get(project_service=late).urls["delete"],
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            messages(response)[-1],
+            "The logged hours and costs of this invoice now cover the service"
+            f" period {local_date_format(in_days(-20))} - "
+            f"{local_date_format(in_days(-20))}. Update the invoice's service"
+            " period if necessary.",
+        )
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.service_period_until, in_days(-2))
+
     def test_no_new_lines_on_sent_invoices(self):
         """Lines can only be added to invoices in preparation"""
         invoice = factories.InvoiceFactory.create(

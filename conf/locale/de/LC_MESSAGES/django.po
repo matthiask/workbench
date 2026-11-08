@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:18+0100\n"
+"POT-Creation-Date: 2026-11-08 16:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2605,6 +2605,11 @@ msgstr "Projektleistung"
 #: workbench/invoices/models.py
 msgid "invoiced from the offer"
 msgstr "aus der Offerte verrechnet"
+
+#: workbench/invoices/models.py
+#, python-format
+msgid "The logged hours and costs of this invoice now cover the service period %(period)s. Update the invoice's service period if necessary."
+msgstr "Die erfassten Stunden und Kosten dieser Rechnung umfassen jetzt den Leistungszeitraum %(period)s. Passe den Leistungszeitraum der Rechnung falls nötig an."
 
 #: workbench/invoices/models.py
 msgid "yearly"

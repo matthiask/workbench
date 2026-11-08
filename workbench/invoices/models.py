@@ -733,6 +733,7 @@ class Service(ServiceBase):
 
     def delete(self, *args, **kwargs):
         invoice = self.invoice
+        period = invoice.service_period_from_logbook()
 
         self.loggedhours_set.update(invoice_service=None, archived_at=None)
         self.loggedcost_set.update(invoice_service=None, archived_at=None)
@@ -740,6 +741,20 @@ class Service(ServiceBase):
         super().delete(*args, **kwargs)
 
         invoice.save()  # Recalculate total
+
+        # The service period may have been changed by hand, don't change it
+        # silently (shown by the generic delete view)
+        if (new_period := invoice.service_period_from_logbook()) != period and all(
+            new_period
+        ):
+            self.delete_warnings = [
+                _(
+                    "The logged hours and costs of this invoice now cover the"
+                    " service period %(period)s. Update the invoice's service"
+                    " period if necessary."
+                )
+                % {"period": " - ".join(local_date_format(day) for day in new_period)}
+            ]
 
     delete.alters_data = True
 
