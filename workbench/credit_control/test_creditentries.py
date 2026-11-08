@@ -165,6 +165,26 @@ class CreditEntriesTest(TestCase):
         entry = CreditEntry.objects.get()
         self.assertRedirects(response, entry.urls["list"])
 
+    def test_assignment_of_invoice_with_credit_entry(self):
+        """Invoices which have a credit entry already aren't offered again,
+        e.g. after setting a paid invoice back to sent"""
+        invoice = factories.InvoiceFactory.create(
+            subtotal=10,
+            liable_to_vat=False,
+            status=Invoice.SENT,
+            due_on=in_days(30),
+        )
+        factories.CreditEntryFactory.create(total=10, invoice=invoice)
+        entry = factories.CreditEntryFactory.create(total=10)
+
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post(
+            "/credit-control/assign/", {f"entry_{entry.pk}_invoice": invoice.pk}
+        )
+        self.assertEqual(response.status_code, 200)
+        entry.refresh_from_db()
+        self.assertIsNone(entry.invoice)
+
     def test_payable_invoices(self):
         """Payments are assigned to sent invoices and to invoices in
         preparation with a date after the freeze date, never to cancelled

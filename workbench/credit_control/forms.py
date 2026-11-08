@@ -256,7 +256,8 @@ class AssignCreditEntriesForm(forms.Form):
                         ),
                     )
                     for invoice in payable_invoices()
-                    .filter(total=entry.total)
+                    # Invoices have at most one credit entry
+                    .filter(total=entry.total, creditentry__isnull=True)
                     .select_related(
                         "contact__organization", "customer", "owned_by", "project"
                     )[:100]
