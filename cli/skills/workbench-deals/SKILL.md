@@ -41,6 +41,13 @@ Change only what the user told you, one command per deal, first with
   `wb deals value-types` lists the value types, `wb deals attributes` the
   attribute groups and attributes `--attribute GROUP=ATTRIBUTE` takes.
 - High probability requires an expected decision date.
+- Contributions say who won the deal: the accepted deals report (`wb deals
+  stats`) splits a deal's value between its contributors by weight (100 main
+  driving force, 50 contributing force). `wb deals show` lists them;
+  `--contribution ab=100 --contribution cd=50` sets them, `cd=0` removes
+  one. The owner always contributes; a new owner (`--owned-by`) takes over
+  the old owner's contribution unless you change either of them in the same
+  command. Ask the user who contributed when a deal is won or changes hands.
 - Add what you learned as a note so others see it:
   `wb notes create --deal <deal_id> --title "<title>" --description "<text>"`.
   The deal's owner is notified by email, mention that to the user.

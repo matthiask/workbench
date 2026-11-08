@@ -164,7 +164,8 @@ def _echo_saved_deal(data, *, dry_run, as_json):
 )
 @click.option(
     "--owned-by",
-    help="Short name, the new owner is added to the contributions.",
+    help="Short name, the new owner takes over the old owner's contribution"
+    " (unless --contribution changes either of them).",
     shell_complete=complete_short_names,
 )
 @click.option(
