@@ -59,6 +59,26 @@ class ReportingTest(TestCase):
         )
 
     @travel("2026-07-01 12:00")
+    def test_key_data_margin_per_fte_by_quarter(self):
+        """Months without anything to show still belong to their quarter"""
+        user = factories.UserFactory.create()
+        factories.EmploymentFactory.create(user=user, date_from=dt.date(2026, 1, 1))
+        for month in range(2, 7):
+            factories.InvoiceFactory.create(
+                invoiced_on=dt.date(2026, month, 10),
+                due_on=dt.date(2026, month, 28),
+                subtotal=100,
+                status=Invoice.SENT,
+            )
+        self.client.force_login(user)
+        response = self.client.get("/report/key-data/")
+        year = response.context["gross_margin_by_years"][-1]
+        self.assertEqual(
+            [round(value) for value in year["margin_per_fte_by_quarter"]],
+            [200, 300, 0, 0],
+        )
+
+    @travel("2026-07-01 12:00")
     def test_key_data_projection(self):
         """The planned gross margin of the year is the gross margin so far
         and the projections which haven't been invoiced yet, not the

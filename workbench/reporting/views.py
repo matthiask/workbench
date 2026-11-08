@@ -10,7 +10,6 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
-from more_itertools import chunked
 
 from workbench.accounts.models import Team, User
 from workbench.accounts.reporting import (
@@ -318,6 +317,12 @@ def key_data_view(request):
         year["margin_per_fte"] = (
             year["gross_margin"] / year["fte"] if year["fte"] else None
         )
+        # Months without anything to show are missing in year["months"]
+        year["margin_per_fte_by_quarter"] = [0, 0, 0, 0]
+        for month in year["months"]:
+            year["margin_per_fte_by_quarter"][(month["date"].month - 1) // 3] += (
+                month["margin_per_fte"] or 0
+            )
 
     gmp_factor = Decimal("365.24") / (
         1 + Decimal((today - dt.date(today.year, 1, 1)).days)
@@ -389,13 +394,7 @@ def key_data_view(request):
             "invoiced_corrected_per_fte_chart": _years_chart(
                 ["Q1", "Q2", "Q3", "Q4"],
                 [
-                    (
-                        year["year"],
-                        [
-                            sum(month["margin_per_fte"] or 0 for month in quarter)
-                            for quarter in chunked(year["months"], 3)
-                        ],
-                    )
+                    (year["year"], year["margin_per_fte_by_quarter"])
                     for year in gross_margin_by_years
                 ],
                 height=200,
