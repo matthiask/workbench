@@ -3,13 +3,11 @@ import re
 
 from django import forms
 from django.contrib import messages
-from django.db.models import Q
 from django.utils.html import format_html, mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
-from workbench.reporting.models import FreezeDate
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
 
@@ -54,17 +52,10 @@ class CreditEntrySearchForm(Form):
 
 
 def payable_invoices():
-    """Sent invoices, and invoices in preparation which have a date after the
-    freeze date (they become paid without being marked as sent first).
-    Cancelled invoices have released their logged entries and down
-    payments."""
-    return Invoice.objects.filter(
-        Q(status=Invoice.SENT)
-        | Q(
-            status=Invoice.IN_PREPARATION,
-            invoiced_on__gt=FreezeDate.objects.up_to(),
-        )
-    )
+    """Sent invoices. Cancelled invoices have released their logged entries
+    and down payments, invoices in preparation aren't sent yet (recurring
+    invoices may create sent invoices directly)."""
+    return Invoice.objects.filter(status=Invoice.SENT)
 
 
 class CreditEntryForm(ModelForm):
@@ -105,10 +96,7 @@ class CreditEntryForm(ModelForm):
         ):
             self.add_error(
                 "invoice",
-                _(
-                    "Payments can only be assigned to sent invoices and to"
-                    " invoices in preparation with an invoice date."
-                ),
+                _("Payments can only be assigned to sent invoices."),
             )
         return data
 

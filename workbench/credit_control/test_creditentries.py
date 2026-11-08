@@ -186,9 +186,9 @@ class CreditEntriesTest(TestCase):
         self.assertIsNone(entry.invoice)
 
     def test_payable_invoices(self):
-        """Payments are assigned to sent invoices and to invoices in
-        preparation with a date after the freeze date, never to cancelled
-        ones"""
+        """Payments are only assigned to sent invoices, not to cancelled ones
+        or to invoices in preparation (recurring invoices may create sent
+        invoices directly)"""
         FreezeDate.objects.create(up_to=in_days(-30))
         canceled = factories.InvoiceFactory.create(
             subtotal=100, liable_to_vat=False, status=Invoice.CANCELED
@@ -205,7 +205,7 @@ class CreditEntriesTest(TestCase):
         entry = factories.CreditEntryFactory.create(total=100)
         self.client.force_login(factories.UserFactory.create())
 
-        for invoice in [canceled, without_date, frozen]:
+        for invoice in [canceled, without_date, frozen, in_preparation]:
             response = self.client.post(
                 "/credit-control/assign/",
                 {f"entry_{entry.pk}_invoice": invoice.pk},
@@ -229,14 +229,6 @@ class CreditEntriesTest(TestCase):
             status = invoice.status
             invoice.refresh_from_db()
             self.assertEqual(invoice.status, status)
-
-        response = self.client.post(
-            "/credit-control/assign/",
-            {f"entry_{entry.pk}_invoice": in_preparation.pk},
-        )
-        self.assertEqual(response.status_code, 302)
-        in_preparation.refresh_from_db()
-        self.assertEqual(in_preparation.status, Invoice.PAID)
 
     def test_unassign_warning(self):
         """Removing the invoice of a credit entry warns that the invoice stays

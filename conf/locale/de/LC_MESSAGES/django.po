@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:15+0100\n"
+"POT-Creation-Date: 2026-11-08 16:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1392,8 +1392,8 @@ msgid "The invoice %(invoice)s stays paid. Change its status if it hasn't been p
 msgstr "Die Rechnung %(invoice)s bleibt bezahlt. Ändere ihren Status, falls sie nicht bezahlt wurde."
 
 #: workbench/credit_control/forms.py
-msgid "Payments can only be assigned to sent invoices and to invoices in preparation with an invoice date."
-msgstr "Zahlungen können nur versendeten Rechnungen und Rechnungen in Vorbereitung mit Rechnungsdatum zugewiesen werden."
+msgid "Payments can only be assigned to sent invoices."
+msgstr "Zahlungen können nur versendeten Rechnungen zugewiesen werden."
 
 #: workbench/credit_control/forms.py
 msgid "Account statement"
@@ -6443,6 +6443,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Payments can only be assigned to sent invoices and to invoices in preparation with an invoice date."
+#~ msgstr "Zahlungen können nur versendeten Rechnungen und Rechnungen in Vorbereitung mit Rechnungsdatum zugewiesen werden."
 
 #~ msgid "Closing the project discards its offers in preparation, some of them have planning entries linked to them. Delete them?"
 #~ msgstr "Beim Schliessen des Projekts werden seine Offerten in Vorbereitung verworfen, einige davon haben Planungseinträge. Sollen diese gelöscht werden?"

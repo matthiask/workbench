@@ -74,10 +74,11 @@ fixed (the commits after "Verification: Findings of the third round").
 - Invoicing an offer doesn't preselect optional services (from the logbook
   they are, work has been logged on them) and starts with its discount.
 - The key data API leaves out deals and squeeze without their features.
-- Payments may be assigned to invoices in preparation with a date after the
-  freeze date (useful, see 06fb06cd); recurring invoices may mark their
-  invoices as sent directly (`mark_as_sent`, off by default, never the
-  standard behaviour).
+- Recurring invoices may mark their invoices as sent directly
+  (`mark_as_sent`, off by default, never the standard behaviour). Payments
+  are only assigned to sent invoices again (round 4: invoices in preparation
+  became unsavable without a due date, and recurring invoices can create
+  sent invoices now).
 - Hours logged on another day than they were rendered on are listed at the
   end of the day, outside the timeline.
 - Declining offers and deals deletes only the planned work after the current
