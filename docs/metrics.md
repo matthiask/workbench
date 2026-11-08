@@ -170,10 +170,10 @@ One row per month (`key_data.py:gross_margin_by_month`); a month is **left out**
 
 **Year rows**: Σ of the displayed months for Umsatz, Fremdkosten, accrual deltas, Umsatz bereinigt, Geplant; FTE = arithmetic mean of the FTE of the displayed months only; Umsatz/FTE = year gross margin / mean FTE. `views.py:key_data_view`
 
-**Hochrechnung row** (current year extrapolation), factor f = 365.24 / (1 + days since 1 Jan):
-- Umsatz: year Umsatz × f
-- Umsatz bereinigt: year gross margin × f
-- Geplant column: year gross margin (not extrapolated) + Σ projected gross margin of the current year's months (projections not invoiced yet). Adding the projections to the extrapolation would count the rest of the year twice.
+**Hochrechnung row** (current year extrapolation), factor f = 365.24 / (1 + days since 1 Jan). It only uses what is dated up to today: invoices and logged third party costs with a future date are shown in their month but neither extrapolated nor part of "so far".
+- Umsatz: Umsatz so far × f
+- Umsatz bereinigt: gross margin so far × f
+- Geplant column: gross margin so far (not extrapolated) + Σ projected gross margin of the current year's months (projections not invoiced yet). Adding the projections to the extrapolation would count the rest of the year twice.
 - Umsatz / FTE: Geplant / mean FTE of the year
 
 **Chart "Umsatz minus Fremdkosten minus Abgrenzungen"**: Umsatz bereinigt per calendar month; current year as bars plus the current year's projected gross margin as an extra bar series ("geplanter Umsatz"), the three earlier years as lines. `views.py:_years_chart`

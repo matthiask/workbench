@@ -112,7 +112,7 @@ def gross_margin_by_month(date_range):
 
     first_of_months = list(
         takewhile(
-            lambda day: day < date_range[1],
+            lambda day: day <= date_range[1],
             recurring(date_range[0], "monthly"),
         )
     )

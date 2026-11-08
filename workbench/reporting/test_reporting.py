@@ -79,6 +79,50 @@ class ReportingTest(TestCase):
         )
 
     @travel("2026-07-01 12:00")
+    def test_key_data_projection_up_to_today(self):
+        """The extrapolation and the planned gross margin only use what has
+        happened so far, future-dated costs are shown in their month"""
+        self.client.force_login(factories.UserFactory.create())
+        service = factories.ServiceFactory.create()
+        factories.InvoiceFactory.create(
+            project=service.project,
+            customer=service.project.customer,
+            contact=service.project.contact,
+            invoiced_on=dt.date(2026, 3, 10),
+            due_on=dt.date(2026, 3, 31),
+            subtotal=10000,
+            status=Invoice.SENT,
+        )
+        factories.LoggedCostFactory.create(
+            service=service,
+            cost=1000,
+            third_party_costs=1000,
+            rendered_on=dt.date(2026, 12, 15),
+        )
+        response = self.client.get("/report/key-data/")
+        projection = response.context["gross_margin_projection"]
+        self.assertAlmostEqual(
+            projection["gross_margin"], Decimal(10000) * Decimal("365.24") / 182, 2
+        )
+        self.assertEqual(projection["gross_margin_incl_projected"], 10000)
+        self.assertEqual(
+            response.context["gross_margin_by_years"][-1]["third_party_costs"], -1000
+        )
+
+        # Today counts, also on the first of the month
+        factories.InvoiceFactory.create(
+            invoiced_on=dt.date(2026, 7, 1),
+            due_on=dt.date(2026, 7, 31),
+            subtotal=100,
+            status=Invoice.SENT,
+        )
+        response = self.client.get("/report/key-data/")
+        self.assertEqual(
+            response.context["gross_margin_projection"]["gross_margin_incl_projected"],
+            10100,
+        )
+
+    @travel("2026-07-01 12:00")
     def test_key_data_projection(self):
         """The planned gross margin of the year is the gross margin so far
         and the projections which haven't been invoiced yet, not the
