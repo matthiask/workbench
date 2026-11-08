@@ -217,7 +217,9 @@ def show_person(person_id, as_json):
     "--remove-group",
     "remove_groups",
     multiple=True,
-    help="Title or ID of a group; repeat it for several.",
+    help="Title or ID of a group; repeat it for several. Groups which apply to"
+    " organizations are removed from the organization, so all its people lose"
+    " them.",
 )
 @click.option(
     "--archive/--unarchive", "is_archived", default=None, help="E.g. who left."

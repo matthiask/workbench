@@ -642,7 +642,8 @@ class PersonPatch(InputSchema):
     remove_groups: list[str] = Field(
         default=[],
         description="Titles or IDs of groups. Groups which apply to"
-        " organizations are removed from the organization too.",
+        " organizations are removed from the organization, so all its people"
+        " lose them.",
     )
     is_archived: bool | None = None
 
