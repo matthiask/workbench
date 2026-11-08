@@ -164,44 +164,35 @@ warning (the commits after "Verification: Findings of the fourth round").
 - Revisit anonymizing users after about ten years: there may be no reason
   to keep their data after that.
 
-### Untested risks
+### Risks and questions, done
 
-- Budget statistics: a budget transfer out of a project without offers
-  makes `sold` negative, all unbilled work counts as "über Offerte".
-- Key data API: accruals of the month in progress are computed at the
-  month end (future cutoff), the gross margin with today's accruals.
-- Budget statistics with a past cutoff use the current link of logged costs
-  to services invoices (Fremdkosten column).
-- Cash data with a future `date` counts the current month as overdue.
-- Squeeze XLSX: the totals row of the users sheet is one cell short.
-- A future `work_completed_on` blocks logging right away.
-- Paying an invoice in preparation without a due date makes it unsavable in
-  its form until a due date is added.
-- Removing invoice lines doesn't update the service period.
-- Down payments larger than the final invoice give a negative total without
-  a warning.
-- Auto dunning mails sum totals excl. tax, reminders use totals incl. tax.
-- `clear_sickness_descriptions()` misses absences changed away from
-  sickness and emptied descriptions (history).
-- External work has no closed-project check.
-- Timer tokens of inactive users still work.
-- Merged contact details keep their weight and may outrank the kept
-  person's postal address.
-- Archived value types can't be removed through the deals API.
-- Notes are never pruned from the audit log.
-- Many query parameters lack descriptions; `wb deals show` has no CLI test.
+Fixed (the commits after "Verification: Deleting offers stays as it is"):
+budget transfers beyond the accepted offers warn, the key data API computes
+the month in progress as of today, the budget statistics' third party costs
+at past cutoff dates, cash data rejects future dates, the squeeze XLSX
+totals row, no future `work_completed_on`, payments only for sent invoices,
+deleting invoice lines warns about the service period, down payments
+exceeding the invoice warn, auto dunning sums totals incl. tax, external
+work on closed projects, inactive users' timer tokens, archived value types
+and attribute groups in the deals API, audit log pruning of data tables,
+query parameter descriptions and a `wb deals show` test, cancelled invoices
+don't make services invoiced, a new deal owner takes over the old owner's
+contribution, the `wb people update` help.
 
-### Possibly decisions
+Decided, no change:
 
-- Credits don't carry the third party costs of the credited invoice; key
-  data keeps deducting them (squeeze floors at 0).
-- `Service.is_invoiced` stays true after the only invoice was cancelled.
-- Changing a project's customer changes the customer of sent invoices too
-  (warning only).
+- `clear_sickness_descriptions()`: absences can't be changed away from
+  sickness with a description anymore (5c494f48); the history of emptied
+  descriptions is pruned with the audit log.
+- Merged contact details keep the weight of their type (see the idea above).
+- Credits don't carry the third party costs of the credited invoice: key
+  data keeps deducting them, which underestimates the gross margin (squeeze
+  floors at 0).
+- Changing a project's customer changes the customer of its invoices, also
+  sent ones (a warning); their documents (postal address) stay as they are.
 - "School attendance of apprentices" counts as working time without
-  confirmation; HR's own paid leave is confirmed automatically; paid leave
-  descriptions are public.
-- `POST /api/deals/` with another owner doesn't add the requesting user as
-  contributor although the docstring calls them the main driving force.
-- Removing an industry group through `wb people update` affects the whole
-  organization (CLI help doesn't say so).
+  confirmation (apprentices have a special status, no weekly approvals);
+  HR's own paid leave is confirmed automatically; paid leave descriptions
+  are public.
+- `POST /api/deals/` adds only the owner as contributor (you by default).
+- The timer token endpoints stay: the controller uses them.
