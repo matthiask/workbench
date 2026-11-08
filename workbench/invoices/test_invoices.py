@@ -1087,6 +1087,37 @@ class InvoicesTest(TestCase):
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
         self.assertIsNone(invoice.closed_on)
 
+    def test_down_payments_larger_than_invoice(self):
+        """Down payments larger than the invoice they are applied to (with a
+        negative total) are a warning"""
+        project = factories.ProjectFactory.create()
+        down_payment = factories.InvoiceFactory.create(
+            project=project,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=3000,
+            invoiced_on=in_days(0),
+            status=Invoice.SENT,
+        )
+        self.client.force_login(project.owned_by)
+        data = {
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "discount": 0,
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            "postal_address": "Anything\nStreet\nCity",
+            "subtotal": 2500,
+            "third_party_costs": 0,
+            "apply_down_payment": [down_payment.pk],
+        }
+        url = project.urls["createinvoice"] + "?type=fixed"
+        response = self.client.post(url, data)
+        self.assertContains(response, 'value="down-payments-exceed-total"')
+
+        response = self.client.post(url, data | {"subtotal": 3000})
+        self.assertEqual(response.status_code, 302)
+
     def test_down_payment(self):
         """Down payment invoices can be linked to invoices"""
         project = factories.ProjectFactory.create()

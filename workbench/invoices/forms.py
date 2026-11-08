@@ -551,6 +551,30 @@ class InvoiceForm(PostalAddressSelectionForm):
                 ),
             )
 
+        if down_payments := data.get("apply_down_payment"):
+            # Lines of new services invoices are only created when saving
+            subtotal = (
+                data.get("subtotal")
+                if self.instance.type == Invoice.FIXED
+                else self.instance.subtotal
+            )
+            down_payment_total = sum(
+                (invoice.total_excl_tax for invoice in down_payments), Z2
+            )
+            if (
+                subtotal is not None
+                and (self.instance.type == Invoice.FIXED or self.instance.pk)
+                and subtotal - (data.get("discount") or Z2) < down_payment_total
+            ):
+                self.add_warning(
+                    _(
+                        "The down payments (%(down_payments)s) exceed this"
+                        " invoice, its total would be negative."
+                    )
+                    % {"down_payments": currency(down_payment_total)},
+                    code="down-payments-exceed-total",
+                )
+
         return data
 
     def save(self):
