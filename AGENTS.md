@@ -402,7 +402,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `row_data` and `changed_fields` as hstore keyed by column name. Renaming a
   field or column loses its history: old entries keep the old key. Only
   rename on purpose, and update the keys in the migration if the history
-  matters.
+  matters. `prune_audit()` (fairy tasks) deletes the history of data after
+  two, three or five years (size and data protection); users, employments
+  and the configuration stay. New audited tables need an entry there.
 - Creating notes sends no mail. The fairy tasks send owners one daily digest
   with titles, truncated descriptions and links of the notes others added or
   edited on their deals, invoices and projects the day before, found in the

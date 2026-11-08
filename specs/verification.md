@@ -156,6 +156,14 @@ warning (the commits after "Verification: Findings of the fourth round").
   fine when invoicing from the logbook) and on whether the planned hours
   have been logged or invoiced; not worth the complexity for now.
 
+### Ideas
+
+- Contact details could be sorted explicitly (drag and drop, handles always
+  visible) instead of weights by type; merging would then put the kept
+  person's details first.
+- Revisit anonymizing users after about ten years: there may be no reason
+  to keep their data after that.
+
 ### Untested risks
 
 - Budget statistics: a budget transfer out of a project without offers

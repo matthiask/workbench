@@ -1,7 +1,12 @@
+import datetime as dt
+
 from django.test import TestCase
+from django.utils import timezone
 
 from workbench import factories
 from workbench.audit.models import LoggedAction
+from workbench.audit.tasks import prune_audit
+from workbench.notes.models import Note
 
 
 class AuditTest(TestCase):
@@ -43,3 +48,19 @@ class AuditTest(TestCase):
             .order_by("event_id")
         )
         self.assertLess(created.created_at, changed.created_at)
+
+    def test_prune_audit(self):
+        """Data like notes is pruned from the audit log after five years,
+        users and the configuration stay"""
+        project = factories.ProjectFactory.create()
+        Note.objects.create(
+            content_object=project, created_by=project.owned_by, title="Note"
+        )
+        LoggedAction.objects.update(
+            created_at=timezone.now() - dt.timedelta(days=6 * 366)
+        )
+        prune_audit()
+        self.assertEqual(
+            set(LoggedAction.objects.values_list("table_name", flat=True)),
+            {"accounts_user"},
+        )
