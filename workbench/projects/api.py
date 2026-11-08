@@ -41,6 +41,7 @@ from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     IGNORE_WARNINGS,
+    InputSchema,
     Number,
     OrganizationID,
     ProjectID,
@@ -474,7 +475,7 @@ def project_detail(request, project_id: str):
     )
 
 
-class ProjectIn(Schema):
+class ProjectIn(InputSchema):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
     customer: int | None = Field(
@@ -582,7 +583,7 @@ def project_create(
     return result
 
 
-class ProjectPatch(Schema):
+class ProjectPatch(InputSchema):
     """Fields which aren't given are left alone"""
 
     title: str | None = Field(default=None, min_length=1, max_length=200)
@@ -789,7 +790,7 @@ def service_list(request, filters: Query[ServiceFilter]):
     )
 
 
-class ServiceFields(Schema):
+class ServiceFields(InputSchema):
     """Fields which aren't given are left alone, ``null`` clears values"""
 
     title: str | None = Field(default=None, max_length=200)
@@ -1071,7 +1072,7 @@ def service_delete(request, service_id: int, *, dry_run: bool = False):
     return result
 
 
-class ServiceOrder(Schema):
+class ServiceOrder(InputSchema):
     services: list[int] = Field(
         description="The IDs of all services of one offer, or of all services"
         " without offer of one project, in the new order."
@@ -1128,7 +1129,7 @@ def service_reorder(request, data: ServiceOrder, *, dry_run: bool = False):
     return result
 
 
-class ReassignLogbookIn(Schema):
+class ReassignLogbookIn(InputSchema):
     to: int = Field(
         description="ID of a service of the same project which allows logging"
     )

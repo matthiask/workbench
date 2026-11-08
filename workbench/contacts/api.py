@@ -29,6 +29,7 @@ from workbench.contacts.models import (
 from workbench.contacts.reassign import primary_contact_suggestions
 from workbench.tools.api import (
     IGNORE_WARNINGS,
+    InputSchema,
     SearchQuery,
     Serialized,
     full_clean,
@@ -325,14 +326,14 @@ def person_out(person, request):
     }
 
 
-class EmailAddressIn(Schema):
+class EmailAddressIn(InputSchema):
     type: str | None = Field(
         default=None, max_length=40, description="E.g. work or private."
     )
     email: str
 
 
-class PhoneNumberIn(Schema):
+class PhoneNumberIn(InputSchema):
     type: str | None = Field(
         default=None, max_length=40, description="E.g. work, mobile or private."
     )
@@ -341,7 +342,7 @@ class PhoneNumberIn(Schema):
     )
 
 
-class PostalAddressIn(Schema):
+class PostalAddressIn(InputSchema):
     type: str | None = Field(
         default=None, max_length=40, description="E.g. work or private."
     )
@@ -353,7 +354,7 @@ class PostalAddressIn(Schema):
     country: str = Field(default="CH", description="ISO 3166-1 alpha-2 code.")
 
 
-class DetailsIn(Schema):
+class DetailsIn(InputSchema):
     email_addresses: list[EmailAddressIn] = []
     phone_numbers: list[PhoneNumberIn] = []
     postal_addresses: list[PostalAddressIn] = []
@@ -627,7 +628,7 @@ def person_add_details(
     return result
 
 
-class PersonPatch(Schema):
+class PersonPatch(InputSchema):
     """Fields which aren't given are left alone"""
 
     primary_contact: str | None = Field(
@@ -708,7 +709,7 @@ def person_update(request, person_id: int, data: PersonPatch, *, dry_run: bool =
     return result
 
 
-class MergeIn(Schema):
+class MergeIn(InputSchema):
     into: int = Field(description="ID of the person to keep")
 
 
@@ -801,12 +802,12 @@ def group_list(request, filters: Query[GroupFilter]):
     )
 
 
-class GroupIn(Schema):
+class GroupIn(InputSchema):
     title: str = Field(min_length=1, max_length=100)
     applies_to_organizations: bool = False
 
 
-class GroupPatch(Schema):
+class GroupPatch(InputSchema):
     """Fields which aren't given are left alone"""
 
     title: str | None = Field(default=None, min_length=1, max_length=100)
@@ -949,7 +950,7 @@ def person_reassign_suggestions(request, filters: Query[ReassignFilter]):
     ]
 
 
-class ReassignIn(Schema):
+class ReassignIn(InputSchema):
     from_: str | None = Field(
         default=None,
         alias="from",

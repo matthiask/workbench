@@ -33,6 +33,7 @@ from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     DateRangeFilter,
+    InputSchema,
     Number,
     OrganizationID,
     ProjectID,
@@ -50,7 +51,7 @@ from workbench.tools.pdf import offer_filename, pdf_response
 router = Router(auth=user_auth(feature=FEATURES.CONTROLLING), tags=["offers"])
 
 
-class ServiceIn(Schema):
+class ServiceIn(InputSchema):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
     service_type: str | None = Field(
@@ -89,7 +90,7 @@ class ServiceIn(Schema):
     )
 
 
-class OfferIn(Schema):
+class OfferIn(InputSchema):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
     postal_address: str | None = Field(
@@ -578,7 +579,7 @@ def _changeable_offer(offer_id):
     )
 
 
-class OfferPatch(Schema):
+class OfferPatch(InputSchema):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     description: str | None = None
     postal_address: str | None = None
@@ -713,7 +714,7 @@ def offer_service_add(
     )
 
 
-class OfferServicePatch(Schema):
+class OfferServicePatch(InputSchema):
     """Fields which aren't given are left alone, ``null`` clears values"""
 
     title: str | None = Field(default=None, min_length=1, max_length=200)
@@ -784,7 +785,7 @@ def offer_service_delete(
     return _save(offer, [], request, dry_run=dry_run, delete=[service])
 
 
-class OfferServiceOrder(Schema):
+class OfferServiceOrder(InputSchema):
     services: list[int] = Field(
         description="The IDs of all services of the offer in the new order."
     )

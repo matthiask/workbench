@@ -13,6 +13,7 @@ from workbench.notes.forms import NoteForm
 from workbench.notes.models import TARGETS, Note, visible_content_types
 from workbench.tools.api import (
     DateRangeFilter,
+    InputSchema,
     ProjectID,
     SearchQuery,
     Serialized,
@@ -100,7 +101,7 @@ def note_list(request, filters: Query[NoteFilter]):
     )
 
 
-class NoteIn(Schema):
+class NoteIn(InputSchema):
     title: str = Field(min_length=1, max_length=200)
     description: str = Field(min_length=1)
     deal: int | None = None

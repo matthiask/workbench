@@ -25,6 +25,7 @@ from workbench.tools.api import (
     DateRangeFilter,
     Days,
     Hours,
+    InputSchema,
     Percentage,
     Serialized,
     ShortName,
@@ -95,7 +96,7 @@ def _absence_out(absence, request):
     }
 
 
-class AbsenceIn(Schema):
+class AbsenceIn(InputSchema):
     user: str | None = Field(
         default=None, description="Short name, defaults to the authenticated user."
     )

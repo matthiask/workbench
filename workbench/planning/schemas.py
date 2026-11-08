@@ -1,10 +1,12 @@
 import datetime as dt
 
-from ninja import Field, Schema
+from ninja import Field
 from pydantic import model_validator
 
+from workbench.tools.api import InputSchema
 
-class MilestoneIn(Schema):
+
+class MilestoneIn(InputSchema):
     id: int | None = Field(
         default=None,
         description="ID of an existing milestone of the project to update,"
@@ -26,7 +28,7 @@ class MilestoneIn(Schema):
     )
 
 
-class PlannedWorkIn(Schema):
+class PlannedWorkIn(InputSchema):
     id: int | None = Field(
         default=None,
         description="ID of existing planned work of the project to update,"
@@ -76,7 +78,7 @@ class PlannedWorkIn(Schema):
 REQUIRED = ["title", "user", "service_type", "weeks", "planned_hours"]
 
 
-class PlanningImport(Schema):
+class PlanningImport(InputSchema):
     milestones: list[MilestoneIn] = []
     planned_work: list[PlannedWorkIn] = []
     delete_milestones: list[int] = Field(
@@ -87,7 +89,7 @@ class PlanningImport(Schema):
     )
 
 
-class PlannedWorkPatch(Schema):
+class PlannedWorkPatch(InputSchema):
     """Changes of single planned work, fields left out keep their values"""
 
     title: str | None = Field(default=None, min_length=1, max_length=200)

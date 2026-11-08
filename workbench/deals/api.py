@@ -35,6 +35,7 @@ from workbench.tools.api import (
     IGNORE_WARNINGS,
     Amount,
     DateRangeFilter,
+    InputSchema,
     OrganizationID,
     SearchQuery,
     Serialized,
@@ -472,7 +473,7 @@ def deal_detail(request, deal_id: str):
     )
 
 
-class DealIn(Schema):
+class DealIn(InputSchema):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
     customer: int | None = Field(
@@ -637,7 +638,7 @@ def _save_deal(form, request, *, dry_run):
     return result
 
 
-class DealPatch(Schema):
+class DealPatch(InputSchema):
     """Fields which aren't given are left alone"""
 
     title: str | None = Field(default=None, min_length=1, max_length=200)
@@ -726,7 +727,7 @@ def deal_update(
     return _save_deal(form, request, dry_run=dry_run)
 
 
-class DealStatusIn(Schema):
+class DealStatusIn(InputSchema):
     status: Literal["open", "accepted", "declined"]
     closing_type: str | None = Field(
         default=None,
@@ -824,7 +825,7 @@ def deal_status(
     return _save_deal(form, request, dry_run=dry_run)
 
 
-class RelatedOffers(Schema):
+class RelatedOffers(InputSchema):
     offers: list[int | str] = Field(
         min_length=1,
         description="IDs or codes of offers, e.g. 2026-0179-o02.",

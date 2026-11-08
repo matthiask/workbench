@@ -9,7 +9,7 @@ from django.utils.translation import gettext as _
 from ninja import Query, Schema
 from ninja.errors import ValidationError as NinjaValidationError
 from ninja.pagination import LimitOffsetPagination
-from pydantic import Field, PlainSerializer
+from pydantic import ConfigDict, Field, PlainSerializer
 
 from workbench.accounts.models import Team, User
 from workbench.tools.validation import monday
@@ -120,6 +120,13 @@ ShortName = Annotated[
 ]
 OrganizationID = Annotated[int | None, Field(description="ID of the organization.")]
 ProjectID = Annotated[int | None, Field(description="ID of the project.")]
+
+
+class InputSchema(Schema):
+    """Request bodies reject unknown fields: data under a wrong key (often
+    from LLMs) would be lost silently"""
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class DateRangeFilter(Schema):

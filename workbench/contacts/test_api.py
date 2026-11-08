@@ -584,6 +584,27 @@ class ContactsAPITest(TestCase):
         self.assertEqual(Person.objects.get().primary_contact, other)
         self.assertEqual(Organization.objects.get().primary_contact, other)
 
+    def test_create_unknown_fields(self):
+        """Unknown fields are errors, the data would be lost silently"""
+        self.client.force_login(factories.UserFactory.create())
+        response = self.client.post(
+            "/api/contacts/people/",
+            {
+                "given_name": "Hans",
+                "family_name": "Muster",
+                "salutation": "Lieber Hans",
+                "email": "hans@example.com",
+                "phone_numbers": [{"type": "mobile", "number": "079 123 45 67"}],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            sorted(error["loc"][-1] for error in response.json()["detail"]),
+            ["email", "number", "phone_number"],
+        )
+        self.assertFalse(Person.objects.exists())
+
     def test_create(self):
         """People are created with their details and their organization"""
         user = factories.UserFactory.create()

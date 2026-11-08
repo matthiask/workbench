@@ -35,6 +35,39 @@ class APISchemaTest(SimpleTestCase):
                         self.assertNotIn(name, names, (module_name, names.get(name)))
                     names[name] = module_name
 
+    def test_request_bodies_reject_unknown_fields(self):
+        """Request bodies (also nested objects) reject unknown fields, data
+        under a wrong key would be lost silently (``InputSchema``)"""
+        schema = api.get_openapi_schema(path_prefix="/api/")
+        components = schema["components"]["schemas"]
+
+        def refs(obj):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    if key == "$ref":
+                        yield value.rsplit("/", 1)[-1]
+                    else:
+                        yield from refs(value)
+            elif isinstance(obj, list):
+                for value in obj:
+                    yield from refs(value)
+
+        todo = [
+            name
+            for operations in schema["paths"].values()
+            for operation in operations.values()
+            for name in refs(operation.get("requestBody", {}))
+        ]
+        seen = set()
+        while todo:
+            if (name := todo.pop()) in seen:
+                continue
+            seen.add(name)
+            todo.extend(refs(components[name]))
+            with self.subTest(name=name):
+                self.assertFalse(components[name].get("additionalProperties", True))
+        self.assertIn("PlannedWorkIn", seen)
+
     def test_schema(self):
         """The OpenAPI document is generated without errors"""
         schema = api.get_openapi_schema(path_prefix="/api/")

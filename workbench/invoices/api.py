@@ -36,6 +36,7 @@ from workbench.projects.models import Project
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     DateRangeFilter,
+    InputSchema,
     OrganizationID,
     ProjectID,
     SearchQuery,
@@ -267,7 +268,7 @@ def _reminders(invoices, request):
     return list(nested.values())
 
 
-class Reminded(Schema):
+class Reminded(InputSchema):
     invoices: list[int] = Field(
         min_length=1, description="IDs of overdue invoices from the reminders."
     )
@@ -294,7 +295,7 @@ def mark_reminded(request, data: Reminded, *, dry_run: bool = False):
     return result
 
 
-class SendReminder(Schema):
+class SendReminder(InputSchema):
     to: str | None = Field(
         default=None,
         description="Recipient, e.g. one of the contact's email addresses."
@@ -353,7 +354,7 @@ def send_reminder(
     }
 
 
-class PostponeReminders(Schema):
+class PostponeReminders(InputSchema):
     until: dt.date | None = Field(
         description="No reminders before this date, null postpones nothing."
     )
@@ -422,7 +423,7 @@ TYPES = {
 }
 
 
-class InvoiceIn(Schema):
+class InvoiceIn(InputSchema):
     project: int | None = Field(
         default=None,
         description="Project ID; invoices without project are fixed amount"

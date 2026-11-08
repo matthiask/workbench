@@ -17,6 +17,7 @@ from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Service
 from workbench.reporting.utils import sum_of
 from workbench.timer.models import Slice, Timestamp, timestamp_project
+from workbench.tools.api import InputSchema
 from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
 
@@ -73,7 +74,7 @@ def _slice_out(slice, request, *, codes):
     }
 
 
-class TimestampIn(Schema):
+class TimestampIn(InputSchema):
     type: Literal["start", "stop"]
     notes: str = Field(default="", max_length=500)
     time: dt.time | None = Field(
