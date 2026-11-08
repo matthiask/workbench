@@ -644,6 +644,43 @@ class OffersTest(TestCase):
         self.assertEqual(service.effort_rate, 100)
         self.assertEqual(service.effort_hours, 10)
 
+    def test_offer_form_keeps_invoiced_services(self):
+        """Invoiced services are neither removed from nor added to offers"""
+        offer = factories.OfferFactory.create(
+            title="Offer", postal_address="A\nStreet\nCity"
+        )
+        service = factories.ServiceFactory.create(offer=offer, project=offer.project)
+        unoffered = factories.ServiceFactory.create(project=offer.project)
+        factories.InvoiceFactory.create(
+            project=offer.project,
+            customer=offer.project.customer,
+            contact=offer.project.contact,
+            type=Invoice.SERVICES,
+        ).create_services_from_offer([service, unoffered])
+
+        self.client.force_login(offer.owned_by)
+        data = {
+            "title": offer.title,
+            "owned_by": offer.owned_by_id,
+            "status": offer.status,
+            "postal_address": offer.postal_address,
+            "discount": "0",
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            WarningsForm.ignore_warnings_id: "on",
+        }
+        for services in [[], [service.id, unoffered.id]]:
+            response = self.client.post(
+                offer.urls["update"], data | {"services": services}
+            )
+            self.assertContains(response, "invoiced already")
+        self.assertEqual(list(offer.services.all()), [service])
+
+        response = self.client.post(
+            offer.urls["update"], data | {"services": [service.id]}
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+
     def test_no_changes_to_services_of_sent_offers(self):
         """The services of offers which have been sent or accepted can't be
         repriced, added or removed (put them back into preparation first)"""
