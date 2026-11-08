@@ -463,6 +463,27 @@ class DealsAPITest(TestCase):
         self.assertEqual((deal.status, offer.status), (Deal.DECLINED, Offer.DECLINED))
         self.assertEqual(deal.closing_notice, "Cheaper offer")
 
+    def test_status_offers_without_related_offers(self):
+        """Offers given when closing a deal without related offers are an
+        error, not ignored"""
+        user = factories.UserFactory.create()
+        deal = factories.DealFactory.create(owned_by=user, probability=Deal.NORMAL)
+        offer = factories.OfferFactory.create(status=Offer.OFFERED)
+        factories.ClosingTypeFactory.create(title="Won", represents_a_win=True)
+        self.client.force_login(user)
+
+        response = self.client.post(
+            f"/api/deals/{deal.pk}/status/",
+            {"status": "accepted", "closing_type": "Won", "offers": [offer.pk]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "offers"]
+        )
+        deal.refresh_from_db()
+        self.assertEqual(deal.status, Deal.OPEN)
+
     def test_related_offers(self):
         """Offers are linked to open deals and unlinked like in the web
         interface, by ID or code"""

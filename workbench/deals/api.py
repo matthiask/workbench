@@ -807,6 +807,11 @@ def deal_status(
                     "msg": _("Unknown offer %r, expected an ID or a code like %s.")
                     % (value, "2026-0179-o02"),
                 })
+    elif data.offers:
+        errors.append({
+            "loc": ["body", "data", "offers"],
+            "msg": _("This deal has no related offers to settle."),
+        })
     if "delete_planned_work" in form.fields and data.delete_planned_work is not None:
         values["delete_planned_work"] = int(data.delete_planned_work)
     if errors:
