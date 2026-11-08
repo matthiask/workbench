@@ -547,9 +547,9 @@ def project_create(
     code; nothing is saved if anything is invalid or with ``dry_run``."""
     owned_by = request.user
     if data.owned_by is not None:
-        owned_by = User.objects.filter(
-            is_active=True, _short_name__iexact=data.owned_by
-        ).first()
+        owned_by = (
+            User.objects.by_short_name(data.owned_by).filter(is_active=True).first()
+        )
         if not owned_by:
             raise ValidationError([
                 {
@@ -629,9 +629,9 @@ def project_update(
         if field in patch:
             values[field] = "" if patch[field] is None else patch[field]
     if patch.get("owned_by"):
-        owned_by = User.objects.filter(
-            is_active=True, _short_name__iexact=patch["owned_by"]
-        ).first()
+        owned_by = (
+            User.objects.by_short_name(patch["owned_by"]).filter(is_active=True).first()
+        )
         if not owned_by:
             raise ValidationError([
                 {

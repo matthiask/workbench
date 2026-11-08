@@ -225,7 +225,7 @@ def person_list(request, filters: Query[PersonFilter]):
     if filters.missing_postal_address:
         people = people.without_complete_postal_address()
     if filters.primary_contact:
-        user = User.objects.filter(_short_name__iexact=filters.primary_contact).first()
+        user = User.objects.by_short_name(filters.primary_contact).first()
         if not user:
             raise _query_error(
                 "primary_contact", _("Unknown user %r.") % filters.primary_contact
@@ -537,9 +537,7 @@ def person_create(
     errors.extend(_duplicates(data, allow_duplicates=allow_duplicates))
     primary_contact = request.user
     if data.primary_contact:
-        primary_contact = User.objects.filter(
-            _short_name__iexact=data.primary_contact
-        ).first()
+        primary_contact = User.objects.by_short_name(data.primary_contact).first()
         if not primary_contact:
             errors.append({
                 "loc": ["body", "data", "primary_contact"],
@@ -677,9 +675,12 @@ def person_update(request, person_id: int, data: PersonPatch, *, dry_run: bool =
             else:
                 target.append(group)
     if data.primary_contact is not None:
-        user = User.objects.filter(
-            is_active=True, _short_name__iexact=data.primary_contact
-        ).first()
+        user = (
+            User.objects
+            .by_short_name(data.primary_contact)
+            .filter(is_active=True)
+            .first()
+        )
         if user:
             person.primary_contact = user
         else:
@@ -886,7 +887,7 @@ class ReassignFilter(Schema):
 
 
 def _user(short_name, loc, *, active_only=False):
-    users = User.objects.filter(_short_name__iexact=short_name)
+    users = User.objects.by_short_name(short_name)
     if active_only:
         users = users.filter(is_active=True)
     if user := users.first():

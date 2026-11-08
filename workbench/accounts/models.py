@@ -114,6 +114,11 @@ class UserManager(BaseUserManager):
     def active(self):
         return self.filter(is_active=True)
 
+    def by_short_name(self, short_name):
+        """Users with this short name (case-insensitive, unique); a blank
+        short name identifies nobody"""
+        return self.exclude(_short_name="").filter(_short_name__iexact=short_name)
+
 
 @model_urls
 @total_ordering

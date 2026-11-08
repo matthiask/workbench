@@ -122,7 +122,7 @@ def absence_create(
     nothing is saved if anything is invalid or with ``dry_run``."""
     user = request.user
     if data.user is not None:
-        user = User.objects.filter(_short_name__iexact=data.user).first()
+        user = User.objects.by_short_name(data.user).first()
         if not user:
             raise ValidationError([
                 {"loc": ["body", "data", "user"], "msg": _("Unknown user.")}
@@ -279,7 +279,7 @@ def working_time(request, filters: Query[WorkingTimeFilter]):
     ):
         if not details:
             check_feature(request.user, FEATURES.PERSONNEL_ADMINISTRATION)
-        users = list(User.objects.filter(_short_name__iexact=filters.user))
+        users = list(User.objects.by_short_name(filters.user))
         if not users:
             raise ValidationError([
                 {"loc": ["query", "filters", "user"], "msg": _("Unknown user.")}

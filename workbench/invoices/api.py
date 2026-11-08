@@ -582,9 +582,12 @@ def _invoice_form(request, data, error):  # noqa: C901
     if data.contact is not None:
         values["contact"] = data.contact
     if data.owned_by is not None:
-        if user := User.objects.filter(
-            is_active=True, _short_name__iexact=data.owned_by
-        ).first():
+        if (
+            user := User.objects
+            .by_short_name(data.owned_by)
+            .filter(is_active=True)
+            .first()
+        ):
             values["owned_by"] = user.pk
         else:
             error(["owned_by"], _("Unknown or inactive user %r.") % data.owned_by)

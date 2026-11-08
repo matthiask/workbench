@@ -221,3 +221,12 @@ class AbsenceCreateAPITest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 422)
+
+        # A blank short name identifies nobody, also not users without one
+        factories.UserFactory.create(_short_name="")
+        response = self.client.post(
+            "/api/absences/",
+            absence | {"user": ""},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)

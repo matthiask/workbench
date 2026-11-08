@@ -583,9 +583,9 @@ def deal_create(
 
     owned_by = request.user
     if data.owned_by is not None:
-        owned_by = User.objects.filter(
-            is_active=True, _short_name__iexact=data.owned_by
-        ).first()
+        owned_by = (
+            User.objects.by_short_name(data.owned_by).filter(is_active=True).first()
+        )
         if not owned_by:
             error(["owned_by"], _("Unknown or inactive user %r.") % data.owned_by)
 
@@ -622,7 +622,7 @@ def deal_create(
 
 
 def _user_by_short_name(short_name, loc, error):
-    user = User.objects.filter(is_active=True, _short_name__iexact=short_name).first()
+    user = User.objects.by_short_name(short_name).filter(is_active=True).first()
     if not user:
         error(loc, _("Unknown or inactive user %r.") % short_name)
     return user
@@ -709,7 +709,7 @@ def deal_update(
     field = f"user_{values['owned_by']}_contribution"
     values[field] = values.get(field) or 100
     for short_name, weight in data.contributions.items():
-        user = User.objects.filter(_short_name__iexact=short_name).first()
+        user = User.objects.by_short_name(short_name).first()
         # Active users and those contributing already, like in the form
         if not user or (field := f"user_{user.pk}_contribution") not in (
             initial_form.fields

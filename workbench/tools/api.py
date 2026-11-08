@@ -234,7 +234,7 @@ class UsersFilter(Schema):
 def user_by_short_name(short_name, *, param):
     """The user with this short name (case-insensitive) for a filter, unknown
     ones are errors instead of finding nothing"""
-    if user := User.objects.filter(_short_name__iexact=short_name).first():
+    if user := User.objects.by_short_name(short_name).first():
         return user
     raise NinjaValidationError([
         {
@@ -262,7 +262,7 @@ def filter_users(filters):
         q = Q()
         for short_name in filters.user:
             q |= Q(_short_name__iexact=short_name)
-        users = users.filter(q)
+        users = users.exclude(_short_name="").filter(q)
         found = {user.get_short_name().casefold() for user in users}
         if missing := [name for name in filters.user if name.casefold() not in found]:
             q = Q()
