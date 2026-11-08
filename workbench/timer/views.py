@@ -41,7 +41,8 @@ class TokenUserMixin:
             data["user"] = self.request.user
         else:
             try:
-                data["user"] = User.objects.get(
+                # Tokens of users who left don't work anymore
+                data["user"] = User.objects.active().get(
                     token=self.request.POST.get("token")
                     or self.request.GET.get("token")
                 )

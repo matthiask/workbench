@@ -73,6 +73,17 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(t.user, user)
 
+    def test_timestamps_of_inactive_users(self):
+        """Tokens of users who left don't work anymore"""
+        user = factories.UserFactory.create(is_active=False)
+        response = self.client.post(
+            "/create-timestamp/", {"type": "start", "token": user.token}
+        )
+        self.assertEqual(response.status_code, 400)
+        response = self.client.get(f"/list-timestamps/?token={user.token}")
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Timestamp.objects.exists())
+
     def test_timestamp_with_time(self):
         """Specifying a time makes the endpoint use it instead of the current time"""
         user = factories.UserFactory.create()
