@@ -241,6 +241,44 @@ class DealsAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["probability"], "normal")
 
+    def test_update_archived_value_types_and_attributes(self):
+        """Values of archived value types and attributes of archived groups
+        which the deal has can be changed and removed, like in the web form"""
+        deal = factories.DealFactory.create()
+        old = factories.ValueTypeFactory.create(title="Old", is_archived=True)
+        deal.values.create(type=old, value=500)
+        group = AttributeGroup.objects.create(title="Gone", is_archived=True)
+        fax = group.attributes.create(title="Fax", is_archived=True)
+        phone = group.attributes.create(title="Phone")
+        deal.attributes.add(fax)
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.patch(
+            f"/api/deals/{deal.pk}/",
+            {"values": {"old": 800}, "attributes": {"gone": "fax"}},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(deal.values.get().value, 800)
+
+        response = self.client.patch(
+            f"/api/deals/{deal.pk}/",
+            {"values": {"old": None}, "attributes": {"gone": "phone"}},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(deal.values.exists())
+        self.assertEqual(list(deal.attributes.all()), [phone])
+
+        # Other deals don't get them
+        other = factories.DealFactory.create(owned_by=deal.owned_by)
+        response = self.client.patch(
+            f"/api/deals/{other.pk}/",
+            {"values": {"old": 100}},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+
     def test_value_types_and_attributes(self):
         """Value types and attribute groups are listed with the titles the
         other endpoints take, archived ones are left out"""

@@ -511,14 +511,19 @@ def _choices(objects):
     return ", ".join(repr(str(obj.title)) for obj in objects)
 
 
-def _values_and_attributes(data, form_data, error):
+def _values_and_attributes(data, form_data, error, *, deal=None):
     """Put the values and attributes given by title into the form data of a
     ``DealForm``, return the form fields' locations in the request body
 
     Values of ``None`` are removed. Required attribute groups must be in the
-    form data afterwards."""
+    form data afterwards. Like the form, archived value types and attribute
+    groups are only available if the deal has them."""
     fields = {}
-    value_types = list(ValueType.objects.filter(is_archived=False))
+    values = {v.type_id for v in deal.values.all()} if deal else set()
+    current = {a.group_id: a.id for a in deal.attributes.all()} if deal else {}
+    value_types = [
+        vt for vt in ValueType.objects.all() if not vt.is_archived or vt.id in values
+    ]
     by_title = {vt.title.casefold(): vt for vt in value_types}
     for title, value in data.values.items():
         if vt := by_title.get(title.casefold()):
@@ -530,9 +535,11 @@ def _values_and_attributes(data, form_data, error):
                 _("Unknown value type. Choices: %s") % _choices(value_types),
             )
 
-    groups = list(
-        AttributeGroup.objects.filter(is_archived=False).prefetch_related("attributes")
-    )
+    groups = [
+        group
+        for group in AttributeGroup.objects.all()
+        if not group.is_archived or group.id in current
+    ]
     by_title = {group.title.casefold(): group for group in groups}
     for title, attribute_title in data.attributes.items():
         if not (group := by_title.get(title.casefold())):
@@ -541,7 +548,7 @@ def _values_and_attributes(data, form_data, error):
                 _("Unknown attribute group. Choices: %s") % _choices(groups),
             )
             continue
-        attributes = [a for a in group.attributes.all() if not a.is_archived]
+        attributes = list(group.attributes.active(include=current.get(group.id)))
         attribute = next(
             (a for a in attributes if a.title.casefold() == attribute_title.casefold()),
             None,
@@ -559,7 +566,7 @@ def _values_and_attributes(data, form_data, error):
             error(
                 ["attributes", group.title],
                 _("This field is required. Choices: %s")
-                % _choices(a for a in group.attributes.all() if not a.is_archived),
+                % _choices(group.attributes.active(include=current.get(group.id))),
             )
     return fields
 
@@ -718,7 +725,7 @@ def deal_update(
             error(["contributions", short_name], _("Unknown user %r.") % short_name)
             continue
         values[field] = weight
-    fields = _values_and_attributes(data, values, error)
+    fields = _values_and_attributes(data, values, error, deal=deal)
     if errors:
         raise ValidationError(errors)
 
