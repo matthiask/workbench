@@ -196,7 +196,8 @@ def autodunning():
             for line in [
                 contact.organization if contact else customer,
                 contact,
-                currency(sum(invoice.total_excl_tax for invoice in contact_invoices)),
+                # The amounts the customers owe, like the reminders
+                currency(sum(invoice.total for invoice in contact_invoices)),
             ]
             if line
         )

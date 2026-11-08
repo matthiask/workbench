@@ -16,7 +16,7 @@ from workbench.invoices.tasks import autodunning
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
 from workbench.reporting.utils import effort_cost_by_project
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -1657,10 +1657,14 @@ class InvoicesTest(TestCase):
             due_on=in_days(-40),
             status=Invoice.SENT,
             contact=None,
+            subtotal=100,
         )
         autodunning()
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(invoice.customer.name, mail.outbox[0].body)
+        # Amounts customers owe, like the reminders and the dunning letter
+        self.assertIn(currency(invoice.total), mail.outbox[0].body)
+        self.assertNotEqual(invoice.total, invoice.total_excl_tax)
 
     def test_postpone_reminders(self):
         """Postponing reminders removes invoices from the reminders list"""
