@@ -123,3 +123,72 @@ fixed (the commits after "Verification: Findings of the third round").
 - The annual working time keeps scaling partial months by calendar days:
   changing balances needs a lot of consideration (short partial months
   with holidays can have a negative target).
+
+## Round 4 (2026-11-08)
+
+Four agents (invoices/offers/logbook, reports, time, contacts/deals/API).
+Fixed: margin per FTE by calendar quarter, invoiced services in the offer
+pricing form, the old offer service API and the offer form, auto dunning
+without contact, batch assignment of credit entries, blank short names in
+the APIs, malformed parameters of the annual working time, offers given when
+closing deals without related offers, recurring invoices in the merge
+warning.
+
+### Open, to decide
+
+- Invoicing the logbook after invoicing the offer doesn't warn: lines
+  invoiced from the offer which have linked entries (hours logged before)
+  count as invoiced from the logbook (`CreateProjectInvoiceForm.clean`).
+  Invoice lines don't know their source.
+- A sickness description becomes visible to everyone when the reason is
+  changed away from sickness (`Absence.details_visible_to()`,
+  `public_text()`; the planning mail already hides it).
+- Key data: future-dated logged third party costs (and invoices) of the
+  current year are extrapolated by the Hochrechnung.
+- Unknown fields in API request bodies are ignored (no `extra="forbid"`),
+  data under a wrong key is lost silently.
+- Deleting an offer with invoiced services moves them out of the offer
+  (`SET_NULL`); deleting a declined offer turns its services into budgeted
+  ones; deleting an offer deletes all its planned work, past weeks too.
+
+### Untested risks
+
+- Budget statistics: a budget transfer out of a project without offers
+  makes `sold` negative, all unbilled work counts as "über Offerte".
+- Key data API: accruals of the month in progress are computed at the
+  month end (future cutoff), the gross margin with today's accruals.
+- Budget statistics with a past cutoff use the current link of logged costs
+  to services invoices (Fremdkosten column).
+- Cash data with a future `date` counts the current month as overdue.
+- Squeeze XLSX: the totals row of the users sheet is one cell short.
+- A future `work_completed_on` blocks logging right away.
+- Paying an invoice in preparation without a due date makes it unsavable in
+  its form until a due date is added.
+- Removing invoice lines doesn't update the service period.
+- Down payments larger than the final invoice give a negative total without
+  a warning.
+- Auto dunning mails sum totals excl. tax, reminders use totals incl. tax.
+- `clear_sickness_descriptions()` misses absences changed away from
+  sickness and emptied descriptions (history).
+- External work has no closed-project check.
+- Timer tokens of inactive users still work.
+- Merged contact details keep their weight and may outrank the kept
+  person's postal address.
+- Archived value types can't be removed through the deals API.
+- Notes are never pruned from the audit log.
+- Many query parameters lack descriptions; `wb deals show` has no CLI test.
+
+### Possibly decisions
+
+- Credits don't carry the third party costs of the credited invoice; key
+  data keeps deducting them (squeeze floors at 0).
+- `Service.is_invoiced` stays true after the only invoice was cancelled.
+- Changing a project's customer changes the customer of sent invoices too
+  (warning only).
+- "School attendance of apprentices" counts as working time without
+  confirmation; HR's own paid leave is confirmed automatically; paid leave
+  descriptions are public.
+- `POST /api/deals/` with another owner doesn't add the requesting user as
+  contributor although the docstring calls them the main driving force.
+- Removing an industry group through `wb people update` affects the whole
+  organization (CLI help doesn't say so).
