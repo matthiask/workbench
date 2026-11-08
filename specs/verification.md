@@ -148,12 +148,12 @@ warning (the commits after "Verification: Findings of the fourth round").
 - The offer form neither removes invoiced services from the offer nor adds
   them to it, like the service form of the project. Revisit if adding them
   proves to be needed.
-
-### Open, to decide
-
-- Deleting an offer with invoiced services moves them out of the offer
-  (`SET_NULL`); deleting a declined offer turns its services into budgeted
-  ones; deleting an offer deletes all its planned work, past weeks too.
+- Deleting offers stays as it is: invoiced services lose their offer
+  (`SET_NULL`), the services of a deleted declined offer become budgeted,
+  and all planned work of the offer is deleted, past weeks too. Whether
+  that's right depends on how the services were invoiced (deleting may be
+  fine when invoicing from the logbook) and on whether the planned hours
+  have been logged or invoiced; not worth the complexity for now.
 
 ### Untested risks
 
