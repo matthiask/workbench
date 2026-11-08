@@ -350,6 +350,9 @@ def _apply_service(service, values, *, service_types, loc, errors, warnings):
         if field in values:
             setattr(service, model_field, _decimal(values[field], exp))
 
+    # The logbook of invoiced work would be valued differently
+    invoiced = service.is_invoiced
+    effort = (service.effort_type, service.effort_rate)
     unknown_service_type = False
     if (title := values.get("service_type")) is not None:
         if service_type := service_types.get(title):
@@ -365,10 +368,18 @@ def _apply_service(service, values, *, service_types, loc, errors, warnings):
         service.effort_type = values["effort_type"] or ""
     if "hourly_rate" in values:
         service.effort_rate = _decimal(values["hourly_rate"], "0.00")
-    if service.project.flat_rate is not None:
+    if service.project.flat_rate is not None and not invoiced:
         with override(settings.WORKBENCH.PDF_LANGUAGE):
             service.effort_type = _("flat rate")
         service.effort_rate = service.project.flat_rate
+    if invoiced and (service.effort_type, service.effort_rate) != effort:
+        errors.append({
+            "loc": [*loc, "hourly_rate"],
+            "msg": _(
+                "This service has been invoiced already,"
+                " its effort type and rate cannot be changed."
+            ),
+        })
 
     if (
         service.effort_hours is not None

@@ -658,6 +658,35 @@ class OfferServicesAPITest(TestCase):
         self.assertIn("invoiced", response.content.decode())
         self.assertEqual(self.offer.services.count(), 2)
 
+    def test_invoiced_services_keep_their_rate(self):
+        """Invoiced services keep their effort type and rate"""
+        project = self.offer.project
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        ).create_services_from_offer([self.concept])
+
+        response = self.send(
+            "patch", f"services/{self.concept.pk}/", {"hourly_rate": 300}
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("invoiced", response.content.decode())
+        self.concept.refresh_from_db()
+        self.assertNotEqual(self.concept.effort_rate, 300)
+
+        # Also not through a flat rate of the project
+        project.flat_rate = 160
+        project.save()
+        self.concept.refresh_from_db()
+        rate = self.concept.effort_rate
+        response = self.send("patch", f"services/{self.concept.pk}/", {"hours": 12})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.concept.refresh_from_db()
+        self.assertEqual(self.concept.effort_rate, rate)
+        self.assertEqual(self.concept.effort_hours, 12)
+
     def test_reorder(self):
         """Services are reordered by listing all their IDs"""
         order = {"services": [self.hosting.pk, self.concept.pk]}
