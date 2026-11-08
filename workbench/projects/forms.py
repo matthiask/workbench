@@ -967,7 +967,36 @@ class BudgetTransferForm(ModelForm):
                 code="budget-transfer-too-large",
             )
 
+        if amount and amount > (sold := self.sold_amount()):
+            # Transfers move the budget of offers whose work isn't finished
+            self.add_warning(
+                _(
+                    "Moving %(amount)s away exceeds the accepted offers of"
+                    " %(project)s (%(sold)s after other transfers). The budget"
+                    " statistics would count all its work which isn't invoiced"
+                    " as beyond the offer. Are you sure?"
+                )
+                % {
+                    "amount": currency(amount),
+                    "project": self.project,
+                    "sold": currency(sold),
+                },
+                code="budget-transfer-beyond-offers",
+            )
+
         return data
+
+    def sold_amount(self):
+        """The accepted offers and the net transfers of this project, without
+        this transfer ("verkauft" of the budget statistics)"""
+        accepted = accepted_offers_by_project([self.project.pk])
+        adjustments = BudgetTransfer.objects.exclude(pk=self.instance.pk).adjustments(
+            projects=[self.project]
+        )
+        return (
+            accepted.get(self.project.id, {}).get("total", Z2)
+            + adjustments[self.project.id]
+        )
 
     def save(self):
         instance = super().save(commit=False)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:22+0100\n"
+"POT-Creation-Date: 2026-11-08 16:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3889,6 +3889,11 @@ msgstr "Verfügbar: %(available)s."
 #, python-format
 msgid "Moving %(amount)s away leaves %(project)s with a negative budget. Are you sure?"
 msgstr "Wenn Du %(amount)s wegschiebst, bleibt %(project)s mit einem negativen Budget zurück. Bist Du sicher?"
+
+#: workbench/projects/forms.py
+#, python-format
+msgid "Moving %(amount)s away exceeds the accepted offers of %(project)s (%(sold)s after other transfers). The budget statistics would count all its work which isn't invoiced as beyond the offer. Are you sure?"
+msgstr "Wenn Du %(amount)s wegschiebst, übersteigt das die akzeptierten Offerten von %(project)s (%(sold)s nach anderen Budgetverschiebungen). Die Projektbudgetstatistik zählt dann alle nicht verrechnete Arbeit als über die Offerte hinaus. Bist Du sicher?"
 
 #: workbench/projects/models.py
 msgid "is outreach"

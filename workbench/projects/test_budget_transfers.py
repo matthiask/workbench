@@ -9,6 +9,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
+from workbench.offers.models import Offer
 from workbench.projects.models import BudgetTransfer
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin, squeeze_data
@@ -190,13 +191,15 @@ class BudgetTransferTest(TestCase):
         self.assertContains(response, '<div class="modal">')
         self.assertNotContains(response, "<!DOCTYPE html>")
 
-        # Reserve first, without naming a target project.
+        # Reserve first, without naming a target project. The project has no
+        # accepted offers (invoiced with a fixed amount), which is a warning.
         response = self.client.post(
             source.urls["createbudgettransfer"],
             {
                 "modal-title": "Re-Konzeption",
                 "modal-amount": "8000",
                 "modal-notes": "",
+                WarningsForm.ignore_warnings_id: "budget-transfer-beyond-offers",
             },
             headers={"x-requested-with": "XMLHttpRequest"},
         )
@@ -216,6 +219,7 @@ class BudgetTransferTest(TestCase):
                 "modal-title": "Re-Konzeption",
                 "modal-amount": "8000",
                 "modal-notes": "",
+                WarningsForm.ignore_warnings_id: "budget-transfer-beyond-offers",
             },
             headers={"x-requested-with": "XMLHttpRequest"},
         )
@@ -273,11 +277,41 @@ class BudgetTransferTest(TestCase):
                 "modal-title": "Too much",
                 "modal-amount": "20000",
                 "modal-notes": "",
-                WarningsForm.ignore_warnings_id: "budget-transfer-too-large",
+                WarningsForm.ignore_warnings_id: (
+                    "budget-transfer-too-large budget-transfer-beyond-offers"
+                ),
             },
             headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertEqual(response.status_code, 201)
+
+    def test_warns_when_moving_more_than_was_sold(self):
+        """Moving more than the accepted offers (after other transfers) makes
+        the sold amount negative, the budget statistics would count all work
+        which isn't invoiced as beyond the offer"""
+        user = factories.UserFactory.create()
+        project = factories.ProjectFactory.create(owned_by=user)
+        offer = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        factories.ServiceFactory.create(project=project, offer=offer, cost=5000)
+        offer.save()
+        self.client.force_login(user)
+
+        def transfer(amount):
+            return self.client.post(
+                project.urls["createbudgettransfer"],
+                {
+                    "modal-title": "Later",
+                    "modal-amount": str(amount),
+                    "modal-notes": "",
+                    WarningsForm.ignore_warnings_id: "budget-transfer-too-large",
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        self.assertEqual(transfer(3000).status_code, 201)
+        response = transfer(3000)
+        self.assertContains(response, "budget-transfer-beyond-offers")
+        self.assertEqual(BudgetTransfer.objects.count(), 1)
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_requires_controlling(self):

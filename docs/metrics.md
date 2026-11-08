@@ -312,7 +312,7 @@ Sorting: web by delta ascending; API by delta descending.
 
 | Label (DE) | Key | Formula |
 |---|---|---|
-| verkauft (tooltip "Offeriert und akzeptiert") | `sold` | total of the accepted offers per project (`accepted_offers_by_project()`: the accepted budget retainer offers or the other accepted offers, whichever is larger; discount already deducted; optional services not in total) **+ net budget transfers** (`BudgetTransfer.objects.adjustments`). No cutoff date filter on offers or transfers. |
+| verkauft (tooltip "Offeriert und akzeptiert") | `sold` | total of the accepted offers per project (`accepted_offers_by_project()`: the accepted budget retainer offers or the other accepted offers, whichever is larger; discount already deducted; optional services not in total) **+ net budget transfers** (`BudgetTransfer.objects.adjustments`). Transfers out of a project can make it negative (e.g. a project invoiced with a fixed amount without offers); the transfer form warns (`budget-transfer-beyond-offers`), since all work not invoiced then counts as "über Offerte". No cutoff date filter on offers or transfers. |
 | Rabatt (report only) | `discount` | −Σ `Offer.discount` of the same accepted offers as "verkauft" (`accepted_offers_by_project()`). Shown as a negative number. No cutoff. |
 | Logbuch | `logbook` | `cost` + `effort_cost` (see building blocks), entries with `rendered_on <= cutoff`. |
 | (hidden in table, API/XLSX) | `cost` | Σ `LoggedCost.cost`, `rendered_on <= cutoff` |
