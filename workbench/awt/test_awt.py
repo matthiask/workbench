@@ -38,11 +38,12 @@ class AWTTest(TestCase):
         deactivate_all()
 
     def test_redirect(self):
-        """Invalid year produces a redirect"""
+        """Invalid years and users produce a redirect"""
         user = factories.UserFactory.create()
         self.client.force_login(user)
-        response = self.client.get("/report/annual-working-time/?year=asdf")
-        self.assertRedirects(response, "/report/annual-working-time/")
+        for query in ["year=asdf", "year=0", "year=10000&user=active", "user=abc"]:
+            response = self.client.get(f"/report/annual-working-time/?{query}")
+            self.assertRedirects(response, "/report/annual-working-time/")
 
     def test_year(self):
         """Basic year methods work"""

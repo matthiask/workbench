@@ -35,8 +35,13 @@ def annual_working_time_view(request):
         year = int(request.GET.get("year", this_year))
     except Exception:  # noqa: BLE001
         return redirect(".")
-
     user = request.GET.get("user")
+    # The computations look at the years before and after too
+    if not dt.MINYEAR < year < dt.MAXYEAR or (
+        user and user != "active" and not user.isdigit()
+    ):
+        return redirect(".")
+
     users = None
     overview_requested = False
     # Sickness days and descriptions, monthly figures, the PDF
