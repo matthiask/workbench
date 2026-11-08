@@ -10,6 +10,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
+from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.formats import local_date_format
@@ -604,6 +605,44 @@ class OffersTest(TestCase):
         # - updated only once because of skip_related_model
         actions = LoggedAction.objects.for_model(offer).with_data(id=offer.id)
         self.assertEqual([action.action for action in actions], ["I", "U", "U"])
+
+    def test_offer_pricing_keeps_rates_of_invoiced_services(self):
+        """Invoiced services keep their effort type and rate, also in the
+        pricing form"""
+        offer = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(
+            offer=offer, project=offer.project, effort_type="Design", effort_rate=100
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=2)
+        factories.InvoiceFactory.create(
+            project=offer.project,
+            customer=offer.project.customer,
+            contact=offer.project.contact,
+            type=Invoice.SERVICES,
+        ).create_services_from_logbook([service])
+
+        self.client.force_login(offer.owned_by)
+        response = self.client.post(
+            offer.urls["pricing"],
+            {
+                "discount": 0,
+                "services-TOTAL_FORMS": 1,
+                "services-INITIAL_FORMS": 1,
+                "services-MAX_NUM_FORMS": 1000,
+                "services-0-id": service.id,
+                "services-0-offer": offer.id,
+                "services-0-title": service.title,
+                "services-0-effort_type": "Programming",
+                "services-0-effort_rate": 250,
+                "services-0-effort_hours": 10,
+                "services-0-cost": 0,
+            },
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        service.refresh_from_db()
+        self.assertEqual(service.effort_type, "Design")
+        self.assertEqual(service.effort_rate, 100)
+        self.assertEqual(service.effort_hours, 10)
 
     def test_no_changes_to_services_of_sent_offers(self):
         """The services of offers which have been sent or accepted can't be

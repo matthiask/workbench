@@ -322,7 +322,11 @@ class ServiceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.pk and self.instance.project.flat_rate is not None:
+        # Invoiced services keep their effort type and rate, the logbook of
+        # invoiced work would be valued differently
+        if self.instance.pk and (
+            self.instance.project.flat_rate is not None or self.instance.is_invoiced
+        ):
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
 
