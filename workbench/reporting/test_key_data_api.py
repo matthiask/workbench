@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from time_machine import travel
 
 from workbench import factories
 from workbench.deals.models import Deal
@@ -103,6 +104,30 @@ class KeyDataAPITest(TestCase):
             "squeeze_gross_margin",
         ]:
             self.assertIn(key, data)
+
+    @travel("2026-07-15 12:00")
+    @override_settings(KEY_DATA_API_TOKEN="secret")
+    def test_month_in_progress(self):
+        """The month in progress is computed as of today like in the web
+        interface, not at its end"""
+        project = factories.ProjectFactory.create()
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            invoiced_on=dt.date(2026, 7, 20),
+            due_on=dt.date(2026, 8, 20),
+            subtotal=1000,
+            status=Invoice.SENT,
+        )
+        response = self.client.get(
+            "/api/reports/key-data/?month=2026-07",
+            headers={"Authorization": "Bearer secret"},
+        )
+        data = response.json()
+        self.assertEqual(data["accruals"], 0)
+        self.assertEqual(data["open_invoices_total_excl_tax"], 0)
 
     @override_settings(KEY_DATA_API_TOKEN="secret")
     def test_canceled_invoices(self):

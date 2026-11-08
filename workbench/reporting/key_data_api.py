@@ -74,7 +74,8 @@ def key_data_for_month(first_of_month, *, deals=True, squeeze_data=True):
     """Key data of a month; ``deals`` and ``squeeze_data`` add the fields
     which require the deals and productivity features"""
     date_range = month_range(first_of_month)
-    last_of_month = date_range[1]
+    # The month in progress is computed as of today, like the key data report
+    last_of_month = min(date_range[1], dt.date.today())
     month = (first_of_month.year, first_of_month.month)
 
     gross_margin = next(

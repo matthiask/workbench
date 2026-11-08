@@ -191,7 +191,7 @@ From `workbench/reporting/green_hours.py:green_hours_by_month` (SQL), all logged
 
 #### Caveats from code
 - Accruals are snapshots: the fairy tasks recompute (`update_or_create`) the stored accruals of every month-end of the last two years on each run (`reporting/tasks.py:create_accruals_for_last_month`), with current data (current invoice status, current project types). Older stored records stay as they were.
-- Last month's figures are final only after the fairy tasks have run in the new month. Before, last month has no stored record: its Umsatz bereinigt lacks the accrual delta, the current month's delta (live, cutoff today) is taken against the month before last instead, and the key data API's `accruals` (computed live at the month end) doesn't match the delta in its `gross_margin`. Months before the first stored record behave the same way. Computing the missing record live would cost another run of the project budget statistics for every request, for a gap of a few hours a month.
+- Last month's figures are final only after the fairy tasks have run in the new month. Before, last month has no stored record: its Umsatz bereinigt lacks the accrual delta, the current month's delta (live, cutoff today) is taken against the month before last instead, and the key data API's `accruals` (computed live at the month end) doesn't match the delta in its `gross_margin`. The month in progress uses the cutoff today in both. Months before the first stored record behave the same way. Computing the missing record live would cost another run of the project budget statistics for every request, for a gap of a few hours a month.
 - Projections not invoiced in time stay in their original month (AGENTS.md; `projected_gross_margin`).
 
 ---
@@ -210,9 +210,9 @@ web interface; the static reporting token gets everything.
 | `gross_margin` | "Umsatz bereinigt" of the month exactly as in the web view (0.00 if the month row is left out). |
 | `green_hours_percentage` | grün % of the month (null if no hours). |
 | `previous_months[3]` | For each of the 3 preceding months: `green_hours_percentage`, `canceled_invoices_total_excl_tax`. |
-| `open_invoices_total_excl_tax` | Σ total_excl_tax of invoices outstanding on the last day of the month (current status: later canceled ones excluded). |
+| `open_invoices_total_excl_tax` | Σ total_excl_tax of invoices outstanding on the last day of the month, today for the month in progress (current status: later canceled ones excluded). |
 | `canceled_invoices_total_excl_tax` | Σ total_excl_tax of invoices with status `CANCELED` and `closed_on` in the month. Invoices in preparation can't be cancelled (they are deleted) since November 2026; older data may contain invoices cancelled before they were sent. |
-| `accruals` | Stored `Accruals` with `cutoff_date` = last day of month, else computed live (`delta_negative` of external projects, with today's data). |
+| `accruals` | Stored `Accruals` with `cutoff_date` = last day of month, else computed live (`delta_negative` of external projects, with today's data); for the month in progress with cutoff today, like the key data report. |
 | `full_time_equivalents` | FTE of the month (see above). |
 | `squeeze_gross_margin` | `squeeze_data(month)["totals"]["gross_margin"]` (see squeeze documentation). |
 | `deals_funnel` | Open deals as of **today** (not the requested month, on purpose: the funnel looks ahead from today, and probabilities and expected decision dates aren't versioned), Σ Deal.value: `high_probability_next_4_weeks` (HIGH, decision_expected_on − today ≤ 28 days, overdue included), `_next_12_weeks` (≤ 84 days), `_later` (later or no date), `normal_probability` (NORMAL). LOW/UNKNOWN left out. `key_data_api.py:deals_funnel`, `templatetags/workbench.py:deal_group` |
