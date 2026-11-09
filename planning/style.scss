@@ -23,6 +23,11 @@
   --stripe2: color-mix(in srgb, var(--bs-primary) 6%, var(--wb-surface));
   --stripe3: color-mix(in srgb, var(--bs-body-color) 3%, transparent);
   --stripe4: color-mix(in srgb, var(--bs-body-color) 2.5%, transparent);
+  // The row stripes let the column of this week shine through, the sticky
+  // titles stay opaque
+  --row-stripe1: color-mix(in srgb, var(--stripe1) 80%, transparent);
+  --row-stripe2: color-mix(in srgb, var(--stripe2) 80%, transparent);
+  --this-week: color-mix(in srgb, var(--bs-teal) 30%, transparent);
 
   --absences: color-mix(in srgb, var(--bs-info) 10%, var(--wb-surface));
   --milestones: color-mix(in srgb, var(--bs-pink) 8%, transparent);
@@ -163,12 +168,12 @@
 
 .planning--stripe1 {
   border-top: 1px solid var(--bs-border-color);
-  background-color: var(--stripe1);
+  background-color: var(--row-stripe1);
   padding: 10px 0;
 }
 
 .planning--stripe2 {
-  background-color: var(--stripe2);
+  background-color: var(--row-stripe2);
 }
 
 .planning--stripe3 {
@@ -180,7 +185,13 @@
 }
 
 .planning--this-week {
-  background-color: color-mix(in srgb, var(--bs-primary) 12%, transparent);
+  background-color: var(--this-week);
+}
+
+.planning--scale.is-this-week {
+  background-color: var(--this-week);
+  color: var(--bs-body-color);
+  font-weight: 600;
 }
 
 .planning--absences {

@@ -246,7 +246,9 @@ function Planning({ data: initialData }) {
               {data.weeks.map((week, idx) => (
                 <Cell
                   key={idx}
-                  className="planning--scale text-center planning--small"
+                  className={`planning--scale text-center planning--small${
+                    idx === data.this_week_index ? " is-this-week" : ""
+                  }`}
                   row={2}
                   column={FIRST_DATA_COLUMN + idx}
                 >
@@ -256,7 +258,9 @@ function Planning({ data: initialData }) {
               {data.weeks.map((week, idx) => (
                 <Cell
                   key={idx}
-                  className="planning--scale text-center planning--smaller"
+                  className={`planning--scale text-center planning--smaller${
+                    idx === data.this_week_index ? " is-this-week" : ""
+                  }`}
                   row={3}
                   column={FIRST_DATA_COLUMN + idx}
                 >
