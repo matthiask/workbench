@@ -16,7 +16,7 @@ Contents:
 3. [Project budgets](#project-budgets): project budget statistics, project
    key figures, budget transfers, budget alerts
 4. [Profitability](#profitability): squeeze, project profitability, labor costs
-5. [Time and people](#time-and-people): user statistics, annual working time,
+5. [Time and people](#time-and-people): annual working time,
    green hours, hours per customer and type, logging, planning vs. logbook,
    planning capacity
 6. [Deals](#deals): accepted and declined deals, deal history
@@ -688,19 +688,6 @@ Code: `workbench/reporting/labor_costs.py:_labor_costs_by_project_id`,
 
 ## Time and people
 
-### User statistics (Statistik: "Stunden pro Woche", "Stunden pro Kundschaft")
-
-- Where: `/users/<pk>/statistics/` (`accounts_user_statistics`, `workbench/accounts/views.py:ProfileView`). No feature check, so any user can open any user's page. No API.
-- Answers: how many hours a person logged per week over roughly the last half year, by project type and by customer, compared with the expected hours.
-- Period: from `monday(today − 180 days)` to the Sunday of the current week. Weeks without hours are kept as 0 (`generate_series`).
-
-| Figure                                                                                        | Computation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Stunden pro Woche (bars per project type: Order/Maintenance/Internal, `Project.TYPE_CHOICES`) | `SUM(hours)` of the user's `LoggedHours` grouped by `date_trunc('week', rendered_on)` and `project.type`                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| Erwartet (dashed line, both charts)                                                           | The hours one is expected to log: per week max(target − absences, 0) from `target_and_absences_by_week()` (`workbench/awt/reporting.py`, shared with the weekly working time): target = Σ over the weekdays of each employment of `working_time_per_day` (Year of the user's WTM, 8.0 if not configured) × percentage / 100 × (1 − holiday fraction); absences which count as working time are spread evenly over their weekdays and valued at `working_time_per_day`, like in the annual working time. Unpaid absences (reason `other`) don't reduce it. |
-| Stunden pro Kundschaft                                                                        | `SUM(hours)` per week and `customer.name` (first line only). The 7 customers with the most hours over the whole period get their own series, and everyone else goes into "Alle anderen". Each label gets `round(100 × customer_hours / all_hours)%`.                                                                                                                                                                                                                                                                                                      |
-
-Code: `workbench/accounts/reporting.py:logged_hours`, chart in `workbench/accounts/views.py:ProfileView.get_context_data`.
 Productivity in the sense of the `PRODUCTIVITY` feature ("Produktivität") is the squeeze report (`report_squeeze`, `/api/reports/squeeze/`), see [Squeeze](#squeeze-squeeze).
 
 ---

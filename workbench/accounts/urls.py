@@ -41,11 +41,6 @@ urlpatterns = [
         {"retro": True},
         name="accounts_user_retrospective",
     ),
-    path(
-        "users/<int:pk>/statistics/",
-        views.ProfileView.as_view(),
-        name="accounts_user_statistics",
-    ),
     # Teams
     path(
         "teams/",

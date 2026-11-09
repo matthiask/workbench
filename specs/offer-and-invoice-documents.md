@@ -61,7 +61,7 @@ reference") already changes documents which were sent years ago.
 Not offers or invoices, internal only, out of scope here and can stay on
 reportlab for now:
 
-- annual working time and user statistics (`workbench/awt/pdf.py`)
+- annual working time (`workbench/awt/pdf.py`)
 - expense reports (`workbench/expenses/views.py`)
 
 ## 2. Old documents

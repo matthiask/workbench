@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 16:54+0100\n"
+"POT-Creation-Date: 2026-11-09 09:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -422,10 +422,6 @@ msgstr "API-Token"
 msgid "API tokens"
 msgstr "API-Tokens"
 
-#: workbench/accounts/reporting.py
-msgid "All others"
-msgstr "Alle anderen"
-
 #: workbench/accounts/views.py workbench/templates/base.html
 msgid "Settings"
 msgstr "Einstellungen"
@@ -455,10 +451,6 @@ msgstr "Keine Nutzer:innen mit Emailadresse %s gefunden."
 #: workbench/accounts/views.py
 msgid "You have been signed out."
 msgstr "Du wurdest abgemeldet."
-
-#: workbench/accounts/views.py workbench/deals/forms.py
-msgid "Expected"
-msgstr "Erwartet"
 
 #: workbench/accounts/views.py
 msgid "The API token has been deleted."
@@ -1687,6 +1679,10 @@ msgstr "archivierter Werttyp"
 #, python-format
 msgid "Total %(currency)s"
 msgstr "Total %(currency)s"
+
+#: workbench/deals/forms.py
+msgid "Expected"
+msgstr "Erwartet"
 
 #: workbench/deals/forms.py
 msgid "in one week"
@@ -4111,9 +4107,7 @@ msgstr "Verrechnet"
 msgid "offer or service group"
 msgstr "Offerte oder Leistungsgruppe"
 
-#: workbench/projects/views.py workbench/templates/accounts/user_base.html
-#: workbench/templates/accounts/user_statistics.html
-#: workbench/templates/base.html
+#: workbench/projects/views.py
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/campaign_statistics.html
 #: workbench/templates/projects/project_detail.html
@@ -4610,16 +4604,6 @@ msgstr "Bearbeiten"
 msgid "Planning"
 msgstr "Planung"
 
-#: workbench/templates/accounts/user_statistics.html
-msgid "Hours per week"
-msgstr "Stunden pro Woche"
-
-#: workbench/templates/accounts/user_statistics.html
-#: workbench/templates/base.html
-#: workbench/templates/reporting/hours_per_customer.html
-msgid "Hours per customer"
-msgstr "Stunden pro Kundschaft"
-
 #: workbench/templates/accounts/work_anniversaries_notice.txt
 msgid "Work anniversaries notice"
 msgstr "Hinweis auf Jubiläum"
@@ -4806,6 +4790,11 @@ msgstr "Bank spielen"
 #: workbench/templates/reporting/open_items_list.html
 msgid "Open items list"
 msgstr "Offene-Posten-Liste"
+
+#: workbench/templates/base.html
+#: workbench/templates/reporting/hours_per_customer.html
+msgid "Hours per customer"
+msgstr "Stunden pro Kundschaft"
 
 #: workbench/templates/base.html
 #: workbench/templates/reporting/hours_per_type.html
@@ -6483,6 +6472,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "All others"
+#~ msgstr "Alle anderen"
+
+#~ msgid "Hours per week"
+#~ msgstr "Stunden pro Woche"
 
 #~ msgid "This fields' value is overridden when processing credit entries."
 #~ msgstr "Der Inhalt dieses Felds wird bei der Verarbeitung von Zahlungseingängen überschrieben."
