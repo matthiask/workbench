@@ -228,7 +228,7 @@ class CLITest(TestCase):
         # decision
         offer = factories.OfferFactory.create(project=project)
         factories.PlannedWorkFactory.create(
-            project=project, offer=offer, weeks=[dt.date.today()]
+            project=project, offer=offer, weeks=[monday() + dt.timedelta(days=7)]
         )
         result = self.wb("projects", "update", project.pk, "--close")
         self.assertEqual(result.exit_code, 1)

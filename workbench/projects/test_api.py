@@ -978,7 +978,7 @@ class ProjectsAPITest(TestCase):
         # decision
         offer = factories.OfferFactory.create(project=project)
         factories.PlannedWorkFactory.create(
-            project=project, offer=offer, weeks=[dt.date.today()]
+            project=project, offer=offer, weeks=[monday() + dt.timedelta(days=7)]
         )
         response = patch({"closed_on": dt.date.today().isoformat()})
         self.assertEqual(response.status_code, 422)
