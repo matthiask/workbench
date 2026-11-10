@@ -34,7 +34,12 @@ from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
-from workbench.projects.forms import ProjectForm, ReassignLogbookForm, ServiceForm
+from workbench.projects.forms import (
+    ProjectForm,
+    ReassignLogbookForm,
+    ServiceForm,
+    ServiceMergeForm,
+)
 from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
@@ -1161,7 +1166,7 @@ def service_reassign_logbook(
     """Reassign the logged hours and costs of a service to another service,
     validated with the form of the web interface
 
-    Services can't be deleted afterwards like in the web interface."""
+    Merge services to also move the invoice lines and delete the service."""
     service = get_object_or_404(Service, pk=service_id)
     form = ReassignLogbookForm(
         {"service": data.to, "include_invoiced": data.include_invoiced or ""},
@@ -1183,6 +1188,43 @@ def service_reassign_logbook(
             ),
             "to": _service_out(services[target.pk], request, controlling=controlling),
         }
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+class ServiceMergeIn(InputSchema):
+    into: int = Field(description="ID of the service of the same project to keep")
+
+
+@router.post("/services/{int:service_id}/merge/", response=ServiceOut)
+def service_merge(
+    request,
+    service_id: int,
+    data: ServiceMergeIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Merge a service into another service of the same project, like in
+    the web interface: logged hours and costs (also invoiced ones), invoice
+    lines, timestamps and pins move, the merged service is deleted
+
+    Only services without offer or of offers in preparation can be merged.
+    Different effort types or rates are a warning (``different-rate``), the
+    logged hours are valued with the rate of the service kept."""
+    service = get_object_or_404(Service, pk=service_id)
+    form = ServiceMergeForm(
+        {"into": data.into}, instance=service, request=request, prefix=""
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+
+    controlling = request.user.features[FEATURES.CONTROLLING]
+    with transaction.atomic():
+        keep = form.save()
+        result = _service_out(
+            _services().get(pk=keep.pk), request, controlling=controlling
+        )
         if dry_run:
             transaction.set_rollback(True)
     return result

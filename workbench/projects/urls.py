@@ -32,6 +32,7 @@ from workbench.projects.forms import (
     ProjectSearchForm,
     ReassignLogbookForm,
     ServiceForm,
+    ServiceMergeForm,
     ServiceMoveForm,
 )
 from workbench.projects.models import BudgetTransfer, Campaign, Project, Service
@@ -326,6 +327,16 @@ urlpatterns = [
             title=_("Reassign logbook entries of %(instance)s"),
         ),
         name="projects_service_reassign_logbook",
+    ),
+    path(
+        "service/<int:pk>/merge/",
+        generic.UpdateView.as_view(
+            model=Service,
+            form_class=ServiceMergeForm,
+            template_name="modalform.html",
+            title=_("Merge %(instance)s"),
+        ),
+        name="projects_service_merge",
     ),
     path(
         "service/<int:pk>/delete/",

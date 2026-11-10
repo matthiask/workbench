@@ -708,6 +708,48 @@ class ProjectsAPITest(TestCase):
         )
         self.assertTrue(Service.objects.filter(pk=service.pk).exists())
 
+    def test_service_merge(self):
+        """Merging moves the invoice lines too and deletes the merged
+        service, different rates are a warning"""
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(project=project, effort_rate=150)
+        keep = factories.ServiceFactory.create(project=project, effort_rate=180)
+        factories.LoggedHoursFactory.create(service=service, hours=2)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        self.client.force_login(project.owned_by)
+        url = f"/api/services/{service.pk}/merge/"
+
+        response = self.client.post(
+            url, {"into": keep.pk}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(response.json()["detail"][0]["code"], "different-rate")
+
+        response = self.client.post(
+            url + "?ignore_warnings=different-rate&dry_run=true",
+            {"into": keep.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertTrue(Service.objects.filter(pk=service.pk).exists())
+
+        response = self.client.post(
+            url + "?ignore_warnings=different-rate",
+            {"into": keep.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], keep.pk)
+        self.assertEqual(response.json()["invoiced_hours"], "2.0")
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
+        self.assertTrue(keep.is_invoiced)
+
     def test_service_description(self):
         """Descriptions of services which aren't bound to sent offers can be
         changed, e.g. to move URLs into the external reference"""

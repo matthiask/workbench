@@ -330,7 +330,8 @@ def reorder_services(service_ids, dry_run, as_json):
 @click.option("--json", "as_json", is_flag=True)
 def reassign_logbook(service_id, to, include_invoiced, dry_run, as_json):
     """Reassign the logged hours and costs of a service to another service,
-    like in the web interface (which can also delete the old service)"""
+    like in the web interface (`wb services merge` also moves the invoice
+    lines and deletes the service)"""
     data = request(
         "POST",
         f"services/{service_id}/reassign-logbook/",
@@ -347,3 +348,40 @@ def reassign_logbook(service_id, to, include_invoiced, dry_run, as_json):
         f" from {link(source['id'], source['url'])} {source['title']}"
         f" to {link(target['id'], target['url'])} {target['title']}"
     )
+
+
+@services.command("merge")
+@click.argument("service_id", type=int)
+@click.option(
+    "--into",
+    type=int,
+    required=True,
+    help="ID of the service of the same project to keep.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate and show the result only.")
+@ignore_warnings_option
+@click.option("--json", "as_json", is_flag=True)
+def merge_service(service_id, into, dry_run, ignore_warnings, as_json):
+    """Merge a service into another service of the same project and delete it
+
+    Logged hours and costs (also invoiced ones), invoice lines, timestamps
+    and pins move. Only services without offer or of offers in preparation
+    can be merged. Different effort types or rates are a warning
+    (different-rate), the logged hours are valued with the rate of the
+    service kept."""
+    data = request(
+        "POST",
+        f"services/{service_id}/merge/",
+        json={"into": into},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
+    )
+    _echo_service(data, dry_run=dry_run, as_json=as_json)
+    if not as_json:
+        console.print(
+            f"Dry run, nothing changed: {service_id} would be merged into {into}."
+            if dry_run
+            else f"{service_id} has been merged into {into}."
+        )

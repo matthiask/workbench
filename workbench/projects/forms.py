@@ -11,6 +11,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
 from workbench.invoices.models import ProjectedInvoice
+from workbench.projects.merge import merge_services
 from workbench.projects.models import BudgetTransfer, Campaign, Project, Service
 from workbench.reporting.models import FreezeDate
 from workbench.reporting.squeeze import project_gross_margin
@@ -19,6 +20,7 @@ from workbench.services.models import ServiceType
 from workbench.tools.formats import Z2, currency, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
+    ComboboxSelect,
     DateInput,
     Form,
     ModelForm,
@@ -685,13 +687,6 @@ class ReassignLogbookForm(Form):
                 required=False,
             )
 
-        offer = self.from_service.offer
-        if not offer or offer.status <= offer.IN_PREPARATION:
-            self.fields["try_delete"] = forms.BooleanField(
-                label=_("Try deleting the service after reassigning logbook entries"),
-                required=False,
-            )
-
     def logbook_entries(self):
         """The logged hours and costs which are reassigned"""
         hours = self.from_service.loggedhours.all()
@@ -706,20 +701,62 @@ class ReassignLogbookForm(Form):
         hours, costs = self.logbook_entries()
         hours.update(service=service)
         costs.update(service=service)
-
-        if self.cleaned_data.get("try_delete") and self.from_service.allow_delete(
-            self.from_service, self.request
-        ):
-            self.from_service.delete()
-            messages.success(
-                self.request,
-                _("%(class)s '%(object)s' has been deleted successfully.")
-                % {
-                    "class": self.from_service._meta.verbose_name,
-                    "object": self.from_service,
-                },
-            )
         return service
+
+
+@add_prefix("modal")
+class ServiceMergeForm(Form):
+    """Merge a service into another service of the same project, see
+    merge_services()"""
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop("instance")
+        super().__init__(*args, **kwargs)
+        services = self.instance.project.services.exclude(pk=self.instance.pk)
+        self.fields["into"] = forms.ModelChoiceField(
+            services,
+            label=_("Merge into"),
+            help_text=_(
+                "Logged hours and costs (also invoiced ones), invoice lines,"
+                " timestamps and pins move there, this service is deleted."
+            ),
+            widget=ComboboxSelect,
+        )
+        self.fields["into"].choices = services.choices()
+
+    def clean(self):
+        data = super().clean()
+        offer = self.instance.offer
+        if offer and offer.status > offer.IN_PREPARATION:
+            # Like deleting: offers which have been sent keep their services
+            self.add_error(
+                None,
+                _(
+                    "Cannot merge a service bound to an offer"
+                    " which is not in preparation anymore."
+                ),
+            )
+        keep = data.get("into")
+        if (
+            keep
+            and (keep.effort_type, keep.effort_rate)
+            != (self.instance.effort_type, self.instance.effort_rate)
+            and self.instance.loggedhours.exists()
+        ):
+            self.add_warning(
+                _(
+                    "The services have different effort types or rates, the"
+                    " logged hours will be valued with the rate of %(service)s."
+                )
+                % {"service": keep},
+                code="different-rate",
+            )
+        return data
+
+    def save(self):
+        keep = self.cleaned_data["into"]
+        merge_services(merged=self.instance, keep=keep)
+        return keep
 
 
 @add_prefix("modal")

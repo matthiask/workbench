@@ -17,6 +17,7 @@ from workbench.projects.charts import projected_vs_invoiced_chart
 from workbench.projects.forms import delete_future_planned_work
 from workbench.projects.models import InternalType, Project, Service
 from workbench.projects.views import projected_invoices_timeline
+from workbench.timer.models import Timestamp
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
@@ -145,14 +146,6 @@ class ProjectsTest(TestCase):
         self.assertEqual(service1.loggedcosts.count(), 0)
         self.assertEqual(service2.loggedcosts.count(), 1)
 
-        response = self.client.post(
-            service1.urls["reassign_logbook"],
-            {"service": service2.pk, "try_delete": "on"},
-            headers={"x-requested-with": "XMLHttpRequest"},
-        )
-        self.assertEqual(response.status_code, 202)
-        self.assertEqual(set(project.services.all()), {service2})
-
     def test_reassign_include_invoiced(self):
         """Reassigning logbook entries leaves invoiced entries where they are
         unless they are included, the option is only offered if there are any"""
@@ -192,26 +185,76 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.loggedhours.count(), 0)
         self.assertEqual(service.loggedcosts.count(), 0)
 
-    def test_try_delete_available(self):
-        """The try_delete box is only available if service isn't bound to an offer"""
-        service = factories.ServiceFactory.create()
-        self.client.force_login(service.project.owned_by)
+    def test_merge_services(self):
+        """Merging moves the logbook (invoiced entries too), the invoice
+        lines, timestamps and pins to the service kept and deletes the
+        merged one; different rates are a warning"""
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(
+            project=project, effort_type="Programming", effort_rate=150
+        )
+        keep = factories.ServiceFactory.create(
+            project=project, effort_type="Programming", effort_rate=180
+        )
+        hours = factories.LoggedHoursFactory.create(service=service, hours=3)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        cost = factories.LoggedCostFactory.create(service=service, cost=50)
+        timestamp = Timestamp.objects.create(
+            user=project.owned_by, type=Timestamp.START, service=service
+        )
+        project.owned_by.pinned_services.add(service)
+        self.client.force_login(project.owned_by)
+        url = service.urls["merge"]
+        ajax = {"x-requested-with": "XMLHttpRequest"}
 
-        response = self.client.get(
-            service.urls["reassign_logbook"],
-            headers={"x-requested-with": "XMLHttpRequest"},
+        response = self.client.post(url, {"modal-into": keep.pk}, headers=ajax)
+        self.assertContains(response, "different-rate")
+
+        response = self.client.post(
+            url,
+            {"modal-into": keep.pk, WarningsForm.ignore_warnings_id: "different-rate"},
+            headers=ajax,
         )
-        self.assertContains(response, "try_delete")
-        offer = factories.OfferFactory.create(
-            project=service.project, status=Offer.ACCEPTED
+        self.assertEqual(response.status_code, 202)
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
+        self.assertEqual(set(keep.loggedhours.all()), {hours})
+        self.assertEqual(set(keep.loggedcosts.all()), {cost})
+        self.assertEqual(
+            list(keep.invoice_services.all()), list(invoice.services.all())
         )
-        service.offer = offer
-        service.save()
-        response = self.client.get(
-            service.urls["reassign_logbook"],
-            headers={"x-requested-with": "XMLHttpRequest"},
+        timestamp.refresh_from_db()
+        self.assertEqual(timestamp.service, keep)
+        self.assertEqual(list(project.owned_by.pinned_services.all()), [keep])
+
+    def test_merge_services_of_sent_offers(self):
+        """Services of offers which have been sent aren't merged, like they
+        aren't deleted, and only services of the same project are offered"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
+        service = factories.ServiceFactory.create(project=project, offer=offer)
+        keep = factories.ServiceFactory.create(project=project)
+        other = factories.ServiceFactory.create()
+        self.client.force_login(project.owned_by)
+        url = service.urls["merge"]
+        ajax = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.post(url, {"modal-into": keep.pk}, headers=ajax)
+        self.assertContains(
+            response,
+            "Cannot merge a service bound to an offer which is not in preparation anymore.",
         )
-        self.assertNotContains(response, "try_delete")
+        self.assertTrue(Service.objects.filter(pk=service.pk).exists())
+
+        response = self.client.post(
+            keep.urls["merge"], {"modal-into": other.pk}, headers=ajax
+        )
+        self.assertContains(response, "Select a valid choice.")
 
     def test_service_with_rate_zero(self):
         """Services with 0/h rate are allowed (since effort_rate is Falsy)"""

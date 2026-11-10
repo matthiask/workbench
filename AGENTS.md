@@ -257,10 +257,17 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (or the services without offer of one project). `POST
   /api/services/<id>/reassign-logbook/` (`wb services reassign-logbook`)
   reassigns logged hours and costs with `ReassignLogbookForm`; invoiced
-  entries only with `include_invoiced`. It doesn't delete the old service:
-  the form reports that through Django's messages, and messages added during
-  API requests are dropped (`api_messages_middleware` in
-  `workbench/middleware.py`), they would show up later in the web interface. `wb offers
+  entries only with `include_invoiced`. Messages added during API requests
+  are dropped (`api_messages_middleware` in `workbench/middleware.py`), they
+  would show up later in the web interface. `POST
+  /api/services/<id>/merge/` (`wb services merge ID --into ID`, also in the
+  web interface; `ServiceMergeForm`, `merge_services()` in
+  `workbench/projects/merge.py`) merges a service into another one of the
+  same project: the logbook (invoiced entries too), invoice lines,
+  timestamps and pins move with `substitute_with()`, the service is
+  deleted. Like deleting, only services without offer or of offers in
+  preparation; different effort types or rates are a warning
+  (`different-rate`). `wb offers
   guidelines` prints a private file configured per installation in the wb
   configuration (`offer_guidelines`), which the `workbench-offer` skill
   follows; the guidelines contain confidential figures, so they don't live in

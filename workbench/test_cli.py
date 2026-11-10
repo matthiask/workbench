@@ -26,7 +26,7 @@ from workbench.contacts.models import Group, Person
 from workbench.deals.models import AttributeGroup, Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
-from workbench.projects.models import InternalType, Project
+from workbench.projects.models import InternalType, Project, Service
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days, monday
 
@@ -670,6 +670,15 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("1 logged hours", result.output)
         self.assertEqual(target.loggedhours.count(), 1)
+        merge = ["services", "merge", service.pk, "--into", target.pk]
+        result = self.wb(*merge, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing changed", result.output)
+        self.assertTrue(Service.objects.filter(pk=service.pk).exists())
+        result = self.wb(*merge)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"{service.pk} has been merged into", result.output)
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
         result = self.wb(
             "hours", "search", "--project", project.pk, "--rendered-by", "ab"
         )
@@ -1838,6 +1847,7 @@ planned_work:
             [
                 "create",
                 "delete",
+                "merge",
                 "reassign-logbook",
                 "reorder",
                 "search",

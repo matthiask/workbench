@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 09:27+0100\n"
+"POT-Creation-Date: 2026-11-10 09:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2077,7 +2077,7 @@ msgstr "%(class)s '%(object)s' wurde erfolgreich geändert."
 msgid "Delete %(object)s"
 msgstr "%(object)s löschen"
 
-#: workbench/generic.py workbench/projects/forms.py workbench/timer/views.py
+#: workbench/generic.py workbench/timer/views.py
 #, python-format
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
@@ -3838,8 +3838,20 @@ msgid "Otherwise they stay with this service, to which their invoice lines refer
 msgstr "Sonst bleiben sie bei dieser Leistung, auf die ihre Rechnungszeilen verweisen."
 
 #: workbench/projects/forms.py
-msgid "Try deleting the service after reassigning logbook entries"
-msgstr "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
+msgid "Merge into"
+msgstr "Zusammenführen mit"
+
+#: workbench/projects/forms.py
+msgid "Logged hours and costs (also invoiced ones), invoice lines, timestamps and pins move there, this service is deleted."
+msgstr "Erfasste Stunden und Kosten (auch verrechnete), Rechnungspositionen, Zeitstempel und Pins wandern dorthin, diese Leistung wird gelöscht."
+
+#: workbench/projects/forms.py
+msgid "Cannot merge a service bound to an offer which is not in preparation anymore."
+msgstr "Leistungen von Offerten, welche nicht mehr in Vorbereitung sind, können nicht zusammengeführt werden."
+
+#: workbench/projects/forms.py
+msgid "The services have different effort types or rates, the logged hours will be valued with the rate of %(service)s."
+msgstr "Die Leistungen haben unterschiedliche Aufwandarten oder Ansätze, die erfassten Stunden werden mit dem Ansatz von %(service)s bewertet."
 
 #: workbench/projects/forms.py
 msgid "Cannot move a service which is already bound to an offer."
@@ -4060,6 +4072,10 @@ msgstr "Budgetwarnung"
 #, python-format
 msgid "Reassign logbook entries of %(instance)s"
 msgstr "Logbucheinträge von %(instance)s neu zuweisen"
+
+#: workbench/projects/urls.py
+msgid "Merge %(instance)s"
+msgstr "%(instance)s zusammenführen"
 
 #: workbench/projects/views.py
 #, python-format
@@ -5535,6 +5551,10 @@ msgid "Reassign logbook entries"
 msgstr "Logbucheinträge neu zuweisen"
 
 #: workbench/templates/projects/project_detail.html
+msgid "Merge into another service"
+msgstr "Mit anderer Leistung zusammenführen"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Move to other project"
 msgstr "Zu anderem Projekt verschieben"
 
@@ -6464,9 +6484,8 @@ msgstr "Suchanfrage fehlt."
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
 
-#, python-format
-#~ msgid "Some services have been invoiced already, they cannot be moved to another offer: %(services)s."
-#~ msgstr "Einige Leistungen wurden bereits verrechnet, sie können nicht in eine andere Offerte verschoben werden: %(services)s."
+#~ msgid "Try deleting the service after reassigning logbook entries"
+#~ msgstr "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
 
 #~ msgid "This service has been invoiced already, it cannot be moved to another offer."
 #~ msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht in eine andere Offerte verschoben werden."
