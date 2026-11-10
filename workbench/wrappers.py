@@ -24,6 +24,12 @@ class BootstrapFieldWrapper(FieldWrapper):
             extra_classes.append(self.required_css_class)
 
         widget = self.field.field.widget
+        # Subclasses of checkbox lists are styled like checkbox lists
+        widget_name = (
+            "checkboxselectmultiple"
+            if isinstance(widget, forms.CheckboxSelectMultiple)
+            else widget.__class__.__name__.lower()
+        )
         extra_label_classes = []
         if isinstance(widget, forms.CheckboxInput):
             widget.attrs["class"] = widget.attrs.get("class", "") + " form-check-input"
@@ -67,7 +73,7 @@ class BootstrapFieldWrapper(FieldWrapper):
                 "css_classes": self.field.css_classes(
                     extra_classes=[
                         *extra_classes,
-                        f"widget--{self.field.field.widget.__class__.__name__.lower()}",
+                        f"widget--{widget_name}",
                     ]
                 ),
             },
