@@ -1,4 +1,5 @@
 import datetime as dt
+from collections import defaultdict
 
 from django import forms
 from django.conf import settings
@@ -21,6 +22,7 @@ from workbench.offers.models import Offer
 from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.services.models import ServiceType
 from workbench.timer.models import Timestamp
+from workbench.tools.formats import currency, hours, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     ComboboxSelect,
@@ -963,9 +965,23 @@ class LoggedCostMoveForm(LoggedMoveForm):
         fields = ["service"]
 
 
-class EntriesChoiceField(forms.ModelMultipleChoiceField):
-    def label_from_instance(self, obj):
-        return obj.pretty()
+def _entry_label(entry):
+    amount = hours(entry.hours) if hasattr(entry, "hours") else currency(entry.cost)
+    return f"{local_date_format(entry.rendered_on)} {entry.rendered_by.get_short_name()} {amount}: {entry.description}"
+
+
+def _grouped_entries(entries):
+    """Checkboxes grouped by offer and service like the services in
+    ServiceQuerySet.choices(), services often share their titles"""
+    services = defaultdict(list)
+    for entry in entries.select_related("service__offer__owned_by"):
+        services[entry.service].append((entry.pk, _entry_label(entry)))
+    return [
+        (f"{service.offer or _('Not offered yet')}: {service.title}", choices)
+        for service, choices in sorted(
+            services.items(), key=lambda item: (item[0].offer, item[0])
+        )
+    ]
 
 
 class LogbookBatchForm(Form):
@@ -974,11 +990,12 @@ class LogbookBatchForm(Form):
         self._entries = kwargs.pop("entries")
         super().__init__(*args, **kwargs)
 
-        self.fields["entries"] = EntriesChoiceField(
-            self._entries.reverse(),
+        self.fields["entries"] = forms.ModelMultipleChoiceField(
+            self._entries,
             label=_("Entries"),
-            widget=forms.SelectMultiple(attrs={"size": min(30, len(self._entries))}),
+            widget=forms.CheckboxSelectMultiple,
         )
+        self.fields["entries"].choices = _grouped_entries(self._entries)
 
         self.fields["service"] = forms.ModelChoiceField(
             self._project.services.logging(),
@@ -986,6 +1003,7 @@ class LogbookBatchForm(Form):
             required=False,
             widget=ComboboxSelect,
         )
+        self.fields["service"].choices = self._project.services.logging().choices()
 
     def process(self):
         data = self.cleaned_data

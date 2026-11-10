@@ -256,6 +256,31 @@ class LogbookTest(TestCase):
         hours.refresh_from_db()
         self.assertEqual(hours.service, other)
 
+    def test_batch_update_groups_by_offer(self):
+        """The batch update groups entries and services by offer, services
+        with the same title can't be told apart otherwise"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, title="Phase 1")
+        service = factories.ServiceFactory.create(
+            project=project, offer=offer, title="Grundlagenarbeit"
+        )
+        factories.ServiceFactory.create(project=project, title="Grundlagenarbeit")
+        hours = factories.LoggedHoursFactory.create(
+            service=service, description="Konzept lesen"
+        )
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.get(project.urls["logbook_batch_update_hours"])
+        self.assertContains(
+            response,
+            f'<optgroup label="{offer.code} Phase 1 - {offer.owned_by.get_short_name()}">',
+        )
+        self.assertContains(response, 'type="checkbox" name="entries"')
+        self.assertContains(
+            response,
+            f"{offer.code} Phase 1 - {offer.owned_by.get_short_name()}: Grundlagenarbeit",
+        )
+
     def test_invoiced_hours_are_locked(self):
         """Invoiced hours keep their service and hours, the description can
         still be changed"""
