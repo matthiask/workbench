@@ -1027,13 +1027,13 @@ def service_update(
 @router.delete("/services/{int:service_id}/", response=ServiceOut)
 def service_delete(request, service_id: int, *, dry_run: DryRun = False):
     """Delete a service like in the web interface: not when it is bound to an
-    offer which isn't in preparation anymore, and not when hours or costs
-    have been logged on it
+    offer which has been sent (service groups are fine), and not when hours
+    or costs have been logged on it
 
     Returns the deleted service."""
     service = get_object_or_404(Service.objects.select_related("offer"), pk=service_id)
     errors = []
-    if service.offer and service.offer.status > Offer.IN_PREPARATION:
+    if service.offer and not service.offer.services_changeable:
         errors.append({
             "loc": ["path", "service_id"],
             "msg": _(

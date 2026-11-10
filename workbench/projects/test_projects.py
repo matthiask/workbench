@@ -185,6 +185,26 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.loggedhours.count(), 0)
         self.assertEqual(service.loggedcosts.count(), 0)
 
+    def test_delete_service_of_service_group(self):
+        """Services of service groups can be deleted, they haven't been sent"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(
+            project=project, status=Offer.SERVICE_GROUP
+        )
+        service = factories.ServiceFactory.create(project=project, offer=offer)
+        other = factories.ServiceFactory.create(project=project, offer=offer)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.post(
+            service.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
+
+        response = self.client.delete(f"/api/services/{other.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(Service.objects.filter(pk=other.pk).exists())
+
     def test_merge_services(self):
         """Merging moves the logbook (invoiced entries too), the invoice
         lines, timestamps and pins to the service kept and deletes the

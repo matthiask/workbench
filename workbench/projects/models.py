@@ -959,7 +959,8 @@ class Service(ServiceBase):
 
     @classmethod
     def allow_delete(cls, instance, request):
-        if instance.offer and instance.offer.status > instance.offer.IN_PREPARATION:
+        # Service groups haven't been sent
+        if instance.offer and not instance.offer.services_changeable:
             messages.error(
                 request,
                 _(
