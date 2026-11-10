@@ -278,8 +278,28 @@ class LogbookTest(TestCase):
         self.assertContains(response, 'type="checkbox" name="entries"')
         self.assertContains(
             response,
-            f"{offer.code} Phase 1 - {offer.owned_by.get_short_name()}: Grundlagenarbeit",
+            f"<small>{offer.code}</small> Phase 1 - {offer.owned_by.get_short_name()}: Grundlagenarbeit",
         )
+
+    def test_batch_update_details(self):
+        """The batch update shows the listed, logged, offered and invoiced
+        hours of each service, and the hours of each entry for the total of
+        the selected entries"""
+        service = factories.ServiceFactory.create(effort_hours=10, effort_rate=100)
+        hours = factories.LoggedHoursFactory.create(service=service, hours=2)
+        archived = factories.LoggedHoursFactory.create(service=service, hours=3)
+        LoggedHours.objects.filter(pk=archived.pk).update(archived_at=timezone.now())
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.get(service.project.urls["logbook_batch_update_hours"])
+        self.assertContains(
+            response,
+            "&middot; 2.0h not invoiced · 5.0h logged of 10.0h offered · 3.0h invoiced",
+        )
+        self.assertContains(response, f'value="{hours.pk}"', 1)
+        self.assertContains(response, 'data-amount="2.0"')
+        self.assertNotContains(response, f'value="{archived.pk}"')
+        self.assertContains(response, "data-selection-total")
 
     def test_invoiced_hours_are_locked(self):
         """Invoiced hours keep their service and hours, the description can

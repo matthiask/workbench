@@ -12,3 +12,11 @@
     {{ block.super }}
   {% endif %}
 {% endblock uplink %}
+
+{% block fields %}
+  {{ block.super }}
+  <p class="mb-3" data-selection-total data-unit="{% if form.amount_field == 'hours' %}h{% endif %}">
+    {% translate 'Selected entries' %}: <span data-selection-count>0</span>,
+    <span data-selection-amount></span>
+  </p>
+{% endblock fields %}

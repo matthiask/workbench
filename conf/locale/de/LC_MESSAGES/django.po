@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 09:40+0100\n"
+"POT-Creation-Date: 2026-11-10 10:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2933,6 +2933,26 @@ msgid "Cannot move logbook entries of closed projects."
 msgstr "Kann Logbucheinträge von geschlossenen Projekten nicht verschieben."
 
 #: workbench/logbook/forms.py
+#, python-format
+msgid "%s not invoiced"
+msgstr "%s nicht verrechnet"
+
+#: workbench/logbook/forms.py
+#, python-format
+msgid "%(logged)s logged of %(budget)s offered"
+msgstr "%(logged)s erfasst von %(budget)s offeriert"
+
+#: workbench/logbook/forms.py
+#, python-format
+msgid "%s logged"
+msgstr "%s erfasst"
+
+#: workbench/logbook/forms.py
+#, python-format
+msgid "%s invoiced"
+msgstr "%s verrechnet"
+
+#: workbench/logbook/forms.py
 msgid "Entries"
 msgstr "Einträge"
 
@@ -5400,6 +5420,10 @@ msgstr "Offeriert und akzeptiert"
 msgid "sold"
 msgstr "verkauft"
 
+#: workbench/templates/projects/logbook_batch_update.html
+msgid "Selected entries"
+msgstr "Ausgewählte Einträge"
+
 #: workbench/templates/projects/project_detail.html
 msgid "Cost"
 msgstr "Kosten"
@@ -6569,9 +6593,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "projected"
 #~ msgstr "Geplant"
-
-#~ msgid "logged"
-#~ msgstr "Erfasst"
 
 #~ msgid "rate based on accepted offers (offered or logged hours)"
 #~ msgstr "Ansatz basierend auf akzeptierten Offerten (offerierte bzw. erfasste Stunden)"

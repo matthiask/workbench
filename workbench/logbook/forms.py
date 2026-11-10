@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.db.models import F, Q, Sum
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.utils.html import mark_safe
+from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
 from django.utils.timezone import localtime
 from django.utils.translation import gettext, gettext_lazy as _, override
@@ -965,23 +965,80 @@ class LoggedCostMoveForm(LoggedMoveForm):
         fields = ["service"]
 
 
-def _entry_label(entry):
-    amount = hours(entry.hours) if hasattr(entry, "hours") else currency(entry.cost)
+def _entry_label(entry, amount):
     return f"{local_date_format(entry.rendered_on)} {entry.rendered_by.get_short_name()} {amount}: {entry.description}"
 
 
-def _grouped_entries(entries):
+class _EntriesCheckboxes(forms.CheckboxSelectMultiple):
+    """Checkboxes carrying the hours or the cost of the entry for the total
+    of the selected entries"""
+
+    def __init__(self, *args, amounts, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.amounts = amounts
+
+    def create_option(self, name, value, *args, **kwargs):
+        option = super().create_option(name, value, *args, **kwargs)
+        option["attrs"]["data-amount"] = self.amounts.get(value, "")
+        return option
+
+
+def _grouped_entries(entries, *, amount_field):
     """Checkboxes grouped by offer and service like the services in
-    ServiceQuerySet.choices(), services often share their titles"""
+    ServiceQuerySet.choices(), services often share their titles
+
+    The heading of each service shows the amount of the listed entries, the
+    amount logged in total (including invoiced entries, which aren't listed
+    since they can't be moved anymore) and the offered budget."""
+    fmt = hours if amount_field == "hours" else currency
     services = defaultdict(list)
     for entry in entries.select_related("service__offer__owned_by"):
-        services[entry.service].append((entry.pk, _entry_label(entry)))
-    return [
-        (f"{service.offer or _('Not offered yet')}: {service.title}", choices)
-        for service, choices in sorted(
-            services.items(), key=lambda item: (item[0].offer, item[0])
+        services[entry.service].append(entry)
+
+    totals = {
+        row["service"]: row
+        for row in entries.model.objects
+        .filter(service__in=services)
+        .order_by()
+        .values("service")
+        .annotate(
+            logged=Sum(amount_field),
+            invoiced=Sum(amount_field, filter=Q(archived_at__isnull=False)),
         )
-    ]
+    }
+
+    choices = []
+    amounts = {}
+    for service, service_entries in sorted(
+        services.items(), key=lambda item: (item[0].offer, item[0])
+    ):
+        listed = sum(getattr(entry, amount_field) for entry in service_entries)
+        logged = totals[service.pk]["logged"]
+        invoiced = totals[service.pk]["invoiced"]
+        budget = service.service_hours if amount_field == "hours" else service.cost
+        details = [
+            _("%s not invoiced") % fmt(listed),
+            _("%(logged)s logged of %(budget)s offered")
+            % {"logged": fmt(logged), "budget": fmt(budget)}
+            if budget
+            else _("%s logged") % fmt(logged),
+        ]
+        if invoiced:
+            details.append(_("%s invoiced") % fmt(invoiced))
+        amounts |= {entry.pk: getattr(entry, amount_field) for entry in service_entries}
+        choices.append((
+            format_html(
+                '{}: {} <span class="fw-normal">&middot; {}</span>',
+                service.offer or _("Not offered yet"),
+                service.title,
+                " · ".join(str(detail) for detail in details),
+            ),
+            [
+                (entry.pk, _entry_label(entry, fmt(amounts[entry.pk])))
+                for entry in service_entries
+            ],
+        ))
+    return choices, amounts
 
 
 class LogbookBatchForm(Form):
@@ -990,12 +1047,16 @@ class LogbookBatchForm(Form):
         self._entries = kwargs.pop("entries")
         super().__init__(*args, **kwargs)
 
+        self.amount_field = "hours" if self._entries.model is LoggedHours else "cost"
+        choices, amounts = _grouped_entries(
+            self._entries, amount_field=self.amount_field
+        )
         self.fields["entries"] = forms.ModelMultipleChoiceField(
             self._entries,
             label=_("Entries"),
-            widget=forms.CheckboxSelectMultiple,
+            widget=_EntriesCheckboxes(amounts=amounts),
         )
-        self.fields["entries"].choices = _grouped_entries(self._entries)
+        self.fields["entries"].choices = choices
 
         self.fields["service"] = forms.ModelChoiceField(
             self._project.services.logging(),

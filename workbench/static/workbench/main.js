@@ -142,6 +142,25 @@ on("click", '[data-range-select] input[type="checkbox"]', (e, el) => {
   lastRangeCheckbox = el
 })
 
+// Number and total amount of the checked checkboxes with a data-amount
+document.addEventListener("DOMContentLoaded", () => {
+  for (const el of document.querySelectorAll("[data-selection-total]")) {
+    const form = el.closest("form")
+    const unit = el.dataset.unit
+    const update = () => {
+      const checked = form.querySelectorAll("input[data-amount]:checked")
+      let sum = 0
+      for (const box of checked) sum += Number.parseFloat(box.dataset.amount)
+      const [int, frac] = sum.toFixed(unit === "h" ? 1 : 2).split(".")
+      el.querySelector("[data-selection-count]").textContent = checked.length
+      el.querySelector("[data-selection-amount]").textContent =
+        `${int.replace(/\B(?=(\d{3})+$)/g, "’")}.${frac}${unit}`
+    }
+    update()
+    form.addEventListener("change", update)
+  }
+})
+
 function setValue(el, value, { change = false } = {}) {
   if (!el) return
   el.value = value
