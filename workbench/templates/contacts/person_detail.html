@@ -122,7 +122,7 @@
             <dt>{{ person|label:'primary_contact' }}</dt>
             <dd>{{ person.primary_contact }}</dd>
             <dt>{{ person|label:'date_of_birth' }}</dt>
-            <dd>{{ person.date_of_birth|local_date_format|default:'&ndash;' }}</dd>
+            <dd>{{ person.birthday|default:'&ndash;' }}</dd>
             {% if person.notes %}
               <dt>{{ person|label:'notes' }}</dt>
               <dd>{{ person.notes|urlizetrunc:60|linebreaksbr }}</dd>

@@ -62,7 +62,9 @@ def birthdays():
                 "user": user,
                 "on": on,
                 "already": on < today,
-                "age": on.year - dob.year,
+                "age": None
+                if user.person.year_of_birth_unknown
+                else on.year - dob.year,
             })
         else:
             users_without_birthdays.append(user)

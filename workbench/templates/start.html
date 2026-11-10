@@ -82,7 +82,7 @@
                 class="list-group-item list-group-item-action wb-row {% if birthday.is_active_user %}fw-semibold{% endif %}"
               >
                 <span>{{ birthday.given_name }} {{ birthday.family_name }}</span>
-                <span class="wb-row-meta">{{ birthday.date_of_birth|local_date_format }}</span>
+                <span class="wb-row-meta">{{ birthday.birthday }}</span>
               </a>
             {% endfor %}
           </div>

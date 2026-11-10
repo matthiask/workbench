@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 10:09+0100\n"
+"POT-Creation-Date: 2026-11-10 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1167,6 +1167,10 @@ msgid "%(duplicate)s has been merged into %(keep)s."
 msgstr "%(duplicate)s wurde mit %(keep)s zusammengeführt."
 
 #: workbench/contacts/forms.py
+msgid "Enter any year and the day and the month of the birthday."
+msgstr "Bitte ein beliebiges Jahr und den Tag und Monat des Geburtstags eingeben."
+
+#: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
 msgstr "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
 
@@ -1284,6 +1288,14 @@ msgstr "Lieber Hans/Sehr geehrte Frau Muster"
 #: workbench/contacts/models.py
 msgid "date of birth"
 msgstr "Geburtstag"
+
+#: workbench/contacts/models.py
+msgid "year of birth unknown"
+msgstr "Geburtsjahr unbekannt"
+
+#: workbench/contacts/models.py
+msgid "Only the day and the month of the date of birth are known."
+msgstr "Nur Tag und Monat des Geburtsdatums sind bekannt."
 
 #: workbench/contacts/models.py
 msgid "work"

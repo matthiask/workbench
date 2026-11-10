@@ -11,7 +11,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
-from workbench.tools.formats import Z2
+from workbench.tools.formats import Z2, local_date_format
 from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.search import refresh_fts
 from workbench.tools.urls import model_urls
@@ -264,6 +264,11 @@ class Person(Model):
         help_text=_("Dear John/Dear Ms Smith"),
     )
     date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
+    year_of_birth_unknown = models.BooleanField(
+        _("year of birth unknown"),
+        default=False,
+        help_text=_("Only the day and the month of the date of birth are known."),
+    )
     notes = models.TextField(_("notes"), blank=True)
     organization = models.ForeignKey(
         Organization,
@@ -294,6 +299,13 @@ class Person(Model):
         if self.is_archived:
             parts.append(gettext("(archived)"))
         return " ".join(parts)
+
+    @property
+    def birthday(self):
+        """The date of birth formatted without the year if it isn't known"""
+        return local_date_format(
+            self.date_of_birth, fmt="d.m." if self.year_of_birth_unknown else None
+        )
 
     @property
     def full_name(self):

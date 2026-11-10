@@ -691,6 +691,43 @@ class ContactsTest(TestCase):
         self.assertIn("OVERRIDE", serialized)
         self.assertIn("2020-03-01", serialized)
 
+    def test_year_of_birth_unknown(self):
+        """Birthdays without year are shown, exported and merged without it"""
+        person = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+        data = person_to_dict(
+            person, salutation="Dear John", year_of_birth_unknown="on"
+        )
+        response = self.client.post(person.urls["update"], data)
+        self.assertContains(response, "Enter any year and the day and the month")
+
+        # The start page uses the database's date, travelling doesn't help
+        born = (dt.date.today() + dt.timedelta(days=2)).replace(year=2000)
+        response = self.client.post(
+            person.urls["update"], data | {"date_of_birth": born.isoformat()}
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        person.refresh_from_db()
+        self.assertTrue(person.year_of_birth_unknown)
+        self.assertEqual(person.birthday, born.strftime("%d.%m."))
+        self.assertContains(
+            self.client.get(person.urls["detail"]), f"{person.birthday}<"
+        )
+        self.assertContains(self.client.get("/"), f"{person.birthday}<")
+
+        serialized = person_to_vcard(person).serialize()
+        self.assertIn(
+            f"BDAY;X-APPLE-OMIT-YEAR=1604:{born.replace(year=1604).isoformat()}",
+            serialized,
+        )
+
+        # A full date of birth wins when merging
+        duplicate = factories.PersonFactory.create(date_of_birth=dt.date(1980, 2, 28))
+        merge_people(duplicate=duplicate, keep=person)
+        person.refresh_from_db()
+        self.assertEqual(person.date_of_birth, dt.date(1980, 2, 28))
+        self.assertFalse(person.year_of_birth_unknown)
+
     def test_maps_url(self):
         """Person.get_maps_url returns a maps URL"""
         address = factories.PostalAddressFactory.build()

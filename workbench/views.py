@@ -21,6 +21,7 @@ from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.models import Project
 from workbench.search import list_url, search_sources
+from workbench.tools.formats import local_date_format
 from workbench.tools.history import HISTORY, changes, generic_related
 from workbench.tools.validation import in_days
 
@@ -121,12 +122,15 @@ def _all_users_hours():
 def _birthdays():
     with connections["default"].cursor() as cursor:
         cursor.execute("""
-SELECT id, given_name, family_name, date_of_birth, is_active_user FROM (
+SELECT
+    id, given_name, family_name, date_of_birth, year_of_birth_unknown, is_active_user
+FROM (
     SELECT
         p.id,
         given_name,
         family_name,
         date_of_birth,
+        year_of_birth_unknown,
         u.is_active AS is_active_user,
         (current_date - date_of_birth) % 365.24 AS diff
     FROM contacts_person p
@@ -141,8 +145,8 @@ ORDER BY (diff + 180) % 365 DESC
                 "id": row[0],
                 "given_name": row[1],
                 "family_name": row[2],
-                "date_of_birth": row[3],
-                "is_active_user": row[4],
+                "birthday": local_date_format(row[3], fmt="d.m." if row[4] else None),
+                "is_active_user": row[5],
             }
             for row in cursor
         ]

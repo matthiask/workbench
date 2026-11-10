@@ -31,7 +31,7 @@
           <tr>
             <td>{% link_or_none birthday.user %}</td>
             <td class="text-end">{{ birthday.on|local_date_format }}</td>
-            <td class="text-end">{{ birthday.age }}</td>
+            <td class="text-end">{{ birthday.age|default_if_none:'?' }}</td>
           </tr>
         {% endfor %}
         {% for user in birthdays.users_without_birthdays %}

@@ -165,8 +165,10 @@ class AccountsTest(TestCase):
     def test_birthdays_and_anniversaries_window(self):
         """Dates of the last 60 days are shown, otherwise the next ones"""
 
-        def user(*, born=None, employed=None):
-            person = factories.PersonFactory.create(date_of_birth=born)
+        def user(*, born=None, employed=None, without_year=False):
+            person = factories.PersonFactory.create(
+                date_of_birth=born, year_of_birth_unknown=without_year
+            )
             return factories.UserFactory.create(
                 person=person, date_of_employment=employed
             )
@@ -174,6 +176,7 @@ class AccountsTest(TestCase):
         recent = user(born=dt.date(1990, 10, 15), employed=dt.date(2018, 10, 20))
         older = user(born=dt.date(1990, 8, 1), employed=dt.date(2026, 9, 1))
         leap = user(born=dt.date(1992, 2, 29), employed=dt.date(2026, 12, 1))
+        unknown = user(born=dt.date(2026, 11, 20), without_year=True)
 
         rows = {row["user"]: row for row in birthdays()["users_with_birthdays"]}
         self.assertEqual(
@@ -187,7 +190,10 @@ class AccountsTest(TestCase):
         self.assertEqual(
             (rows[leap]["on"], rows[leap]["age"]), (dt.date(2027, 2, 28), 35)
         )
-        self.assertEqual(list(rows), [recent, leap, older])
+        self.assertEqual(
+            (rows[unknown]["on"], rows[unknown]["age"]), (dt.date(2026, 11, 20), None)
+        )
+        self.assertEqual(list(rows), [recent, unknown, leap, older])
 
         rows = {row["user"]: row for row in work_anniversaries()}
         self.assertEqual(

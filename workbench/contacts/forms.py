@@ -498,6 +498,7 @@ class PersonForm(ModelForm):
             "address_on_first_name_terms",
             "salutation",
             "date_of_birth",
+            "year_of_birth_unknown",
             "notes",
             "organization",
             "primary_contact",
@@ -537,6 +538,11 @@ class PersonForm(ModelForm):
 
     def clean(self):
         data = super().clean()
+        if data.get("year_of_birth_unknown") and not data.get("date_of_birth"):
+            self.add_error(
+                "date_of_birth",
+                _("Enter any year and the day and the month of the birthday."),
+            )
         if data.get("salutation") and len(data.get("salutation").split()) < 2:
             self.add_warning(
                 _("This does not look right. Please add a full salutation."),

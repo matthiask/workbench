@@ -246,7 +246,9 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 phone.phone_number if phone else "",
                 ", ".join(group.title for group in person.all_groups()),
                 person.notes,
-                person.date_of_birth,
+                person.birthday
+                if person.year_of_birth_unknown
+                else person.date_of_birth,
                 person.is_archived,
                 person.pk,
             ]

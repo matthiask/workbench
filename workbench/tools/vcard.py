@@ -16,7 +16,12 @@ def person_to_vcard(person):
 
     if person.organization and not person.organization.is_private_person:
         v.add("org").value = [person.organization.name]
-    if person.date_of_birth:
+    if person.year_of_birth_unknown and person.date_of_birth:
+        # Apple's convention for birthdays without year (a leap year)
+        bday = v.add("bday")
+        bday.value = person.date_of_birth.replace(year=1604).isoformat()
+        bday.params["X-APPLE-OMIT-YEAR"] = ["1604"]
+    elif person.date_of_birth:
         v.add("bday").value = person.date_of_birth.isoformat()
     if person.notes:
         v.add("note").value = person.notes

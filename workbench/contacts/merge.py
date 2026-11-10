@@ -85,7 +85,7 @@ def merge_people(*, duplicate, keep):
     Projects, deals, invoices, the linked user and the contact details move
     (details the person to keep has already are dropped), groups are added
     like in the person form, notes are appended and the date of birth is
-    taken over if the person to keep has none. The person kept is archived
+    taken over if the person to keep has none or one without the year. The person kept is archived
     only if both were. Name, organization and primary contact stay those of
     the person to keep."""
     if errors := merge_errors(duplicate=duplicate, keep=keep):
@@ -105,7 +105,12 @@ def merge_people(*, duplicate, keep):
 
         if duplicate.notes.strip() and duplicate.notes.strip() not in keep.notes:
             keep.notes = "\n\n".join(filter(None, (keep.notes, duplicate.notes)))
-        keep.date_of_birth = keep.date_of_birth or duplicate.date_of_birth
+        if duplicate.date_of_birth and (
+            not keep.date_of_birth
+            or (keep.year_of_birth_unknown and not duplicate.year_of_birth_unknown)
+        ):
+            keep.date_of_birth = duplicate.date_of_birth
+            keep.year_of_birth_unknown = duplicate.year_of_birth_unknown
         # Archived only if both were archived
         keep.is_archived = keep.is_archived and duplicate.is_archived
 
