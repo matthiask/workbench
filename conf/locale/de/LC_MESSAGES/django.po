@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 09:54+0100\n"
+"POT-Creation-Date: 2026-11-10 09:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2313,9 +2313,9 @@ msgstr "Logbucheinträge nur bis und mit diesem Datum berücksichtigen. Die unte
 msgid "%s logged but no hourly rate defined."
 msgstr "%s erfasst aber kein Stundensatz definiert."
 
-#: workbench/invoices/forms.py workbench/offers/forms.py
-#: workbench/projects/models.py workbench/projects/views.py
-#: workbench/templates/projects/project_detail.html
+#: workbench/invoices/forms.py workbench/logbook/forms.py
+#: workbench/offers/forms.py workbench/projects/models.py
+#: workbench/projects/views.py workbench/templates/projects/project_detail.html
 msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
 
@@ -3219,11 +3219,6 @@ msgid "You are attempting to set status to '%(to)s', but the offer has already b
 msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde schon am %(closed)s geschlossen. Bist Du sicher?"
 
 #: workbench/offers/forms.py
-#, python-format
-msgid "Some services have been invoiced already, they cannot be moved to another offer: %(services)s."
-msgstr "Einige Leistungen wurden bereits verrechnet, sie können nicht in eine andere Offerte verschoben werden: %(services)s."
-
-#: workbench/offers/forms.py
 msgid "You are setting the offer status to 'Declined'. However, if you just want to change a few things and send the offer to the client again then you could just as well put the offer back into preparation."
 msgstr "Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige Dinge anpassen willst und die Offerte nochmals der Kundschaft senden willst, kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
 
@@ -3833,10 +3828,6 @@ msgstr "Offerten in Vorbereitung, welche bereits verschickt wurden, wurden abgel
 #: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."
 msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
-
-#: workbench/projects/forms.py
-msgid "This service has been invoiced already, it cannot be moved to another offer."
-msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht in eine andere Offerte verschoben werden."
 
 #: workbench/projects/forms.py
 msgid "Also reassign invoiced logbook entries"
@@ -6472,6 +6463,13 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "Some services have been invoiced already, they cannot be moved to another offer: %(services)s."
+#~ msgstr "Einige Leistungen wurden bereits verrechnet, sie können nicht in eine andere Offerte verschoben werden: %(services)s."
+
+#~ msgid "This service has been invoiced already, it cannot be moved to another offer."
+#~ msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht in eine andere Offerte verschoben werden."
 
 #~ msgid "All others"
 #~ msgstr "Alle anderen"

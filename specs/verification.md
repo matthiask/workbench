@@ -146,9 +146,9 @@ warning (the commits after "Verification: Findings of the fourth round").
   replaces the old one.
 - The Hochrechnung only extrapolates what is dated up to today.
 - Request bodies reject unknown fields (`InputSchema`).
-- The offer form neither removes invoiced services from the offer nor adds
-  them to it, like the service form of the project. Revisit if adding them
-  proves to be needed.
+- Invoiced services may move between the offers of their project (offer
+  form and service form): reassigning their logbook entries already moved
+  the work and left empty services behind which couldn't be deleted.
 - Deleting offers stays as it is: invoiced services lose their offer
   (`SET_NULL`), the services of a deleted declined offer become budgeted,
   and all planned work of the offer is deleted, past weeks too. Whether

@@ -626,14 +626,6 @@ class ServiceForm(ModelForm):
                     " its effort type and rate cannot be changed."
                 ),
             )
-        if "offer" in self.changed_data and self.instance.is_invoiced:
-            self.add_error(
-                "offer",
-                _(
-                    "This service has been invoiced already,"
-                    " it cannot be moved to another offer."
-                ),
-            )
         # Only warn about what's changed, not about old services
         if (
             "title" in self.changed_data

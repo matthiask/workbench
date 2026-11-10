@@ -644,8 +644,9 @@ class OffersTest(TestCase):
         self.assertEqual(service.effort_rate, 100)
         self.assertEqual(service.effort_hours, 10)
 
-    def test_offer_form_keeps_invoiced_services(self):
-        """Invoiced services are neither removed from nor added to offers"""
+    def test_offer_form_moves_invoiced_services(self):
+        """Invoiced services may be removed from and added to offers of
+        their project, the invoice lines still point to them"""
         offer = factories.OfferFactory.create(
             title="Offer", postal_address="A\nStreet\nCity"
         )
@@ -669,17 +670,13 @@ class OffersTest(TestCase):
             "tax_rate": "8.10",
             WarningsForm.ignore_warnings_id: "on",
         }
-        for services in [[], [service.id, unoffered.id]]:
-            response = self.client.post(
-                offer.urls["update"], data | {"services": services}
-            )
-            self.assertContains(response, "invoiced already")
-        self.assertEqual(list(offer.services.all()), [service])
-
         response = self.client.post(
-            offer.urls["update"], data | {"services": [service.id]}
+            offer.urls["update"], data | {"services": [unoffered.id]}
         )
         self.assertRedirects(response, offer.get_absolute_url())
+        self.assertEqual(list(offer.services.all()), [unoffered])
+        service.refresh_from_db()
+        self.assertIsNone(service.offer)
 
     def test_work_completed_on_not_in_the_future(self):
         """Work can't be completed in the future, the date prohibits logging
