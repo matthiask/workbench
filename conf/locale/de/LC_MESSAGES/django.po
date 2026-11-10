@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 09:35+0100\n"
+"POT-Creation-Date: 2026-11-10 09:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3174,23 +3174,6 @@ msgstr "Nur Offerten in Vorbereitung können geändert werden."
 msgid "Only the title, the description and the external reference of service groups can be changed."
 msgstr "Bei Leistungsgruppen lassen sich nur Titel, Beschreibung und externe Referenz ändern."
 
-#: workbench/offers/api.py
-msgid "The offer has no service with this ID."
-msgstr "Die Offerte hat keine Leistung mit dieser ID."
-
-#: workbench/offers/api.py workbench/projects/api.py
-msgid "Hours or costs have been logged on this service, it cannot be deleted."
-msgstr "Auf dieser Leistung wurden bereits Stunden oder Kosten erfasst, sie kann nicht gelöscht werden."
-
-#: workbench/offers/api.py workbench/projects/api.py
-#: workbench/projects/models.py
-msgid "This service has been invoiced already, it cannot be deleted."
-msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht gelöscht werden."
-
-#: workbench/offers/api.py
-msgid "Expected the IDs of all services of the offer once."
-msgstr "Erwartet werden die IDs aller Leistungen der Offerte, jede genau einmal."
-
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
 #: workbench/templates/shortcuts.html workbench/tools/pdf.py
@@ -3682,6 +3665,14 @@ msgstr "Die Leistung gehört zu einer Offerte, die nicht mehr in Vorbereitung is
 #: workbench/projects/api.py workbench/projects/models.py
 msgid "Cannot delete a service bound to an offer which is not in preparation anymore."
 msgstr "Kann Leistung von Offerte, welche nicht mehr in Vorbereitung ist, nicht löschen."
+
+#: workbench/projects/api.py
+msgid "Hours or costs have been logged on this service, it cannot be deleted."
+msgstr "Auf dieser Leistung wurden bereits Stunden oder Kosten erfasst, sie kann nicht gelöscht werden."
+
+#: workbench/projects/api.py workbench/projects/models.py
+msgid "This service has been invoiced already, it cannot be deleted."
+msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht gelöscht werden."
 
 #: workbench/projects/api.py workbench/tools/models.py
 #, python-format
@@ -6485,6 +6476,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "The offer has no service with this ID."
+#~ msgstr "Die Offerte hat keine Leistung mit dieser ID."
+
+#~ msgid "Expected the IDs of all services of the offer once."
+#~ msgstr "Erwartet werden die IDs aller Leistungen der Offerte, jede genau einmal."
 
 #~ msgid "Try deleting the service after reassigning logbook entries"
 #~ msgstr "Versuche, die Leistung nach der Zuweisung der Logbucheinträge zu löschen"
