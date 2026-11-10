@@ -116,6 +116,32 @@ function on(type, selector, handler) {
   })
 }
 
+// Shift-click on a checkbox of a list sets all checkboxes between it and the
+// previously clicked one to its state
+let lastRangeCheckbox = null
+on("mousedown", "[data-range-select] .form-check", (e) => {
+  // Shift-clicking the label would select its text otherwise
+  if (e.shiftKey) e.preventDefault()
+})
+on("click", '[data-range-select] input[type="checkbox"]', (e, el) => {
+  const boxes = [
+    ...el
+      .closest("[data-range-select]")
+      .querySelectorAll('input[type="checkbox"]:not(:disabled)'),
+  ]
+  const last = boxes.indexOf(lastRangeCheckbox)
+  if (e.shiftKey && last !== -1) {
+    const current = boxes.indexOf(el)
+    for (const box of boxes.slice(
+      Math.min(last, current),
+      Math.max(last, current) + 1,
+    )) {
+      box.checked = el.checked
+    }
+  }
+  lastRangeCheckbox = el
+})
+
 function setValue(el, value, { change = false } = {}) {
   if (!el) return
   el.value = value
