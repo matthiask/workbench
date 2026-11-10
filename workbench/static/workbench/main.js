@@ -980,6 +980,11 @@ function initCombobox(select) {
         ? items.findLastIndex((item) => item.offsetTop <= target)
         : items.findIndex((item) => item.offsetTop >= target)
       highlight(Math.max(index, 0))
+    } else if (e.key === "Home" || e.key === "End") {
+      // Opens the menu like the arrow keys, instead of moving the cursor
+      e.preventDefault()
+      if (!menu.classList.contains("show")) render("")
+      if (items.length) highlight(e.key === "Home" ? 0 : items.length - 1)
     } else if (e.key === "Enter" && menu.classList.contains("show")) {
       // Don't submit the form
       e.preventDefault()
