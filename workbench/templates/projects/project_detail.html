@@ -520,19 +520,14 @@
       </div>
 
       {% if offer.description or offer.external_reference %}
-        <div class="wb-offer-description {% if offer.should_collapse %}offer-{{ offer.id }}-collapsed collapse{% endif %}">
-          <div class="wb-clamp" data-clamp>
-            {{ offer.description|linebreaksbr|urlizetrunc:60 }}
-            {% if offer.external_reference %}
-              {% if offer.description %}<br>{% endif %}
-              <em>{{ offer.external_reference|linebreaksbr|urlizetrunc:60 }}</em>
-            {% endif %}
-          </div>
+        <div class="wb-offer-description" {% if offer.should_collapse %}hidden="until-found" data-foldable{% endif %}>
+          {% clamped offer.description offer.external_reference %}
         </div>
       {% endif %}
 
       <div
-        class="list-group list-group-flush wb-services {% if offer.should_collapse %}offer-{{ offer.id }}-collapsed collapse{% endif %}"
+        class="list-group list-group-flush wb-services"
+        {% if offer.should_collapse %}hidden="until-found" data-foldable{% endif %}
         {% if not offer or offer.services_changeable %}
           data-sortable-container
           data-sortable-url="{% url 'projects_service_set_order' %}"
@@ -552,15 +547,7 @@
                 {% pin row.service request.user %}
                 {% history_link row.service %}
               </div>
-              {% if row.service.description or row.service.external_reference %}
-                <div class="wb-service-description wb-clamp" data-clamp>
-                  {{ row.service.description|linebreaksbr|urlizetrunc:60 }}
-                  {% if row.service.external_reference %}
-                    {% if row.service.description %}<br>{% endif %}
-                    <em>{{ row.service.external_reference|urlizetrunc:60 }}</em>
-                  {% endif %}
-                </div>
-              {% endif %}
+              {% clamped row.service.description row.service.external_reference "wb-service-description" %}
             </div>
 
             <div class="wb-figures">

@@ -5,10 +5,34 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
-from workbench.templatetags.workbench import field_value_pairs, link_or_none
+from workbench.templatetags.workbench import clamped, field_value_pairs, link_or_none
 
 
 class TemplateTagsTest(TestCase):
+    def test_clamped(self):
+        """Long descriptions hide the rest until clicked or found by the
+        browser's search, URLs aren't cut"""
+        self.assertEqual(
+            clamped("Short <b>", "https://example.com/1"),
+            '<div class="wb-clamp" data-clamp><span class="wb-clamp-excerpt">'
+            'Short &lt;b&gt;<br><em><a href="https://example.com/1"'
+            ' rel="nofollow">https://example.com/1</a></em></span></div>',
+        )
+        self.assertEqual(clamped("", ""), "")
+
+        html = clamped("One\nTwo\nThree", "https://example.com/1")
+        self.assertIn(">One<br>Two</span>", html)
+        self.assertIn(
+            '<div class="wb-clamp-rest" hidden="until-found" data-foldable>'
+            "<br>Three<br><em>",
+            html,
+        )
+
+        url = "https://example.com/" + "x" * 200
+        html = clamped("word " * 20 + url, "")
+        self.assertIn(">" + "word " * 19 + "word</span>", html)
+        self.assertIn(f'href="{url}"', html)
+
     def test_mark_current(self):
         """{% mark_current %}"""
         t = Template("""

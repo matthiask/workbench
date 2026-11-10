@@ -440,6 +440,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   stripes; totals rows get `.wb-total-row`. Styles live in
   `workbench/static/workbench/main.scss` and must work in light and dark
   mode (`data-bs-theme`).
+  Collapsed content uses `hidden="until-found"` (not Bootstrap's
+  `.collapse` or CSS line clamps) so that the browser's search finds and
+  reveals it; long descriptions use `{% clamped %}`.
 - Charts are server-side SVG, not chart.js: `bar_chart()` in
   `workbench/tools/charts.py` rendered with `charts/bar_chart.html`, colors
   from `.wb-series-1` to `-8`, `-muted` and `-neutral` (colors with a

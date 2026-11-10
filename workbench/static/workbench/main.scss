@@ -1385,17 +1385,27 @@ a:hover {
   }
 }
 
-.wb-clamp {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
+// Searchable while hidden: the browser's search reveals the match
+// (beforematch). Bootstrap hides [hidden] with display: none, which the
+// search skips.
+[hidden="until-found"] {
+  display: block !important;
+  content-visibility: hidden;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+// Long descriptions show their beginning, see {% clamped %}
+.wb-clamp:has(> .wb-clamp-rest[hidden]) {
   cursor: pointer;
 
-  &.is-expanded {
-    display: block;
-    cursor: auto;
+  .wb-clamp-excerpt::after {
+    content: " …";
   }
+}
+
+.wb-clamp-rest {
+  display: inline;
 }
 
 .wb-invoice {

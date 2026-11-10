@@ -8,7 +8,7 @@ from django import template
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import F
-from django.template.defaultfilters import linebreaksbr
+from django.template.defaultfilters import linebreaksbr, urlizetrunc
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import capfirst
@@ -406,4 +406,59 @@ def hours_ring(value, target, name):
         complete=" complete" if ratio >= 1 else "",
         name=name,
         percentage=round(100 * ratio, 1),
+    )
+
+
+CLAMP_LINES = 2
+CLAMP_CHARS = 240
+
+
+def _clamp_html(text):
+    return urlizetrunc(linebreaksbr(text), 60)
+
+
+@register.simple_tag
+def clamped(text, external_reference="", css_class=""):
+    """The beginning of a long description, the rest is hidden until it is
+    clicked or the browser's search finds something in it
+    (hidden="until-found"; clipping with CSS would hide matches)"""
+    text = (text or "").replace("\r\n", "\n").strip()
+    external_reference = (external_reference or "").strip()
+    if not text and not external_reference:
+        return ""
+
+    lines = text.split("\n")
+    excerpt = "\n".join(lines[:CLAMP_LINES])
+    if len(excerpt) > CLAMP_CHARS:
+        # Cut at whitespace so that URLs stay whole
+        cut = max(
+            excerpt.rfind(" ", 0, CLAMP_CHARS), excerpt.rfind("\n", 0, CLAMP_CHARS)
+        )
+        if cut > 0:
+            excerpt = excerpt[:cut]
+    rest = text[len(excerpt) :]
+
+    excerpt_html = _clamp_html(excerpt)
+    rest_html = _clamp_html(rest) if rest else ""
+    if external_reference:
+        reference = format_html(
+            "{}<em>{}</em>",
+            mark_safe("<br>") if text else "",
+            _clamp_html(external_reference),
+        )
+        if rest or len(lines) >= CLAMP_LINES:
+            rest_html = format_html("{}{}", rest_html, reference)
+        else:
+            excerpt_html = format_html("{}{}", excerpt_html, reference)
+
+    return format_html(
+        '<div class="{}" data-clamp><span class="wb-clamp-excerpt">{}</span>{}</div>',
+        " ".join(filter(None, [css_class, "wb-clamp"])),
+        excerpt_html,
+        format_html(
+            '<div class="wb-clamp-rest" hidden="until-found" data-foldable>{}</div>',
+            rest_html,
+        )
+        if rest_html
+        else "",
     )

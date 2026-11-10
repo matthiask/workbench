@@ -1207,44 +1207,68 @@ function initCelebration() {
   setTimeout(() => el.remove(), 3000)
 }
 
+// Collapsed offers and the rest of long descriptions are hidden with
+// hidden="until-found" (data-foldable) so that the browser's search finds
+// them. The button expands or collapses everything in an offer.
+function updateExpandButton(offer) {
+  const button = offer?.querySelector("[data-expand-offer]")
+  if (!button) return
+
+  const foldables = offer.querySelectorAll("[data-foldable]")
+  const expanded = ![...foldables].some((el) => el.hidden)
+  button.hidden = !foldables.length
+  button.dataset.titleCollapsed ??= button.title
+  button.title = expanded
+    ? button.dataset.titleExpanded
+    : button.dataset.titleCollapsed
+  button.setAttribute("aria-expanded", expanded ? "true" : "false")
+}
+
 // Clamped descriptions expand when clicked
 document.addEventListener("click", (e) => {
-  const clamp = e.target.closest("[data-clamp]")
-  if (clamp && !e.target.closest("a")) clamp.classList.add("is-expanded")
+  const rest = e.target.closest("[data-clamp]")?.querySelector(".wb-clamp-rest")
+  if (rest && !e.target.closest("a")) {
+    rest.hidden = false
+    updateExpandButton(rest.closest(".wb-offer"))
+  }
 })
 
-// Expand the description and the services of an offer at once
+// A match in a collapsed offer expands its description and services
+document.addEventListener(
+  "beforematch",
+  (e) => {
+    const offer = e.target.closest(".wb-offer")
+    if (offer && !e.target.matches(".wb-clamp-rest")) {
+      for (const el of offer.querySelectorAll(
+        ":scope > [data-foldable]:not(.wb-clamp-rest)",
+      )) {
+        el.hidden = false
+      }
+    }
+    // The browser reveals the target after the event
+    setTimeout(() => updateExpandButton(offer))
+  },
+  true,
+)
+
 document.addEventListener("click", (e) => {
   const button = e.target.closest("[data-expand-offer]")
   if (!button) return
 
   const offer = button.closest(".wb-offer")
   const expand = button.getAttribute("aria-expanded") !== "true"
-  for (const clamp of offer.querySelectorAll("[data-clamp]")) {
-    clamp.classList.toggle("is-expanded", expand)
+  for (const el of offer.querySelectorAll("[data-foldable]")) {
+    if (expand) {
+      el.hidden = false
+    } else {
+      el.setAttribute("hidden", "until-found")
+    }
   }
-  for (const el of offer.querySelectorAll(".collapse")) {
-    bootstrap.Collapse.getOrCreateInstance(el, { toggle: false })[
-      expand ? "show" : "hide"
-    ]()
-  }
-
-  button.dataset.titleCollapsed ??= button.title
-  button.title = expand
-    ? button.dataset.titleExpanded
-    : button.dataset.titleCollapsed
-  button.setAttribute("aria-expanded", expand ? "true" : "false")
+  updateExpandButton(offer)
 })
 
-// Hide the button when there is nothing to expand
-function hideUselessExpandButtons() {
-  for (const button of document.querySelectorAll("[data-expand-offer]")) {
-    const offer = button.closest(".wb-offer")
-    button.hidden =
-      !offer.querySelector(".collapse") &&
-      ![...offer.querySelectorAll("[data-clamp]")].some(
-        (clamp) => clamp.scrollHeight > clamp.clientHeight,
-      )
+document.addEventListener("DOMContentLoaded", () => {
+  for (const offer of document.querySelectorAll(".wb-offer")) {
+    updateExpandButton(offer)
   }
-}
-document.addEventListener("DOMContentLoaded", hideUselessExpandButtons)
+})
