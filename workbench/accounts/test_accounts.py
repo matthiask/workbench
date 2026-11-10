@@ -9,6 +9,7 @@ from django.db import connection
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils.translation import override
 from time_machine import travel
 
 from workbench import factories
@@ -70,6 +71,7 @@ class AccountsTest(TestCase):
         user = User.objects.latest("pk")
         self.assertEqual(user._features, ["LATE_LOGGING"])
 
+    @override("de")
     def test_choices(self):
         """User.objects.choices() does what it should"""
         u1 = factories.UserFactory.create(_full_name="M A", is_active=True)
