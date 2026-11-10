@@ -288,6 +288,18 @@ class PDFDocument(_PDFDocument):
         self.p(postal_address)
         self.next_frame()
 
+    def service_description(self, service):
+        # Invoice services show the external reference of their project's
+        # service (e.g. an issue), offers don't
+        project_service = getattr(service, "project_service", None)
+        lines = [
+            service.description.strip(),
+            project_service.external_reference if project_service else "",
+        ]
+        for line in filter(None, lines):
+            self.p(line)
+        return any(lines)
+
     def services_row(self, service):
         is_optional = getattr(service, "is_optional", False)
         self.table(
@@ -313,8 +325,7 @@ class PDFDocument(_PDFDocument):
             self.style.tableServices,
         )
 
-        if stripped := service.description.strip():
-            self.p(stripped)
+        self.service_description(service)
         self.spacer(1 * mm)
 
     def services_row_with_details(self, service):
@@ -337,8 +348,7 @@ class PDFDocument(_PDFDocument):
             self.style.tableThreeColumns,
             self.style.tableServices,
         )
-        if stripped := service.description.strip():
-            self.p(stripped)
+        if self.service_description(service):
             self.spacer(0.25 * mm)
         self.table(
             [
@@ -576,7 +586,7 @@ class PDFDocument(_PDFDocument):
             self.p("{}: {}".format(_("Service period"), invoice.service_period))
             self.spacer()
         self.table_services(
-            invoice.services.all(),
+            invoice.services.select_related("project_service"),
             show_details=invoice.show_service_details,
         )
         self.table_total(invoice)

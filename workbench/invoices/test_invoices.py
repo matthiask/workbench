@@ -1,4 +1,5 @@
 import datetime as dt
+import io
 from decimal import Decimal
 
 from django.core import mail
@@ -18,8 +19,24 @@ from workbench.offers.models import Offer
 from workbench.reporting.utils import effort_cost_by_project
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import WarningsForm
+from workbench.tools.pdf import PDFDocument
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
+
+
+def pdf_text(flowables):
+    def walk(item):
+        if isinstance(item, (list, tuple)):
+            for child in item:
+                yield from walk(child)
+        elif hasattr(item, "_cellvalues"):
+            yield from walk(item._cellvalues)
+        elif hasattr(item, "text"):
+            yield item.text
+        elif isinstance(item, str):
+            yield item
+
+    return " ".join(walk(flowables))
 
 
 def invoice_to_dict(invoice, **kwargs):
@@ -1353,6 +1370,30 @@ class InvoicesTest(TestCase):
         self.client.force_login(invoice.owned_by)
         response = self.client.get(invoice.urls["pdf"])
         self.assertEqual(response.status_code, 200)
+
+    def test_pdf_external_reference_of_services(self):
+        """Invoice PDFs show the external reference of the project's services"""
+        service = factories.ServiceFactory.create(
+            external_reference="https://github.com/example/repo/issues/1"
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=4)
+        project = service.project
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook(project.services.all())
+
+        for show_details in [False, True]:
+            with self.subTest(show_details=show_details):
+                pdf = PDFDocument(io.BytesIO())
+                pdf.init_invoice_letter()
+                pdf.table_services(invoice.services.all(), show_details=show_details)
+                text = pdf_text(pdf.story)
+                self.assertIn(service.title, text)
+                self.assertIn("https://github.com/example/repo/issues/1", text)
 
     def test_cancel_applied_down_payment(self):
         """Down payments applied to an invoice are cancelled after it"""
