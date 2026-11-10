@@ -2159,7 +2159,9 @@ kbd {
   max-height: min(30rem, 70vh);
   overflow-y: auto;
 
-  padding-top: 0;
+  // No padding: the sticky headers stick to the top, the last item ends
+  // with the menu (Bootstrap's padding looks like a misalignment there)
+  padding-block: 0;
 
   .dropdown-item {
     white-space: normal;
