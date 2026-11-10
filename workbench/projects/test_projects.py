@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
@@ -25,6 +26,9 @@ from workbench.tools.validation import in_days, monday
 
 
 class ProjectsTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     @override_settings(FEATURES={"INTERNAL_TYPES": F.NEVER})
     def test_create(self):
         """Create a project and create, update, delete and merge a few services"""
@@ -1342,6 +1346,9 @@ class ProjectsTest(TestCase):
 
 
 class ProjectedInvoicesTimelineTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_timeline(self):
         """Projected invoices around today are listed one by one, earlier ones
         are summed up and later ones are summed up per quarter"""

@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.translation import deactivate_all
 from time_machine import travel
 
 from workbench import factories
@@ -20,6 +21,9 @@ def c(day, time):
 
 
 class BreaksTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_list(self):
         """Filter form smoke test"""
         user = factories.UserFactory.create()

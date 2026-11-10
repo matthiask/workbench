@@ -4,6 +4,7 @@ from decimal import Decimal
 from django import forms
 from django.db.models import ProtectedError
 from django.test import TestCase
+from django.utils.translation import deactivate_all
 from time_machine import travel
 
 from workbench import factories
@@ -19,6 +20,9 @@ from workbench.tools.validation import is_title_specific, last_month_range, mont
 
 
 class ToolsTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_model(self):
         """Shared methods of tools.models.Model work"""
         self.assertEqual(Year().code, "")

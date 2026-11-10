@@ -20,7 +20,7 @@ from workbench.tools.validation import in_days, monday
 
 
 class OffersTest(TestCase):
-    def tearDown(self):
+    def setUp(self):
         deactivate_all()
 
     def test_create_offer(self):

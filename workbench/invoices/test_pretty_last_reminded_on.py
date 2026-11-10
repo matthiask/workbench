@@ -7,9 +7,7 @@ from workbench.invoices.models import Invoice
 
 
 class PrettyLastRemindedOnTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
         deactivate_all()
 
     def test_not_reminded_yet(self):

@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.expenses.models import ExchangeRates, ExpenseReport
@@ -19,6 +20,9 @@ from workbench.tools.validation import in_days
 
 class ExpensesTest(TestCase):
     fixtures = ["exchangerates.json"]
+
+    def setUp(self):
+        deactivate_all()
 
     def test_logged_cost_deletion(self):
         """Archived logged costs cannot be deleted, others can"""

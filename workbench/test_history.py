@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
@@ -13,6 +14,9 @@ from workbench.tools.history import EVERYTHING, Prettifier
 
 
 class HistoryTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_header(self):
         """Headings of versions contain users' names or primary keys"""
         set_user_name("ballabla")
