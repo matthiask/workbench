@@ -265,8 +265,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `workbench/projects/merge.py`) merges a service into another one of the
   same project: the logbook (invoiced entries too), invoice lines,
   timestamps and pins move with `substitute_with()`, the service is
-  deleted. Like deleting, only services without offer or of offers in
-  preparation; different effort types or rates are a warning
+  deleted. Not for services of offers which have been sent
+  (`Offer.services_changeable`, service groups can); different effort types or rates are a warning
   (`different-rate`). `wb offers
   guidelines` prints a private file configured per installation in the wb
   configuration (`offer_guidelines`), which the `workbench-offer` skill

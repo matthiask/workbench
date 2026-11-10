@@ -727,13 +727,13 @@ class ServiceMergeForm(Form):
     def clean(self):
         data = super().clean()
         offer = self.instance.offer
-        if offer and offer.status > offer.IN_PREPARATION:
-            # Like deleting: offers which have been sent keep their services
+        if offer and not offer.services_changeable:
+            # Offers which have been sent keep their services
             self.add_error(
                 None,
                 _(
                     "Cannot merge a service bound to an offer"
-                    " which is not in preparation anymore."
+                    " which has been sent already."
                 ),
             )
         keep = data.get("into")

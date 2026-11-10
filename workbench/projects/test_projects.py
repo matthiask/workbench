@@ -233,8 +233,9 @@ class ProjectsTest(TestCase):
         self.assertEqual(list(project.owned_by.pinned_services.all()), [keep])
 
     def test_merge_services_of_sent_offers(self):
-        """Services of offers which have been sent aren't merged, like they
-        aren't deleted, and only services of the same project are offered"""
+        """Services of offers which have been sent aren't merged, those of
+        service groups are, and only services of the same project are
+        offered"""
         project = factories.ProjectFactory.create()
         offer = factories.OfferFactory.create(project=project, status=Offer.ACCEPTED)
         service = factories.ServiceFactory.create(project=project, offer=offer)
@@ -247,7 +248,7 @@ class ProjectsTest(TestCase):
         response = self.client.post(url, {"modal-into": keep.pk}, headers=ajax)
         self.assertContains(
             response,
-            "Cannot merge a service bound to an offer which is not in preparation anymore.",
+            "Cannot merge a service bound to an offer which has been sent already.",
         )
         self.assertTrue(Service.objects.filter(pk=service.pk).exists())
 
@@ -255,6 +256,13 @@ class ProjectsTest(TestCase):
             keep.urls["merge"], {"modal-into": other.pk}, headers=ajax
         )
         self.assertContains(response, "Select a valid choice.")
+
+        # Service groups haven't been sent
+        offer.status = Offer.SERVICE_GROUP
+        offer.save()
+        response = self.client.post(url, {"modal-into": keep.pk}, headers=ajax)
+        self.assertEqual(response.status_code, 202)
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
 
     def test_service_with_rate_zero(self):
         """Services with 0/h rate are allowed (since effort_rate is Falsy)"""

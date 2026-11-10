@@ -1210,7 +1210,8 @@ def service_merge(
     the web interface: logged hours and costs (also invoiced ones), invoice
     lines, timestamps and pins move, the merged service is deleted
 
-    Only services without offer or of offers in preparation can be merged.
+    Services of offers which have been sent can't be merged (service groups
+    can).
     Different effort types or rates are a warning (``different-rate``), the
     logged hours are valued with the rate of the service kept."""
     service = get_object_or_404(Service, pk=service_id)

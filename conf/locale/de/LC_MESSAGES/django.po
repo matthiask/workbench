@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 09:33+0100\n"
+"POT-Creation-Date: 2026-11-10 09:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3846,10 +3846,11 @@ msgid "Logged hours and costs (also invoiced ones), invoice lines, timestamps an
 msgstr "Erfasste Stunden und Kosten (auch verrechnete), Rechnungspositionen, Zeitstempel und Pins wandern dorthin, diese Leistung wird gelöscht."
 
 #: workbench/projects/forms.py
-msgid "Cannot merge a service bound to an offer which is not in preparation anymore."
-msgstr "Leistungen von Offerten, welche nicht mehr in Vorbereitung sind, können nicht zusammengeführt werden."
+msgid "Cannot merge a service bound to an offer which has been sent already."
+msgstr "Leistungen von bereits verschickten Offerten können nicht zusammengeführt werden."
 
 #: workbench/projects/forms.py
+#, python-format
 msgid "The services have different effort types or rates, the logged hours will be valued with the rate of %(service)s."
 msgstr "Die Leistungen haben unterschiedliche Aufwandarten oder Ansätze, die erfassten Stunden werden mit dem Ansatz von %(service)s bewertet."
 
@@ -4074,6 +4075,7 @@ msgid "Reassign logbook entries of %(instance)s"
 msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 
 #: workbench/projects/urls.py
+#, python-format
 msgid "Merge %(instance)s"
 msgstr "%(instance)s zusammenführen"
 

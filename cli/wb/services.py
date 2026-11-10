@@ -365,8 +365,8 @@ def merge_service(service_id, into, dry_run, ignore_warnings, as_json):
     """Merge a service into another service of the same project and delete it
 
     Logged hours and costs (also invoiced ones), invoice lines, timestamps
-    and pins move. Only services without offer or of offers in preparation
-    can be merged. Different effort types or rates are a warning
+    and pins move. Services of offers which have been sent can't be merged
+    (service groups can). Different effort types or rates are a warning
     (different-rate), the logged hours are valued with the rate of the
     service kept."""
     data = request(
