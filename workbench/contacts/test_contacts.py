@@ -376,6 +376,50 @@ class ContactsTest(TestCase):
             ' &quot;Fax&quot;]"',
         )
 
+    def test_detail_types_migration(self):
+        """Spellings and synonyms of the suggested types are cleaned up, the
+        prefix of details copied from the organization stays"""
+        migration = importlib.import_module(
+            "workbench.contacts.migrations.0026_clean_detail_types"
+        )
+        person = factories.PersonFactory.create()
+        types = {
+            "work": "Work",
+            "Arbeit": "Work",
+            "Work Phone": "Work",
+            "Privat": "Home",
+            "Handy": "Mobile",
+            "Work  Fax": "Fax",
+            "organization Work Phone": "organization Work",
+            "organization FAX": "organization Fax",
+            "Home Mobile": "Home Mobile",
+            "Rechnungen": "Rechnungen",
+        }
+        for index, value in enumerate(types):
+            # update() bypasses the normalization of save()
+            phone = person.phonenumbers.create(phone_number=f"+41 79 555 12 {index:02}")
+            PhoneNumber.objects.filter(pk=phone.pk).update(type=value, weight=0)
+        migration.forwards(apps, None)
+        self.assertEqual(
+            {
+                (phone.phone_number[-2:], phone.type, phone.weight)
+                for phone in person.phonenumbers.all()
+            },
+            # Unchanged types keep their weight
+            {
+                ("00", "Work", 20),
+                ("01", "Work", 20),
+                ("02", "Work", 20),
+                ("03", "Home", 10),
+                ("04", "Mobile", 30),
+                ("05", "Fax", 0),
+                ("06", "organization Work", -80),
+                ("07", "organization Fax", -100),
+                ("08", "Home Mobile", 0),
+                ("09", "Rechnungen", 0),
+            },
+        )
+
     def test_contacts_redirect(self):
         """Accessing /contacts/ (not linked anywhere) redirects"""
         self.client.force_login(factories.UserFactory.create())
