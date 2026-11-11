@@ -22,6 +22,7 @@ from workbench.contacts.forms import (
     PersonMergeForm,
     organization_update_warning,
     recent_projects_or_deals,
+    short_salutation_warning,
 )
 from workbench.contacts.merge import possible_duplicates
 from workbench.contacts.models import (
@@ -459,6 +460,9 @@ class OrganizationDetail(OrganizationOut):
     phone_number: str = Field(
         description="Central number in E.164 format, e.g. the reception"
     )
+    default_billing_address: str = Field(
+        description="E.g. of a centralized accounts payable department"
+    )
     primary_contact: str
     groups: list[str]
     people: list[PersonSummary]
@@ -481,6 +485,7 @@ def organization_detail(request, organization_id: int):
         "email": organization.email,
         "accounts_payable_email": organization.accounts_payable_email,
         "phone_number": organization.phone_number,
+        "default_billing_address": organization.default_billing_address,
         "primary_contact": organization.primary_contact.get_short_name(),
         "groups": [group.title for group in organization.groups.all()],
         "people": [
@@ -505,6 +510,11 @@ class MergeIn(InputSchema):
 
 
 class OrganizationPatch(InputSchema):
+    """Fields which aren't given are left alone"""
+
+    name: str | None = None
+    is_private_person: bool | None = None
+    notes: str | None = Field(default=None, description="Replaces the notes")
     primary_contact: str | None = Field(
         default=None, description="Short name of an active user"
     )
@@ -522,6 +532,14 @@ class OrganizationPatch(InputSchema):
         description="Central number, e.g. the reception; remove it from the"
         " people of the organization, it's shown on them",
     )
+    default_billing_address: str | None = Field(
+        default=None,
+        description="E.g. of a centralized accounts payable department",
+    )
+    add_groups: list[str] = Field(
+        default=[], description="Titles or IDs of active groups"
+    )
+    remove_groups: list[str] = Field(default=[], description="Titles or IDs of groups")
 
 
 def _organization_detail_out(organization, request):
@@ -539,9 +557,11 @@ def organization_update(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Change the primary contact, the email addresses or the phone number
-    of an organization or archive it. Archiving warns about active people (`archive-people`),
-    ignoring the warning archives them too."""
+    """Change the name, the notes, the primary contact, the email addresses,
+    the phone number, the billing address and the groups of an organization
+    or archive it, with the rules of the organization form. Archiving warns
+    about active people (`archive-people`), ignoring the warning archives them
+    too."""
     organization = get_object_or_404(Organization, pk=organization_id)
     archiving = data.is_archived and not organization.is_archived
     if (
@@ -552,6 +572,14 @@ def organization_update(
         raise ValidationError([
             {"loc": ["body", "data"], "msg": warning, "code": "archive-people"}
         ])
+    errors = []
+
+    def error(loc, msg):
+        errors.append({"loc": ["body", "data", *loc], "msg": msg})
+
+    add, remove = _groups_to_change(
+        {group.pk for group in organization.groups.all()}, data, error
+    )
     if data.primary_contact is not None:
         user = (
             User.objects
@@ -559,25 +587,34 @@ def organization_update(
             .filter(is_active=True)
             .first()
         )
-        if not user:
-            raise ValidationError([
-                {
-                    "loc": ["body", "data", "primary_contact"],
-                    "msg": _("Unknown or inactive user %r.") % data.primary_contact,
-                }
-            ])
-        organization.primary_contact = user
-    if data.is_archived is not None:
-        organization.is_archived = data.is_archived
-    for field in ["email", "accounts_payable_email", "phone_number"]:
+        if user:
+            organization.primary_contact = user
+        else:
+            error(
+                ["primary_contact"],
+                _("Unknown or inactive user %r.") % data.primary_contact,
+            )
+    for field in ["is_private_person", "is_archived"]:
+        if (value := getattr(data, field)) is not None:
+            setattr(organization, field, value)
+    for field in [
+        "name",
+        "notes",
+        "email",
+        "accounts_payable_email",
+        "phone_number",
+        "default_billing_address",
+    ]:
         if (value := getattr(data, field)) is not None:
             setattr(organization, field, value.strip())
-    errors = []
     full_clean(organization, ["body", "data"], errors)
     if errors:
         raise ValidationError(errors)
     with transaction.atomic():
+        # Also updates the search texts of related objects when renamed
         organization.save()
+        organization.groups.add(*add)
+        organization.groups.remove(*remove)
         if archiving:
             organization.archive_people()
         result = _organization_detail_out(organization, request)
@@ -670,7 +707,9 @@ class ContactDetail(Schema):
 
 
 class PersonDetailOut(PersonOut):
+    address: str = Field(description="Mr./Ms./...")
     salutation: str
+    address_on_first_name_terms: bool
     notes: str
     primary_contact: str
     groups: list[str]
@@ -692,7 +731,9 @@ def person_detail(request, person_id: int):
 
 def person_out(person, request):
     return person_list_out(person, request) | {
+        "address": person.address,
         "salutation": person.salutation,
+        "address_on_first_name_terms": person.address_on_first_name_terms,
         "notes": person.notes,
         "primary_contact": person.primary_contact.get_short_name(),
         "groups": [group.title for group in person.all_groups()],
@@ -1062,6 +1103,20 @@ def person_add_details(
 class PersonPatch(InputSchema):
     """Fields which aren't given are left alone"""
 
+    given_name: str | None = None
+    family_name: str | None = None
+    address: str | None = Field(
+        default=None,
+        description="Mr./Ms./... in the language of the correspondence, e.g."
+        " Herr or Frau.",
+    )
+    salutation: str | None = Field(
+        default=None,
+        description="Complete salutation in the language of the correspondence,"
+        " e.g. Lieber Hans or Sehr geehrte Frau Muster.",
+    )
+    address_on_first_name_terms: bool | None = None
+    notes: str | None = Field(default=None, description="Replaces the notes")
     primary_contact: str | None = Field(
         default=None, description="Short name of an active user"
     )
@@ -1184,9 +1239,9 @@ def _postal_address_types(person, types, removed, error):
     return changed
 
 
-def _groups_to_change(person, data, error):
-    """The groups to add to and to remove from the person"""
-    current = {group.pk for group in person.all_groups()}
+def _groups_to_change(current, data, error):
+    """The groups to add to and to remove from a person or an organization
+    which is in the ``current`` groups (primary keys)"""
     add, remove = [], []
     for key, values, target in [
         ("add_groups", data.add_groups, add),
@@ -1221,6 +1276,33 @@ def _move_to_organization(person, data, error):
     return True
 
 
+PERSON_FIELDS = [
+    "given_name",
+    "family_name",
+    "address",
+    "salutation",
+    "address_on_first_name_terms",
+    "notes",
+]
+
+
+def _change_person_fields(person, data, error):
+    """Sets the given fields, validated with the model's rules"""
+    changed = [field for field in PERSON_FIELDS if getattr(data, field) is not None]
+    for field in changed:
+        value = getattr(data, field)
+        setattr(person, field, value.strip() if isinstance(value, str) else value)
+    errors = []
+    full_clean(
+        person,
+        [],
+        errors,
+        exclude=[f.name for f in Person._meta.fields if f.name not in changed],
+    )
+    for e in errors:
+        error(e["loc"], e["msg"])
+
+
 @router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
 def person_update(
     request,
@@ -1230,8 +1312,9 @@ def person_update(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Change the primary contact, the organization and the groups of a
-    person, remove email addresses, phone numbers and postal addresses,
+    """Change the names, the salutation, the notes, the primary contact, the
+    organization and the groups of a person (short salutations are a
+    warning, ``short-salutation``), remove email addresses, phone numbers and postal addresses,
     change the type of postal addresses (e.g. home for private ones) or
     archive them, with the rules of the person form; contact details are
     added with ``details/``. Archiving the
@@ -1249,7 +1332,10 @@ def person_update(
     def error(loc, msg):
         errors.append({"loc": ["body", "data", *loc], "msg": msg})
 
-    add, remove = _groups_to_change(person, data, error)
+    add, remove = _groups_to_change(
+        {group.pk for group in person.all_groups()}, data, error
+    )
+    _change_person_fields(person, data, error)
     if data.primary_contact is not None:
         user = (
             User.objects
@@ -1277,6 +1363,18 @@ def person_update(
     moving = _move_to_organization(person, data, error)
     if errors:
         raise ValidationError(errors)
+    if (
+        data.salutation is not None
+        and "short-salutation" not in ignore_warnings
+        and (warning := short_salutation_warning(person.salutation))
+    ):
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "salutation"],
+                "msg": warning,
+                "code": "short-salutation",
+            }
+        ])
     if (
         moving
         and "organization-update" not in ignore_warnings

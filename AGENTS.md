@@ -118,7 +118,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `wb contacts search` finds both organizations and people, `wb organizations
   show` and `wb people show` show them. `wb organizations search` filters
   organizations (`--without-active-people`, `--primary-contact`), `wb
-  organizations update` changes their primary contact and archives them,
+  organizations update` changes their name, notes, billing address, groups
+  and primary contact and archives them,
   `wb organizations merge ID --into ID` merges duplicates
   (`OrganizationMergeForm`, `merge_organizations()`). `wb people search` filters people like
   the people list of the web interface (`--group`, also through the
@@ -129,8 +130,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   years, `recent_projects_or_deals()`) and has the postal address the XLSX
   export of the people list uses (highest weight), so scripts can build
   mailing lists without fetching every person. `wb
-  people update` changes the primary contact, adds and removes groups and
-  archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
+  people update` changes the names, the salutation (short ones are the
+  form's `short-salutation` warning), the notes and the primary contact,
+  adds and removes groups and archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
   to organizations go to the organization like in the person form
   (`Person.add_to_group()`, `remove_from_group()`). `wb people
   reassign-suggestions` and `wb people reassign` move the people of users who

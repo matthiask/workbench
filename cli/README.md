@@ -155,11 +155,15 @@ active group:
     wb people search --group "Newsletter" --missing-postal-address
     wb people search --projects-or-deals-since 2023-01-01 --csv
 
-`wb people update` changes the primary contact and the groups of a person or
-archives them, e.g. someone who left:
+`wb people update` changes the names, the salutation, the notes, the primary
+contact and the groups of a person or archives them, e.g. someone who left;
+`wb organizations update` changes the name, the notes, the billing address and
+the groups of an organization:
 
     wb people update 1234 --primary-contact mk --add-group "Newsletter"
+    wb people update 1234 --salutation "Liebe Anna" --first-name-terms
     wb people update 1234 --archive
+    wb organizations update 45 --name "Beispiel AG" --add-group "Agenturen"
 
 People whose primary contact left get new ones from their projects and deals
 (the lead of the latest project or the owner of the latest deal, the person's

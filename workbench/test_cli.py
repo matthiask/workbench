@@ -1224,6 +1224,64 @@ planned_work:
             [p.phone_number for p in bea.phonenumbers.all()], ["+41791234567"]
         )
 
+    def test_person_and_organization_fields(self):
+        """Names, salutations, notes, billing addresses and groups are changed"""
+        organization = factories.OrganizationFactory.create(name="Beispiel")
+        person = factories.PersonFactory.create(
+            organization=organization, salutation="Lieber Hans"
+        )
+        Group.objects.create(title="Agenturen", applies_to_organizations=True)
+
+        result = self.wb(
+            "people",
+            "update",
+            person.pk,
+            "--given-name",
+            "Johann",
+            "--address",
+            "Herr",
+            "--salutation",
+            "Sehr geehrter Herr Muster",
+            "--no-first-name-terms",
+            "--notes",
+            "Prefers phone calls",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Sehr geehrter Herr Muster", result.output)
+        person.refresh_from_db()
+        self.assertEqual(person.given_name, "Johann")
+        self.assertEqual(person.address, "Herr")
+        self.assertFalse(person.address_on_first_name_terms)
+        self.assertEqual(person.notes, "Prefers phone calls")
+
+        result = self.wb("people", "update", person.pk, "--salutation", "Hallo")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("short-salutation", result.output)
+
+        result = self.wb(
+            "organizations",
+            "update",
+            organization.pk,
+            "--name",
+            "Beispiel AG",
+            "--default-billing-address",
+            "Beispiel AG\nKreditoren",
+            "--add-group",
+            "Agenturen",
+            "--notes",
+            "",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Kreditoren", result.output)
+        organization.refresh_from_db()
+        self.assertEqual(organization.name, "Beispiel AG")
+        self.assertEqual(
+            organization.default_billing_address, "Beispiel AG\nKreditoren"
+        )
+        self.assertEqual(
+            [group.title for group in organization.groups.all()], ["Agenturen"]
+        )
+
     def test_person_organization(self):
         """People who left move to their new organization or to none, like in
         the person form; they stay the contact of their projects"""

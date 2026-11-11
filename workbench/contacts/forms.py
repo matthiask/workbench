@@ -643,6 +643,12 @@ def organization_update_warning(person):
     ) % ", ".join(related)
 
 
+def short_salutation_warning(salutation):
+    if salutation and len(salutation.split()) < 2:
+        return _("This does not look right. Please add a full salutation.")
+    return None
+
+
 class PersonForm(ModelForm):
     user_fields = default_to_current_user = ["primary_contact"]
 
@@ -702,11 +708,8 @@ class PersonForm(ModelForm):
                 "date_of_birth",
                 _("Enter any year and the day and the month of the birthday."),
             )
-        if data.get("salutation") and len(data.get("salutation").split()) < 2:
-            self.add_warning(
-                _("This does not look right. Please add a full salutation."),
-                code="short-salutation",
-            )
+        if warning := short_salutation_warning(data.get("salutation")):
+            self.add_warning(warning, code="short-salutation")
         if (
             self.instance.pk
             and "organization" in self.changed_data

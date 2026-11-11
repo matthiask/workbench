@@ -147,6 +147,8 @@ def _echo_organization(data):
             ("Email address", data["email"]),
             ("Accounts payable", data["accounts_payable_email"]),
             ("Phone number", data["phone_number"]),
+            ("Billing address", data["default_billing_address"]),
+            ("Private person", "yes" if data["is_private_person"] else ""),
             ("Groups", ", ".join(data["groups"])),
             ("URL", data["url"]),
         ],
@@ -188,6 +190,9 @@ def show_organization(organization_id, as_json):
 
 @organizations.command("update")
 @click.argument("organization_id", type=int)
+@click.option("--name")
+@click.option("--private-person/--no-private-person", "is_private_person", default=None)
+@click.option("--notes", help="Replaces the notes; an empty string removes them.")
 @click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names
 )
@@ -206,6 +211,23 @@ def show_organization(organization_id, as_json):
     " people too; an empty string removes it.",
 )
 @click.option(
+    "--default-billing-address",
+    help="E.g. of a centralized accounts payable department; an empty string"
+    " removes it.",
+)
+@click.option(
+    "--add-group",
+    "add_groups",
+    multiple=True,
+    help="Title or ID of a group; repeat it for several.",
+)
+@click.option(
+    "--remove-group",
+    "remove_groups",
+    multiple=True,
+    help="Title or ID of a group; repeat it for several.",
+)
+@click.option(
     "--archive/--unarchive",
     "is_archived",
     default=None,
@@ -217,33 +239,43 @@ def show_organization(organization_id, as_json):
 @click.option("--json", "as_json", is_flag=True)
 def update_organization(
     organization_id,
+    name,
+    is_private_person,
+    notes,
     primary_contact,
     email,
     accounts_payable_email,
     phone_number,
+    default_billing_address,
+    add_groups,
+    remove_groups,
     is_archived,
     dry_run,
     ignore_warnings,
     as_json,
 ):
-    """Change the primary contact, the email addresses or the phone number of
-    an organization or archive it"""
+    """Change the name, the notes, the primary contact, the email addresses,
+    the phone number, the billing address and the groups of an organization
+    or archive it"""
     data = {
         key: value
         for key, value in [
+            ("name", name),
+            ("is_private_person", is_private_person),
+            ("notes", notes),
             ("primary_contact", primary_contact),
             ("email", email),
             ("accounts_payable_email", accounts_payable_email),
             ("phone_number", phone_number),
+            ("default_billing_address", default_billing_address),
+            ("add_groups", list(add_groups)),
+            ("remove_groups", list(remove_groups)),
             ("is_archived", is_archived),
         ]
-        if value is not None
+        if value not in (None, [])
     }
     if not data:
-        terminate(
-            "Nothing to change, pass --primary-contact, --email,"
-            " --accounts-payable-email, --phone-number, --archive or --unarchive."
-        )
+        terminate("Nothing to change, see --help for the options.")
     data = request(
         "PATCH",
         f"contacts/organizations/{organization_id}/",
@@ -459,6 +491,25 @@ def show_person(person_id, as_json):
 
 @people.command("update")
 @click.argument("person_id", type=int)
+@click.option("--given-name")
+@click.option("--family-name")
+@click.option(
+    "--address",
+    help="Mr./Ms./... in the language of the correspondence, e.g. Herr or Frau;"
+    " an empty string removes it.",
+)
+@click.option(
+    "--salutation",
+    help="Complete salutation in the language of the correspondence, e.g."
+    " `Lieber Hans` or `Sehr geehrte Frau Muster`.",
+)
+@click.option(
+    "--first-name-terms/--no-first-name-terms",
+    "address_on_first_name_terms",
+    default=None,
+    help="Whether to address the person on first-name terms.",
+)
+@click.option("--notes", help="Replaces the notes; an empty string removes them.")
 @click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names
 )
@@ -521,6 +572,12 @@ def show_person(person_id, as_json):
 @click.option("--json", "as_json", is_flag=True)
 def update_person(
     person_id,
+    given_name,
+    family_name,
+    address,
+    salutation,
+    address_on_first_name_terms,
+    notes,
     primary_contact,
     add_groups,
     remove_groups,
@@ -534,14 +591,20 @@ def update_person(
     ignore_warnings,
     as_json,
 ):
-    """Change the primary contact, the organization and the groups of a
-    person, remove email addresses, phone numbers and postal addresses,
-    change the type of postal addresses or archive them, like in the web
-    interface. Projects, deals and invoices keep their customer and contact
+    """Change the names, the salutation, the notes, the primary contact, the
+    organization and the groups of a person, remove email addresses, phone
+    numbers and postal addresses, change the type of postal addresses or
+    archive them, like in the web interface. Projects, deals and invoices keep their customer and contact
     when moving a person to another organization."""
     data = {
         key: value
         for key, value in [
+            ("given_name", given_name),
+            ("family_name", family_name),
+            ("address", address),
+            ("salutation", salutation),
+            ("address_on_first_name_terms", address_on_first_name_terms),
+            ("notes", notes),
             ("primary_contact", primary_contact),
             ("add_groups", list(add_groups)),
             ("remove_groups", list(remove_groups)),
@@ -558,12 +621,7 @@ def update_person(
             terminate(f"--organization must be an ID or empty, not {organization!r}.")
         data["organization"] = int(organization) if organization.strip() else None
     if not data:
-        terminate(
-            "Nothing to change, pass --primary-contact, --add-group,"
-            " --remove-group, --remove-email, --remove-phone,"
-            " --remove-postal-address, --postal-address-type, --organization,"
-            " --archive or --unarchive."
-        )
+        terminate("Nothing to change, see --help for the options.")
     data = request(
         "PATCH",
         f"contacts/people/{person_id}/",
@@ -915,7 +973,12 @@ def _echo_person(data):
                 link(organization.get("name", ""), organization.get("url")),
             ),
             ("Organization ID", organization.get("id")),
+            ("Form of address", data["address"]),
             ("Salutation", data["salutation"]),
+            (
+                "First-name terms",
+                "yes" if data["address_on_first_name_terms"] else "no",
+            ),
             ("Primary contact", data["primary_contact"]),
             ("Groups", ", ".join(data["groups"])),
             *(

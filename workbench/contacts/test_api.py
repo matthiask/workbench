@@ -252,6 +252,103 @@ class ContactsAPITest(TestCase):
         organization.refresh_from_db()
         self.assertFalse(organization.is_archived)
 
+    def test_update_person_fields(self):
+        """Names, the salutation, the address and the notes of people are
+        changed like in the person form, short salutations are a warning"""
+        person = factories.PersonFactory.create(
+            given_name="Hans", family_name="Muster", salutation="Lieber Hans"
+        )
+        self.client.force_login(factories.UserFactory.create())
+        url = f"/api/contacts/people/{person.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch({
+            "given_name": " Johann ",
+            "family_name": "Müller",
+            "address": "Herr",
+            "salutation": "Sehr geehrter Herr Müller",
+            "address_on_first_name_terms": False,
+            "notes": "Prefers phone calls",
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(data["full_name"], "Johann Müller")
+        self.assertEqual(data["address"], "Herr")
+        self.assertEqual(data["salutation"], "Sehr geehrter Herr Müller")
+        self.assertFalse(data["address_on_first_name_terms"])
+        person.refresh_from_db()
+        self.assertEqual(person.given_name, "Johann")
+        self.assertEqual(person.notes, "Prefers phone calls")
+        # The search finds the new name
+        self.assertEqual([p.pk for p in Person.objects.search("Müller")], [person.pk])
+
+        response = patch({"salutation": "Hallo"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["code"], "short-salutation")
+        response = patch({"salutation": "Hallo"}, "?ignore_warnings=short-salutation")
+        self.assertEqual(response.status_code, 200, response.content)
+
+        for data, loc in [
+            ({"given_name": " "}, ["body", "data", "given_name"]),
+            ({"salutation": ""}, ["body", "data", "salutation"]),
+            ({"family_name": "x" * 101}, ["body", "data", "family_name"]),
+        ]:
+            response = patch(data)
+            self.assertEqual(response.status_code, 422, data)
+            self.assertEqual([e["loc"] for e in response.json()["detail"]], [loc], data)
+        person.refresh_from_db()
+        self.assertEqual(person.full_name, "Johann Müller")
+
+    def test_update_organization(self):
+        """Organizations get a new name, notes, billing address and groups"""
+        industry = Group.objects.create(title="Industry", applies_to_organizations=True)
+        old = Group.objects.create(title="Old", is_archived=True)
+        organization = factories.OrganizationFactory.create(name="Beispiel")
+        person = factories.PersonFactory.create(organization=organization)
+        self.client.force_login(factories.UserFactory.create())
+        url = f"/api/contacts/organizations/{organization.pk}/"
+
+        def patch(data):
+            return self.client.patch(url, data, content_type="application/json")
+
+        response = patch({
+            "name": "Beispiel AG ",
+            "is_private_person": False,
+            "notes": "Customer since 2010",
+            "default_billing_address": "Beispiel AG\nKreditoren\n8000 Zürich",
+            "add_groups": ["Industry"],
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(data["name"], "Beispiel AG")
+        self.assertEqual(data["notes"], "Customer since 2010")
+        self.assertEqual(
+            data["default_billing_address"], "Beispiel AG\nKreditoren\n8000 Zürich"
+        )
+        self.assertEqual(data["groups"], ["Industry"])
+        # The search texts of people contain the organization's name
+        self.assertEqual(
+            [p.pk for p in Person.objects.search("Beispiel AG")], [person.pk]
+        )
+
+        organization.groups.add(old)
+        response = patch({"remove_groups": [str(industry.pk), "Old"]})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["groups"], [])
+
+        for data, loc in [
+            ({"name": ""}, ["body", "data", "name"]),
+            ({"add_groups": ["Old"]}, ["body", "data", "add_groups", 0]),
+            ({"remove_groups": ["Nope"]}, ["body", "data", "remove_groups", 0]),
+        ]:
+            response = patch(data)
+            self.assertEqual(response.status_code, 422, data)
+            self.assertEqual([e["loc"] for e in response.json()["detail"]], [loc], data)
+
     def test_groups(self):
         """Groups are listed with their members, created and changed with the
         form of the web interface; titles are unique"""
