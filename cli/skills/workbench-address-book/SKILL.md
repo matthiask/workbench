@@ -95,7 +95,9 @@ contact and apply them after the user's approval:
 
 People without a suggestion stay with the inactive user unless the user
 names someone; they are often candidates for archiving (step 5).
-Organizations have primary contacts too:
+Organizations have primary contacts too. A person's new primary contact
+also replaces their organization's if it isn't active anymore; the others
+are reassigned by hand:
 
     wb organizations search --primary-contact <short name>
     wb organizations update <organization_id> --primary-contact <short name> --dry-run
