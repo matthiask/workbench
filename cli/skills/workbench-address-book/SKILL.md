@@ -147,6 +147,9 @@ organization-update` after the user confirms. Membership in an active group
 
     wb people update <person_id> --organization <organization_id> --dry-run
     wb people update <person_id> --organization "" --dry-run
+    wb people update <person_id> --remove-postal-address <address_id> --dry-run
+
+`wb people show` lists the IDs of the postal addresses.
 
 People are only archived when the user confirms we lost touch with them (`wb
 people update <person_id> --archive`); archiving the last active person of an organization

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 09:25+0100\n"
+"POT-Creation-Date: 2026-11-11 09:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1065,6 +1065,11 @@ msgstr "%(person)s hat diese Telefonnummer bereits."
 #, python-format
 msgid "The person has no email address %r."
 msgstr "Die Person hat keine Emailadresse %r."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "The person has no postal address with the ID %r."
+msgstr "Die Person hat keine Postadresse mit der ID %r."
 
 #: workbench/contacts/api.py
 #, python-format

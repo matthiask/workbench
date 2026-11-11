@@ -1198,6 +1198,32 @@ planned_work:
         person.refresh_from_db()
         self.assertIsNone(person.organization)
 
+        # Old addresses of the organization are removed by ID
+        office = person.postaladdresses.create(
+            type="work", street="Altweg", postal_code="8000", city="Zürich"
+        )
+        home = person.postaladdresses.create(
+            type="home", street="Heimweg", postal_code="8001", city="Zürich"
+        )
+        self.assertIn(f"ID {office.pk}", self.wb("people", "show", person.pk).output)
+        result = self.wb(
+            "people", "update", person.pk, "--remove-postal-address", home.pk + 100
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("no postal address", result.output)
+        result = self.wb(
+            "people", "update", person.pk, "--remove-postal-address", office.pk
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(list(person.postaladdresses.all()), [home])
+        # Addresses of others can't be removed
+        stranger = factories.PersonFactory.create()
+        result = self.wb(
+            "people", "update", stranger.pk, "--remove-postal-address", home.pk
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertEqual(list(person.postaladdresses.all()), [home])
+
         # Without related objects there's nothing to confirm
         other = factories.PersonFactory.create()
         result = self.wb("people", "update", other.pk, "--organization", old.pk)

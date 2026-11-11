@@ -987,6 +987,11 @@ class PersonPatch(InputSchema):
         description="Email addresses to remove, e.g. generic ones like info@"
         " which belong to the organization",
     )
+    remove_postal_addresses: list[int] = Field(
+        default=[],
+        description="IDs of postal addresses to remove, e.g. old ones of the"
+        " organization",
+    )
     organization: int | None = Field(
         default=None,
         description="ID of the organization, e.g. the new employer of someone"
@@ -1012,6 +1017,17 @@ def _email_addresses_to_remove(person, values, error):
                 _("The person has no email address %r.") % value,
             )
     return remove
+
+
+def _postal_addresses_to_remove(person, ids, error):
+    addresses = {address.pk: address for address in person.postaladdresses.all()}
+    for index, pk in enumerate(ids):
+        if pk not in addresses:
+            error(
+                ["remove_postal_addresses", index],
+                _("The person has no postal address with the ID %r.") % pk,
+            )
+    return [addresses[pk] for pk in ids if pk in addresses]
 
 
 def _groups_to_change(person, data, error):
@@ -1061,7 +1077,7 @@ def person_update(
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change the primary contact, the organization and the groups of a
-    person, remove email addresses or archive them, with the rules of the
+    person, remove email and postal addresses or archive them, with the rules of the
     person form; contact details are added with ``details/``. Archiving the
     last active person of an organization without open projects or deals
     archives the organization too, unarchiving a person unarchives their
@@ -1095,6 +1111,9 @@ def person_update(
     remove_emails = _email_addresses_to_remove(
         person, data.remove_email_addresses, error
     )
+    remove_addresses = _postal_addresses_to_remove(
+        person, data.remove_postal_addresses, error
+    )
     moving = _move_to_organization(person, data, error)
     if errors:
         raise ValidationError(errors)
@@ -1113,8 +1132,8 @@ def person_update(
     if data.is_archived is not None:
         person.is_archived = data.is_archived
     with transaction.atomic():
-        for email in remove_emails:
-            email.delete()
+        for detail in [*remove_emails, *remove_addresses]:
+            detail.delete()
         # Also updates the full text search
         person.save()
         if archival_changed:

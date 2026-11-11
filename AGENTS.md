@@ -400,8 +400,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   People who left move to their new organization or to none (person form,
   `wb people update --organization`); moving the contact of projects, deals
   or invoices warns (`organization-update`, `organization_update_warning()`),
-  they keep their customer and contact. Former employees stay in an active
-  group (e.g. the team's) so they aren't archived.
+  they keep their customer and contact; `--remove-postal-address ID`
+  removes the old organization's addresses. Former employees stay in an
+  active group (e.g. the team's) so they aren't archived.
   Archiving an organization warns about its active people
   (`archive-people`, form and API) and archives them when confirmed
   (`Organization.archive_warning()`, `archive_people()`).

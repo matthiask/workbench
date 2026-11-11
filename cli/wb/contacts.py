@@ -476,6 +476,14 @@ def show_person(person_id, as_json):
     " organization; repeat it for several.",
 )
 @click.option(
+    "--remove-postal-address",
+    "remove_postal_addresses",
+    type=int,
+    multiple=True,
+    help="ID of a postal address to remove (`wb people show`), e.g. an old one"
+    " of the organization; repeat it for several.",
+)
+@click.option(
     "--organization",
     help="ID of the organization, e.g. the new employer of someone who left;"
     " an empty string removes the person from their organization.",
@@ -492,6 +500,7 @@ def update_person(
     add_groups,
     remove_groups,
     remove_emails,
+    remove_postal_addresses,
     organization,
     is_archived,
     dry_run,
@@ -499,7 +508,7 @@ def update_person(
     as_json,
 ):
     """Change the primary contact, the organization and the groups of a
-    person, remove email addresses or archive them, like in the web
+    person, remove email and postal addresses or archive them, like in the web
     interface. Projects, deals and invoices keep their customer and contact
     when moving a person to another organization."""
     data = {
@@ -509,6 +518,7 @@ def update_person(
             ("add_groups", list(add_groups)),
             ("remove_groups", list(remove_groups)),
             ("remove_email_addresses", list(remove_emails)),
+            ("remove_postal_addresses", list(remove_postal_addresses)),
             ("is_archived", is_archived),
         ]
         if value not in (None, [])
@@ -520,8 +530,8 @@ def update_person(
     if not data:
         terminate(
             "Nothing to change, pass --primary-contact, --add-group,"
-            " --remove-group, --remove-email, --organization, --archive or"
-            " --unarchive."
+            " --remove-group, --remove-email, --remove-postal-address,"
+            " --organization, --archive or --unarchive."
         )
     data = request(
         "PATCH",
@@ -844,9 +854,12 @@ def _echo_person(data):
                 for label, key in [
                     ("Email", "email_addresses"),
                     ("Phone", "phone_numbers"),
-                    ("Address", "postal_addresses"),
                 ]
                 for detail in data[key]
+            ),
+            *(
+                (f"Address ({detail['type']}, ID {detail['id']})", detail["value"])
+                for detail in data["postal_addresses"]
             ),
             ("URL", data["url"]),
         ],
