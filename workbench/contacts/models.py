@@ -159,6 +159,9 @@ class Organization(Model):
     def recent_invoices(self):
         return self.invoice_set.select_related("owned_by")[:10]
 
+    def postal_addresses(self):
+        return organization_postal_addresses(self)
+
     def recent_offers(self):
         from workbench.offers.models import Offer
 
@@ -595,7 +598,8 @@ def organization_postal_addresses(organization, *, exclude_person=None):
     of most people first, without those ``exclude_person`` has already
 
     Returns dicts with the ``fields`` of ``ADDRESS_FIELDS``, the ``type``,
-    the address on one ``line`` and the ``people`` who have it."""
+    the address on one ``line``, the ``people`` who have it (and their
+    ``names``) and their ``addresses``."""
     addresses = {}
     for address in (
         PostalAddress.objects
@@ -611,7 +615,11 @@ def organization_postal_addresses(organization, *, exclude_person=None):
             {
                 "fields": fields,
                 "type": address.type,
-                "line": address.postal_address_override.replace("\n", ", ")
+                "line": ", ".join(
+                    line.strip()
+                    for line in address.postal_address_override.splitlines()
+                    if line.strip()
+                )
                 or ", ".join(
                     filter(
                         None,
@@ -628,14 +636,18 @@ def organization_postal_addresses(organization, *, exclude_person=None):
                     )
                 ),
                 "people": [],
+                "addresses": [],
             },
         )
+        entry["addresses"].append(address)
         if address.person not in entry["people"]:
             entry["people"].append(address.person)
     if exclude_person:
         for key, entry in list(addresses.items()):
             if exclude_person in entry["people"]:
                 del addresses[key]
+    for entry in addresses.values():
+        entry["names"] = ", ".join(person.full_name for person in entry["people"])
     return sorted(addresses.values(), key=lambda entry: -len(entry["people"]))
 
 

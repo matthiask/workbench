@@ -105,7 +105,7 @@
   {% endif %}
 
   <div class="row g-3 mb-4">
-    <div class="col-lg-6">
+    <div class="col-lg-4">
       <section class="card h-100">
         <div class="card-header">{% translate 'Details' %}</div>
         <div class="card-body">
@@ -124,7 +124,7 @@
         </div>
       </section>
     </div>
-    <div class="col-lg-6">
+    <div class="col-lg-4">
       <section class="card h-100">
         <div class="card-header">{% translate 'people'|capfirst %}</div>
         <div class="list-group list-group-flush wb-scroll-list">
@@ -135,6 +135,31 @@
             >
               {{ person }}
             </a>
+          {% empty %}
+            <div class="list-group-item text-secondary">&ndash;</div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-4">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'postal addresses'|capfirst %}</div>
+        <div class="list-group list-group-flush wb-scroll-list">
+          {% for address in organization.postal_addresses %}
+            <div class="list-group-item wb-row">
+              <div class="wb-row-main">
+                <div>{{ address.line }}</div>
+                <div class="wb-row-meta">
+                  <span>{{ address.names }}</span>
+                </div>
+              </div>
+              <div class="wb-row-aside">
+                <a
+                  href="{% url 'contacts_organization_postal_address' organization.pk %}?address={{ address.addresses.0.pk }}"
+                  class="btn btn-quiet btn-sm"
+                >{% translate 'Change' %}</a>
+              </div>
+            </div>
           {% empty %}
             <div class="list-group-item text-secondary">&ndash;</div>
           {% endfor %}

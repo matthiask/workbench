@@ -24,7 +24,13 @@ from workbench.contacts.merge import (
     merge_warnings,
     possible_duplicates,
 )
-from workbench.contacts.models import Group, Organization, Person, PhoneNumber
+from workbench.contacts.models import (
+    Group,
+    Organization,
+    Person,
+    PhoneNumber,
+    organization_postal_addresses,
+)
 from workbench.contacts.urls import autocomplete_filter
 from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
@@ -791,6 +797,61 @@ class ContactsTest(TestCase):
 
         response = self.client.get(archived.urls["update"])
         self.assertContains(response, "Hauptstrasse 1, 8000 Zürich")
+
+    def test_change_postal_address_of_organization(self):
+        """An address of an organization's people is changed for the people
+        selected at once"""
+        organization = factories.OrganizationFactory.create()
+        anna, bea, carl = (
+            factories.PersonFactory.create(organization=organization, given_name=name)
+            for name in ["Anna", "Bea", "Carl"]
+        )
+        old = {"street": "Altweg", "house_number": "1", "postal_code": "8000"}
+        address = anna.postaladdresses.create(**old, city="Zürich")
+        bea.postaladdresses.create(**old, city="Zürich ", type="Office")
+        carl.postaladdresses.create(**old, city="Zürich")
+        home = carl.postaladdresses.create(**old, city="Bern", type="Home")
+        self.client.force_login(anna.primary_contact)
+
+        response = self.client.get(organization.urls["detail"])
+        self.assertContains(response, "Altweg 1, 8000 Zürich")
+        self.assertContains(response, "Anna Nachname, Bea Nachname, Carl Nachname")
+        url = f"{organization.urls['postal_address']}?address={address.pk}"
+        self.assertContains(response, url.replace("&", "&amp;"))
+
+        response = self.client.get(url)
+        self.assertContains(response, 'value="Altweg"')
+        response = self.client.get(f"{organization.urls['postal_address']}?address=0")
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.post(
+            url,
+            {
+                "street": "Neuweg",
+                "house_number": "2",
+                "postal_code": "8001",
+                "city": "Zürich",
+                "country": "CH",
+                "people": [anna.pk, bea.pk],
+            },
+        )
+        self.assertRedirects(response, organization.urls["detail"])
+        self.assertEqual(
+            [
+                (a.person, a.type, a.street, a.city)
+                for a in organization_postal_addresses(organization)
+                for a in a["addresses"]
+            ],
+            [
+                (anna, "work", "Neuweg", "Zürich"),
+                (bea, "Office", "Neuweg", "Zürich"),
+                (carl, "work", "Altweg", "Zürich"),
+                (carl, "Home", "Altweg", "Bern"),
+            ],
+        )
+        self.assertEqual(list(Person.objects.search("Neuweg")), [anna, bea])
+        home.refresh_from_db()
+        self.assertEqual(home.street, "Altweg")
 
     def test_create_person_with_preselected_organization(self):
         """Adding a person to an existing org. preselects the organization"""

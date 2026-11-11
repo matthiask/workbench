@@ -5,9 +5,11 @@ from collections import OrderedDict
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Count, Func, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import Coalesce, Lower
 from django.forms.models import inlineformset_factory
+from django.http import Http404
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
 from django.utils.html import format_html, format_html_join
@@ -23,6 +25,7 @@ from workbench.contacts.merge import (
     merge_warnings,
 )
 from workbench.contacts.models import (
+    ADDRESS_FIELDS,
     EmailAddress,
     Group,
     Organization,
@@ -454,6 +457,58 @@ class OrganizationMergeForm(Form):
         keep = self.cleaned_data["into"]
         merge_organizations(duplicate=self.instance, keep=keep)
         return keep
+
+
+class OrganizationPostalAddressForm(Form):
+    """Change an address of the organization's people for all of them, e.g.
+    when it moves (``?address=`` is one of the postal addresses)"""
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop("instance")
+        super().__init__(*args, **kwargs)
+        pk = self.request.GET.get("address")
+        self.address = next(
+            (
+                entry
+                for entry in organization_postal_addresses(self.instance)
+                if any(str(address.pk) == pk for address in entry["addresses"])
+            ),
+            None,
+        )
+        if not self.address:
+            raise Http404
+        self.fields.update(
+            forms.fields_for_model(
+                PostalAddress,
+                fields=ADDRESS_FIELDS,
+                widgets=PostalAddressForm.Meta.widgets,
+            )
+        )
+        self.initial.update(self.address["fields"])
+        self.fields["people"] = forms.TypedMultipleChoiceField(
+            label=_("people"),
+            choices=[
+                (person.pk, person.full_name) for person in self.address["people"]
+            ],
+            coerce=int,
+            widget=forms.CheckboxSelectMultiple,
+            initial=[person.pk for person in self.address["people"]],
+            help_text=_("The address is changed for the selected people."),
+        )
+
+    def save(self):
+        people = set(self.cleaned_data["people"])
+        with transaction.atomic():
+            for address in self.address["addresses"]:
+                if address.person_id in people:
+                    for field in ADDRESS_FIELDS:
+                        setattr(address, field, self.cleaned_data[field])
+                    address.save()
+            # Updates the full text search
+            for person in self.address["people"]:
+                if person.pk in people:
+                    person.save()
+        return self.instance
 
 
 class PersonDeleteForm(ModelForm):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 08:05+0100\n"
+"POT-Creation-Date: 2026-11-11 08:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1155,6 +1155,10 @@ msgid "Moves people, projects, deals, invoices and groups to this organization, 
 msgstr "Verschiebt Personen, Projekte, Deals, Rechnungen und Gruppen zu dieser Organisation, z.B. wenn sie doppelt erfasst ist. Diese Organisation wird gelöscht."
 
 #: workbench/contacts/forms.py
+msgid "The address is changed for the selected people."
+msgstr "Die Adresse wird für die ausgewählten Personen geändert."
+
+#: workbench/contacts/forms.py
 msgid "This person is linked to a user. It is therefore not possible to delete them, but you may merge them into a different person. Alternatively, you can also archive the person."
 msgstr "Diese Person ist mit einem:r Benutzer:in verknüpft. Es ist deshalb nicht möglich, sie zu löschen, aber Du kannst sie mit einer anderen Person zusammenführen. Alternativ kannst Du die Person auch archivieren."
 
@@ -1379,10 +1383,17 @@ msgstr "Überschreibt die Postadresse komplett falls gesetzt."
 msgid "postal address"
 msgstr "Postadresse"
 
-#: workbench/contacts/models.py workbench/templates/contacts/person_detail.html
+#: workbench/contacts/models.py
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
 #: workbench/templates/contacts/person_form.html
 msgid "postal addresses"
 msgstr "Postadressen"
+
+#: workbench/contacts/urls.py
+#, python-format
+msgid "Change a postal address of %(instance)s"
+msgstr "Postadresse von %(instance)s ändern"
 
 #: workbench/contacts/views.py workbench/templates/base.html
 #: workbench/templates/shortcuts.html
@@ -5043,6 +5054,10 @@ msgstr "Umsatz bereinigt / Stunde"
 #: workbench/templates/planning/plannedwork_detail.html
 msgid "yes,no"
 msgstr "ja,nein"
+
+#: workbench/templates/contacts/organization_detail.html
+msgid "Change"
+msgstr "Ändern"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html

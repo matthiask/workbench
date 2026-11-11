@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from django.urls import path
+from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
 from workbench.contacts.forms import (
@@ -8,6 +9,7 @@ from workbench.contacts.forms import (
     OrganizationDeleteForm,
     OrganizationForm,
     OrganizationMergeForm,
+    OrganizationPostalAddressForm,
     PersonDeleteForm,
     PersonForm,
     PersonMergeForm,
@@ -67,6 +69,15 @@ urlpatterns = [
             model=Organization, delete_form_class=OrganizationDeleteForm
         ),
         name="contacts_organization_delete",
+    ),
+    path(
+        "organizations/<int:pk>/postal-address/",
+        generic.UpdateView.as_view(
+            model=Organization,
+            form_class=OrganizationPostalAddressForm,
+            title=_("Change a postal address of %(instance)s"),
+        ),
+        name="contacts_organization_postal_address",
     ),
     path(
         "organizations/<int:pk>/merge/",

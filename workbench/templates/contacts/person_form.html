@@ -107,8 +107,7 @@
                   >
                     {{ address.line }}
                     <small class="d-block text-secondary">
-                      {% for person in address.people %}{{ person.full_name }}{% if not forloop.last %},
-                        {% endif %}{% endfor %}
+                      {{ address.names }}
                     </small>
                   </button>
                 {% endfor %}
