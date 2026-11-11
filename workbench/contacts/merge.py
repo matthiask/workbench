@@ -1,9 +1,15 @@
 """Merging duplicate people"""
 
+import itertools
+from collections import defaultdict
+
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Count, Q, Value
+from django.db.models.functions import Concat, Lower, Trim
 from django.utils.translation import gettext as _, ngettext
 
+from workbench.contacts.models import EmailAddress, Person
 from workbench.tools.substitute_with import substitute_with
 
 
@@ -135,3 +141,100 @@ def merge_people(*, duplicate, keep):
         # Updates the full text search with the moved details
         keep.save()
         keep.refresh_related_fts()
+
+
+def _name():
+    return Lower(Concat(Trim("given_name"), Value(" "), Trim("family_name")))
+
+
+def _duplicates_queryset():
+    return (
+        Person.objects
+        .select_related("organization")
+        .prefetch_related("emailaddresses")
+        .order_by("is_archived", "pk")
+    )
+
+
+def duplicates_of(person):
+    """People with the same name or email address as the person"""
+    emails = {email.email.strip().lower() for email in person.emailaddresses.all()}
+    name = Person.objects.annotate(n=_name()).values("n").get(pk=person.pk)["n"]
+    return list(
+        _duplicates_queryset()
+        .annotate(n=_name())
+        .filter(
+            Q(n=name)
+            | Q(
+                pk__in=EmailAddress.objects
+                .annotate(e=Lower(Trim("email")))
+                .filter(e__in=emails)
+                .values("person")
+            )
+        )
+        .exclude(pk=person.pk)
+    )
+
+
+def possible_duplicates():
+    """Groups of people with the same name or email address (also through
+    others: A has B's name and C's email address), with at least one person
+    who isn't archived"""
+    names = (
+        Person.objects
+        .annotate(key=_name())
+        .values("key")
+        .annotate(count=Count("pk"))
+        .filter(count__gt=1)
+        .values("key")
+    )
+    emails = (
+        EmailAddress.objects
+        .annotate(key=Lower(Trim("email")))
+        .values("key")
+        .annotate(count=Count("person", distinct=True))
+        .filter(count__gt=1)
+        .values("key")
+    )
+    pairs = itertools.chain(
+        (
+            (pk, ("name", key))
+            for pk, key in Person.objects
+            .annotate(key=_name())
+            .filter(key__in=names)
+            .values_list("pk", "key")
+        ),
+        (
+            (pk, ("email", key))
+            for pk, key in EmailAddress.objects
+            .annotate(key=Lower(Trim("email")))
+            .filter(key__in=emails)
+            .values_list("person", "key")
+        ),
+    )
+
+    # Union find of people and their keys
+    parent = {}
+
+    def find(node):
+        while parent.setdefault(node, node) != node:
+            parent[node] = node = parent[parent[node]]
+        return node
+
+    for pk, key in pairs:
+        parent[find(("person", pk))] = find(key)
+
+    groups = defaultdict(list)
+    people = _duplicates_queryset().filter(
+        pk__in=[pk for kind, pk in parent if kind == "person"]
+    )
+    for person in people:
+        groups[find(("person", person.pk))].append(person)
+    return sorted(
+        (
+            group
+            for group in groups.values()
+            if any(not person.is_archived for person in group)
+        ),
+        key=lambda group: group[0].full_name.casefold(),
+    )

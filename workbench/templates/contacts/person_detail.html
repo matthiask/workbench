@@ -139,6 +139,37 @@
     </div>
   </div>
 
+  {% with duplicates=person.possible_duplicates %}
+    {% if duplicates %}
+      <section class="card mb-4">
+        <div class="card-header">{% translate 'Possible duplicates' %}</div>
+        <div class="list-group list-group-flush">
+          {% for duplicate in duplicates %}
+            <div class="list-group-item wb-row">
+              <div class="wb-row-main">
+                <a class="wb-row-title" href="{{ duplicate.get_absolute_url }}">{{ duplicate.full_name }}</a>
+                <div class="wb-row-meta">
+                  {% if duplicate.organization %}<span>{{ duplicate.organization }}</span>{% endif %}
+                  {% for email in duplicate.emailaddresses.all %}<span>{{ email.email }}</span>{% endfor %}
+                </div>
+              </div>
+              <div class="wb-row-aside">
+                {% if duplicate.is_archived %}<span
+                    class="badge text-bg-secondary"
+                  >{% translate 'archived' %}</span>{% endif %}
+                <a
+                  href="{{ duplicate.urls.merge }}?into={{ person.pk }}"
+                  class="btn btn-quiet btn-sm"
+                  data-ajaxmodal
+                >{% translate 'Merge into this person' %}</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  {% endwith %}
+
   <div class="row g-3">
     {% with projects=person.recent_projects %}
       <div class="col-lg-4">

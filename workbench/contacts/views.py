@@ -2,9 +2,11 @@ from django.contrib import messages
 from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 
 from workbench.contacts.forms import OrganizationSearchForm, PersonAutocompleteForm
+from workbench.contacts.merge import possible_duplicates
 from workbench.contacts.models import Organization, Person
 from workbench.generic import ListView
 from workbench.tools.vcard import person_to_vcard, render_vcard_response
@@ -43,7 +45,7 @@ def person_vcard(request, pk):
 
 def merge(request, pk, *, model, form_class):
     """Merge a duplicate into the contact to keep (``?into=`` preselects it)
-    and go there"""
+    and go there (or to ``?next=``)"""
     instance = get_object_or_404(model, pk=pk)
     form = form_class(
         request.POST if request.method == "POST" else None,
@@ -58,11 +60,22 @@ def merge(request, pk, *, model, form_class):
             _("%(duplicate)s has been merged into %(keep)s.")
             % {"duplicate": instance, "keep": keep},
         )
+        url = request.GET.get("next")
+        if not url_has_allowed_host_and_scheme(url, allowed_hosts=None):
+            url = keep.get_absolute_url()
         if request.is_ajax():
-            return JsonResponse({"redirect": keep.get_absolute_url()}, status=299)
-        return redirect(keep)
+            return JsonResponse({"redirect": url}, status=299)
+        return redirect(url)
     return render(
         request,
         "modalform.html",
         {"form": form, "title": _("Merge %(instance)s") % {"instance": instance}},
+    )
+
+
+def duplicates(request):
+    return render(
+        request,
+        "contacts/duplicates.html",
+        {"groups": possible_duplicates()},
     )

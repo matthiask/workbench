@@ -16,6 +16,7 @@ from workbench.contacts.forms import (
 from workbench.contacts.models import Group, Organization, Person
 from workbench.contacts.views import (
     OrganizationListView,
+    duplicates,
     merge,
     person_vcard,
     select,
@@ -89,6 +90,7 @@ urlpatterns = [
         name="contacts_person_autocomplete",
     ),
     path("people/select/", select, name="contacts_person_select"),
+    path("people/duplicates/", duplicates, name="contacts_person_duplicates"),
     path(
         "people/<int:pk>/",
         generic.DetailView.as_view(model=Person),

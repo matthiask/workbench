@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate 'Possible duplicates' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{% translate 'Possible duplicates' %}</h1>
+      <div class="wb-meta">
+        <span>{% translate 'People with the same name or email address.' %}</span>
+        <a href="{% url 'contacts_person_list' %}">{% translate 'people'|capfirst %}</a>
+      </div>
+    </div>
+  </div>
+
+  {% for group in groups %}
+    <section class="card mb-3">
+      <div class="list-group list-group-flush">
+        {% for person in group %}
+          <div class="list-group-item wb-row">
+            <div class="wb-row-main">
+              <a class="wb-row-title" href="{{ person.get_absolute_url }}">{{ person.full_name }}</a>
+              <div class="wb-row-meta">
+                {% if person.organization %}
+                  <a href="{{ person.organization.get_absolute_url }}">{{ person.organization }}</a>
+                {% endif %}
+                {% for email in person.emailaddresses.all %}<span>{{ email.email }}</span>{% endfor %}
+              </div>
+            </div>
+            <div class="wb-row-aside">
+              {% if person.is_archived %}<span
+                  class="badge text-bg-secondary"
+                >{% translate 'archived' %}</span>{% endif %}
+              <a
+                href="{{ person.urls.merge }}?into={% if forloop.first %}{{ group.1.pk }}{% else %}{{ group.0.pk }}{% endif %}&amp;next={{ request.path|urlencode }}"
+                class="btn btn-quiet btn-sm"
+                data-ajaxmodal
+              >{% translate 'Merge' %}</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% empty %}
+    <p class="text-secondary">{% translate 'No possible duplicates.' %}</p>
+  {% endfor %}
+{% endblock content %}

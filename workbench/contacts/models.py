@@ -352,6 +352,11 @@ class Person(Model):
     def recent_projects(self):
         return self.project_set.select_related("owned_by")[:10]
 
+    def possible_duplicates(self):
+        from workbench.contacts.merge import duplicates_of
+
+        return duplicates_of(self)
+
     def recent_deals(self):
         return self.deal_set.select_related("owned_by").order_by("-pk")[:10]
 

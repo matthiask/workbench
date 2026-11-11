@@ -18,7 +18,12 @@ from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
 from workbench.contacts import tasks
 from workbench.contacts.forms import GroupSearchForm
-from workbench.contacts.merge import merge_people, merge_warnings
+from workbench.contacts.merge import (
+    duplicates_of,
+    merge_people,
+    merge_warnings,
+    possible_duplicates,
+)
 from workbench.contacts.models import Group, Organization, Person, PhoneNumber
 from workbench.contacts.urls import autocomplete_filter
 from workbench.deals.models import Deal
@@ -654,6 +659,61 @@ class ContactsTest(TestCase):
             headers=ajax,
         )
         self.assertEqual(response.status_code, 299)
+
+    def test_possible_duplicates(self):
+        """People with the same name or email address are possible
+        duplicates, also through others; groups of archived people only
+        aren't listed"""
+        anna = factories.PersonFactory.create(given_name="Anna", family_name="Muster")
+        same_name = factories.PersonFactory.create(
+            given_name="anna ", family_name="MUSTER"
+        )
+        same_email = factories.PersonFactory.create(
+            given_name="Anna", family_name="Muster-Beispiel"
+        )
+        same_name.emailaddresses.create(email="anna@example.com", type="work")
+        same_email.emailaddresses.create(email="Anna@Example.com ", type="work")
+        other = factories.PersonFactory.create(given_name="Bea", family_name="Muster")
+        archived = [
+            factories.PersonFactory.create(
+                given_name="Carl", family_name="Muster", is_archived=True
+            )
+            for _i in range(2)
+        ]
+
+        self.assertEqual(possible_duplicates(), [[anna, same_name, same_email]])
+        self.assertEqual(duplicates_of(anna), [same_name])
+        self.assertEqual(duplicates_of(same_email), [same_name])
+        self.assertEqual(duplicates_of(other), [])
+        self.assertEqual(duplicates_of(archived[0]), [archived[1]])
+
+        self.client.force_login(anna.primary_contact)
+        response = self.client.get(anna.urls["detail"])
+        self.assertContains(response, "Possible duplicates")
+        self.assertContains(response, f"{same_name.urls['merge']}?into={anna.pk}")
+
+        url = Person.urls["duplicates"]
+        response = self.client.get(Person.urls["list"])
+        self.assertContains(response, url)
+        response = self.client.get(url)
+        self.assertContains(response, same_email.urls["detail"])
+        self.assertNotContains(response, other.urls["detail"])
+        self.assertNotContains(response, archived[0].urls["detail"])
+
+        # Merging from the list goes back to the list
+        response = self.client.post(
+            f"{same_email.urls['merge']}?next={url}",
+            {"modal-into": anna.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.json(), {"redirect": url})
+        response = self.client.post(
+            f"{same_name.urls['merge']}?next=https://example.com/",
+            {"modal-into": anna.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.json(), {"redirect": anna.urls["detail"]})
+        self.assertEqual(possible_duplicates(), [])
 
     def test_create_person_with_preselected_organization(self):
         """Adding a person to an existing org. preselects the organization"""

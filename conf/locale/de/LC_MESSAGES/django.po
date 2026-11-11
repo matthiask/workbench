@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 07:58+0100\n"
+"POT-Creation-Date: 2026-11-11 08:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1135,6 +1135,7 @@ msgid "Missing or incomplete postal address"
 msgstr "Fehlende oder unvollständige Postadresse"
 
 #: workbench/contacts/forms.py workbench/contacts/models.py
+#: workbench/templates/contacts/duplicates.html
 #: workbench/templates/contacts/object_list.html
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/shortcuts.html workbench/tools/xlsx.py
@@ -4939,6 +4940,31 @@ msgstr "Stunden erfassen"
 msgid "Quick actions"
 msgstr "Schnellaktionen"
 
+#: workbench/templates/contacts/duplicates.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/contacts/person_list.html
+msgid "Possible duplicates"
+msgstr "Mögliche Duplikate"
+
+#: workbench/templates/contacts/duplicates.html
+msgid "People with the same name or email address."
+msgstr "Personen mit demselben Namen oder derselben E-Mail-Adresse."
+
+#: workbench/templates/contacts/duplicates.html
+#: workbench/templates/contacts/group_list.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/contacts/person_list.html
+msgid "archived"
+msgstr "archiviert"
+
+#: workbench/templates/contacts/duplicates.html
+msgid "Merge"
+msgstr "Zusammenführen"
+
+#: workbench/templates/contacts/duplicates.html
+msgid "No possible duplicates."
+msgstr "Keine möglichen Duplikate."
+
 #: workbench/templates/contacts/group_list.html
 #, python-format
 msgid "%(count)s person"
@@ -4959,11 +4985,6 @@ msgid "%(count)s archived"
 msgid_plural "%(count)s archived"
 msgstr[0] "%(count)s archiviert"
 msgstr[1] "%(count)s archiviert"
-
-#: workbench/templates/contacts/group_list.html
-#: workbench/templates/contacts/person_list.html
-msgid "archived"
-msgstr "archiviert"
 
 #: workbench/templates/contacts/object_list.html
 #, python-format
@@ -5034,6 +5055,10 @@ msgstr "Mit anderer Person zusammenführen"
 #: workbench/templates/contacts/person_detail.html
 msgid "Maps"
 msgstr "Maps"
+
+#: workbench/templates/contacts/person_detail.html
+msgid "Merge into this person"
+msgstr "Mit dieser Person zusammenführen"
 
 #: workbench/templates/contacts/person_detail.html
 msgid "Recent deals"

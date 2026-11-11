@@ -12,6 +12,7 @@
       vCard
     </a>
   {% endif %}
+  <a href="{% url 'contacts_person_duplicates' %}" class="btn btn-quiet">{% translate 'Possible duplicates' %}</a>
   {{ block.super }}
 {% endblock search-form-buttons %}
 
