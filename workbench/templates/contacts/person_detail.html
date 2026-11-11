@@ -87,6 +87,12 @@
                 <dt>{{ phone.type|capfirst }}</dt>
                 <dd><a href="tel:{{ phone.phone_number }}">{{ phone.pretty_number }}</a></dd>
               {% endfor %}
+              {% if person.organization.phone_number %}
+                <dt>{% translate 'organization'|capfirst %}</dt>
+                <dd>
+                  <a href="tel:{{ person.organization.phone_number }}">{{ person.organization.pretty_phone_number }}</a>
+                </dd>
+              {% endif %}
               {% for email in emails %}
                 <dt>{{ email.type|capfirst }}</dt>
                 <dd><a href="mailto:{{ email.email }}">{{ email.email }}</a></dd>
@@ -96,7 +102,7 @@
                 <dd><a href="mailto:{{ person.organization.email }}">{{ person.organization.email }}</a></dd>
               {% endif %}
             </dl>
-            {% if not phones and not emails and not person.organization.email %}
+            {% if not phones and not emails and not person.organization.email and not person.organization.phone_number %}
               <span class="text-secondary">&ndash;</span>
             {% endif %}
           {% endwith %}

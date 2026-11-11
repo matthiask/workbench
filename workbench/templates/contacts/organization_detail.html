@@ -118,6 +118,10 @@
               <dt>{{ object|label:'email' }}</dt>
               <dd><a href="mailto:{{ organization.email }}">{{ organization.email }}</a></dd>
             {% endif %}
+            {% if organization.phone_number %}
+              <dt>{{ object|label:'phone_number' }}</dt>
+              <dd><a href="tel:{{ organization.phone_number }}">{{ organization.pretty_phone_number }}</a></dd>
+            {% endif %}
             {% if organization.accounts_payable_email %}
               <dt>{{ object|label:'accounts_payable_email' }}</dt>
               <dd>

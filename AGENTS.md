@@ -418,7 +418,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   shared-emails` lists addresses of several active people of the same
   organization (usually generic ones) and central addresses still on
   people; `wb people update --remove-email` removes them. The API doesn't
-  add central addresses to people.
+  add central addresses to people. Organizations also have a central phone
+  number (normalized like those of people, `normalize_phone_number()`),
+  shown on their people; the API doesn't add it to their people.
 - Groups with `applies_to_organizations` (e.g. industries) belong to
   organizations: people are in them through their organization
   (`Person.all_groups()`, `Person.objects.in_group()`, `without_groups()`;

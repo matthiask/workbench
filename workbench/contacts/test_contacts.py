@@ -1008,6 +1008,33 @@ class ContactsTest(TestCase):
         home.refresh_from_db()
         self.assertEqual(home.street, "Altweg")
 
+    def test_organization_phone_number(self):
+        """Organizations have a central phone number which is shown on their
+        people; it's normalized like those of people, merging takes it over"""
+        organization = factories.OrganizationFactory.create(
+            phone_number="044 123 45 67"
+        )
+        organization.full_clean()
+        self.assertEqual(organization.phone_number, "+41441234567")
+        organization.save()
+        person = factories.PersonFactory.create(organization=organization)
+        self.client.force_login(person.primary_contact)
+
+        for url in [organization.urls["detail"], person.urls["detail"]]:
+            response = self.client.get(url)
+            self.assertContains(response, 'href="tel:+41441234567"')
+            self.assertContains(response, "+41 44 123 45 67")
+
+        organization.phone_number = "123"
+        with self.assertRaises(ValidationError):
+            organization.full_clean()
+
+        keep = factories.OrganizationFactory.create()
+        organization.phone_number = "+41441234567"
+        merge_organizations(duplicate=organization, keep=keep)
+        keep.refresh_from_db()
+        self.assertEqual(keep.phone_number, "+41441234567")
+
     def test_organization_email_addresses(self):
         """Organizations have a central and an accounts payable address, the
         central one is shown on their people; merging takes them over"""

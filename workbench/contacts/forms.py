@@ -380,6 +380,7 @@ class OrganizationForm(ModelForm):
             "primary_contact",
             "email",
             "accounts_payable_email",
+            "phone_number",
             "default_billing_address",
             "groups",
         )

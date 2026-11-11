@@ -1069,6 +1069,26 @@ planned_work:
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("info@example.com", result.output)
+        result = self.wb("organizations", "update", keep.pk, "--phone-number", "12")
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb(
+            "organizations", "update", keep.pk, "--phone-number", "044 123 45 67"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("+41441234567", result.output)
+        keep.refresh_from_db()
+        self.assertEqual(keep.phone_number, "+41441234567")
+        # The central number isn't added to people
+        person = factories.PersonFactory.create(organization=keep)
+        result = self.wb(
+            "people",
+            "add-details",
+            person.pk,
+            self.file("phone_numbers:\n  - phone_number: 044 123 45 67\n"),
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("The central phone number of", result.output)
+        keep.people.update(is_archived=True)
         result = self.wb("organizations", "update", keep.pk, "--archive")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("(archived)", result.output)

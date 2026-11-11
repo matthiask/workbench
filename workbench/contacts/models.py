@@ -128,6 +128,15 @@ class Organization(Model):
         blank=True,
         help_text=_("Optional, e.g. for invoices and payment reminders."),
     )
+    phone_number = models.CharField(
+        _("phone number"),
+        max_length=100,
+        blank=True,
+        help_text=_(
+            "Central number, e.g. the reception. It's shown on the"
+            " organization's people too, don't add it to them."
+        ),
+    )
     groups = models.ManyToManyField(Group, verbose_name=_("groups"), blank=True)
 
     objects = OrganizationQuerySet.as_manager()
@@ -142,6 +151,19 @@ class Organization(Model):
         if self.is_archived:
             parts.append(gettext("(archived)"))
         return " ".join(parts)
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude)
+        errors = {}
+        if self.phone_number and "phone_number" not in (exclude or ()):
+            self.phone_number = normalize_phone_number(
+                self.phone_number, "phone_number", errors
+            )
+        raise_if_errors(errors)
+
+    @property
+    def pretty_phone_number(self):
+        return pretty_phone_number(self.phone_number)
 
     def save(self, *args, **kwargs):
         renamed = (
@@ -514,6 +536,29 @@ class PersonDetail(Model):
     save.alters_data = True
 
 
+def normalize_phone_number(value, field, errors):
+    """The number in E.164 format, Swiss numbers don't need the country
+    code; adds an error for invalid numbers and returns them unchanged"""
+    try:
+        number = phonenumbers.parse(value, "CH")
+    except phonenumbers.NumberParseException as exc:
+        errors[field] = str(exc)
+        return value
+    if not phonenumbers.is_valid_number(number):
+        errors[field] = _("Phone number invalid.")
+        return value
+    return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
+
+
+def pretty_phone_number(value):
+    try:
+        return phonenumbers.format_number(
+            phonenumbers.parse(value), phonenumbers.PhoneNumberFormat.INTERNATIONAL
+        )
+    except Exception:  # noqa: BLE001
+        return value
+
+
 class PhoneNumber(PersonDetail):
     person = models.ForeignKey(
         Person,
@@ -534,28 +579,14 @@ class PhoneNumber(PersonDetail):
     def clean_fields(self, exclude):
         super().clean_fields(exclude)
         errors = {}
-        try:
-            number = phonenumbers.parse(self.phone_number, "CH")
-        except phonenumbers.NumberParseException as exc:
-            errors["phone_number"] = str(exc)
-        else:
-            if phonenumbers.is_valid_number(number):
-                self.phone_number = phonenumbers.format_number(
-                    number, phonenumbers.PhoneNumberFormat.E164
-                )
-            else:
-                errors["phone_number"] = _("Phone number invalid.")
+        self.phone_number = normalize_phone_number(
+            self.phone_number, "phone_number", errors
+        )
         raise_if_errors(errors, exclude)
 
     @property
     def pretty_number(self):
-        try:
-            return phonenumbers.format_number(
-                phonenumbers.parse(self.phone_number),
-                phonenumbers.PhoneNumberFormat.INTERNATIONAL,
-            )
-        except Exception:  # noqa: BLE001
-            return self.phone_number
+        return pretty_phone_number(self.phone_number)
 
 
 class EmailAddress(PersonDetail):

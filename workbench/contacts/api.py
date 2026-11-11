@@ -399,6 +399,9 @@ class OrganizationDetail(OrganizationOut):
     accounts_payable_email: str = Field(
         description="Optional, for invoices and payment reminders"
     )
+    phone_number: str = Field(
+        description="Central number in E.164 format, e.g. the reception"
+    )
     primary_contact: str
     groups: list[str]
     people: list[PersonSummary]
@@ -420,6 +423,7 @@ def organization_detail(request, organization_id: int):
         "notes": organization.notes,
         "email": organization.email,
         "accounts_payable_email": organization.accounts_payable_email,
+        "phone_number": organization.phone_number,
         "primary_contact": organization.primary_contact.get_short_name(),
         "groups": [group.title for group in organization.groups.all()],
         "people": [
@@ -456,6 +460,11 @@ class OrganizationPatch(InputSchema):
     accounts_payable_email: str | None = Field(
         default=None, description="For invoices and payment reminders"
     )
+    phone_number: str | None = Field(
+        default=None,
+        description="Central number, e.g. the reception; remove it from the"
+        " people of the organization, it's shown on them",
+    )
 
 
 def _organization_detail_out(organization, request):
@@ -473,8 +482,8 @@ def organization_update(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Change the primary contact or the email addresses of an organization
-    or archive it. Archiving warns about active people (`archive-people`),
+    """Change the primary contact, the email addresses or the phone number
+    of an organization or archive it. Archiving warns about active people (`archive-people`),
     ignoring the warning archives them too."""
     organization = get_object_or_404(Organization, pk=organization_id)
     archiving = data.is_archived and not organization.is_archived
@@ -503,7 +512,7 @@ def organization_update(
         organization.primary_contact = user
     if data.is_archived is not None:
         organization.is_archived = data.is_archived
-    for field in ["email", "accounts_payable_email"]:
+    for field in ["email", "accounts_payable_email", "phone_number"]:
         if (value := getattr(data, field)) is not None:
             setattr(organization, field, value.strip())
     errors = []
@@ -837,6 +846,31 @@ def _details(data, errors):
     return details
 
 
+def _central_phone_errors(details, organization_id):
+    """The central phone number of the organization is shown on its people
+    already"""
+    organization = (
+        Organization.objects.filter(pk=organization_id).first()
+        if organization_id
+        else None
+    )
+    if not (organization and organization.phone_number):
+        return []
+    return [
+        {
+            "loc": ["body", "data", "phone_numbers", index, "phone_number"],
+            "msg": _(
+                "The central phone number of %(organization)s (ID %(id)s), it's"
+                " shown on its people."
+            )
+            % {"organization": organization, "id": organization.pk},
+        }
+        for index, detail in enumerate(d for d in details if isinstance(d, PhoneNumber))
+        # Phone numbers have been normalized by full_clean()
+        if detail.phone_number == organization.phone_number
+    ]
+
+
 def _save_details(person, details):
     for detail in details:
         detail.person = person
@@ -883,6 +917,7 @@ def person_create(
             })
 
     details = _details(data, errors)
+    errors.extend(_central_phone_errors(details, data.organization))
 
     with transaction.atomic():
         organization = data.organization
@@ -944,6 +979,7 @@ def person_add_details(
     )
     errors = _email_errors(data)
     details = _details(data, errors)
+    errors.extend(_central_phone_errors(details, person.organization_id))
     numbers = set(person.phonenumbers.values_list("phone_number", flat=True))
     errors.extend(
         {

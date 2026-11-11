@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 09:33+0100\n"
+"POT-Creation-Date: 2026-11-11 09:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1053,6 +1053,11 @@ msgid "Listed twice."
 msgstr "Doppelt aufgeführt."
 
 #: workbench/contacts/api.py
+#, python-format
+msgid "The central phone number of %(organization)s (ID %(id)s), it's shown on its people."
+msgstr "Die zentrale Telefonnummer von %(organization)s (ID %(id)s), sie wird bei deren Personen angezeigt."
+
+#: workbench/contacts/api.py
 msgid "Either use an existing organization or create a new one."
 msgstr "Verwende entweder eine existierende Organisation oder erstelle eine neue."
 
@@ -1314,6 +1319,14 @@ msgstr "Emailadresse Kreditoren"
 msgid "Optional, e.g. for invoices and payment reminders."
 msgstr "Optional, z.B. für Rechnungen und Zahlungserinnerungen."
 
+#: workbench/contacts/models.py workbench/templates/contacts/person_form.html
+msgid "phone number"
+msgstr "Telefonnummer"
+
+#: workbench/contacts/models.py
+msgid "Central number, e.g. the reception. It's shown on the organization's people too, don't add it to them."
+msgstr "Zentrale Nummer, z.B. der Empfang. Sie wird auch bei den Personen der Organisation angezeigt, erfasse sie dort nicht."
+
 #: workbench/contacts/models.py workbench/reporting/squeeze.py
 #: workbench/templates/contacts/person_detail.html
 msgid "organization"
@@ -1383,17 +1396,13 @@ msgstr "Arbeit"
 msgid "weight"
 msgstr "Gewichtung"
 
-#: workbench/contacts/models.py workbench/templates/contacts/person_form.html
-msgid "phone number"
-msgstr "Telefonnummer"
+#: workbench/contacts/models.py
+msgid "Phone number invalid."
+msgstr "Telefonnummer ungültig."
 
 #: workbench/contacts/models.py workbench/templates/contacts/person_form.html
 msgid "phone numbers"
 msgstr "Telefonnummern"
-
-#: workbench/contacts/models.py
-msgid "Phone number invalid."
-msgstr "Telefonnummer ungültig."
 
 #: workbench/contacts/models.py workbench/templates/contacts/person_form.html
 #: workbench/templates/invoices/send_reminder.html
