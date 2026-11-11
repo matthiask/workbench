@@ -20,6 +20,7 @@ from workbench.contacts.forms import (
     OrganizationPostalAddressForm,
     PersonForm,
     PersonMergeForm,
+    organization_update_warning,
     recent_projects_or_deals,
 )
 from workbench.contacts.merge import possible_duplicates
@@ -32,6 +33,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
     organization_postal_addresses,
+    unarchive_organization,
     update_organization_archival,
 )
 from workbench.contacts.reassign import primary_contact_suggestions
@@ -985,6 +987,11 @@ class PersonPatch(InputSchema):
         description="Email addresses to remove, e.g. generic ones like info@"
         " which belong to the organization",
     )
+    organization: int | None = Field(
+        default=None,
+        description="ID of the organization, e.g. the new employer of someone"
+        " who left; null removes the person from their organization",
+    )
     is_archived: bool | None = None
 
 
@@ -1007,23 +1014,8 @@ def _email_addresses_to_remove(person, values, error):
     return remove
 
 
-@router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
-def person_update(
-    request, person_id: int, data: PersonPatch, *, dry_run: DryRun = False
-):
-    """Change the primary contact and the groups of a person, remove email
-    addresses or archive them, with the rules of the person form; contact
-    details are added with ``details/``. Archiving the last active person of an organization
-    without open projects or deals archives the organization too,
-    unarchiving a person unarchives their organization."""
-    person = get_object_or_404(
-        Person.objects.select_related("organization"), pk=person_id
-    )
-    errors = []
-
-    def error(loc, msg):
-        errors.append({"loc": ["body", "data", *loc], "msg": msg})
-
+def _groups_to_change(person, data, error):
+    """The groups to add to and to remove from the person"""
     current = {group.pk for group in person.all_groups()}
     add, remove = [], []
     for key, values, target in [
@@ -1039,6 +1031,53 @@ def person_update(
                 error([key, index], _("The group %r is archived.") % group.title)
             else:
                 target.append(group)
+    return add, remove
+
+
+def _move_to_organization(person, data, error):
+    """Sets the person's new organization (or none), returns whether it
+    changes"""
+    if (
+        "organization" not in data.model_fields_set
+        or data.organization == person.organization_id
+    ):
+        return False
+    if data.organization is None:
+        person.organization = None
+    elif organization := Organization.objects.filter(pk=data.organization).first():
+        person.organization = organization
+    else:
+        error(["organization"], _("Unknown organization %r.") % data.organization)
+    return True
+
+
+@router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
+def person_update(
+    request,
+    person_id: int,
+    data: PersonPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change the primary contact, the organization and the groups of a
+    person, remove email addresses or archive them, with the rules of the
+    person form; contact details are added with ``details/``. Archiving the
+    last active person of an organization without open projects or deals
+    archives the organization too, unarchiving a person unarchives their
+    organization, so does moving an active person into it. Moving the
+    contact of projects, deals or invoices is a warning
+    (``organization-update``), they keep their customer and contact. Groups
+    which apply to organizations stay with the previous organization."""
+    person = get_object_or_404(
+        Person.objects.select_related("organization"), pk=person_id
+    )
+    errors = []
+
+    def error(loc, msg):
+        errors.append({"loc": ["body", "data", *loc], "msg": msg})
+
+    add, remove = _groups_to_change(person, data, error)
     if data.primary_contact is not None:
         user = (
             User.objects
@@ -1056,8 +1095,17 @@ def person_update(
     remove_emails = _email_addresses_to_remove(
         person, data.remove_email_addresses, error
     )
+    moving = _move_to_organization(person, data, error)
     if errors:
         raise ValidationError(errors)
+    if (
+        moving
+        and "organization-update" not in ignore_warnings
+        and (warning := organization_update_warning(person))
+    ):
+        raise ValidationError([
+            {"loc": ["body", "data"], "msg": warning, "code": "organization-update"}
+        ])
 
     archival_changed = (
         data.is_archived is not None and data.is_archived != person.is_archived
@@ -1071,6 +1119,8 @@ def person_update(
         person.save()
         if archival_changed:
             update_organization_archival(person)
+        elif moving:
+            unarchive_organization(person)
         for group in add:
             person.add_to_group(group)
         for group in remove:

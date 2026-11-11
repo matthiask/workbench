@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 09:11+0100\n"
+"POT-Creation-Date: 2026-11-11 09:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1071,6 +1071,11 @@ msgstr "Die Person hat keine Emailadresse %r."
 msgid "The group %r is archived."
 msgstr "Die Gruppe %r ist archiviert."
 
+#: workbench/contacts/api.py
+#, python-format
+msgid "Unknown organization %r."
+msgstr "Unbekannte Organisation %r."
+
 #: workbench/contacts/api.py workbench/invoices/api.py
 #, python-format
 msgid "Unknown person %r."
@@ -1189,17 +1194,17 @@ msgid "Moves projects, deals, invoices, contact details and groups to this perso
 msgstr "Verschiebt Projekte, Deals, Rechnungen, Kontaktangaben und Gruppen zu dieser Person, z.B. wenn jemand doppelt erfasst ist. Diese Person wird gelöscht."
 
 #: workbench/contacts/forms.py
+#, python-format
+msgid "This person is the contact of the following related objects: %s. Modifying this record may be more confusing than archiving this one and creating a new record instead."
+msgstr "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und einen neuen zu erstellen als die Organisation zu ändern."
+
+#: workbench/contacts/forms.py
 msgid "Enter any year and the day and the month of the birthday."
 msgstr "Bitte ein beliebiges Jahr und den Tag und Monat des Geburtstags eingeben."
 
 #: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
 msgstr "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
-
-#: workbench/contacts/forms.py
-#, python-format
-msgid "This person is the contact of the following related objects: %s. Modifying this record may be more confusing than archiving this one and creating a new record instead."
-msgstr "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und einen neuen zu erstellen als die Organisation zu ändern."
 
 #: workbench/contacts/forms.py
 #, python-format

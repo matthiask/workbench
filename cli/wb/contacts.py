@@ -476,9 +476,15 @@ def show_person(person_id, as_json):
     " organization; repeat it for several.",
 )
 @click.option(
+    "--organization",
+    help="ID of the organization, e.g. the new employer of someone who left;"
+    " an empty string removes the person from their organization.",
+)
+@click.option(
     "--archive/--unarchive", "is_archived", default=None, help="E.g. who left."
 )
 @click.option("--dry-run", is_flag=True, help="Validate only.")
+@ignore_warnings_option
 @click.option("--json", "as_json", is_flag=True)
 def update_person(
     person_id,
@@ -486,12 +492,16 @@ def update_person(
     add_groups,
     remove_groups,
     remove_emails,
+    organization,
     is_archived,
     dry_run,
+    ignore_warnings,
     as_json,
 ):
-    """Change the primary contact and the groups of a person, remove email
-    addresses or archive them, like in the web interface"""
+    """Change the primary contact, the organization and the groups of a
+    person, remove email addresses or archive them, like in the web
+    interface. Projects, deals and invoices keep their customer and contact
+    when moving a person to another organization."""
     data = {
         key: value
         for key, value in [
@@ -503,16 +513,24 @@ def update_person(
         ]
         if value not in (None, [])
     }
+    if organization is not None:
+        if organization.strip() and not organization.strip().isdigit():
+            terminate(f"--organization must be an ID or empty, not {organization!r}.")
+        data["organization"] = int(organization) if organization.strip() else None
     if not data:
         terminate(
             "Nothing to change, pass --primary-contact, --add-group,"
-            " --remove-group, --remove-email, --archive or --unarchive."
+            " --remove-group, --remove-email, --organization, --archive or"
+            " --unarchive."
         )
     data = request(
         "PATCH",
         f"contacts/people/{person_id}/",
         json=data,
-        params={"dry_run": format_bool(dry_run)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
     )
     if as_json:
         echo_json(data)

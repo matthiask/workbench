@@ -181,6 +181,7 @@ postal addresses, e.g. old ones, which are changed for several people at once:
     wb people shared-emails
     wb organizations update 45 --email info@example.com
     wb people update 123 --remove-email info@example.com
+    wb people update 123 --organization 45 --ignore-warning organization-update
     wb organizations search --several-postal-addresses
     wb organizations show 45
     wb organizations change-address 45 --address 789 --street Neuweg --house-number 2

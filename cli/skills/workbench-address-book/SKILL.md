@@ -137,8 +137,19 @@ the rest:
 
     wb organizations update <organization_id> --archive --dry-run
 
-People are only archived when the user confirms they left (`wb people update
-<person_id> --archive`); archiving the last active person of an organization
+People who left an organization but are still worth keeping (e.g. former
+employees) aren't archived: move them to their new organization, or to none
+if it isn't known, and remove the old organization's email and postal
+addresses. Projects, deals and invoices keep them as their contact; moving
+the contact of any warns (`organization-update`), pass `--ignore-warning
+organization-update` after the user confirms. Membership in an active group
+(e.g. the former team) keeps them from being archived automatically:
+
+    wb people update <person_id> --organization <organization_id> --dry-run
+    wb people update <person_id> --organization "" --dry-run
+
+People are only archived when the user confirms we lost touch with them (`wb
+people update <person_id> --archive`); archiving the last active person of an organization
 without open projects or deals archives the organization too. Workbench
 archives contacts unused for five years on its own, so old contacts don't
 need to be archived by hand.

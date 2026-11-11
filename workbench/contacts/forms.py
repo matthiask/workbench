@@ -620,6 +620,27 @@ class PersonMergeForm(Form):
         return keep
 
 
+def organization_update_warning(person):
+    """Warning (``organization-update``) when moving a person who is the
+    contact of related objects to another organization, or None"""
+    from workbench.deals.models import Deal
+    from workbench.invoices.models import Invoice
+    from workbench.projects.models import Project
+
+    related = [
+        f"{count} {ngettext(model._meta.verbose_name, model._meta.verbose_name_plural, count)}"
+        for model in [Invoice, Project, Deal]
+        if (count := model.objects.filter(contact=person).count())
+    ]
+    if not related:
+        return None
+    return _(
+        "This person is the contact of the following related objects:"
+        " %s. Modifying this record may be more confusing than"
+        " archiving this one and creating a new record instead."
+    ) % ", ".join(related)
+
+
 class PersonForm(ModelForm):
     user_fields = default_to_current_user = ["primary_contact"]
 
@@ -684,35 +705,12 @@ class PersonForm(ModelForm):
                 _("This does not look right. Please add a full salutation."),
                 code="short-salutation",
             )
-        if self.instance.pk and "organization" in self.changed_data:
-            from workbench.deals.models import Deal
-            from workbench.invoices.models import Invoice
-            from workbench.projects.models import Project
-
-            related = []
-            for model in [Invoice, Project, Deal]:
-                if count := model.objects.filter(contact=self.instance).count():
-                    related.append(
-                        "{} {}".format(
-                            count,
-                            ngettext(
-                                model._meta.verbose_name,
-                                model._meta.verbose_name_plural,
-                                count,
-                            ),
-                        )
-                    )
-
-            if related:
-                self.add_warning(
-                    _(
-                        "This person is the contact of the following related objects:"
-                        " %s. Modifying this record may be more confusing than"
-                        " archiving this one and creating a new record instead."
-                    )
-                    % ", ".join(related),
-                    code="organization-update",
-                )
+        if (
+            self.instance.pk
+            and "organization" in self.changed_data
+            and (warning := organization_update_warning(self.instance))
+        ):
+            self.add_warning(warning, code="organization-update")
 
         return data
 

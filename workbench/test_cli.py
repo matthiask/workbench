@@ -1138,6 +1138,73 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("The central address of", result.output)
 
+    def test_person_organization(self):
+        """People who left move to their new organization or to none, like in
+        the person form; they stay the contact of their projects"""
+        old = factories.OrganizationFactory.create(name="Alt AG")
+        industry = Group.objects.create(
+            title="Agenturen", applies_to_organizations=True
+        )
+        old.groups.add(industry)
+        new = factories.OrganizationFactory.create(name="Neu AG", is_archived=True)
+        person = factories.PersonFactory.create(organization=old)
+        project = factories.ProjectFactory.create(customer=old, contact=person)
+
+        result = self.wb("people", "update", person.pk, "--organization", new.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning organization-update", result.output)
+
+        result = self.wb(
+            "people", "update", person.pk, "--organization", 0, "--dry-run"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Unknown organization", result.output)
+
+        result = self.wb(
+            "people",
+            "update",
+            person.pk,
+            "--organization",
+            new.pk,
+            "--ignore-warning",
+            "organization-update",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Neu AG", result.output)
+        person.refresh_from_db()
+        new.refresh_from_db()
+        self.assertEqual(person.organization, new)
+        # Moving into an archived organization unarchives it
+        self.assertFalse(new.is_archived)
+        # Groups which apply to organizations stay with the old one
+        self.assertEqual(list(old.groups.all()), [industry])
+        self.assertNotIn(industry, person.all_groups())
+        project.refresh_from_db()
+        self.assertEqual((project.customer, project.contact), (old, person))
+
+        # An empty string removes the organization
+        result = self.wb(
+            "people",
+            "update",
+            person.pk,
+            "--organization",
+            "",
+            "--ignore-warning",
+            "organization-update",
+            "--json",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIsNone(json.loads(result.output)["organization"])
+        person.refresh_from_db()
+        self.assertIsNone(person.organization)
+
+        # Without related objects there's nothing to confirm
+        other = factories.PersonFactory.create()
+        result = self.wb("people", "update", other.pk, "--organization", old.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        other.refresh_from_db()
+        self.assertEqual(other.organization, old)
+
     def test_organization_postal_addresses(self):
         """Organizations with different addresses are found, an address is
         changed for several people at once"""
