@@ -1172,6 +1172,16 @@ planned_work:
         factories.PersonFactory.create().phonenumbers.create(
             phone_number="+41441234567"
         )
+        # Empty values aren't the organization's (empty) central number
+        factories.PersonFactory.create(organization=organization).phonenumbers.create(
+            phone_number=""
+        )
+        factories.PersonFactory.create(organization=organization).emailaddresses.create(
+            email=""
+        )
+        self.assertEqual(
+            json.loads(self.wb("people", "shared-emails", "--json").output)["count"], 0
+        )
 
         result = self.wb("people", "shared-phones", "--json")
         self.assertEqual(

@@ -353,7 +353,8 @@ def _shared_details(details, value, central):
     ):
         person = detail.person
         key = (value(detail), person.organization_id)
-        if person not in rows[key]:
+        # Empty values would match organizations without a central value
+        if key[0] and person not in rows[key]:
             rows[key].append(person)
     for (detail, _organization_id), people in sorted(
         rows.items(), key=lambda item: (item[0][0], item[0][1] or 0)
