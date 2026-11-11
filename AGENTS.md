@@ -144,7 +144,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   left (`/api/contacts/people/reassign/`): suggestions are the lead of the
   latest project or the owner of the latest deal (whichever is newer), the person's own before
   their organization's, only active users (`primary_contact_suggestions()` in
-  `workbench/contacts/reassign.py`); people without a suggestion stay. `wb people merge ID --into ID`
+  `workbench/contacts/reassign.py`); people without a suggestion stay.
+  A person's new primary contact (form, API, reassigning) also replaces the
+  organization's if it isn't active anymore (`take_over_organization()`). `wb people merge ID --into ID`
   merges duplicates (`POST /api/contacts/people/<id>/merge/`, also in the
   web interface, `PersonMergeForm`; organizations are merged in the web
   interface only, `merge_organizations()`; possible duplicates (the same name, or the same email address and a

@@ -69,3 +69,19 @@ def primary_contact_suggestions(people, *, since=None):
                 }
                 break
     return suggestions
+
+
+def take_over_organization(person):
+    """The person's (active) primary contact also becomes the primary contact
+    of their organization if the organization's isn't active anymore; returns
+    the organization if it changed"""
+    organization = person.organization
+    if (
+        organization
+        and person.primary_contact.is_active
+        and not organization.primary_contact.is_active
+    ):
+        organization.primary_contact = person.primary_contact
+        organization.save(update_fields=["primary_contact"])
+        return organization
+    return None

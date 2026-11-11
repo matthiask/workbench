@@ -38,6 +38,7 @@ from workbench.contacts.models import (
     unarchive_organization,
     update_organization_archival,
 )
+from workbench.contacts.reassign import take_over_organization
 from workbench.tools.forms import (
     Autocomplete,
     Form,
@@ -744,9 +745,18 @@ class PersonForm(ModelForm):
         )
 
     def save(self, *, commit=True):
+        created = not self.instance.pk
         instance = super().save()
         if instance.organization:
             self._save_organization_groups(instance)
+        if (created or "primary_contact" in self.changed_data) and (
+            organization := take_over_organization(instance)
+        ):
+            messages.info(
+                self.request,
+                _("%(user)s is now also the primary contact of %(organization)s.")
+                % {"user": instance.primary_contact, "organization": organization},
+            )
         for formset in self.formsets.values():
             formset.save()
         if "is_archived" in self.changed_data:

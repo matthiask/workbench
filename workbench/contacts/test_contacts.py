@@ -105,6 +105,33 @@ class ContactsTest(TestCase):
         )
         self.assertRedirects(response, person.urls["detail"])
 
+    def test_update_primary_contact_takes_over_organization(self):
+        """A new primary contact of a person also becomes the primary contact
+        of the organization if the organization's isn't active anymore"""
+        former = factories.UserFactory.create(is_active=False)
+        organization = factories.OrganizationFactory.create(primary_contact=former)
+        person = factories.PersonFactory.create(
+            organization=organization, primary_contact=former, salutation="Dear John"
+        )
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        response = self.client.post(
+            person.urls["update"], person_to_dict(person, primary_contact=user.pk)
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        organization.refresh_from_db()
+        self.assertEqual(organization.primary_contact, user)
+
+        # Active primary contacts of organizations stay
+        other = factories.UserFactory.create()
+        person.refresh_from_db()
+        response = self.client.post(
+            person.urls["update"], person_to_dict(person, primary_contact=other.pk)
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        organization.refresh_from_db()
+        self.assertEqual(organization.primary_contact, user)
+
     def test_warning(self):
         """Changing the organization of a person with projects produces a warning"""
         person = factories.PersonFactory.create(

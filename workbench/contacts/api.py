@@ -40,7 +40,10 @@ from workbench.contacts.models import (
     unarchive_organization,
     update_organization_archival,
 )
-from workbench.contacts.reassign import primary_contact_suggestions
+from workbench.contacts.reassign import (
+    primary_contact_suggestions,
+    take_over_organization,
+)
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     DryRun,
@@ -1197,6 +1200,7 @@ def person_create(
             # The form only offers active users
             person.primary_contact = primary_contact
             person.save(update_fields=["primary_contact"])
+            take_over_organization(person)
         _save_details(person, details)
 
         result = person_out(person, request)
@@ -1511,8 +1515,9 @@ def person_update(
     added with ``details/``. Archiving the
     last active person of an organization without open projects or deals
     archives the organization too, unarchiving a person unarchives their
-    organization, so does moving an active person into it. Moving the
-    contact of projects, deals or invoices is a warning
+    organization, so does moving an active person into it. A new primary
+    contact also replaces the organization's if it isn't active anymore.
+    Moving the contact of projects, deals or invoices is a warning
     (``organization-update``), they keep their customer and contact. Groups
     which apply to organizations stay with the previous organization."""
     person = get_object_or_404(
@@ -1592,6 +1597,8 @@ def person_update(
             detail.save()
         # Also updates the full text search
         person.save()
+        if data.primary_contact is not None:
+            take_over_organization(person)
         if archival_changed:
             update_organization_archival(person)
         elif moving:
@@ -1933,7 +1940,8 @@ class ReassignOut(Schema):
 @router.post("/contacts/people/reassign/", response=ReassignOut)
 def person_reassign(request, data: ReassignIn, *, dry_run: DryRun = False):
     """Reassign the active people of a user to another active user or to the
-    suggestions, e.g. when someone left"""
+    suggestions, e.g. when someone left; organizations whose primary contact
+    isn't active anymore get their people's new one"""
     if bool(data.to) == data.suggested:
         raise ValidationError([
             {
@@ -1969,6 +1977,7 @@ def person_reassign(request, data: ReassignIn, *, dry_run: DryRun = False):
             if (user := targets.get(person.pk)) and user != person.primary_contact:
                 person.primary_contact = user
                 person.save(update_fields=["primary_contact"])
+                take_over_organization(person)
                 changes.append({
                     "id": person.pk,
                     "full_name": person.full_name,

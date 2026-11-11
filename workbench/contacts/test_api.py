@@ -563,6 +563,34 @@ class ContactsAPITest(TestCase):
         response = send("patch", f"{mailing.pk}/", {"title": "Christmas"})
         self.assertEqual(response.status_code, 422)
 
+    def test_update_primary_contact_takes_over_organization(self):
+        """The new primary contact of a person replaces the inactive one of
+        their organization"""
+        former = factories.UserFactory.create(is_active=False)
+        organization = factories.OrganizationFactory.create(primary_contact=former)
+        person = factories.PersonFactory.create(
+            organization=organization, primary_contact=former
+        )
+        user = factories.UserFactory.create(_short_name="new")
+        self.client.force_login(user)
+        url = f"/api/contacts/people/{person.pk}/"
+
+        response = self.client.patch(
+            f"{url}?dry_run=true",
+            {"primary_contact": "new"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        organization.refresh_from_db()
+        self.assertEqual(organization.primary_contact, former)
+
+        response = self.client.patch(
+            url, {"primary_contact": "new"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        organization.refresh_from_db()
+        self.assertEqual(organization.primary_contact, user)
+
     def test_reassign_newer_deal(self):
         """The newer of the person's own project and deal wins"""
         former = factories.UserFactory.create(_short_name="old", is_active=False)
@@ -589,7 +617,7 @@ class ContactsAPITest(TestCase):
         former = factories.UserFactory.create(_short_name="old", is_active=False)
         lead = factories.UserFactory.create(_short_name="lead")
         other = factories.UserFactory.create(_short_name="other")
-        organization = factories.OrganizationFactory.create()
+        organization = factories.OrganizationFactory.create(primary_contact=former)
         contact = factories.PersonFactory.create(
             given_name="Contact", organization=organization, primary_contact=former
         )
@@ -659,6 +687,9 @@ class ContactsAPITest(TestCase):
         )
         lonely.refresh_from_db()
         self.assertEqual(lonely.primary_contact, former)
+        # The organization's inactive primary contact is replaced too
+        organization.refresh_from_db()
+        self.assertEqual(organization.primary_contact, lead)
 
         # Without from, the suggestions apply to everyone whose primary
         # contact isn't active anymore
