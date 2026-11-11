@@ -26,9 +26,8 @@ address and their organization:
   email addresses, phone numbers or postal addresses can be added (see
   below). Names, the salutation, the organization and the notes are changed
   with `wb people update <person_id> ... --dry-run` (see `--help`), outdated
-  details removed with its `--remove-*` options; confirm changes with the
-  user first. Changing an existing postal address is done in Workbench, tell
-  the user.
+  details removed with its `--remove-*` options and postal addresses changed
+  with `wb people change-address`; confirm changes with the user first.
 - If the organization exists, use its ID (`organization`). If several match,
   ask which one. Only use `new_organization` when there's none.
 
