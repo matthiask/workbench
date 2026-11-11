@@ -32,6 +32,7 @@ from workbench.contacts.models import (
     Person,
     PhoneNumber,
     PostalAddress,
+    normalize_phone_number,
     organization_postal_addresses,
     unarchive_organization,
     update_organization_archival,
@@ -339,41 +340,83 @@ class SharedEmailOut(Schema):
     people: list[PersonSummary]
 
 
+def _shared_details(details, value, central):
+    """``(value, organization, is_central, people)`` of contact details of
+    several active people of the same organization (or without one), or the
+    central value of their organization"""
+    rows = defaultdict(list)
+    for detail in (
+        details
+        .filter(person__is_archived=False)
+        .select_related("person__organization")
+        .order_by("person__given_name", "person__family_name", "person")
+    ):
+        person = detail.person
+        key = (value(detail), person.organization_id)
+        if person not in rows[key]:
+            rows[key].append(person)
+    for (detail, _organization_id), people in sorted(
+        rows.items(), key=lambda item: (item[0][0], item[0][1] or 0)
+    ):
+        organization = people[0].organization
+        is_central = bool(organization and central(organization) == detail)
+        if len(people) > 1 or is_central:
+            yield detail, organization, is_central, people
+
+
+def _shared_out(organization, people, request):
+    return {
+        "organization": organization_out(organization, request)
+        if organization
+        else None,
+        "people": [person_summary(person, request) for person in people],
+    }
+
+
 @router.get("/contacts/people/shared-email-addresses/", response=list[SharedEmailOut])
 @paginate
 def shared_email_addresses(request):
     """Email addresses of several active people of the same organization (or
     without one), or the central address of their organization; usually
     generic addresses like info@ which belong to the organization"""
-    rows = defaultdict(list)
-    for email in (
-        EmailAddress.objects
-        .filter(person__is_archived=False)
-        .select_related("person__organization")
-        .order_by("email", "person__given_name", "person__family_name", "person")
-    ):
-        person = email.person
-        key = (email.email.strip().lower(), person.organization_id)
-        if person not in rows[key]:
-            rows[key].append(person)
-    result = []
-    for (email, _organization_id), people in sorted(
-        rows.items(), key=lambda item: (item[0][0], item[0][1] or 0)
-    ):
-        organization = people[0].organization
-        is_organization_email = bool(
-            organization and organization.email.strip().lower() == email
+    return [
+        {"email": email, "is_organization_email": is_central}
+        | _shared_out(organization, people, request)
+        for email, organization, is_central, people in _shared_details(
+            EmailAddress.objects.all(),
+            lambda detail: detail.email.strip().lower(),
+            lambda organization: organization.email.strip().lower(),
         )
-        if len(people) > 1 or is_organization_email:
-            result.append({
-                "email": email,
-                "organization": organization_out(organization, request)
-                if organization
-                else None,
-                "is_organization_email": is_organization_email,
-                "people": [person_summary(person, request) for person in people],
-            })
-    return result
+    ]
+
+
+class SharedPhoneNumberOut(Schema):
+    phone_number: str
+    organization: OrganizationOut | None
+    is_organization_phone_number: bool = Field(
+        description="The central number of the organization, it's shown on its"
+        " people and doesn't belong on them"
+    )
+    people: list[PersonSummary]
+
+
+@router.get(
+    "/contacts/people/shared-phone-numbers/", response=list[SharedPhoneNumberOut]
+)
+@paginate
+def shared_phone_numbers(request):
+    """Phone numbers of several active people of the same organization (or
+    without one), or the central number of their organization; usually the
+    reception, which belongs to the organization"""
+    return [
+        {"phone_number": number, "is_organization_phone_number": is_central}
+        | _shared_out(organization, people, request)
+        for number, organization, is_central, people in _shared_details(
+            PhoneNumber.objects.all(),
+            lambda detail: detail.phone_number,
+            lambda organization: organization.phone_number,
+        )
+    ]
 
 
 class OrganizationPostalAddressOut(Schema):
@@ -1023,6 +1066,11 @@ class PersonPatch(InputSchema):
         description="Email addresses to remove, e.g. generic ones like info@"
         " which belong to the organization",
     )
+    remove_phone_numbers: list[str] = Field(
+        default=[],
+        description="Phone numbers to remove, e.g. the reception which belongs"
+        " to the organization",
+    )
     remove_postal_addresses: list[int] = Field(
         default=[],
         description="IDs of postal addresses to remove, e.g. old ones of the"
@@ -1051,6 +1099,26 @@ def _email_addresses_to_remove(person, values, error):
             error(
                 ["remove_email_addresses", index],
                 _("The person has no email address %r.") % value,
+            )
+    return remove
+
+
+def _phone_numbers_to_remove(person, values, error):
+    """The person's phone numbers matching the values (normalized)"""
+    remove = []
+    for index, value in enumerate(values):
+        number = normalize_phone_number(value, "phone_number", {})
+        numbers = [
+            detail
+            for detail in person.phonenumbers.all()
+            if detail.phone_number == number
+        ]
+        if numbers:
+            remove.extend(numbers)
+        else:
+            error(
+                ["remove_phone_numbers", index],
+                _("The person has no phone number %r.") % value,
             )
     return remove
 
@@ -1113,8 +1181,9 @@ def person_update(
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change the primary contact, the organization and the groups of a
-    person, remove email and postal addresses or archive them, with the rules of the
-    person form; contact details are added with ``details/``. Archiving the
+    person, remove email addresses, phone numbers and postal addresses or
+    archive them, with the rules of the person form; contact details are
+    added with ``details/``. Archiving the
     last active person of an organization without open projects or deals
     archives the organization too, unarchiving a person unarchives their
     organization, so does moving an active person into it. Moving the
@@ -1147,6 +1216,7 @@ def person_update(
     remove_emails = _email_addresses_to_remove(
         person, data.remove_email_addresses, error
     )
+    remove_phones = _phone_numbers_to_remove(person, data.remove_phone_numbers, error)
     remove_addresses = _postal_addresses_to_remove(
         person, data.remove_postal_addresses, error
     )
@@ -1168,7 +1238,7 @@ def person_update(
     if data.is_archived is not None:
         person.is_archived = data.is_archived
     with transaction.atomic():
-        for detail in [*remove_emails, *remove_addresses]:
+        for detail in [*remove_emails, *remove_phones, *remove_addresses]:
             detail.delete()
         # Also updates the full text search
         person.save()

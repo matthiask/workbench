@@ -1158,6 +1158,54 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("The central address of", result.output)
 
+    def test_shared_phone_numbers(self):
+        """Phone numbers of several people of the same organization belong to
+        it, like generic email addresses"""
+        organization = factories.OrganizationFactory.create(name="Beispiel AG")
+        anna, bea = (
+            factories.PersonFactory.create(organization=organization, given_name=name)
+            for name in ["Anna", "Bea"]
+        )
+        anna.phonenumbers.create(phone_number="+41441234567")
+        bea.phonenumbers.create(phone_number="+41441234567")
+        bea.phonenumbers.create(phone_number="+41791234567")
+        factories.PersonFactory.create().phonenumbers.create(
+            phone_number="+41441234567"
+        )
+
+        result = self.wb("people", "shared-phones", "--json")
+        self.assertEqual(
+            [
+                (row["phone_number"], [p["id"] for p in row["people"]])
+                for row in json.loads(result.output)["items"]
+            ],
+            [("+41441234567", [anna.pk, bea.pk])],
+        )
+        self.assertIn("Beispiel AG", self.wb("people", "shared-phones").output)
+
+        self.wb(
+            "organizations", "update", organization.pk, "--phone-number", "+41441234567"
+        )
+        result = self.wb("people", "update", anna.pk, "--remove-phone", "044 123 45 67")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(list(anna.phonenumbers.all()), [])
+        # Bea still has the organization's number
+        result = self.wb("people", "shared-phones", "--json")
+        self.assertEqual(
+            [
+                (row["is_organization_phone_number"], [p["id"] for p in row["people"]])
+                for row in json.loads(result.output)["items"]
+            ],
+            [(True, [bea.pk])],
+        )
+        result = self.wb("people", "update", bea.pk, "--remove-phone", "+41790000000")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("no phone number", result.output)
+        self.wb("people", "update", bea.pk, "--remove-phone", "+41441234567")
+        self.assertEqual(
+            [p.phone_number for p in bea.phonenumbers.all()], ["+41791234567"]
+        )
+
     def test_person_organization(self):
         """People who left move to their new organization or to none, like in
         the person form; they stay the contact of their projects"""

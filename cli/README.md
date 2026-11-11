@@ -181,6 +181,9 @@ postal addresses, e.g. old ones, which are changed for several people at once:
     wb people shared-emails
     wb organizations update 45 --email info@example.com
     wb people update 123 --remove-email info@example.com
+    wb people shared-phones
+    wb organizations update 45 --phone-number "+41 44 123 45 67"
+    wb people update 123 --remove-phone "+41 44 123 45 67"
     wb people update 123 --organization 45 --ignore-warning organization-update
     wb people update 123 --remove-postal-address 678
     wb organizations search --several-postal-addresses

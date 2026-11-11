@@ -484,6 +484,13 @@ def show_person(person_id, as_json):
     " organization; repeat it for several.",
 )
 @click.option(
+    "--remove-phone",
+    "remove_phones",
+    multiple=True,
+    help="Phone number to remove, e.g. the reception which belongs to the"
+    " organization; repeat it for several.",
+)
+@click.option(
     "--remove-postal-address",
     "remove_postal_addresses",
     type=int,
@@ -508,6 +515,7 @@ def update_person(
     add_groups,
     remove_groups,
     remove_emails,
+    remove_phones,
     remove_postal_addresses,
     organization,
     is_archived,
@@ -516,7 +524,8 @@ def update_person(
     as_json,
 ):
     """Change the primary contact, the organization and the groups of a
-    person, remove email and postal addresses or archive them, like in the web
+    person, remove email addresses, phone numbers and postal addresses or
+    archive them, like in the web
     interface. Projects, deals and invoices keep their customer and contact
     when moving a person to another organization."""
     data = {
@@ -526,6 +535,7 @@ def update_person(
             ("add_groups", list(add_groups)),
             ("remove_groups", list(remove_groups)),
             ("remove_email_addresses", list(remove_emails)),
+            ("remove_phone_numbers", list(remove_phones)),
             ("remove_postal_addresses", list(remove_postal_addresses)),
             ("is_archived", is_archived),
         ]
@@ -538,8 +548,8 @@ def update_person(
     if not data:
         terminate(
             "Nothing to change, pass --primary-contact, --add-group,"
-            " --remove-group, --remove-email, --remove-postal-address,"
-            " --organization, --archive or --unarchive."
+            " --remove-group, --remove-email, --remove-phone,"
+            " --remove-postal-address, --organization, --archive or --unarchive."
         )
     data = request(
         "PATCH",
@@ -593,6 +603,24 @@ def people_duplicates(limit, offset, as_json):
     echo_more(data, offset, "groups")
 
 
+def _echo_shared(rows, *, label, key, central_key, central_label):
+    """Contact details of several people, or the organization's"""
+    table = make_table(label, "Organization", "People")
+    for row in rows:
+        organization = row["organization"] or {}
+        table.add_row(
+            row[key] + (f" ({central_label})" if row[central_key] else ""),
+            link(f"{organization['name']} ({organization['id']})", organization["url"])
+            if organization
+            else "",
+            Text(", ").join(
+                link(f"{person['full_name']} ({person['id']})", person["url"])
+                for person in row["people"]
+            ),
+        )
+    console.print(table)
+
+
 @people.command("shared-emails")
 @page_options
 @click.option("--json", "as_json", is_flag=True)
@@ -611,22 +639,42 @@ def shared_emails(limit, offset, as_json):
     if as_json:
         echo_json(data)
         return
-    table = make_table("Email address", "Organization", "People")
-    for row in data["items"]:
-        organization = row["organization"] or {}
-        table.add_row(
-            row["email"]
-            + (" (organization's address)" if row["is_organization_email"] else ""),
-            link(f"{organization['name']} ({organization['id']})", organization["url"])
-            if organization
-            else "",
-            Text(", ").join(
-                link(f"{person['full_name']} ({person['id']})", person["url"])
-                for person in row["people"]
-            ),
-        )
-    console.print(table)
+    _echo_shared(
+        data["items"],
+        label="Email address",
+        key="email",
+        central_key="is_organization_email",
+        central_label="organization's address",
+    )
     echo_more(data, offset, "email addresses")
+
+
+@people.command("shared-phones")
+@page_options
+@click.option("--json", "as_json", is_flag=True)
+def shared_phones(limit, offset, as_json):
+    """Phone numbers of several active people of the same organization, or
+    the central number of their organization
+
+    Usually the reception: set it as the organization's number (`wb
+    organizations update ID --phone-number`) and remove it from the people
+    (`wb people update ID --remove-phone`)."""
+    data = request(
+        "GET",
+        "contacts/people/shared-phone-numbers/",
+        params=page_params(limit, offset),
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_shared(
+        data["items"],
+        label="Phone number",
+        key="phone_number",
+        central_key="is_organization_phone_number",
+        central_label="organization's number",
+    )
+    echo_more(data, offset, "phone numbers")
 
 
 @people.command("reassign-suggestions")

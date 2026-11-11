@@ -1,6 +1,6 @@
 ---
 name: workbench-address-book
-description: Clean up the Workbench address book with the `wb` CLI. Merges duplicate people and organizations, reassigns people of users who left, moves generic email addresses (info@, kontakt@, ...) from people to their organization, fixes outdated postal addresses and archives organizations nobody works at anymore. Use when the user wants to clean up, tidy, deduplicate or check contacts, people, organizations or addresses in Workbench.
+description: Clean up the Workbench address book with the `wb` CLI. Merges duplicate people and organizations, reassigns people of users who left, moves generic email addresses (info@, kontakt@, ...) and reception phone numbers from people to their organization, fixes outdated postal addresses and archives organizations nobody works at anymore. Use when the user wants to clean up, tidy, deduplicate or check contacts, people, organizations or addresses in Workbench.
 ---
 
 # Cleaning up the Workbench address book
@@ -81,7 +81,7 @@ Organizations have primary contacts too:
     wb organizations search --primary-contact <short name>
     wb organizations update <organization_id> --primary-contact <short name> --dry-run
 
-## 3. Generic email addresses
+## 3. Generic email addresses and phone numbers
 
     wb people shared-emails
 
@@ -102,6 +102,14 @@ and central addresses of organizations which are still on people. Sort them:
 - If the organization has a different central address already, ask.
 - A personal address on several people is usually a duplicate (step 1),
   or a couple or family; ask.
+
+Phone numbers work the same way: the reception's number belongs to the
+organization (its central number, shown on every person), mobile numbers
+on several people are usually duplicates or mistakes; ask.
+
+    wb people shared-phones
+    wb organizations update <organization_id> --phone-number "+41 44 123 45 67" --dry-run
+    wb people update <person_id> --remove-phone "+41 44 123 45 67" --dry-run
 
 ## 4. Postal addresses
 
