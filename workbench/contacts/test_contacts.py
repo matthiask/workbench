@@ -20,6 +20,7 @@ from workbench.contacts import tasks
 from workbench.contacts.forms import GroupSearchForm
 from workbench.contacts.merge import (
     duplicates_of,
+    merge_organizations,
     merge_people,
     merge_warnings,
     possible_duplicates,
@@ -555,6 +556,26 @@ class ContactsTest(TestCase):
         self.assertEqual(keep.notes, "Keep\n\nDuplicate")
         self.assertEqual(keep.date_of_birth, dt.date(1980, 1, 1))
         self.assertIn("other@example.com", keep._fts)
+
+    def test_merge_primary_contact(self):
+        """The primary contact of the duplicate replaces an inactive primary
+        contact of the contact kept, an active one stays"""
+        active = factories.UserFactory.create()
+        inactive = factories.UserFactory.create(is_active=False)
+        for model, factory, merge in [
+            (Person, factories.PersonFactory, merge_people),
+            (Organization, factories.OrganizationFactory, merge_organizations),
+        ]:
+            with self.subTest(model=model):
+                keep = factory.create(primary_contact=inactive)
+                merge(duplicate=factory.create(primary_contact=active), keep=keep)
+                keep.refresh_from_db()
+                self.assertEqual(keep.primary_contact, active)
+
+                other = factories.UserFactory.create()
+                merge(duplicate=factory.create(primary_contact=other), keep=keep)
+                keep.refresh_from_db()
+                self.assertEqual(keep.primary_contact, active)
 
     def test_merge_warnings_recurring_invoices(self):
         """Recurring invoices create invoices for their contact, merging their

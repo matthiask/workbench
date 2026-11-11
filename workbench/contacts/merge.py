@@ -65,14 +65,27 @@ def merge_warnings(*, duplicate, keep):
     ]
 
 
+def _take_primary_contact(*, duplicate, keep):
+    """The duplicate's primary contact replaces an inactive one, returns
+    whether it did"""
+    if not keep.primary_contact.is_active and duplicate.primary_contact.is_active:
+        keep.primary_contact = duplicate.primary_contact
+        return True
+    return False
+
+
 def merge_organizations(*, duplicate, keep):
     """Move everything of the duplicate organization (people, projects,
-    deals, invoices, ...) to the organization to keep and delete it"""
+    deals, invoices, ...) to the organization to keep and delete it; the
+    primary contact stays unless it's an inactive user and the duplicate's
+    is active"""
     if duplicate.pk == keep.pk:
         raise ValidationError(_("An organization cannot be merged with itself."))
     with transaction.atomic():
         # Groups (e.g. industries) aren't moved by substitute_with()
         keep.groups.add(*duplicate.groups.all())
+        if _take_primary_contact(duplicate=duplicate, keep=keep):
+            keep.save()
         substitute_with(to_delete=duplicate, keep=keep)
         keep.refresh_related_fts()
 
@@ -98,8 +111,9 @@ def merge_people(*, duplicate, keep):
     (details the person to keep has already are dropped), groups are added
     like in the person form, notes are appended and the date of birth is
     taken over if the person to keep has none or one without the year. The person kept is archived
-    only if both were. Name, organization and primary contact stay those of
-    the person to keep."""
+    only if both were. Name and organization stay those of the person to
+    keep, the primary contact too unless it's an inactive user and the
+    duplicate's is active."""
     if errors := merge_errors(duplicate=duplicate, keep=keep):
         raise ValidationError(errors)
 
@@ -125,6 +139,7 @@ def merge_people(*, duplicate, keep):
             keep.year_of_birth_unknown = duplicate.year_of_birth_unknown
         # Archived only if both were archived
         keep.is_archived = keep.is_archived and duplicate.is_archived
+        _take_primary_contact(duplicate=duplicate, keep=keep)
 
         substitute_with(to_delete=duplicate, keep=keep)
         # Updates the full text search with the moved details

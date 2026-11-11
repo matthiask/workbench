@@ -142,7 +142,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `workbench/contacts/merge.py`): reverse relations move with
   `substitute_with()`, groups are added with `add_to_group()`, details the
   person kept has already are dropped, notes are appended, the person kept
-  is archived only if both were; people who are
+  is archived only if both were, an inactive primary contact is replaced
+  by the duplicate's active one (organizations too); people who are
   both linked to a user can't be merged. Merging into someone of another
   organization is a warning (`other-organization`) if the duplicate is the
   contact of projects, deals, invoices or recurring invoices: forms only check that the contact
