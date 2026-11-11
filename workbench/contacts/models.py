@@ -402,6 +402,33 @@ class Person(Model):
     save.alters_data = True
 
 
+def update_organization_archival(person):
+    """Archive the organization with its last active person, unless it has
+    open projects or deals (someone will add a new contact), and unarchive
+    it with one of its people. Returns the organization if it changed."""
+    from workbench.deals.models import Deal
+    from workbench.projects.models import Project
+
+    organization = person.organization
+    if not organization:
+        return None
+    if person.is_archived:
+        if (
+            organization.is_archived
+            or organization.people.active().exists()
+            or Project.objects.open().filter(customer=organization).exists()
+            or Deal.objects.filter(customer=organization, status=Deal.OPEN).exists()
+        ):
+            return None
+        organization.is_archived = True
+    elif organization.is_archived:
+        organization.is_archived = False
+    else:
+        return None
+    organization.save()
+    return organization
+
+
 _home_re = re.compile(r"(home|hause|privat)", re.IGNORECASE)
 
 

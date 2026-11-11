@@ -715,6 +715,48 @@ class ContactsTest(TestCase):
         self.assertEqual(response.json(), {"redirect": anna.urls["detail"]})
         self.assertEqual(possible_duplicates(), [])
 
+    def test_archive_organization_with_last_person(self):
+        """Archiving the last active person archives the organization unless
+        it has open projects or deals, unarchiving unarchives it"""
+        organization = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(organization=organization)
+        colleague = factories.PersonFactory.create(organization=organization)
+        self.client.force_login(person.primary_contact)
+
+        def archive(person, *, is_archived=True):
+            response = self.client.post(
+                person.urls["update"],
+                person_to_dict(person, is_archived=is_archived, salutation="Dear Anna"),
+            )
+            self.assertRedirects(response, person.urls["detail"])
+            organization.refresh_from_db()
+            # Messages of the form come before the success message
+            return messages(response)[:-1]
+
+        self.assertEqual(archive(person), [])
+        self.assertFalse(organization.is_archived)
+
+        project = factories.ProjectFactory.create(
+            customer=organization, contact=colleague
+        )
+        archive(colleague)
+        self.assertFalse(organization.is_archived)
+
+        project.closed_on = dt.date.today()
+        project.save()
+        archive(colleague, is_archived=False)
+        self.assertEqual(
+            archive(colleague),
+            [f"{organization.name} has been archived with its last person."],
+        )
+        self.assertTrue(organization.is_archived)
+
+        self.assertEqual(
+            archive(person, is_archived=False),
+            [f"{organization.name} has been unarchived."],
+        )
+        self.assertFalse(organization.is_archived)
+
     def test_create_person_with_preselected_organization(self):
         """Adding a person to an existing org. preselects the organization"""
         organization = factories.OrganizationFactory.create(name="ABCD")

@@ -245,6 +245,12 @@ class ContactsAPITest(TestCase):
         person.refresh_from_db()
         self.assertTrue(person.is_archived)
         self.assertEqual(list(person.groups.all()), [])
+        # Archiving the last person archived the organization
+        organization.refresh_from_db()
+        self.assertTrue(organization.is_archived)
+        patch({"is_archived": False})
+        organization.refresh_from_db()
+        self.assertFalse(organization.is_archived)
 
     def test_groups(self):
         """Groups are listed with their members, created and changed with the

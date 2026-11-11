@@ -24,6 +24,7 @@ from workbench.contacts.models import (
     Person,
     PhoneNumber,
     PostalAddress,
+    update_organization_archival,
 )
 from workbench.contacts.reassign import primary_contact_suggestions
 from workbench.tools.api import (
@@ -660,7 +661,9 @@ def person_update(
 ):
     """Change the primary contact and the groups of a person or archive them,
     with the rules of the person form; contact details are added with
-    ``details/``"""
+    ``details/``. Archiving the last active person of an organization
+    without open projects or deals archives the organization too,
+    unarchiving a person unarchives their organization."""
     person = get_object_or_404(
         Person.objects.select_related("organization"), pk=person_id
     )
@@ -701,10 +704,15 @@ def person_update(
     if errors:
         raise ValidationError(errors)
 
+    archival_changed = (
+        data.is_archived is not None and data.is_archived != person.is_archived
+    )
     if data.is_archived is not None:
         person.is_archived = data.is_archived
     with transaction.atomic():
         person.save()
+        if archival_changed:
+            update_organization_archival(person)
         for group in add:
             person.add_to_group(group)
         for group in remove:

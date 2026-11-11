@@ -387,6 +387,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   are always kept (a test lists all relations). Membership in groups which
   aren't archived keeps people (not organizations: those without active
   people are useless for mailings), so do edits in the audit log.
+  Archiving the last active person of an organization (person form and
+  API) archives it too, unless it has open projects or deals; unarchiving
+  a person unarchives their organization (`update_organization_archival()`).
 - Groups with `applies_to_organizations` (e.g. industries) belong to
   organizations: people are in them through their organization
   (`Person.all_groups()`, `Person.objects.in_group()`, `without_groups()`;

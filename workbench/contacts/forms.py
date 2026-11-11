@@ -30,6 +30,7 @@ from workbench.contacts.models import (
     PostalAddress,
     in_group_q,
     postal_address_choices,
+    update_organization_archival,
 )
 from workbench.tools.forms import (
     Autocomplete,
@@ -638,6 +639,18 @@ class PersonForm(ModelForm):
             self._save_organization_groups(instance)
         for formset in self.formsets.values():
             formset.save()
+        if "is_archived" in self.changed_data and (
+            organization := update_organization_archival(instance)
+        ):
+            messages.info(
+                self.request,
+                (
+                    _("%(organization)s has been archived with its last person.")
+                    if organization.is_archived
+                    else _("%(organization)s has been unarchived.")
+                )
+                % {"organization": organization.name},
+            )
         return instance
 
     def _save_organization_groups(self, instance):

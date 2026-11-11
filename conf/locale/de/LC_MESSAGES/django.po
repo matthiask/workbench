@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 08:00+0100\n"
+"POT-Creation-Date: 2026-11-11 08:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1179,6 +1179,16 @@ msgstr "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüss
 #, python-format
 msgid "This person is the contact of the following related objects: %s. Modifying this record may be more confusing than archiving this one and creating a new record instead."
 msgstr "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und einen neuen zu erstellen als die Organisation zu ändern."
+
+#: workbench/contacts/forms.py
+#, python-format
+msgid "%(organization)s has been archived with its last person."
+msgstr "%(organization)s wurde mit der letzten Person archiviert."
+
+#: workbench/contacts/forms.py
+#, python-format
+msgid "%(organization)s has been unarchived."
+msgstr "%(organization)s ist nicht mehr archiviert."
 
 #: workbench/contacts/forms.py
 msgid "Select one of the following addresses:"
