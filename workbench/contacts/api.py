@@ -340,6 +340,11 @@ class SharedEmailOut(Schema):
     people: list[PersonSummary]
 
 
+def _normalized(phone_number):
+    """Also numbers saved before they were normalized, e.g. +4104412..."""
+    return normalize_phone_number(phone_number.strip(), "phone_number", {})
+
+
 def _shared_details(details, value, central):
     """``(value, organization, is_central, people)`` of contact details of
     several active people of the same organization (or without one), or the
@@ -414,7 +419,8 @@ def shared_phone_numbers(request):
         | _shared_out(organization, people, request)
         for number, organization, is_central, people in _shared_details(
             PhoneNumber.objects.all(),
-            lambda detail: detail.phone_number,
+            # Also numbers saved before they were normalized
+            lambda detail: _normalized(detail.phone_number),
             lambda organization: organization.phone_number,
         )
     ]
@@ -1105,14 +1111,15 @@ def _email_addresses_to_remove(person, values, error):
 
 
 def _phone_numbers_to_remove(person, values, error):
-    """The person's phone numbers matching the values (normalized)"""
+    """The person's phone numbers matching the values, also numbers saved
+    before they were normalized"""
     remove = []
     for index, value in enumerate(values):
-        number = normalize_phone_number(value, "phone_number", {})
+        number = _normalized(value)
         numbers = [
             detail
             for detail in person.phonenumbers.all()
-            if detail.phone_number == number
+            if _normalized(detail.phone_number) == number
         ]
         if numbers:
             remove.extend(numbers)

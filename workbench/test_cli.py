@@ -1167,7 +1167,8 @@ planned_work:
             for name in ["Anna", "Bea"]
         )
         anna.phonenumbers.create(phone_number="+41441234567")
-        bea.phonenumbers.create(phone_number="+41441234567")
+        # Saved before numbers were normalized
+        bea.phonenumbers.create(phone_number="+410441234567")
         bea.phonenumbers.create(phone_number="+41791234567")
         factories.PersonFactory.create().phonenumbers.create(
             phone_number="+41441234567"
@@ -1212,6 +1213,13 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("no phone number", result.output)
         self.wb("people", "update", bea.pk, "--remove-phone", "+41441234567")
+        self.assertEqual(
+            [p.phone_number for p in bea.phonenumbers.all()], ["+41791234567"]
+        )
+        # Numbers saved before they were normalized are found too
+        bea.phonenumbers.create(phone_number="+410318501026")
+        result = self.wb("people", "update", bea.pk, "--remove-phone", "+410318501026")
+        self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(
             [p.phone_number for p in bea.phonenumbers.all()], ["+41791234567"]
         )
