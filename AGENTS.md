@@ -162,7 +162,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   and archives groups (`/api/contacts/groups/`, with `GroupSearchForm` and
   `GroupForm` of the web interface); titles of groups are unique
   (case-insensitive, `GroupForm` and a constraint) because the other
-  endpoints find groups by their title. `wb people create` is mostly fed by
+  endpoints find groups by their title. Dates of birth are left out of the
+  API (neither shown nor changed) on purpose: personal data which scripts and
+  LLMs don't need, they're edited in the web interface only. `wb people create` is mostly fed by
   LLMs, so the API rejects duplicate names and email addresses (the web
   interface doesn't), and archived people with the same name and
   organization (or both without), who should rather be unarchived. Its `primary_contact` defaults to the current user and
