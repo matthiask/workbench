@@ -1,6 +1,7 @@
 import datetime as dt
 import importlib
 import io
+import re
 from unittest import mock
 
 from django.apps import apps
@@ -1195,6 +1196,17 @@ class ContactsTest(TestCase):
             self.assertContains(response, "Recent projects")
             self.assertNotContains(response, "Recent invoices")
             self.assertNotContains(response, "Recent offers")
+
+    def test_archived_organization_detail(self):
+        """Archived organizations get a badge like archived people"""
+        organization = factories.OrganizationFactory.create(
+            name="Beispiel AG", is_archived=True
+        )
+        self.client.force_login(organization.primary_contact)
+        response = self.client.get(organization.urls["detail"])
+        heading = re.search(r"<h1.*?</h1>", response.content.decode(), re.DOTALL)[0]
+        self.assertIn("wb-title-badge", heading)
+        self.assertNotIn("(archived)", heading)
 
     def test_person_detail(self):
         """The person detail page lists the projects, deals and invoices the

@@ -3,7 +3,16 @@
 {% block content %}
   <div class="wb-page-header">
     <div class="min-w-0">
-      <h1 class="mb-1">{{ object }} {% history_link object %}</h1>
+      <h1 class="mb-1">
+        {# HTML shows newlines in the name as spaces, like __str__ #}
+        {{ organization.name }}
+        {% history_link organization %}
+        {% if organization.is_archived %}
+          <span class="wb-title-badge"><span
+              class="badge text-bg-secondary"
+            >{{ organization|label:'is_archived' }}</span></span>
+        {% endif %}
+      </h1>
       <div class="wb-meta">
         {% for group in organization.groups.all %}
           <a href="{% url 'contacts_organization_list' %}?g={{ group.id }}" class="badge text-bg-light">{{ group }}</a>
