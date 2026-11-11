@@ -467,8 +467,9 @@ class OrganizationPostalAddressForm(Form):
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop("instance")
+        pk = kwargs.pop("address", None)
         super().__init__(*args, **kwargs)
-        pk = self.request.GET.get("address")
+        pk = str(pk or self.request.GET.get("address"))
         self.address = next(
             (
                 entry

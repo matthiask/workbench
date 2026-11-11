@@ -1,9 +1,11 @@
 import datetime as dt
+import itertools
 from collections import defaultdict
 from typing import Literal
 
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Count, Prefetch, Q, TextField, Value
+from django.db.models.functions import Concat, Lower, Trim
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, P, Query, Router, Schema
@@ -15,18 +17,21 @@ from workbench.contacts.forms import (
     GroupForm,
     GroupSearchForm,
     OrganizationMergeForm,
+    OrganizationPostalAddressForm,
     PersonForm,
     PersonMergeForm,
     recent_projects_or_deals,
 )
 from workbench.contacts.merge import possible_duplicates
 from workbench.contacts.models import (
+    ADDRESS_FIELDS,
     EmailAddress,
     Group,
     Organization,
     Person,
     PhoneNumber,
     PostalAddress,
+    organization_postal_addresses,
     update_organization_archival,
 )
 from workbench.contacts.reassign import primary_contact_suggestions
@@ -37,6 +42,7 @@ from workbench.tools.api import (
     OrganizationID,
     SearchQuery,
     Serialized,
+    form_data,
     full_clean,
     raise_form_errors,
     validate_form,
@@ -150,6 +156,11 @@ class OrganizationSearchFilter(OrganizationFilter):
         " search of the web interface",
     )
     primary_contact: str | None = Field(default=None, description="Short name")
+    several_postal_addresses: bool = Field(
+        default=False,
+        description="Only organizations whose active people have different postal"
+        " addresses, e.g. old ones",
+    )
 
 
 @router.get("/contacts/organizations/", response=list[OrganizationOut])
@@ -170,6 +181,17 @@ def organization_list(request, filters: Query[OrganizationSearchFilter]):
                 "primary_contact", _("Unknown user %r.") % filters.primary_contact
             )
         organizations = organizations.filter(primary_contact=user)
+    if filters.several_postal_addresses:
+        address = Concat(
+            *itertools.chain.from_iterable(
+                (Lower(Trim(f"people__postaladdresses__{field}")), Value("|"))
+                for field in ADDRESS_FIELDS
+            ),
+            output_field=TextField(),
+        )
+        organizations = organizations.annotate(
+            addresses=Count(address, distinct=True, filter=Q(people__is_archived=False))
+        ).filter(addresses__gt=1)
     return Serialized(
         organizations, lambda organization: organization_out(organization, request)
     )
@@ -352,6 +374,22 @@ def shared_email_addresses(request):
     return result
 
 
+class OrganizationPostalAddressOut(Schema):
+    id: int = Field(
+        description="ID of one of the people's postal addresses, identifies the"
+        " address when changing it"
+    )
+    value: str = Field(description="The address on one line")
+    street: str
+    house_number: str
+    address_suffix: str
+    postal_code: str
+    city: str
+    country: str = Field(description="ISO 3166-1 code, e.g. CH")
+    postal_address_override: str
+    people: list[PersonSummary]
+
+
 class OrganizationDetail(OrganizationOut):
     is_private_person: bool
     notes: str
@@ -362,6 +400,10 @@ class OrganizationDetail(OrganizationOut):
     primary_contact: str
     groups: list[str]
     people: list[PersonSummary]
+    postal_addresses: list[OrganizationPostalAddressOut] = Field(
+        description="The distinct postal addresses of the active people, those of"
+        " most people first"
+    )
 
 
 @router.get(
@@ -380,6 +422,17 @@ def organization_detail(request, organization_id: int):
         "groups": [group.title for group in organization.groups.all()],
         "people": [
             person_summary(person, request) for person in organization.people.all()
+        ],
+        "postal_addresses": [
+            address["fields"]
+            | {
+                "id": address["addresses"][0].pk,
+                "value": address["line"],
+                "people": [
+                    person_summary(person, request) for person in address["people"]
+                ],
+            }
+            for address in organization_postal_addresses(organization)
         ],
     }
 
@@ -471,6 +524,51 @@ def organization_merge(
     with transaction.atomic():
         keep = form.save()
         result = _organization_detail_out(keep, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+class OrganizationPostalAddressIn(InputSchema):
+    """Fields which aren't given keep their current value"""
+
+    address: int = Field(description="ID from the organization's postal_addresses")
+    street: str | None = None
+    house_number: str | None = None
+    address_suffix: str | None = None
+    postal_code: str | None = None
+    city: str | None = None
+    country: str | None = Field(default=None, description="ISO 3166-1 code, e.g. CH")
+    postal_address_override: str | None = None
+    people: list[int] | None = Field(
+        default=None,
+        description="IDs of the people whose address changes, defaults to all who"
+        " have it",
+    )
+
+
+@router.post(
+    "/contacts/organizations/{int:organization_id}/postal-address/",
+    response=OrganizationDetail,
+)
+def organization_change_postal_address(
+    request,
+    organization_id: int,
+    data: OrganizationPostalAddressIn,
+    *,
+    dry_run: DryRun = False,
+):
+    """Change a postal address of several people of the organization at once,
+    e.g. when it moves, like in the web interface"""
+    organization = get_object_or_404(Organization, pk=organization_id)
+    kwargs = {"instance": organization, "request": request, "address": data.address}
+    values = form_data(OrganizationPostalAddressForm(**kwargs))
+    values.update(data.dict(exclude={"address"}, exclude_none=True))
+    form = OrganizationPostalAddressForm(values, **kwargs)
+    validate_form(form)
+    with transaction.atomic():
+        form.save()
+        result = _organization_detail_out(organization, request)
         if dry_run:
             transaction.set_rollback(True)
     return result

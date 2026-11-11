@@ -86,6 +86,11 @@ def organizations():
 @click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names
 )
+@click.option(
+    "--several-postal-addresses",
+    is_flag=True,
+    help="Only organizations whose active people have different postal addresses.",
+)
 @click.option("--include-archived", is_flag=True, help="Also archived contacts.")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -94,6 +99,7 @@ def search_organizations(
     query,
     without_active_people,
     primary_contact,
+    several_postal_addresses,
     include_archived,
     limit,
     offset,
@@ -105,6 +111,7 @@ def search_organizations(
         "q": " ".join(query),
         "include_archived": format_bool(include_archived),
         "without_active_people": format_bool(without_active_people),
+        "several_postal_addresses": format_bool(several_postal_addresses),
     }
     if primary_contact:
         params["primary_contact"] = primary_contact
@@ -154,6 +161,18 @@ def _echo_organization(data):
             + (" (archived)" if person["is_archived"] else ""),
         )
     console.print(table)
+    if data["postal_addresses"]:
+        table = make_table("ID>", "Postal address", "People", title="Postal addresses")
+        for address in data["postal_addresses"]:
+            table.add_row(
+                str(address["id"]),
+                address["value"],
+                ", ".join(
+                    f"{person['full_name']} ({person['id']})"
+                    for person in address["people"]
+                ),
+            )
+        console.print(table)
 
 
 @organizations.command("show")
@@ -211,6 +230,80 @@ def update_organization(
     data = request(
         "PATCH",
         f"contacts/organizations/{organization_id}/",
+        json=data,
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing changed:")
+    _echo_organization(data)
+
+
+@organizations.command("change-address")
+@click.argument("organization_id", type=int)
+@click.option(
+    "--address",
+    "address_id",
+    type=int,
+    required=True,
+    help="ID of the address from `wb organizations show`.",
+)
+@click.option("--street")
+@click.option("--house-number")
+@click.option("--address-suffix")
+@click.option("--postal-code")
+@click.option("--city")
+@click.option("--country", help="ISO 3166-1 code, e.g. CH.")
+@click.option("--override", help="Replaces the whole address if set.")
+@click.option(
+    "--person",
+    "people",
+    type=int,
+    multiple=True,
+    help="ID of a person whose address changes; repeat it for several. Defaults"
+    " to everyone who has the address.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate and show the result only.")
+@click.option("--json", "as_json", is_flag=True)
+def change_organization_address(
+    organization_id,
+    address_id,
+    street,
+    house_number,
+    address_suffix,
+    postal_code,
+    city,
+    country,
+    override,
+    people,
+    dry_run,
+    as_json,
+):
+    """Change a postal address of several people of an organization at once,
+    e.g. when it moves; fields which aren't given stay"""
+    data = {
+        key: value
+        for key, value in [
+            ("street", street),
+            ("house_number", house_number),
+            ("address_suffix", address_suffix),
+            ("postal_code", postal_code),
+            ("city", city),
+            ("country", country),
+            ("postal_address_override", override),
+        ]
+        if value is not None
+    }
+    if not data:
+        terminate("Nothing to change, pass the fields of the new address.")
+    data["address"] = address_id
+    if people:
+        data["people"] = list(people)
+    data = request(
+        "POST",
+        f"contacts/organizations/{organization_id}/postal-address/",
         json=data,
         params={"dry_run": format_bool(dry_run)},
     )

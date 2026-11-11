@@ -1116,6 +1116,56 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("The central address of", result.output)
 
+    def test_organization_postal_addresses(self):
+        """Organizations with different addresses are found, an address is
+        changed for several people at once"""
+        organization = factories.OrganizationFactory.create(name="Beispiel AG")
+        anna, bea, carl = (
+            factories.PersonFactory.create(organization=organization, given_name=name)
+            for name in ["Anna", "Bea", "Carl"]
+        )
+        old = {"street": "Altweg", "postal_code": "8000", "city": "Zürich"}
+        address = anna.postaladdresses.create(**old)
+        bea.postaladdresses.create(**old)
+        carl.postaladdresses.create(**old, house_number="2")
+        other = factories.OrganizationFactory.create(name="Anders AG")
+        factories.PersonFactory.create(organization=other).postaladdresses.create(**old)
+
+        result = self.wb("organizations", "search", "--several-postal-addresses")
+        self.assertIn("Beispiel AG", result.output)
+        self.assertNotIn("Anders AG", result.output)
+
+        result = self.wb("organizations", "show", organization.pk)
+        self.assertIn("Altweg 2, 8000 Zürich", result.output)
+        self.assertIn(f"Bea Nachname ({bea.pk})", result.output)
+
+        change = [
+            "organizations",
+            "change-address",
+            organization.pk,
+            "--address",
+            address.pk,
+            "--house-number",
+            "2",
+        ]
+        result = self.wb(*change, "--person", anna.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(anna.postaladdresses.get().house_number, "")
+        result = self.wb(*change, "--person", anna.pk, "--person", bea.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(
+            [a.house_number for p in [anna, bea] for a in p.postaladdresses.all()],
+            ["2", "2"],
+        )
+        result = self.wb("organizations", "search", "--several-postal-addresses")
+        self.assertNotIn("Beispiel AG", result.output)
+
+        result = self.wb(*change[:4], "0", "--city", "Bern")
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb(*change[:5], "--city", "")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("city", result.output)
+
     def test_invoices(self):
         """Invoices, projected and recurring invoices, and pagination"""
         project = factories.ProjectFactory.create(owned_by=self.user)

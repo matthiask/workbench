@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 08:31+0100\n"
+"POT-Creation-Date: 2026-11-11 08:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1063,13 +1063,13 @@ msgstr "%(person)s hat diese Telefonnummer bereits."
 
 #: workbench/contacts/api.py
 #, python-format
-msgid "The group %r is archived."
-msgstr "Die Gruppe %r ist archiviert."
+msgid "The person has no email address %r."
+msgstr "Die Person hat keine Emailadresse %r."
 
 #: workbench/contacts/api.py
 #, python-format
-msgid "The person has no email address %r."
-msgstr "Die Person hat keine Emailadresse %r."
+msgid "The group %r is archived."
+msgstr "Die Gruppe %r ist archiviert."
 
 #: workbench/contacts/api.py workbench/invoices/api.py
 #, python-format

@@ -397,7 +397,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   a person unarchives their organization (`update_organization_archival()`).
   Postal addresses belong to people; the person form copies those of
   colleagues and the organization changes one address of several people
-  at once (`organization_postal_addresses()`, `OrganizationPostalAddressForm`).
+  at once (`organization_postal_addresses()`, `OrganizationPostalAddressForm`;
+  `wb organizations show` lists them, `wb organizations change-address`,
+  `wb organizations search --several-postal-addresses` finds outdated ones).
   Organizations have a central email address (e.g. info@, shown on their
   people, so it doesn't belong on them) and an optional accounts payable
   address; payment reminders suggest the accounts payable address, the
