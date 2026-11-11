@@ -1320,7 +1320,7 @@ planned_work:
         )
         self.assertEqual(result.exit_code, 0, result.output)
         private.refresh_from_db()
-        self.assertEqual((private.type, private.weight), ("home", 10))
+        self.assertEqual((private.type, private.weight), ("Home", 10))
         result = self.wb(
             "people", "update", person.pk, "--postal-address-type", private.pk, " "
         )
@@ -1342,7 +1342,7 @@ planned_work:
         )
         self.assertEqual(result.exit_code, 1)
         private.refresh_from_db()
-        self.assertEqual(private.type, "home")
+        self.assertEqual(private.type, "Home")
 
         # Without related objects there's nothing to confirm
         other = factories.PersonFactory.create()

@@ -354,6 +354,28 @@ class ContactsTest(TestCase):
         email.save()
         self.assertEqual(email.weight, -100)
 
+    def test_detail_types(self):
+        """The suggested types are offered and keep their spelling, other
+        types can still be entered"""
+        person = factories.PersonFactory.create()
+        phone = person.phonenumbers.create(phone_number="+41 79 555 12 34")
+        self.assertEqual(phone.type, "Work")
+        phone.type = " mobile "
+        phone.save()
+        self.assertEqual((phone.type, phone.weight), ("Mobile", 30))
+        address = person.postaladdresses.create(
+            type="Büro Lausanne", street="Rue", postal_code="1000", city="Lausanne"
+        )
+        self.assertEqual(address.type, "Büro Lausanne")
+
+        self.client.force_login(person.primary_contact)
+        response = self.client.get(person.urls["update"])
+        self.assertContains(
+            response,
+            'data-suggestions="[&quot;Work&quot;, &quot;Mobile&quot;, &quot;Home&quot;,'
+            ' &quot;Fax&quot;]"',
+        )
+
     def test_contacts_redirect(self):
         """Accessing /contacts/ (not linked anywhere) redirects"""
         self.client.force_login(factories.UserFactory.create())
@@ -1043,9 +1065,9 @@ class ContactsTest(TestCase):
                 for a in a["addresses"]
             ],
             [
-                (anna, "work", "Neuweg", "Zürich"),
+                (anna, "Work", "Neuweg", "Zürich"),
                 (bea, "Office", "Neuweg", "Zürich"),
-                (carl, "work", "Altweg", "Zürich"),
+                (carl, "Work", "Altweg", "Zürich"),
                 (carl, "Home", "Altweg", "Bern"),
             ],
         )

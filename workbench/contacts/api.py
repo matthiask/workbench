@@ -655,8 +655,9 @@ def organization_change_postal_address(
 class ContactDetail(Schema):
     id: int
     type: str = Field(
-        description="Free text like work, mobile or private; the web interface"
-        " suggests a localized default."
+        description="Free text; Work, Mobile, Home and Fax are suggested and"
+        " keep their spelling, details copied from the organization start with"
+        " organization."
     )
     value: str
 
@@ -705,14 +706,14 @@ def person_out(person, request):
 
 class EmailAddressIn(InputSchema):
     type: str | None = Field(
-        default=None, max_length=40, description="E.g. work or private."
+        default=None, max_length=40, description="E.g. Work or Home."
     )
     email: str
 
 
 class PhoneNumberIn(InputSchema):
     type: str | None = Field(
-        default=None, max_length=40, description="E.g. work, mobile or private."
+        default=None, max_length=40, description="E.g. Work, Mobile, Home or Fax."
     )
     phone_number: str = Field(
         description="Numbers without a country code are Swiss numbers."
@@ -721,7 +722,7 @@ class PhoneNumberIn(InputSchema):
 
 class PostalAddressIn(InputSchema):
     type: str | None = Field(
-        default=None, max_length=40, description="E.g. work or private."
+        default=None, max_length=40, description="E.g. Work or Home."
     )
     street: str
     house_number: str = ""
@@ -1085,7 +1086,7 @@ class PersonPatch(InputSchema):
     )
     postal_address_types: dict[int, str] = Field(
         default={},
-        description="New types of postal addresses by their ID, e.g. home for a"
+        description="New types of postal addresses by their ID, e.g. Home for a"
         " private address saved as a work address",
     )
     organization: int | None = Field(

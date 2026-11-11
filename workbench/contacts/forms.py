@@ -42,6 +42,7 @@ from workbench.tools.forms import (
     Autocomplete,
     Form,
     ModelForm,
+    SuggestionsInput,
     Textarea,
     add_prefix,
 )
@@ -786,8 +787,9 @@ PhoneNumberFormset = inlineformset_factory(
     fields=("type", "phone_number"),
     extra=0,
     widgets={
-        "type": forms.TextInput(
-            attrs={"class": "form-control short", "placeholder": _("type")}
+        "type": SuggestionsInput(
+            PhoneNumber.TYPES,
+            attrs={"class": "form-control short", "placeholder": _("type")},
         ),
         "phone_number": forms.TextInput(attrs={"class": "form-control"}),
     },
@@ -799,8 +801,9 @@ EmailAddressFormset = inlineformset_factory(
     fields=("type", "email"),
     extra=0,
     widgets={
-        "type": forms.TextInput(
-            attrs={"class": "form-control short", "placeholder": _("type")}
+        "type": SuggestionsInput(
+            EmailAddress.TYPES,
+            attrs={"class": "form-control short", "placeholder": _("type")},
         ),
         "email": forms.TextInput(attrs={"class": "form-control"}),
     },
@@ -821,8 +824,9 @@ class PostalAddressForm(forms.ModelForm):
             "postal_address_override",
         )
         widgets = {
-            "type": forms.TextInput(
-                attrs={"class": "form-control short", "placeholder": _("type")}
+            "type": SuggestionsInput(
+                PostalAddress.TYPES,
+                attrs={"class": "form-control short", "placeholder": _("type")},
             ),
             "postal_address_override": Textarea(
                 attrs={"class": "form-control", "rows": 3}

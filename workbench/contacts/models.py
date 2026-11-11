@@ -513,7 +513,10 @@ class PersonDetail(Model):
         (re.compile(r"(organization|firm)", re.IGNORECASE), -100),
     )
 
-    type = models.CharField(_("type"), max_length=40, default=_("work"))
+    # Suggested in the forms, other types can still be entered
+    TYPES = ("Work", "Home")
+
+    type = models.CharField(_("type"), max_length=40, default="Work")
     weight = models.SmallIntegerField(_("weight"), default=0, editable=False)
 
     class Meta:
@@ -527,6 +530,12 @@ class PersonDetail(Model):
         return self.person.urls["detail"]
 
     def save(self, *args, **kwargs):
+        # The suggested types in their spelling, e.g. Home instead of home
+        self.type = str(self.type).strip()
+        self.type = next(
+            (type for type in self.TYPES if type.casefold() == self.type.casefold()),
+            self.type,
+        )
         self.weight = sum(
             (weight for regex, weight in self.WEIGHTS if regex.search(str(self.type))),
             0,
@@ -560,6 +569,8 @@ def pretty_phone_number(value):
 
 
 class PhoneNumber(PersonDetail):
+    TYPES = ("Work", "Mobile", "Home", "Fax")
+
     person = models.ForeignKey(
         Person,
         on_delete=models.CASCADE,

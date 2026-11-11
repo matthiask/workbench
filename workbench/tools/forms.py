@@ -1,3 +1,4 @@
+import json
 import time
 from functools import wraps
 from urllib.parse import urlencode
@@ -45,6 +46,16 @@ class ComboboxSelect(forms.Select):
 
     def __init__(self, attrs=None, choices=()):
         super().__init__({"data-combobox": ""} | (attrs or {}), choices)
+
+
+class SuggestionsInput(forms.TextInput):
+    """Text input suggesting predefined values, other values can still be
+    typed, see initSuggestions in main.js"""
+
+    def __init__(self, suggestions, attrs=None):
+        super().__init__(
+            {"data-suggestions": json.dumps(list(suggestions))} | (attrs or {})
+        )
 
 
 class Autocomplete(forms.TextInput):

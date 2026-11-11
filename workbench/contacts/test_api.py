@@ -482,7 +482,7 @@ class ContactsAPITest(TestCase):
         self.assertEqual(data["organization"]["id"], person.organization_id)
         self.assertEqual(
             data["email_addresses"],
-            [{"id": ANY, "type": "work", "value": "hans@example.com"}],
+            [{"id": ANY, "type": "Work", "value": "hans@example.com"}],
         )
         self.assertEqual(data["phone_numbers"][0]["value"], "+41 44 123 45 67")
         self.assertEqual(data["url"], f"http://testserver{person.get_absolute_url()}")
@@ -658,7 +658,7 @@ class ContactsAPITest(TestCase):
         self.assertEqual(created.primary_contact, user)
         self.assertEqual(
             [(e.type, e.email) for e in created.emailaddresses.all()],
-            [("work", "hans@example.com"), ("private", "hans@example.org")],
+            [("Work", "hans@example.com"), ("private", "hans@example.org")],
         )
         self.assertIn("Bahnhofstrasse 1", created.postaladdresses.get().postal_address)
         # The details are searchable

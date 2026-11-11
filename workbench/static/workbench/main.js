@@ -705,6 +705,13 @@ function initWidgets() {
     initCombobox(el)
   }
 
+  for (const el of document.querySelectorAll(
+    "input[data-suggestions]:not(.initialized)",
+  )) {
+    el.classList.add("initialized")
+    initSuggestions(el)
+  }
+
   for (const form of document.querySelectorAll("[data-offer-form]")) {
     const read = (sel, root = document) =>
       Number.parseFloat(root.querySelector(sel).value) || 0
@@ -1004,6 +1011,104 @@ function initCombobox(select) {
       close()
       reset()
       input.select()
+    }
+  })
+}
+
+// Text field suggesting predefined values (SuggestionsInput in
+// workbench/tools/forms.py), other values can still be typed. Enter only
+// chooses a suggestion highlighted with the arrow keys.
+function initSuggestions(input) {
+  const suggestions = JSON.parse(input.dataset.suggestions)
+  const wrapper = document.createElement("div")
+  wrapper.className = "position-relative"
+  const menu = document.createElement("div")
+  menu.className = "dropdown-menu wb-autocomplete"
+  menu.setAttribute("role", "listbox")
+  input.before(wrapper)
+  wrapper.append(input, menu)
+  input.autocomplete = "off"
+  input.setAttribute("role", "combobox")
+  input.setAttribute("aria-expanded", "false")
+
+  let items = []
+  let active = null
+
+  const close = () => {
+    menu.classList.remove("show")
+    input.setAttribute("aria-expanded", "false")
+    active = null
+  }
+
+  const highlight = (index) => {
+    active = index
+    items.forEach((item, i) => {
+      item.classList.toggle("active", i === active)
+    })
+  }
+
+  const choose = (value) => {
+    input.value = value
+    input.dispatchEvent(new Event("change", { bubbles: true }))
+    close()
+  }
+
+  const render = (term) => {
+    const words = term.toLowerCase().split(/\s+/).filter(Boolean)
+    const matches = suggestions.filter((value) =>
+      words.every((word) => value.toLowerCase().includes(word)),
+    )
+    items = matches.map((value) => {
+      const item = document.createElement("button")
+      item.type = "button"
+      item.className = "dropdown-item"
+      item.setAttribute("role", "option")
+      item.textContent = value
+      if (value === input.value) item.classList.add("wb-selected")
+      // Keep the focus in the input until the click has been handled
+      item.addEventListener("mousedown", (e) => e.preventDefault())
+      item.addEventListener("click", () => choose(value))
+      return item
+    })
+    if (!items.length) {
+      close()
+      return
+    }
+    menu.replaceChildren(...items)
+    menu.classList.add("show")
+    input.setAttribute("aria-expanded", "true")
+    keepInViewport(menu)
+    active = null
+  }
+
+  input.addEventListener("click", () => {
+    if (!menu.classList.contains("show")) render("")
+  })
+  input.addEventListener("input", () => render(input.value))
+  input.addEventListener("blur", close)
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault()
+      if (!menu.classList.contains("show")) {
+        render("")
+        return
+      }
+      const step = e.key === "ArrowDown" ? 1 : -1
+      highlight(
+        active === null
+          ? step > 0
+            ? 0
+            : items.length - 1
+          : (active + step + items.length) % items.length,
+      )
+    } else if (e.key === "Enter" && active !== null) {
+      // Don't submit the form
+      e.preventDefault()
+      items[active].click()
+    } else if (e.key === "Escape" && menu.classList.contains("show")) {
+      // Don't close the modal too
+      e.stopPropagation()
+      close()
     }
   })
 }
