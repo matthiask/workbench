@@ -170,6 +170,22 @@ own before their organization's), or all of them go to one person:
     wb people reassign --from ab --to cd
     wb people reassign --suggested --since 2023-01-01 --dry-run   # everyone who left
 
+Cleaning up the address book (the workbench-address-book skill walks through
+it): possible duplicates and generic addresses like info@ of several people,
+which belong to the organization; organizations whose people have different
+postal addresses, e.g. old ones, which are changed for several people at once:
+
+    wb people duplicates
+    wb people merge 345 --into 123 --dry-run
+    wb organizations merge 67 --into 45 --dry-run
+    wb people shared-emails
+    wb organizations update 45 --email info@example.com
+    wb people update 123 --remove-email info@example.com
+    wb organizations search --several-postal-addresses
+    wb organizations show 45
+    wb organizations change-address 45 --address 789 --street Neuweg --house-number 2
+    wb organizations search --without-active-people
+
 Groups are listed, created and archived with `wb groups`:
 
     wb groups
@@ -550,8 +566,8 @@ name.
 ## Claude Code skills
 
 [`skills/`](skills/) contains [Claude Code](https://claude.com/claude-code)
-skills for common Workbench tasks: offers, contacts, deals, planning,
-mailing lists and controlling summaries. See its README for what they do and how to install
+skills for common Workbench tasks: offers, contacts, cleaning up the
+address book, deals, planning, mailing lists and controlling summaries. See its README for what they do and how to install
 them.
 
 ## Bug reports

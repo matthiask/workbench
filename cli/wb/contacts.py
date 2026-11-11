@@ -479,8 +479,8 @@ def update_person(
     dry_run,
     as_json,
 ):
-    """Change the primary contact and the groups of a person or archive them,
-    like in the web interface"""
+    """Change the primary contact and the groups of a person, remove email
+    addresses or archive them, like in the web interface"""
     data = {
         key: value
         for key, value in [
