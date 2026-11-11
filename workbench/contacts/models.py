@@ -579,6 +579,66 @@ class PostalAddress(PersonDetail):
         return None
 
 
+ADDRESS_FIELDS = (
+    "street",
+    "house_number",
+    "address_suffix",
+    "postal_code",
+    "city",
+    "country",
+    "postal_address_override",
+)
+
+
+def organization_postal_addresses(organization, *, exclude_person=None):
+    """Distinct postal addresses of the organization's active people, those
+    of most people first, without those ``exclude_person`` has already
+
+    Returns dicts with the ``fields`` of ``ADDRESS_FIELDS``, the ``type``,
+    the address on one ``line`` and the ``people`` who have it."""
+    addresses = {}
+    for address in (
+        PostalAddress.objects
+        .filter(person__organization=organization, person__is_archived=False)
+        .select_related("person")
+        .order_by("person__given_name", "person__family_name", "-weight", "pk")
+    ):
+        fields = {
+            field: str(getattr(address, field)).strip() for field in ADDRESS_FIELDS
+        }
+        entry = addresses.setdefault(
+            tuple(value.casefold() for value in fields.values()),
+            {
+                "fields": fields,
+                "type": address.type,
+                "line": address.postal_address_override.replace("\n", ", ")
+                or ", ".join(
+                    filter(
+                        None,
+                        (
+                            " ".join(
+                                filter(None, (address.street, address.house_number))
+                            ),
+                            address.address_suffix,
+                            " ".join(filter(None, (address.postal_code, address.city))),
+                            address.country.name
+                            if address.country.code != "CH"
+                            else "",
+                        ),
+                    )
+                ),
+                "people": [],
+            },
+        )
+        if address.person not in entry["people"]:
+            entry["people"].append(address.person)
+    if exclude_person:
+        for key, entry in list(addresses.items()):
+            if exclude_person in entry["people"]:
+                del addresses[key]
+    return sorted(addresses.values(), key=lambda entry: -len(entry["people"]))
+
+
 def postal_address_choices(*, organization=None, person=None, for_billing=False):
     """Postal addresses of the person, or of the organization's people
 

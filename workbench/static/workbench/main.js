@@ -791,7 +791,7 @@ function initWidgets() {
 }
 
 // Adds a form to a formset, see workbench/templatetags/formset.py
-window.addInlineForm = function addInlineForm(slug) {
+window.addInlineForm = function addInlineForm(slug, initial = {}) {
   const totalForms = document.getElementById(`id_${slug}-TOTAL_FORMS`)
   const newId = Number.parseInt(totalForms.value, 10) || 0
   totalForms.value = newId + 1
@@ -801,6 +801,10 @@ window.addInlineForm = function addInlineForm(slug) {
   template.innerHTML = empty.innerHTML.replaceAll("__prefix__", newId)
   const form = template.content.firstElementChild
   form.id = `${slug}-${newId}`
+  for (const [name, value] of Object.entries(initial)) {
+    const field = form.querySelector(`[name="${slug}-${newId}-${name}"]`)
+    if (field) field.value = value
+  }
 
   // Insert the form after the last form (or the template if there are none)
   const forms = [...empty.parentElement.children].filter(
@@ -811,6 +815,11 @@ window.addInlineForm = function addInlineForm(slug) {
 
   return false
 }
+
+// Adds an inline form with initial values, e.g. a colleague's address
+on("click", "[data-inline-form]", (_e, el) => {
+  window.addInlineForm(el.dataset.inlineForm, JSON.parse(el.dataset.initial))
+})
 
 // The menus of autocompletes and comboboxes may be wider than their input
 function keepInViewport(menu) {

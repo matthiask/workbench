@@ -757,6 +757,41 @@ class ContactsTest(TestCase):
         )
         self.assertFalse(organization.is_archived)
 
+    def test_copy_postal_address_from_colleague(self):
+        """The person form offers the distinct addresses of active colleagues
+        which the person doesn't have yet"""
+        organization = factories.OrganizationFactory.create()
+        person, colleague, other, archived = (
+            factories.PersonFactory.create(
+                organization=organization, given_name=name, is_archived=is_archived
+            )
+            for name, is_archived in [
+                ("Anna", False),
+                ("Bea", False),
+                ("Carl", False),
+                ("Dora", True),
+            ]
+        )
+        address = {"street": "Hauptstrasse", "postal_code": "8000", "city": "Zürich"}
+        person.postaladdresses.create(**address, house_number="1")
+        colleague.postaladdresses.create(**address, house_number="1")
+        colleague.postaladdresses.create(**address, house_number="2", type="Home")
+        other.postaladdresses.create(**address, house_number=" 2 ")
+        archived.postaladdresses.create(**address, house_number="3")
+
+        self.client.force_login(person.primary_contact)
+        response = self.client.get(person.urls["update"])
+        self.assertContains(response, "Copy from colleague")
+        self.assertContains(response, "Hauptstrasse 2, 8000 Zürich")
+        self.assertContains(response, "Bea Nachname, Carl Nachname")
+        self.assertContains(response, "&quot;house_number&quot;: &quot;2&quot;")
+        self.assertContains(response, "&quot;type&quot;: &quot;Home&quot;")
+        self.assertNotContains(response, "Hauptstrasse 1,")
+        self.assertNotContains(response, "Hauptstrasse 3")
+
+        response = self.client.get(archived.urls["update"])
+        self.assertContains(response, "Hauptstrasse 1, 8000 Zürich")
+
     def test_create_person_with_preselected_organization(self):
         """Adding a person to an existing org. preselects the organization"""
         organization = factories.OrganizationFactory.create(name="ABCD")

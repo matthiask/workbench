@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 08:02+0100\n"
+"POT-Creation-Date: 2026-11-11 08:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5079,6 +5079,10 @@ msgstr "Letzte Geschäfte"
 #, python-format
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
+
+#: workbench/templates/contacts/person_form.html
+msgid "Copy from colleague"
+msgstr "Von Kolleg:in übernehmen"
 
 #: workbench/templates/credit_control/creditentry_detail.html
 msgid "invoice total"

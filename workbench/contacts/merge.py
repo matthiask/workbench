@@ -9,7 +9,7 @@ from django.db.models import Count, Q, Value
 from django.db.models.functions import Concat, Lower, Trim
 from django.utils.translation import gettext as _, ngettext
 
-from workbench.contacts.models import EmailAddress, Person
+from workbench.contacts.models import ADDRESS_FIELDS, EmailAddress, Person
 from workbench.tools.substitute_with import substitute_with
 
 
@@ -87,18 +87,7 @@ def _detail_keys(details, fields):
 DETAILS = [
     ("emailaddresses", ["email"]),
     ("phonenumbers", ["phone_number"]),
-    (
-        "postaladdresses",
-        [
-            "street",
-            "house_number",
-            "address_suffix",
-            "postal_code",
-            "city",
-            "country",
-            "postal_address_override",
-        ],
-    ),
+    ("postaladdresses", ADDRESS_FIELDS),
 ]
 
 

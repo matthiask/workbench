@@ -1,4 +1,5 @@
 import datetime as dt
+import json
 from collections import OrderedDict
 
 from django import forms
@@ -29,6 +30,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
     in_group_q,
+    organization_postal_addresses,
     postal_address_choices,
     update_organization_archival,
 )
@@ -626,6 +628,21 @@ class PersonForm(ModelForm):
                 )
 
         return data
+
+    def colleague_postal_addresses(self):
+        """Addresses of colleagues, to be copied in the postal addresses
+        formset"""
+        if not (self.instance.pk and self.instance.organization):
+            return []
+        return [
+            {
+                **address,
+                "initial": json.dumps({**address["fields"], "type": address["type"]}),
+            }
+            for address in organization_postal_addresses(
+                self.instance.organization, exclude_person=self.instance
+            )
+        ]
 
     def is_valid(self, *, ignore_warnings=False):
         return all(

@@ -85,6 +85,37 @@
           class="btn btn-quiet btn-sm"
           onclick="return addInlineForm('postaladdresses')"
         >{% include 'svg/plus.svg' %} {% translate 'postal address' %}</a>
+        {% with addresses=form.colleague_postal_addresses %}
+          {% if addresses %}
+            <span class="dropdown">
+              <button
+                type="button"
+                class="btn btn-quiet btn-sm dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {% translate 'Copy from colleague' %}
+              </button>
+              <div class="dropdown-menu">
+                {% for address in addresses %}
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    data-inline-form="postaladdresses"
+                    data-initial="{{ address.initial }}"
+                  >
+                    {{ address.line }}
+                    <small class="d-block text-secondary">
+                      {% for person in address.people %}{{ person.full_name }}{% if not forloop.last %},
+                        {% endif %}{% endfor %}
+                    </small>
+                  </button>
+                {% endfor %}
+              </div>
+            </span>
+          {% endif %}
+        {% endwith %}
       </div>
     </section>
   {% endif %}
