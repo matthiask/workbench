@@ -1512,6 +1512,14 @@ planned_work:
         result = self.wb("organizations", "show", organization.pk)
         self.assertIn("Altweg 2, 8000 Zürich", result.output)
         self.assertIn(f"Bea Nachname ({bea.pk})", result.output)
+        # The types show which addresses are private
+        result = self.wb("organizations", "show", other.pk)
+        self.assertRegex(result.output, r"Heimweg.*Privat")
+        data = json.loads(self.wb("organizations", "show", other.pk, "--json").output)
+        self.assertEqual(
+            {a["street"]: a["types"] for a in data["postal_addresses"]},
+            {"Altweg": ["Work"], "Heimweg": ["Privat"]},
+        )
 
         change = [
             "organizations",

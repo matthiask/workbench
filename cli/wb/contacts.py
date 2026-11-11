@@ -166,11 +166,14 @@ def _echo_organization(data):
         )
     console.print(table)
     if data["postal_addresses"]:
-        table = make_table("ID>", "Postal address", "People", title="Postal addresses")
+        table = make_table(
+            "ID>", "Postal address", "Type", "People", title="Postal addresses"
+        )
         for address in data["postal_addresses"]:
             table.add_row(
                 str(address["id"]),
                 address["value"],
+                ", ".join(address.get("types", [])),
                 ", ".join(
                     f"{person['full_name']} ({person['id']})"
                     for person in address["people"]

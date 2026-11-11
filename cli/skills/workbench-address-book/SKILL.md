@@ -144,9 +144,8 @@ look at the organization's website if they agree.
 
 Home addresses are excluded from the matching: they are private and never
 outdated addresses of the organization. `show` still lists every address of
-the active people without its type, so look up the types with `wb people
-show` (or `--json`) before proposing anything, and leave Home addresses out
-of the conflicts you show the user and of every change. When a
+the active people, with its type: leave Home (and other private) addresses
+out of the conflicts you show the user and of every change. When a
 person has two work addresses, one is often private (fix its type, see
 above) or old. Then change the old address for the people who still have
 it:

@@ -451,6 +451,9 @@ class OrganizationPostalAddressOut(Schema):
     city: str
     country: str = Field(description="ISO 3166-1 code, e.g. CH")
     postal_address_override: str
+    types: list[str] = Field(
+        description="Types of the people's addresses, e.g. Work or Home (private)"
+    )
     people: list[PersonSummary]
 
 
@@ -500,6 +503,7 @@ def organization_detail(request, organization_id: int):
             | {
                 "id": address["addresses"][0].pk,
                 "value": address["line"],
+                "types": list(dict.fromkeys(a.type for a in address["addresses"])),
                 "people": [
                     person_summary(person, request) for person in address["people"]
                 ],
