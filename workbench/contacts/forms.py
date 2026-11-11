@@ -191,7 +191,7 @@ class OrganizationSearchForm(Form):
                         _("Any projects or deals in the last 5 years"),
                     ),
                     ("no-group", _("No group")),
-                    ("no-people", _("No people")),
+                    ("no-people", _("No active people")),
                 ],
             ),
         ],

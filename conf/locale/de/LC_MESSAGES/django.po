@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 08:08+0100\n"
+"POT-Creation-Date: 2026-11-11 08:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1119,8 +1119,8 @@ msgid "No group"
 msgstr "Keine Gruppe"
 
 #: workbench/contacts/forms.py
-msgid "No people"
-msgstr "Keine Personen"
+msgid "No active people"
+msgstr "Keine aktiven Personen"
 
 #: workbench/contacts/forms.py
 msgid "Missing salutation (only w/email)"
