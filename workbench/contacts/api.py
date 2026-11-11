@@ -13,10 +13,12 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import (
     GroupForm,
     GroupSearchForm,
+    OrganizationMergeForm,
     PersonForm,
     PersonMergeForm,
     recent_projects_or_deals,
 )
+from workbench.contacts.merge import possible_duplicates
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -140,15 +142,25 @@ class OrganizationFilter(Schema):
     include_archived: bool = Field(default=False, description="Also archived contacts.")
 
 
+class OrganizationSearchFilter(OrganizationFilter):
+    without_active_people: bool = Field(
+        default=False,
+        description="Only organizations without active people, like the defined"
+        " search of the web interface",
+    )
+
+
 @router.get("/contacts/organizations/", response=list[OrganizationOut])
 @paginate
-def organization_list(request, filters: Query[OrganizationFilter]):
+def organization_list(request, filters: Query[OrganizationSearchFilter]):
     """Search organizations, e.g. the customer of a new project"""
     organizations = Organization.objects.order_by("name", "pk")
     if not filters.include_archived:
         organizations = organizations.active()
     if filters.q:
         organizations = organizations.search(filters.q)
+    if filters.without_active_people:
+        organizations = organizations.exclude(people__is_archived=False)
     return Serialized(
         organizations, lambda organization: organization_out(organization, request)
     )
@@ -251,6 +263,39 @@ def person_list(request, filters: Query[PersonFilter]):
     )
 
 
+class PersonDuplicateOut(PersonOut):
+    primary_contact: str
+    email_addresses: list[str]
+
+
+class DuplicatesOut(Schema):
+    people: list[PersonDuplicateOut]
+
+
+@router.get("/contacts/people/duplicates/", response=list[DuplicatesOut])
+@paginate
+def person_duplicates(request):
+    """Groups of possible duplicates like in the web interface: people with
+    the same name, or with the same email address and a common given or
+    family name; archived people only with active people of their
+    organization. The person to keep is usually the first (active, oldest)."""
+    return [
+        {
+            "people": [
+                person_list_out(person, request)
+                | {
+                    "primary_contact": person.primary_contact.get_short_name(),
+                    "email_addresses": [
+                        email.email for email in person.emailaddresses.all()
+                    ],
+                }
+                for person in group
+            ]
+        }
+        for group in possible_duplicates()
+    ]
+
+
 class OrganizationDetail(OrganizationOut):
     is_private_person: bool
     notes: str
@@ -275,6 +320,82 @@ def organization_detail(request, organization_id: int):
             person_summary(person, request) for person in organization.people.all()
         ],
     }
+
+
+class MergeIn(InputSchema):
+    into: int = Field(description="ID of the person or organization to keep")
+
+
+class OrganizationPatch(InputSchema):
+    primary_contact: str | None = Field(
+        default=None, description="Short name of an active user"
+    )
+    is_archived: bool | None = None
+
+
+def _organization_detail_out(organization, request):
+    return organization_detail(request, organization.pk)
+
+
+@router.patch(
+    "/contacts/organizations/{int:organization_id}/", response=OrganizationDetail
+)
+def organization_update(
+    request, organization_id: int, data: OrganizationPatch, *, dry_run: DryRun = False
+):
+    """Change the primary contact of an organization or archive it"""
+    organization = get_object_or_404(Organization, pk=organization_id)
+    if data.primary_contact is not None:
+        user = (
+            User.objects
+            .by_short_name(data.primary_contact)
+            .filter(is_active=True)
+            .first()
+        )
+        if not user:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "primary_contact"],
+                    "msg": _("Unknown or inactive user %r.") % data.primary_contact,
+                }
+            ])
+        organization.primary_contact = user
+    if data.is_archived is not None:
+        organization.is_archived = data.is_archived
+    with transaction.atomic():
+        organization.save()
+        result = _organization_detail_out(organization, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+@router.post(
+    "/contacts/organizations/{int:organization_id}/merge/",
+    response=OrganizationDetail,
+)
+def organization_merge(
+    request,
+    organization_id: int,
+    data: MergeIn,
+    *,
+    dry_run: DryRun = False,
+):
+    """Merge a duplicate organization into the organization to keep, like
+    in the web interface: people, projects, deals, invoices and groups move,
+    the duplicate is deleted. An inactive primary contact of the
+    organization kept is replaced by the duplicate's active one."""
+    duplicate = get_object_or_404(Organization, pk=organization_id)
+    form = OrganizationMergeForm(
+        {"into": data.into}, instance=duplicate, request=request, prefix=""
+    )
+    validate_form(form)
+    with transaction.atomic():
+        keep = form.save()
+        result = _organization_detail_out(keep, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
 
 
 class ContactDetail(Schema):
@@ -724,10 +845,6 @@ def person_update(
         if dry_run:
             transaction.set_rollback(True)
     return result
-
-
-class MergeIn(InputSchema):
-    into: int = Field(description="ID of the person to keep")
 
 
 @router.post("/contacts/people/{int:person_id}/merge/", response=PersonDetailOut)

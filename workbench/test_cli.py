@@ -979,6 +979,28 @@ planned_work:
         result = self.wb(*merge, "--ignore-warning", "other-organization")
         self.assertEqual(result.exit_code, 0, result.output)
 
+    def test_people_duplicates(self):
+        """Possible duplicates are listed in groups"""
+        keep = factories.PersonFactory.create(given_name="Anna", family_name="Muster")
+        keep.emailaddresses.create(email="anna@example.com")
+        duplicate = factories.PersonFactory.create(
+            given_name="Anna", family_name="Muster"
+        )
+        factories.PersonFactory.create(given_name="Bea", family_name="Muster")
+
+        result = self.wb("people", "duplicates")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("anna@example.com", result.output)
+        self.assertNotIn("Bea", result.output)
+
+        result = self.wb("people", "duplicates", "--json")
+        data = json.loads(result.output)
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(
+            [person["id"] for person in data["items"][0]["people"]],
+            [keep.pk, duplicate.pk],
+        )
+
     def test_invoices(self):
         """Invoices, projected and recurring invoices, and pagination"""
         project = factories.ProjectFactory.create(owned_by=self.user)

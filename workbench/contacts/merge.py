@@ -154,7 +154,7 @@ def _name():
 def _duplicates_queryset():
     return (
         Person.objects
-        .select_related("organization")
+        .select_related("organization", "primary_contact")
         .prefetch_related("emailaddresses")
         .order_by("is_archived", "pk")
     )

@@ -260,6 +260,41 @@ def update_person(
     _echo_person(data)
 
 
+@people.command("duplicates")
+@page_options
+@click.option("--json", "as_json", is_flag=True)
+def people_duplicates(limit, offset, as_json):
+    """Groups of possible duplicates: people with the same name, or with the
+    same email address and a common given or family name
+
+    The first person of a group is usually the one to keep (active, oldest),
+    merge the others with `wb people merge ID --into ID`."""
+    data = request(
+        "GET", "contacts/people/duplicates/", params=page_params(limit, offset)
+    )
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table(
+        "Group>", "ID>", "Name", "Organization", "Email addresses", "Primary contact"
+    )
+    for index, group in enumerate(data["items"], start=(offset or 0) + 1):
+        for person in group["people"]:
+            organization = person["organization"] or {}
+            table.add_row(
+                str(index),
+                link(person["id"], person["url"]),
+                link(person["full_name"], person["url"])
+                + (" (archived)" if person["is_archived"] else ""),
+                link(organization.get("name", ""), organization.get("url")),
+                ", ".join(person["email_addresses"]),
+                person["primary_contact"],
+            )
+        table.add_section()
+    console.print(table)
+    echo_more(data, offset, "groups")
+
+
 @people.command("reassign-suggestions")
 @click.option(
     "--from",
