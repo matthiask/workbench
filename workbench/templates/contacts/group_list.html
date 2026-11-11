@@ -12,7 +12,12 @@
   {% for group in object_list %}
     <div class="list-group-item wb-row align-items-center">
       <div class="wb-row-main">
-        <a href="{{ group.get_absolute_url }}" class="wb-row-title">{{ group }}</a>
+        <a href="{{ group.get_absolute_url }}" class="wb-row-title">
+          {% if group.is_pinned %}<span
+              title="{% translate 'is pinned' %}"
+            >{% include 'svg/pin.svg' %}</span>{% endif %}
+          {{ group }}
+        </a>
         <div class="wb-row-meta">
           <a href="{% url 'contacts_person_list' %}?g={{ group.pk }}">
             {% blocktranslate count count=group.people_count trimmed %}

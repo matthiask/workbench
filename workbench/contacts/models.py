@@ -42,12 +42,18 @@ class Group(Model):
         ),
     )
 
+    is_pinned = models.BooleanField(
+        _("is pinned"),
+        default=False,
+        help_text=_("Pinned groups are listed first, e.g. those of the company."),
+    )
+
     class Meta:
         constraints = [
             # The APIs find groups by their title, GroupForm validates it
             models.UniqueConstraint(Lower("title"), name="contacts_group_unique_title")
         ]
-        ordering = ("title",)
+        ordering = ("-is_pinned", Lower("title"), "pk")
         verbose_name = _("group")
         verbose_name_plural = _("groups")
 
@@ -337,7 +343,10 @@ class Person(Model):
                 for group in self.organization.groups.all()
                 if group.applies_to_organizations
             }
-        return sorted(groups.values(), key=lambda group: group.title.lower())
+        return sorted(
+            groups.values(),
+            key=lambda group: (not group.is_pinned, group.title.lower(), group.pk),
+        )
 
     def add_to_group(self, group):
         """Groups which apply to organizations go to the organization, like in

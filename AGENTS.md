@@ -416,6 +416,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   are members themselves. Turning the flag on moves existing memberships to
   the organizations (`Group.move_people_to_organizations()`), turning it off
   makes their people members (`move_organizations_to_people()`).
+  Pinned groups (`is_pinned`, e.g. the company's own) come first wherever
+  groups are listed (`Group._meta.ordering`, `Person.all_groups()`); `wb
+  groups update --pin`.
 - Offers are only linked to and unlinked from open deals, and only offers
   which aren't closed yet (in preparation, service group, offered): closing a
   deal settles its offers (those in preparation, which customers may have

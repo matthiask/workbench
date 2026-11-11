@@ -1307,6 +1307,32 @@ class GroupsTest(TestCase):
         response = self.client.get(person.urls["update"])
         self.assertContains(response, "Newsletter 2015")
 
+    def test_pinned_groups(self):
+        """Pinned groups come first, everywhere groups are listed"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        Group.objects.create(title="Alumni")
+        company = Group.objects.create(title="Zeta Team")
+        response = self.client.post(
+            company.urls["update"],
+            {"modal-title": "Zeta Team", "modal-is_pinned": "on"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(
+            [group.title for group in Group.objects.all()], ["Zeta Team", "Alumni"]
+        )
+
+        person = factories.PersonFactory.create()
+        person.groups.set(Group.objects.all())
+        self.assertEqual(
+            [group.title for group in person.all_groups()], ["Zeta Team", "Alumni"]
+        )
+        for url in [Group.urls["list"], Person.urls["list"], person.urls["update"]]:
+            with self.subTest(url=url):
+                content = self.client.get(url).content.decode()
+                self.assertLess(content.index("Zeta Team"), content.index("Alumni"))
+
     def test_group_titles_are_unique(self):
         """Titles of groups are unique, also archived ones, case-insensitive"""
         Group.objects.create(title="Christmas", is_archived=True)

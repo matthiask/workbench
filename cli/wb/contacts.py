@@ -879,6 +879,7 @@ def _echo_group(data, *, dry_run):
         note
         for note, flag in [
             ("applies to organizations", data["applies_to_organizations"]),
+            ("pinned", data["is_pinned"]),
             ("archived", data["is_archived"]),
         ]
         if flag
@@ -924,25 +925,29 @@ def create_group(title, applies_to_organizations, dry_run, as_json):
     default=None,
     help="Applying to organizations moves the memberships to the organizations.",
 )
+@click.option(
+    "--pin/--unpin", "is_pinned", default=None, help="Pinned groups are listed first."
+)
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_group(
-    group_id, title, is_archived, applies_to_organizations, dry_run, as_json
+    group_id, title, is_archived, applies_to_organizations, is_pinned, dry_run, as_json
 ):
-    """Rename or archive a group"""
+    """Rename, pin or archive a group"""
     data = {
         key: value
         for key, value in [
             ("title", title),
             ("is_archived", is_archived),
             ("applies_to_organizations", applies_to_organizations),
+            ("is_pinned", is_pinned),
         ]
         if value is not None
     }
     if not data:
         terminate(
             "Nothing to change, pass --title, --archive, --unarchive,"
-            " --applies-to-organizations or --applies-to-people."
+            " --applies-to-organizations, --applies-to-people, --pin or --unpin."
         )
     data = request(
         "PATCH",

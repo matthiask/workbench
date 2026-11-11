@@ -1113,6 +1113,7 @@ class GroupOut(Schema):
     title: str
     is_archived: bool
     applies_to_organizations: bool
+    is_pinned: bool = Field(description="Pinned groups are listed first")
     people_count: int | None = Field(
         default=None, description="Active people, also through organizations"
     )
@@ -1133,6 +1134,7 @@ def _group_out(group, request):
         "title": group.title,
         "is_archived": group.is_archived,
         "applies_to_organizations": group.applies_to_organizations,
+        "is_pinned": group.is_pinned,
         "people_count": getattr(group, "people_count", None),
         "organizations_count": getattr(group, "organizations_count", None),
     }
@@ -1166,6 +1168,9 @@ class GroupPatch(InputSchema):
         default=None,
         description="Turning it on moves the people's memberships to their"
         " organizations, like in the web interface.",
+    )
+    is_pinned: bool | None = Field(
+        default=None, description="Pinned groups are listed first"
     )
     is_archived: bool | None = None
 
@@ -1206,7 +1211,7 @@ def group_create(request, data: GroupIn, *, dry_run: DryRun = False):
 
 @router.patch("/contacts/groups/{int:group_id}/", response=GroupOut)
 def group_update(request, group_id: int, data: GroupPatch, *, dry_run: DryRun = False):
-    """Rename or archive a group, or let it apply to organizations"""
+    """Rename, pin or archive a group, or let it apply to organizations"""
     group = get_object_or_404(Group, pk=group_id)
     values = _group_values(group, request) | data.dict(
         exclude_unset=True, exclude_none=True

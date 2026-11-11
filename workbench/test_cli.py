@@ -446,8 +446,12 @@ email_addresses:
         self.assertEqual(orphan.project_set.count(), 2)
 
         christmas = Group.objects.get(title="Christmas")
-        result = self.wb("groups", "update", christmas.pk, "--archive")
+        result = self.wb("groups", "update", christmas.pk, "--pin")
         self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("(pinned)", result.output)
+        result = self.wb("groups", "update", christmas.pk, "--unpin", "--archive")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertNotIn("pinned", result.output)
         self.assertIn("(archived)", result.output)
         result = self.wb("groups", "search", "--include-archived")
         self.assertIn("Christmas", result.output)

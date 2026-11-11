@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count, Func, OuterRef, Prefetch, Q, Subquery
-from django.db.models.functions import Coalesce, Lower
+from django.db.models.functions import Coalesce
 from django.forms.models import inlineformset_factory
 from django.http import Http404
 from django.template.defaultfilters import linebreaksbr
@@ -52,7 +52,7 @@ from workbench.tools.xlsx import WorkbenchXLSXDocument
 def group_choices():
     """Groups for filters, archived groups separately at the end"""
     groups = {False: [], True: []}
-    for group in Group.objects.order_by(Lower("title"), "pk"):
+    for group in Group.objects.all():
         groups[group.is_archived].append((group.pk, group.title))
     return [
         ("", _("All groups")),
@@ -96,7 +96,7 @@ class GroupSearchForm(Form):
             organizations_count=_member_count(Organization, is_archived=False),
             archived_people_count=_people_count(is_archived=True),
             archived_organizations_count=_member_count(Organization, is_archived=True),
-        ).order_by(Lower("title"), "pk")
+        ).order_by(*Group._meta.ordering)
 
 
 def _member_count(model, *, is_archived):
@@ -135,7 +135,7 @@ def _people_count(*, is_archived):
 class GroupForm(ModelForm):
     class Meta:
         model = Group
-        fields = ["title", "applies_to_organizations", "is_archived"]
+        fields = ["title", "applies_to_organizations", "is_pinned", "is_archived"]
 
     def clean_title(self):
         """The APIs find groups by their title"""
