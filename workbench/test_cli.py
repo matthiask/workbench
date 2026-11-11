@@ -1278,6 +1278,40 @@ planned_work:
         phone.refresh_from_db()
         self.assertEqual((email.type, phone.type), ("Home", "Mobile"))
 
+        address = person.postaladdresses.create(
+            type="Work", street="Altweg", postal_code="8000", city="Zürich"
+        )
+        result = self.wb(
+            "people",
+            "change-address",
+            person.pk,
+            "--address",
+            address.pk,
+            "--street",
+            "Neuweg",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Neuweg", result.output)
+        address.refresh_from_db()
+        self.assertEqual(address.street, "Altweg")
+        result = self.wb("people", "change-address", person.pk, "--address", address.pk)
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb(
+            "people",
+            "change-address",
+            person.pk,
+            "--address",
+            address.pk,
+            "--street",
+            "Neuweg",
+            "--city",
+            "Bern",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        address.refresh_from_db()
+        self.assertEqual((address.street, address.city), ("Neuweg", "Bern"))
+
         result = self.wb(
             "organizations",
             "update",

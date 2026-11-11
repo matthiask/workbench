@@ -149,7 +149,12 @@ it:
         --street "Neuweg" --house-number 2 --postal-code 8001 --city Zürich --dry-run
 
 Fields which aren't given stay; `--person ID` (repeated) limits the change
-to some people. People without a complete address:
+to some people. A single person's address (also of people without an
+organization, e.g. who moved) changes with:
+
+    wb people change-address <person_id> --address <address_id> --city Bern --dry-run
+
+People without a complete address:
 
     wb people search --missing-postal-address --organization <organization_id>
 

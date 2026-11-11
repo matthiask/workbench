@@ -341,6 +341,47 @@ class ContactsAPITest(TestCase):
             ],
         )
 
+    def test_change_postal_address(self):
+        """A postal address of a person is changed, fields which aren't given
+        stay"""
+        person = factories.PersonFactory.create()
+        address = person.postaladdresses.create(
+            type="Work", street="Altweg", postal_code="8000", city="Zürich"
+        )
+        other = factories.PersonFactory.create().postaladdresses.create(
+            type="Work", street="Weg", postal_code="8000", city="Zürich"
+        )
+        self.client.force_login(factories.UserFactory.create())
+
+        def patch(pk, data):
+            return self.client.patch(
+                f"/api/contacts/people/{person.pk}/postal-addresses/{pk}/",
+                data,
+                content_type="application/json",
+            )
+
+        response = patch(
+            address.pk, {"street": "Neuweg", "house_number": "2", "type": "Home"}
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["postal_addresses"][0]["value"],
+            f"{person.full_name}\nNeuweg 2\n8000 Zürich",
+        )
+        address.refresh_from_db()
+        self.assertEqual((address.street, address.city), ("Neuweg", "Zürich"))
+        # Private addresses come after work addresses
+        self.assertEqual((address.type, address.weight), ("Home", 10))
+        self.assertEqual([p.pk for p in Person.objects.search("Neuweg")], [person.pk])
+
+        self.assertEqual(patch(other.pk, {"city": "Bern"}).status_code, 404)
+        response = patch(address.pk, {"postal_code": "", "country": "XX"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            {tuple(e["loc"]) for e in response.json()["detail"]},
+            {("body", "data", "postal_code"), ("body", "data", "country")},
+        )
+
     def test_update_organization(self):
         """Organizations get a new name, notes, billing address and groups"""
         industry = Group.objects.create(title="Industry", applies_to_organizations=True)

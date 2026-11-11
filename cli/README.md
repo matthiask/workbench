@@ -195,6 +195,7 @@ postal addresses, e.g. old ones, which are changed for several people at once:
     wb organizations search --several-postal-addresses
     wb organizations show 45
     wb organizations change-address 45 --address 789 --street Neuweg --house-number 2
+    wb people change-address 123 --address 679 --street Neuweg --house-number 2
     wb organizations search --without-active-people
 
 Groups are listed, created and archived with `wb groups`:

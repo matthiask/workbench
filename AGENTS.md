@@ -426,7 +426,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   at once (`organization_postal_addresses()`, `OrganizationPostalAddressForm`;
   `wb organizations show` lists them, `wb organizations change-address`,
   `wb organizations search --several-postal-addresses` finds outdated ones,
-  private addresses (`HOME_TYPE`) don't count).
+  private addresses (`HOME_TYPE`) don't count); `wb people change-address`
+  changes one address of one person (`PATCH
+  /api/contacts/people/<id>/postal-addresses/<id>/`, also its type).
   Organizations have a central email address (e.g. info@, shown on their
   people, so it doesn't belong on them) and an optional accounts payable
   address; payment reminders suggest the accounts payable address, the

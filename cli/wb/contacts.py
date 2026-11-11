@@ -660,6 +660,75 @@ def update_person(
     _echo_person(data)
 
 
+@people.command("change-address")
+@click.argument("person_id", type=int)
+@click.option(
+    "--address",
+    "address_id",
+    type=int,
+    required=True,
+    help="ID of the address from `wb people show`.",
+)
+@click.option("--type", "type_", help="E.g. Work or Home.")
+@click.option("--street")
+@click.option("--house-number")
+@click.option("--address-suffix")
+@click.option("--postal-code")
+@click.option("--city")
+@click.option("--country", help="ISO 3166-1 code, e.g. CH.")
+@click.option(
+    "--override",
+    help="Replaces the whole address if set; an empty string removes it.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate and show the result only.")
+@click.option("--json", "as_json", is_flag=True)
+def change_person_address(
+    person_id,
+    address_id,
+    type_,
+    street,
+    house_number,
+    address_suffix,
+    postal_code,
+    city,
+    country,
+    override,
+    dry_run,
+    as_json,
+):
+    """Change a postal address of a person; fields which aren't given stay.
+    `wb organizations change-address` changes an address of several people
+    at once."""
+    data = {
+        key: value
+        for key, value in [
+            ("type", type_),
+            ("street", street),
+            ("house_number", house_number),
+            ("address_suffix", address_suffix),
+            ("postal_code", postal_code),
+            ("city", city),
+            ("country", country),
+            ("postal_address_override", override),
+        ]
+        if value is not None
+    }
+    if not data:
+        terminate("Nothing to change, pass the fields of the new address.")
+    data = request(
+        "PATCH",
+        f"contacts/people/{person_id}/postal-addresses/{address_id}/",
+        json=data,
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing changed:")
+    _echo_person(data)
+
+
 @people.command("duplicates")
 @page_options
 @click.option("--json", "as_json", is_flag=True)

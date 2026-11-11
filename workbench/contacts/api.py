@@ -1446,6 +1446,60 @@ def person_update(
     return result
 
 
+class PostalAddressPatch(InputSchema):
+    """Fields which aren't given keep their current value"""
+
+    type: str | None = Field(default=None, description="E.g. Work or Home")
+    street: str | None = None
+    house_number: str | None = None
+    address_suffix: str | None = None
+    postal_code: str | None = None
+    city: str | None = None
+    country: str | None = Field(default=None, description="ISO 3166-1 code, e.g. CH")
+    postal_address_override: str | None = Field(
+        default=None, description="Completely overrides the postal address if set"
+    )
+
+
+@router.patch(
+    "/contacts/people/{int:person_id}/postal-addresses/{int:address_id}/",
+    response=PersonDetailOut,
+)
+def person_change_postal_address(
+    request,
+    person_id: int,
+    address_id: int,
+    data: PostalAddressPatch,
+    *,
+    dry_run: DryRun = False,
+):
+    """Change a postal address of a person; ``organizations/<id>/postal-address/``
+    changes an address of several people of an organization at once"""
+    address = get_object_or_404(
+        PostalAddress.objects.select_related("person"),
+        pk=address_id,
+        person=person_id,
+    )
+    for field, value in data.dict(exclude_none=True).items():
+        setattr(address, field, value.strip())
+    errors = []
+    full_clean(address, ["body", "data"], errors, exclude=["person"])
+    if errors:
+        raise ValidationError(errors)
+    with transaction.atomic():
+        # Also updates the weight
+        address.save()
+        # Updates the full text search
+        address.person.save()
+        person = Person.objects.select_related("organization", "primary_contact").get(
+            pk=person_id
+        )
+        result = person_out(person, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
 @router.post("/contacts/people/{int:person_id}/merge/", response=PersonDetailOut)
 def person_merge(
     request,
