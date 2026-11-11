@@ -689,15 +689,18 @@ class PersonForm(ModelForm):
         formset"""
         if not (self.instance.pk and self.instance.organization):
             return []
-        return [
-            {
-                **address,
-                "initial": json.dumps({**address["fields"], "type": address["type"]}),
-            }
-            for address in organization_postal_addresses(
-                self.instance.organization, exclude_person=self.instance
-            )
-        ]
+        addresses = organization_postal_addresses(
+            self.instance.organization, exclude_person=self.instance
+        )
+        for address in addresses:
+            fields = {**address["fields"], "type": address["type"]}
+            # Overrides often contain the name of the colleague
+            for person in address["people"]:
+                fields["postal_address_override"] = fields[
+                    "postal_address_override"
+                ].replace(person.full_name, self.instance.full_name)
+            address["initial"] = json.dumps(fields)
+        return addresses
 
     def is_valid(self, *, ignore_warnings=False):
         return all(

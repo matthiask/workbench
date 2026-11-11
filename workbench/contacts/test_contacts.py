@@ -29,6 +29,7 @@ from workbench.contacts.models import (
     Organization,
     Person,
     PhoneNumber,
+    PostalAddress,
     organization_postal_addresses,
 )
 from workbench.contacts.urls import autocomplete_filter
@@ -797,6 +798,18 @@ class ContactsTest(TestCase):
 
         response = self.client.get(archived.urls["update"])
         self.assertContains(response, "Hauptstrasse 1, 8000 Zürich")
+
+        # Overrides get the person's name instead of the colleague's
+        PostalAddress.objects.all().delete()
+        colleague.postaladdresses.create(
+            **address,
+            postal_address_override="Org\nBea Nachname\nPostfach\n8000 Zürich",
+        )
+        response = self.client.get(person.urls["update"])
+        self.assertContains(response, "Org, Bea Nachname, Postfach, 8000 Zürich")
+        self.assertContains(
+            response, "Org\\nAnna Nachname\\nPostfach\\n8000 Z\\u00fcrich"
+        )
 
     def test_change_postal_address_of_organization(self):
         """An address of an organization's people is changed for the people
