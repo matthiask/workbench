@@ -13,11 +13,10 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import (
     GroupForm,
     GroupSearchForm,
-    PersonDeleteForm,
     PersonForm,
+    PersonMergeForm,
     recent_projects_or_deals,
 )
-from workbench.contacts.merge import merge_people
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -732,8 +731,7 @@ def person_merge(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Merge a duplicate into the person to keep, like deleting a person in
-    the web interface: projects, deals, invoices, the linked user, contact
+    """Merge a duplicate into the person to keep, like in the web interface: projects, deals, invoices, the linked user, contact
     details (except those the person to keep has already) and groups move,
     notes are appended; the duplicate is deleted
 
@@ -749,14 +747,12 @@ def person_merge(
                 "msg": _("Unknown person %r.") % data.into,
             }
         ])
-    form = PersonDeleteForm(
-        {"merge_into": keep.pk}, instance=duplicate, request=request
+    form = PersonMergeForm(
+        {"into": keep.pk}, instance=duplicate, request=request, prefix=""
     )
-    validate_form(
-        form, fields={"merge_into": ["into"]}, ignore_warnings=ignore_warnings
-    )
+    validate_form(form, ignore_warnings=ignore_warnings)
     with transaction.atomic():
-        merge_people(duplicate=duplicate, keep=keep)
+        form.save()
         keep = Person.objects.select_related("organization", "primary_contact").get(
             pk=keep.pk
         )

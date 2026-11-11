@@ -14,7 +14,13 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from workbench.accounts.models import User
-from workbench.contacts.merge import merge_errors, merge_people, merge_warnings
+from workbench.contacts.merge import (
+    contact_of,
+    merge_errors,
+    merge_organizations,
+    merge_people,
+    merge_warnings,
+)
 from workbench.contacts.models import (
     EmailAddress,
     Group,
@@ -33,7 +39,6 @@ from workbench.tools.forms import (
     add_prefix,
 )
 from workbench.tools.models import ProtectedError, SlowCollector
-from workbench.tools.substitute_with import substitute_with
 from workbench.tools.vcard import person_to_vcard, render_vcard_response
 from workbench.tools.xlsx import WorkbenchXLSXDocument
 
@@ -399,32 +404,53 @@ class OrganizationDeleteForm(ModelForm):
         try:
             collector.collect([self.instance])
         except ProtectedError:
-            self.fields["substitute_with"] = forms.ModelChoiceField(
-                Organization.objects.exclude(pk=self.instance.pk),
-                widget=Autocomplete(model=Organization),
-                label=_("substitute with"),
-            )
+            self.protected = True
             if self.request.method == "GET":
-                messages.info(
-                    self.request,
-                    _(
-                        "This organization has related objects. It is"
-                        " therefore not possible to delete it, but you"
-                        " may reassign the related objects to a different"
-                        " organization."
-                        " Alternatively, you can also archive the organization."
-                    ),
-                )
+                messages.info(self.request, self.protected_message())
+        else:
+            self.protected = False
+
+    def protected_message(self):
+        return _(
+            "This organization has related objects. It is therefore not"
+            " possible to delete it, but you may merge it into a different"
+            " organization. Alternatively, you can also archive the"
+            " organization."
+        )
+
+    def clean(self):
+        data = super().clean()
+        if self.protected:
+            self.add_error(None, self.protected_message())
+        return data
 
     def delete(self):
-        if "substitute_with" in self.fields:
-            keep = self.cleaned_data["substitute_with"]
-            # Groups (e.g. industries) aren't moved by substitute_with()
-            keep.groups.add(*self.instance.groups.all())
-            substitute_with(to_delete=self.instance, keep=keep)
-            keep.refresh_related_fts()
-        else:
-            self.instance.delete()
+        self.instance.delete()
+
+
+@add_prefix("modal")
+class OrganizationMergeForm(Form):
+    """Merge a duplicate organization into the organization to keep, see
+    merge_organizations()"""
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop("instance")
+        super().__init__(*args, **kwargs)
+        self.fields["into"] = forms.ModelChoiceField(
+            Organization.objects.exclude(pk=self.instance.pk),
+            widget=Autocomplete(model=Organization),
+            label=_("merge into"),
+            help_text=_(
+                "Moves people, projects, deals, invoices and groups to this"
+                " organization, e.g. if it exists twice. This organization"
+                " is deleted."
+            ),
+        )
+
+    def save(self):
+        keep = self.cleaned_data["into"]
+        merge_organizations(duplicate=self.instance, keep=keep)
+        return keep
 
 
 class PersonDeleteForm(ModelForm):
@@ -438,50 +464,70 @@ class PersonDeleteForm(ModelForm):
         try:
             collector.collect([self.instance])
         except ProtectedError:
-            required = True
+            self.protected = True
+            if self.request.method == "GET":
+                messages.info(self.request, self.protected_message())
         else:
-            required = False
-        self.fields["merge_into"] = forms.ModelChoiceField(
-            Person.objects.exclude(pk=self.instance.pk),
-            widget=Autocomplete(model=Person),
-            label=_("merge into"),
-            required=required,
-            help_text=_(
-                "Moves projects, deals, invoices, contact details and groups"
-                " to this person, e.g. if someone exists twice. Otherwise they"
-                " lose their contact."
-            ),
+            self.protected = False
+
+    def protected_message(self):
+        return _(
+            "This person is linked to a user. It is therefore not possible"
+            " to delete them, but you may merge them into a different"
+            " person. Alternatively, you can also archive the person."
         )
-        if required and self.request.method == "GET":
-            messages.info(
-                self.request,
-                _(
-                    "This person is linked to a user. It is therefore not"
-                    " possible to delete them, but you may merge them into a"
-                    " different person. Alternatively, you can also archive"
-                    " the person."
-                ),
-            )
 
     def clean(self):
         data = super().clean()
-        if keep := data.get("merge_into"):
+        if self.protected:
+            self.add_error(None, self.protected_message())
+        elif related := contact_of(self.instance):
+            self.add_warning(
+                _(
+                    "%(person)s is the contact of %(related)s, which lose"
+                    " their contact when deleting them. Merge them into a"
+                    " different person instead if they exist twice."
+                )
+                % {"person": self.instance, "related": ", ".join(related)},
+                code="lose-contact",
+            )
+        return data
+
+    def delete(self):
+        self.instance.delete()
+
+
+@add_prefix("modal")
+class PersonMergeForm(Form):
+    """Merge a duplicate into the person to keep, see merge_people()"""
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop("instance")
+        super().__init__(*args, **kwargs)
+        self.fields["into"] = forms.ModelChoiceField(
+            Person.objects.exclude(pk=self.instance.pk),
+            widget=Autocomplete(model=Person),
+            label=_("merge into"),
+            help_text=_(
+                "Moves projects, deals, invoices, contact details and groups"
+                " to this person, e.g. if someone exists twice. This person"
+                " is deleted."
+            ),
+        )
+
+    def clean(self):
+        data = super().clean()
+        if keep := data.get("into"):
             for error in merge_errors(duplicate=self.instance, keep=keep):
-                self.add_error("merge_into", error)
+                self.add_error("into", error)
             for message, code in merge_warnings(duplicate=self.instance, keep=keep):
                 self.add_warning(message, code=code)
         return data
 
-    def delete(self):
-        if keep := self.cleaned_data.get("merge_into"):
-            merge_people(duplicate=self.instance, keep=keep)
-            self.success_url = keep.get_absolute_url()
-            self.success_message = _("%(duplicate)s has been merged into %(keep)s.") % {
-                "duplicate": self.instance,
-                "keep": keep,
-            }
-        else:
-            self.instance.delete()
+    def save(self):
+        keep = self.cleaned_data["into"]
+        merge_people(duplicate=self.instance, keep=keep)
+        return keep
 
 
 class PersonForm(ModelForm):

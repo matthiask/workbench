@@ -2,7 +2,7 @@
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, ngettext
 
 from workbench.tools.substitute_with import substitute_with
 
@@ -26,20 +26,25 @@ def merge_errors(*, duplicate, keep):
     return []
 
 
-def merge_warnings(*, duplicate, keep):
-    """``(message, code)`` of things to confirm before merging"""
+def contact_of(person):
+    """``["2 projects", "1 deal"]`` of the objects the person is the contact
+    of, which lose their contact when deleting the person"""
     from workbench.deals.models import Deal
     from workbench.invoices.models import Invoice, RecurringInvoice
     from workbench.projects.models import Project
 
+    return [
+        f"{count} {ngettext(model._meta.verbose_name, model._meta.verbose_name_plural, count)}"
+        for model in [Project, Deal, Invoice, RecurringInvoice]
+        if (count := model.objects.filter(contact=person).count())
+    ]
+
+
+def merge_warnings(*, duplicate, keep):
+    """``(message, code)`` of things to confirm before merging"""
     if duplicate.organization_id == keep.organization_id:
         return []
-    related = [
-        f"{count} {model._meta.verbose_name_plural}"
-        for model in [Project, Deal, Invoice, RecurringInvoice]
-        if (count := model.objects.filter(contact=duplicate).count())
-    ]
-    if not related:
+    if not (related := contact_of(duplicate)):
         return []
     return [
         (
@@ -52,6 +57,18 @@ def merge_warnings(*, duplicate, keep):
             "other-organization",
         )
     ]
+
+
+def merge_organizations(*, duplicate, keep):
+    """Move everything of the duplicate organization (people, projects,
+    deals, invoices, ...) to the organization to keep and delete it"""
+    if duplicate.pk == keep.pk:
+        raise ValidationError(_("An organization cannot be merged with itself."))
+    with transaction.atomic():
+        # Groups (e.g. industries) aren't moved by substitute_with()
+        keep.groups.add(*duplicate.groups.all())
+        substitute_with(to_delete=duplicate, keep=keep)
+        keep.refresh_related_fts()
 
 
 def _detail_keys(details, fields):

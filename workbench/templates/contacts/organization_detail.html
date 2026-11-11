@@ -55,11 +55,11 @@
           <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}" class="dropdown-item">
             {% translate 'invoices'|capfirst %}
           </a>
+          <a href="{{ object.urls.merge }}" class="dropdown-item" data-ajaxmodal>
+            {% translate 'Merge into another organization' %}
+          </a>
           <div class="dropdown-divider"></div>
-          <a
-            href="{{ object.urls.delete }}"
-            class="dropdown-item text-danger"
-          >{% translate 'Delete or substitute' %}</a>
+          <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
         </div>
       </span>
     </div>

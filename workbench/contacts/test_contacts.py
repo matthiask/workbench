@@ -26,6 +26,7 @@ from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.planning.models import ExternalWork
 from workbench.projects.models import Project
+from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import messages
 from workbench.tools.validation import monday
 from workbench.tools.vcard import person_to_vcard
@@ -410,7 +411,7 @@ class ContactsTest(TestCase):
         self.client.force_login(organization.primary_contact)
 
         response = self.client.get(organization.urls["delete"])
-        self.assertNotContains(response, "substitute_with")
+        self.assertNotContains(response, "merge it into")
 
         response = self.client.post(organization.urls["delete"])
         self.assertRedirects(response, organization.urls["list"])
@@ -418,36 +419,22 @@ class ContactsTest(TestCase):
         self.assertEqual(Organization.objects.count(), 0)
 
     def test_organization_delete_with_relations(self):
-        """Organizations with relations can be merged with a different org."""
+        """Organizations with relations aren't deleted but may be merged"""
         organization = factories.OrganizationFactory.create()
-        person = factories.PersonFactory.create(organization=organization)
+        factories.PersonFactory.create(organization=organization)
         self.client.force_login(organization.primary_contact)
 
-        group = Group.objects.create(title="A")
-        organization.groups.set([group])
-
         response = self.client.get(organization.urls["delete"])
-        self.assertContains(response, "substitute_with")
+        self.assertContains(response, "you may merge it into")
 
         response = self.client.post(organization.urls["delete"])
-        self.assertEqual(response.status_code, 200)
-
-        new = factories.OrganizationFactory.create()
-        response = self.client.post(
-            organization.urls["delete"], {"substitute_with": new.pk}
-        )
-        self.assertRedirects(response, organization.urls["list"])
-
+        self.assertContains(response, "you may merge it into")
         self.assertEqual(Organization.objects.count(), 1)
 
-        person.refresh_from_db()
-        self.assertEqual(person.organization, new)
-        # The groups (e.g. industries) of the organization move too
-        self.assertEqual(list(new.groups.all()), [group])
-
-    def test_organization_delete_with_external_work(self):
-        """External work an organization provides moves to the substitute"""
+    def test_organization_merge(self):
+        """Merging organizations moves people, external work and groups"""
         organization = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(organization=organization)
         project = factories.ProjectFactory.create()
         work = ExternalWork.objects.create(
             project=project,
@@ -456,18 +443,30 @@ class ContactsTest(TestCase):
             title="Printing",
             weeks=[monday()],
         )
-        self.client.force_login(organization.primary_contact)
-
-        response = self.client.get(organization.urls["delete"])
-        self.assertContains(response, "substitute_with")
-
+        group = Group.objects.create(title="A")
+        organization.groups.set([group])
         new = factories.OrganizationFactory.create()
-        response = self.client.post(
-            organization.urls["delete"], {"substitute_with": new.pk}
-        )
-        self.assertRedirects(response, organization.urls["list"])
+        self.client.force_login(organization.primary_contact)
+        url = organization.urls["merge"]
+        ajax = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.get(f"{url}?into={new.pk}", headers=ajax)
+        self.assertContains(response, 'name="modal-into"')
+        self.assertContains(response, f'value="{new.pk}"')
+
+        response = self.client.post(url, {"modal-into": organization.pk}, headers=ajax)
+        self.assertContains(response, "Select a valid choice.")
+
+        response = self.client.post(url, {"modal-into": new.pk}, headers=ajax)
+        self.assertEqual(response.status_code, 299)
+        self.assertEqual(response.json(), {"redirect": new.urls["detail"]})
+
+        self.assertFalse(Organization.objects.filter(pk=organization.pk).exists())
+        person.refresh_from_db()
+        self.assertEqual(person.organization, new)
         work.refresh_from_db()
         self.assertEqual(work.provided_by, new)
+        self.assertEqual(list(new.groups.all()), [group])
 
     def test_search_after_renaming_and_merging(self):
         """Renaming and merging contacts updates the search of related
@@ -504,10 +503,8 @@ class ContactsTest(TestCase):
 
         keep = factories.OrganizationFactory.create(name="Gammakeep")
         self.client.force_login(organization.primary_contact)
-        response = self.client.post(
-            organization.urls["delete"], {"substitute_with": keep.pk}
-        )
-        self.assertRedirects(response, organization.urls["list"])
+        response = self.client.post(organization.urls["merge"], {"modal-into": keep.pk})
+        self.assertRedirects(response, keep.urls["detail"])
         for queryset, instance in querysets:
             with self.subTest(model=queryset.model):
                 self.assertEqual(list(queryset.search("Gammakeep")), [instance])
@@ -581,31 +578,82 @@ class ContactsTest(TestCase):
             merge_people(duplicate=keep, keep=keep)
         self.assertEqual(Person.objects.count(), 2)
 
-    def test_person_delete_merge(self):
-        """People can be deleted or merged into a different person, which is
-        required if they are linked to a user"""
+    def test_person_delete(self):
+        """Deleting people warns if they are the contact of projects, deals
+        or invoices; people linked to users can't be deleted"""
         person = factories.PersonFactory.create()
         self.client.force_login(person.primary_contact)
 
-        response = self.client.get(person.urls["delete"])
-        self.assertContains(response, "merge_into")
         response = self.client.post(person.urls["delete"])
         self.assertRedirects(response, person.urls["list"])
         self.assertEqual(Person.objects.count(), 0)
 
         person = factories.PersonFactory.create()
-        project = factories.ProjectFactory.create(contact=person)
-        factories.UserFactory.create(person=person)
+        factories.ProjectFactory.create(contact=person)
         response = self.client.post(person.urls["delete"])
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "lose-contact")
+        self.assertContains(response, "is the contact of 1 project")
+        response = self.client.post(
+            person.urls["delete"], {WarningsForm.ignore_warnings_id: "lose-contact"}
+        )
+        self.assertRedirects(response, person.urls["list"])
+        self.assertFalse(Person.objects.filter(pk=person.pk).exists())
+
+        person = factories.PersonFactory.create()
+        factories.UserFactory.create(person=person)
+        response = self.client.get(person.urls["delete"])
+        self.assertContains(response, "you may merge them into")
+        response = self.client.post(person.urls["delete"])
+        self.assertContains(response, "you may merge them into")
         self.assertTrue(Person.objects.filter(pk=person.pk).exists())
 
-        keep = factories.PersonFactory.create()
-        response = self.client.post(person.urls["delete"], {"merge_into": keep.pk})
-        self.assertRedirects(response, keep.urls["detail"])
+    def test_person_merge(self):
+        """People are merged in a modal which goes to the person kept"""
+        person = factories.PersonFactory.create()
+        project = factories.ProjectFactory.create(contact=person)
+        factories.UserFactory.create(person=person)
+        keep = factories.PersonFactory.create(organization=person.organization)
+        self.client.force_login(person.primary_contact)
+        url = person.urls["merge"]
+        ajax = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.get(person.urls["detail"])
+        self.assertContains(response, url)
+
+        response = self.client.get(f"{url}?into={keep.pk}", headers=ajax)
+        self.assertContains(response, f'value="{keep.pk}"')
+
+        response = self.client.post(url, {"modal-into": person.pk}, headers=ajax)
+        self.assertContains(response, "Select a valid choice.")
+
+        response = self.client.post(url, {"modal-into": keep.pk}, headers=ajax)
+        self.assertEqual(response.status_code, 299)
+        self.assertEqual(response.json(), {"redirect": keep.urls["detail"]})
         self.assertFalse(Person.objects.filter(pk=person.pk).exists())
         project.refresh_from_db()
         self.assertEqual(project.contact, keep)
+        self.assertEqual(messages(response), [f"{person} has been merged into {keep}."])
+
+    def test_person_merge_warnings(self):
+        """Merging into people of other organizations is confirmed"""
+        project = factories.ProjectFactory.create()
+        person = project.contact
+        keep = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+        url = person.urls["merge"]
+        ajax = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.post(url, {"modal-into": keep.pk}, headers=ajax)
+        self.assertContains(response, "other-organization")
+        response = self.client.post(
+            url,
+            {
+                "modal-into": keep.pk,
+                WarningsForm.ignore_warnings_id: "other-organization",
+            },
+            headers=ajax,
+        )
+        self.assertEqual(response.status_code, 299)
 
     def test_create_person_with_preselected_organization(self):
         """Adding a person to an existing org. preselects the organization"""

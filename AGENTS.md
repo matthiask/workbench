@@ -135,7 +135,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   their organization's, only active users (`primary_contact_suggestions()` in
   `workbench/contacts/reassign.py`); people without a suggestion stay. `wb people merge ID --into ID`
   merges duplicates (`POST /api/contacts/people/<id>/merge/`, also in the
-  web interface when deleting a person; `merge_people()` in
+  web interface, `PersonMergeForm`; organizations are merged in the web
+  interface only, `merge_organizations()`; `merge_people()` in
   `workbench/contacts/merge.py`): reverse relations move with
   `substitute_with()`, groups are added with `add_to_group()`, details the
   person kept has already are dropped, notes are appended, the person kept

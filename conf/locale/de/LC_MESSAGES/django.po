@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 14:07+0100\n"
+"POT-Creation-Date: 2026-11-11 07:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1142,20 +1142,16 @@ msgid "people"
 msgstr "Personen"
 
 #: workbench/contacts/forms.py
-msgid "substitute with"
-msgstr "ersetzen durch"
-
-#: workbench/contacts/forms.py
-msgid "This organization has related objects. It is therefore not possible to delete it, but you may reassign the related objects to a different organization. Alternatively, you can also archive the organization."
-msgstr "Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, die Organisation zu löschen, aber Du kannst die Objekte mit einer anderen Organisation verbinden. Alternativ kannst Du diese Organisation auch archivieren."
+msgid "This organization has related objects. It is therefore not possible to delete it, but you may merge it into a different organization. Alternatively, you can also archive the organization."
+msgstr "Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, die Organisation zu löschen, aber Du kannst sie mit einer anderen Organisation zusammenführen. Alternativ kannst Du diese Organisation auch archivieren."
 
 #: workbench/contacts/forms.py
 msgid "merge into"
 msgstr "zusammenführen mit"
 
 #: workbench/contacts/forms.py
-msgid "Moves projects, deals, invoices, contact details and groups to this person, e.g. if someone exists twice. Otherwise they lose their contact."
-msgstr "Verschiebt Projekte, Deals, Rechnungen, Kontaktangaben und Gruppen zu dieser Person, z.B. wenn jemand doppelt erfasst ist. Sonst verlieren diese ihren Kontakt."
+msgid "Moves people, projects, deals, invoices and groups to this organization, e.g. if it exists twice. This organization is deleted."
+msgstr "Verschiebt Personen, Projekte, Deals, Rechnungen und Gruppen zu dieser Organisation, z.B. wenn sie doppelt erfasst ist. Diese Organisation wird gelöscht."
 
 #: workbench/contacts/forms.py
 msgid "This person is linked to a user. It is therefore not possible to delete them, but you may merge them into a different person. Alternatively, you can also archive the person."
@@ -1163,8 +1159,12 @@ msgstr "Diese Person ist mit einem:r Benutzer:in verknüpft. Es ist deshalb nich
 
 #: workbench/contacts/forms.py
 #, python-format
-msgid "%(duplicate)s has been merged into %(keep)s."
-msgstr "%(duplicate)s wurde mit %(keep)s zusammengeführt."
+msgid "%(person)s is the contact of %(related)s, which lose their contact when deleting them. Merge them into a different person instead if they exist twice."
+msgstr "%(person)s ist Kontakt von %(related)s, die beim Löschen ihren Kontakt verlieren. Führe die Person stattdessen mit einer anderen zusammen, wenn sie doppelt erfasst ist."
+
+#: workbench/contacts/forms.py
+msgid "Moves projects, deals, invoices, contact details and groups to this person, e.g. if someone exists twice. This person is deleted."
+msgstr "Verschiebt Projekte, Deals, Rechnungen, Kontaktangaben und Gruppen zu dieser Person, z.B. wenn jemand doppelt erfasst ist. Diese Person wird gelöscht."
 
 #: workbench/contacts/forms.py
 msgid "Enter any year and the day and the month of the birthday."
@@ -1199,6 +1199,10 @@ msgstr "Beide Personen sind mit einem:r Benutzer:in verknüpft, entferne zuerst 
 #, python-format
 msgid "%(keep)s doesn't belong to the organization of %(duplicate)s. The %(related)s of %(duplicate)s will need a new contact when changing their customer or contact."
 msgstr "%(keep)s gehört nicht zur Organisation von %(duplicate)s. Die %(related)s von %(duplicate)s brauchen einen neuen Kontakt, wenn ihr Kunde oder Kontakt geändert wird."
+
+#: workbench/contacts/merge.py
+msgid "An organization cannot be merged with itself."
+msgstr "Eine Organisation kann nicht mit sich selbst zusammengeführt werden."
 
 #: workbench/contacts/models.py workbench/deals/models.py
 msgid "is archived"
@@ -1373,6 +1377,16 @@ msgstr "Postadressen"
 #: workbench/templates/shortcuts.html
 msgid "Jump to person"
 msgstr "Zu Person springen"
+
+#: workbench/contacts/views.py
+#, python-format
+msgid "%(duplicate)s has been merged into %(keep)s."
+msgstr "%(duplicate)s wurde mit %(keep)s zusammengeführt."
+
+#: workbench/contacts/views.py workbench/projects/urls.py
+#, python-format
+msgid "Merge %(instance)s"
+msgstr "%(instance)s zusammenführen"
 
 #: workbench/credit_control/apps.py
 msgid "credit control"
@@ -4097,11 +4111,6 @@ msgstr "Budgetwarnung"
 msgid "Reassign logbook entries of %(instance)s"
 msgstr "Logbucheinträge von %(instance)s neu zuweisen"
 
-#: workbench/projects/urls.py
-#, python-format
-msgid "Merge %(instance)s"
-msgstr "%(instance)s zusammenführen"
-
 #: workbench/projects/views.py
 #, python-format
 msgid "until %s"
@@ -4493,6 +4502,7 @@ msgstr "Kopiere das Token jetzt, es wird nicht noch einmal angezeigt:"
 #: workbench/templates/accounts/api_tokens.html
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/contacts/group_form.html
+#: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
@@ -4983,8 +4993,8 @@ msgid "More actions"
 msgstr "Weitere Aktionen"
 
 #: workbench/templates/contacts/organization_detail.html
-msgid "Delete or substitute"
-msgstr "Löschen oder ersetzen"
+msgid "Merge into another organization"
+msgstr "Mit anderer Organisation zusammenführen"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/reporting/key_data.html
@@ -5016,6 +5026,10 @@ msgstr "Letzte Rechnungen"
 #: workbench/templates/contacts/organization_detail.html
 msgid "Recent offers"
 msgstr "Letzte Offerten"
+
+#: workbench/templates/contacts/person_detail.html
+msgid "Merge into another person"
+msgstr "Mit anderer Person zusammenführen"
 
 #: workbench/templates/contacts/person_detail.html
 msgid "Maps"
@@ -6512,6 +6526,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "substitute with"
+#~ msgstr "ersetzen durch"
+
+#~ msgid "Delete or substitute"
+#~ msgstr "Löschen oder ersetzen"
 
 #~ msgid "The offer has no service with this ID."
 #~ msgstr "Die Offerte hat keine Leistung mit dieser ID."

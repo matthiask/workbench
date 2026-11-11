@@ -7,12 +7,19 @@ from workbench.contacts.forms import (
     GroupSearchForm,
     OrganizationDeleteForm,
     OrganizationForm,
+    OrganizationMergeForm,
     PersonDeleteForm,
     PersonForm,
+    PersonMergeForm,
     PersonSearchForm,
 )
 from workbench.contacts.models import Group, Organization, Person
-from workbench.contacts.views import OrganizationListView, person_vcard, select
+from workbench.contacts.views import (
+    OrganizationListView,
+    merge,
+    person_vcard,
+    select,
+)
 
 
 def autocomplete_filter(*, request, queryset):
@@ -61,6 +68,12 @@ urlpatterns = [
         name="contacts_organization_delete",
     ),
     path(
+        "organizations/<int:pk>/merge/",
+        merge,
+        {"model": Organization, "form_class": OrganizationMergeForm},
+        name="contacts_organization_merge",
+    ),
+    path(
         "people/",
         generic.ListView.as_view(model=Person, search_form_class=PersonSearchForm),
         name="contacts_person_list",
@@ -95,6 +108,12 @@ urlpatterns = [
         "people/<int:pk>/delete/",
         generic.DeleteView.as_view(model=Person, delete_form_class=PersonDeleteForm),
         name="contacts_person_delete",
+    ),
+    path(
+        "people/<int:pk>/merge/",
+        merge,
+        {"model": Person, "form_class": PersonMergeForm},
+        name="contacts_person_merge",
     ),
     path("people/<int:pk>/vcard/", person_vcard, name="contacts_person_vcard"),
     path(
