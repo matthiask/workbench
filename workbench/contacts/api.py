@@ -148,6 +148,7 @@ class OrganizationSearchFilter(OrganizationFilter):
         description="Only organizations without active people, like the defined"
         " search of the web interface",
     )
+    primary_contact: str | None = Field(default=None, description="Short name")
 
 
 @router.get("/contacts/organizations/", response=list[OrganizationOut])
@@ -161,6 +162,13 @@ def organization_list(request, filters: Query[OrganizationSearchFilter]):
         organizations = organizations.search(filters.q)
     if filters.without_active_people:
         organizations = organizations.exclude(people__is_archived=False)
+    if filters.primary_contact:
+        user = User.objects.by_short_name(filters.primary_contact).first()
+        if not user:
+            raise _query_error(
+                "primary_contact", _("Unknown user %r.") % filters.primary_contact
+            )
+        organizations = organizations.filter(primary_contact=user)
     return Serialized(
         organizations, lambda organization: organization_out(organization, request)
     )

@@ -116,7 +116,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   The package `cli/wb/` has one module per noun (`wb/offers.py`); `wb/core.py`
   has the configuration, requests, output helpers and options they share.
   `wb contacts search` finds both organizations and people, `wb organizations
-  show` and `wb people show` show them. `wb people search` filters people like
+  show` and `wb people show` show them. `wb organizations search` filters
+  organizations (`--without-active-people`, `--primary-contact`), `wb
+  organizations update` changes their primary contact and archives them,
+  `wb organizations merge ID --into ID` merges duplicates
+  (`OrganizationMergeForm`, `merge_organizations()`). `wb people search` filters people like
   the people list of the web interface (`--group`, also through the
   organization, `--without-groups`, `--missing-postal-address` like the
   defined search, `Person.objects.without_complete_postal_address()`,

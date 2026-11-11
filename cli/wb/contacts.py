@@ -72,18 +72,64 @@ def search_contacts(query, include_archived, limit, offset, as_json):
 
 @cli.group()
 def organizations():
-    """Look at organizations, search them with `wb contacts search`"""
+    """Look at, search, change and merge organizations"""
 
 
-@organizations.command("show")
-@click.argument("organization_id", type=int)
+@organizations.command("search")
+@click.argument("query", nargs=-1)
+@click.option(
+    "--without-active-people",
+    is_flag=True,
+    help="Only organizations without active people.",
+)
+@click.option(
+    "--primary-contact", help="Short name.", shell_complete=complete_short_names
+)
+@click.option("--include-archived", is_flag=True, help="Also archived contacts.")
+@page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
-def show_organization(organization_id, as_json):
-    """Show an organization and its people"""
-    data = request("GET", f"contacts/organizations/{organization_id}/")
+def search_organizations(
+    query,
+    without_active_people,
+    primary_contact,
+    include_archived,
+    limit,
+    offset,
+    as_csv,
+    as_json,
+):
+    """Search organizations"""
+    params = {
+        "q": " ".join(query),
+        "include_archived": format_bool(include_archived),
+        "without_active_people": format_bool(without_active_people),
+    }
+    if primary_contact:
+        params["primary_contact"] = primary_contact
+    data = request(
+        "GET", "contacts/organizations/", params=params | page_params(limit, offset)
+    )
+    if as_csv:
+        echo_csv(data["items"])
+        echo_more(data, offset)
+        return
     if as_json:
         echo_json(data)
         return
+    table = make_table("ID>", "Organization")
+    for organization in data["items"]:
+        url = organization["url"]
+        table.add_row(
+            link(organization["id"], url),
+            link(organization["name"], url)
+            + (" (archived)" if organization["is_archived"] else ""),
+        )
+    console.print(table)
+    echo_more(data, offset, "organizations")
+
+
+def _echo_organization(data):
     echo_fields(
         data["name"] + (" (archived)" if data["is_archived"] else ""),
         [
@@ -105,6 +151,81 @@ def show_organization(organization_id, as_json):
             + (" (archived)" if person["is_archived"] else ""),
         )
     console.print(table)
+
+
+@organizations.command("show")
+@click.argument("organization_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_organization(organization_id, as_json):
+    """Show an organization and its people"""
+    data = request("GET", f"contacts/organizations/{organization_id}/")
+    echo_json(data) if as_json else _echo_organization(data)
+
+
+@organizations.command("update")
+@click.argument("organization_id", type=int)
+@click.option(
+    "--primary-contact", help="Short name.", shell_complete=complete_short_names
+)
+@click.option("--archive/--unarchive", "is_archived", default=None)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_organization(
+    organization_id, primary_contact, is_archived, dry_run, as_json
+):
+    """Change the primary contact of an organization or archive it"""
+    data = {
+        key: value
+        for key, value in [
+            ("primary_contact", primary_contact),
+            ("is_archived", is_archived),
+        ]
+        if value is not None
+    }
+    if not data:
+        terminate(
+            "Nothing to change, pass --primary-contact, --archive or --unarchive."
+        )
+    data = request(
+        "PATCH",
+        f"contacts/organizations/{organization_id}/",
+        json=data,
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing changed:")
+    _echo_organization(data)
+
+
+@organizations.command("merge")
+@click.argument("organization_id", type=int)
+@click.option("--into", type=int, required=True, help="ID of the organization to keep.")
+@click.option("--dry-run", is_flag=True, help="Validate and show the result only.")
+@click.option("--json", "as_json", is_flag=True)
+def merge_organization(organization_id, into, dry_run, as_json):
+    """Merge a duplicate into the organization to keep and delete it
+
+    People, projects, deals, invoices and groups move. An inactive primary
+    contact of the organization kept is replaced by the duplicate's active
+    one."""
+    data = request(
+        "POST",
+        f"contacts/organizations/{organization_id}/merge/",
+        json={"into": into},
+        params={"dry_run": format_bool(dry_run)},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_organization(data)
+    console.print(
+        f"Dry run, nothing changed: {organization_id} would be merged into {into}."
+        if dry_run
+        else f"{organization_id} has been merged into {into}."
+    )
 
 
 @cli.group()

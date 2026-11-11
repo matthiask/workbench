@@ -22,7 +22,7 @@ from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
 from workbench.api_keys import KEYS
-from workbench.contacts.models import Group, Person
+from workbench.contacts.models import Group, Organization, Person
 from workbench.deals.models import AttributeGroup, Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
@@ -1000,6 +1000,50 @@ planned_work:
             [person["id"] for person in data["items"][0]["people"]],
             [keep.pk, duplicate.pk],
         )
+
+    def test_organizations(self):
+        """Organizations are searched, changed and merged"""
+        former = factories.UserFactory.create(_short_name="old", is_active=False)
+        keep = factories.OrganizationFactory.create(
+            name="Beispiel AG", primary_contact=former
+        )
+        factories.PersonFactory.create(organization=keep)
+        duplicate = factories.OrganizationFactory.create(name="Beispiel")
+        person = factories.PersonFactory.create(organization=duplicate)
+
+        result = self.wb("organizations", "search", "--primary-contact", "old")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Beispiel AG", result.output)
+        result = self.wb("organizations", "search", "--primary-contact", "nobody")
+        self.assertEqual(result.exit_code, 1)
+
+        result = self.wb(
+            "organizations", "merge", duplicate.pk, "--into", keep.pk, "--dry-run"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("would be merged", result.output)
+        self.assertTrue(Organization.objects.filter(pk=duplicate.pk).exists())
+        result = self.wb("organizations", "merge", duplicate.pk, "--into", duplicate.pk)
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb("organizations", "merge", duplicate.pk, "--into", keep.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertFalse(Organization.objects.filter(pk=duplicate.pk).exists())
+        person.refresh_from_db()
+        self.assertEqual(person.organization, keep)
+        keep.refresh_from_db()
+        # The active primary contact of the duplicate replaced the inactive one
+        self.assertEqual(keep.primary_contact, duplicate.primary_contact)
+
+        result = self.wb("organizations", "update", keep.pk, "--primary-contact", "old")
+        self.assertEqual(result.exit_code, 1)
+        keep.people.update(is_archived=True)
+        result = self.wb("organizations", "search", "--without-active-people")
+        self.assertIn("Beispiel AG", result.output)
+        result = self.wb("organizations", "update", keep.pk, "--archive")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("(archived)", result.output)
+        result = self.wb("organizations", "search", "--without-active-people")
+        self.assertNotIn("Beispiel AG", result.output)
 
     def test_invoices(self):
         """Invoices, projected and recurring invoices, and pagination"""
