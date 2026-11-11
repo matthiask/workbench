@@ -35,6 +35,7 @@ from workbench.contacts.models import (
     in_group_q,
     organization_postal_addresses,
     postal_address_choices,
+    unarchive_organization,
     update_organization_archival,
 )
 from workbench.tools.forms import (
@@ -745,9 +746,13 @@ class PersonForm(ModelForm):
             self._save_organization_groups(instance)
         for formset in self.formsets.values():
             formset.save()
-        if "is_archived" in self.changed_data and (
-            organization := update_organization_archival(instance)
-        ):
+        if "is_archived" in self.changed_data:
+            organization = update_organization_archival(instance)
+        elif "organization" in self.changed_data:
+            organization = unarchive_organization(instance)
+        else:
+            organization = None
+        if organization:
             messages.info(
                 self.request,
                 (

@@ -817,6 +817,51 @@ class ContactsTest(TestCase):
         )
         self.assertFalse(organization.is_archived)
 
+    def test_active_person_unarchives_organization(self):
+        """Creating or moving an active person into an archived organization
+        and merging people unarchive the organization"""
+        organization = factories.OrganizationFactory.create(is_archived=True)
+        person = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.post(
+            person.urls["update"],
+            person_to_dict(
+                person, organization=organization.pk, salutation="Dear Anna"
+            ),
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        self.assertEqual(
+            messages(response)[:-1], [f"{organization.name} has been unarchived."]
+        )
+        organization.refresh_from_db()
+        self.assertFalse(organization.is_archived)
+
+        organization.is_archived = True
+        organization.save()
+        response = self.client.post(
+            Person.urls["create"],
+            person_to_dict(
+                person,
+                given_name="Bea",
+                family_name="X",
+                organization=organization.pk,
+                salutation="Liebe Bea",
+                groups=[],
+            ),
+        )
+        self.assertEqual(response.status_code, 302)
+        organization.refresh_from_db()
+        self.assertFalse(organization.is_archived)
+
+        Person.objects.update(is_archived=True)
+        organization.is_archived = True
+        organization.save()
+        keep = Person.objects.get(given_name="Bea")
+        merge_people(duplicate=factories.PersonFactory.create(), keep=keep)
+        organization.refresh_from_db()
+        self.assertFalse(organization.is_archived)
+
     def test_archive_organization_with_people(self):
         """Archiving an organization asks whether to archive its active
         people too and archives them if confirmed"""

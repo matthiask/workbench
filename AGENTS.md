@@ -394,7 +394,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   people are useless for mailings), so do edits in the audit log.
   Archiving the last active person of an organization (person form and
   API) archives it too, unless it has open projects or deals; unarchiving
-  a person unarchives their organization (`update_organization_archival()`).
+  a person unarchives their organization (`update_organization_archival()`),
+  so do creating, moving and merging active people into an archived one
+  (`unarchive_organization()`).
   Archiving an organization warns about its active people
   (`archive-people`, form and API) and archives them when confirmed
   (`Organization.archive_warning()`, `archive_people()`).

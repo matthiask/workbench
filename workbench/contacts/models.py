@@ -464,10 +464,18 @@ def update_organization_archival(person):
         ):
             return None
         organization.is_archived = True
-    elif organization.is_archived:
-        organization.is_archived = False
-    else:
+        organization.save()
+        return organization
+    return unarchive_organization(person)
+
+
+def unarchive_organization(person):
+    """Active people (also new ones, moved or merged) unarchive their
+    organization. Returns the organization if it changed."""
+    organization = person.organization
+    if person.is_archived or not organization or not organization.is_archived:
         return None
+    organization.is_archived = False
     organization.save()
     return organization
 

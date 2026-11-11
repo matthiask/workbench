@@ -9,7 +9,12 @@ from django.db.models import Count, Q, Value
 from django.db.models.functions import Concat, Lower, Trim
 from django.utils.translation import gettext as _, ngettext
 
-from workbench.contacts.models import ADDRESS_FIELDS, EmailAddress, Person
+from workbench.contacts.models import (
+    ADDRESS_FIELDS,
+    EmailAddress,
+    Person,
+    unarchive_organization,
+)
 from workbench.tools.substitute_with import substitute_with
 
 
@@ -150,6 +155,7 @@ def merge_people(*, duplicate, keep):
         # Updates the full text search with the moved details
         keep.save()
         keep.refresh_related_fts()
+        unarchive_organization(keep)
 
 
 def _name():
