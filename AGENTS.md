@@ -148,8 +148,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   A person's new primary contact (form, API, reassigning) also replaces the
   organization's if it isn't active anymore (`take_over_organization()`). `wb people merge ID --into ID`
   merges duplicates (`POST /api/contacts/people/<id>/merge/`, also in the
-  web interface, `PersonMergeForm`; organizations are merged in the web
-  interface only, `merge_organizations()`; possible duplicates (the same name, or the same email address and a
+  web interface, `PersonMergeForm`; organizations by `wb organizations
+  merge`, `OrganizationMergeForm`, `merge_organizations()`; possible duplicates (the same name, or the same email address and a
   common given or family name) are listed on the person, globally and by
   `wb people duplicates`, `possible_duplicates()`; organizations with the
   same name (case and whitespace ignored) or central email address are
