@@ -1083,6 +1083,11 @@ class PersonPatch(InputSchema):
         description="IDs of postal addresses to remove, e.g. old ones of the"
         " organization",
     )
+    postal_address_types: dict[int, str] = Field(
+        default={},
+        description="New types of postal addresses by their ID, e.g. home for a"
+        " private address saved as a work address",
+    )
     organization: int | None = Field(
         default=None,
         description="ID of the organization, e.g. the new employer of someone"
@@ -1142,6 +1147,35 @@ def _postal_addresses_to_remove(person, ids, error):
     return [addresses[pk] for pk in ids if pk in addresses]
 
 
+def _postal_address_types(person, types, removed, error):
+    """The person's postal addresses with their new types, not those which
+    are removed"""
+    addresses = {address.pk: address for address in person.postaladdresses.all()}
+    max_length = PostalAddress._meta.get_field("type").max_length
+    changed = []
+    for pk, value in types.items():
+        type = value.strip()
+        if pk not in addresses:
+            error(
+                ["postal_address_types", pk],
+                _("The person has no postal address with the ID %r.") % pk,
+            )
+        elif addresses[pk] in removed:
+            error(
+                ["postal_address_types", pk],
+                _("The postal address %r is removed.") % pk,
+            )
+        elif not type or len(type) > max_length:
+            error(
+                ["postal_address_types", pk],
+                _("The type must have between 1 and %s characters.") % max_length,
+            )
+        else:
+            addresses[pk].type = type
+            changed.append(addresses[pk])
+    return changed
+
+
 def _groups_to_change(person, data, error):
     """The groups to add to and to remove from the person"""
     current = {group.pk for group in person.all_groups()}
@@ -1189,7 +1223,8 @@ def person_update(
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change the primary contact, the organization and the groups of a
-    person, remove email addresses, phone numbers and postal addresses or
+    person, remove email addresses, phone numbers and postal addresses,
+    change the type of postal addresses (e.g. home for private ones) or
     archive them, with the rules of the person form; contact details are
     added with ``details/``. Archiving the
     last active person of an organization without open projects or deals
@@ -1228,6 +1263,9 @@ def person_update(
     remove_addresses = _postal_addresses_to_remove(
         person, data.remove_postal_addresses, error
     )
+    retyped_addresses = _postal_address_types(
+        person, data.postal_address_types, remove_addresses, error
+    )
     moving = _move_to_organization(person, data, error)
     if errors:
         raise ValidationError(errors)
@@ -1248,6 +1286,9 @@ def person_update(
     with transaction.atomic():
         for detail in [*remove_emails, *remove_phones, *remove_addresses]:
             detail.delete()
+        for address in retyped_addresses:
+            # Also updates the weight, private addresses come after work ones
+            address.save()
         # Also updates the full text search
         person.save()
         if archival_changed:

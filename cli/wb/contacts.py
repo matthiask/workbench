@@ -499,6 +499,15 @@ def show_person(person_id, as_json):
     " of the organization; repeat it for several.",
 )
 @click.option(
+    "--postal-address-type",
+    "postal_address_types",
+    type=(int, str),
+    multiple=True,
+    metavar="ID TYPE",
+    help="New type of a postal address (`wb people show`), e.g. `home` for a"
+    " private address saved as a work address; repeat it for several.",
+)
+@click.option(
     "--organization",
     help="ID of the organization, e.g. the new employer of someone who left;"
     " an empty string removes the person from their organization.",
@@ -517,6 +526,7 @@ def update_person(
     remove_emails,
     remove_phones,
     remove_postal_addresses,
+    postal_address_types,
     organization,
     is_archived,
     dry_run,
@@ -524,8 +534,8 @@ def update_person(
     as_json,
 ):
     """Change the primary contact, the organization and the groups of a
-    person, remove email addresses, phone numbers and postal addresses or
-    archive them, like in the web
+    person, remove email addresses, phone numbers and postal addresses,
+    change the type of postal addresses or archive them, like in the web
     interface. Projects, deals and invoices keep their customer and contact
     when moving a person to another organization."""
     data = {
@@ -537,9 +547,10 @@ def update_person(
             ("remove_email_addresses", list(remove_emails)),
             ("remove_phone_numbers", list(remove_phones)),
             ("remove_postal_addresses", list(remove_postal_addresses)),
+            ("postal_address_types", dict(postal_address_types)),
             ("is_archived", is_archived),
         ]
-        if value not in (None, [])
+        if value not in (None, [], {})
     }
     if organization is not None:
         if organization.strip() and not organization.strip().isdigit():
@@ -549,7 +560,8 @@ def update_person(
         terminate(
             "Nothing to change, pass --primary-contact, --add-group,"
             " --remove-group, --remove-email, --remove-phone,"
-            " --remove-postal-address, --organization, --archive or --unarchive."
+            " --remove-postal-address, --postal-address-type, --organization,"
+            " --archive or --unarchive."
         )
     data = request(
         "PATCH",

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 13:42+0100\n"
+"POT-Creation-Date: 2026-11-11 14:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1083,6 +1083,11 @@ msgstr "Die Person hat keine Postadresse mit der ID %r."
 
 #: workbench/contacts/api.py
 #, python-format
+msgid "The type must have between 1 and %s characters."
+msgstr "Der Typ muss zwischen 1 und %s Zeichen lang sein."
+
+#: workbench/contacts/api.py
+#, python-format
 msgid "The group %r is archived."
 msgstr "Die Gruppe %r ist archiviert."
 
@@ -1090,6 +1095,11 @@ msgstr "Die Gruppe %r ist archiviert."
 #, python-format
 msgid "Unknown organization %r."
 msgstr "Unbekannte Organisation %r."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "The postal address %r is removed."
+msgstr "Die Postadresse %r wird entfernt."
 
 #: workbench/contacts/api.py workbench/invoices/api.py
 #, python-format
@@ -5150,9 +5160,7 @@ msgstr "Letzte Offerten"
 
 #: workbench/templates/contacts/organization_duplicates.html
 msgid "Organizations with the same name or email address, archived ones included."
-msgstr ""
-"Organisationen mit demselben Namen oder derselben E-Mail-Adresse, auch "
-"archivierte."
+msgstr "Organisationen mit demselben Namen oder derselben E-Mail-Adresse, auch archivierte."
 
 #: workbench/templates/contacts/person_detail.html
 msgid "Merge into another person"

@@ -1310,6 +1310,40 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertEqual(list(person.postaladdresses.all()), [home])
 
+        # Private addresses saved as work addresses get the right type, which
+        # also lowers their weight
+        private = person.postaladdresses.create(
+            type="work", street="Privatweg", postal_code="8002", city="Zürich"
+        )
+        result = self.wb(
+            "people", "update", person.pk, "--postal-address-type", private.pk, "home"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        private.refresh_from_db()
+        self.assertEqual((private.type, private.weight), ("home", 10))
+        result = self.wb(
+            "people", "update", person.pk, "--postal-address-type", private.pk, " "
+        )
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb(
+            "people", "update", stranger.pk, "--postal-address-type", home.pk, "work"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("no postal address", result.output)
+        result = self.wb(
+            "people",
+            "update",
+            person.pk,
+            "--postal-address-type",
+            private.pk,
+            "work",
+            "--remove-postal-address",
+            private.pk,
+        )
+        self.assertEqual(result.exit_code, 1)
+        private.refresh_from_db()
+        self.assertEqual(private.type, "home")
+
         # Without related objects there's nothing to confirm
         other = factories.PersonFactory.create()
         result = self.wb("people", "update", other.pk, "--organization", old.pk)
