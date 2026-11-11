@@ -25,7 +25,10 @@ from workbench.contacts.forms import (
     recent_projects_or_deals,
     short_salutation_warning,
 )
-from workbench.contacts.merge import possible_duplicates
+from workbench.contacts.merge import (
+    possible_duplicates,
+    possible_organization_duplicates,
+)
 from workbench.contacts.models import (
     ADDRESS_FIELDS,
     HOME_TYPE,
@@ -339,6 +342,45 @@ def person_duplicates(request):
             ]
         }
         for group in possible_duplicates()
+    ]
+
+
+class OrganizationDuplicateOut(OrganizationOut):
+    email: str
+    primary_contact: str
+    people: list[PersonSummary] = Field(description="Active people")
+
+
+class OrganizationDuplicatesOut(Schema):
+    organizations: list[OrganizationDuplicateOut]
+
+
+@router.get(
+    "/contacts/organizations/duplicates/",
+    response=list[OrganizationDuplicatesOut],
+)
+@paginate
+def organization_duplicates(request):
+    """Groups of possible duplicates like in the web interface: organizations
+    with the same name (case and whitespace ignored) or the same central
+    email address, archived ones included. Active organizations come first,
+    then the oldest."""
+    return [
+        {
+            "organizations": [
+                organization_out(organization, request)
+                | {
+                    "email": organization.email,
+                    "primary_contact": (organization.primary_contact.get_short_name()),
+                    "people": [
+                        person_summary(person, request)
+                        for person in organization.people.all()
+                    ],
+                }
+                for organization in group
+            ]
+        }
+        for group in possible_organization_duplicates()
     ]
 
 

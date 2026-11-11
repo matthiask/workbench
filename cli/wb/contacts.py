@@ -457,6 +457,42 @@ def change_organization_address(
     _echo_organization(data)
 
 
+@organizations.command("duplicates")
+@page_options
+@click.option("--json", "as_json", is_flag=True)
+def organizations_duplicates(limit, offset, as_json):
+    """Groups of possible duplicates: organizations with the same name or the
+    same central email address, archived ones included
+
+    Active organizations come first, then the oldest; merge the others with
+    `wb organizations merge ID --into ID`."""
+    data = request(
+        "GET",
+        "contacts/organizations/duplicates/",
+        params=page_params(limit, offset),
+    )
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table(
+        "Group>", "ID>", "Name", "Email", "Active people", "Primary contact"
+    )
+    for index, group in enumerate(data["items"], start=(offset or 0) + 1):
+        for organization in group["organizations"]:
+            table.add_row(
+                str(index),
+                link(organization["id"], organization["url"]),
+                link(organization["name"], organization["url"])
+                + (" (archived)" if organization["is_archived"] else ""),
+                organization["email"],
+                ", ".join(person["full_name"] for person in organization["people"]),
+                organization["primary_contact"],
+            )
+        table.add_section()
+    console.print(table)
+    echo_more(data, offset, "groups")
+
+
 @organizations.command("merge")
 @click.argument("organization_id", type=int)
 @click.option("--into", type=int, required=True, help="ID of the organization to keep.")

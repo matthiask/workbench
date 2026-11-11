@@ -1005,6 +1005,30 @@ planned_work:
             [keep.pk, duplicate.pk],
         )
 
+    def test_organizations_duplicates(self):
+        """Possible duplicate organizations are listed in groups"""
+        keep = factories.OrganizationFactory.create(name="Beispiel AG")
+        factories.PersonFactory.create(
+            organization=keep, given_name="Anna", family_name="Muster"
+        )
+        duplicate = factories.OrganizationFactory.create(
+            name=" beispiel ag", is_archived=True
+        )
+        factories.OrganizationFactory.create(name="Andere AG")
+
+        result = self.wb("organizations", "duplicates")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Anna Muster", result.output)
+        self.assertNotIn("Andere", result.output)
+
+        result = self.wb("organizations", "duplicates", "--json")
+        data = json.loads(result.output)
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(
+            [org["id"] for org in data["items"][0]["organizations"]],
+            [keep.pk, duplicate.pk],
+        )
+
     def test_organizations(self):
         """Organizations are searched, changed and merged"""
         former = factories.UserFactory.create(_short_name="old", is_active=False)

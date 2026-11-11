@@ -20,8 +20,9 @@ repository root, again when skills are added):
 ## workbench-address-book
 
 Cleans up the address book: merges duplicate people and organizations
-(`wb people duplicates`), reassigns the people of users who left, moves
-generic email addresses like info@ from people to their organization's
+(`wb people duplicates`, `wb organizations duplicates`), reassigns the
+people of users who left, moves generic email addresses like info@ from
+people to their organization's
 central or accounts payable address, changes outdated postal addresses of
 an organization's people at once and archives organizations without active
 people. It shows its findings in batches, proposes which duplicate to keep

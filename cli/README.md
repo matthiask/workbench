@@ -182,6 +182,7 @@ postal addresses, e.g. old ones, which are changed for several people at once:
 
     wb people duplicates
     wb people merge 345 --into 123 --dry-run
+    wb organizations duplicates
     wb organizations merge 67 --into 45 --dry-run
     wb people shared-emails
     wb organizations update 45 --email info@example.com

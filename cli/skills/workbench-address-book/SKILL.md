@@ -68,8 +68,13 @@ deals and the person kept belongs to another organization, Workbench warns
 (`other-organization`); only pass `--ignore-warning other-organization`
 after the user confirms.
 
-Duplicate organizations show up as the same person at two organizations
-with similar names, or when searching (`wb organizations search <name>
+Duplicate organizations (the same name, case and whitespace ignored, or the
+same central email address, archived ones included) are listed by
+
+    wb organizations duplicates
+
+Organizations with similar but different names show up as the same person at
+two organizations, or when searching (`wb organizations search <name>
 --include-archived`). Keep the one with projects and invoices, usually the
 older one:
 
