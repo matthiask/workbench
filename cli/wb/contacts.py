@@ -551,6 +551,24 @@ def show_person(person_id, as_json):
     " of the organization; repeat it for several.",
 )
 @click.option(
+    "--email-type",
+    "email_address_types",
+    type=(int, str),
+    multiple=True,
+    metavar="ID TYPE",
+    help="New type of an email address (`wb people show`), e.g. `Home`;"
+    " repeat it for several.",
+)
+@click.option(
+    "--phone-type",
+    "phone_number_types",
+    type=(int, str),
+    multiple=True,
+    metavar="ID TYPE",
+    help="New type of a phone number (`wb people show`), e.g. `Mobile`;"
+    " repeat it for several.",
+)
+@click.option(
     "--postal-address-type",
     "postal_address_types",
     type=(int, str),
@@ -584,6 +602,8 @@ def update_person(
     remove_emails,
     remove_phones,
     remove_postal_addresses,
+    email_address_types,
+    phone_number_types,
     postal_address_types,
     organization,
     is_archived,
@@ -593,8 +613,7 @@ def update_person(
 ):
     """Change the names, the salutation, the notes, the primary contact, the
     organization and the groups of a person, remove email addresses, phone
-    numbers and postal addresses, change the type of postal addresses or
-    archive them, like in the web interface. Projects, deals and invoices keep their customer and contact
+    numbers and postal addresses, change their types or archive them, like in the web interface. Projects, deals and invoices keep their customer and contact
     when moving a person to another organization."""
     data = {
         key: value
@@ -611,6 +630,8 @@ def update_person(
             ("remove_email_addresses", list(remove_emails)),
             ("remove_phone_numbers", list(remove_phones)),
             ("remove_postal_addresses", list(remove_postal_addresses)),
+            ("email_address_types", dict(email_address_types)),
+            ("phone_number_types", dict(phone_number_types)),
             ("postal_address_types", dict(postal_address_types)),
             ("is_archived", is_archived),
         ]
@@ -982,16 +1003,13 @@ def _echo_person(data):
             ("Primary contact", data["primary_contact"]),
             ("Groups", ", ".join(data["groups"])),
             *(
-                (f"{label} ({detail['type']})", detail["value"])
+                (f"{label} ({detail['type']}, ID {detail['id']})", detail["value"])
                 for label, key in [
                     ("Email", "email_addresses"),
                     ("Phone", "phone_numbers"),
+                    ("Address", "postal_addresses"),
                 ]
                 for detail in data[key]
-            ),
-            *(
-                (f"Address ({detail['type']}, ID {detail['id']})", detail["value"])
-                for detail in data["postal_addresses"]
             ),
             ("URL", data["url"]),
         ],

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 14:41+0100\n"
+"POT-Creation-Date: 2026-11-11 15:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1083,6 +1083,16 @@ msgstr "Die Person hat keine Postadresse mit der ID %r."
 
 #: workbench/contacts/api.py
 #, python-format
+msgid "The person has no %(detail)s with the ID %(id)r."
+msgstr "Die Person hat keine %(detail)s mit der ID %(id)r."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "The %(detail)s %(id)r is removed."
+msgstr "Die %(detail)s %(id)r wird entfernt."
+
+#: workbench/contacts/api.py
+#, python-format
 msgid "The type must have between 1 and %s characters."
 msgstr "Der Typ muss zwischen 1 und %s Zeichen lang sein."
 
@@ -1095,11 +1105,6 @@ msgstr "Die Gruppe %r ist archiviert."
 #, python-format
 msgid "Unknown organization %r."
 msgstr "Unbekannte Organisation %r."
-
-#: workbench/contacts/api.py
-#, python-format
-msgid "The postal address %r is removed."
-msgstr "Die Postadresse %r wird entfernt."
 
 #: workbench/contacts/api.py workbench/invoices/api.py
 #, python-format
@@ -1224,12 +1229,12 @@ msgid "This person is the contact of the following related objects: %s. Modifyin
 msgstr "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und einen neuen zu erstellen als die Organisation zu ändern."
 
 #: workbench/contacts/forms.py
-msgid "Enter any year and the day and the month of the birthday."
-msgstr "Bitte ein beliebiges Jahr und den Tag und Monat des Geburtstags eingeben."
-
-#: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
 msgstr "Das sieht nicht korrekt aus. Bitte definiere eine vollständige Begrüssung."
+
+#: workbench/contacts/forms.py
+msgid "Enter any year and the day and the month of the birthday."
+msgstr "Bitte ein beliebiges Jahr und den Tag und Monat des Geburtstags eingeben."
 
 #: workbench/contacts/forms.py
 #, python-format
@@ -1403,10 +1408,6 @@ msgstr "Geburtsjahr unbekannt"
 #: workbench/contacts/models.py
 msgid "Only the day and the month of the date of birth are known."
 msgstr "Nur Tag und Monat des Geburtsdatums sind bekannt."
-
-#: workbench/contacts/models.py
-msgid "work"
-msgstr "Arbeit"
 
 #: workbench/contacts/models.py workbench/deals/models.py
 msgid "weight"
@@ -6669,6 +6670,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "work"
+#~ msgstr "Arbeit"
 
 #~ msgid "substitute with"
 #~ msgstr "ersetzen durch"

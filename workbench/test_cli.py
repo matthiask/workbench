@@ -1258,6 +1258,26 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("short-salutation", result.output)
 
+        email = person.emailaddresses.create(type="Work", email="hans@example.com")
+        phone = person.phonenumbers.create(type="Work", phone_number="+41791234567")
+        result = self.wb("people", "show", person.pk)
+        self.assertIn(f"ID {email.pk}", result.output)
+        result = self.wb(
+            "people",
+            "update",
+            person.pk,
+            "--email-type",
+            email.pk,
+            "Home",
+            "--phone-type",
+            phone.pk,
+            "Mobile",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        email.refresh_from_db()
+        phone.refresh_from_db()
+        self.assertEqual((email.type, phone.type), ("Home", "Mobile"))
+
         result = self.wb(
             "organizations",
             "update",

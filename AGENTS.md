@@ -409,7 +409,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   or invoices warns (`organization-update`, `organization_update_warning()`),
   they keep their customer and contact; `--remove-postal-address ID`
   removes the old organization's addresses, `--postal-address-type ID TYPE`
-  fixes the type, e.g. of private addresses saved as work addresses.
+  fixes the type, e.g. of private addresses saved as work addresses
+  (`--email-type` and `--phone-type` alike).
   The types of email addresses, phone numbers and postal addresses are free
   text; the forms suggest `PersonDetail.TYPES` (Work, Mobile, Home;
   `SuggestionsInput`, `initSuggestions` in `main.js`), which keep their

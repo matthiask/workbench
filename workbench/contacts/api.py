@@ -1146,6 +1146,15 @@ class PersonPatch(InputSchema):
         description="IDs of postal addresses to remove, e.g. old ones of the"
         " organization",
     )
+    email_address_types: dict[int, str] = Field(
+        default={},
+        description="New types of email addresses by their ID, e.g. Home for a"
+        " private address saved as a work address",
+    )
+    phone_number_types: dict[int, str] = Field(
+        default={},
+        description="New types of phone numbers by their ID, e.g. Mobile",
+    )
     postal_address_types: dict[int, str] = Field(
         default={},
         description="New types of postal addresses by their ID, e.g. Home for a"
@@ -1210,32 +1219,35 @@ def _postal_addresses_to_remove(person, ids, error):
     return [addresses[pk] for pk in ids if pk in addresses]
 
 
-def _postal_address_types(person, types, removed, error):
-    """The person's postal addresses with their new types, not those which
-    are removed"""
-    addresses = {address.pk: address for address in person.postaladdresses.all()}
-    max_length = PostalAddress._meta.get_field("type").max_length
+def _detail_types(details, key, types, removed, error):
+    """The person's ``details`` (a queryset of email addresses, phone numbers
+    or postal addresses) with their new types, not those which are removed"""
+    model = details.model
+    details = {detail.pk: detail for detail in details}
+    max_length = model._meta.get_field("type").max_length
     changed = []
     for pk, value in types.items():
         type = value.strip()
-        if pk not in addresses:
+        if pk not in details:
             error(
-                ["postal_address_types", pk],
-                _("The person has no postal address with the ID %r.") % pk,
+                [key, pk],
+                _("The person has no %(detail)s with the ID %(id)r.")
+                % {"detail": model._meta.verbose_name, "id": pk},
             )
-        elif addresses[pk] in removed:
+        elif details[pk] in removed:
             error(
-                ["postal_address_types", pk],
-                _("The postal address %r is removed.") % pk,
+                [key, pk],
+                _("The %(detail)s %(id)r is removed.")
+                % {"detail": model._meta.verbose_name, "id": pk},
             )
         elif not type or len(type) > max_length:
             error(
-                ["postal_address_types", pk],
+                [key, pk],
                 _("The type must have between 1 and %s characters.") % max_length,
             )
         else:
-            addresses[pk].type = type
-            changed.append(addresses[pk])
+            details[pk].type = type
+            changed.append(details[pk])
     return changed
 
 
@@ -1314,9 +1326,9 @@ def person_update(
 ):
     """Change the names, the salutation, the notes, the primary contact, the
     organization and the groups of a person (short salutations are a
-    warning, ``short-salutation``), remove email addresses, phone numbers and postal addresses,
-    change the type of postal addresses (e.g. home for private ones) or
-    archive them, with the rules of the person form; contact details are
+    warning, ``short-salutation``), remove email addresses, phone numbers
+    and postal addresses, change their types (e.g. home for private ones)
+    or archive them, with the rules of the person form; contact details are
     added with ``details/``. Archiving the
     last active person of an organization without open projects or deals
     archives the organization too, unarchiving a person unarchives their
@@ -1357,9 +1369,29 @@ def person_update(
     remove_addresses = _postal_addresses_to_remove(
         person, data.remove_postal_addresses, error
     )
-    retyped_addresses = _postal_address_types(
-        person, data.postal_address_types, remove_addresses, error
-    )
+    retyped = [
+        *_detail_types(
+            person.emailaddresses.all(),
+            "email_address_types",
+            data.email_address_types,
+            remove_emails,
+            error,
+        ),
+        *_detail_types(
+            person.phonenumbers.all(),
+            "phone_number_types",
+            data.phone_number_types,
+            remove_phones,
+            error,
+        ),
+        *_detail_types(
+            person.postaladdresses.all(),
+            "postal_address_types",
+            data.postal_address_types,
+            remove_addresses,
+            error,
+        ),
+    ]
     moving = _move_to_organization(person, data, error)
     if errors:
         raise ValidationError(errors)
@@ -1392,9 +1424,9 @@ def person_update(
     with transaction.atomic():
         for detail in [*remove_emails, *remove_phones, *remove_addresses]:
             detail.delete()
-        for address in retyped_addresses:
-            # Also updates the weight, private addresses come after work ones
-            address.save()
+        for detail in retyped:
+            # Also updates the weight, private details come after work ones
+            detail.save()
         # Also updates the full text search
         person.save()
         if archival_changed:

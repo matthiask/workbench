@@ -24,8 +24,8 @@ organization. Address books have hundreds of findings: work in batches
 (`--limit`, `--offset`) and report what's still open when stopping.
 
 Take the type of email addresses, phone numbers and postal addresses into
-account (`wb people show` lists it, e.g. `Email (Work)`, `Address (Home, ID
-123)`). Work, Mobile and Home are the usual types, others are free
+account (`wb people show` lists it with the ID, e.g. `Email (Work, ID 45)`,
+`Address (Home, ID 123)`). Work, Mobile and Home are the usual types, others are free
 text:
 
 - Types starting with `organization` (e.g. `organization Work`) were copied
@@ -35,10 +35,12 @@ text:
 - Private addresses (Home, Privat, Zuhause) are supposed to differ from the
   organization's, and other special types (e.g. Rechnungen, Büro Lausanne)
   may be deliberate; leave them alone or ask.
-- A private address saved as a work address gets the right type instead of
-  being removed or changed:
+- A private address or number saved as a work one gets the right type
+  instead of being removed or changed:
 
       wb people update <person_id> --postal-address-type <address_id> Home --dry-run
+      wb people update <person_id> --email-type <email_id> Home --dry-run
+      wb people update <person_id> --phone-type <phone_id> Mobile --dry-run
 
 ## 1. Duplicates
 

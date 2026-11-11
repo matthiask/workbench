@@ -303,6 +303,44 @@ class ContactsAPITest(TestCase):
         person.refresh_from_db()
         self.assertEqual(person.full_name, "Johann Müller")
 
+    def test_update_detail_types(self):
+        """The types of email addresses and phone numbers are changed like
+        those of postal addresses"""
+        person = factories.PersonFactory.create()
+        email = person.emailaddresses.create(type="Work", email="hans@example.com")
+        phone = person.phonenumbers.create(type="Work", phone_number="+41791234567")
+        self.client.force_login(factories.UserFactory.create())
+
+        def patch(data):
+            return self.client.patch(
+                f"/api/contacts/people/{person.pk}/",
+                data,
+                content_type="application/json",
+            )
+
+        response = patch({
+            "email_address_types": {email.pk: "Home"},
+            "phone_number_types": {phone.pk: "Mobile"},
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        email.refresh_from_db()
+        phone.refresh_from_db()
+        self.assertEqual((email.type, phone.type), ("Home", "Mobile"))
+
+        response = patch({
+            "remove_email_addresses": ["hans@example.com"],
+            "email_address_types": {email.pk: "Work"},
+            "phone_number_types": {0: "Work"},
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [
+                ["body", "data", "email_address_types", email.pk],
+                ["body", "data", "phone_number_types", 0],
+            ],
+        )
+
     def test_update_organization(self):
         """Organizations get a new name, notes, billing address and groups"""
         industry = Group.objects.create(title="Industry", applies_to_organizations=True)
