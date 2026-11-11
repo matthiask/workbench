@@ -364,6 +364,16 @@ class InvoicesAPITest(TestCase):
         self.assertFalse(preview["sent"])
         self.assertEqual(preview["emails"], ["billing@example.com"])
         self.assertEqual(preview["invoices"][0]["id"], invoice.pk)
+
+        # The addresses of the organization are suggested too
+        contact.organization.email = "info@example.com"
+        contact.organization.accounts_payable_email = "creditors@example.com"
+        contact.organization.save()
+        response = self.client.post(url, {}, content_type="application/json")
+        self.assertEqual(
+            response.json()["emails"],
+            ["creditors@example.com", "billing@example.com", "info@example.com"],
+        )
         self.assertEqual(len(mail.outbox), 0)
 
         response = self.client.post(

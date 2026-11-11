@@ -1039,6 +1039,14 @@ planned_work:
         keep.people.update(is_archived=True)
         result = self.wb("organizations", "search", "--without-active-people")
         self.assertIn("Beispiel AG", result.output)
+        result = self.wb("organizations", "update", keep.pk, "--email", "nope")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("email", result.output)
+        result = self.wb(
+            "organizations", "update", keep.pk, "--email", "info@example.com"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("info@example.com", result.output)
         result = self.wb("organizations", "update", keep.pk, "--archive")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("(archived)", result.output)

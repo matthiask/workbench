@@ -135,6 +135,8 @@ def _echo_organization(data):
         [
             ("ID", data["id"]),
             ("Primary contact", data["primary_contact"]),
+            ("Email address", data["email"]),
+            ("Accounts payable", data["accounts_payable_email"]),
             ("Groups", ", ".join(data["groups"])),
             ("URL", data["url"]),
         ],
@@ -167,24 +169,43 @@ def show_organization(organization_id, as_json):
 @click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names
 )
+@click.option(
+    "--email",
+    help="Central address, e.g. info@, shown on the organization's people too;"
+    " an empty string removes it.",
+)
+@click.option(
+    "--accounts-payable-email",
+    help="For invoices and payment reminders; an empty string removes it.",
+)
 @click.option("--archive/--unarchive", "is_archived", default=None)
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_organization(
-    organization_id, primary_contact, is_archived, dry_run, as_json
+    organization_id,
+    primary_contact,
+    email,
+    accounts_payable_email,
+    is_archived,
+    dry_run,
+    as_json,
 ):
-    """Change the primary contact of an organization or archive it"""
+    """Change the primary contact or the email addresses of an organization
+    or archive it"""
     data = {
         key: value
         for key, value in [
             ("primary_contact", primary_contact),
+            ("email", email),
+            ("accounts_payable_email", accounts_payable_email),
             ("is_archived", is_archived),
         ]
         if value is not None
     }
     if not data:
         terminate(
-            "Nothing to change, pass --primary-contact, --archive or --unarchive."
+            "Nothing to change, pass --primary-contact, --email,"
+            " --accounts-payable-email, --archive or --unarchive."
         )
     data = request(
         "PATCH",

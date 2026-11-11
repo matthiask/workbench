@@ -398,6 +398,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Postal addresses belong to people; the person form copies those of
   colleagues and the organization changes one address of several people
   at once (`organization_postal_addresses()`, `OrganizationPostalAddressForm`).
+  Organizations have a central email address (e.g. info@, shown on their
+  people, so it doesn't belong on them) and an optional accounts payable
+  address; payment reminders suggest the accounts payable address, the
+  contact's addresses and the central address, in this order.
 - Groups with `applies_to_organizations` (e.g. industries) belong to
   organizations: people are in them through their organization
   (`Person.all_groups()`, `Person.objects.in_group()`, `without_groups()`;

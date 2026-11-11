@@ -91,8 +91,14 @@
                 <dt>{{ email.type|capfirst }}</dt>
                 <dd><a href="mailto:{{ email.email }}">{{ email.email }}</a></dd>
               {% endfor %}
+              {% if person.organization.email %}
+                <dt>{% translate 'organization'|capfirst %}</dt>
+                <dd><a href="mailto:{{ person.organization.email }}">{{ person.organization.email }}</a></dd>
+              {% endif %}
             </dl>
-            {% if not phones and not emails %}<span class="text-secondary">&ndash;</span>{% endif %}
+            {% if not phones and not emails and not person.organization.email %}
+              <span class="text-secondary">&ndash;</span>
+            {% endif %}
           {% endwith %}
         </div>
       </section>

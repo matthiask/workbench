@@ -919,6 +919,30 @@ class ContactsTest(TestCase):
         home.refresh_from_db()
         self.assertEqual(home.street, "Altweg")
 
+    def test_organization_email_addresses(self):
+        """Organizations have a central and an accounts payable address, the
+        central one is shown on their people; merging takes them over"""
+        organization = factories.OrganizationFactory.create(
+            email="info@example.com", accounts_payable_email="ap@example.com"
+        )
+        person = factories.PersonFactory.create(organization=organization)
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.get(organization.urls["detail"])
+        self.assertContains(response, "mailto:info@example.com")
+        self.assertContains(response, "mailto:ap@example.com")
+        response = self.client.get(person.urls["detail"])
+        self.assertContains(response, "mailto:info@example.com")
+        self.assertNotContains(response, "ap@example.com")
+
+        keep = factories.OrganizationFactory.create(email="keep@example.com")
+        merge_organizations(duplicate=organization, keep=keep)
+        keep.refresh_from_db()
+        self.assertEqual(
+            (keep.email, keep.accounts_payable_email),
+            ("keep@example.com", "ap@example.com"),
+        )
+
     def test_create_person_with_preselected_organization(self):
         """Adding a person to an existing org. preselects the organization"""
         organization = factories.OrganizationFactory.create(name="ABCD")

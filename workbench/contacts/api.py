@@ -307,6 +307,10 @@ def person_duplicates(request):
 class OrganizationDetail(OrganizationOut):
     is_private_person: bool
     notes: str
+    email: str = Field(description="Central address, e.g. info@")
+    accounts_payable_email: str = Field(
+        description="Optional, for invoices and payment reminders"
+    )
     primary_contact: str
     groups: list[str]
     people: list[PersonSummary]
@@ -322,6 +326,8 @@ def organization_detail(request, organization_id: int):
     return organization_out(organization, request) | {
         "is_private_person": organization.is_private_person,
         "notes": organization.notes,
+        "email": organization.email,
+        "accounts_payable_email": organization.accounts_payable_email,
         "primary_contact": organization.primary_contact.get_short_name(),
         "groups": [group.title for group in organization.groups.all()],
         "people": [
@@ -339,6 +345,14 @@ class OrganizationPatch(InputSchema):
         default=None, description="Short name of an active user"
     )
     is_archived: bool | None = None
+    email: str | None = Field(
+        default=None,
+        description="Central address, e.g. info@; remove it from the people"
+        " of the organization, it's shown on them",
+    )
+    accounts_payable_email: str | None = Field(
+        default=None, description="For invoices and payment reminders"
+    )
 
 
 def _organization_detail_out(organization, request):
@@ -351,7 +365,8 @@ def _organization_detail_out(organization, request):
 def organization_update(
     request, organization_id: int, data: OrganizationPatch, *, dry_run: DryRun = False
 ):
-    """Change the primary contact of an organization or archive it"""
+    """Change the primary contact or the email addresses of an organization
+    or archive it"""
     organization = get_object_or_404(Organization, pk=organization_id)
     if data.primary_contact is not None:
         user = (
@@ -370,6 +385,13 @@ def organization_update(
         organization.primary_contact = user
     if data.is_archived is not None:
         organization.is_archived = data.is_archived
+    for field in ["email", "accounts_payable_email"]:
+        if (value := getattr(data, field)) is not None:
+            setattr(organization, field, value.strip())
+    errors = []
+    full_clean(organization, ["body", "data"], errors)
+    if errors:
+        raise ValidationError(errors)
     with transaction.atomic():
         organization.save()
         result = _organization_detail_out(organization, request)

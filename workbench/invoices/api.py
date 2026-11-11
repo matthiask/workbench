@@ -314,7 +314,9 @@ class SendReminder(InputSchema):
 
 class ReminderSent(Schema):
     contact: PersonSummary
-    emails: list[str] = Field(description="The contact's email addresses.")
+    emails: list[str] = Field(
+        description="The accounts payable address of the contact's organization, the contact's email addresses and the central address of the organization."
+    )
     to: list[str]
     cc: list[str]
     bcc: list[str]

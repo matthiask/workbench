@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 08:09+0100\n"
+"POT-Creation-Date: 2026-11-11 08:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1007,15 +1007,21 @@ msgstr "Die Abwesenheit wurde bestätigt."
 msgid "Your wb is too old for this Workbench, please upgrade it: %(command)s"
 msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: %(command)s"
 
+#: workbench/contacts/api.py workbench/deals/api.py workbench/tools/api.py
+#, python-format
+msgid "Unknown user %r."
+msgstr "Unbekannte:r Benutzer:in %r."
+
 #: workbench/contacts/api.py
 #, python-format
 msgid "Unknown group %r."
 msgstr "Unbekannte Gruppe %r."
 
-#: workbench/contacts/api.py workbench/deals/api.py workbench/tools/api.py
+#: workbench/contacts/api.py workbench/deals/api.py workbench/invoices/api.py
+#: workbench/planning/api.py workbench/projects/api.py
 #, python-format
-msgid "Unknown user %r."
-msgstr "Unbekannte:r Benutzer:in %r."
+msgid "Unknown or inactive user %r."
+msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
 
 #: workbench/contacts/api.py
 #, python-format
@@ -1054,12 +1060,6 @@ msgstr "%(person)s hat diese Telefonnummer bereits."
 #, python-format
 msgid "The group %r is archived."
 msgstr "Die Gruppe %r ist archiviert."
-
-#: workbench/contacts/api.py workbench/deals/api.py workbench/invoices/api.py
-#: workbench/planning/api.py workbench/projects/api.py
-#, python-format
-msgid "Unknown or inactive user %r."
-msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
 
 #: workbench/contacts/api.py workbench/invoices/api.py
 #, python-format
@@ -1263,7 +1263,24 @@ msgstr "Standard-Rechnungsadresse"
 msgid "Mainly useful for organizations with a centralized accounts payable departement."
 msgstr "Hauptsächlich nützlich für Organisationen mit einem zentralen Kreditoreneingang."
 
+#: workbench/contacts/models.py workbench/templates/contacts/person_form.html
+msgid "email address"
+msgstr "Emailadresse"
+
+#: workbench/contacts/models.py
+msgid "Central address, e.g. info@. It's shown on the organization's people too, don't add it to them."
+msgstr "Zentrale Adresse, z.B. info@. Sie wird auch bei den Personen der Organisation angezeigt, erfasse sie dort nicht."
+
+#: workbench/contacts/models.py
+msgid "accounts payable email address"
+msgstr "Emailadresse Kreditoren"
+
+#: workbench/contacts/models.py
+msgid "Optional, e.g. for invoices and payment reminders."
+msgstr "Optional, z.B. für Rechnungen und Zahlungserinnerungen."
+
 #: workbench/contacts/models.py workbench/reporting/squeeze.py
+#: workbench/templates/contacts/person_detail.html
 msgid "organization"
 msgstr "Organisation"
 
@@ -1335,10 +1352,6 @@ msgstr "Telefonnummern"
 #: workbench/contacts/models.py
 msgid "Phone number invalid."
 msgstr "Telefonnummer ungültig."
-
-#: workbench/contacts/models.py workbench/templates/contacts/person_form.html
-msgid "email address"
-msgstr "Emailadresse"
 
 #: workbench/contacts/models.py workbench/templates/contacts/person_form.html
 #: workbench/templates/invoices/send_reminder.html

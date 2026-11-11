@@ -377,6 +377,8 @@ class OrganizationForm(ModelForm):
             "is_private_person",
             "notes",
             "primary_contact",
+            "email",
+            "accounts_payable_email",
             "default_billing_address",
             "groups",
         )

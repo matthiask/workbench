@@ -109,6 +109,19 @@ class Organization(Model):
             " accounts payable departement."
         ),
     )
+    email = models.EmailField(
+        _("email address"),
+        blank=True,
+        help_text=_(
+            "Central address, e.g. info@. It's shown on the organization's"
+            " people too, don't add it to them."
+        ),
+    )
+    accounts_payable_email = models.EmailField(
+        _("accounts payable email address"),
+        blank=True,
+        help_text=_("Optional, e.g. for invoices and payment reminders."),
+    )
     groups = models.ManyToManyField(Group, verbose_name=_("groups"), blank=True)
 
     objects = OrganizationQuerySet.as_manager()

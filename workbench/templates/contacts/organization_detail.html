@@ -114,6 +114,16 @@
             <dd>{{ organization.primary_contact }}</dd>
             <dt>{{ object|label:'is_private_person' }}</dt>
             <dd>{{ organization.is_private_person|yesno:_("yes,no") }}</dd>
+            {% if organization.email %}
+              <dt>{{ object|label:'email' }}</dt>
+              <dd><a href="mailto:{{ organization.email }}">{{ organization.email }}</a></dd>
+            {% endif %}
+            {% if organization.accounts_payable_email %}
+              <dt>{{ object|label:'accounts_payable_email' }}</dt>
+              <dd>
+                <a href="mailto:{{ organization.accounts_payable_email }}">{{ organization.accounts_payable_email }}</a>
+              </dd>
+            {% endif %}
             <dt>{{ object|label:'default_billing_address' }}</dt>
             <dd>{{ organization.default_billing_address|linebreaksbr|default:"&ndash;" }}</dd>
             {% if organization.notes %}

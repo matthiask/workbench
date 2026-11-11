@@ -1320,7 +1320,19 @@ class SendReminderForm(Form):
             .filter(contact=self.contact)
             .select_related("customer", "contact__organization", "owned_by", "project")
         )
-        self.emails = self.contact.emailaddresses.values_list("email", flat=True)
+        organization = self.contact.organization
+        self.emails = list(
+            dict.fromkeys(
+                filter(
+                    None,
+                    [
+                        organization and organization.accounts_payable_email,
+                        *self.contact.emailaddresses.values_list("email", flat=True),
+                        organization and organization.email,
+                    ],
+                )
+            )
+        )
 
         self.fields["email"] = forms.EmailField(label=_("email"))
 

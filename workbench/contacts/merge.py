@@ -78,13 +78,18 @@ def merge_organizations(*, duplicate, keep):
     """Move everything of the duplicate organization (people, projects,
     deals, invoices, ...) to the organization to keep and delete it; the
     primary contact stays unless it's an inactive user and the duplicate's
-    is active"""
+    is active, empty email and billing addresses are taken over"""
     if duplicate.pk == keep.pk:
         raise ValidationError(_("An organization cannot be merged with itself."))
     with transaction.atomic():
         # Groups (e.g. industries) aren't moved by substitute_with()
         keep.groups.add(*duplicate.groups.all())
-        if _take_primary_contact(duplicate=duplicate, keep=keep):
+        changed = _take_primary_contact(duplicate=duplicate, keep=keep)
+        for field in ["email", "accounts_payable_email", "default_billing_address"]:
+            if not getattr(keep, field) and getattr(duplicate, field):
+                setattr(keep, field, getattr(duplicate, field))
+                changed = True
+        if changed:
             keep.save()
         substitute_with(to_delete=duplicate, keep=keep)
         keep.refresh_related_fts()
