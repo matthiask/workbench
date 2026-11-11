@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import Exists, OuterRef, Q, Sum
 from django.db.models.functions import Lower
 from django.utils.functional import cached_property
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, ngettext
 from django_countries.fields import CountryField
 
 from workbench.accounts.models import User
@@ -153,6 +153,24 @@ class Organization(Model):
             self.refresh_related_fts()
 
     save.alters_data = True
+
+    def archive_warning(self):
+        """Archiving an organization asks whether to archive its active
+        people too, see ``archive_people()``"""
+        if count := self.people.active().count():
+            return ngettext(
+                "%(count)s person of this organization is still active."
+                " Archive them too?",
+                "%(count)s people of this organization are still active."
+                " Archive them too?",
+                count,
+            ) % {"count": count}
+        return None
+
+    def archive_people(self):
+        return self.people.active().update(is_archived=True)
+
+    archive_people.alters_data = True
 
     def refresh_related_fts(self):
         """The search texts of related objects contain the name"""

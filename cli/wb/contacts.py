@@ -198,8 +198,15 @@ def show_organization(organization_id, as_json):
     "--accounts-payable-email",
     help="For invoices and payment reminders; an empty string removes it.",
 )
-@click.option("--archive/--unarchive", "is_archived", default=None)
+@click.option(
+    "--archive/--unarchive",
+    "is_archived",
+    default=None,
+    help="Archiving warns about active people (archive-people), ignoring the"
+    " warning archives them too.",
+)
 @click.option("--dry-run", is_flag=True, help="Validate only.")
+@ignore_warnings_option
 @click.option("--json", "as_json", is_flag=True)
 def update_organization(
     organization_id,
@@ -208,6 +215,7 @@ def update_organization(
     accounts_payable_email,
     is_archived,
     dry_run,
+    ignore_warnings,
     as_json,
 ):
     """Change the primary contact or the email addresses of an organization
@@ -231,7 +239,10 @@ def update_organization(
         "PATCH",
         f"contacts/organizations/{organization_id}/",
         json=data,
-        params={"dry_run": format_bool(dry_run)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
     )
     if as_json:
         echo_json(data)

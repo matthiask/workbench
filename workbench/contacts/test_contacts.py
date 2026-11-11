@@ -817,6 +817,50 @@ class ContactsTest(TestCase):
         )
         self.assertFalse(organization.is_archived)
 
+    def test_archive_organization_with_people(self):
+        """Archiving an organization asks whether to archive its active
+        people too and archives them if confirmed"""
+        organization = factories.OrganizationFactory.create()
+        person = factories.PersonFactory.create(organization=organization)
+        archived = factories.PersonFactory.create(
+            organization=organization, is_archived=True
+        )
+        other = factories.PersonFactory.create()
+        self.client.force_login(person.primary_contact)
+
+        data = {
+            "name": organization.name,
+            "primary_contact": organization.primary_contact_id,
+            "is_archived": "on",
+        }
+        response = self.client.post(organization.urls["update"], data)
+        self.assertContains(response, "archive-people")
+        self.assertContains(response, "1 person of this organization is still active.")
+        organization.refresh_from_db()
+        self.assertFalse(organization.is_archived)
+
+        response = self.client.post(
+            organization.urls["update"],
+            data | {WarningsForm.ignore_warnings_id: "archive-people"},
+        )
+        self.assertRedirects(response, organization.urls["detail"])
+        self.assertEqual(
+            messages(response)[:-1],
+            ["1 person has been archived with the organization."],
+        )
+        organization.refresh_from_db()
+        self.assertTrue(organization.is_archived)
+        self.assertEqual(
+            set(Person.objects.filter(is_archived=True)), {person, archived}
+        )
+        self.assertFalse(Person.objects.get(pk=other.pk).is_archived)
+
+        # Without active people there is nothing to ask
+        organization.is_archived = False
+        organization.save()
+        response = self.client.post(organization.urls["update"], data)
+        self.assertRedirects(response, organization.urls["detail"])
+
     def test_copy_postal_address_from_colleague(self):
         """The person form offers the distinct addresses of active colleagues
         which the person doesn't have yet"""

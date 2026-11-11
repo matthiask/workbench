@@ -464,11 +464,26 @@ def _organization_detail_out(organization, request):
     "/contacts/organizations/{int:organization_id}/", response=OrganizationDetail
 )
 def organization_update(
-    request, organization_id: int, data: OrganizationPatch, *, dry_run: DryRun = False
+    request,
+    organization_id: int,
+    data: OrganizationPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change the primary contact or the email addresses of an organization
-    or archive it"""
+    or archive it. Archiving warns about active people (`archive-people`),
+    ignoring the warning archives them too."""
     organization = get_object_or_404(Organization, pk=organization_id)
+    archiving = data.is_archived and not organization.is_archived
+    if (
+        archiving
+        and "archive-people" not in ignore_warnings
+        and (warning := organization.archive_warning())
+    ):
+        raise ValidationError([
+            {"loc": ["body", "data"], "msg": warning, "code": "archive-people"}
+        ])
     if data.primary_contact is not None:
         user = (
             User.objects
@@ -495,6 +510,8 @@ def organization_update(
         raise ValidationError(errors)
     with transaction.atomic():
         organization.save()
+        if archiving:
+            organization.archive_people()
         result = _organization_detail_out(organization, request)
         if dry_run:
             transaction.set_rollback(True)

@@ -395,6 +395,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Archiving the last active person of an organization (person form and
   API) archives it too, unless it has open projects or deals; unarchiving
   a person unarchives their organization (`update_organization_archival()`).
+  Archiving an organization warns about its active people
+  (`archive-people`, form and API) and archives them when confirmed
+  (`Organization.archive_warning()`, `archive_people()`).
   Postal addresses belong to people; the person form copies those of
   colleagues and the organization changes one address of several people
   at once (`organization_postal_addresses()`, `OrganizationPostalAddressForm`;

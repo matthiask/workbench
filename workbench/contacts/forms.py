@@ -395,6 +395,34 @@ class OrganizationForm(ModelForm):
             self.instance.groups.values("pk") if self.instance.pk else []
         )
 
+    def _archiving(self):
+        return (
+            self.instance.pk
+            and "is_archived" in self.changed_data
+            and self.cleaned_data.get("is_archived")
+        )
+
+    def clean(self):
+        data = super().clean()
+        if self._archiving() and (warning := self.instance.archive_warning()):
+            self.add_warning(warning, code="archive-people")
+        return data
+
+    def save(self, *, commit=True):
+        archiving = self._archiving()
+        instance = super().save(commit=commit)
+        if archiving and (count := instance.archive_people()):
+            messages.info(
+                self.request,
+                ngettext(
+                    "%(count)s person has been archived with the organization.",
+                    "%(count)s people have been archived with the organization.",
+                    count,
+                )
+                % {"count": count},
+            )
+        return instance
+
 
 def _offered_groups(current):
     """Archived groups only for contacts already in them"""

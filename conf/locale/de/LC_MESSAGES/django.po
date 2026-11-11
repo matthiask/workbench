@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 08:36+0100\n"
+"POT-Creation-Date: 2026-11-11 09:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1153,6 +1153,13 @@ msgid "people"
 msgstr "Personen"
 
 #: workbench/contacts/forms.py
+#, python-format
+msgid "%(count)s person has been archived with the organization."
+msgid_plural "%(count)s people have been archived with the organization."
+msgstr[0] "%(count)s Person wurde mit der Organisation archiviert."
+msgstr[1] "%(count)s Personen wurden mit der Organisation archiviert."
+
+#: workbench/contacts/forms.py
 msgid "This organization has related objects. It is therefore not possible to delete it, but you may merge it into a different organization. Alternatively, you can also archive the organization."
 msgstr "Diese Organisation hat verbundene Objekte. Es ist deshalb nicht möglich, die Organisation zu löschen, aber Du kannst sie mit einer anderen Organisation zusammenführen. Alternativ kannst Du diese Organisation auch archivieren."
 
@@ -1310,6 +1317,13 @@ msgstr "Organisationen"
 #: workbench/contacts/models.py
 msgid "(archived)"
 msgstr "(archiviert)"
+
+#: workbench/contacts/models.py
+#, python-format
+msgid "%(count)s person of this organization is still active. Archive them too?"
+msgid_plural "%(count)s people of this organization are still active. Archive them too?"
+msgstr[0] "%(count)s Person dieser Organisation ist noch aktiv. Auch archivieren?"
+msgstr[1] "%(count)s Personen dieser Organisation sind noch aktiv. Auch archivieren?"
 
 #: workbench/contacts/models.py
 msgid "given name"

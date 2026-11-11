@@ -1040,7 +1040,25 @@ planned_work:
 
         result = self.wb("organizations", "update", keep.pk, "--primary-contact", "old")
         self.assertEqual(result.exit_code, 1)
-        keep.people.update(is_archived=True)
+        # Archiving asks whether to archive the active people too
+        result = self.wb("organizations", "update", keep.pk, "--archive")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("archive-people", result.output)
+        result = self.wb(
+            "organizations",
+            "update",
+            keep.pk,
+            "--archive",
+            "--ignore-warning",
+            "archive-people",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertFalse(keep.people.active().exists())
+        keep.refresh_from_db()
+        self.assertTrue(keep.is_archived)
+        self.assertEqual(
+            self.wb("organizations", "update", keep.pk, "--unarchive").exit_code, 0
+        )
         result = self.wb("organizations", "search", "--without-active-people")
         self.assertIn("Beispiel AG", result.output)
         result = self.wb("organizations", "update", keep.pk, "--email", "nope")
