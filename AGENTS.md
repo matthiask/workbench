@@ -131,7 +131,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   export of the people list uses (highest weight), so scripts can build
   mailing lists without fetching every person. `wb
   people update` changes the names, the salutation (short ones are the
-  form's `short-salutation` warning), the notes and the primary contact,
+  form's `short-salutation` warning; renaming people and organizations to
+  the name of another active one is a `duplicate-name` warning, the API
+  rejects creating duplicates), the notes and the primary contact,
   adds and removes groups and archives people (`PATCH /api/contacts/people/<id>/`); groups which apply
   to organizations go to the organization like in the person form
   (`Person.add_to_group()`, `remove_from_group()`). `wb people

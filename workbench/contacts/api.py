@@ -542,6 +542,26 @@ class OrganizationPatch(InputSchema):
     remove_groups: list[str] = Field(default=[], description="Titles or IDs of groups")
 
 
+def _duplicate_name_warning(duplicates, ignore_warnings):
+    """Renaming to the name of someone else is a warning, the API rejects
+    creating duplicates"""
+    if "duplicate-name" in ignore_warnings:
+        return
+    if messages := [
+        _("%(name)s (ID %(id)s) has the same name. Merge them if they are the same.")
+        % {
+            "name": getattr(duplicate, "name_with_organization", None)
+            or str(duplicate),
+            "id": duplicate.pk,
+        }
+        for duplicate in duplicates
+    ]:
+        raise ValidationError([
+            {"loc": ["body", "data"], "msg": msg, "code": "duplicate-name"}
+            for msg in messages
+        ])
+
+
 def _organization_detail_out(organization, request):
     return organization_detail(request, organization.pk)
 
@@ -559,10 +579,12 @@ def organization_update(
 ):
     """Change the name, the notes, the primary contact, the email addresses,
     the phone number, the billing address and the groups of an organization
-    or archive it, with the rules of the organization form. Archiving warns
+    or archive it, with the rules of the organization form. The name of
+    another active organization is a warning (``duplicate-name``). Archiving warns
     about active people (`archive-people`), ignoring the warning archives them
     too."""
     organization = get_object_or_404(Organization, pk=organization_id)
+    name = organization.name
     archiving = data.is_archived and not organization.is_archived
     if (
         archiving
@@ -610,6 +632,14 @@ def organization_update(
     full_clean(organization, ["body", "data"], errors)
     if errors:
         raise ValidationError(errors)
+    if organization.name != name:
+        _duplicate_name_warning(
+            Organization.objects
+            .active()
+            .filter(name__iexact=organization.name)
+            .exclude(pk=organization.pk),
+            ignore_warnings,
+        )
     with transaction.atomic():
         # Also updates the search texts of related objects when renamed
         organization.save()
@@ -1315,6 +1345,43 @@ def _change_person_fields(person, data, error):
         error(e["loc"], e["msg"])
 
 
+def _person_update_warnings(person, data, *, name, moving, ignore_warnings):
+    """Warnings of the person form (and for duplicate names) are errors
+    unless they are ignored; ``name`` is the name before the update"""
+    if (person.given_name, person.family_name) != name:
+        _duplicate_name_warning(
+            Person.objects
+            .active()
+            .filter(
+                given_name__iexact=person.given_name,
+                family_name__iexact=person.family_name,
+            )
+            .exclude(pk=person.pk)
+            .select_related("organization"),
+            ignore_warnings,
+        )
+    if (
+        data.salutation is not None
+        and "short-salutation" not in ignore_warnings
+        and (warning := short_salutation_warning(person.salutation))
+    ):
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "salutation"],
+                "msg": warning,
+                "code": "short-salutation",
+            }
+        ])
+    if (
+        moving
+        and "organization-update" not in ignore_warnings
+        and (warning := organization_update_warning(person))
+    ):
+        raise ValidationError([
+            {"loc": ["body", "data"], "msg": warning, "code": "organization-update"}
+        ])
+
+
 @router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
 def person_update(
     request,
@@ -1326,7 +1393,8 @@ def person_update(
 ):
     """Change the names, the salutation, the notes, the primary contact, the
     organization and the groups of a person (short salutations are a
-    warning, ``short-salutation``), remove email addresses, phone numbers
+    warning, ``short-salutation``, so are names of other active people,
+    ``duplicate-name``), remove email addresses, phone numbers
     and postal addresses, change their types (e.g. home for private ones)
     or archive them, with the rules of the person form; contact details are
     added with ``details/``. Archiving the
@@ -1344,6 +1412,7 @@ def person_update(
     def error(loc, msg):
         errors.append({"loc": ["body", "data", *loc], "msg": msg})
 
+    name = (person.given_name, person.family_name)
     add, remove = _groups_to_change(
         {group.pk for group in person.all_groups()}, data, error
     )
@@ -1395,26 +1464,9 @@ def person_update(
     moving = _move_to_organization(person, data, error)
     if errors:
         raise ValidationError(errors)
-    if (
-        data.salutation is not None
-        and "short-salutation" not in ignore_warnings
-        and (warning := short_salutation_warning(person.salutation))
-    ):
-        raise ValidationError([
-            {
-                "loc": ["body", "data", "salutation"],
-                "msg": warning,
-                "code": "short-salutation",
-            }
-        ])
-    if (
-        moving
-        and "organization-update" not in ignore_warnings
-        and (warning := organization_update_warning(person))
-    ):
-        raise ValidationError([
-            {"loc": ["body", "data"], "msg": warning, "code": "organization-update"}
-        ])
+    _person_update_warnings(
+        person, data, name=name, moving=moving, ignore_warnings=ignore_warnings
+    )
 
     archival_changed = (
         data.is_archived is not None and data.is_archived != person.is_archived

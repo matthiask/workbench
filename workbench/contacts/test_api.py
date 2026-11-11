@@ -382,6 +382,35 @@ class ContactsAPITest(TestCase):
             {("body", "data", "postal_code"), ("body", "data", "country")},
         )
 
+    def test_rename_duplicates(self):
+        """Renaming people and organizations to the name of someone else is a
+        warning, like creating them"""
+        factories.PersonFactory.create(given_name="Hans", family_name="Muster")
+        factories.OrganizationFactory.create(name="Beispiel AG")
+        person = factories.PersonFactory.create(given_name="Hans", family_name="M")
+        organization = factories.OrganizationFactory.create(name="Beispiel")
+        self.client.force_login(factories.UserFactory.create())
+
+        def patch(url, data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        for url, data in [
+            (f"/api/contacts/people/{person.pk}/", {"family_name": "muster"}),
+            (
+                f"/api/contacts/organizations/{organization.pk}/",
+                {"name": "beispiel ag"},
+            ),
+        ]:
+            response = patch(url, data)
+            self.assertEqual(response.status_code, 422, url)
+            self.assertEqual(response.json()["detail"][0]["code"], "duplicate-name")
+            response = patch(url, data, "?ignore_warnings=duplicate-name")
+            self.assertEqual(response.status_code, 200, response.content)
+            # Unchanged names aren't checked again
+            self.assertEqual(patch(url, data).status_code, 200)
+
     def test_update_organization(self):
         """Organizations get a new name, notes, billing address and groups"""
         industry = Group.objects.create(title="Industry", applies_to_organizations=True)
