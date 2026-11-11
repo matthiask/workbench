@@ -23,6 +23,23 @@ only the contacts of one primary contact (`--primary-contact`) or one
 organization. Address books have hundreds of findings: work in batches
 (`--limit`, `--offset`) and report what's still open when stopping.
 
+Take the type of email addresses, phone numbers and postal addresses into
+account (`wb people show` lists it, e.g. `Email (Work)`, `Address (Home, ID
+123)`). Work, Mobile, Home and Fax are the usual types, others are free
+text:
+
+- Types starting with `organization` (e.g. `organization Work`) were copied
+  from the organization by an old import. When several people share an
+  address or a number, the one who has it with their own type (without the
+  prefix) is usually its owner, the others have a copy.
+- Private addresses (Home, Privat, Zuhause) are supposed to differ from the
+  organization's, and other special types (e.g. Rechnungen, Büro Lausanne)
+  may be deliberate; leave them alone or ask.
+- A private address saved as a work address gets the right type instead of
+  being removed or changed:
+
+      wb people update <person_id> --postal-address-type <address_id> Home --dry-run
+
 ## 1. Duplicates
 
     wb people duplicates
@@ -119,9 +136,12 @@ on several people are usually duplicates or mistakes; ask.
 Organizations whose active people have different addresses; `show` lists
 each address with its ID and the people who have it. The address most
 people have is usually the current one, but not always: ask the user, or
-look at the organization's website if they agree. Home addresses (type
-home, privat) are supposed to differ, leave them alone. Then change the old
-address for the people who still have it:
+look at the organization's website if they agree. Private addresses don't
+count as different addresses, but `show` lists every address of the active
+people without its type: check `wb people show` before changing one. When a
+person has two work addresses, one is often private (fix its type, see
+above) or old. Then change the old address for the people who still have
+it:
 
     wb organizations change-address <organization_id> --address <address_id> \
         --street "Neuweg" --house-number 2 --postal-code 8001 --city Zürich --dry-run
