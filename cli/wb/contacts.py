@@ -1,6 +1,7 @@
 """Organizations and people"""
 
 import click
+from rich.text import Text
 
 from wb.core import (
     cli,
@@ -364,12 +365,26 @@ def show_person(person_id, as_json):
     " them.",
 )
 @click.option(
+    "--remove-email",
+    "remove_emails",
+    multiple=True,
+    help="Email address to remove, e.g. a generic one which belongs to the"
+    " organization; repeat it for several.",
+)
+@click.option(
     "--archive/--unarchive", "is_archived", default=None, help="E.g. who left."
 )
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def update_person(
-    person_id, primary_contact, add_groups, remove_groups, is_archived, dry_run, as_json
+    person_id,
+    primary_contact,
+    add_groups,
+    remove_groups,
+    remove_emails,
+    is_archived,
+    dry_run,
+    as_json,
 ):
     """Change the primary contact and the groups of a person or archive them,
     like in the web interface"""
@@ -379,6 +394,7 @@ def update_person(
             ("primary_contact", primary_contact),
             ("add_groups", list(add_groups)),
             ("remove_groups", list(remove_groups)),
+            ("remove_email_addresses", list(remove_emails)),
             ("is_archived", is_archived),
         ]
         if value not in (None, [])
@@ -386,7 +402,7 @@ def update_person(
     if not data:
         terminate(
             "Nothing to change, pass --primary-contact, --add-group,"
-            " --remove-group, --archive or --unarchive."
+            " --remove-group, --remove-email, --archive or --unarchive."
         )
     data = request(
         "PATCH",
@@ -435,6 +451,42 @@ def people_duplicates(limit, offset, as_json):
         table.add_section()
     console.print(table)
     echo_more(data, offset, "groups")
+
+
+@people.command("shared-emails")
+@page_options
+@click.option("--json", "as_json", is_flag=True)
+def shared_emails(limit, offset, as_json):
+    """Email addresses of several active people of the same organization, or
+    the central address of their organization
+
+    Usually generic addresses like info@: set them as the organization's
+    address (`wb organizations update ID --email`) and remove them from the
+    people (`wb people update ID --remove-email`)."""
+    data = request(
+        "GET",
+        "contacts/people/shared-email-addresses/",
+        params=page_params(limit, offset),
+    )
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table("Email address", "Organization", "People")
+    for row in data["items"]:
+        organization = row["organization"] or {}
+        table.add_row(
+            row["email"]
+            + (" (organization's address)" if row["is_organization_email"] else ""),
+            link(f"{organization['name']} ({organization['id']})", organization["url"])
+            if organization
+            else "",
+            Text(", ").join(
+                link(f"{person['full_name']} ({person['id']})", person["url"])
+                for person in row["people"]
+            ),
+        )
+    console.print(table)
+    echo_more(data, offset, "email addresses")
 
 
 @people.command("reassign-suggestions")

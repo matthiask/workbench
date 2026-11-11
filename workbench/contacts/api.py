@@ -1,4 +1,5 @@
 import datetime as dt
+from collections import defaultdict
 from typing import Literal
 
 from django.db import transaction
@@ -304,6 +305,53 @@ def person_duplicates(request):
     ]
 
 
+class SharedEmailOut(Schema):
+    email: str
+    organization: OrganizationOut | None
+    is_organization_email: bool = Field(
+        description="The central address of the organization, it's shown on its"
+        " people and doesn't belong on them"
+    )
+    people: list[PersonSummary]
+
+
+@router.get("/contacts/people/shared-email-addresses/", response=list[SharedEmailOut])
+@paginate
+def shared_email_addresses(request):
+    """Email addresses of several active people of the same organization (or
+    without one), or the central address of their organization; usually
+    generic addresses like info@ which belong to the organization"""
+    rows = defaultdict(list)
+    for email in (
+        EmailAddress.objects
+        .filter(person__is_archived=False)
+        .select_related("person__organization")
+        .order_by("email", "person__given_name", "person__family_name", "person")
+    ):
+        person = email.person
+        key = (email.email.strip().lower(), person.organization_id)
+        if person not in rows[key]:
+            rows[key].append(person)
+    result = []
+    for (email, _organization_id), people in sorted(
+        rows.items(), key=lambda item: (item[0][0], item[0][1] or 0)
+    ):
+        organization = people[0].organization
+        is_organization_email = bool(
+            organization and organization.email.strip().lower() == email
+        )
+        if len(people) > 1 or is_organization_email:
+            result.append({
+                "email": email,
+                "organization": organization_out(organization, request)
+                if organization
+                else None,
+                "is_organization_email": is_organization_email,
+                "people": [person_summary(person, request) for person in people],
+            })
+    return result
+
+
 class OrganizationDetail(OrganizationOut):
     is_private_person: bool
     notes: str
@@ -563,7 +611,8 @@ def person_context(request):
 
 
 def _email_errors(data):
-    """Email addresses are never used twice"""
+    """Email addresses are never used twice, central addresses of
+    organizations are shown on their people already"""
     return [
         {
             "loc": ["body", "data", "email_addresses", index, "email"],
@@ -572,8 +621,21 @@ def _email_errors(data):
         }
         for index, item in enumerate(data.email_addresses)
         for existing in EmailAddress.objects.filter(
-            email__iexact=item.email
+            email__iexact=item.email.strip()
         ).select_related("person")
+    ] + [
+        {
+            "loc": ["body", "data", "email_addresses", index, "email"],
+            "msg": _(
+                "The central address of %(organization)s (ID %(id)s), it's"
+                " shown on its people."
+            )
+            % {"organization": organization, "id": organization.pk},
+        }
+        for index, item in enumerate(data.email_addresses)
+        for organization in Organization.objects.filter(
+            email__iexact=item.email.strip()
+        )
     ]
 
 
@@ -803,16 +865,40 @@ class PersonPatch(InputSchema):
         " organizations are removed from the organization, so all its people"
         " lose them.",
     )
+    remove_email_addresses: list[str] = Field(
+        default=[],
+        description="Email addresses to remove, e.g. generic ones like info@"
+        " which belong to the organization",
+    )
     is_archived: bool | None = None
+
+
+def _email_addresses_to_remove(person, values, error):
+    """The person's email addresses matching the values (case-insensitive)"""
+    remove = []
+    for index, value in enumerate(values):
+        emails = [
+            email
+            for email in person.emailaddresses.all()
+            if email.email.strip().lower() == value.strip().lower()
+        ]
+        if emails:
+            remove.extend(emails)
+        else:
+            error(
+                ["remove_email_addresses", index],
+                _("The person has no email address %r.") % value,
+            )
+    return remove
 
 
 @router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
 def person_update(
     request, person_id: int, data: PersonPatch, *, dry_run: DryRun = False
 ):
-    """Change the primary contact and the groups of a person or archive them,
-    with the rules of the person form; contact details are added with
-    ``details/``. Archiving the last active person of an organization
+    """Change the primary contact and the groups of a person, remove email
+    addresses or archive them, with the rules of the person form; contact
+    details are added with ``details/``. Archiving the last active person of an organization
     without open projects or deals archives the organization too,
     unarchiving a person unarchives their organization."""
     person = get_object_or_404(
@@ -852,6 +938,9 @@ def person_update(
                 ["primary_contact"],
                 _("Unknown or inactive user %r.") % data.primary_contact,
             )
+    remove_emails = _email_addresses_to_remove(
+        person, data.remove_email_addresses, error
+    )
     if errors:
         raise ValidationError(errors)
 
@@ -861,6 +950,9 @@ def person_update(
     if data.is_archived is not None:
         person.is_archived = data.is_archived
     with transaction.atomic():
+        for email in remove_emails:
+            email.delete()
+        # Also updates the full text search
         person.save()
         if archival_changed:
             update_organization_archival(person)

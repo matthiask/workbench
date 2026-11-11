@@ -1053,6 +1053,69 @@ planned_work:
         result = self.wb("organizations", "search", "--without-active-people")
         self.assertNotIn("Beispiel AG", result.output)
 
+    def test_shared_emails(self):
+        """Generic addresses of several people move to the organization"""
+        organization = factories.OrganizationFactory.create()
+        anna, bea = (
+            factories.PersonFactory.create(organization=organization, given_name=name)
+            for name in ["Anna", "Bea"]
+        )
+        anna.emailaddresses.create(email="info@example.com")
+        bea.emailaddresses.create(email="Info@Example.com ")
+        bea.emailaddresses.create(email="bea@example.com")
+        # Other organizations and archived people don't count
+        factories.PersonFactory.create().emailaddresses.create(email="info@example.com")
+        factories.PersonFactory.create(
+            organization=organization, is_archived=True
+        ).emailaddresses.create(email="bea@example.com")
+
+        result = self.wb("people", "shared-emails", "--json")
+        data = json.loads(result.output)
+        self.assertEqual(
+            [(row["email"], [p["id"] for p in row["people"]]) for row in data["items"]],
+            [("info@example.com", [anna.pk, bea.pk])],
+        )
+        self.assertIn("Anna", self.wb("people", "shared-emails").output)
+
+        self.wb(
+            "organizations", "update", organization.pk, "--email", "info@example.com"
+        )
+        result = self.wb(
+            "people", "update", anna.pk, "--remove-email", "INFO@example.com"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(list(anna.emailaddresses.all()), [])
+        # Bea still has the organization's address
+        result = self.wb("people", "shared-emails", "--json")
+        self.assertEqual(
+            [
+                (row["is_organization_email"], [p["id"] for p in row["people"]])
+                for row in json.loads(result.output)["items"]
+            ],
+            [(True, [bea.pk])],
+        )
+        result = self.wb("people", "update", bea.pk, "--remove-email", "x@example.com")
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb(
+            "people", "update", bea.pk, "--remove-email", "info@example.com"
+        )
+        self.assertEqual(
+            [e.email for e in bea.emailaddresses.all()], ["bea@example.com"]
+        )
+        self.assertEqual(
+            json.loads(self.wb("people", "shared-emails", "--json").output)["count"], 0
+        )
+
+        # The central address isn't added to people again
+        result = self.wb(
+            "people",
+            "add-details",
+            anna.pk,
+            self.file("email_addresses:\n  - email: info@example.com\n"),
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("The central address of", result.output)
+
     def test_invoices(self):
         """Invoices, projected and recurring invoices, and pagination"""
         project = factories.ProjectFactory.create(owned_by=self.user)
