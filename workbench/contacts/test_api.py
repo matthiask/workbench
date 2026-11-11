@@ -411,6 +411,59 @@ class ContactsAPITest(TestCase):
             # Unchanged names aren't checked again
             self.assertEqual(patch(url, data).status_code, 200)
 
+    def test_create_organization(self):
+        """Organizations are created with the organization form, duplicate
+        names are rejected unless they are allowed"""
+        industry = Group.objects.create(title="Industry", applies_to_organizations=True)
+        Group.objects.create(title="Old", is_archived=True)
+        factories.OrganizationFactory.create(name="Beispiel AG")
+        factories.OrganizationFactory.create(name="Alt AG", is_archived=True)
+        user = factories.UserFactory.create(_short_name="xy")
+        self.client.force_login(user)
+
+        def post(data, query=""):
+            return self.client.post(
+                f"/api/contacts/organizations/{query}",
+                data,
+                content_type="application/json",
+            )
+
+        data = {
+            "name": "Neu AG",
+            "email": "info@example.com",
+            "phone_number": "044 123 45 67",
+            "notes": "Found at a conference",
+            "groups": ["Industry"],
+        }
+        response = post(data, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertFalse(Organization.objects.filter(name="Neu AG").exists())
+
+        response = post(data)
+        self.assertEqual(response.status_code, 200, response.content)
+        organization = Organization.objects.get(pk=response.json()["id"])
+        self.assertEqual(organization.primary_contact, user)
+        self.assertEqual(organization.phone_number, "+41441234567")
+        self.assertEqual(list(organization.groups.all()), [industry])
+
+        for data, loc in [
+            ({"name": "beispiel ag"}, ["body", "data"]),
+            ({"name": "Alt AG"}, ["body", "data"]),
+            ({"name": "X", "groups": ["Old"]}, ["body", "data", "groups", 0]),
+            ({"name": "X", "email": "nope"}, ["body", "data", "email"]),
+            (
+                {"name": "X", "primary_contact": "nobody"},
+                ["body", "data", "primary_contact"],
+            ),
+            ({"name": " "}, ["body", "data", "name"]),
+        ]:
+            response = post(data)
+            self.assertEqual(response.status_code, 422, data)
+            self.assertEqual([e["loc"] for e in response.json()["detail"]], [loc], data)
+        response = post({"name": "beispiel ag"}, "?allow_duplicates=true")
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_update_organization(self):
         """Organizations get a new name, notes, billing address and groups"""
         industry = Group.objects.create(title="Industry", applies_to_organizations=True)

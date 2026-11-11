@@ -16,6 +16,7 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import (
     GroupForm,
     GroupSearchForm,
+    OrganizationForm,
     OrganizationMergeForm,
     OrganizationPostalAddressForm,
     PersonForm,
@@ -650,6 +651,116 @@ def organization_update(
         result = _organization_detail_out(organization, request)
         if dry_run:
             transaction.set_rollback(True)
+    return result
+
+
+class OrganizationIn(InputSchema):
+    name: str
+    is_private_person: bool = False
+    notes: str = ""
+    primary_contact: str | None = Field(
+        default=None,
+        description="Short name of an active user, defaults to the current user",
+    )
+    email: str = Field(
+        default="",
+        description="Central address, e.g. info@; it's shown on the people of"
+        " the organization, don't add it to them",
+    )
+    accounts_payable_email: str = Field(
+        default="", description="For invoices and payment reminders"
+    )
+    phone_number: str = Field(
+        default="",
+        description="Central number, e.g. the reception; it's shown on the"
+        " people of the organization, don't add it to them",
+    )
+    default_billing_address: str = Field(
+        default="", description="E.g. of a centralized accounts payable department"
+    )
+    groups: list[str] = Field(default=[], description="Titles or IDs of active groups")
+
+
+class OrganizationCreated(OrganizationDetail):
+    id: int | None
+    url: str | None
+
+
+@router.post("/contacts/organizations/", response=OrganizationCreated)
+def organization_create(
+    request,
+    data: OrganizationIn,
+    *,
+    dry_run: DryRun = False,
+    allow_duplicates: Query[
+        bool,
+        P(
+            description="Create the organization although one with the same"
+            " name exists."
+        ),
+    ] = False,
+):
+    """Create an organization with the rules of the organization form;
+    organizations with the same name are rejected (also archived ones, which
+    should rather be unarchived), nothing is saved if anything is invalid or
+    with ``dry_run``. People are added with their organization's ID."""
+    errors = []
+
+    def error(loc, msg):
+        errors.append({"loc": ["body", "data", *loc], "msg": msg})
+
+    if not allow_duplicates:
+        for organization in Organization.objects.filter(name__iexact=data.name.strip()):
+            error(
+                [],
+                (
+                    _(
+                        "%(organization)s (ID %(id)s) has been archived. Unarchive"
+                        " it instead, or allow duplicates."
+                    )
+                    if organization.is_archived
+                    else _(
+                        "%(organization)s (ID %(id)s) exists already. Use its ID or"
+                        " allow duplicates."
+                    )
+                )
+                % {"organization": organization.name, "id": organization.pk},
+            )
+    primary_contact = request.user
+    if data.primary_contact:
+        if user := User.objects.by_short_name(data.primary_contact).first():
+            primary_contact = user
+        else:
+            error(["primary_contact"], _("Unknown user %r.") % data.primary_contact)
+    groups = []
+    for index, value in enumerate(data.groups):
+        group = _group(value)
+        if not group:
+            error(["groups", index], _("Unknown group %r.") % value)
+        elif group.is_archived:
+            error(["groups", index], _("The group %r is archived.") % group.title)
+        else:
+            groups.append(group.pk)
+    form = OrganizationForm(
+        {
+            **data.dict(exclude={"primary_contact", "groups"}),
+            "primary_contact": primary_contact.pk,
+            "groups": groups,
+        },
+        request=request,
+    )
+    try:
+        validate_form(form)
+    except ValidationError as exc:
+        errors.extend(exc.errors)
+    if errors:
+        raise ValidationError(errors)
+    with transaction.atomic():
+        organization = form.save()
+        result = _organization_detail_out(organization, request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "url": None}
     return result
 
 

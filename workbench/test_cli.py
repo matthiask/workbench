@@ -1336,6 +1336,28 @@ planned_work:
             [group.title for group in organization.groups.all()], ["Agenturen"]
         )
 
+    def test_create_organization(self):
+        """Organizations are created, duplicate names are rejected"""
+        result = self.wb(
+            "organizations",
+            "create",
+            "Neu AG",
+            "--email",
+            "info@example.com",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("info@example.com", result.output)
+        self.assertFalse(Organization.objects.exists())
+        result = self.wb("organizations", "create", "Neu AG")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertTrue(Organization.objects.filter(name="Neu AG").exists())
+        result = self.wb("organizations", "create", "neu ag")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("exists already", result.output)
+        result = self.wb("organizations", "create", "neu ag", "--allow-duplicates")
+        self.assertEqual(result.exit_code, 0, result.output)
+
     def test_person_organization(self):
         """People who left move to their new organization or to none, like in
         the person form; they stay the contact of their projects"""

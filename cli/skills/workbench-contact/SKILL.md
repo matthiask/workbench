@@ -29,7 +29,11 @@ address and their organization:
   details removed with its `--remove-*` options and postal addresses changed
   with `wb people change-address`; confirm changes with the user first.
 - If the organization exists, use its ID (`organization`). If several match,
-  ask which one. Only use `new_organization` when there's none.
+  ask which one. Only use `new_organization` when there's none. If the data
+  has a central email address (info@, kontakt@, ...) or a reception number,
+  they belong to the organization, not the person: create it first with
+  `wb organizations create "<name>" --email ... --phone-number ... --dry-run`
+  (after the user's approval without `--dry-run`) and use its ID.
 
 ## 2. Get the schema
 

@@ -120,6 +120,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   organizations (`--without-active-people`, `--primary-contact`), `wb
   organizations update` changes their name, notes, billing address, groups
   and primary contact and archives them,
+  `wb organizations create` creates them with `OrganizationForm` (names of
+  existing organizations, also archived ones, are rejected unless
+  `allow_duplicates`),
   `wb organizations merge ID --into ID` merges duplicates
   (`OrganizationMergeForm`, `merge_organizations()`). `wb people search` filters people like
   the people list of the web interface (`--group`, also through the

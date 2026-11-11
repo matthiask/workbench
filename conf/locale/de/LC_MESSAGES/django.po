@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 15:28+0100\n"
+"POT-Creation-Date: 2026-11-11 15:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1020,15 +1020,28 @@ msgstr "Unbekannte Gruppe %r."
 #: workbench/contacts/api.py
 #, python-format
 msgid "%(name)s (ID %(id)s) has the same name. Merge them if they are the same."
-msgstr ""
-"%(name)s (ID %(id)s) hat denselben Namen. Falls es dieselben sind, "
-"zusammenführen."
+msgstr "%(name)s (ID %(id)s) hat denselben Namen. Falls es dieselben sind, zusammenführen."
 
 #: workbench/contacts/api.py workbench/deals/api.py workbench/invoices/api.py
 #: workbench/planning/api.py workbench/projects/api.py
 #, python-format
 msgid "Unknown or inactive user %r."
 msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "%(organization)s (ID %(id)s) has been archived. Unarchive it instead, or allow duplicates."
+msgstr "%(organization)s (ID %(id)s) wurde archiviert. Hole die Organisation aus dem Archiv, oder erlaube Duplikate."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "%(organization)s (ID %(id)s) exists already. Use its ID or allow duplicates."
+msgstr "%(organization)s (ID %(id)s) existiert bereits. Verwende ihre ID oder erlaube Duplikate."
+
+#: workbench/contacts/api.py
+#, python-format
+msgid "The group %r is archived."
+msgstr "Die Gruppe %r ist archiviert."
 
 #: workbench/contacts/api.py
 #, python-format
@@ -1049,11 +1062,6 @@ msgstr "%(person)s (ID %(id)s) existiert bereits. Erlaube Duplikate, falls es si
 #, python-format
 msgid "%(person)s (ID %(id)s) has been archived. Unarchive them instead, or allow duplicates if this is someone else."
 msgstr "%(person)s (ID %(id)s) wurde archiviert. Hole die Person aus dem Archiv, oder erlaube Duplikate, falls es sich um jemand anderes handelt."
-
-#: workbench/contacts/api.py
-#, python-format
-msgid "%(organization)s (ID %(id)s) exists already. Use its ID or allow duplicates."
-msgstr "%(organization)s (ID %(id)s) existiert bereits. Verwende ihre ID oder erlaube Duplikate."
 
 #: workbench/contacts/api.py
 msgid "Listed twice."
@@ -1102,11 +1110,6 @@ msgstr "Die %(detail)s %(id)r wird entfernt."
 #, python-format
 msgid "The type must have between 1 and %s characters."
 msgstr "Der Typ muss zwischen 1 und %s Zeichen lang sein."
-
-#: workbench/contacts/api.py
-#, python-format
-msgid "The group %r is archived."
-msgstr "Die Gruppe %r ist archiviert."
 
 #: workbench/contacts/api.py
 #, python-format

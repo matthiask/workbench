@@ -188,6 +188,93 @@ def show_organization(organization_id, as_json):
     echo_json(data) if as_json else _echo_organization(data)
 
 
+@organizations.command("create")
+@click.argument("name")
+@click.option("--private-person", "is_private_person", is_flag=True)
+@click.option("--notes")
+@click.option(
+    "--primary-contact",
+    help="Short name, defaults to you.",
+    shell_complete=complete_short_names,
+)
+@click.option(
+    "--email",
+    default="",
+    help="Central address, e.g. info@, shown on the organization's people too.",
+)
+@click.option(
+    "--accounts-payable-email",
+    default="",
+    help="For invoices and payment reminders.",
+)
+@click.option(
+    "--phone-number",
+    default="",
+    help="Central number, e.g. the reception, shown on the organization's people too.",
+)
+@click.option(
+    "--default-billing-address",
+    default="",
+    help="E.g. of a centralized accounts payable department.",
+)
+@click.option(
+    "--group",
+    "groups",
+    multiple=True,
+    help="Title or ID of a group; repeat it for several.",
+)
+@click.option(
+    "--allow-duplicates",
+    is_flag=True,
+    help="Create it although an organization with the same name exists.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_organization(
+    name,
+    is_private_person,
+    notes,
+    primary_contact,
+    email,
+    accounts_payable_email,
+    phone_number,
+    default_billing_address,
+    groups,
+    allow_duplicates,
+    dry_run,
+    as_json,
+):
+    """Create an organization; people are added to it with `wb people create`
+    and its ID. Organizations with the same name are rejected."""
+    data = {
+        "name": name,
+        "is_private_person": is_private_person,
+        "notes": notes or "",
+        "email": email,
+        "accounts_payable_email": accounts_payable_email,
+        "phone_number": phone_number,
+        "default_billing_address": default_billing_address,
+        "groups": list(groups),
+    }
+    if primary_contact:
+        data["primary_contact"] = primary_contact
+    data = request(
+        "POST",
+        "contacts/organizations/",
+        json=data,
+        params={
+            "dry_run": format_bool(dry_run),
+            "allow_duplicates": format_bool(allow_duplicates),
+        },
+    )
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing created:")
+    _echo_organization(data)
+
+
 @organizations.command("update")
 @click.argument("organization_id", type=int)
 @click.option("--name")

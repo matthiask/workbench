@@ -164,6 +164,7 @@ the groups of an organization:
     wb people update 1234 --salutation "Liebe Anna" --first-name-terms
     wb people update 1234 --archive
     wb organizations update 45 --name "Beispiel AG" --add-group "Agenturen"
+    wb organizations create "Neu AG" --email info@example.com --dry-run
 
 People whose primary contact left get new ones from their projects and deals
 (the lead of the latest project or the owner of the latest deal, the person's
