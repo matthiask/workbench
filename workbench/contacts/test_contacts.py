@@ -372,8 +372,7 @@ class ContactsTest(TestCase):
         response = self.client.get(person.urls["update"])
         self.assertContains(
             response,
-            'data-suggestions="[&quot;Work&quot;, &quot;Mobile&quot;, &quot;Home&quot;,'
-            ' &quot;Fax&quot;]"',
+            'data-suggestions="[&quot;Work&quot;, &quot;Mobile&quot;, &quot;Home&quot;]"',
         )
 
     def test_detail_types_migration(self):

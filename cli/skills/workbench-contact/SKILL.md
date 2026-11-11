@@ -68,7 +68,7 @@ Guidelines:
 - The salutation is in the language of the correspondence (usually German).
   Use first-name terms only if the data or the user says so.
 - `type` of email addresses, phone numbers and postal addresses defaults to
-  Work; use Mobile, Home or Fax where it's clear (other types are possible,
+  Work; use Mobile or Home where it's clear (other types are possible,
   but these are the ones the forms suggest).
 - Quote postal codes and house numbers so they stay strings.
 - Leave out `notes` unless the user wants to keep something, and never put

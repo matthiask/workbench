@@ -662,7 +662,7 @@ def organization_change_postal_address(
 class ContactDetail(Schema):
     id: int
     type: str = Field(
-        description="Free text; Work, Mobile, Home and Fax are suggested and"
+        description="Free text; Work, Mobile and Home are suggested and"
         " keep their spelling, details copied from the organization start with"
         " organization."
     )
@@ -720,7 +720,7 @@ class EmailAddressIn(InputSchema):
 
 class PhoneNumberIn(InputSchema):
     type: str | None = Field(
-        default=None, max_length=40, description="E.g. Work, Mobile, Home or Fax."
+        default=None, max_length=40, description="E.g. Work, Mobile or Home."
     )
     phone_number: str = Field(
         description="Numbers without a country code are Swiss numbers."

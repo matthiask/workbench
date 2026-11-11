@@ -407,11 +407,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   removes the old organization's addresses, `--postal-address-type ID TYPE`
   fixes the type, e.g. of private addresses saved as work addresses.
   The types of email addresses, phone numbers and postal addresses are free
-  text; the forms suggest `PersonDetail.TYPES` (Work, Mobile, Home, Fax,
+  text; the forms suggest `PersonDetail.TYPES` (Work, Mobile, Home;
   `SuggestionsInput`, `initSuggestions` in `main.js`), which keep their
   spelling when saved. Details copied from the organization by an old import
-  start with `organization` and come last (`PersonDetail.WEIGHTS`). Former employees stay in an
-  active group (e.g. the team's) so they aren't archived.
+  start with `organization` and come last (`PersonDetail.WEIGHTS`). Former
+  employees stay in an active group (e.g. the team's) so they aren't
+  archived.
   Archiving an organization warns about its active people
   (`archive-people`, form and API) and archives them when confirmed
   (`Organization.archive_warning()`, `archive_people()`).

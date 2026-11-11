@@ -25,7 +25,7 @@ organization. Address books have hundreds of findings: work in batches
 
 Take the type of email addresses, phone numbers and postal addresses into
 account (`wb people show` lists it, e.g. `Email (Work)`, `Address (Home, ID
-123)`). Work, Mobile, Home and Fax are the usual types, others are free
+123)`). Work, Mobile and Home are the usual types, others are free
 text:
 
 - Types starting with `organization` (e.g. `organization Work`) were copied

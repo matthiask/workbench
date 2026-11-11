@@ -570,7 +570,7 @@ def pretty_phone_number(value):
 
 
 class PhoneNumber(PersonDetail):
-    TYPES = ("Work", "Mobile", "Home", "Fax")
+    TYPES = ("Work", "Mobile", "Home")
 
     person = models.ForeignKey(
         Person,
