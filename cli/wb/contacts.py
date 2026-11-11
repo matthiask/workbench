@@ -89,7 +89,8 @@ def organizations():
 @click.option(
     "--several-postal-addresses",
     is_flag=True,
-    help="Only organizations whose active people have different postal addresses.",
+    help="Only organizations whose active people have different postal addresses,"
+    " private ones (e.g. Home) don't count.",
 )
 @click.option("--include-archived", is_flag=True, help="Also archived contacts.")
 @page_options

@@ -1364,7 +1364,12 @@ planned_work:
         bea.postaladdresses.create(**old)
         carl.postaladdresses.create(**old, house_number="2")
         other = factories.OrganizationFactory.create(name="Anders AG")
-        factories.PersonFactory.create(organization=other).postaladdresses.create(**old)
+        anders = factories.PersonFactory.create(organization=other)
+        anders.postaladdresses.create(**old)
+        # Private addresses are supposed to differ
+        anders.postaladdresses.create(
+            type="Privat", street="Heimweg", postal_code="8001", city="Zürich"
+        )
 
         result = self.wb("organizations", "search", "--several-postal-addresses")
         self.assertIn("Beispiel AG", result.output)

@@ -26,6 +26,7 @@ from workbench.contacts.forms import (
 from workbench.contacts.merge import possible_duplicates
 from workbench.contacts.models import (
     ADDRESS_FIELDS,
+    HOME_TYPE,
     EmailAddress,
     Group,
     Organization,
@@ -162,7 +163,7 @@ class OrganizationSearchFilter(OrganizationFilter):
     several_postal_addresses: bool = Field(
         default=False,
         description="Only organizations whose active people have different postal"
-        " addresses, e.g. old ones",
+        " addresses, e.g. old ones; private addresses (e.g. Home) don't count",
     )
 
 
@@ -192,8 +193,14 @@ def organization_list(request, filters: Query[OrganizationSearchFilter]):
             ),
             output_field=TextField(),
         )
+        # Private addresses are supposed to differ
         organizations = organizations.annotate(
-            addresses=Count(address, distinct=True, filter=Q(people__is_archived=False))
+            addresses=Count(
+                address,
+                distinct=True,
+                filter=Q(people__is_archived=False)
+                & ~Q(people__postaladdresses__type__iregex=HOME_TYPE.pattern),
+            )
         ).filter(addresses__gt=1)
     return Serialized(
         organizations, lambda organization: organization_out(organization, request)

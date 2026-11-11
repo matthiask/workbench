@@ -502,14 +502,15 @@ def unarchive_organization(person):
     return organization
 
 
-_home_re = re.compile(r"(home|hause|privat)", re.IGNORECASE)
+# Types of private addresses, e.g. Home, Privat or Zuhause
+HOME_TYPE = re.compile(r"(home|hause|privat)", re.IGNORECASE)
 
 
 class PersonDetail(Model):
     WEIGHTS = (
         (re.compile(r"mobil", re.IGNORECASE), 30),
         (re.compile(r"(work|arbeit)", re.IGNORECASE), 20),
-        (_home_re, 10),
+        (HOME_TYPE, 10),
         (re.compile(r"(organization|firm)", re.IGNORECASE), -100),
     )
 
@@ -653,7 +654,7 @@ class PostalAddress(PersonDetail):
             self.person.organization.name
             if self.person.organization
             and not self.person.organization.is_private_person
-            and not _home_re.search(self.type)
+            and not HOME_TYPE.search(self.type)
             else "",
             self.person.full_name,
             " ".join(filter(None, (self.street, self.house_number))),
