@@ -20,6 +20,7 @@ from workbench.contacts.views import (
     OrganizationListView,
     duplicates,
     merge,
+    organization_duplicates,
     person_vcard,
     select,
 )
@@ -78,6 +79,11 @@ urlpatterns = [
             title=_("Change a postal address of %(instance)s"),
         ),
         name="contacts_organization_postal_address",
+    ),
+    path(
+        "organizations/duplicates/",
+        organization_duplicates,
+        name="contacts_organization_duplicates",
     ),
     path(
         "organizations/<int:pk>/merge/",

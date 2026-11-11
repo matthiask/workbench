@@ -24,6 +24,7 @@ from workbench.contacts.merge import (
     merge_people,
     merge_warnings,
     possible_duplicates,
+    possible_organization_duplicates,
 )
 from workbench.contacts.models import (
     Group,
@@ -774,6 +775,50 @@ class ContactsTest(TestCase):
         )
         self.assertEqual(response.json(), {"redirect": anna.urls["detail"]})
         self.assertEqual(possible_duplicates(), [])
+
+    def test_possible_organization_duplicates(self):
+        """Organizations with the same name or central email address are
+        possible duplicates, also through others and archived ones"""
+        feinheit = factories.OrganizationFactory.create(name="Feinheit AG")
+        same_name = factories.OrganizationFactory.create(
+            name=" feinheit  ag", is_archived=True
+        )
+        same_name.email = "Info@Feinheit.ch"
+        same_name.save()
+        same_email = factories.OrganizationFactory.create(
+            name="Feinheit", email="info@feinheit.ch"
+        )
+        factories.OrganizationFactory.create(name="Feinheit GmbH")
+        archived = [
+            factories.OrganizationFactory.create(name="Old AG", is_archived=True)
+            for _i in range(2)
+        ]
+        self.assertEqual(
+            possible_organization_duplicates(),
+            [[feinheit, same_email, same_name], archived],
+        )
+
+        self.client.force_login(feinheit.primary_contact)
+        url = Organization.urls["duplicates"]
+        response = self.client.get(Organization.urls["list"])
+        self.assertContains(response, url)
+        response = self.client.get(url)
+        self.assertContains(response, same_email.urls["detail"])
+        self.assertContains(response, archived[1].urls["detail"])
+        self.assertContains(
+            response, f"{same_name.urls['merge']}?into={feinheit.pk}&amp;next="
+        )
+
+        response = self.client.post(
+            f"{same_name.urls['merge']}?next={url}",
+            {"modal-into": feinheit.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.json(), {"redirect": url})
+        # The central address moved to the organization kept
+        self.assertEqual(
+            possible_organization_duplicates(), [[feinheit, same_email], archived]
+        )
 
     def test_archive_organization_with_last_person(self):
         """Archiving the last active person archives the organization unless

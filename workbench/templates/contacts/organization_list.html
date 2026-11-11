@@ -1,4 +1,10 @@
 {% extends "contacts/object_list.html" %}
+{% load i18n %}
+
+{% block search-form-buttons %}
+  <a href="{% url 'contacts_organization_duplicates' %}" class="btn btn-quiet">{% translate 'Possible duplicates' %}</a>
+  {{ block.super }}
+{% endblock search-form-buttons %}
 
 {% block rows %}
   {% for organization in object_list %}

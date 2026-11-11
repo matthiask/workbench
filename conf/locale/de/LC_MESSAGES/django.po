@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 09:43+0100\n"
+"POT-Creation-Date: 2026-11-11 13:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1339,6 +1339,7 @@ msgstr "Organisation"
 
 #: workbench/contacts/models.py workbench/reporting/squeeze.py
 #: workbench/templates/contacts/object_list.html
+#: workbench/templates/contacts/organization_duplicates.html
 msgid "organizations"
 msgstr "Organisationen"
 
@@ -5031,6 +5032,8 @@ msgid "Quick actions"
 msgstr "Schnellaktionen"
 
 #: workbench/templates/contacts/duplicates.html
+#: workbench/templates/contacts/organization_duplicates.html
+#: workbench/templates/contacts/organization_list.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/contacts/person_list.html
 msgid "Possible duplicates"
@@ -5042,16 +5045,19 @@ msgstr "Personen mit demselben Namen oder derselben E-Mail-Adresse."
 
 #: workbench/templates/contacts/duplicates.html
 #: workbench/templates/contacts/group_list.html
+#: workbench/templates/contacts/organization_duplicates.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/contacts/person_list.html
 msgid "archived"
 msgstr "archiviert"
 
 #: workbench/templates/contacts/duplicates.html
+#: workbench/templates/contacts/organization_duplicates.html
 msgid "Merge"
 msgstr "Zusammenführen"
 
 #: workbench/templates/contacts/duplicates.html
+#: workbench/templates/contacts/organization_duplicates.html
 msgid "No possible duplicates."
 msgstr "Keine möglichen Duplikate."
 
@@ -5141,6 +5147,12 @@ msgstr "Letzte Rechnungen"
 #: workbench/templates/contacts/organization_detail.html
 msgid "Recent offers"
 msgstr "Letzte Offerten"
+
+#: workbench/templates/contacts/organization_duplicates.html
+msgid "Organizations with the same name or email address, archived ones included."
+msgstr ""
+"Organisationen mit demselben Namen oder derselben E-Mail-Adresse, auch "
+"archivierte."
 
 #: workbench/templates/contacts/person_detail.html
 msgid "Merge into another person"

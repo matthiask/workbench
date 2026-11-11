@@ -142,7 +142,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   web interface, `PersonMergeForm`; organizations are merged in the web
   interface only, `merge_organizations()`; possible duplicates (the same name, or the same email address and a
   common given or family name) are listed on the person, globally and by
-  `wb people duplicates`, `possible_duplicates()`; `merge_people()` in
+  `wb people duplicates`, `possible_duplicates()`; organizations with the
+  same name (case and whitespace ignored) or central email address are
+  listed globally, archived ones included,
+  `possible_organization_duplicates()`; `merge_people()` in
   `workbench/contacts/merge.py`): reverse relations move with
   `substitute_with()`, groups are added with `add_to_group()`, details the
   person kept has already are dropped, notes are appended, the person kept

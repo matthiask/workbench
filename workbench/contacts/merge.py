@@ -1,17 +1,18 @@
-"""Merging duplicate people"""
+"""Merging duplicate people and organizations"""
 
 import itertools
 from collections import defaultdict
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Count, Q, Value
+from django.db.models import Count, Prefetch, Q, Value
 from django.db.models.functions import Concat, Lower, Trim
 from django.utils.translation import gettext as _, ngettext
 
 from workbench.contacts.models import (
     ADDRESS_FIELDS,
     EmailAddress,
+    Organization,
     Person,
     unarchive_organization,
 )
@@ -293,3 +294,39 @@ def possible_duplicates():
         (group for group in groups.values() if len(group) > 1),
         key=lambda group: group[0].full_name.casefold(),
     )
+
+
+def _organization_name(name):
+    return " ".join(name.casefold().split())
+
+
+def possible_organization_duplicates():
+    """Groups of organizations with the same name or the same central email
+    address, archived ones included (also through others: A has B's name and
+    C's email address)"""
+    parent = {}
+
+    def find(node):
+        while parent.setdefault(node, node) != node:
+            parent[node] = node = parent[parent[node]]
+        return node
+
+    for pk, name, email in Organization.objects.values_list("pk", "name", "email"):
+        parent[find(("organization", pk))] = find(("name", _organization_name(name)))
+        if email := email.strip().lower():
+            parent[find(("organization", pk))] = find(("email", email))
+
+    groups = defaultdict(list)
+    for node in list(parent):
+        if node[0] == "organization":
+            groups[find(node)].append(node[1])
+    pks = [pk for group in groups.values() if len(group) > 1 for pk in group]
+    organizations = defaultdict(list)
+    for organization in (
+        Organization.objects
+        .filter(pk__in=pks)
+        .prefetch_related(Prefetch("people", queryset=Person.objects.active()))
+        .order_by("is_archived", "pk")
+    ):
+        organizations[find(("organization", organization.pk))].append(organization)
+    return sorted(organizations.values(), key=lambda group: group[0].name.casefold())

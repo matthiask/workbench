@@ -6,7 +6,10 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 
 from workbench.contacts.forms import OrganizationSearchForm, PersonAutocompleteForm
-from workbench.contacts.merge import possible_duplicates
+from workbench.contacts.merge import (
+    possible_duplicates,
+    possible_organization_duplicates,
+)
 from workbench.contacts.models import Organization, Person
 from workbench.generic import ListView
 from workbench.tools.vcard import person_to_vcard, render_vcard_response
@@ -78,4 +81,12 @@ def duplicates(request):
         request,
         "contacts/duplicates.html",
         {"groups": possible_duplicates()},
+    )
+
+
+def organization_duplicates(request):
+    return render(
+        request,
+        "contacts/organization_duplicates.html",
+        {"groups": possible_organization_duplicates()},
     )
