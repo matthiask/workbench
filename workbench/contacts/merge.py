@@ -145,12 +145,33 @@ def _duplicates_queryset():
     )
 
 
+def _name_parts(person):
+    return {
+        part
+        for part in (
+            person.given_name.strip().lower(),
+            person.family_name.strip().lower(),
+        )
+        if part
+    }
+
+
+def _may_be_duplicates(a, b):
+    """Archived people of other organizations than active people probably
+    changed their job, the person form recommends a new person then"""
+    return a.is_archived == b.is_archived or a.organization_id == b.organization_id
+
+
 def duplicates_of(person):
-    """People with the same name or email address as the person"""
+    """People with the same name as the person, or with the same email
+    address and a common given or family name (shared addresses like info@
+    aren't a reason)"""
     emails = {email.email.strip().lower() for email in person.emailaddresses.all()}
     name = Person.objects.annotate(n=_name()).values("n").get(pk=person.pk)["n"]
-    return list(
-        _duplicates_queryset()
+    parts = _name_parts(person)
+    return [
+        other
+        for other in _duplicates_queryset()
         .annotate(n=_name())
         .filter(
             Q(n=name)
@@ -162,13 +183,15 @@ def duplicates_of(person):
             )
         )
         .exclude(pk=person.pk)
-    )
+        if (other.n == name or parts & _name_parts(other))
+        and _may_be_duplicates(person, other)
+    ]
 
 
 def possible_duplicates():
-    """Groups of people with the same name or email address (also through
-    others: A has B's name and C's email address), with at least one person
-    who isn't archived"""
+    """Groups of people with the same name, or with the same email address
+    and a common given or family name (also through others: A has B's name
+    and C's email address), with at least one person who isn't archived"""
     names = (
         Person.objects
         .annotate(key=_name())
@@ -185,24 +208,22 @@ def possible_duplicates():
         .filter(count__gt=1)
         .values("key")
     )
-    pairs = itertools.chain(
-        (
-            (pk, ("name", key))
-            for pk, key in Person.objects
-            .annotate(key=_name())
-            .filter(key__in=names)
-            .values_list("pk", "key")
-        ),
-        (
-            (pk, ("email", key))
-            for pk, key in EmailAddress.objects
-            .annotate(key=Lower(Trim("email")))
-            .filter(key__in=emails)
-            .values_list("person", "key")
-        ),
-    )
+    by_email = defaultdict(set)
+    for pk, key in (
+        EmailAddress.objects
+        .annotate(key=Lower(Trim("email")))
+        .filter(key__in=emails)
+        .values_list("person", "key")
+    ):
+        by_email[key].add(pk)
+    parts = {
+        person.pk: _name_parts(person)
+        for person in Person.objects.filter(
+            pk__in=set().union(*by_email.values())
+        ).only("given_name", "family_name")
+    }
 
-    # Union find of people and their keys
+    # Union find of people and the names they share
     parent = {}
 
     def find(node):
@@ -210,8 +231,20 @@ def possible_duplicates():
             parent[node] = node = parent[parent[node]]
         return node
 
-    for pk, key in pairs:
-        parent[find(("person", pk))] = find(key)
+    def union(a, b):
+        parent[find(a)] = find(b)
+
+    for pk, key in (
+        Person.objects
+        .annotate(key=_name())
+        .filter(key__in=names)
+        .values_list("pk", "key")
+    ):
+        union(("person", pk), ("name", key))
+    for pks in by_email.values():
+        for a, b in itertools.combinations(sorted(pks), 2):
+            if parts[a] & parts[b]:
+                union(("person", a), ("person", b))
 
     groups = defaultdict(list)
     people = _duplicates_queryset().filter(
@@ -219,11 +252,12 @@ def possible_duplicates():
     )
     for person in people:
         groups[find(("person", person.pk))].append(person)
+    for key, group in groups.items():
+        organizations = {p.organization_id for p in group if not p.is_archived}
+        groups[key] = [
+            p for p in group if not p.is_archived or p.organization_id in organizations
+        ]
     return sorted(
-        (
-            group
-            for group in groups.values()
-            if any(not person.is_archived for person in group)
-        ),
+        (group for group in groups.values() if len(group) > 1),
         key=lambda group: group[0].full_name.casefold(),
     )

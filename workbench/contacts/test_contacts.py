@@ -681,12 +681,44 @@ class ContactsTest(TestCase):
         same_name.emailaddresses.create(email="anna@example.com", type="work")
         same_email.emailaddresses.create(email="Anna@Example.com ", type="work")
         other = factories.PersonFactory.create(given_name="Bea", family_name="Muster")
+        # Shared addresses (info@) only link people with a common name
+        other.emailaddresses.create(email="info@example.com", type="work")
+        factories.PersonFactory.create(
+            given_name="Dora", family_name="Beispiel"
+        ).emailaddresses.create(email="info@example.com", type="work")
         archived = [
             factories.PersonFactory.create(
                 given_name="Carl", family_name="Muster", is_archived=True
             )
             for _i in range(2)
         ]
+
+        # Archived people of other organizations probably changed their job,
+        # those of the same organization are duplicates
+        eva = factories.PersonFactory.create(
+            given_name="Eva",
+            family_name="Muster",
+            organization=factories.OrganizationFactory.create(),
+        )
+        factories.PersonFactory.create(
+            given_name="Eva",
+            family_name="Muster",
+            is_archived=True,
+            organization=factories.OrganizationFactory.create(),
+        )
+        self.assertEqual(duplicates_of(eva), [])
+        old_eva = factories.PersonFactory.create(
+            given_name="Eva",
+            family_name="Muster",
+            is_archived=True,
+            organization=eva.organization,
+        )
+        self.assertEqual(duplicates_of(eva), [old_eva])
+        self.assertEqual(
+            possible_duplicates(), [[anna, same_name, same_email], [eva, old_eva]]
+        )
+        eva.delete()
+        old_eva.delete()
 
         self.assertEqual(possible_duplicates(), [[anna, same_name, same_email]])
         self.assertEqual(duplicates_of(anna), [same_name])
