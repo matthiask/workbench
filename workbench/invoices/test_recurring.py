@@ -10,7 +10,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
 from workbench.reporting.models import FreezeDate
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import currency, local_date_format
 from workbench.tools.models import default_tax_rate
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -440,6 +440,76 @@ class RecurringTest(TestCase):
         self.assertIn(invoices[1].code, message.subject)
         self.assertIn(local_date_format(invoices[1].due_on), message.body)
         self.assertEqual(len(message.attachments), 1)
+
+    def test_send_automatically_configured(self):
+        """The recipient, subject and text are configured on the recurring
+        invoice; the placeholders are replaced for each invoice"""
+        r = factories.RecurringInvoiceFactory.create(
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+            send_automatically=True,
+            send_to="other@example.com",
+            mail_subject="Rechnung {code}",
+            mail_body="{total} für {service_period}, bis {due_on}.",
+        )
+        r.contact.emailaddresses.create(email="contact@example.com")
+        [invoice] = r.create_invoices()
+        self.assertEqual(invoice.status, Invoice.SENT)
+        message = mail.outbox[0]
+        self.assertEqual(message.to, ["other@example.com"])
+        self.assertEqual(message.subject, f"Rechnung {invoice.code}")
+        self.assertEqual(
+            message.body,
+            f"{currency(invoice.total)} für {invoice.service_period},"
+            f" bis {local_date_format(invoice.due_on)}.",
+        )
+
+    def test_send_automatically_form(self):
+        """The form proposes the recipient and the mail with placeholders"""
+        r = factories.RecurringInvoiceFactory.create(
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+            starts_on=in_days(10),
+        )
+        r.contact.salutation = "Liebe Anna"
+        r.contact.address_on_first_name_terms = True
+        r.contact.save()
+        r.contact.emailaddresses.create(email="anna@example.com")
+        self.client.force_login(r.owned_by)
+
+        response = self.client.get(r.urls["update"])
+        self.assertContains(response, 'value="anna@example.com"')
+        self.assertContains(response, "Rechnung {code} von")
+        self.assertContains(response, "Liebe Anna")
+        self.assertContains(response, "über CHF {total}, zahlbar bis {due_on}")
+
+        data = {
+            "customer": r.customer_id,
+            "contact": r.contact_id,
+            "title": r.title,
+            "owned_by": r.owned_by_id,
+            "postal_address": r.postal_address,
+            "starts_on": r.starts_on.isoformat(),
+            "periodicity": "yearly",
+            "create_invoice_on_day": -20,
+            "subtotal": 100,
+            "discount": 0,
+            "liable_to_vat": "1",
+            "third_party_costs": 0,
+            "send_automatically": "on",
+        }
+        response = self.client.post(r.urls["update"], data)
+        self.assertRedirects(response, r.urls["detail"])
+        r.refresh_from_db()
+        self.assertEqual(r.send_to, "anna@example.com")
+        self.assertContains(self.client.get(r.urls["detail"]), "anna@example.com")
+        self.assertIn("{code}", r.mail_subject)
+        self.assertIn("Liebe Anna", r.mail_body)
+
+        # Without any address
+        r.contact.emailaddresses.all().delete()
+        response = self.client.post(r.urls["update"], data | {"send_to": ""})
+        self.assertContains(response, "No email address.")
 
     def test_send_automatically_manually(self):
         """Creating the invoices by hand shows what has been sent"""

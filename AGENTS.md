@@ -249,10 +249,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   one of their addresses), `{due_on}` is replaced when sending;
   it stays in preparation if the mail fails (`SendInvoiceForm`,
   `SendInvoiceView`, `workbench/invoices/sending.py`). Recurring invoices
-  with `send_automatically` send their new invoices to the first suggested
-  address with the proposal (invoice dates on or before the freeze date
-  move to the day after it) and tell the owner what happened
-  (`invoice.sending`). Paid and cancelled invoices require a payment notice;
+  with `send_automatically` send their new invoices to their `send_to` with
+  their `mail_subject` and `mail_body` (proposed in the form like above,
+  with the placeholders `{code}`, `{total}`, `{due_on}` and
+  `{service_period}`, `sending.fill()`); invoice dates on or before the
+  freeze date move to the day after it, and the owner is told what
+  happened (`invoice.sending`). Paid and cancelled invoices require a payment notice;
   assigning a credit entry writes its date, ledger, amount, payment notice
   and notes into it (`CreditEntry.mark_invoice_as_paid()`).
   Values given by name have a listing which shows them with their ID

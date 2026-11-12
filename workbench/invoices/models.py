@@ -866,12 +866,28 @@ class RecurringInvoice(ModelWithTotal):
     send_automatically = models.BooleanField(
         _("Send invoices automatically?"),
         help_text=_(
-            "New invoices are mailed to the accounts payable address of the"
-            " organization, the contact or the central address (the first"
-            " which exists), the owner in Cc. Invoice dates on or before the"
-            " freeze date move to the day after it."
+            "New invoices are mailed to the recipient with the subject and the"
+            " text, the owner in Cc. Invoice dates on or before the freeze date"
+            " move to the day after it."
         ),
         default=False,
+    )
+    send_to = models.EmailField(
+        _("recipient"),
+        blank=True,
+        help_text=_(
+            "Proposed: the accounts payable address of the organization, the"
+            " contact or the central address."
+        ),
+    )
+    mail_subject = models.CharField(_("subject"), max_length=200, blank=True)
+    mail_body = models.TextField(
+        _("text"),
+        blank=True,
+        help_text=_(
+            "{code}, {total}, {due_on} and {service_period} are replaced with"
+            " the values of each invoice."
+        ),
     )
 
     objects = RecurringInvoiceQuerySet.as_manager()
@@ -980,7 +996,7 @@ class RecurringInvoice(ModelWithTotal):
                 period_starts_on=starts_on, period_ends_on=ends_on
             )
             if self.send_automatically and invoice.status == Invoice.IN_PREPARATION:
-                send_automatically(invoice)
+                send_automatically(invoice, self)
             invoices.append(invoice)
             self.next_period_starts_on = ends_on + dt.timedelta(days=1)
         self.save()

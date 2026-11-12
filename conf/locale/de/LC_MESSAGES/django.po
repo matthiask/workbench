@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 14:38+0100\n"
+"POT-Creation-Date: 2026-11-12 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2348,7 +2348,7 @@ msgstr "%s Rechnungen in der Auswahl, das sind zu viele."
 msgid "project"
 msgstr "Projekt"
 
-#: workbench/invoices/forms.py
+#: workbench/invoices/forms.py workbench/invoices/models.py
 msgid "recipient"
 msgstr "Empfänger:in"
 
@@ -2356,18 +2356,13 @@ msgstr "Empfänger:in"
 msgid "The owner of the invoice gets a copy and the replies."
 msgstr "Die verantwortliche Person der Rechnung erhält eine Kopie und die Antworten."
 
-#: workbench/invoices/forms.py
+#: workbench/invoices/forms.py workbench/invoices/models.py
 msgid "subject"
 msgstr "Betreff"
 
-#: workbench/invoices/forms.py
+#: workbench/invoices/forms.py workbench/invoices/models.py
 msgid "text"
 msgstr "Text"
-
-#: workbench/invoices/forms.py
-#, python-brace-format
-msgid "{due_on} is replaced with the due date."
-msgstr "{due_on} wird durch das Fälligkeitsdatum ersetzt."
 
 #: workbench/invoices/forms.py
 msgid "Only invoices in preparation can be sent."
@@ -2563,6 +2558,10 @@ msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 #: workbench/invoices/forms.py workbench/invoices/models.py
 msgid "Cannot modify a service bound to an invoice which is not in preparation anymore."
 msgstr "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht mehr bearbeiten."
+
+#: workbench/invoices/forms.py workbench/invoices/sending.py
+msgid "No email address."
+msgstr "Keine Emailadresse."
 
 #: workbench/invoices/forms.py
 #, python-brace-format
@@ -2862,8 +2861,17 @@ msgid "Send invoices automatically?"
 msgstr "Rechnungen automatisch versenden?"
 
 #: workbench/invoices/models.py
-msgid "New invoices are mailed to the accounts payable address of the organization, the contact or the central address (the first which exists), the owner in Cc. Invoice dates on or before the freeze date move to the day after it."
-msgstr "Neue Rechnungen werden an die Kreditorenadresse der Organisation, den Kontakt oder die zentrale Adresse geschickt (die erste vorhandene), die verantwortliche Person im Cc. Rechnungsdaten am oder vor dem Einfrierdatum werden auf den Tag danach verschoben."
+msgid "New invoices are mailed to the recipient with the subject and the text, the owner in Cc. Invoice dates on or before the freeze date move to the day after it."
+msgstr "Neue Rechnungen werden mit dem Betreff und dem Text an die Empfänger:in geschickt, die verantwortliche Person im Cc. Rechnungsdaten am oder vor dem Einfrierdatum werden auf den Tag danach verschoben."
+
+#: workbench/invoices/models.py
+msgid "Proposed: the accounts payable address of the organization, the contact or the central address."
+msgstr "Vorgeschlagen: die Kreditorenadresse der Organisation, der Kontakt oder die zentrale Adresse."
+
+#: workbench/invoices/models.py
+#, python-brace-format
+msgid "{code}, {total}, {due_on} and {service_period} are replaced with the values of each invoice."
+msgstr "{code}, {total}, {due_on} und {service_period} werden durch die Werte der jeweiligen Rechnung ersetzt."
 
 #: workbench/invoices/models.py
 msgid "recurring invoice"
@@ -2902,10 +2910,6 @@ msgstr "Rechnungstotal exkl. MwSt. abzüglich Fremdkosten inkl. MwSt."
 #, python-format
 msgid "Not sent: %s"
 msgstr "Nicht versendet: %s"
-
-#: workbench/invoices/sending.py
-msgid "No email address."
-msgstr "Keine Emailadresse."
 
 #: workbench/invoices/sending.py
 #, python-format
@@ -6817,6 +6821,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-brace-format
+#~ msgid "{due_on} is replaced with the due date."
+#~ msgstr "{due_on} wird durch das Fälligkeitsdatum ersetzt."
 
 #~ msgid "The invoice date is on or before the freeze date."
 #~ msgstr "Das Rechnungsdatum liegt am oder vor dem Einfrierdatum."

@@ -209,7 +209,7 @@ class SendInvoiceForm(ModelForm):
             label=_("text"),
             initial=body,
             widget=Textarea({"rows": 12}),
-            help_text=_("{due_on} is replaced with the due date."),
+            help_text=RecurringInvoice._meta.get_field("mail_body").help_text,
         )
         self.order_fields(["email", "invoiced_on", "due_on", "subject", "body"])
 
@@ -1274,6 +1274,9 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "create_project",
             "mark_as_sent",
             "send_automatically",
+            "send_to",
+            "mail_subject",
+            "mail_body",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),
@@ -1281,6 +1284,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "description": Textarea,
             "postal_address": Textarea,
             "periodicity": forms.RadioSelect,
+            "mail_body": Textarea({"rows": 12}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -1350,9 +1354,54 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
                 organization=customer,
                 for_billing=True,
             )
+            self.propose_mail()
+
+    def propose_mail(self):
+        """Suggests recipients and proposes the mail for sending
+        automatically once the recurring invoice has a customer"""
+        if not self.instance.customer_id:
+            return
+        emails = sending.suggested_emails(self.instance)
+        self.fields["send_to"].widget = SuggestionsInput(emails)
+        if emails and not self.instance.send_to:
+            self.initial["send_to"] = emails[0]
+        if not (self.instance.mail_subject and self.instance.mail_body):
+            subject, body = sending.recurring_proposal(
+                self.instance, self.initial.get("send_to") or self.instance.send_to
+            )
+            self.initial["mail_subject"] = self.instance.mail_subject or subject
+            self.initial["mail_body"] = self.instance.mail_body or body
+
+    def clean_mail(self, data):
+        """Fills in the recipient and the proposal for sending automatically,
+        e.g. for new recurring invoices"""
+        if not data.get("send_automatically") or not (customer := data.get("customer")):
+            return
+        recurring_invoice = RecurringInvoice(
+            customer=customer,
+            contact=data.get("contact"),
+            title=data.get("title", ""),
+            owned_by=data.get("owned_by") or self.request.user,
+            subtotal=data.get("subtotal") or 0,
+            discount=data.get("discount") or 0,
+            liable_to_vat=data.get("liable_to_vat", True),
+        )
+        if not data.get("send_to"):
+            emails = sending.suggested_emails(recurring_invoice)
+            if not emails:
+                self.add_error("send_to", _("No email address."))
+                return
+            data["send_to"] = emails[0]
+        if not (data.get("mail_subject") and data.get("mail_body")):
+            subject, body = sending.recurring_proposal(
+                recurring_invoice, data["send_to"]
+            )
+            data["mail_subject"] = data.get("mail_subject") or subject
+            data["mail_body"] = data.get("mail_body") or body
 
     def clean(self):
         data = super().clean()
+        self.clean_mail(data)
         if (
             "starts_on" in self.changed_data
             and (starts_on := data.get("starts_on"))
