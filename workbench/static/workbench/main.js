@@ -784,11 +784,11 @@ function initWidgets() {
     initSuggestions(el)
   }
 
-  // Textareas which grow with their content; CSS does it where field-sizing
-  // is supported (see .wb-autogrow in main.scss)
+  // Textareas grow with their content; CSS does it where field-sizing is
+  // supported (see main.scss)
   if (!CSS.supports("field-sizing", "content")) {
     for (const el of document.querySelectorAll(
-      "textarea.wb-autogrow:not(.initialized)",
+      "textarea:not(.wb-no-autogrow, .initialized)",
     )) {
       el.classList.add("initialized")
       const resize = () => {

@@ -122,8 +122,8 @@ class OfferForm(PostalAddressSelectionForm):
             "external_reference",
         )
         widgets = {
-            "description": Textarea({"rows": 2, "class": "wb-autogrow"}),
-            "external_reference": Textarea({"rows": 1, "class": "wb-autogrow"}),
+            "description": Textarea({"rows": 2}),
+            "external_reference": Textarea({"rows": 1}),
             "status": forms.RadioSelect,
             "postal_address": Textarea,
             "tax_rate": forms.RadioSelect,
@@ -429,7 +429,7 @@ class HeadingForm(forms.ModelForm):
         fields = ["position", "title", "description"]
         widgets = {
             "position": forms.HiddenInput,
-            "description": Textarea({"rows": 1, "class": "wb-autogrow"}),
+            "description": Textarea({"rows": 1}),
         }
 
     def __init__(self, *args, editable, **kwargs):
@@ -471,7 +471,7 @@ ServiceFormset = inlineformset_factory(
     ),
     widgets={
         "position": forms.HiddenInput,
-        "description": Textarea({"rows": 1, "class": "wb-autogrow"}),
+        "description": Textarea({"rows": 1}),
     },
     extra=0,
     can_delete=False,

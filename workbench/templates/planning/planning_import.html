@@ -35,7 +35,8 @@
               project.
             {% endblocktranslate %}
           </p>
-          <textarea id="planning-prompt" class="form-control font-monospace" rows="16" readonly>{{ prompt }}</textarea>
+          <textarea id="planning-prompt" class="form-control font-monospace wb-no-autogrow" rows="16" readonly
+          >{{ prompt }}</textarea>
           <div class="wb-form-actions mt-2 mb-0">
             <button type="button" id="planning-copy" class="btn btn-quiet">
               {% include 'svg/clippy.svg' %}
@@ -56,7 +57,7 @@
             {% endblocktranslate %}
           </p>
           {% csrf_token %}
-          <textarea id="planning-json" class="form-control font-monospace" rows="16"></textarea>
+          <textarea id="planning-json" class="form-control font-monospace wb-no-autogrow" rows="16"></textarea>
           <div class="wb-form-actions mt-2 mb-0">
             <button type="button" id="planning-check" class="btn btn-quiet">{% translate 'Check' %}</button>
             <button type="button" id="planning-import" class="btn btn-primary" disabled>

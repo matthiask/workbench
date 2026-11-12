@@ -554,6 +554,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   Collapsed content uses `hidden="until-found"` (not Bootstrap's
   `.collapse` or CSS line clamps) so that the browser's search finds and
   reveals it; long descriptions use `{% clamped %}`.
+  Textareas grow with their content (`field-sizing: content`, a fallback in
+  `main.js`); fixed sizes, e.g. for long generated text, use
+  `.wb-no-autogrow`.
 - Charts are server-side SVG, not chart.js: `bar_chart()` in
   `workbench/tools/charts.py` rendered with `charts/bar_chart.html`, colors
   from `.wb-series-1` to `-8`, `-muted` and `-neutral` (colors with a

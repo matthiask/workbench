@@ -667,13 +667,13 @@ tbody th > a {
   margin-top: 0.25rem;
 }
 
-// Textareas which grow with their content (main.js handles browsers without
-// field-sizing)
-textarea.wb-autogrow {
+// Textareas grow with their content (main.js handles browsers without
+// field-sizing); long texts scroll
+textarea:not(.wb-no-autogrow) {
   field-sizing: content;
   min-height: calc(2lh + 0.75rem);
+  max-height: 80vh;
   resize: none;
-  overflow: hidden;
 }
 
 // Quick actions in the bottom left corner: a plus button which reveals the
