@@ -1933,6 +1933,12 @@ a.wb-row-title:hover {
   font-weight: 600;
 }
 
+// Headings which group the rows below them, e.g. offers and their services
+.wb-table-group > th {
+  color: var(--bs-body-color);
+  font-size: inherit;
+}
+
 // Forms: centered, fields in cards, actions below
 .wb-form-page {
   max-width: 48rem;
