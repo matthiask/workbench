@@ -192,6 +192,27 @@ class StatisticsTest(TestCase):
         self.assertContains(response, "accepted offers gross margin: 10’000.00")
         self.assertNotContains(response, "third party costs")
 
+    def test_budget_retainment(self):
+        """Only services without offer release the retained budget, not the
+        services of other offers"""
+        project = factories.ProjectFactory.create()
+        for cost, status, retainer in [
+            (5000, factories.Offer.ACCEPTED, True),
+            (20000, factories.Offer.ACCEPTED, False),
+            (40000, factories.Offer.OFFERED, False),
+        ]:
+            offer = factories.OfferFactory.create(
+                project=project, status=status, is_budget_retainer=retainer
+            )
+            factories.ServiceFactory.create(project=project, offer=offer, cost=cost)
+            offer.save()
+        factories.ServiceFactory.create(project=project, cost=3000)
+
+        gs = project.grouped_services
+        self.assertEqual(gs["budget_retainer_total"], 5000)
+        self.assertEqual(gs["released_service_cost"], 3000)
+        self.assertEqual(gs["budget_retainment"], 2000)
+
     def test_surcharge(self):
         """Hours for invoicing above the hours use up the budget too, the
         progress bars show them separately"""

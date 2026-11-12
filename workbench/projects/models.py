@@ -524,6 +524,7 @@ class Project(Model):
         not_archived = defaultdict(lambda: Z2)
         # Project logbook vs. project service cost (hours and cost)
         total_service_cost = Z2
+        released_service_cost = Z2
         total_service_third_party_costs = Z2
         accepted_offers_service_cost = Z2
         total_logged_cost = Z2
@@ -655,6 +656,8 @@ class Project(Model):
                 service_hours[service.project] += service.service_hours
                 service_cost[service.project] += service.cost or Z2
                 total_service_cost += service.service_cost
+                if service.offer is None:
+                    released_service_cost += service.service_cost
                 total_service_third_party_costs += service.third_party_costs or Z2
                 if service.offer and service.offer.is_accepted:
                     accepted_offers_service_cost += service.service_cost
@@ -774,8 +777,10 @@ class Project(Model):
             "warnings": [],
         }
 
+        # Budget retainers are released with services without offer
+        stats["released_service_cost"] = released_service_cost
         stats["budget_retainment"] = (
-            stats["budget_retainer_total"] - stats["total_service_cost"]
+            stats["budget_retainer_total"] - released_service_cost
         )
 
         if stats["budget_retainment"] > 0 and stats["total_logged_cost"] > stats[

@@ -194,7 +194,7 @@
               <div class="wb-stat-note">
                 {{ gs.budget_retainer_total|currency }}
                 {% translate 'sold' %},
-                {{ gs.total_service_cost|currency }}
+                {{ gs.released_service_cost|currency }}
                 {% translate 'freed' %}
                 {% if gs.budget_retainer_discount %}
                   ({% blocktranslate with discount=gs.budget_retainer_discount|currency trimmed %}incl.
