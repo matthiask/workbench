@@ -240,6 +240,41 @@ class OfferForm(PostalAddressSelectionForm):
                 code="yes-please-decline",
             )
 
+        # Retainers are released with services without offer: other offers
+        # are added to them
+        others = (
+            self.project.offers
+            .exclude(pk=self.instance.pk)
+            .exclude(status__in=Offer.NOT_PURSUED)
+            .values_list("is_budget_retainer", flat=True)
+        )
+        if (
+            data.get("is_budget_retainer")
+            and not self.instance.is_budget_retainer
+            and False in others
+        ):
+            self.add_warning(
+                _(
+                    "This project has other offers. They are added to the"
+                    " budget retainer, release the retained budget with"
+                    " services without offer."
+                ),
+                code="budget-retainer",
+            )
+        elif (
+            not self.instance.pk
+            and not data.get("is_budget_retainer")
+            and True in others
+        ):
+            self.add_warning(
+                _(
+                    "This project has a budget retainer. This offer is added"
+                    " to it, release the retained budget with services without"
+                    " offer instead."
+                ),
+                code="budget-retainer",
+            )
+
         return data
 
     def total_titles(self):

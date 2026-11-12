@@ -753,6 +753,32 @@ class OffersTest(TestCase):
         offer.refresh_from_db()
         self.assertEqual(offer.subtotal, 700)
 
+    def test_budget_retainer_warning(self):
+        """Budget retainers and other offers on the same project are a
+        warning: the retainer is released with services without offer"""
+        offer = factories.OfferFactory.create()
+        project = offer.project
+        factories.OfferFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+
+        def post(url, offer, **kwargs):
+            data = offer_form_data(offer, **kwargs)
+            data.pop(WarningsForm.ignore_warnings_id)
+            return self.client.post(url, data)
+
+        response = post(offer.urls["update"], offer, is_budget_retainer="on")
+        self.assertContains(response, 'value="budget-retainer"')
+
+        offer.is_budget_retainer = True
+        offer.save()
+        new = Offer(project=project, owned_by=project.owned_by, title="New")
+        response = post(project.urls["createoffer"], new)
+        self.assertContains(response, 'value="budget-retainer"')
+
+        # Saving the retainer again doesn't warn
+        response = post(offer.urls["update"], offer, is_budget_retainer="on")
+        self.assertRedirects(response, offer.get_absolute_url())
+
     def test_create_offer_with_services(self):
         """Offers are created with new services and services of the project
         without offer"""

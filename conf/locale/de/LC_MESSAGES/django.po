@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 15:06+0100\n"
+"POT-Creation-Date: 2026-11-12 16:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3476,6 +3476,14 @@ msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde 
 #: workbench/offers/forms.py
 msgid "You are setting the offer status to 'Declined'. However, if you just want to change a few things and send the offer to the client again then you could just as well put the offer back into preparation."
 msgstr "Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige Dinge anpassen willst und die Offerte nochmals der Kundschaft senden willst, kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
+
+#: workbench/offers/forms.py
+msgid "This project has other offers. They are added to the budget retainer, release the retained budget with services without offer."
+msgstr "Dieses Projekt hat weitere Offerten. Sie werden zum zurückbehaltenen Budget dazugezählt. Gib das zurückbehaltene Budget mit Leistungen ohne Offerte frei."
+
+#: workbench/offers/forms.py
+msgid "This project has a budget retainer. This offer is added to it, release the retained budget with services without offer instead."
+msgstr "Dieses Projekt hat eine Offerte, welche Budget zurückbehält. Diese Offerte wird dazugezählt. Gib das zurückbehaltene Budget stattdessen mit Leistungen ohne Offerte frei."
 
 #: workbench/offers/forms.py workbench/offers/models.py
 #, python-format
