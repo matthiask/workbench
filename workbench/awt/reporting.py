@@ -578,6 +578,36 @@ def target_and_absences_by_week(user, first, last, *, default_per_day=None):
     return weeks
 
 
+def suggested_absence_days(user, starts_on, ends_on):
+    """Days of an absence as the target counts them: weekdays less holidays
+    times the employment percentage of each day
+
+    Exact for full weeks; for partial weeks of part-time employments only if
+    they work evenly on all weekdays. ``None`` without employments."""
+    holidays = defaultdict(lambda: Z1)
+    for holiday in Holiday.objects.filter(
+        working_time_model=user.working_time_model_id,
+        date__range=[starts_on, ends_on],
+    ):
+        holidays[holiday.date] += holiday.fraction
+
+    days = None
+    for employment in Employment.objects.filter(
+        user=user, date_from__lte=ends_on, date_until__gte=starts_on
+    ):
+        if days is None:
+            days = Z2
+        for day in weekdays(
+            max(starts_on, employment.date_from), min(ends_on, employment.date_until)
+        ):
+            days += (
+                Decimal(employment.percentage)
+                / 100
+                * (1 - min(holidays.get(day, Z1), 1))
+            )
+    return None if days is None else days.quantize(Z2)
+
+
 def working_time_by_week(year, *, user):
     """Target, logged hours and absences per week (starting on Monday) of the
     year until the current week

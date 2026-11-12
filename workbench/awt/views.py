@@ -2,9 +2,10 @@ import datetime as dt
 import time
 from collections import defaultdict
 
+from django import forms
 from django.contrib import messages
 from django.db.models.functions import Coalesce
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
@@ -24,6 +25,7 @@ from workbench.awt.pdf import annual_working_time_pdf
 from workbench.awt.reporting import (
     active_users,
     annual_working_time,
+    suggested_absence_days,
     working_time_by_week,
 )
 from workbench.tools.validation import filter_form, monday
@@ -248,3 +250,28 @@ def confirm_absence(request, pk):
     if request.is_ajax():
         return HttpResponse(status=202)  # Accepted, reloads the page
     return redirect(absence.urls["list"] + "?s=unconfirmed")
+
+
+class SuggestedDaysForm(forms.Form):
+    user = forms.ModelChoiceField(User.objects.all())
+    starts_on = forms.DateField()
+    ends_on = forms.DateField(required=False)
+
+    def clean(self):
+        data = super().clean()
+        if data.get("starts_on") and not data.get("ends_on"):
+            data["ends_on"] = data["starts_on"]
+        if data.get("starts_on") and data["ends_on"] < data["starts_on"]:
+            raise forms.ValidationError("Absences cannot end before they began.")
+        return data
+
+
+def suggested_days(request):
+    """Days of an absence for the absence form, see suggested_absence_days()"""
+    form = SuggestedDaysForm(request.GET)
+    if not form.is_valid():
+        return JsonResponse({"days": None})
+    data = form.cleaned_data
+    return JsonResponse({
+        "days": suggested_absence_days(data["user"], data["starts_on"], data["ends_on"])
+    })

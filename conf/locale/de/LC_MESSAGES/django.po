@@ -583,6 +583,15 @@ msgid "Enter hours"
 msgstr "Stunden eingeben"
 
 #: workbench/awt/forms.py
+#, python-format
+msgid "Suggestion: %s days"
+msgstr "Vorschlag: %s Tage"
+
+#: workbench/awt/forms.py
+msgid "Weekdays without holidays times the employment percentage"
+msgstr "Wochentage ohne Feiertage mal Anstellungspensum"
+
+#: workbench/awt/forms.py
 msgid "Absences need days, only corrections may be negative."
 msgstr "Abwesenheiten brauchen Tage, nur Korrekturen dürfen negativ sein."
 

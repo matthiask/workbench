@@ -447,6 +447,60 @@ class AWTTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
+    def test_suggested_absence_days(self):
+        """The absence form suggests weekdays less holidays times the
+        employment percentage of each day"""
+        user = factories.UserFactory.create()
+        # Monday 2026-03-02 until Friday 2026-03-13, 80% from 2026-03-09
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2026, 1, 1), percentage=100
+        )
+        factories.EmploymentFactory.create(
+            user=user, date_from=dt.date(2026, 3, 9), percentage=80
+        )
+        Holiday.objects.create(
+            working_time_model=user.working_time_model,
+            date=dt.date(2026, 3, 12),
+            fraction=Decimal("0.5"),
+        )
+        Holiday.objects.create(
+            working_time_model=user.working_time_model,
+            date=dt.date(2026, 3, 12),
+            kind=Holiday.Kind.COMPANY,
+        )
+        self.client.force_login(user)
+
+        def suggest(**params):
+            return self.client.get("/absences/suggested-days/", params).json()
+
+        # 5 days at 100%, 4 days at 80% (the holiday counts once)
+        self.assertEqual(
+            suggest(user=user.pk, starts_on="2026-03-01", ends_on="2026-03-15"),
+            {"days": "8.20"},
+        )
+        self.assertEqual(
+            suggest(user=user.pk, starts_on="2026-03-10"), {"days": "0.80"}
+        )
+        self.assertEqual(
+            suggest(user=user.pk, starts_on="2026-03-14", ends_on="2026-03-15"),
+            {"days": "0.00"},
+        )
+        # Without employment or with invalid data there's no suggestion
+        self.assertEqual(
+            suggest(user=user.pk, starts_on="2025-12-01", ends_on="2025-12-05"),
+            {"days": None},
+        )
+        self.assertEqual(
+            suggest(user=user.pk, starts_on="2026-03-10", ends_on="2026-03-09"),
+            {"days": None},
+        )
+        self.assertEqual(suggest(user="x", starts_on="2026-03-10"), {"days": None})
+
+        response = self.client.get(
+            "/absences/create/", headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertContains(response, 'data-suggested-days="/absences/suggested-days/"')
+
     def test_absence_days(self):
         """Absences have days, only corrections may be negative"""
         user = factories.UserFactory.create()

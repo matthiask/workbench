@@ -2,6 +2,7 @@ import datetime as dt
 from urllib.parse import urlencode
 
 from django import forms
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -107,8 +108,13 @@ class AbsenceForm(ModelForm, WarningsForm):
         )
         self.fields["user"].choices = User.objects.choices(collapse_inactive=False)
         self.fields["days"].help_text = format_html(
-            '<a href="#" data-hours-button="{hours}">{hours}</a>',
+            '<a href="#" data-hours-button="{hours}">{hours}</a>'
+            ' <a href="#" class="ms-2" data-suggested-days="{url}"'
+            ' data-label="{label}" title="{title}" hidden></a>',
             hours=_("Enter hours"),
+            url=reverse("awt_absence_suggested_days"),
+            label=_("Suggestion: %s days"),
+            title=_("Weekdays without holidays times the employment percentage"),
         )
         if not self.request.user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
             # Absences can't be handed over to others, see Absence.allow_update

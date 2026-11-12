@@ -489,6 +489,50 @@ on("click", "[data-hours-button]", (_e, el) => {
   }
 })
 
+// Suggests the days of absences, see suggested_absence_days()
+function initSuggestedDays(el) {
+  const form = el.closest("form")
+  const field = (name) => form.querySelector(`[name="modal-${name}"]`)
+  let request = 0
+
+  const update = async () => {
+    const current = ++request
+    const params = new URLSearchParams({
+      user: field("user")?.value || "",
+      starts_on: field("starts_on")?.value || "",
+      ends_on: field("ends_on")?.value || "",
+    })
+    let days = null
+    if (field("reason")?.value !== "correction" && params.get("starts_on")) {
+      try {
+        days = (
+          await (await fetch(`${el.dataset.suggestedDays}?${params}`)).json()
+        ).days
+      } catch {
+        days = null
+      }
+    }
+    // Only the latest request wins
+    if (current !== request) return
+    el.hidden = days === null
+    el.dataset.days = days ?? ""
+    el.textContent = el.dataset.label.replace("%s", days ?? "")
+  }
+
+  for (const name of ["user", "starts_on", "ends_on", "reason"]) {
+    field(name)?.addEventListener("change", update)
+  }
+  update()
+}
+
+on("click", "[data-suggested-days]", (e, el) => {
+  e.preventDefault()
+  el.blur()
+  const days = _sel("#id_modal-days")
+  setValue(days, el.dataset.days)
+  days?.focus()
+})
+
 on("click", "[data-multiply-cost]", (e, el) => {
   e.preventDefault()
   const factor = Number.parseFloat(el.dataset.multiplyCost)
@@ -669,6 +713,13 @@ function initWidgets() {
   follow("#id_modal-starts_on", "#id_modal-ends_on", (startsOn, endsOn) => {
     if (!endsOn.value) endsOn.value = startsOn.value
   })
+  for (const el of document.querySelectorAll(
+    "[data-suggested-days]:not(.initialized)",
+  )) {
+    el.classList.add("initialized")
+    initSuggestedDays(el)
+  }
+
   follow("#id_offered_on", "#id_valid_until", (offeredOn, validUntil) => {
     validUntil.value = daysLater(offeredOn.value, 59)
   })
