@@ -6,18 +6,17 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import EmailMultiAlternatives
-from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy as _, override
+from django.utils.translation import gettext, gettext_lazy as _
 from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
 
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
+from workbench.invoices import sending
 from workbench.invoices.models import Invoice, RecurringInvoice, Service
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.forms import (
@@ -37,7 +36,7 @@ from workbench.tools.forms import (
     Textarea,
     add_prefix,
 )
-from workbench.tools.pdf import PDFDocument, invoice_filename, pdf_response
+from workbench.tools.pdf import PDFDocument, pdf_response
 from workbench.tools.validation import in_days
 
 
@@ -191,27 +190,7 @@ class SendInvoiceForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        invoice = self.instance
-        organization = invoice.contact.organization if invoice.contact else None
-        organization = organization or invoice.customer
-        self.contact_emails = (
-            list(invoice.contact.emailaddresses.values_list("email", flat=True))
-            if invoice.contact
-            else []
-        )
-        # Like the payment reminders
-        emails = list(
-            dict.fromkeys(
-                filter(
-                    None,
-                    [
-                        organization.accounts_payable_email,
-                        *self.contact_emails,
-                        organization.email,
-                    ],
-                )
-            )
-        )
+        emails = sending.suggested_emails(self.instance)
         self.fields["email"] = forms.EmailField(
             label=_("recipient"),
             initial=emails[0] if emails else "",
@@ -222,40 +201,17 @@ class SendInvoiceForm(ModelForm):
         self.fields["due_on"].required = True
         self.initial["invoiced_on"] = dt.date.today()
         self.initial["due_on"] = in_days(self.DUE_DAYS)
-        proposal = render_to_mail(
-            "invoices/invoice_mail",
-            {
-                "invoice": invoice,
-                **self.address(self.fields["email"].initial),
-                "WORKBENCH": settings.WORKBENCH,
-            },
-        )
+        subject, body = sending.proposal(self.instance, self.fields["email"].initial)
         self.fields["subject"] = forms.CharField(
-            label=_("subject"), initial=proposal.subject, max_length=200
+            label=_("subject"), initial=subject, max_length=200
         )
         self.fields["body"] = forms.CharField(
             label=_("text"),
-            initial=proposal.body,
+            initial=body,
             widget=Textarea({"rows": 12}),
             help_text=_("{due_on} is replaced with the due date."),
         )
         self.order_fields(["email", "invoiced_on", "due_on", "subject", "body"])
-
-    def address(self, email):
-        """The contact's salutation and Du or Sie only for their own addresses"""
-        contact = self.instance.contact
-        personal = bool(contact and email in self.contact_emails)
-        first_name_terms = personal and contact.address_on_first_name_terms
-        return {
-            # Old contacts may lack a salutation
-            "salutation": (personal and contact.salutation)
-            or (
-                f"Hallo {contact.given_name}"
-                if first_name_terms
-                else "Sehr geehrte Damen und Herren"
-            ),
-            "first_name_terms": first_name_terms,
-        }
 
     def clean(self):
         data = super().clean()
@@ -283,44 +239,21 @@ class SendInvoiceForm(ModelForm):
         return data
 
     def mail(self):
-        invoice = self.instance
         data = self.cleaned_data
-        to = data["email"]
-        owner = [invoice.owned_by.email] if invoice.owned_by.is_active else []
-        body = "\n".join(data["body"].splitlines()).replace(
-            "{due_on}",
-            local_date_format(data["due_on"]),
+        return sending.invoice_mail(
+            self.instance, to=data["email"], subject=data["subject"], body=data["body"]
         )
-        mail = EmailMultiAlternatives(
-            data["subject"],
-            body,
-            from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
-            to=[to],
-            cc=owner,
-            reply_to=owner,
-            bcc=[
-                email
-                for email in [settings.WORKBENCH.REMINDER_FROM_EMAIL]
-                if email and email not in owner
-            ],
-        )
-        with io.BytesIO() as buf, override(settings.WORKBENCH.PDF_LANGUAGE):
-            pdf = PDFDocument(buf)
-            pdf.init_invoice_letter()
-            pdf.process_invoice(invoice)
-            pdf.generate()
-            mail.attach(
-                f"{invoice_filename(invoice)}.pdf", buf.getvalue(), "application/pdf"
-            )
-        return mail
 
     def save(self):
-        self.instance.status = Invoice.SENT
-        # The invoice stays in preparation if the mail can't be sent
-        with transaction.atomic():
-            instance = super().save()
-            self.mail().send()
-        return instance
+        data = self.cleaned_data
+        sending.send(
+            self.instance,
+            to=data["email"],
+            subject=data["subject"],
+            body=data["body"],
+            save=super().save,
+        )
+        return self.instance
 
 
 @add_prefix("modal")
@@ -1340,6 +1273,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "liable_to_vat",
             "create_project",
             "mark_as_sent",
+            "send_automatically",
         )
         widgets = {
             "customer": Autocomplete(model=Organization),

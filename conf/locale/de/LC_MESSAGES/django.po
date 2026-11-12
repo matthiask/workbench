@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 14:26+0100\n"
+"POT-Creation-Date: 2026-11-12 14:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1359,6 +1359,7 @@ msgid "Central address, e.g. info@. It's shown on the organization's people too,
 msgstr "Zentrale Adresse, z.B. info@. Sie wird auch bei den Personen der Organisation angezeigt, erfasse sie dort nicht."
 
 #: workbench/contacts/models.py
+#: workbench/templates/invoices/invoice_detail.html
 msgid "accounts payable email address"
 msgstr "Emailadresse Kreditoren"
 
@@ -2365,7 +2366,6 @@ msgstr "Text"
 
 #: workbench/invoices/forms.py
 #, python-brace-format
-#, python-brace-format
 msgid "{due_on} is replaced with the due date."
 msgstr "{due_on} wird durch das Fälligkeitsdatum ersetzt."
 
@@ -2858,6 +2858,14 @@ msgid "Invoices are created in preparation by default. Only if they are sent ano
 msgstr "Standardmässig werden Rechnungen in Vorbereitung erstellt. Nur wenn sie anderweitig versendet werden, nicht im eingefrorenen Zeitraum."
 
 #: workbench/invoices/models.py
+msgid "Send invoices automatically?"
+msgstr "Rechnungen automatisch versenden?"
+
+#: workbench/invoices/models.py
+msgid "New invoices are mailed to the accounts payable address of the organization, the contact or the central address (the first which exists), the owner in Cc. Invoice dates on or before the freeze date move to the day after it."
+msgstr "Neue Rechnungen werden an die Kreditorenadresse der Organisation, den Kontakt oder die zentrale Adresse geschickt (die erste vorhandene), die verantwortliche Person im Cc. Rechnungsdaten am oder vor dem Einfrierdatum werden auf den Tag danach verschoben."
+
+#: workbench/invoices/models.py
 msgid "recurring invoice"
 msgstr "Stapelrechnung"
 
@@ -2889,6 +2897,20 @@ msgstr "Umsatz bereinigt"
 #: workbench/invoices/models.py
 msgid "Invoice total excl. tax minus third party costs incl. tax."
 msgstr "Rechnungstotal exkl. MwSt. abzüglich Fremdkosten inkl. MwSt."
+
+#: workbench/invoices/sending.py
+#, python-format
+msgid "Not sent: %s"
+msgstr "Nicht versendet: %s"
+
+#: workbench/invoices/sending.py
+msgid "No email address."
+msgstr "Keine Emailadresse."
+
+#: workbench/invoices/sending.py
+#, python-format
+msgid "Sent to %s"
+msgstr "Versendet an %s"
 
 #: workbench/invoices/tasks.py
 msgid "Unsent projected invoices"
@@ -6795,6 +6817,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "The invoice date is on or before the freeze date."
+#~ msgstr "Das Rechnungsdatum liegt am oder vor dem Einfrierdatum."
 
 #, python-brace-format
 #~ msgid "{salutation} is replaced with the salutation of the contact if the recipient is one of their addresses (otherwise with a general one), {due_on} with the due date."

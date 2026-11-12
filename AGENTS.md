@@ -246,8 +246,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   in Cc and Reply-To), invoiced today and due in 15 days, and marks it as
   sent; subject and text are proposed by `invoices/invoice_mail.txt` and
   editable (the salutation is the contact's if the suggested recipient is
-  one of their addresses), `{due_on}` is replaced when sending; it stays in preparation if the mail fails (`SendInvoiceForm`,
-  `SendInvoiceView`, `invoices/invoice_mail.txt`). Paid and cancelled invoices require a payment notice;
+  one of their addresses), `{due_on}` is replaced when sending;
+  it stays in preparation if the mail fails (`SendInvoiceForm`,
+  `SendInvoiceView`, `workbench/invoices/sending.py`). Recurring invoices
+  with `send_automatically` send their new invoices to the first suggested
+  address with the proposal (invoice dates on or before the freeze date
+  move to the day after it) and tell the owner what happened
+  (`invoice.sending`). Paid and cancelled invoices require a payment notice;
   assigning a credit entry writes its date, ledger, amount, payment notice
   and notes into it (`CreditEntry.mark_invoice_as_paid()`).
   Values given by name have a listing which shows them with their ID

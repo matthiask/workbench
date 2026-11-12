@@ -23,7 +23,7 @@ TEMPLATE = """\
 {invoice}
 {total}
 {base_url}{invoice_url}
-
+{sending}
 """
 
 
@@ -45,6 +45,8 @@ def create_recurring_invoices_and_notify():
                 base_url=settings.WORKBENCH.URL,
                 invoice_url=invoice.get_absolute_url(),
                 recurring_url=ri.get_absolute_url(),
+                # Only set for recurring invoices which send automatically
+                sending=getattr(invoice, "sending", ""),
             )
             for (ri, invoice) in invoices
         )

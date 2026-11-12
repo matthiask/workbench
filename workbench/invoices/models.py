@@ -863,6 +863,16 @@ class RecurringInvoice(ModelWithTotal):
         ),
         default=False,
     )
+    send_automatically = models.BooleanField(
+        _("Send invoices automatically?"),
+        help_text=_(
+            "New invoices are mailed to the accounts payable address of the"
+            " organization, the contact or the central address (the first"
+            " which exists), the owner in Cc. Invoice dates on or before the"
+            " freeze date move to the day after it."
+        ),
+        default=False,
+    )
 
     objects = RecurringInvoiceQuerySet.as_manager()
 
@@ -962,13 +972,16 @@ class RecurringInvoice(ModelWithTotal):
         return periods
 
     def create_invoices(self):
+        from workbench.invoices.sending import send_automatically
+
         invoices = []
         for starts_on, ends_on in self.pending_periods():
-            invoices.append(
-                self.create_single_invoice(
-                    period_starts_on=starts_on, period_ends_on=ends_on
-                )
+            invoice = self.create_single_invoice(
+                period_starts_on=starts_on, period_ends_on=ends_on
             )
+            if self.send_automatically and invoice.status == Invoice.IN_PREPARATION:
+                send_automatically(invoice)
+            invoices.append(invoice)
             self.next_period_starts_on = ends_on + dt.timedelta(days=1)
         self.save()
         return invoices

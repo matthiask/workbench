@@ -10,6 +10,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.invoices.tasks import create_recurring_invoices_and_notify
 from workbench.reporting.models import FreezeDate
+from workbench.tools.formats import local_date_format
 from workbench.tools.models import default_tax_rate
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days
@@ -395,6 +396,76 @@ class RecurringTest(TestCase):
             [Invoice.IN_PREPARATION, Invoice.SENT, Invoice.SENT],
         )
         self.assertTrue(all(invoice.due_on for invoice in invoices))
+
+    def test_send_automatically(self):
+        """Recurring invoices may send their invoices to the first suggested
+        address; frozen invoice dates move to the day after the freeze date"""
+        r = factories.RecurringInvoiceFactory.create(
+            starts_on=in_days(-70),
+            periodicity="monthly",
+            create_invoice_on_day=0,
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+            send_automatically=True,
+        )
+        FreezeDate.objects.create(up_to=in_days(-50))
+
+        # Without an address nothing is sent
+        invoices = r.create_invoices()
+        self.assertEqual(
+            {invoice.status for invoice in invoices}, {Invoice.IN_PREPARATION}
+        )
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(
+            [invoice.sending for invoice in invoices],
+            ["Not sent: No email address."] * 3,
+        )
+
+        Invoice.objects.all().delete()
+        r.contact.emailaddresses.create(email="contact@example.com")
+        r.next_period_starts_on = None
+        r.save()
+        invoices = r.create_invoices()
+        self.assertEqual({invoice.status for invoice in invoices}, {Invoice.SENT})
+        self.assertEqual(invoices[1].sending, "Sent to contact@example.com")
+        self.assertEqual(len(mail.outbox), 3)
+        invoices[0].refresh_from_db()
+        self.assertEqual(invoices[0].invoiced_on, in_days(-49))
+        self.assertEqual(invoices[0].due_on, in_days(-49 + 15))
+        self.assertEqual(invoices[0].service_period_from, in_days(-70))
+        message = mail.outbox[1]
+        self.assertEqual(message.to, ["contact@example.com"])
+        self.assertEqual(message.cc, [r.owned_by.email])
+        self.assertEqual(message.reply_to, [r.owned_by.email])
+        self.assertIn(invoices[1].code, message.subject)
+        self.assertIn(local_date_format(invoices[1].due_on), message.body)
+        self.assertEqual(len(message.attachments), 1)
+
+    def test_send_automatically_manually(self):
+        """Creating the invoices by hand shows what has been sent"""
+        r = factories.RecurringInvoiceFactory.create(
+            subtotal=100, postal_address="Name\nStreet\nCity", send_automatically=True
+        )
+        r.contact.emailaddresses.create(email="contact@example.com")
+        self.client.force_login(r.owned_by)
+        response = self.client.get(r.get_absolute_url() + "?create_invoices=1")
+        invoice = Invoice.objects.get()
+        self.assertEqual(
+            messages(response),
+            ["Created 1 invoice.", f"{invoice}: Sent to contact@example.com"],
+        )
+
+    def test_send_automatically_notification(self):
+        """The owners' mail says whether new invoices have been sent"""
+        r = factories.RecurringInvoiceFactory.create(
+            subtotal=100, postal_address="Name\nStreet\nCity", send_automatically=True
+        )
+        r.contact.emailaddresses.create(email="contact@example.com")
+        create_recurring_invoices_and_notify()
+        self.assertEqual(
+            [message.subject for message in mail.outbox][-1], "recurring invoices"
+        )
+        self.assertIn("Sent to contact@example.com", mail.outbox[-1].body)
 
     def test_current_tax_rate(self):
         """Recurring invoices have no tax rate of their own, they and their

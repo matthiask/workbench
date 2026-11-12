@@ -129,6 +129,9 @@ class RecurringInvoiceDetailView(generic.DetailView):
                 ngettext("Created %s invoice.", "Created %s invoices.", len(invoices))
                 % len(invoices),
             )
+            for invoice in invoices:
+                if sending := getattr(invoice, "sending", None):
+                    messages.info(request, f"{invoice}: {sending}")
             return redirect("invoices_invoice_list" if len(invoices) else self.object)
         context = self.get_context_data()
         return self.render_to_response(context)

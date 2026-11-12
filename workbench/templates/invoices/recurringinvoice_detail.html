@@ -75,6 +75,8 @@
             <dd>{{ object.create_project|yesno:_('yes,no') }}</dd>
             <dt>{{ object|label:'mark_as_sent' }}</dt>
             <dd>{{ object.mark_as_sent|yesno:_('yes,no') }}</dd>
+            <dt>{{ object|label:'send_automatically' }}</dt>
+            <dd>{{ object.send_automatically|yesno:_('yes,no') }}</dd>
           </dl>
         </div>
       </section>
