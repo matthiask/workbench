@@ -76,9 +76,16 @@
     </div>
   </div>
 
-  {% if object.customer.notes %}
+  {% if object.customer.notes or object.customer.accounts_payable_email %}
     <div class="alert alert-warning">
-      <strong>{% translate 'notes of the organization' %}:</strong><br>{{ object.customer.notes|linebreaksbr }}
+      {% if object.customer.accounts_payable_email %}
+        <strong>{% translate 'accounts payable email address'|capfirst %}:</strong>
+        <a href="mailto:{{ object.customer.accounts_payable_email }}">{{ object.customer.accounts_payable_email }}</a>
+        {% if object.customer.notes %}<br>{% endif %}
+      {% endif %}
+      {% if object.customer.notes %}
+        <strong>{% translate 'notes of the organization' %}:</strong><br>{{ object.customer.notes|linebreaksbr }}
+      {% endif %}
     </div>
   {% endif %}
 

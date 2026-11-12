@@ -1916,6 +1916,10 @@ class InvoicesTest(TestCase):
 
         response = self.client.get(invoice.get_absolute_url())
         self.assertContains(response, invoice.urls["send"])
+        # The accounts payable address is shown with the organization's notes
+        self.assertContains(
+            response, '<a href="mailto:creditors@example.com">creditors@example.com</a>'
+        )
         response = self.client.get(invoice.urls["send"], headers=headers)
         self.assertContains(
             response,
