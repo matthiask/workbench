@@ -389,12 +389,18 @@ class PDFDocument(_PDFDocument):
         )
         self.spacer(1 * mm)
 
-    def heading_row(self, heading):
+    def heading_row(self, heading, *, first=False):
+        """Headings of offers separate the services by a line, except at the
+        top where the services' header has one already"""
+        if not first:
+            self.spacer(3 * mm)
+            self.hr_mini()
         self.spacer(2 * mm)
         self.h3(heading.title)
         if heading.description.strip():
+            self.spacer(1.5 * mm)
             self.p(heading.description.strip())
-        self.spacer(1 * mm)
+        self.spacer(3 * mm)
 
     def table_services(self, services, *, show_details=False):
         if not services:
@@ -408,10 +414,10 @@ class PDFDocument(_PDFDocument):
         )
         self.spacer(2 * mm)
 
-        for service in services:
+        for index, service in enumerate(services):
             # Offers' headings have no amounts
             if not hasattr(service, "service_cost"):
-                self.heading_row(service)
+                self.heading_row(service, first=not index)
             else:
                 fn(service)
             # + list(chain.from_iterable(fn(service) for service in services)),
