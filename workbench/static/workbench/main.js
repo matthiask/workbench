@@ -728,9 +728,14 @@ function initWidgets() {
     }
   }
 
-  // The pricing of offers: optional services don't count towards the total,
-  // the total incl. tax is rounded to 5 cents like Offer._calculate_total()
-  for (const form of document.querySelectorAll("[data-offer-form]")) {
+  // The services and totals of offers: optional services don't count towards
+  // the total, the total incl. tax is rounded to 5 cents like
+  // Offer._calculate_total(). The project's services without offer are
+  // hidden rows which can be added (and removed again).
+  for (const form of document.querySelectorAll(
+    "[data-offer-form]:not(.initialized)",
+  )) {
+    form.classList.add("initialized")
     const read = (sel, root) =>
       Number.parseFloat(root.querySelector(sel)?.value) || 0
     // Like currency() in workbench/tools/formats.py
@@ -745,13 +750,15 @@ function initWidgets() {
       const el = form.querySelector(sel)
       if (el) el.textContent = format(value)
     }
-    const taxRate = Number.parseFloat(form.dataset.taxRate) || 0
+    const inOffer = (service) =>
+      service.querySelector("input[name$='-in_offer']").checked
 
     function recalculate() {
       let subtotal = 0
       let optionalTotal = 0
 
       for (const service of form.querySelectorAll("tbody [data-service]")) {
+        if (!inOffer(service)) continue
         const serviceCost =
           read("[data-effort-rate] input", service) *
             read("[data-effort-hours] input", service) +
@@ -769,6 +776,12 @@ function initWidgets() {
         cell.classList.toggle("text-body-secondary", !!isOptional)
       }
 
+      const liableToVat = form.querySelector("#id_liable_to_vat")?.checked
+      const taxRate = liableToVat
+        ? Number.parseFloat(
+            form.querySelector("[name='tax_rate']:checked")?.value,
+          ) || 0
+        : 0
       const totalExclTax = subtotal - read("#id_discount", form)
       const total =
         Math.round((totalExclTax * (1 + taxRate / 100)) / 0.05) * 0.05
@@ -778,24 +791,70 @@ function initWidgets() {
       write("[data-tax]", total - totalExclTax)
       write("[data-total]", total)
       write("[data-optional-total]", optionalTotal)
+      form.querySelector("[data-tax-rate]").textContent = taxRate
+      for (const el of form.querySelectorAll("[data-tax-row]")) {
+        el.hidden = !liableToVat
+      }
+      for (const el of form.querySelectorAll("[data-no-tax-row]")) {
+        el.hidden = !!liableToVat
+      }
       form.querySelector("[data-optional-total-row]").hidden = !optionalTotal
     }
 
     const services = form.querySelector("[data-services]")
-    if (services) {
+    // Services are numbered in the order they're shown
+    const renumber = () => {
+      services
+        .querySelectorAll("[data-service]:not([hidden])")
+        .forEach((service, index) => {
+          service.querySelector("input[name$='-position']").value =
+            10 * (index + 1)
+        })
+    }
+    const existing = form.querySelector("[data-existing-services]")
+    const updateExisting = () => {
+      if (existing) {
+        existing.hidden = !existing.querySelector(
+          "[data-add-service]:not([hidden])",
+        )
+      }
+    }
+
+    if (services && form.querySelector("[data-sortable-grabber]")) {
       Sortable.create(services, {
         draggable: "[data-service]",
         handle: "[data-sortable-grabber]",
-        onEnd() {
-          services
-            .querySelectorAll("[data-service] input[name$='-position']")
-            .forEach((input, index) => {
-              input.value = 10 * (index + 1)
-            })
-        },
+        onEnd: renumber,
       })
     }
 
+    form.addEventListener("click", (e) => {
+      const remove = e.target.closest("[data-remove-service]")
+      if (remove) {
+        const service = remove.closest("[data-service]")
+        service.querySelector("input[name$='-in_offer']").checked = false
+        service.hidden = true
+        const item = form.querySelector(`[data-add-service="${service.id}"]`)
+        if (item) item.hidden = false
+        updateExisting()
+        recalculate()
+        return
+      }
+
+      const add = e.target.closest("[data-add-service]")
+      if (add) {
+        const service = document.getElementById(add.dataset.addService)
+        service.querySelector("input[name$='-in_offer']").checked = true
+        service.hidden = false
+        services.append(service)
+        add.hidden = true
+        renumber()
+        updateExisting()
+        recalculate()
+      }
+    })
+
+    updateExisting()
     recalculate()
     form.addEventListener("input", recalculate)
     form.addEventListener("change", recalculate)

@@ -12,11 +12,52 @@ from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
-from workbench.projects.models import Project
+from workbench.projects.models import Project, Service
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
 from workbench.tools.validation import in_days, monday
+
+
+def service_data(service, **kwargs):
+    """The fields of a service in the offer form"""
+    return {
+        "id": service.id,
+        "position": service.position,
+        "in_offer": "on",
+        "title": service.title,
+        "effort_type": service.effort_type,
+        "effort_rate": service.effort_rate or "",
+        "effort_hours": service.effort_hours or "",
+        "cost": service.cost or "",
+    } | kwargs
+
+
+def services_formset(*services):
+    """The services' formset of the offer form"""
+    data = {
+        "services-TOTAL_FORMS": len(services),
+        "services-INITIAL_FORMS": sum("id" in service for service in services),
+        "services-MAX_NUM_FORMS": 1000,
+    }
+    for index, service in enumerate(services):
+        data |= {f"services-{index}-{key}": value for key, value in service.items()}
+    return data
+
+
+def offer_form_data(offer, *services, **kwargs):
+    """The fields of the offer form with the services' formset"""
+    return {
+        "title": offer.title or "Offer",
+        "owned_by": offer.owned_by_id,
+        "status": offer.status,
+        "postal_address": offer.postal_address or "A\nStreet\nCity",
+        "discount": "0",
+        "liable_to_vat": "1",
+        "tax_rate": "8.10",
+        WarningsForm.ignore_warnings_id: "on",
+        **services_formset(*services),
+    } | kwargs
 
 
 class OffersTest(TestCase):
@@ -50,7 +91,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
                 "postal_address": postal_address.postal_address,
-                "services": [service.id],
+                **services_formset(service_data(service)),
                 "status": Offer.IN_PREPARATION,
             },
         )
@@ -121,6 +162,7 @@ class OffersTest(TestCase):
             {
                 "title": "Test",
                 "owned_by": offer.owned_by_id,
+                **services_formset(),
                 "discount": "0",
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
@@ -169,7 +211,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
                 "postal_address": "Anything\nStreet\nCity",
-                "services": [service.id],
+                **services_formset(service_data(service)),
                 # "offered_on": dt.date.today().isoformat(),
                 "status": Offer.ACCEPTED,
             },
@@ -186,7 +228,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
                 "postal_address": "Anything\nStreet\nCity",
-                "services": [service.id],
+                **services_formset(service_data(service)),
                 "offered_on": dt.date.today().isoformat(),
                 "valid_until": in_days(60).isoformat(),
                 "status": Offer.ACCEPTED,
@@ -252,7 +294,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
                 "postal_address": "Anything\nStreet\nCity",
-                "services": [service.id],
+                **services_formset(service_data(service)),
                 "offered_on": dt.date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
             },
@@ -268,7 +310,7 @@ class OffersTest(TestCase):
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
                 "postal_address": "Anything\nStreet\nCity",
-                "services": [service.id],
+                **services_formset(service_data(service)),
                 "offered_on": dt.date.today().isoformat(),
                 "status": Offer.IN_PREPARATION,
                 WarningsForm.ignore_warnings_id: "status-change-but-already-closed",
@@ -471,6 +513,7 @@ class OffersTest(TestCase):
             {
                 "title": "Stuff",
                 "owned_by": project.owned_by_id,
+                **services_formset(),
                 "discount": "0",
                 "liable_to_vat": "1",
                 "tax_rate": "8.10",
@@ -496,6 +539,7 @@ class OffersTest(TestCase):
             {
                 "title": "Stuff",
                 "owned_by": project.owned_by_id,
+                **services_formset(),
                 "discount": "10",
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
@@ -563,145 +607,174 @@ class OffersTest(TestCase):
         self.assertRedirects(response, offer.project.urls["detail"])
         self.assertFalse(Offer.objects.filter(pk=offer.pk).exists())
 
-    def test_offer_pricing(self):
-        """Offer total calculation works"""
-        offer = factories.OfferFactory.create()
+    def test_offer_form_services(self):
+        """The offer form changes its services and calculates the total"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
         service = factories.ServiceFactory.create(offer=offer, project=offer.project)
 
         self.client.force_login(offer.owned_by)
-        response = self.client.get(offer.urls["pricing"])
+        response = self.client.get(offer.urls["update"])
         self.assertContains(response, "data-effort-rate", 2)  # Empty form too
+        self.assertContains(response, 'name="services-0-description"')
+        self.assertContains(response, 'name="services-0-is_optional"')
+        self.assertContains(response, 'name="services-__prefix__-service_type"')
 
         response = self.client.post(
-            offer.urls["pricing"],
-            {
-                "discount": 100,
-                "liable_to_vat": "1",
-                "tax_rate": "7.70",
-                "services-TOTAL_FORMS": 1,
-                "services-INITIAL_FORMS": 1,
-                "services-MAX_NUM_FORMS": 1000,
-                "services-0-id": service.id,
-                "services-0-offer": offer.id,
-                "services-0-position": service.position,
-                "services-0-title": service.title,
-                "services-0-effort_type": "Programming",
-                "services-0-effort_rate": 250,
-                "services-0-effort_hours": 10,
-                "services-0-cost": 35,
-            },
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(
+                    service,
+                    effort_type="Programming",
+                    effort_rate=250,
+                    effort_hours=10,
+                    cost=35,
+                ),
+                discount=100,
+            ),
         )
-
         self.assertRedirects(response, offer.get_absolute_url())
 
         offer.refresh_from_db()
         service.refresh_from_db()
-
         self.assertEqual(service.service_cost, 250 * 10 + 35)
         self.assertEqual(offer.total_excl_tax, 250 * 10 + 35 - 100)
 
         # Offer has been
         # - inserted
         # - updated once because of _fts
-        # - updated only once because of skip_related_model
+        # - updated once when saving the form (the services skip their offer)
         actions = LoggedAction.objects.for_model(offer).with_data(id=offer.id)
         self.assertEqual([action.action for action in actions], ["I", "U", "U"])
 
-    def test_offer_pricing_order_optional_and_descriptions(self):
-        """The pricing form changes the order, the descriptions and whether
-        services are optional; optional services don't count"""
-        offer = factories.OfferFactory.create()
+    def test_offer_form_orders_services(self):
+        """Services are saved in the order they are shown, also when nothing
+        else has changed; optional services don't count"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
         first = factories.ServiceFactory.create(
-            offer=offer, project=offer.project, title="First"
+            offer=offer,
+            project=offer.project,
+            effort_type="Programming",
+            effort_rate=100,
+            effort_hours=10,
         )
         second = factories.ServiceFactory.create(
-            offer=offer, project=offer.project, title="Second"
+            offer=offer,
+            project=offer.project,
+            effort_type="Programming",
+            effort_rate=100,
+            effort_hours=10,
         )
-
-        def service_data(index, service, **kwargs):
-            return {
-                f"services-{index}-{key}": value
-                for key, value in {
-                    "id": service.id,
-                    "offer": offer.id,
-                    "title": service.title,
-                    "effort_type": "Programming",
-                    "effort_rate": 100,
-                    "effort_hours": 10,
-                    "cost": 0,
-                    **kwargs,
-                }.items()
-            }
 
         self.client.force_login(offer.owned_by)
-        response = self.client.get(offer.urls["pricing"])
-        self.assertContains(response, 'name="services-0-description"')
-        self.assertContains(response, 'name="services-0-is_optional"')
-        self.assertContains(response, 'name="services-0-position"')
-
         response = self.client.post(
-            offer.urls["pricing"],
-            {
-                "discount": 0,
-                "services-TOTAL_FORMS": 2,
-                "services-INITIAL_FORMS": 2,
-                "services-MAX_NUM_FORMS": 1000,
-                **service_data(0, first, position=20, is_optional="on"),
-                **service_data(1, second, position=10, description="Details"),
-            },
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(first, position=20, is_optional="on"),
+                service_data(second, position=10, description="Details"),
+            ),
         )
         self.assertRedirects(response, offer.get_absolute_url())
-
         self.assertEqual(list(offer.services.all()), [second, first])
-        first.refresh_from_db()
         second.refresh_from_db()
-        self.assertTrue(first.is_optional)
         self.assertEqual(second.description, "Details")
         offer.refresh_from_db()
         self.assertEqual(offer.subtotal, 1000)
 
-    def test_offer_pricing_adds_services(self):
-        """New services can be added to the offer in the pricing form, they
-        are added at the end"""
-        offer = factories.OfferFactory.create()
+        response = self.client.post(
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(first, position=10, is_optional="on"),
+                service_data(second, position=20),
+            ),
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        self.assertEqual(list(offer.services.all()), [first, second])
+
+    def test_offer_form_adds_and_removes_services(self):
+        """New services and services of the project without offer are added
+        to the offer, removed services stay on the project"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
         service = factories.ServiceFactory.create(offer=offer, project=offer.project)
+        unoffered = factories.ServiceFactory.create(
+            project=offer.project, cost=200, title="Unoffered"
+        )
+        other_offer = factories.OfferFactory.create(project=offer.project)
+        other = factories.ServiceFactory.create(
+            project=offer.project, offer=other_offer
+        )
 
         self.client.force_login(offer.owned_by)
-        response = self.client.get(offer.urls["pricing"])
-        self.assertContains(response, 'name="services-__prefix__-service_type"')
+        response = self.client.get(offer.urls["update"])
+        self.assertContains(response, 'data-add-service="services-1"')
+        self.assertContains(response, "Unoffered")
+        self.assertNotContains(response, f'value="{other.pk}"')
 
+        new = {
+            "title": "New",
+            "in_offer": "on",
+            "effort_type": "Programming",
+            "effort_rate": 100,
+            "effort_hours": 5,
+        }
+        empty = {"in_offer": "on", "position": 40}
+        removed = {"title": "Removed", "in_offer": ""}
         response = self.client.post(
-            offer.urls["pricing"],
-            {
-                "discount": 0,
-                "services-TOTAL_FORMS": 3,
-                "services-INITIAL_FORMS": 1,
-                "services-MAX_NUM_FORMS": 1000,
-                "services-0-id": service.id,
-                "services-0-offer": offer.id,
-                "services-0-position": service.position,
-                "services-0-title": service.title,
-                "services-1-offer": offer.id,
-                "services-1-title": "New",
-                "services-1-effort_type": "Programming",
-                "services-1-effort_rate": 100,
-                "services-1-effort_hours": 5,
-                # Left empty
-                "services-2-offer": offer.id,
-            },
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(service, in_offer=""),
+                service_data(unoffered, position=10),
+                new,
+                empty,
+                removed,
+            ),
         )
         self.assertRedirects(response, offer.get_absolute_url())
 
         new = offer.services.get(title="New")
         self.assertEqual(new.project, offer.project)
-        self.assertEqual(list(offer.services.all()), [service, new])
+        self.assertEqual(list(offer.services.all()), [unoffered, new])
+        service.refresh_from_db()
+        self.assertIsNone(service.offer)
+        self.assertEqual(service.project, offer.project)
+        self.assertFalse(Service.objects.filter(title="Removed").exists())
         offer.refresh_from_db()
-        self.assertEqual(offer.subtotal, 500)
+        self.assertEqual(offer.subtotal, 700)
 
-    def test_offer_pricing_keeps_rates_of_invoiced_services(self):
+    def test_create_offer_with_services(self):
+        """Offers are created with new services and services of the project
+        without offer"""
+        project = factories.ProjectFactory.create()
+        unoffered = factories.ServiceFactory.create(project=project, cost=200)
+
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.urls["createoffer"])
+        self.assertContains(response, 'data-add-service="services-0"')
+
+        offer = Offer(project=project, owned_by=project.owned_by, title="Offer")
+        response = self.client.post(
+            project.urls["createoffer"],
+            offer_form_data(
+                offer,
+                service_data(unoffered),
+                {"title": "New", "in_offer": "on", "cost": 100},
+            ),
+        )
+        offer = project.offers.get()
+        self.assertRedirects(response, offer.get_absolute_url())
+        self.assertEqual(
+            [service.title for service in offer.services.all()],
+            [unoffered.title, "New"],
+        )
+        self.assertEqual(offer.subtotal, 300)
+
+    def test_offer_form_keeps_rates_of_invoiced_services(self):
         """Invoiced services keep their effort type and rate, also in the
-        pricing form"""
-        offer = factories.OfferFactory.create()
+        offer form"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
         service = factories.ServiceFactory.create(
             offer=offer, project=offer.project, effort_type="Design", effort_rate=100
         )
@@ -715,21 +788,13 @@ class OffersTest(TestCase):
 
         self.client.force_login(offer.owned_by)
         response = self.client.post(
-            offer.urls["pricing"],
-            {
-                "discount": 0,
-                "services-TOTAL_FORMS": 1,
-                "services-INITIAL_FORMS": 1,
-                "services-MAX_NUM_FORMS": 1000,
-                "services-0-id": service.id,
-                "services-0-offer": offer.id,
-                "services-0-position": service.position,
-                "services-0-title": service.title,
-                "services-0-effort_type": "Programming",
-                "services-0-effort_rate": 250,
-                "services-0-effort_hours": 10,
-                "services-0-cost": 0,
-            },
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(
+                    service, effort_type="Programming", effort_rate=250, effort_hours=10
+                ),
+            ),
         )
         self.assertRedirects(response, offer.get_absolute_url())
         service.refresh_from_db()
@@ -740,9 +805,7 @@ class OffersTest(TestCase):
     def test_offer_form_moves_invoiced_services(self):
         """Invoiced services may be removed from and added to offers of
         their project, the invoice lines still point to them"""
-        offer = factories.OfferFactory.create(
-            title="Offer", postal_address="A\nStreet\nCity"
-        )
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
         service = factories.ServiceFactory.create(offer=offer, project=offer.project)
         unoffered = factories.ServiceFactory.create(project=offer.project)
         factories.InvoiceFactory.create(
@@ -753,18 +816,11 @@ class OffersTest(TestCase):
         ).create_services_from_offer([service, unoffered])
 
         self.client.force_login(offer.owned_by)
-        data = {
-            "title": offer.title,
-            "owned_by": offer.owned_by_id,
-            "status": offer.status,
-            "postal_address": offer.postal_address,
-            "discount": "0",
-            "liable_to_vat": "1",
-            "tax_rate": "8.10",
-            WarningsForm.ignore_warnings_id: "on",
-        }
         response = self.client.post(
-            offer.urls["update"], data | {"services": [unoffered.id]}
+            offer.urls["update"],
+            offer_form_data(
+                offer, service_data(service, in_offer=""), service_data(unoffered)
+            ),
         )
         self.assertRedirects(response, offer.get_absolute_url())
         self.assertEqual(list(offer.services.all()), [unoffered])
@@ -781,6 +837,7 @@ class OffersTest(TestCase):
         data = {
             "title": offer.title,
             "owned_by": offer.owned_by_id,
+            **services_formset(),
             "status": offer.status,
             "postal_address": offer.postal_address,
             "discount": "0",
@@ -811,64 +868,83 @@ class OffersTest(TestCase):
             postal_address="A\nStreet\nCity",
         )
         service = factories.ServiceFactory.create(
-            offer=offer, project=offer.project, effort_rate=100, effort_hours=10
+            offer=offer,
+            project=offer.project,
+            effort_type="Programming",
+            effort_rate=100,
+            effort_hours=10,
         )
         unoffered = factories.ServiceFactory.create(project=offer.project, cost=500)
         self.client.force_login(offer.owned_by)
 
-        response = self.client.post(
-            offer.urls["pricing"],
-            {
-                "discount": 0,
-                "services-TOTAL_FORMS": 1,
-                "services-INITIAL_FORMS": 1,
-                "services-MAX_NUM_FORMS": 1000,
-                "services-0-id": service.id,
-                "services-0-offer": offer.id,
-                "services-0-position": service.position,
-                "services-0-title": service.title,
-                "services-0-effort_type": "Programming",
-                "services-0-effort_rate": 250,
-                "services-0-effort_hours": 10,
-                "services-0-cost": 0,
-            },
-        )
-        self.assertContains(response, "Only offers in preparation can be changed.")
-        service.refresh_from_db()
-        self.assertEqual(service.effort_rate, 100)
+        response = self.client.get(offer.urls["update"])
+        self.assertNotContains(response, "data-add-service")
+        self.assertNotContains(response, "data-sortable-grabber")
+        self.assertContains(response, 'name="services-0-effort_rate"')
 
         response = self.client.post(
             offer.urls["update"],
-            {
-                "offered_on": offer.offered_on.isoformat(),
-                "valid_until": offer.valid_until.isoformat(),
-                "title": offer.title,
-                "owned_by": offer.owned_by_id,
-                "status": offer.status,
-                "postal_address": offer.postal_address,
-                "discount": "0",
-                "liable_to_vat": "1",
-                "tax_rate": "8.10",
-                "services": [service.id, unoffered.id],
-                WarningsForm.ignore_warnings_id: "on",
-            },
+            offer_form_data(
+                offer,
+                service_data(service, effort_rate=250),
+                service_data(unoffered),
+                offered_on=offer.offered_on.isoformat(),
+                valid_until=offer.valid_until.isoformat(),
+            ),
         )
         self.assertRedirects(response, offer.get_absolute_url())
+        service.refresh_from_db()
+        self.assertEqual(service.effort_rate, 100)
         self.assertEqual(list(offer.services.all()), [service])
 
-    def test_offer_pricing_with_flat_rate(self):
-        """Pricing with flat rates does not allow editing effort rates"""
+    def test_sending_an_offer_with_changed_services(self):
+        """Services can be changed together with sending the offer, the
+        status before the change counts"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
+        service = factories.ServiceFactory.create(
+            offer=offer,
+            project=offer.project,
+            effort_type="Programming",
+            effort_rate=100,
+            effort_hours=10,
+        )
+        self.client.force_login(offer.owned_by)
+        response = self.client.post(
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(service, effort_rate=250),
+                status=Offer.OFFERED,
+                offered_on=dt.date.today().isoformat(),
+                valid_until=in_days(30).isoformat(),
+            ),
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.OFFERED)
+        self.assertEqual(offer.subtotal, 2500)
+
+    def test_offer_form_with_flat_rate(self):
+        """Offers of projects with flat rates do not allow editing effort
+        rates"""
         project = factories.ProjectFactory.create(flat_rate=160)
         offer = factories.OfferFactory.create(project=project)
         factories.ServiceFactory.create(offer=offer, project=project)
 
         self.client.force_login(project.owned_by)
-        response = self.client.get(offer.urls["pricing"])
+        response = self.client.get(offer.urls["update"])
         self.assertContains(
             response,
             '<input type="number" name="services-0-effort_rate" step="0.01" class="form-control" disabled id="id_services-0-effort_rate">',
             html=True,
         )
+
+    def test_pricing_redirects_to_the_offer_form(self):
+        """The pricing has been merged into the offer form"""
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(offer.urls["pricing"])
+        self.assertRedirects(response, offer.urls["update"])
 
     def test_renumber_offers(self):
         """Offers can be renumbered (and reordered)"""
@@ -909,6 +985,7 @@ class OffersTest(TestCase):
             {
                 "title": "Stuff",
                 "owned_by": offer.owned_by_id,
+                **services_formset(),
                 "discount": "10",
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
@@ -928,6 +1005,7 @@ class OffersTest(TestCase):
             {
                 "title": "Stuff",
                 "owned_by": offer.owned_by_id,
+                **services_formset(),
                 "discount": "10",
                 "liable_to_vat": "1",
                 "tax_rate": "7.70",
@@ -968,6 +1046,7 @@ class OffersTest(TestCase):
         data = {
             "title": "Stuff",
             "owned_by": offer.owned_by_id,
+            **services_formset(),
             "discount": "10",
             "liable_to_vat": "1",
             "tax_rate": "7.70",
@@ -1017,6 +1096,7 @@ class OffersTest(TestCase):
         data = {
             "title": "Stuff",
             "owned_by": offer.owned_by_id,
+            **services_formset(),
             "discount": "10",
             "liable_to_vat": "1",
             "tax_rate": "7.70",
@@ -1057,6 +1137,7 @@ class OffersTest(TestCase):
         data = {
             "title": "Stuff",
             "owned_by": offer.owned_by_id,
+            **services_formset(),
             "discount": "10",
             "liable_to_vat": "1",
             "tax_rate": "7.70",

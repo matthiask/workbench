@@ -4,8 +4,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
-from django.forms.models import inlineformset_factory
-from django.utils.html import format_html
+from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.models import User
@@ -14,7 +13,7 @@ from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.formats import currency, local_date_format
+from workbench.tools.formats import local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     Form,
@@ -123,8 +122,8 @@ class OfferForm(PostalAddressSelectionForm):
             "external_reference",
         )
         widgets = {
-            "description": Textarea,
-            "external_reference": Textarea,
+            "description": Textarea({"rows": 2, "class": "wb-autogrow"}),
+            "external_reference": Textarea({"rows": 1, "class": "wb-autogrow"}),
             "status": forms.RadioSelect,
             "postal_address": Textarea,
             "tax_rate": forms.RadioSelect,
@@ -141,50 +140,18 @@ class OfferForm(PostalAddressSelectionForm):
         warn_if_not_in_preparation(self)
 
         self.instance.project = self.project
-        self.service_candidates = Service.objects.filter(
-            Q(project=self.project), Q(offer__isnull=True) | Q(offer=self.instance.pk)
-        )
-
-        self.fields["services"] = forms.ModelMultipleChoiceField(
-            queryset=self.service_candidates,
-            label=_("services"),
-            widget=forms.CheckboxSelectMultiple,
-            required=False,
-            initial=(
-                self.instance.services.values_list("pk", flat=True)
-                if self.instance.pk
-                else []
-            ),
-        )
-        # Services of offers which have been sent can't be added or removed
-        self.fields["services"].disabled = bool(
-            self.instance.pk
-            and self.instance.status not in {Offer.IN_PREPARATION, Offer.SERVICE_GROUP}
-        )
-        self.fields["services"].choices = [
-            (
-                format_html(
-                    "<u>{}</u><br>"
-                    '<div class="form-check">'
-                    '<input type="checkbox" data-toggle-following id="offer-none">'
-                    '<label for="offer-none">{}</label>'
-                    "</div>",
-                    _("Not offered yet"),
-                    _("Select all"),
-                ),
-                [
-                    (
-                        service.id,
-                        format_html(
-                            '<div class="mb-2 text-break"><strong>{}</strong><br>{}</div>',
-                            service.title,
-                            currency(service.service_cost),
-                        ),
-                    )
-                    for service in self.service_candidates
-                ],
-            ),
-        ]
+        # Services of offers which have been sent stay as they were sent
+        self.services_changeable = self.instance.services_changeable
+        self.formsets = {
+            "services": ServiceFormset(
+                self.data or None,
+                instance=self.instance,
+                form_kwargs={
+                    "offer": self.instance,
+                    "editable": self.services_changeable,
+                },
+            )
+        }
 
         self.order_fields(
             field
@@ -205,6 +172,7 @@ class OfferForm(PostalAddressSelectionForm):
             person=self.project.contact, organization=self.project.customer
         )
         self.fields["subtotal"].disabled = True
+        self.fields["discount"].widget.attrs["class"] = "form-control text-end"
 
         if self.instance.pk and self.instance.planned_work.all().after_this_week():
             posted_status = (
@@ -269,14 +237,32 @@ class OfferForm(PostalAddressSelectionForm):
 
         return data
 
+    def total_titles(self):
+        """Titles of the totals with and without tax, the form switches
+        between them"""
+        currency = {"currency": settings.WORKBENCH.CURRENCY}
+        return {
+            "total": _("Total %(currency)s") % currency,
+            "total_incl_tax": _("Total %(currency)s incl. tax") % currency,
+            "optional": _("Total %(currency)s for optional services") % currency,
+            "optional_excl_tax": (
+                _("Total %(currency)s excl. tax for optional services") % currency
+            ),
+        }
+
+    def is_valid(self):
+        return all([
+            super().is_valid(),
+            not self.services_changeable or self.formsets["services"].is_valid(),
+        ])
+
     def save(self):
         instance = super().save(commit=False)
         if not instance.pk:
             instance.save()
-        self.cleaned_data["services"].update(offer=instance)
-        self.service_candidates.exclude(id__in=self.cleaned_data["services"]).update(
-            offer=None
-        )
+        if self.services_changeable:
+            self.formsets["services"].save()
+        # Totals of the services
         instance.save()
         if instance.status in Offer.NOT_PURSUED and self.cleaned_data.get(
             "delete_planned_work"
@@ -286,66 +272,32 @@ class OfferForm(PostalAddressSelectionForm):
         return instance
 
 
-class OfferPricingForm(ModelForm):
-    class Meta:
-        model = Offer
-        fields = (
-            "subtotal",
-            "discount",
-            "total_excl_tax",
-        )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        warn_if_not_in_preparation(self)
-
-        self.fields["subtotal"].disabled = True
-        self.fields["total_excl_tax"].disabled = True
-        self.fields["discount"].widget.attrs["class"] = "form-control text-end"
-
-        kwargs.pop("request")
-        self.formsets = (
-            {
-                "services": ServiceFormset(
-                    *args, form_kwargs={"project": self.instance.project}, **kwargs
-                )
-            }
-            if self.instance.pk
-            else {}
-        )
-
-    def clean(self):
-        data = super().clean()
-        # Like the API and the service form of the project
-        if self.instance.status not in {Offer.IN_PREPARATION, Offer.SERVICE_GROUP}:
-            raise forms.ValidationError(_("Only offers in preparation can be changed."))
-        return data
-
-    def is_valid(self):
-        return all(
-            [super().is_valid()]
-            + [formset.is_valid() for formset in self.formsets.values()]
-        )
-
-    def save(self, commit=True):  # noqa: FBT002
-        for formset in self.formsets.values():
-            formset.save()
-        return super().save()
-
-
 class ServiceForm(forms.ModelForm):
+    """A service in the offer form: the offer's services and the project's
+    services without offer, which can be added to the offer"""
+
     service_type = forms.ModelChoiceField(
         ServiceType.objects.all(),
         label=ServiceType._meta.verbose_name,
         required=False,
+    )
+    in_offer = forms.BooleanField(
+        required=False, widget=forms.CheckboxInput(attrs={"hidden": True})
     )
 
     class Meta:
         model = Service
         fields = "__all__"  # noqa: DJ007
 
-    def __init__(self, *args, project, **kwargs):
+    def __init__(self, *args, offer, editable, **kwargs):
         super().__init__(*args, **kwargs)
+        self.offer = offer
+        project = offer.project
+        # Unchanged services aren't validated, those without offer are hidden
+        self.empty_permitted = True
+        self.initial["in_offer"] = not self.instance.pk or bool(
+            offer.pk and self.instance.offer_id == offer.pk
+        )
         # New services are added at the end unless they are moved
         self.fields["position"].required = False
         if not self.instance.pk:
@@ -357,25 +309,58 @@ class ServiceForm(forms.ModelForm):
 
         # Invoiced services keep their effort type and rate, the logbook of
         # invoiced work would be valued differently
-        if project.flat_rate is not None or self.instance.is_invoiced:
+        if not editable or project.flat_rate is not None or self.instance.is_invoiced:
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
             self.fields.pop("service_type")
+        if not editable:
+            for field in self.fields.values():
+                field.disabled = True
 
     def has_changed(self):
-        # Empty new rows are skipped, also when they have been moved
-        return bool(set(self.changed_data) - {"position"})
+        if not self.instance.pk:
+            # Empty new rows are skipped, also when they have been moved, and
+            # so are removed ones
+            return bool(
+                self["in_offer"].data
+                and set(self.changed_data) - {"position", "in_offer"}
+            )
+        return super().has_changed()
 
     def save(self, commit=True):  # noqa: FBT002
         instance = super().save(commit=False)
+        instance.offer = self.offer if self.cleaned_data["in_offer"] else None
         instance.save(skip_related_model=True)
         return instance
+
+
+class ServiceFormsetBase(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Before validating the offer changes its status
+        self.get_queryset()
+
+    def get_queryset(self):
+        if not hasattr(self, "_queryset"):
+            services = Service.objects.filter(project=self.instance.project)
+            if self.instance.pk:
+                offer = Q(offer=self.instance)
+                if self.instance.services_changeable:
+                    offer |= Q(offer__isnull=True)
+                services = services.filter(offer)
+            elif self.instance.services_changeable:
+                services = services.filter(offer__isnull=True)
+            else:
+                services = services.none()
+            self._queryset = services.select_related("project")
+        return self._queryset
 
 
 ServiceFormset = inlineformset_factory(
     Offer,
     Service,
     form=ServiceForm,
+    formset=ServiceFormsetBase,
     fields=(
         "position",
         "title",

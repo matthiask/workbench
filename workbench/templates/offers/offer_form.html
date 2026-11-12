@@ -1,5 +1,5 @@
 {% extends "generic/object_form.html" %}
-{% load i18n %}
+{% load fineforms formset i18n workbench %}
 {% block uplink %}
   {% if view.project %}
     <a href="{{ view.project.get_absolute_url }}" class="btn btn-quiet btn-sm uplink">
@@ -10,3 +10,208 @@
     {{ block.super }}
   {% endif %}
 {% endblock uplink %}
+
+{% block form_width %}wb-form-page-full{% endblock %}
+
+{% block form_attrs %}data-offer-form{% endblock %}
+
+{% block fields %}
+  {% with services=form.formsets.services editable=form.services_changeable titles=form.total_titles %}
+    <section class="card mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-7">
+            {% ff_field form.title %}
+            {% ff_field form.description %}
+            {% ff_field form.external_reference %}
+          </div>
+          <div class="col-lg-5">
+            {% ff_field form.owned_by %}
+            {% ff_field form.status %}
+            <div class="row">
+              <div class="col-sm-6">{% ff_field form.offered_on %}</div>
+              <div class="col-sm-6">{% ff_field form.valid_until %}</div>
+            </div>
+            {% ff_field form.postal_address %}
+            {% ff_fields form exclude='title,description,external_reference,owned_by,status,offered_on,valid_until,postal_address,subtotal,discount,liable_to_vat,tax_rate,show_service_details,work_completed_on,is_budget_retainer' %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card mb-3 wb-table-card">
+      <div class="card-header">{% translate 'services'|capfirst %}</div>
+      <table class="table table-sm mb-0 table-offer-pricing">
+        <colgroup>
+          <col>
+          <col>
+          <col width="16%">
+          <col width="8%">
+          <col width="7%">
+          <col width="8%">
+          <col>
+          <col width="8%">
+        </colgroup>
+        <thead class="sticky">
+          <tr>
+            <th></th>
+            <th>
+              {% translate 'title'|capfirst %} / {% translate 'description' %}
+            </th>
+            <th>
+              {% if editable %}{% translate 'service type'|capfirst %} /
+                {% translate 'effort type' %}{% else %}{% translate 'effort type'|capfirst %}{% endif %}
+            </th>
+            <th>{% translate 'hourly rate'|capfirst %}</th>
+            <th>{% translate 'hours'|capfirst %}</th>
+            <th>{% translate 'cost'|capfirst %}</th>
+            <th title="{{ services.empty_form.is_optional.help_text }}">
+              {% translate 'optional'|capfirst %}
+            </th>
+            <th class="text-end">{% translate 'service cost'|capfirst %}</th>
+          </tr>
+        </thead>
+        <tbody data-services>
+          {% formset services "services" %}
+          <tr
+            id="{{ form_id }}"
+            data-service
+            {% if form.service_type %}data-autofill="{{ view.default_service_types_json }}"{% endif %}
+            {% if not form.in_offer.value %}hidden{% endif %}
+          >
+            <td class="text-nowrap">
+              {% if editable %}
+                <span
+                  class="btn btn-quiet btn-sm btn-icon wb-grabber"
+                  title="{% translate 'Sort' %}"
+                  data-sortable-grabber
+                >
+                  {% include 'svg/grabber.svg' %}
+                </span>
+              {% endif %}
+              {{ form.in_offer }}
+              {% ff_errors form %}
+              {% ff_fields form exclude='in_offer,service_type,title,description,effort_type,effort_rate,effort_hours,cost,is_optional' %}
+            </td>
+            <td>
+              {% ff_field form.title %}
+              {% ff_field form.description %}
+            </td>
+            <td>
+              {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
+              {% ff_field form.effort_type %}
+            </td>
+            <td data-effort-rate>{% ff_field form.effort_rate %}</td>
+            <td data-effort-hours>{% ff_field form.effort_hours %}</td>
+            <td data-cost>{% ff_field form.cost %}</td>
+            <td data-optional>{% ff_field form.is_optional %}</td>
+            <td class="text-end text-nowrap">
+              <span data-service-cost></span>
+              {% if editable %}
+                <button
+                  type="button"
+                  class="btn btn-quiet btn-sm btn-icon"
+                  title="{% translate 'Remove from offer' %}"
+                  data-remove-service
+                >
+                  &times;
+                </button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endformset %}
+        </tbody>
+        {% if editable %}
+          <tbody>
+            <tr>
+              <td colspan="8">
+                <a
+                  href="#"
+                  class="btn btn-quiet btn-sm"
+                  onclick="return addInlineForm('services')"
+                >{% include 'svg/plus.svg' %} {% translate 'New service' %}</a>
+                <span class="dropdown" data-existing-services>
+                  <button
+                    type="button"
+                    class="btn btn-quiet btn-sm dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    {% include 'svg/plus.svg' %}
+                    {% translate 'Existing service' %}
+                  </button>
+                  <div class="dropdown-menu">
+                    {% for service_form in services %}
+                      {% if service_form.instance.pk %}
+                        <button
+                          type="button"
+                          class="dropdown-item"
+                          data-add-service="services-{{ forloop.counter0 }}"
+                          {% if service_form.in_offer.value %}hidden{% endif %}
+                        >
+                          <strong>{{ service_form.instance.title }}</strong>
+                          {{ service_form.instance.service_cost|currency }}
+                        </button>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        {% endif %}
+        <tfoot>
+          <tr>
+            <th colspan="7" class="text-end">{{ form.subtotal.label }}</th>
+            <td class="text-end text-nowrap" data-subtotal></td>
+          </tr>
+          <tr>
+            <th colspan="7" class="text-end">
+              <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
+              {{ form.discount.errors }}
+            </th>
+            <td>{{ form.discount }}</td>
+          </tr>
+          <tr data-tax-row>
+            <th colspan="7" class="text-end">{% translate 'total excl. tax'|capfirst %}</th>
+            <td class="text-end text-nowrap" data-total-excl-tax></td>
+          </tr>
+          <tr data-tax-row>
+            <th colspan="7" class="text-end"><span data-tax-rate></span>% {% translate 'tax' %}</th>
+            <td class="text-end text-nowrap" data-tax></td>
+          </tr>
+          <tr class="wb-total-row">
+            <th colspan="7" class="text-end">
+              <span data-tax-row>{{ titles.total_incl_tax }}</span>
+              <span data-no-tax-row>{{ titles.total }}</span>
+            </th>
+            <td class="text-end text-nowrap" data-total></td>
+          </tr>
+          <tr data-optional-total-row>
+            <th colspan="7" class="text-end fw-normal fst-italic">
+              <span data-tax-row>{{ titles.optional_excl_tax }}</span>
+              <span data-no-tax-row>{{ titles.optional }}</span>
+            </th>
+            <td class="text-end text-nowrap fst-italic" data-optional-total></td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <section class="card mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-4">
+            {% ff_field form.liable_to_vat %}
+            {% ff_field form.tax_rate %}
+          </div>
+          <div class="col-lg-4">
+            {% ff_field form.show_service_details %}
+            {% ff_field form.is_budget_retainer %}
+          </div>
+          <div class="col-lg-4">{% ff_field form.work_completed_on %}</div>
+        </div>
+      </div>
+    </section>
+  {% endwith %}
+{% endblock fields %}

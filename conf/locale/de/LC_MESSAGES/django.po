@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 16:34+0100\n"
+"POT-Creation-Date: 2026-11-12 07:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -391,7 +391,7 @@ msgstr "lesen und schreiben"
 #: workbench/planning/models.py workbench/projects/models.py
 #: workbench/reporting/models.py workbench/services/models.py
 #: workbench/templates/accounts/api_tokens.html
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/planning/planning_import.html
 msgid "title"
 msgstr "Titel"
@@ -786,6 +786,7 @@ msgstr "endet am"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "description"
 msgstr "Beschreibung"
@@ -1698,6 +1699,7 @@ msgstr "Ansprechperson"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_list.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/offers/offer_list.html
 #: workbench/templates/reporting/key_data_gross_profit.html
 #: workbench/templates/reporting/key_data_third_party_costs.html
@@ -1819,7 +1821,7 @@ msgid "archived value type"
 msgstr "archivierter Werttyp"
 
 #: workbench/deals/forms.py workbench/invoices/models.py
-#: workbench/offers/models.py
+#: workbench/offers/forms.py workbench/offers/models.py
 #, python-format
 msgid "Total %(currency)s"
 msgstr "Total %(currency)s"
@@ -2205,7 +2207,6 @@ msgid "%(class)s '%(object)s' has been created successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich erstellt."
 
 #: workbench/generic.py workbench/templates/contacts/person_form.html
-#: workbench/templates/offers/offer_pricing.html
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
@@ -2458,19 +2459,19 @@ msgid "%s logged but no hourly rate defined."
 msgstr "%s erfasst aber kein Stundensatz definiert."
 
 #: workbench/invoices/forms.py workbench/logbook/forms.py
-#: workbench/offers/forms.py workbench/projects/models.py
-#: workbench/projects/views.py workbench/templates/projects/project_detail.html
+#: workbench/projects/models.py workbench/projects/views.py
+#: workbench/templates/projects/project_detail.html
 msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
 
-#: workbench/invoices/forms.py workbench/offers/forms.py
+#: workbench/invoices/forms.py
 msgid "Select all"
 msgstr "Alles auswählen"
 
-#: workbench/invoices/forms.py workbench/offers/forms.py
-#: workbench/services/apps.py workbench/services/models.py
+#: workbench/invoices/forms.py workbench/services/apps.py
+#: workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/offers/offer_form.html
 msgid "services"
 msgstr "Leistungen"
 
@@ -2734,7 +2735,8 @@ msgstr "Gutschrift Total %(currency)s inkl. MwSt"
 msgid "Credit total %(currency)s"
 msgstr "Gutschrift Total %(currency)s"
 
-#: workbench/invoices/models.py workbench/offers/models.py
+#: workbench/invoices/models.py workbench/offers/forms.py
+#: workbench/offers/models.py
 #, python-format
 msgid "Total %(currency)s incl. tax"
 msgstr "Total %(currency)s inkl. MwSt"
@@ -2881,13 +2883,13 @@ msgid "rendered on"
 msgstr "Erbracht am"
 
 #: workbench/invoices/views.py workbench/services/models.py
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/_logged_hours_per_rate.html
 msgid "effort type"
 msgstr "Aufwandtyp"
 
 #: workbench/invoices/views.py workbench/services/models.py
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/_logged_hours_per_rate.html
 #: workbench/tools/xlsx.py
 msgid "hourly rate"
@@ -2896,6 +2898,7 @@ msgstr "Stundensatz"
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/reporting/squeeze.py workbench/services/models.py
 #: workbench/templates/logbook/loggedhours_detail.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_hours_for_invoicing.html
 #: workbench/templates/reporting/labor_costs.html
@@ -2908,7 +2911,7 @@ msgstr "Stunden"
 #: workbench/projects/views.py workbench/services/models.py
 #: workbench/templates/invoices/service_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
-#: workbench/templates/offers/offer_pricing.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/service_form.html
 #: workbench/templates/reporting/labor_costs.html
@@ -3038,7 +3041,7 @@ msgstr "Die Stunden für Verrechnung sind viel höher als die Stunden. Bist du s
 msgid "This seems to be a duplicate. Is it?"
 msgstr "Scheint ein Duplikat zu sein. Oder nicht?"
 
-#: workbench/logbook/forms.py workbench/offers/api.py
+#: workbench/logbook/forms.py workbench/offers/api.py workbench/offers/forms.py
 #: workbench/offers/models.py workbench/projects/forms.py
 #: workbench/projects/models.py
 msgid "flat rate"
@@ -3330,7 +3333,7 @@ msgstr "Auf Leistungen dieser Offerte wurden bereits Stunden oder Kosten erfasst
 msgid "Services of this offer have been invoiced already, they cannot be replaced."
 msgstr "Leistungen dieser Offerte wurden bereits verrechnet, sie können nicht ersetzt werden."
 
-#: workbench/offers/api.py workbench/offers/forms.py
+#: workbench/offers/api.py
 msgid "Only offers in preparation can be changed."
 msgstr "Nur Offerten in Vorbereitung können geändert werden."
 
@@ -3368,6 +3371,16 @@ msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde 
 #: workbench/offers/forms.py
 msgid "You are setting the offer status to 'Declined'. However, if you just want to change a few things and send the offer to the client again then you could just as well put the offer back into preparation."
 msgstr "Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige Dinge anpassen willst und die Offerte nochmals der Kundschaft senden willst, kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
+
+#: workbench/offers/forms.py workbench/offers/models.py
+#, python-format
+msgid "Total %(currency)s for optional services"
+msgstr "Total %(currency)s für optionale Leistungen"
+
+#: workbench/offers/forms.py workbench/offers/models.py
+#, python-format
+msgid "Total %(currency)s excl. tax for optional services"
+msgstr "Total %(currency)s exkl. MwSt für optionale Leistungen"
 
 #: workbench/offers/forms.py
 msgid "Same project selected as offer already belongs to."
@@ -3429,7 +3442,7 @@ msgid "The offer is only used for budgeting; services have to be created later w
 msgstr "Diese Offerte wird nur zur Zurückbehaltung von Budget verwendet; wenn später Stunden oder Kosten erfasst werden, müssen individuelle Leistungen erstellt werden."
 
 #: workbench/offers/models.py workbench/planning/models.py
-#: workbench/projects/models.py workbench/templates/offers/offer_pricing.html
+#: workbench/projects/models.py
 #: workbench/templates/planning/planning_import.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/service_form.html workbench/tools/pdf.py
@@ -3466,16 +3479,6 @@ msgstr "Offeriert am %(offered_on)s, aber Offerte nicht mehr gültig"
 #, python-format
 msgid "Offered on %(offered_on)s"
 msgstr "Offeriert am %(offered_on)s"
-
-#: workbench/offers/models.py
-#, python-format
-msgid "Total %(currency)s excl. tax for optional services"
-msgstr "Total %(currency)s exkl. MwSt für optionale Leistungen"
-
-#: workbench/offers/models.py
-#, python-format
-msgid "Total %(currency)s for optional services"
-msgstr "Total %(currency)s für optionale Leistungen"
 
 #: workbench/offers/models.py
 msgid "Offers can only be created from projects. Go to the project and add services first, then you'll be able to create the offer itself."
@@ -4537,7 +4540,7 @@ msgstr "Ziel"
 msgid "Invoices for the selected period may not be complete yet (cutoff: %(cutoff)s)."
 msgstr "Die Rechnungen für den gewählten Zeitraum sind möglicherweise noch nicht vollständig (Stichtag: %(cutoff)s)."
 
-#: workbench/services/models.py
+#: workbench/services/models.py workbench/templates/offers/offer_form.html
 msgid "service type"
 msgstr "Leistungstyp"
 
@@ -4552,7 +4555,7 @@ msgstr "Leistungstypen"
 msgid "service hours"
 msgstr "Leistungsstunden"
 
-#: workbench/services/models.py workbench/templates/offers/offer_pricing.html
+#: workbench/services/models.py workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/project_detail.html
 msgid "service cost"
 msgstr "Leistungskosten"
@@ -5195,7 +5198,6 @@ msgid "Recent deals"
 msgstr "Letzte Geschäfte"
 
 #: workbench/templates/contacts/person_form.html
-#: workbench/templates/offers/offer_pricing.html
 #, python-format
 msgid "Create %(class)s"
 msgstr "%(class)s erstellen"
@@ -5486,9 +5488,31 @@ msgstr "Hallo %(owner)s"
 msgid "Others have added or edited these notes on your deals, invoices and projects. Read them in Workbench:"
 msgstr "Andere haben diese Notizen bei Deinen Geschäften, Rechnungen und Projekten hinzugefügt oder bearbeitet. Lies sie in Workbench:"
 
-#: workbench/templates/offers/offer_pricing.html
-msgid "effort hours"
-msgstr "Aufwände in Stunden"
+#: workbench/templates/offers/offer_form.html
+#: workbench/templates/projects/project_detail.html
+msgid "optional"
+msgstr "optional"
+
+#: workbench/templates/offers/offer_form.html
+#: workbench/templates/projects/project_detail.html
+msgid "Sort"
+msgstr "Sortieren"
+
+#: workbench/templates/offers/offer_form.html
+msgid "Remove from offer"
+msgstr "Aus Offerte entfernen"
+
+#: workbench/templates/offers/offer_form.html
+msgid "New service"
+msgstr "Neue Leistung"
+
+#: workbench/templates/offers/offer_form.html
+msgid "Existing service"
+msgstr "Bestehende Leistung"
+
+#: workbench/templates/offers/offer_form.html workbench/tools/pdf.py
+msgid "tax"
+msgstr "MwSt"
 
 #: workbench/templates/open-modal.html
 msgid "This page does not exist (anymore)."
@@ -5735,18 +5759,6 @@ msgstr "Alles zuklappen"
 #: workbench/templates/projects/project_detail.html
 msgid "Plan work"
 msgstr "Arbeit planen"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Pricing"
-msgstr "Kalkulation"
-
-#: workbench/templates/projects/project_detail.html
-msgid "optional"
-msgstr "optional"
-
-#: workbench/templates/projects/project_detail.html
-msgid "Sort"
-msgstr "Sortieren"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Reassign logbook entries"
@@ -6625,10 +6637,6 @@ msgid "fixed costs"
 msgstr "Fixkosten"
 
 #: workbench/tools/pdf.py
-msgid "tax"
-msgstr "MwSt"
-
-#: workbench/tools/pdf.py
 msgid "Our reference"
 msgstr "Unsere Referenz"
 
@@ -6685,6 +6693,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "effort hours"
+#~ msgstr "Aufwände in Stunden"
+
+#~ msgid "Pricing"
+#~ msgstr "Kalkulation"
 
 #~ msgid "work"
 #~ msgstr "Arbeit"

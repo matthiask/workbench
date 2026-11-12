@@ -3,7 +3,7 @@ from django.urls import path
 
 from workbench import generic
 from workbench.accounts.features import controlling_only
-from workbench.offers.forms import OfferForm, OfferPricingForm, OfferSearchForm
+from workbench.offers.forms import OfferForm, OfferSearchForm
 from workbench.offers.models import Offer
 from workbench.offers.views import OfferDeleteView, OfferPDFView, copy_offer
 
@@ -41,13 +41,8 @@ urlpatterns = [
     ),
     path(
         "<int:pk>/pricing/",
-        controlling_only(
-            generic.UpdateView.as_view(
-                form_class=OfferPricingForm,
-                model=Offer,
-                template_name_suffix="_pricing",
-            )
-        ),
+        # The pricing is part of the offer form now
+        lambda request, pk: redirect(get_object_or_404(Offer, pk=pk).urls["update"]),
         name="offers_offer_pricing",
     ),
     path(
