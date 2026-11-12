@@ -1,0 +1,19 @@
+{% load workbench %}
+{% comment %}
+  The not archived hours for invoicing and costs of a service, of an offer
+  (0 for the services without offer) or of the project in a table cell, see
+  grouped_services
+{% endcomment %}
+{% if hours or not cost %}
+  <a
+    {% if not hours %}class="text-body-tertiary"{% endif %}
+    href="{% url 'logbook_loggedhours_list' %}?{% if service %}service={{ service }}{% else %}project={{ project }}{% if offer != None %}&amp;offer={{ offer }}{% endif %}{% endif %}&amp;not_archived=1"
+  >{{ hours|hours }}</a>
+{% endif %}
+{% if cost %}
+  <div class="small">
+    <a
+      href="{% url 'logbook_loggedcost_list' %}?{% if service %}service={{ service }}{% else %}project={{ project }}{% if offer != None %}&amp;offer={{ offer }}{% endif %}{% endif %}&amp;not_archived=1"
+    >+{{ cost|currency }}</a>
+  </div>
+{% endif %}

@@ -520,6 +520,8 @@ class Project(Model):
         # Logged vs. service cost
         service_cost = defaultdict(lambda: Z2)
         logged_cost = defaultdict(lambda: Z2)
+        # Hours for invoicing and costs not invoiced yet, keyed (field, offer or project)
+        not_archived = defaultdict(lambda: Z2)
         # Project logbook vs. project service cost (hours and cost)
         total_service_cost = Z2
         total_service_third_party_costs = Z2
@@ -631,6 +633,9 @@ class Project(Model):
 
             logged_hours[service.offer] += row["logged_hours"]
             logged_cost[service.offer] += row["logged_cost"]
+            for key in ["not_archived_logged_hours", "not_archived_logged_cost"]:
+                not_archived[key, service.offer] += row[key]
+                not_archived[key, service.project] += row[key]
             logged_hours[service.project] += row["logged_hours"]
             surcharge[service.offer] += row["surcharge"]
             surcharge[service.project] += row["surcharge"]
@@ -689,6 +694,12 @@ class Project(Model):
             offer_data["surcharge"] = surcharge[offer]
             offer_data["service_cost"] = service_cost[offer]
             offer_data["logged_cost"] = logged_cost[offer]
+            offer_data["not_archived_logged_hours"] = not_archived[
+                "not_archived_logged_hours", offer
+            ]
+            offer_data["not_archived_logged_cost"] = not_archived[
+                "not_archived_logged_cost", offer
+            ]
 
         stats = {
             "offers": sorted(
@@ -717,6 +728,10 @@ class Project(Model):
                 key=lambda row: (row[1] is not None, -(row[1] or 0), row[0]),
             ),
             "logged_cost": logged_cost[self],
+            "not_archived_logged_hours": not_archived[
+                "not_archived_logged_hours", self
+            ],
+            "not_archived_logged_cost": not_archived["not_archived_logged_cost", self],
             "service_hours": service_hours[self],
             "service_cost": service_cost[self],
             "total_service_cost": total_service_cost,

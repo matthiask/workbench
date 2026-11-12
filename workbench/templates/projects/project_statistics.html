@@ -18,6 +18,12 @@
             <th class="text-end">{% translate 'Scheduled' %}</th>
             <th class="text-end">{% translate 'Logged' %}</th>
             <th></th>
+            <th
+              class="text-end"
+              title="{% translate 'Hours for invoicing and costs which have not been invoiced yet' %}"
+            >
+              {% translate 'Not archived' %}
+            </th>
             {% for user, hours in gs.logged_hours_per_user %}
               <th class="text-end">{{ user.get_short_name }}</th>
             {% endfor %}
@@ -30,6 +36,9 @@
             </th>
             <th class="progress-cell">
               {% bar gs.logged_hours gs.service_hours surcharge=gs.surcharge unit="hours" %}
+            </th>
+            <th class="text-end text-nowrap">
+              {% include 'projects/_not_archived_cell.html' with project=object.pk hours=gs.not_archived_logged_hours cost=gs.not_archived_logged_cost %}
             </th>
             {% for user, hours in gs.logged_hours_per_user %}
               <th class="text-end text-nowrap">
@@ -49,10 +58,13 @@
               <th class="progress-cell">
                 {% bar offer_data.logged_hours offer_data.service_hours surcharge=offer_data.surcharge unit="hours" %}
               </th>
+              <th class="text-end text-nowrap">
+                {% include 'projects/_not_archived_cell.html' with project=object.pk offer=offer.pk|default:0 hours=offer_data.not_archived_logged_hours cost=offer_data.not_archived_logged_cost %}
+              </th>
               {% if gs.logged_hours_per_user %}<th colspan="{{ gs.logged_hours_per_user|length }}"></th>{% endif %}
             </tr>
             {% for row in offer_data.services %}
-              {% if row.logged_hours or row.service.service_hours %}
+              {% if row.logged_hours or row.service.service_hours or row.not_archived_logged_cost %}
                 <tr>
                   <td class="ps-3">{{ row.service.title }}</td>
                   <td class="text-end text-nowrap {% if not row.service.service_hours %}text-body-tertiary{% endif %}">
@@ -68,6 +80,9 @@
                     {% if row.service.allow_logging or row.logged_hours %}
                       {% bar row.logged_hours row.service.service_hours surcharge=row.surcharge unit="hours" %}
                     {% endif %}
+                  </td>
+                  <td class="text-end text-nowrap">
+                    {% include 'projects/_not_archived_cell.html' with service=row.service.pk hours=row.not_archived_logged_hours cost=row.not_archived_logged_cost %}
                   </td>
                   {% project_statistics_row gs.logged_hours_per_user row.logged_hours_per_user as user_row %}
                   {% for user, hours in user_row %}

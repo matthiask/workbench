@@ -1,8 +1,10 @@
 import datetime as dt
 import io
+import re
 from decimal import Decimal
 
 from django.test import TestCase
+from django.utils import timezone
 from openpyxl import load_workbook
 
 from workbench import factories
@@ -547,6 +549,36 @@ class StatisticsTest(TestCase):
             hours.service.project.urls["cost_by_month_and_service_xlsx"]
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_statistics_not_archived(self):
+        """The statistics show the hours for invoicing and the costs which
+        haven't been invoiced yet per service, offer and project"""
+        offer = factories.OfferFactory.create()
+        project = offer.project
+        service = factories.ServiceFactory.create(project=project, offer=offer)
+        without_offer = factories.ServiceFactory.create(project=project)
+        factories.LoggedHoursFactory.create(
+            service=service, hours=2, hours_for_invoicing=3
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, hours=20, archived_at=timezone.now()
+        )
+        factories.LoggedHoursFactory.create(service=without_offer, hours=4)
+        factories.LoggedCostFactory.create(service=without_offer, cost=150)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["statistics"])
+        content = re.sub(r"\s+", " ", response.content.decode())
+        self.assertIn("Not archived", content)
+        for query, hours in [
+            (f"project={project.pk}", "7.0h"),
+            (f"project={project.pk}&amp;offer={offer.pk}", "3.0h"),
+            (f"project={project.pk}&amp;offer=0", "4.0h"),
+            (f"service={service.pk}", "3.0h"),
+            (f"service={without_offer.pk}", "4.0h"),
+        ]:
+            self.assertIn(f'?{query}&amp;not_archived=1" >{hours}</a>', content)
+        self.assertEqual(content.count(">+150.00</a>"), 3)
 
     def test_cost_by_month_uses_hours_for_invoicing(self):
         """Work is valued with the hours for invoicing, the time spent otherwise"""
