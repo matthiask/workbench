@@ -226,7 +226,7 @@ class SendInvoiceForm(ModelForm):
             "invoices/invoice_mail",
             {
                 "invoice": invoice,
-                "salutation": self.salutation(self.fields["email"].initial),
+                **self.address(self.fields["email"].initial),
                 "WORKBENCH": settings.WORKBENCH,
             },
         )
@@ -241,12 +241,21 @@ class SendInvoiceForm(ModelForm):
         )
         self.order_fields(["email", "invoiced_on", "due_on", "subject", "body"])
 
-    def salutation(self, email):
-        """The contact's salutation only for their own addresses"""
+    def address(self, email):
+        """The contact's salutation and Du or Sie only for their own addresses"""
         contact = self.instance.contact
-        return (
-            contact.salutation if contact and email in self.contact_emails else ""
-        ) or "Sehr geehrte Damen und Herren"
+        personal = bool(contact and email in self.contact_emails)
+        first_name_terms = personal and contact.address_on_first_name_terms
+        return {
+            # Old contacts may lack a salutation
+            "salutation": (personal and contact.salutation)
+            or (
+                f"Hallo {contact.given_name}"
+                if first_name_terms
+                else "Sehr geehrte Damen und Herren"
+            ),
+            "first_name_terms": first_name_terms,
+        }
 
     def clean(self):
         data = super().clean()

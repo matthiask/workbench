@@ -1,14 +1,18 @@
 {% load workbench %}{% comment %}
   The proposal for the mail of SendInvoiceForm, {due_on} is replaced when
-  sending
+  sending; "du" for contacts on first name terms
 {% endcomment %}Rechnung {{ invoice.code }} von {{ WORKBENCH.PDF_COMPANY }}
 
 {{ salutation }}
 
-Im Anhang finden Sie unsere Rechnung {{ invoice.code }} «{{ invoice.title }}» über {{ WORKBENCH.CURRENCY }} {{ invoice.total|currency }}, zahlbar bis {due_on}.
+{% if first_name_terms %}Im Anhang findest du unsere Rechnung {{ invoice.code }} «{{ invoice.title }}» über {{ WORKBENCH.CURRENCY }} {{ invoice.total|currency }}, zahlbar bis {due_on}.
+
+Falls du Fragen hast, melde dich gerne.
+
+Liebe Grüsse{% else %}Im Anhang finden Sie unsere Rechnung {{ invoice.code }} «{{ invoice.title }}» über {{ WORKBENCH.CURRENCY }} {{ invoice.total|currency }}, zahlbar bis {due_on}.
 
 Falls Sie Fragen haben, stehen wir Ihnen gerne zur Verfügung.
 
-Freundliche Grüsse
+Freundliche Grüsse{% endif %}
 {{ invoice.owned_by.get_full_name }}
 {{ WORKBENCH.PDF_COMPANY }}

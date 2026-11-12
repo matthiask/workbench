@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.contacts.models import Person
 from workbench.invoices.models import Invoice
 from workbench.invoices.tasks import autodunning
 from workbench.logbook.models import LoggedHours
@@ -1970,12 +1971,14 @@ class InvoicesTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_send_salutation_and_failure(self):
-        """The proposal uses the contact's salutation only for their own
-        addresses; invoices stay in preparation when the mail can't be sent"""
+        """The proposal uses the contact's salutation and Du or Sie only for
+        their own addresses; invoices stay in preparation when the mail
+        can't be sent"""
         invoice = factories.InvoiceFactory.create(
             subtotal=100, postal_address="Test\nStreet\nCity"
         )
         invoice.contact.salutation = "Liebe Anna"
+        invoice.contact.address_on_first_name_terms = True
         invoice.contact.save()
         invoice.contact.emailaddresses.create(email="anna@example.com")
         self.client.force_login(invoice.owned_by)
@@ -1983,10 +1986,15 @@ class InvoicesTest(TestCase):
 
         response = self.client.get(invoice.urls["send"], headers=headers)
         self.assertContains(response, "Liebe Anna")
+        self.assertContains(response, "Im Anhang findest du")
+        Person.objects.filter(pk=invoice.contact.pk).update(salutation="")
+        response = self.client.get(invoice.urls["send"], headers=headers)
+        self.assertContains(response, f"Hallo {invoice.contact.given_name}")
         invoice.customer.accounts_payable_email = "creditors@example.com"
         invoice.customer.save()
         response = self.client.get(invoice.urls["send"], headers=headers)
         self.assertContains(response, "Sehr geehrte Damen und Herren")
+        self.assertContains(response, "Im Anhang finden Sie")
         self.assertNotContains(response, "Liebe Anna")
 
         with mock.patch.object(
