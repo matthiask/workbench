@@ -1,17 +1,19 @@
 import datetime as dt
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.forms.models import inlineformset_factory
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization
 from workbench.offers.models import Offer
 from workbench.projects.models import Project, Service
+from workbench.services.models import ServiceType
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
@@ -299,10 +301,17 @@ class OfferPricingForm(ModelForm):
 
         self.fields["subtotal"].disabled = True
         self.fields["total_excl_tax"].disabled = True
+        self.fields["discount"].widget.attrs["class"] = "form-control text-end"
 
         kwargs.pop("request")
         self.formsets = (
-            {"services": ServiceFormset(*args, **kwargs)} if self.instance.pk else {}
+            {
+                "services": ServiceFormset(
+                    *args, form_kwargs={"project": self.instance.project}, **kwargs
+                )
+            }
+            if self.instance.pk
+            else {}
         )
 
     def clean(self):
@@ -325,19 +334,37 @@ class OfferPricingForm(ModelForm):
 
 
 class ServiceForm(forms.ModelForm):
+    service_type = forms.ModelChoiceField(
+        ServiceType.objects.all(),
+        label=ServiceType._meta.verbose_name,
+        required=False,
+    )
+
     class Meta:
         model = Service
         fields = "__all__"  # noqa: DJ007
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, project, **kwargs):
         super().__init__(*args, **kwargs)
+        # New services are added at the end unless they are moved
+        self.fields["position"].required = False
+        if not self.instance.pk:
+            self.instance.project = project
+            if project.flat_rate is not None:
+                with override(settings.WORKBENCH.PDF_LANGUAGE):
+                    self.initial["effort_type"] = gettext("flat rate")
+                self.initial["effort_rate"] = project.flat_rate
+
         # Invoiced services keep their effort type and rate, the logbook of
         # invoiced work would be valued differently
-        if self.instance.pk and (
-            self.instance.project.flat_rate is not None or self.instance.is_invoiced
-        ):
+        if project.flat_rate is not None or self.instance.is_invoiced:
             self.fields["effort_type"].disabled = True
             self.fields["effort_rate"].disabled = True
+            self.fields.pop("service_type")
+
+    def has_changed(self):
+        # Empty new rows are skipped, also when they have been moved
+        return bool(set(self.changed_data) - {"position"})
 
     def save(self, commit=True):  # noqa: FBT002
         instance = super().save(commit=False)
@@ -349,7 +376,20 @@ ServiceFormset = inlineformset_factory(
     Offer,
     Service,
     form=ServiceForm,
-    fields=("title", "effort_type", "effort_rate", "effort_hours", "cost"),
+    fields=(
+        "position",
+        "title",
+        "description",
+        "effort_type",
+        "effort_rate",
+        "effort_hours",
+        "cost",
+        "is_optional",
+    ),
+    widgets={
+        "position": forms.HiddenInput,
+        "description": Textarea({"rows": 1, "class": "wb-autogrow"}),
+    },
     extra=0,
     can_delete=False,
 )

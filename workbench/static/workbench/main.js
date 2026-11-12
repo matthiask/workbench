@@ -712,34 +712,92 @@ function initWidgets() {
     initSuggestions(el)
   }
 
+  // Textareas which grow with their content; CSS does it where field-sizing
+  // is supported (see .wb-autogrow in main.scss)
+  if (!CSS.supports("field-sizing", "content")) {
+    for (const el of document.querySelectorAll(
+      "textarea.wb-autogrow:not(.initialized)",
+    )) {
+      el.classList.add("initialized")
+      const resize = () => {
+        el.style.height = "auto"
+        el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`
+      }
+      resize()
+      el.addEventListener("input", resize)
+    }
+  }
+
+  // The pricing of offers: optional services don't count towards the total,
+  // the total incl. tax is rounded to 5 cents like Offer._calculate_total()
   for (const form of document.querySelectorAll("[data-offer-form]")) {
-    const read = (sel, root = document) =>
-      Number.parseFloat(root.querySelector(sel).value) || 0
-    const write = (sel, value, root = document) =>
-      (root.querySelector(sel).value = value.toFixed(2))
+    const read = (sel, root) =>
+      Number.parseFloat(root.querySelector(sel)?.value) || 0
+    // Like currency() in workbench/tools/formats.py
+    const format = (value) =>
+      value
+        .toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+        .replace(/,/g, "’")
+    const write = (sel, value) => {
+      const el = form.querySelector(sel)
+      if (el) el.textContent = format(value)
+    }
+    const taxRate = Number.parseFloat(form.dataset.taxRate) || 0
 
     function recalculate() {
-      let offerCost = 0
+      let subtotal = 0
+      let optionalTotal = 0
 
-      Array.from(form.querySelectorAll("[data-service]")).forEach((service) => {
-        const effortRate = read("[data-effort-rate] input", service)
-        const effortHours = read("[data-effort-hours] input", service)
-        const cost = read("[data-cost] input", service)
+      for (const service of form.querySelectorAll("tbody [data-service]")) {
+        const serviceCost =
+          read("[data-effort-rate] input", service) *
+            read("[data-effort-hours] input", service) +
+          read("[data-cost] input", service)
+        const isOptional = service.querySelector(
+          "[data-optional] input",
+        )?.checked
 
-        const serviceCost = effortRate * effortHours + cost
-        offerCost += serviceCost
+        if (isOptional) optionalTotal += serviceCost
+        else subtotal += serviceCost
 
-        write("[data-service-cost]", serviceCost, service)
+        const cell = service.querySelector("[data-service-cost]")
+        cell.textContent = format(serviceCost)
+        cell.classList.toggle("fst-italic", !!isOptional)
+        cell.classList.toggle("text-body-secondary", !!isOptional)
+      }
+
+      const totalExclTax = subtotal - read("#id_discount", form)
+      const total =
+        Math.round((totalExclTax * (1 + taxRate / 100)) / 0.05) * 0.05
+
+      write("[data-subtotal]", subtotal)
+      write("[data-total-excl-tax]", totalExclTax)
+      write("[data-tax]", total - totalExclTax)
+      write("[data-total]", total)
+      write("[data-optional-total]", optionalTotal)
+      form.querySelector("[data-optional-total-row]").hidden = !optionalTotal
+    }
+
+    const services = form.querySelector("[data-services]")
+    if (services) {
+      Sortable.create(services, {
+        draggable: "[data-service]",
+        handle: "[data-sortable-grabber]",
+        onEnd() {
+          services
+            .querySelectorAll("[data-service] input[name$='-position']")
+            .forEach((input, index) => {
+              input.value = 10 * (index + 1)
+            })
+        },
       })
-
-      const discount = read("#id_discount")
-      const totalExclTax = offerCost - discount
-
-      write("#id_subtotal", offerCost)
-      write("#id_total_excl_tax", totalExclTax)
     }
 
     recalculate()
+    form.addEventListener("input", recalculate)
     form.addEventListener("change", recalculate)
   }
 

@@ -639,8 +639,26 @@ tbody th > a {
   margin-bottom: 0.5rem;
 }
 
-.table-offer-pricing tbody label {
+// The column headings say what the fields are
+.table-offer-pricing tbody :is(label, .form-text) {
   display: none;
+}
+
+.table-offer-pricing .form-group {
+  margin-bottom: 0;
+}
+
+.table-offer-pricing tbody .form-group + .form-group {
+  margin-top: 0.25rem;
+}
+
+// Textareas which grow with their content (main.js handles browsers without
+// field-sizing)
+textarea.wb-autogrow {
+  field-sizing: content;
+  min-height: calc(2lh + 0.75rem);
+  resize: none;
+  overflow: hidden;
 }
 
 // Quick actions in the bottom left corner: a plus button which reveals the
@@ -1887,6 +1905,10 @@ a.wb-row-title:hover {
 
 .wb-form-page-wide {
   max-width: 80rem;
+}
+
+.wb-form-page-full {
+  max-width: none;
 }
 
 .wb-form-page .card-body > .form-group:last-child {

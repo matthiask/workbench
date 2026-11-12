@@ -11,7 +11,7 @@
   {% endif %}
 {% endblock uplink %}
 
-{% block form_width %}wb-form-page-wide{% endblock %}
+{% block form_width %}wb-form-page-full{% endblock %}
 
 {% block heading %}
   {% if object %}
@@ -25,58 +25,119 @@
   {% endif %}
 {% endblock heading %}
 
-{% block form_attrs %}data-offer-form{% endblock %}
+{% block form_attrs %}data-offer-form
+  data-tax-rate="{% if object.liable_to_vat %}{{ object.tax_rate|stringformat:'s' }}{% else %}0{% endif %}"{% endblock form_attrs %}
 
 {% block fields %}
-  {% if form.formsets %}
-    <section class="card mb-3 wb-table-card">
-      <div class="card-header">{% translate 'services'|capfirst %}</div>
-      <table class="table table-sm mb-0 table-offer-pricing">
-        <colgroup>
-          <col>
-          <col width="50%">
-          <col>
-          <col>
-          <col>
-          <col>
-          <col>
-        </colgroup>
-        <thead>
-          <tr>
-            <th></th>
-            <th>{% translate 'title'|capfirst %}</th>
-            <th>{% translate 'effort type'|capfirst %}</th>
-            <th>{% translate 'hourly rate'|capfirst %}</th>
-            <th>{% translate 'effort hours'|capfirst %}</th>
-            <th>{% translate 'cost'|capfirst %}</th>
-            <th>{% translate 'service cost'|capfirst %}</th>
-          </tr>
-        </thead>
-        <tbody>
+  <section class="card mb-3 wb-table-card">
+    <div class="card-header">{% translate 'services'|capfirst %}</div>
+    <table class="table table-sm mb-0 table-offer-pricing">
+      <colgroup>
+        <col>
+        <col>
+        <col width="16%">
+        <col width="8%">
+        <col width="7%">
+        <col width="8%">
+        <col>
+        <col width="8%">
+      </colgroup>
+      <thead class="sticky">
+        <tr>
+          <th></th>
+          <th>
+            {% translate 'title'|capfirst %} / {% translate 'description' %}
+          </th>
+          <th>
+            {% translate 'service type'|capfirst %} / {% translate 'effort type' %}
+          </th>
+          <th>{% translate 'hourly rate'|capfirst %}</th>
+          <th>{% translate 'effort hours'|capfirst %}</th>
+          <th>{% translate 'cost'|capfirst %}</th>
+          <th title="{{ form.formsets.services.empty_form.is_optional.help_text }}">
+            {% translate 'optional'|capfirst %}
+          </th>
+          <th class="text-end">{% translate 'service cost'|capfirst %}</th>
+        </tr>
+      </thead>
+      {% if form.formsets %}
+        <tbody data-services>
           {% formset form.formsets.services "services" %}
-          <tr id="{{ form_id }}" data-service>
+          <tr
+            id="{{ form_id }}"
+            data-service
+            {% if form.service_type %}data-autofill="{{ view.default_service_types_json }}"{% endif %}
+          >
             <td>
+              <span
+                class="btn btn-quiet btn-sm btn-icon wb-grabber"
+                title="{% translate 'Sort' %}"
+                data-sortable-grabber
+              >
+                {% include 'svg/grabber.svg' %}
+              </span>
               {% ff_errors form %}
-              {% ff_fields form exclude='title,effort_type,effort_rate,effort_hours,cost' %}
+              {% ff_fields form exclude='service_type,title,description,effort_type,effort_rate,effort_hours,cost,is_optional' %}
             </td>
-            <td>{% ff_field form.title %}</td>
-            <td>{% ff_field form.effort_type %}</td>
+            <td>
+              {% ff_field form.title %}
+              {% ff_field form.description %}
+            </td>
+            <td>
+              {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
+              {% ff_field form.effort_type %}
+            </td>
             <td data-effort-rate>{% ff_field form.effort_rate %}</td>
             <td data-effort-hours>{% ff_field form.effort_hours %}</td>
             <td data-cost>{% ff_field form.cost %}</td>
-            <td>
-              <input type="text" class="form-control" disabled data-service-cost>
-            </td>
+            <td data-optional>{% ff_field form.is_optional %}</td>
+            <td class="text-end text-nowrap" data-service-cost></td>
           </tr>
           {% endformset %}
         </tbody>
-      </table>
-    </section>
-  {% endif %}
-  <section class="card mb-3">
-    <div class="card-body">
-      {% ff_fields form %}
-      <div data-offer-cost></div>
-    </div>
+        <tbody>
+          <tr>
+            <td colspan="8">
+              <a
+                href="#"
+                class="btn btn-quiet btn-sm"
+                onclick="return addInlineForm('services')"
+              >{% include 'svg/plus.svg' %} {% translate 'service' %}</a>
+            </td>
+          </tr>
+        </tbody>
+      {% endif %}
+      <tfoot>
+        <tr>
+          <th colspan="7" class="text-end">{{ form.subtotal.label }}</th>
+          <td class="text-end text-nowrap" data-subtotal></td>
+        </tr>
+        <tr>
+          <th colspan="7" class="text-end">
+            <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
+            {{ form.discount.errors }}
+          </th>
+          <td>{{ form.discount }}</td>
+        </tr>
+        <tr>
+          <th colspan="7" class="text-end">{{ form.total_excl_tax.label }}</th>
+          <td class="text-end text-nowrap" data-total-excl-tax></td>
+        </tr>
+        {% if object.liable_to_vat %}
+          <tr>
+            <th colspan="7" class="text-end">{{ object.tax_rate }}% {% translate 'tax' %}</th>
+            <td class="text-end text-nowrap" data-tax></td>
+          </tr>
+        {% endif %}
+        <tr class="wb-total-row">
+          <th colspan="7" class="text-end">{{ object.total_title }}</th>
+          <td class="text-end text-nowrap" data-total></td>
+        </tr>
+        <tr data-optional-total-row hidden>
+          <th colspan="7" class="text-end fw-normal fst-italic">{{ object.optional_total_title }}</th>
+          <td class="text-end text-nowrap fst-italic" data-optional-total></td>
+        </tr>
+      </tfoot>
+    </table>
   </section>
 {% endblock fields %}

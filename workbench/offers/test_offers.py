@@ -583,6 +583,7 @@ class OffersTest(TestCase):
                 "services-MAX_NUM_FORMS": 1000,
                 "services-0-id": service.id,
                 "services-0-offer": offer.id,
+                "services-0-position": service.position,
                 "services-0-title": service.title,
                 "services-0-effort_type": "Programming",
                 "services-0-effort_rate": 250,
@@ -605,6 +606,97 @@ class OffersTest(TestCase):
         # - updated only once because of skip_related_model
         actions = LoggedAction.objects.for_model(offer).with_data(id=offer.id)
         self.assertEqual([action.action for action in actions], ["I", "U", "U"])
+
+    def test_offer_pricing_order_optional_and_descriptions(self):
+        """The pricing form changes the order, the descriptions and whether
+        services are optional; optional services don't count"""
+        offer = factories.OfferFactory.create()
+        first = factories.ServiceFactory.create(
+            offer=offer, project=offer.project, title="First"
+        )
+        second = factories.ServiceFactory.create(
+            offer=offer, project=offer.project, title="Second"
+        )
+
+        def service_data(index, service, **kwargs):
+            return {
+                f"services-{index}-{key}": value
+                for key, value in {
+                    "id": service.id,
+                    "offer": offer.id,
+                    "title": service.title,
+                    "effort_type": "Programming",
+                    "effort_rate": 100,
+                    "effort_hours": 10,
+                    "cost": 0,
+                    **kwargs,
+                }.items()
+            }
+
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(offer.urls["pricing"])
+        self.assertContains(response, 'name="services-0-description"')
+        self.assertContains(response, 'name="services-0-is_optional"')
+        self.assertContains(response, 'name="services-0-position"')
+
+        response = self.client.post(
+            offer.urls["pricing"],
+            {
+                "discount": 0,
+                "services-TOTAL_FORMS": 2,
+                "services-INITIAL_FORMS": 2,
+                "services-MAX_NUM_FORMS": 1000,
+                **service_data(0, first, position=20, is_optional="on"),
+                **service_data(1, second, position=10, description="Details"),
+            },
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+
+        self.assertEqual(list(offer.services.all()), [second, first])
+        first.refresh_from_db()
+        second.refresh_from_db()
+        self.assertTrue(first.is_optional)
+        self.assertEqual(second.description, "Details")
+        offer.refresh_from_db()
+        self.assertEqual(offer.subtotal, 1000)
+
+    def test_offer_pricing_adds_services(self):
+        """New services can be added to the offer in the pricing form, they
+        are added at the end"""
+        offer = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(offer=offer, project=offer.project)
+
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(offer.urls["pricing"])
+        self.assertContains(response, 'name="services-__prefix__-service_type"')
+
+        response = self.client.post(
+            offer.urls["pricing"],
+            {
+                "discount": 0,
+                "services-TOTAL_FORMS": 3,
+                "services-INITIAL_FORMS": 1,
+                "services-MAX_NUM_FORMS": 1000,
+                "services-0-id": service.id,
+                "services-0-offer": offer.id,
+                "services-0-position": service.position,
+                "services-0-title": service.title,
+                "services-1-offer": offer.id,
+                "services-1-title": "New",
+                "services-1-effort_type": "Programming",
+                "services-1-effort_rate": 100,
+                "services-1-effort_hours": 5,
+                # Left empty
+                "services-2-offer": offer.id,
+            },
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+
+        new = offer.services.get(title="New")
+        self.assertEqual(new.project, offer.project)
+        self.assertEqual(list(offer.services.all()), [service, new])
+        offer.refresh_from_db()
+        self.assertEqual(offer.subtotal, 500)
 
     def test_offer_pricing_keeps_rates_of_invoiced_services(self):
         """Invoiced services keep their effort type and rate, also in the
@@ -631,6 +723,7 @@ class OffersTest(TestCase):
                 "services-MAX_NUM_FORMS": 1000,
                 "services-0-id": service.id,
                 "services-0-offer": offer.id,
+                "services-0-position": service.position,
                 "services-0-title": service.title,
                 "services-0-effort_type": "Programming",
                 "services-0-effort_rate": 250,
@@ -732,6 +825,7 @@ class OffersTest(TestCase):
                 "services-MAX_NUM_FORMS": 1000,
                 "services-0-id": service.id,
                 "services-0-offer": offer.id,
+                "services-0-position": service.position,
                 "services-0-title": service.title,
                 "services-0-effort_type": "Programming",
                 "services-0-effort_rate": 250,
