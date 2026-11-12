@@ -1,7 +1,6 @@
 """Sending invoices to customers by mail, from the invoice (SendInvoiceForm)
 or automatically from recurring invoices"""
 
-import datetime as dt
 import io
 
 from authlib.email import render_to_mail
@@ -11,7 +10,6 @@ from django.db import transaction
 from django.utils.translation import gettext as _, override
 
 from workbench.invoices.models import Invoice
-from workbench.reporting.models import FreezeDate
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.pdf import PDFDocument, invoice_filename
 
@@ -138,17 +136,12 @@ def send(invoice, *, to, subject, body, save=None):
 
 def send_automatically(invoice, recurring_invoice):
     """Sends a new invoice of a recurring invoice with its recipient, subject
-    and text (or the proposal); invoice dates on or before the freeze date
-    move to the day after it (the due date too). ``invoice.sending`` says
-    what happened"""
+    and text (or the proposal), see RecurringInvoice.create_single_invoice()
+    for the invoice date; ``invoice.sending`` says what happened"""
     emails = suggested_emails(invoice)
     if not (to := recurring_invoice.send_to or (emails[0] if emails else "")):
         invoice.sending = _("Not sent: %s") % _("No email address.")
         return
-    if invoice.invoiced_on <= (freeze := FreezeDate.objects.up_to()):
-        days = invoice.due_on - invoice.invoiced_on
-        invoice.invoiced_on = freeze + dt.timedelta(days=1)
-        invoice.due_on = invoice.invoiced_on + days
     subject, body = proposal(invoice, to)
     try:
         send(

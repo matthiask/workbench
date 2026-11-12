@@ -376,8 +376,9 @@ class RecurringTest(TestCase):
         self.assertEqual(invoices[0].type, invoices[0].DOWN_PAYMENT)
 
     def test_mark_as_sent(self):
-        """Recurring invoices may optionally create sent invoices, but not in
-        the frozen period"""
+        """Recurring invoices may optionally create sent invoices; invoice
+        dates in the frozen period move to the day after the freeze date, also
+        for invoices in preparation"""
         r = factories.RecurringInvoiceFactory.create(
             starts_on=in_days(-70),
             periodicity="monthly",
@@ -386,20 +387,24 @@ class RecurringTest(TestCase):
             postal_address="Name\nStreet\nCity",
         )
         self.assertEqual(r.new_invoices, RecurringInvoice.PREPARE)
+        FreezeDate.objects.create(up_to=in_days(-50))
         [invoice, *_rest] = r.create_invoices()
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
+        self.assertEqual(invoice.invoiced_on, in_days(-49))
+        self.assertEqual(invoice.service_period_from, in_days(-70))
         Invoice.objects.all().delete()
 
-        FreezeDate.objects.create(up_to=in_days(-50))
         r.new_invoices = RecurringInvoice.MARK_AS_SENT
         r.next_period_starts_on = None
         r.save()
         invoices = r.create_invoices()
         self.assertEqual(
             [invoice.status for invoice in invoices],
-            [Invoice.IN_PREPARATION, Invoice.SENT, Invoice.SENT],
+            [Invoice.SENT, Invoice.SENT, Invoice.SENT],
         )
-        self.assertTrue(all(invoice.due_on for invoice in invoices))
+        self.assertEqual(invoices[0].invoiced_on, in_days(-49))
+        self.assertEqual(invoices[0].due_on, in_days(-49 + 15))
+        self.assertEqual(invoices[0].service_period_from, in_days(-70))
 
     def test_send_automatically(self):
         """Recurring invoices may send their invoices to the first suggested

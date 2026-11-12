@@ -253,9 +253,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   other choices create them in preparation or mark them as sent) send them to their `send_to` with
   their `mail_subject` and `mail_body` (proposed in the form like above,
   with the placeholders `{code}`, `{total}`, `{due_on}` and
-  `{service_period}`, `sending.fill()`); invoice dates on or before the
-  freeze date move to the day after it, and the owner is told what
-  happened (`invoice.sending`). Paid and cancelled invoices require a payment notice;
+  `{service_period}`, `sending.fill()`), and the owner is told what
+  happened (`invoice.sending`). New invoices of recurring
+  invoices which would be dated on or before the freeze date are dated the
+  day after it (`create_single_invoice()`). Paid and cancelled invoices require a payment notice;
   assigning a credit entry writes its date, ledger, amount, payment notice
   and notes into it (`CreditEntry.mark_invoice_as_paid()`).
   Values given by name have a listing which shows them with their ID

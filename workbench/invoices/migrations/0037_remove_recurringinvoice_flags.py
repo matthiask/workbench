@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                     ("send", "Send them by email automatically"),
                 ],
                 default="prepare",
-                help_text="Invoices dated on or before the freeze date stay in preparation when marking them as sent; when sending them, their date moves to the day after it.",
+                help_text="New invoices which would be dated on or before the freeze date are dated the day after it.",
                 max_length=20,
                 verbose_name="new invoices",
             ),

@@ -872,9 +872,8 @@ class RecurringInvoice(ModelWithTotal):
         choices=NEW_INVOICES_CHOICES,
         default=PREPARE,
         help_text=_(
-            "Invoices dated on or before the freeze date stay in preparation"
-            " when marking them as sent; when sending them, their date moves"
-            " to the day after it."
+            "New invoices which would be dated on or before the freeze date"
+            " are dated the day after it."
         ),
     )
     send_to = models.EmailField(
@@ -953,12 +952,17 @@ class RecurringInvoice(ModelWithTotal):
                 type=Project.MAINTENANCE,
             )
 
+        # Not in the frozen period, invoices couldn't be sent anymore
+        invoiced_on = max(
+            period_starts_on, FreezeDate.objects.up_to() + dt.timedelta(days=1)
+        )
+
         return Invoice.objects.create(
             customer=self.customer,
             contact=self.contact,
             project=project,
-            invoiced_on=period_starts_on,
-            due_on=period_starts_on + dt.timedelta(days=15),
+            invoiced_on=invoiced_on,
+            due_on=invoiced_on + dt.timedelta(days=15),
             title=self.title,
             description=self.description,
             service_period_from=period_starts_on,
@@ -968,7 +972,6 @@ class RecurringInvoice(ModelWithTotal):
             # mail has been sent, see create_invoices()
             status=Invoice.SENT
             if self.new_invoices == self.MARK_AS_SENT
-            and period_starts_on > FreezeDate.objects.up_to()
             else Invoice.IN_PREPARATION,
             type=Invoice.DOWN_PAYMENT if self.create_project else Invoice.FIXED,
             postal_address=self.postal_address,

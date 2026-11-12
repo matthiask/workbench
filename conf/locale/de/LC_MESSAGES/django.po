@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 15:03+0100\n"
+"POT-Creation-Date: 2026-11-12 15:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2865,8 +2865,8 @@ msgid "new invoices"
 msgstr "neue Rechnungen"
 
 #: workbench/invoices/models.py
-msgid "Invoices dated on or before the freeze date stay in preparation when marking them as sent; when sending them, their date moves to the day after it."
-msgstr "Rechnungen mit einem Datum am oder vor dem Einfrierdatum bleiben beim Markieren in Vorbereitung; beim Versenden wird ihr Datum auf den Tag danach verschoben."
+msgid "New invoices which would be dated on or before the freeze date are dated the day after it."
+msgstr "Neue Rechnungen, die am oder vor dem Einfrierdatum datiert wären, werden auf den Tag danach datiert."
 
 #: workbench/invoices/models.py
 msgid "Proposed: the accounts payable address of the organization, the contact or the central address. The owner gets a copy and the replies."
@@ -6826,6 +6826,9 @@ msgstr "Suchanfrage fehlt."
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
 
+#~ msgid "Invoices dated on or before the freeze date stay in preparation when marking them as sent; when sending them, their date moves to the day after it."
+#~ msgstr "Rechnungen mit einem Datum am oder vor dem Einfrierdatum bleiben beim Markieren in Vorbereitung; beim Versenden wird ihr Datum auf den Tag danach verschoben."
+
 #~ msgid "Mark invoices as sent?"
 #~ msgstr "Rechnungen als versendet markieren?"
 
@@ -6838,9 +6841,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 #, python-brace-format
 #~ msgid "{due_on} is replaced with the due date."
 #~ msgstr "{due_on} wird durch das Fälligkeitsdatum ersetzt."
-
-#~ msgid "The invoice date is on or before the freeze date."
-#~ msgstr "Das Rechnungsdatum liegt am oder vor dem Einfrierdatum."
 
 #, python-brace-format
 #~ msgid "{salutation} is replaced with the salutation of the contact if the recipient is one of their addresses (otherwise with a general one), {due_on} with the due date."
