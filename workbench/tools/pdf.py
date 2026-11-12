@@ -407,6 +407,9 @@ class PDFDocument(_PDFDocument):
             return
 
         fn = self.services_row_with_details if show_details else self.services_row
+        # Services aren't split between pages (unless they don't fit on one),
+        # the header and headings stay with the following service
+        self.start_keeptogether()
         self.table(
             [(_("Services"), "", "")],
             self.style.tableThreeColumns,
@@ -414,13 +417,20 @@ class PDFDocument(_PDFDocument):
         )
         self.spacer(2 * mm)
 
+        group_open = True
         for index, service in enumerate(services):
+            if not group_open:
+                self.start_keeptogether()
+                group_open = True
             # Offers' headings have no amounts
             if not hasattr(service, "service_cost"):
                 self.heading_row(service, first=not index)
             else:
                 fn(service)
-            # + list(chain.from_iterable(fn(service) for service in services)),
+                self.end_keeptogether()
+                group_open = False
+        if group_open:
+            self.end_keeptogether()
 
     def table_total(self, instance, *, optional_total=None):
         def transform(x):
