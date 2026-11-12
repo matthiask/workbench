@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 14:56+0100\n"
+"POT-Creation-Date: 2026-11-12 15:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2865,12 +2865,12 @@ msgid "new invoices"
 msgstr "neue Rechnungen"
 
 #: workbench/invoices/models.py
-msgid "Invoices dated on or before the freeze date stay in preparation when marking them as sent; when sending them, their date moves to the day after it. The owner gets a copy of the mails."
-msgstr "Rechnungen mit einem Datum am oder vor dem Einfrierdatum bleiben beim Markieren in Vorbereitung; beim Versenden wird ihr Datum auf den Tag danach verschoben. Die verantwortliche Person erhält eine Kopie der Mails."
+msgid "Invoices dated on or before the freeze date stay in preparation when marking them as sent; when sending them, their date moves to the day after it."
+msgstr "Rechnungen mit einem Datum am oder vor dem Einfrierdatum bleiben beim Markieren in Vorbereitung; beim Versenden wird ihr Datum auf den Tag danach verschoben."
 
 #: workbench/invoices/models.py
-msgid "Proposed: the accounts payable address of the organization, the contact or the central address."
-msgstr "Vorgeschlagen: die Kreditorenadresse der Organisation, der Kontakt oder die zentrale Adresse."
+msgid "Proposed: the accounts payable address of the organization, the contact or the central address. The owner gets a copy and the replies."
+msgstr "Vorgeschlagen: die Kreditorenadresse der Organisation, der Kontakt oder die zentrale Adresse. Die verantwortliche Person erhält eine Kopie und die Antworten."
 
 #: workbench/invoices/models.py
 #, python-brace-format

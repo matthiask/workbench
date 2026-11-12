@@ -1,4 +1,4 @@
-from django.db import migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -17,5 +17,33 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name="recurringinvoice",
             name="send_automatically",
+        ),
+        migrations.AlterField(
+            model_name="recurringinvoice",
+            name="new_invoices",
+            field=models.CharField(
+                choices=[
+                    ("prepare", "Create them in preparation"),
+                    (
+                        "mark_as_sent",
+                        "Create them and mark them as sent (if they are sent another way)",
+                    ),
+                    ("send", "Send them by email automatically"),
+                ],
+                default="prepare",
+                help_text="Invoices dated on or before the freeze date stay in preparation when marking them as sent; when sending them, their date moves to the day after it.",
+                max_length=20,
+                verbose_name="new invoices",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="recurringinvoice",
+            name="send_to",
+            field=models.EmailField(
+                blank=True,
+                help_text="Proposed: the accounts payable address of the organization, the contact or the central address. The owner gets a copy and the replies.",
+                max_length=254,
+                verbose_name="recipient",
+            ),
         ),
     ]

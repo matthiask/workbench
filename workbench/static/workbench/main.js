@@ -713,6 +713,27 @@ function initWidgets() {
   follow("#id_modal-starts_on", "#id_modal-ends_on", (startsOn, endsOn) => {
     if (!endsOn.value) endsOn.value = startsOn.value
   })
+  // The mail of recurring invoices only matters when sending them by email
+  for (const form of document.querySelectorAll(
+    "form:has([name='new_invoices']):not(.initialized)",
+  )) {
+    form.classList.add("initialized")
+    const groups = ["send_to", "mail_subject", "mail_body"]
+      .map((name) =>
+        form.querySelector(`[name='${name}']`)?.closest(".form-group"),
+      )
+      .filter(Boolean)
+    const update = () => {
+      const send =
+        form.querySelector("[name='new_invoices']:checked")?.value === "send"
+      for (const group of groups) group.hidden = !send
+    }
+    for (const radio of form.querySelectorAll("[name='new_invoices']")) {
+      radio.addEventListener("change", update)
+    }
+    update()
+  }
+
   for (const el of document.querySelectorAll(
     "[data-suggested-days]:not(.initialized)",
   )) {

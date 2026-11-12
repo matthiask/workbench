@@ -874,7 +874,7 @@ class RecurringInvoice(ModelWithTotal):
         help_text=_(
             "Invoices dated on or before the freeze date stay in preparation"
             " when marking them as sent; when sending them, their date moves"
-            " to the day after it. The owner gets a copy of the mails."
+            " to the day after it."
         ),
     )
     send_to = models.EmailField(
@@ -882,7 +882,8 @@ class RecurringInvoice(ModelWithTotal):
         blank=True,
         help_text=_(
             "Proposed: the accounts payable address of the organization, the"
-            " contact or the central address."
+            " contact or the central address. The owner gets a copy and the"
+            " replies."
         ),
     )
     mail_subject = models.CharField(_("subject"), max_length=200, blank=True)
