@@ -121,8 +121,8 @@ class BudgetAlertsTest(TestCase):
         self.accepted_offer(project, Decimal(5000), is_budget_retainer=True)
 
         response = self.client.get(project.urls["update"])
-        # The budget retainer is not part of the cost cap.
-        self.assertContains(response, "Cost cap: 20’000.00")
-        self.assertContains(response, 'data-field-value="15000.00">75%</a>')
-        self.assertContains(response, 'data-field-value="16000.00">80%</a>')
-        self.assertContains(response, 'data-field-value="18000.00">90%</a>')
+        # The budget retainer is added to the other accepted offers.
+        self.assertContains(response, "Cost cap: 25’000.00")
+        self.assertContains(response, 'data-field-value="18750.00">75%</a>')
+        self.assertContains(response, 'data-field-value="20000.00">80%</a>')
+        self.assertContains(response, 'data-field-value="22500.00">90%</a>')

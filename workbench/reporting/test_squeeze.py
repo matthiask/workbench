@@ -140,8 +140,8 @@ class SqueezeTest(TestCase):
         self.assertEqual(project_gross_margin(other)["offered"], 0)
 
     def test_offered_rate_with_budget_retainer(self):
-        """When the budget retainer counts, its budget pays for the services
-        added later without offer (and maybe the other accepted offers)"""
+        """The budget retainer pays for the services added later without
+        offer, the other accepted offers are added"""
         project = factories.ProjectFactory.create()
         retainer = self.offer(project, status=Offer.ACCEPTED, hours=100).offer
         retainer.is_budget_retainer = True
@@ -153,7 +153,7 @@ class SqueezeTest(TestCase):
         factories.LoggedHoursFactory.create(service=released, hours=70)
 
         pgm = project_gross_margin(project)
-        self.assertEqual(pgm["offered"], 20000)
+        self.assertEqual(pgm["offered"], 22000)
         # max(50 + 10 budgeted, 70 logged)
         self.assertEqual(pgm["hours_accepted"], 70)
 

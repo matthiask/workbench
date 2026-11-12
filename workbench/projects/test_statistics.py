@@ -149,8 +149,8 @@ class StatisticsTest(TestCase):
         self.assertContains(response, "Logbook, invoiced and accepted offers")
 
     def test_budget_retainer_and_other_offers(self):
-        """Projects with an accepted budget retainer and other accepted offers
-        count the larger side only, on the project page like in the reports"""
+        """Accepted budget retainers and other accepted offers are added up, on
+        the project page like in the reports"""
         from django.utils.translation import activate, deactivate_all
 
         from workbench.projects.charts import budget_chart
@@ -176,20 +176,20 @@ class StatisticsTest(TestCase):
         )
         offer.save()
         factories.ServiceFactory.create(
-            project=project, effort_rate=100, effort_hours=90
+            project=project, effort_rate=100, effort_hours=120
         )
         factories.LoggedHoursFactory.create(service=service, hours=2)
         factories.ProjectedInvoiceFactory.create(
-            project=project, gross_margin=12000, invoiced_on=in_days(30)
+            project=project, gross_margin=16000, invoiced_on=in_days(30)
         )
 
         chart = budget_chart(project)
-        self.assertIn("accepted offers: 10’000.00", chart["columns"][-1]["title"])
+        self.assertIn("accepted offers: 14’000.00", chart["columns"][-1]["title"])
 
         self.client.force_login(project.owned_by)
         response = self.client.get(project.get_absolute_url())
         self.assertContains(response, "Projected invoices exceed the accepted offer")
-        self.assertContains(response, "accepted offers gross margin: 10’000.00")
+        self.assertContains(response, "accepted offers gross margin: 14’000.00")
         self.assertNotContains(response, "third party costs")
 
     def test_budget_retainment(self):

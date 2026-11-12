@@ -124,46 +124,37 @@ def accepted_offers_by_project(projects):
     "discount": ..., "third_party_costs": ...}}``
 
     Budget retainer offers hold the budget of services which are added later
-    without offers of their own. If a project has both, the larger of the
-    retainer offers and the other offers counts, the retainer may also have
-    been used up by other accepted offers. Undercounting is better than
-    counting the same work twice."""
+    without offers of their own, so they are added to the other accepted
+    offers."""
     # Avoid circular imports
     from workbench.offers.models import Offer
     from workbench.projects.models import Service
 
-    def side(*, retainer=False):
+    def empty():
         return {
             "total": Z2,
             "discount": Z2,
             "third_party_costs": Z2,
-            "is_budget_retainer": retainer,
         }
 
-    sides = defaultdict(lambda: {True: side(retainer=True), False: side()})
+    result = defaultdict(empty)
     offers = Offer.objects.accepted().filter(project__in=projects)
-    for project, retainer, total, discount in (
+    for project, total, discount in (
         offers
         .order_by()
-        .values("project", "is_budget_retainer")
+        .values("project")
         .annotate(s=Sum("total_excl_tax"), d=Sum("discount"))
-        .values_list("project", "is_budget_retainer", "s", "d")
+        .values_list("project", "s", "d")
     ):
-        sides[project][retainer]["total"] += total
-        sides[project][retainer]["discount"] += discount
-    for project, retainer, costs in (
+        result[project]["total"] += total
+        result[project]["discount"] += discount
+    for project, costs in (
         Service.objects
         .filter(offer__in=offers, is_optional=False, third_party_costs__isnull=False)
         .order_by()
-        .values("project", "offer__is_budget_retainer")
+        .values("project")
         .annotate(s=Sum("third_party_costs"))
-        .values_list("project", "offer__is_budget_retainer", "s")
+        .values_list("project", "s")
     ):
-        sides[project][retainer]["third_party_costs"] += costs
-    return defaultdict(
-        side,
-        {
-            project: max(both[True], both[False], key=lambda side: side["total"])
-            for project, both in sides.items()
-        },
-    )
+        result[project]["third_party_costs"] += costs
+    return result

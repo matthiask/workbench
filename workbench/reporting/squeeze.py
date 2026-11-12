@@ -214,10 +214,9 @@ def project_gross_margin(project):
     hours_logged_budgeted = project_hours["hours_logged_budgeted"]
     # Only the hours of accepted offers match the offered amount (logged hours
     # are taken into account below). The budget of retainers pays for the
-    # services added later without offers of their own, maybe also for the
-    # other accepted offers.
+    # services added later without offers of their own.
     accepted = Q(offer__in=accepted_offers)
-    if accepted_offers_by_project([project.id])[project.id]["is_budget_retainer"]:
+    if any(offer.is_budget_retainer for offer in accepted_offers):
         accepted |= Q(offer__isnull=True)
     hours_accepted_offered = sum_of(
         Service.objects.budgeted().filter(accepted, project=project),

@@ -159,8 +159,8 @@ class InvoicesTest(TestCase):
         self.assertEqual(project.planned_work.count(), 0)
 
     def test_accepted_offers_help_text(self):
-        """The help text uses the accepted offers like the reports, either the
-        budget retainer offers or the others"""
+        """The help text uses the accepted offers like the reports, budget
+        retainers included"""
         project = factories.ProjectFactory.create()
         for total, retainer in [(10000, True), (3000, False)]:
             offer = factories.OfferFactory.create(
@@ -170,7 +170,7 @@ class InvoicesTest(TestCase):
             offer.save()
         self.client.force_login(project.owned_by)
         response = self.client.get(project.urls["createinvoice"] + "?type=fixed")
-        self.assertContains(response, "Total excl. tax of accepted offers: 10’000.00")
+        self.assertContains(response, "Total excl. tax of accepted offers: 13’000.00")
 
     def test_services_invoiced_already(self):
         """Invoicing services again is a warning"""

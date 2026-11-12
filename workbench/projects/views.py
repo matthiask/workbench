@@ -82,7 +82,6 @@ class ProjectDetailView(generic.DetailView):
         grouped_services = self.object.grouped_services
 
         squeeze = project_gross_margin(self.object)
-        # The budget retainers or the other offers, like squeeze
         accepted_offers = accepted_offers_by_project([self.object.id])[self.object.id]
 
         # Projected invoices are entered as gross margin, that is, without

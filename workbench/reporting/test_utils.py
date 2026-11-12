@@ -25,8 +25,8 @@ class UtilsTest(TestCase):
         )
 
     def test_accepted_offers_with_budget_retainer(self):
-        """Budget retainer offers and other accepted offers aren't added up,
-        the larger of both counts"""
+        """Budget retainer offers and other accepted offers are added up: the
+        retainer is released with services without offer"""
         from workbench import factories
         from workbench.offers.models import Offer
         from workbench.reporting.project_budget_statistics import (
@@ -56,39 +56,30 @@ class UtilsTest(TestCase):
         offer(1000, retainer=True, third_party_costs=100)
         # Services without an offer use up the retained budget
         factories.ServiceFactory.create(project=project, cost=400)
-        regular = offer(300, retainer=False, third_party_costs=50)
-
         self.assertEqual(
             accepted_offers_by_project([project.id])[project.id],
             {
                 "total": 990,
                 "discount": 10,
                 "third_party_costs": 100,
-                "is_budget_retainer": True,
+            },
+        )
+
+        offer(300, retainer=False, third_party_costs=50)
+        self.assertEqual(
+            accepted_offers_by_project([project.id])[project.id],
+            {
+                "total": 1280,
+                "discount": 20,
+                "third_party_costs": 150,
             },
         )
         self.assertEqual(
-            gross_margin_components([project.id])[project.id]["offered"], 890
+            gross_margin_components([project.id])[project.id]["offered"], 1130
         )
         # Offers which aren't accepted yet don't count, also not their discount
         offer(5000, retainer=False, status=Offer.OFFERED)
         [row] = project_budget_statistics([project])["statistics"]
-        self.assertEqual(row["sold"], 990)
-        self.assertEqual(row["discount"], -10)
-
-        # Other accepted offers add up to more than the retainer
-        offer(800, retainer=False)
-        self.assertEqual(
-            accepted_offers_by_project([project.id])[project.id],
-            {
-                "total": 1080,
-                "discount": 20,
-                "third_party_costs": 50,
-                "is_budget_retainer": False,
-            },
-        )
-        regular.delete()
-        self.assertEqual(
-            accepted_offers_by_project([project.id])[project.id]["total"], 990
-        )
+        self.assertEqual(row["sold"], 1280)
+        self.assertEqual(row["discount"], -20)
         self.assertEqual(accepted_offers_by_project([])[project.id]["total"], 0)

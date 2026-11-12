@@ -828,7 +828,6 @@ class CreateProjectInvoiceForm(InvoiceForm):
             self.fields.pop("service_period_until")
 
         if self.instance.type in {self.instance.DOWN_PAYMENT, self.instance.FIXED}:
-            # The budget retainer offers or the others, like the reports
             project = self.instance.project
             accepted = accepted_offers_by_project([project.pk])[project.pk]["total"]
             self.fields["subtotal"].help_text = mark_safe(
