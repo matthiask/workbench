@@ -7,7 +7,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.invoices.models import Invoice
-from workbench.offers.models import Offer
+from workbench.offers.models import Offer, OfferHeading
 from workbench.projects.models import Service
 
 
@@ -260,6 +260,74 @@ class OffersAPITest(TestCase):
             content_type="application/json",
         ).json()
         self.assertEqual([s["effort_rate"] for s in data["services"]], ["160.00"] * 3)
+
+    def test_headings(self):
+        """Offers are created and replaced with headings between their
+        services"""
+        factories.service_types()
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        offer = self.offer(
+            postal_address="A\nB\nC",
+            headings=[
+                {"title": "Concept phase", "description": "Ideas", "before": 0},
+                {"title": "Operation", "before": 1},
+                {"title": "Options", "before": 2},
+            ],
+        )
+        url = f"/api/projects/{project.pk}/offers/"
+
+        data = self.client.post(
+            f"{url}?dry_run=true", offer, content_type="application/json"
+        ).json()
+        self.assertEqual(
+            [(h["id"], h["title"], h["position"]) for h in data["headings"]],
+            [
+                (None, "Concept phase", 10),
+                (None, "Operation", 30),
+                (None, "Options", 50),
+            ],
+        )
+        self.assertEqual([s["position"] for s in data["services"]], [20, 40, 60])
+        self.assertFalse(OfferHeading.objects.exists())
+
+        data = self.client.post(url, offer, content_type="application/json").json()
+        instance = Offer.objects.get()
+        self.assertEqual(
+            [str(item) for item in instance.items()],
+            ["Concept phase", "Concept", "Operation", "Hosting", "Options", "Extra"],
+        )
+        self.assertEqual(instance.headings.first().description, "Ideas")
+        detail = self.client.get(f"/api/offers/{instance.code}/").json()
+        self.assertEqual(len(detail["headings"]), 3)
+
+        response = self.client.put(
+            f"/api/offers/{instance.pk}/",
+            self.offer(
+                postal_address="A\nB\nC",
+                headings=[{"title": "Everything", "before": 0}],
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            [str(item) for item in instance.items()],
+            ["Everything", "Concept", "Hosting", "Extra"],
+        )
+
+        response = self.client.put(
+            f"/api/offers/{instance.pk}/",
+            self.offer(
+                postal_address="A\nB\nC",
+                headings=[{"title": "Too far", "before": 4}],
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"],
+            ["body", "data", "headings", 0, "before"],
+        )
 
     def test_replace(self):
         """Offers in preparation can be replaced"""

@@ -8,7 +8,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
-from workbench.offers.models import Offer
+from workbench.offers.models import Offer, OfferHeading
 from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.models import FreezeDate
 from workbench.tools.testing import messages
@@ -884,6 +884,36 @@ class ProjectsAPITest(TestCase):
         )
         response = patch({"external_reference": "https://example.com/1"})
         self.assertEqual(response.status_code, 200, response.content)
+
+    def test_service_create_and_reorder_with_headings(self):
+        """Headings stay in their place when the services of an offer are
+        reordered, services created after another one come right after it"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        first = factories.ServiceFactory.create(project=project, offer=offer)
+        second = factories.ServiceFactory.create(project=project, offer=offer)
+        heading = OfferHeading.objects.create(
+            offer=offer, title="Later", position=first.position + 1
+        )
+        self.client.force_login(project.owned_by)
+        self.assertEqual(offer.items(), [first, heading, second])
+
+        response = self.client.post(
+            "/api/services/reorder/",
+            {"services": [second.pk, first.pk]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(offer.items(), [second, heading, first])
+
+        response = self.client.post(
+            "/api/services/",
+            {"offer": offer.pk, "title": "Added", "after": second.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        added = Service.objects.get(title="Added")
+        self.assertEqual(offer.items(), [second, added, heading, first])
 
     def test_service_create_delete_reorder(self):
         """Services are created at the end of their group or after another

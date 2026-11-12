@@ -19,6 +19,7 @@ from workbench.api_keys import KEYS, OfferStatus, key
 from workbench.contacts.models import postal_address_choices
 from workbench.offers.models import (
     Offer,
+    OfferHeading,
     normalize_external_reference,
     validate_external_reference,
 )
@@ -91,6 +92,17 @@ class ServiceIn(InputSchema):
     )
 
 
+class OfferHeadingIn(InputSchema):
+    title: str = Field(min_length=1, max_length=200)
+    description: str = ""
+    before: int = Field(
+        ge=0,
+        description="Index of the service (in `services`, starting at 0) which"
+        " the heading comes before; the number of services puts it after the"
+        " last one. Headings with the same index keep their order.",
+    )
+
+
 class OfferIn(InputSchema):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
@@ -100,6 +112,11 @@ class OfferIn(InputSchema):
         " contact or customer.",
     )
     services: list[ServiceIn] = Field(min_length=1)
+    headings: list[OfferHeadingIn] = Field(
+        default=[],
+        description="Headings structure the services, e.g. by phase. They have"
+        " no amounts.",
+    )
 
 
 class OfferCreateIn(OfferIn):
@@ -141,6 +158,15 @@ class OfferServiceOut(Schema):
     is_optional: bool
 
 
+class OfferHeadingOut(Schema):
+    id: int | None
+    position: int = Field(
+        description="Headings and services are shown ordered by their position."
+    )
+    title: str
+    description: str
+
+
 class OfferWarning(Schema):
     loc: list[str | int]
     msg: str
@@ -169,6 +195,7 @@ class OfferOut(Schema):
     tax_rate: Decimal
     total: Decimal
     services: list[OfferServiceOut]
+    headings: list[OfferHeadingOut]
     warnings: list[OfferWarning] = Field(
         default=[],
         description="Things to look at in the services which were just written,"
@@ -222,6 +249,7 @@ def offer_out(offer, services, request):
         "tax_rate": offer.tax_rate,
         "total": offer.total,
         "services": services,
+        "headings": list(offer.headings.all()) if offer.pk else [],
     }
 
 
@@ -230,7 +258,7 @@ def _project_offers(project, request):
         offer_out(offer, list(offer.services.all()), request)
         for offer in project.offers.select_related(
             "project", "owned_by"
-        ).prefetch_related("services")
+        ).prefetch_related("services", "headings")
     ]
 
 
@@ -274,7 +302,7 @@ def offer_list_search(request, filters: Query[OfferFilter]):
     offers = (
         Offer.objects
         .select_related("project", "owned_by")
-        .prefetch_related("services")
+        .prefetch_related("services", "headings")
         .order_by("-pk")
     )
     if filters.project:
@@ -442,12 +470,47 @@ def _build_services(project, data, errors, warnings):
     return services
 
 
-def _save(offer, services, request, *, dry_run, delete=(), warnings=()):
+def _build_headings(data, errors):
+    """Headings and the index of the service they come before"""
+    headings = []
+    for index, item in enumerate(data.headings):
+        if item.before > len(data.services):
+            errors.append({
+                "loc": ["body", "data", "headings", index, "before"],
+                "msg": _("There are only %s services.") % len(data.services),
+            })
+        heading = OfferHeading(title=item.title, description=item.description)
+        full_clean(
+            heading,
+            ["body", "data", "headings", index],
+            errors,
+            exclude=["offer", "position"],
+        )
+        headings.append((item.before, heading))
+    return headings
+
+
+def _arrange(services, headings):
+    """Positions for the services and the headings in front of them"""
+    items = []
+    for index, service in enumerate(services):
+        items.extend(heading for before, heading in headings if before == index)
+        items.append(service)
+    items.extend(heading for before, heading in headings if before >= len(services))
+    for index, item in enumerate(items, 1):
+        item.position = 10 * index
+
+
+def _save(offer, services, request, *, dry_run, delete=(), headings=None, warnings=()):
     """Save everything and return the offer, roll back with ``dry_run``
 
-    Objects which only exist because of the dry run have no ID and URL."""
+    ``headings`` (pairs of the index of the service they come before and the
+    heading) replace the offer's headings unless they are ``None``. Objects
+    which only exist because of the dry run have no ID and URL."""
     existing = set(offer.services.values_list("id", flat=True)) if offer.pk else set()
     is_new = offer.pk is None
+    if headings is not None:
+        _arrange(services, headings)
     with transaction.atomic():
         for service in delete:
             service.delete()
@@ -455,6 +518,11 @@ def _save(offer, services, request, *, dry_run, delete=(), warnings=()):
         for service in services:
             service.offer = offer
             service.save(skip_related_model=True)
+        if headings is not None:
+            offer.headings.all().delete()
+            for _before, heading in headings:
+                heading.offer = offer
+                heading.save()
         offer.save()  # Recalculate the total
         result = offer_out(offer, list(offer.services.all()), request)
         result["warnings"] = list(warnings)
@@ -465,6 +533,9 @@ def _save(offer, services, request, *, dry_run, delete=(), warnings=()):
             for service in result["services"]:
                 if service.id not in existing:
                     service.id = None
+            if headings is not None:
+                for heading in result["headings"]:
+                    heading.id = None
     return result
 
 
@@ -511,11 +582,19 @@ def offer_create(
     full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
     warnings = []
     services = _build_services(project, data, errors, warnings)
+    headings = _build_headings(data, errors)
 
     if errors:
         raise ValidationError(errors)
 
-    return _save(offer, services, request, dry_run=dry_run, warnings=warnings)
+    return _save(
+        offer,
+        services,
+        request,
+        dry_run=dry_run,
+        headings=headings,
+        warnings=warnings,
+    )
 
 
 def _offer_in_preparation(offer_id, message):
@@ -569,6 +648,7 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: DryRun = Fa
     full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
     warnings = []
     services = _build_services(offer.project, data, errors, warnings)
+    headings = _build_headings(data, errors)
 
     if errors:
         raise ValidationError(errors)
@@ -579,6 +659,7 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: DryRun = Fa
         request,
         dry_run=dry_run,
         delete=existing,
+        headings=headings,
         warnings=warnings,
     )
 

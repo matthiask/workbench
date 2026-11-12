@@ -572,15 +572,26 @@ def echo_offer(offer):
     table = make_table(
         "ID>", "Service", "Effort type", "Hours>", "Rate>", "Cost>", show_footer=True
     )
-    for service in offer["services"]:
+    # Headings are shown between the services, ordered by their position
+    items = sorted(
+        [
+            *(("heading", heading) for heading in offer.get("headings", [])),
+            *(("service", service) for service in offer["services"]),
+        ],
+        key=lambda item: (item[1]["position"], item[0] == "service"),
+    )
+    for kind, item in items:
+        if kind == "heading":
+            table.add_row("", item["title"], style="bold")
+            continue
         table.add_row(
-            str(service["id"] or "(new)"),
-            service["title"] + (" (optional)" if service["is_optional"] else ""),
-            service["effort_type"],
-            service["effort_hours"] or "",
-            service["effort_rate"] or "",
-            service["service_cost"],
-            style="dim" if service["is_optional"] else None,
+            str(item["id"] or "(new)"),
+            item["title"] + (" (optional)" if item["is_optional"] else ""),
+            item["effort_type"],
+            item["effort_hours"] or "",
+            item["effort_rate"] or "",
+            item["service_cost"],
+            style="dim" if item["is_optional"] else None,
         )
     table.columns[1].footer = "Subtotal"
     table.columns[-1].footer = offer["subtotal"]

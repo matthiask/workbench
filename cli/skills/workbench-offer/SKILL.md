@@ -100,6 +100,10 @@ services:
     service_type: Programmierung & IT
     hours: 12
     is_optional: true           # Offered, but not part of the total
+headings:                       # Optional, structure only (no amounts)
+  - title: Operation
+    description: From the launch on.
+    before: 1                   # Index of the service it comes before
 ```
 
 Guidelines:
@@ -115,6 +119,9 @@ Guidelines:
   silently picking either.
 - One service per deliverable or phase, with a description saying what is and
   isn't included. Put assumptions and exclusions into the descriptions.
+- Longer offers with several phases or areas get headings between their
+  services, if the specification or the existing offers are structured like
+  that. Headings have no amounts and no subtotals.
 - Estimate hours realistically, rather a bit high than too low. With
   guidelines, apply their factors and shares and say which ones you applied. Things the
   specification mentions as "maybe", "nice to have" or "later" become optional
@@ -185,7 +192,8 @@ Change only what was asked, one command per change, each one first with
 - Show the user the change (the dry run prints the service; `wb offers
   show` shows the totals afterwards) and run the command without `--dry-run`
   only after their explicit approval.
-- `reorder` needs the IDs of all services of the offer.
+- `reorder` needs the IDs of all services of the offer; headings stay in
+  their place.
 - Services with logged hours or costs can be changed but not deleted.
 - Services without hours or a cost are allowed (Workbench only warns), e.g.
   when several people estimate their own services one after the other. Only
@@ -199,8 +207,10 @@ explicit approval:
     wb offers replace <offer_id> <scratchpad>/offer.yaml --dry-run
     wb offers replace <offer_id> <scratchpad>/offer.yaml
 
-`replace` swaps title, description and all services, so start from the
-current offer and keep what wasn't asked to change.
+`replace` swaps title, description, all services and the headings, so start
+from the current offer and keep what wasn't asked to change (the headings of
+`wb offers show --json` have positions like the services, `before` is the
+index of the service which follows them).
 
 If the reason for a revision isn't obvious from the offer itself (a new
 requirement, a changed estimate), offer to record it as a note on the

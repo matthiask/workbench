@@ -470,6 +470,9 @@ services:
     hours: 10
   - title: Hosting
     cost: 500
+headings:
+  - title: Operation phase
+    before: 1
 """
         )
 
@@ -481,6 +484,8 @@ services:
         result = self.wb("offers", "create", project.pk, offer)
         created = Offer.objects.get()
         self.assertIn(created.code, result.output)
+        # Between the services
+        self.assertRegex(result.output, r"(?s)Concept.*Operation phase.*Hosting")
 
         result = self.wb("offers", "search", "--project", project.pk)
         self.assertIn(created.code, result.output)

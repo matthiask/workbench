@@ -32,7 +32,12 @@ from workbench.contacts.api import (
 )
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
-from workbench.offers.models import Offer
+from workbench.offers.models import (
+    Offer,
+    offer_items,
+    reorder_services,
+    save_positions,
+)
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import (
     ProjectForm,
@@ -967,10 +972,18 @@ def service_create(
     with transaction.atomic():
         service = form.save()
         if data.after is not None:
-            index = 1 + [s.pk for s in group].index(data.after)
-            group.insert(index, service)
-            for position, s in enumerate(group, 1):
-                Service.objects.filter(pk=s.pk).update(position=10 * position)
+            # Right after that service, also when a heading follows it
+            items = offer_items(
+                services=group,
+                headings=service.offer.headings.all() if service.offer else [],
+            )
+            after = next(
+                item
+                for item in items
+                if isinstance(item, Service) and item.pk == data.after
+            )
+            items.insert(1 + items.index(after), service)
+            save_positions(items)
         result = _service_result(service, request, dry_run=dry_run, created=True)
         if dry_run:
             transaction.set_rollback(True)
@@ -1125,8 +1138,11 @@ def service_reorder(request, data: ServiceOrder, *, dry_run: DryRun = False):
         ])
     controlling = request.user.features[FEATURES.CONTROLLING]
     with transaction.atomic():
-        for position, pk in enumerate(data.services, 1):
-            Service.objects.filter(pk=pk).update(position=10 * position)
+        # The offer's headings stay in their place
+        reorder_services(
+            [services[pk] for pk in data.services],
+            headings=first.offer.headings.all() if first.offer else [],
+        )
         ordered = {s.pk: s for s in _services().filter(pk__in=data.services)}
         result = [
             _service_out(ordered[pk], request, controlling=controlling)

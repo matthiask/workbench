@@ -158,7 +158,7 @@ def overview(request):
         "offers": [
             offer_out(offer, list(offer.services.all()), request)
             for offer in Offer.objects.maybe_actionable(user=user).prefetch_related(
-                "services"
+                "services", "headings"
             )
         ]
         if features[FEATURES.CONTROLLING]

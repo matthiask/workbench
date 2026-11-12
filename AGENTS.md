@@ -478,7 +478,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (two formsets, renumbered when submitting; the project's services
   without offer are hidden rows which can be added), the project page
   sorts both (`set_order` takes `heading-<id>`), the PDF shows them as
-  headings and copies of offers keep them.
+  headings and copies of offers keep them. The offers API creates and
+  replaces them with the services (`headings` with `before`, the index of
+  the service which follows them) and outputs them with their positions,
+  `wb offers show` lists them between the services; reordering services
+  through the API keeps them in place.
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating deals;
