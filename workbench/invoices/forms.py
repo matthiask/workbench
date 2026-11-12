@@ -6,11 +6,12 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, override
 from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
 
 from workbench.accounts.models import User
@@ -31,10 +32,11 @@ from workbench.tools.forms import (
     DateInput,
     Form,
     ModelForm,
+    SuggestionsInput,
     Textarea,
     add_prefix,
 )
-from workbench.tools.pdf import PDFDocument, pdf_response
+from workbench.tools.pdf import PDFDocument, invoice_filename, pdf_response
 from workbench.tools.validation import in_days
 
 
@@ -172,6 +174,121 @@ class PostponeRemindersForm(ModelForm):
             )
         warn_about_postponed_reminders(self, data.get("postpone_reminders_until"))
         return data
+
+
+@add_prefix("modal")
+class SendInvoiceForm(ModelForm):
+    """Releases an invoice in preparation: mails it with the PDF to the
+    customer and marks it as sent, invoiced today and due in 15 days"""
+
+    DUE_DAYS = 15
+
+    class Meta:
+        model = Invoice
+        fields = ["invoiced_on", "due_on"]
+        widgets = {"invoiced_on": DateInput, "due_on": DateInput}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        invoice = self.instance
+        organization = invoice.contact.organization if invoice.contact else None
+        organization = organization or invoice.customer
+        self.contact_emails = (
+            list(invoice.contact.emailaddresses.values_list("email", flat=True))
+            if invoice.contact
+            else []
+        )
+        # Like the payment reminders
+        emails = list(
+            dict.fromkeys(
+                filter(
+                    None,
+                    [
+                        organization.accounts_payable_email,
+                        *self.contact_emails,
+                        organization.email,
+                    ],
+                )
+            )
+        )
+        self.fields["email"] = forms.EmailField(
+            label=_("recipient"),
+            initial=emails[0] if emails else "",
+            widget=SuggestionsInput(emails),
+            help_text=_("The owner of the invoice gets a copy and the replies."),
+        )
+        self.fields["invoiced_on"].required = True
+        self.fields["due_on"].required = True
+        self.initial["invoiced_on"] = dt.date.today()
+        self.initial["due_on"] = in_days(self.DUE_DAYS)
+        self.order_fields(["email", "invoiced_on", "due_on"])
+
+    def clean(self):
+        data = super().clean()
+        if self.instance._orig_status != Invoice.IN_PREPARATION:
+            raise forms.ValidationError(_("Only invoices in preparation can be sent."))
+        if (
+            (invoiced_on := data.get("invoiced_on"))
+            and (freeze := FreezeDate.objects.up_to())
+            and invoiced_on <= freeze
+        ):
+            self.add_error(
+                "invoiced_on",
+                _(
+                    "Cannot create an invoice with a date of {} or earlier anymore."
+                ).format(local_date_format(freeze)),
+            )
+        elif invoiced_on and invoiced_on < in_days(-3):
+            self.add_warning(
+                _("The invoice date is in the past (%s). Are you sure?")
+                % local_date_format(invoiced_on),
+                code="invoiced-in-past",
+            )
+        if invoiced_on and (due_on := data.get("due_on")) and due_on < invoiced_on:
+            self.add_error("due_on", _("Due date has to be after invoice date."))
+        return data
+
+    def mail(self):
+        invoice = self.instance
+        to = self.cleaned_data["email"]
+        owner = [invoice.owned_by.email] if invoice.owned_by.is_active else []
+        mail = render_to_mail(
+            "invoices/invoice_mail",
+            {
+                "invoice": invoice,
+                # The contact's salutation only for their own addresses
+                "salutation": invoice.contact.salutation
+                if invoice.contact and to in self.contact_emails
+                else "",
+                "WORKBENCH": settings.WORKBENCH,
+            },
+            from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
+            to=[to],
+            cc=owner,
+            reply_to=owner,
+            bcc=[
+                email
+                for email in [settings.WORKBENCH.REMINDER_FROM_EMAIL]
+                if email and email not in owner
+            ],
+        )
+        with io.BytesIO() as buf, override(settings.WORKBENCH.PDF_LANGUAGE):
+            pdf = PDFDocument(buf)
+            pdf.init_invoice_letter()
+            pdf.process_invoice(invoice)
+            pdf.generate()
+            mail.attach(
+                f"{invoice_filename(invoice)}.pdf", buf.getvalue(), "application/pdf"
+            )
+        return mail
+
+    def save(self):
+        self.instance.status = Invoice.SENT
+        # The invoice stays in preparation if the mail can't be sent
+        with transaction.atomic():
+            instance = super().save()
+            self.mail().send()
+        return instance
 
 
 @add_prefix("modal")

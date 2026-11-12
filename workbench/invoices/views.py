@@ -6,7 +6,7 @@ from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
-from django.utils.translation import gettext, ngettext
+from django.utils.translation import gettext, gettext_lazy, ngettext
 
 from workbench import generic
 from workbench.contacts.models import Person
@@ -196,3 +196,28 @@ def send_reminder(request, contact_id):
         "invoices/send_reminder.html",
         {"form": form, "title": gettext("Send reminder")},
     )
+
+
+class SendInvoiceView(generic.UpdateView):
+    """Releases and sends an invoice, see SendInvoiceForm (passed to as_view()
+    because add_prefix() turns it into a function)"""
+
+    model = Invoice
+    template_name = "invoices/send_invoice.html"
+    title = gettext_lazy("Release and send %(object)s")
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+        except Exception as exc:  # noqa: BLE001
+            # The transaction has been rolled back
+            form.instance.status = Invoice.IN_PREPARATION
+            form.add_error(None, gettext("Unable to send the invoice: {}").format(exc))
+            return self.form_invalid(form)
+        messages.success(
+            self.request,
+            gettext("The invoice has been sent to {}.").format(
+                form.cleaned_data["email"]
+            ),
+        )
+        return HttpResponse("Sent", status=202)

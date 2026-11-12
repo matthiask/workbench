@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 13:43+0100\n"
+"POT-Creation-Date: 2026-11-12 14:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2348,6 +2348,32 @@ msgid "project"
 msgstr "Projekt"
 
 #: workbench/invoices/forms.py
+msgid "recipient"
+msgstr "Empfänger:in"
+
+#: workbench/invoices/forms.py
+msgid "The owner of the invoice gets a copy and the replies."
+msgstr "Die verantwortliche Person der Rechnung erhält eine Kopie und die Antworten."
+
+#: workbench/invoices/forms.py
+msgid "Only invoices in preparation can be sent."
+msgstr "Nur Rechnungen in Vorbereitung können versendet werden."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Cannot create an invoice with a date of {} or earlier anymore."
+msgstr "Kann Rechnungen mit einem Datum von {} oder früher nicht mehr erstellen."
+
+#: workbench/invoices/forms.py
+#, python-format
+msgid "The invoice date is in the past (%s). Are you sure?"
+msgstr "Das Rechnungsdatum liegt in der Vergangenheit (%s). Bist du sicher?"
+
+#: workbench/invoices/forms.py workbench/invoices/models.py
+msgid "Due date has to be after invoice date."
+msgstr "Fälligkeitsdatum muss später als Rechnungsdatum sein."
+
+#: workbench/invoices/forms.py
 msgid "Only sent invoices can be settled here."
 msgstr "Hier können nur versendete Rechnungen abgeschlossen werden."
 
@@ -2389,11 +2415,6 @@ msgstr "Diese Rechnung ist eingefroren, nur wenige Felder sind bearbeitbar."
 #: workbench/invoices/forms.py
 msgid "A negative subtotal is almost certainly an error. Did you want to create a credit?"
 msgstr "Ein negatives Zwischentotal ist fast sicher ein Fehler. Wolltest Du eine Gutschrift erstellen?"
-
-#: workbench/invoices/forms.py
-#, python-brace-format
-msgid "Cannot create an invoice with a date of {} or earlier anymore."
-msgstr "Kann Rechnungen mit einem Datum von {} oder früher nicht mehr erstellen."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -2613,10 +2634,6 @@ msgstr "Rechnungs- und/oder Fälligkeitsdatum fehlen für den augewählten Statu
 #: workbench/invoices/models.py
 msgid "Invalid status when closed on is already set."
 msgstr "Ungültiger Status wenn \"Geschlossen am\"-Feld schon gesetzt ist."
-
-#: workbench/invoices/models.py
-msgid "Due date has to be after invoice date."
-msgstr "Fälligkeitsdatum muss später als Rechnungsdatum sein."
 
 #: workbench/invoices/models.py
 #, python-format
@@ -2956,6 +2973,21 @@ msgstr "Keine überfälligen Rechnungen für diese Kontaktperson."
 #: workbench/invoices/views.py
 msgid "Send reminder"
 msgstr "Zahlungserinnerung verschicken"
+
+#: workbench/invoices/views.py
+#, python-format
+msgid "Release and send %(object)s"
+msgstr "%(object)s freigeben und versenden"
+
+#: workbench/invoices/views.py
+#, python-brace-format
+msgid "Unable to send the invoice: {}"
+msgstr "Konnte die Rechnung nicht versenden: {}"
+
+#: workbench/invoices/views.py
+#, python-brace-format
+msgid "The invoice has been sent to {}."
+msgstr "Die Rechnung wurde an {} versendet."
 
 #: workbench/logbook/celebrations.py
 msgid "Week complete 🏁"
@@ -5332,6 +5364,11 @@ msgstr "Abbrechen"
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
 msgstr "Geschichte"
+
+#: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/send_invoice.html
+msgid "Release and send"
+msgstr "Freigeben und versenden"
 
 #: workbench/templates/invoices/invoice_detail.html
 msgid "Mark as paid"

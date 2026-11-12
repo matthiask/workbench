@@ -1,9 +1,11 @@
 import datetime as dt
 import io
 from decimal import Decimal
+from unittest import mock
 
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import ProtectedError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -16,6 +18,7 @@ from workbench.invoices.models import Invoice
 from workbench.invoices.tasks import autodunning
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
+from workbench.reporting.models import FreezeDate
 from workbench.reporting.utils import effort_cost_by_project
 from workbench.tools.formats import currency, local_date_format
 from workbench.tools.forms import WarningsForm
@@ -1884,6 +1887,131 @@ class InvoicesTest(TestCase):
         self.assertContains(
             response, "Reminders can only be postponed for sent invoices."
         )
+
+    def test_send(self):
+        """Invoices in preparation are released and mailed to the customer
+        with the PDF, the owner in Cc and Reply-To; invoiced today, due in
+        15 days"""
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(-10),
+            subtotal=100,
+            postal_address="Test\nStreet\nCity",
+        )
+        invoice.contact.emailaddresses.create(email="contact@example.com")
+        invoice.customer.email = "info@example.com"
+        invoice.customer.accounts_payable_email = "creditors@example.com"
+        invoice.customer.save()
+        self.client.force_login(invoice.owned_by)
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.get(invoice.get_absolute_url())
+        self.assertContains(response, invoice.urls["send"])
+        response = self.client.get(invoice.urls["send"], headers=headers)
+        self.assertContains(
+            response,
+            "[&quot;creditors@example.com&quot;, &quot;contact@example.com&quot;,"
+            " &quot;info@example.com&quot;]",
+        )
+        self.assertContains(response, 'value="creditors@example.com"')
+        self.assertContains(response, f'value="{in_days(15).isoformat()}"')
+
+        response = self.client.post(
+            invoice.urls["send"],
+            {
+                "modal-email": "contact@example.com",
+                "modal-invoiced_on": dt.date.today().isoformat(),
+                "modal-due_on": in_days(20).isoformat(),
+            },
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 202)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.SENT)
+        self.assertEqual(invoice.invoiced_on, dt.date.today())
+        self.assertEqual(invoice.due_on, in_days(20))
+
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.to, ["contact@example.com"])
+        self.assertEqual(message.cc, [invoice.owned_by.email])
+        self.assertEqual(message.reply_to, [invoice.owned_by.email])
+        self.assertIn(invoice.code, message.subject)
+        self.assertIn(local_date_format(in_days(20)), message.body)
+        self.assertIn(currency(invoice.total), message.body)
+        ((filename, content, mimetype),) = message.attachments
+        self.assertTrue(filename.endswith(".pdf"))
+        self.assertEqual(mimetype, "application/pdf")
+        self.assertTrue(content.startswith(b"%PDF"))
+
+        # Only invoices in preparation
+        response = self.client.get(invoice.get_absolute_url())
+        self.assertNotContains(response, invoice.urls["send"])
+        response = self.client.post(
+            invoice.urls["send"],
+            {
+                "modal-email": "contact@example.com",
+                "modal-invoiced_on": dt.date.today().isoformat(),
+                "modal-due_on": in_days(20).isoformat(),
+            },
+            headers=headers,
+        )
+        self.assertContains(response, "Only invoices in preparation can be sent.")
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_send_salutation_and_failure(self):
+        """The contact's salutation only for their own addresses; invoices
+        stay in preparation when the mail can't be sent"""
+        invoice = factories.InvoiceFactory.create(
+            subtotal=100, postal_address="Test\nStreet\nCity"
+        )
+        invoice.contact.salutation = "Liebe Anna"
+        invoice.contact.save()
+        invoice.contact.emailaddresses.create(email="anna@example.com")
+        self.client.force_login(invoice.owned_by)
+
+        def send(email):
+            return self.client.post(
+                invoice.urls["send"],
+                {
+                    "modal-email": email,
+                    "modal-invoiced_on": dt.date.today().isoformat(),
+                    "modal-due_on": in_days(15).isoformat(),
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        with mock.patch.object(
+            EmailMultiAlternatives, "send", side_effect=OSError("Connection refused")
+        ):
+            response = send("creditors@example.com")
+        self.assertContains(response, "Unable to send the invoice: Connection refused")
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
+
+        send("creditors@example.com")
+        self.assertIn("Sehr geehrte Damen und Herren", mail.outbox[0].body)
+        Invoice.objects.filter(pk=invoice.pk).update(status=Invoice.IN_PREPARATION)
+        send("anna@example.com")
+        self.assertIn("Liebe Anna", mail.outbox[1].body)
+
+    def test_send_requires_dates_after_freeze(self):
+        """Invoices can't be sent with a frozen invoice date"""
+        invoice = factories.InvoiceFactory.create(
+            subtotal=100, postal_address="Test\nStreet\nCity"
+        )
+        FreezeDate.objects.create(up_to=in_days(-5))
+        self.client.force_login(invoice.owned_by)
+        response = self.client.post(
+            invoice.urls["send"],
+            {
+                "modal-email": "contact@example.com",
+                "modal-invoiced_on": in_days(-10).isoformat(),
+                "modal-due_on": in_days(5).isoformat(),
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "Cannot create an invoice with a date of")
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_settle(self):
         """Sent invoices are marked as paid or cancelled in a modal with only

@@ -20,7 +20,18 @@
       </div>
     </div>
     <div class="wb-page-actions">
-      <a href="{{ object.urls.pdf }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+      {% if object.status == object.IN_PREPARATION %}
+        <a href="{{ object.urls.send }}" class="btn btn-primary" data-ajaxmodal>
+          {% include 'svg/mail.svg' %}
+          {% translate 'Release and send' %}
+        </a>
+      {% endif %}
+      <a
+        href="{{ object.urls.pdf }}"
+        class="btn {% if object.status == object.IN_PREPARATION %}btn-quiet{% else %}btn-primary{% endif %}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {% include 'svg/file-pdf.svg' %}
         PDF
       </a>

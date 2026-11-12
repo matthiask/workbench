@@ -9,6 +9,7 @@ from workbench.invoices.forms import (
     InvoiceForm,
     InvoiceSearchForm,
     PostponeRemindersForm,
+    SendInvoiceForm,
     ServiceForm,
     SettleInvoiceForm,
 )
@@ -71,6 +72,11 @@ urlpatterns = [
             )
         ),
         name="invoices_invoice_postpone_reminders",
+    ),
+    path(
+        "<int:pk>/send/",
+        controlling_only(views.SendInvoiceView.as_view(form_class=SendInvoiceForm)),
+        name="invoices_invoice_send",
     ),
     path(
         "<int:pk>/settle/",

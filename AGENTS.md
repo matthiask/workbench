@@ -241,7 +241,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   preparation, validated with the web interface's creation forms
   (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
   query parameters of the web views) and their defaults; sending them stays
-  in the web interface. Paid and cancelled invoices require a payment notice;
+  in the web interface. "Release and send" mails an invoice in preparation
+  with its PDF to the customer (suggested like payment reminders, the owner
+  in Cc and Reply-To), invoiced today and due in 15 days, and marks it as
+  sent; it stays in preparation if the mail fails (`SendInvoiceForm`,
+  `SendInvoiceView`, `invoices/invoice_mail.txt`). Paid and cancelled invoices require a payment notice;
   assigning a credit entry writes its date, ledger, amount, payment notice
   and notes into it (`CreditEntry.mark_invoice_as_paid()`).
   Values given by name have a listing which shows them with their ID

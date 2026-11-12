@@ -1,0 +1,11 @@
+{% load workbench %}Rechnung {{ invoice.code }} von {{ WORKBENCH.PDF_COMPANY }}
+
+{{ salutation|default:"Sehr geehrte Damen und Herren" }}
+
+Im Anhang finden Sie unsere Rechnung {{ invoice.code }} «{{ invoice.title }}» über {{ WORKBENCH.CURRENCY }} {{ invoice.total|currency }}, zahlbar bis {{ invoice.due_on|local_date_format }}.
+
+Falls Sie Fragen haben, stehen wir Ihnen gerne zur Verfügung.
+
+Freundliche Grüsse
+{{ invoice.owned_by.get_full_name }}
+{{ WORKBENCH.PDF_COMPANY }}
