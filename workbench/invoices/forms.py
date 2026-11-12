@@ -6,6 +6,7 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -221,7 +222,31 @@ class SendInvoiceForm(ModelForm):
         self.fields["due_on"].required = True
         self.initial["invoiced_on"] = dt.date.today()
         self.initial["due_on"] = in_days(self.DUE_DAYS)
-        self.order_fields(["email", "invoiced_on", "due_on"])
+        proposal = render_to_mail(
+            "invoices/invoice_mail",
+            {
+                "invoice": invoice,
+                "salutation": self.salutation(self.fields["email"].initial),
+                "WORKBENCH": settings.WORKBENCH,
+            },
+        )
+        self.fields["subject"] = forms.CharField(
+            label=_("subject"), initial=proposal.subject, max_length=200
+        )
+        self.fields["body"] = forms.CharField(
+            label=_("text"),
+            initial=proposal.body,
+            widget=Textarea({"rows": 12}),
+            help_text=_("{due_on} is replaced with the due date."),
+        )
+        self.order_fields(["email", "invoiced_on", "due_on", "subject", "body"])
+
+    def salutation(self, email):
+        """The contact's salutation only for their own addresses"""
+        contact = self.instance.contact
+        return (
+            contact.salutation if contact and email in self.contact_emails else ""
+        ) or "Sehr geehrte Damen und Herren"
 
     def clean(self):
         data = super().clean()
@@ -250,18 +275,16 @@ class SendInvoiceForm(ModelForm):
 
     def mail(self):
         invoice = self.instance
-        to = self.cleaned_data["email"]
+        data = self.cleaned_data
+        to = data["email"]
         owner = [invoice.owned_by.email] if invoice.owned_by.is_active else []
-        mail = render_to_mail(
-            "invoices/invoice_mail",
-            {
-                "invoice": invoice,
-                # The contact's salutation only for their own addresses
-                "salutation": invoice.contact.salutation
-                if invoice.contact and to in self.contact_emails
-                else "",
-                "WORKBENCH": settings.WORKBENCH,
-            },
+        body = "\n".join(data["body"].splitlines()).replace(
+            "{due_on}",
+            local_date_format(data["due_on"]),
+        )
+        mail = EmailMultiAlternatives(
+            data["subject"],
+            body,
             from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
             to=[to],
             cc=owner,

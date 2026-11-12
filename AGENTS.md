@@ -244,7 +244,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   in the web interface. "Release and send" mails an invoice in preparation
   with its PDF to the customer (suggested like payment reminders, the owner
   in Cc and Reply-To), invoiced today and due in 15 days, and marks it as
-  sent; it stays in preparation if the mail fails (`SendInvoiceForm`,
+  sent; subject and text are proposed by `invoices/invoice_mail.txt` and
+  editable (the salutation is the contact's if the suggested recipient is
+  one of their addresses), `{due_on}` is replaced when sending; it stays in preparation if the mail fails (`SendInvoiceForm`,
   `SendInvoiceView`, `invoices/invoice_mail.txt`). Paid and cancelled invoices require a payment notice;
   assigning a credit entry writes its date, ledger, amount, payment notice
   and notes into it (`CreditEntry.mark_invoice_as_paid()`).

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 14:09+0100\n"
+"POT-Creation-Date: 2026-11-12 14:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2354,6 +2354,20 @@ msgstr "Empfänger:in"
 #: workbench/invoices/forms.py
 msgid "The owner of the invoice gets a copy and the replies."
 msgstr "Die verantwortliche Person der Rechnung erhält eine Kopie und die Antworten."
+
+#: workbench/invoices/forms.py
+msgid "subject"
+msgstr "Betreff"
+
+#: workbench/invoices/forms.py
+msgid "text"
+msgstr "Text"
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+#, python-brace-format
+msgid "{due_on} is replaced with the due date."
+msgstr "{due_on} wird durch das Fälligkeitsdatum ersetzt."
 
 #: workbench/invoices/forms.py
 msgid "Only invoices in preparation can be sent."
@@ -6781,6 +6795,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-brace-format
+#~ msgid "{salutation} is replaced with the salutation of the contact if the recipient is one of their addresses (otherwise with a general one), {due_on} with the due date."
+#~ msgstr "{salutation} wird durch die Anrede des Kontakts ersetzt, wenn die Empfängeradresse eine seiner Adressen ist (sonst durch eine allgemeine), {due_on} durch das Fälligkeitsdatum."
 
 #~ msgid "effort hours"
 #~ msgstr "Aufwände in Stunden"
