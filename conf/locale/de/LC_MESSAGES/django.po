@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 07:16+0100\n"
+"POT-Creation-Date: 2026-11-12 13:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3312,6 +3312,11 @@ msgstr "Stunden benötigen eine Aufwandsart und einen Stundensatz, z.B. von eine
 msgid "%s: Neither hours nor a cost have been given yet."
 msgstr "%s: Es wurden noch weder Stunden noch Kosten angegeben."
 
+#: workbench/offers/api.py
+#, python-format
+msgid "There are only %s services."
+msgstr "Es gibt nur %s Leistungen."
+
 #: workbench/offers/api.py workbench/offers/forms.py workbench/planning/api.py
 #: workbench/planning/forms.py
 msgid "The project is closed."
@@ -3340,6 +3345,14 @@ msgstr "Nur Offerten in Vorbereitung können geändert werden."
 #: workbench/offers/api.py
 msgid "Only the title, the description and the external reference of service groups can be changed."
 msgstr "Bei Leistungsgruppen lassen sich nur Titel, Beschreibung und externe Referenz ändern."
+
+#: workbench/offers/api.py
+msgid "Only the headings of offers in preparation can be changed."
+msgstr "Nur die Zwischentitel von Offerten in Vorbereitung können geändert werden."
+
+#: workbench/offers/api.py
+msgid "The offer has no service with this ID."
+msgstr "Die Offerte hat keine Leistung mit dieser ID."
 
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
@@ -6718,9 +6731,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "Delete or substitute"
 #~ msgstr "Löschen oder ersetzen"
-
-#~ msgid "The offer has no service with this ID."
-#~ msgstr "Die Offerte hat keine Leistung mit dieser ID."
 
 #~ msgid "Expected the IDs of all services of the offer once."
 #~ msgstr "Erwartet werden die IDs aller Leistungen der Offerte, jede genau einmal."
