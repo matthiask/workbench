@@ -172,8 +172,9 @@ add `--ignore-warning other-customer` if the user confirms the link is right.
 
 ## Revising an offer
 
-Offers in preparation are changed service by service with `wb services`.
-Look at the current offer first; its table shows the IDs of the services:
+Offers in preparation are changed service by service with `wb services`, and
+heading by heading with `wb offers headings`. Look at the current offer first;
+its table shows the IDs of the services and the headings (bold):
 
     wb offers show <offer_id>
 
@@ -187,6 +188,9 @@ Change only what was asked, one command per change, each one first with
     wb services update <service_id> <scratchpad>/service.yaml --dry-run
     wb services delete <service_id> --dry-run
     wb services reorder <service_id> <service_id> ... --dry-run
+    wb offers headings create <offer_id> --title "<title>" --before <service_id> --dry-run
+    wb offers headings update <heading_id> --title "<title>" --before <service_id> --dry-run
+    wb offers headings delete <heading_id> --dry-run
 
 - `update` only sends the given fields, everything else stays as it is.
   `--clear-hours` and `--clear-cost` remove values, `--optional` and
@@ -198,7 +202,8 @@ Change only what was asked, one command per change, each one first with
   show` shows the totals afterwards) and run the command without `--dry-run`
   only after their explicit approval.
 - `reorder` needs the IDs of all services of the offer; headings stay in
-  their place.
+  their place. Headings are placed in front of a service (`--before`), or at
+  the end without it (`update --to-end` moves one there).
 - Services with logged hours or costs can be changed but not deleted.
 - Services without hours or a cost are allowed (Workbench only warns), e.g.
   when several people estimate their own services one after the other. Only

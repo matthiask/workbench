@@ -482,7 +482,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   replaces them with the services (`headings` with `before`, the index of
   the service which follows them) and outputs them with their positions,
   `wb offers show` lists them between the services; reordering services
-  through the API keeps them in place.
+  through the API keeps them in place. Single headings are created, changed
+  and deleted with `wb offers headings create/update/delete`
+  (`/api/offers/<id>/headings/`, `/api/offers/headings/<id>/`, only for
+  offers in preparation and service groups), placed in front of a service
+  (`before`, by ID) or at the end; `place_heading()` renumbers the offer.
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating deals;

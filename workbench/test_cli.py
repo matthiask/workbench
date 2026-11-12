@@ -487,6 +487,29 @@ headings:
         # Between the services
         self.assertRegex(result.output, r"(?s)Concept.*Operation phase.*Hosting")
 
+        concept = created.services.get(title="Concept")
+        result = self.wb(
+            "offers",
+            "headings",
+            "create",
+            created.code,
+            "--title",
+            "Concept phase",
+            "--before",
+            concept.pk,
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertRegex(result.output, r"(?s)Concept phase.*Concept.*Operation phase")
+        heading = created.headings.get(title="Concept phase")
+        result = self.wb(
+            "offers", "headings", "update", heading.pk, "--title", "Ideas", "--to-end"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertRegex(result.output, r"(?s)Hosting.*Ideas")
+        result = self.wb("offers", "headings", "delete", heading.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertNotIn("Ideas", result.output)
+
         result = self.wb("offers", "search", "--project", project.pk)
         self.assertIn(created.code, result.output)
 

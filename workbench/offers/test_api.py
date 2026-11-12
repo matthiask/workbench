@@ -329,6 +329,73 @@ class OffersAPITest(TestCase):
             ["body", "data", "headings", 0, "before"],
         )
 
+    def test_single_headings(self):
+        """Headings are added in front of services or at the end, changed,
+        moved and deleted one by one"""
+        offer = factories.OfferFactory.create()
+        first = factories.ServiceFactory.create(offer=offer, project=offer.project)
+        second = factories.ServiceFactory.create(offer=offer, project=offer.project)
+        other = factories.ServiceFactory.create(project=offer.project)
+        self.client.force_login(offer.owned_by)
+
+        def send(method, url, data=None, query=""):
+            return getattr(self.client, method)(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        url = f"/api/offers/{offer.code}/headings/"
+        response = send(
+            "post", url, {"title": "Second", "before": second.pk}, "?dry_run=1"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["headings"][0]["id"], None)
+        self.assertFalse(OfferHeading.objects.exists())
+
+        response = send("post", url, {"title": "Second", "before": second.pk})
+        heading = OfferHeading.objects.get()
+        self.assertEqual(response.json()["headings"][0]["id"], heading.pk)
+        self.assertEqual(offer.items(), [first, heading, second])
+
+        response = send("post", url, {"title": "End", "description": "Last"})
+        end = OfferHeading.objects.get(title="End")
+        self.assertEqual(offer.items(), [first, heading, second, end])
+
+        response = send("post", url, {"title": "X", "before": other.pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "before"]
+        )
+
+        url = f"/api/offers/headings/{heading.pk}/"
+        response = send("patch", url, {"title": "First", "before": first.pk})
+        self.assertEqual(response.status_code, 200, response.content)
+        heading.refresh_from_db()
+        self.assertEqual(heading.title, "First")
+        self.assertEqual(offer.items(), [heading, first, second, end])
+
+        response = send("patch", url, {"before": None})
+        self.assertEqual(offer.items(), [first, second, end, heading])
+
+        response = send("patch", url, {"title": ""})
+        self.assertEqual(response.status_code, 422)
+
+        response = send("delete", url, query="?dry_run=1")
+        self.assertEqual(len(response.json()["headings"]), 1)
+        self.assertTrue(OfferHeading.objects.filter(pk=heading.pk).exists())
+        response = send("delete", url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(offer.items(), [first, second, end])
+
+        Offer.objects.filter(pk=offer.pk).update(
+            status=Offer.OFFERED,
+            offered_on=dt.date.today(),
+            valid_until=dt.date.today(),
+        )
+        response = send("delete", f"/api/offers/headings/{end.pk}/")
+        self.assertEqual(response.status_code, 409)
+        response = send("post", f"/api/offers/{offer.pk}/headings/", {"title": "X"})
+        self.assertEqual(response.status_code, 409)
+
     def test_replace(self):
         """Offers in preparation can be replaced"""
         factories.service_types()

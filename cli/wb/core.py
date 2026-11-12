@@ -582,7 +582,7 @@ def echo_offer(offer):
     )
     for kind, item in items:
         if kind == "heading":
-            table.add_row("", item["title"], style="bold")
+            table.add_row(str(item["id"] or "(new)"), item["title"], style="bold")
             continue
         table.add_row(
             str(item["id"] or "(new)"),

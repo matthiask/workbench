@@ -309,6 +309,14 @@ validates without saving anything:
 `reorder` takes all services of one offer, or all services without offer of a
 project, in the new order.
 
+Headings structure the services of offers in preparation (no amounts); they
+are placed in front of a service or at the end, `reorder` leaves them where
+they are:
+
+    wb offers headings create 2026-0042-o01 --title "Konzept" --before 901
+    wb offers headings update 77 --title "Konzeption" --to-end
+    wb offers headings delete 77
+
 Logged hours and costs are reassigned to another service of the project like
 in the web interface; invoiced entries stay with their service unless they are
 included:

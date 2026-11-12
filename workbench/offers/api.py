@@ -21,6 +21,7 @@ from workbench.offers.models import (
     Offer,
     OfferHeading,
     normalize_external_reference,
+    place_heading,
     validate_external_reference,
 )
 from workbench.projects.api import (
@@ -753,3 +754,124 @@ def _update_external_reference(request, offer_id, value, *, dry_run):
         if dry_run:
             transaction.set_rollback(True)
     return result
+
+
+# Headings of offers
+
+
+class OfferHeadingCreateIn(InputSchema):
+    title: str = Field(min_length=1, max_length=200)
+    description: str = ""
+    before: int | None = Field(
+        default=None,
+        description="ID of the offer's service which the heading comes before,"
+        " leave this out to add it at the end.",
+    )
+
+
+class OfferHeadingPatch(InputSchema):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    before: int | None = Field(
+        default=None,
+        description="Moves the heading in front of this service of the offer"
+        " (by ID), null moves it to the end.",
+    )
+
+
+def _heading_offer(offer):
+    """Headings change with the services: only those of offers in
+    preparation and of service groups"""
+    if not offer.services_changeable:
+        raise HttpError(
+            409, _("Only the headings of offers in preparation can be changed.")
+        )
+    return offer
+
+
+def _heading_before(offer, service_id):
+    if service_id is None:
+        return None
+    if service := offer.services.filter(pk=service_id).first():
+        return service
+    raise ValidationError([
+        {
+            "loc": ["body", "data", "before"],
+            "msg": _("The offer has no service with this ID."),
+        }
+    ])
+
+
+def _heading_result(offer, request, *, dry_run, created=None):
+    """The offer, rolled back with ``dry_run`` (new headings have no ID)"""
+    result = offer_out(offer, list(offer.services.all()), request)
+    if dry_run:
+        transaction.set_rollback(True)
+        for heading in result["headings"]:
+            if created and heading.pk == created.pk:
+                heading.id = None
+    return result
+
+
+@router.post("/offers/{offer_id}/headings/", response=OfferOut)
+def offer_heading_create(
+    request,
+    offer_id: str,
+    data: OfferHeadingCreateIn,
+    *,
+    dry_run: DryRun = False,
+):
+    """Add a heading to an offer (by ID or code) in preparation or a service
+    group, in front of one of its services or at the end"""
+    offer = _heading_offer(
+        by_id_or_code(Offer.objects.select_related("project", "owned_by"), offer_id)
+    )
+    before = _heading_before(offer, data.before)
+    heading = OfferHeading(offer=offer, title=data.title, description=data.description)
+    errors = []
+    full_clean(heading, ["body", "data"], errors, exclude=["offer", "position"])
+    if errors:
+        raise ValidationError(errors)
+    with transaction.atomic():
+        place_heading(heading, before=before)
+        return _heading_result(offer, request, dry_run=dry_run, created=heading)
+
+
+@router.patch("/offers/headings/{int:heading_id}/", response=OfferOut)
+def offer_heading_update(
+    request, heading_id: int, data: OfferHeadingPatch, *, dry_run: DryRun = False
+):
+    """Change the title or the description of a heading or move it, only the
+    given fields"""
+    heading = get_object_or_404(
+        OfferHeading.objects.select_related("offer__project", "offer__owned_by"),
+        pk=heading_id,
+    )
+    offer = _heading_offer(heading.offer)
+    fields = data.model_dump(exclude_unset=True)
+    before = _heading_before(offer, fields.get("before"))
+    for field in ["title", "description"]:
+        if field in fields:
+            setattr(heading, field, fields[field] or "")
+    errors = []
+    full_clean(heading, ["body", "data"], errors, exclude=["offer"])
+    if errors:
+        raise ValidationError(errors)
+    with transaction.atomic():
+        heading.save()
+        if "before" in fields:
+            place_heading(heading, before=before)
+        return _heading_result(offer, request, dry_run=dry_run)
+
+
+@router.delete("/offers/headings/{int:heading_id}/", response=OfferOut)
+def offer_heading_delete(request, heading_id: int, *, dry_run: DryRun = False):
+    """Delete a heading, the services stay where they are"""
+    heading = get_object_or_404(
+        OfferHeading.objects.select_related("offer__project", "offer__owned_by"),
+        pk=heading_id,
+    )
+    offer = _heading_offer(heading.offer)
+    with transaction.atomic():
+        heading.delete()
+        return _heading_result(offer, request, dry_run=dry_run)

@@ -279,3 +279,80 @@ def update_offer(
         json=data,
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
+
+
+@offers.group("headings")
+def headings():
+    """Add, change and delete the headings between the services of an offer
+
+    Headings structure the services, they have no amounts. `wb offers show`
+    lists them with their IDs."""
+
+
+@headings.command("create")
+@click.argument("offer_id")
+@click.option("--title", required=True)
+@click.option("--description", help="The text, or - to read it from stdin.")
+@click.option(
+    "--before",
+    type=int,
+    help="ID of the service the heading comes before, at the end otherwise.",
+)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_heading(offer_id, title, description, before, dry_run, as_json):
+    """Add a heading to an offer (by ID or code) in preparation"""
+    data = {"title": title, "before": before}
+    if description is not None:
+        data["description"] = text_or_stdin(description)
+    data = request(
+        "POST",
+        f"offers/{offer_id}/headings/",
+        params={"dry_run": format_bool(dry_run)},
+        json=data,
+    )
+    _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
+
+
+@headings.command("update")
+@click.argument("heading_id", type=int)
+@click.option("--title")
+@click.option("--description", help="The text, or - to read it from stdin.")
+@click.option("--before", type=int, help="Move it in front of this service (by ID).")
+@click.option("--to-end", is_flag=True, help="Move it after the last service.")
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_heading(heading_id, title, description, before, to_end, dry_run, as_json):
+    """Change a heading or move it, only the given fields"""
+    if before is not None and to_end:
+        terminate("--before and --to-end contradict each other.")
+    data = {}
+    if title is not None:
+        data["title"] = title
+    if description is not None:
+        data["description"] = text_or_stdin(description)
+    if before is not None or to_end:
+        data["before"] = before
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"offers/headings/{heading_id}/",
+        params={"dry_run": format_bool(dry_run)},
+        json=data,
+    )
+    _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
+
+
+@headings.command("delete")
+@click.argument("heading_id", type=int)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def delete_heading(heading_id, dry_run, as_json):
+    """Delete a heading, the services stay where they are"""
+    data = request(
+        "DELETE",
+        f"offers/headings/{heading_id}/",
+        params={"dry_run": format_bool(dry_run)},
+    )
+    _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)

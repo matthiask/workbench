@@ -502,6 +502,17 @@ def save_positions(items):
             type(item).objects.filter(pk=item.pk).update(position=item.position)
 
 
+def place_heading(heading, *, before=None):
+    """Save the heading in front of the service ``before`` of its offer, or
+    at the end, and renumber the offer's services and headings"""
+    if heading.pk is None:
+        heading.save()
+    items = [item for item in heading.offer.items() if item != heading]
+    index = items.index(before) if before is not None else len(items)
+    items.insert(index, heading)
+    save_positions(items)
+
+
 def reorder_services(services, *, headings):
     """Services in a new order, the headings stay where they are: each keeps
     its place in the list of services and headings"""
