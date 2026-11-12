@@ -1,0 +1,47 @@
+{% load fineforms i18n %}
+<tr
+  id="{{ form_id }}"
+  data-service
+  {% if form.service_type %}data-autofill="{{ view.default_service_types_json }}"{% endif %}
+  {% if not form.in_offer.value %}hidden{% endif %}
+>
+  <td class="text-nowrap">
+    {% if editable %}
+      <span
+        class="btn btn-quiet btn-sm btn-icon wb-grabber"
+        title="{% translate 'Sort' %}"
+        data-sortable-grabber
+      >
+        {% include 'svg/grabber.svg' %}
+      </span>
+    {% endif %}
+    {{ form.in_offer }}
+    {% ff_errors form %}
+    {% ff_fields form exclude='in_offer,service_type,title,description,effort_type,effort_rate,effort_hours,cost,is_optional' %}
+  </td>
+  <td>
+    {% ff_field form.title %}
+    {% ff_field form.description %}
+  </td>
+  <td>
+    {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
+    {% ff_field form.effort_type %}
+  </td>
+  <td data-effort-rate>{% ff_field form.effort_rate %}</td>
+  <td data-effort-hours>{% ff_field form.effort_hours %}</td>
+  <td data-cost>{% ff_field form.cost %}</td>
+  <td data-optional>{% ff_field form.is_optional %}</td>
+  <td class="text-end text-nowrap">
+    <span data-service-cost></span>
+    {% if editable %}
+      <button
+        type="button"
+        class="btn btn-quiet btn-sm btn-icon"
+        title="{% translate 'Remove from offer' %}"
+        data-remove-row
+      >
+        &times;
+      </button>
+    {% endif %}
+  </td>
+</tr>

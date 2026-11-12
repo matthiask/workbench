@@ -10,7 +10,7 @@ from django.utils.translation import gettext, gettext_lazy as _, override
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization
-from workbench.offers.models import Offer
+from workbench.offers.models import Offer, OfferHeading
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.formats import local_date_format
@@ -150,7 +150,12 @@ class OfferForm(PostalAddressSelectionForm):
                     "offer": self.instance,
                     "editable": self.services_changeable,
                 },
-            )
+            ),
+            "headings": HeadingFormset(
+                self.data or None,
+                instance=self.instance,
+                form_kwargs={"editable": self.services_changeable},
+            ),
         }
 
         self.order_fields(
@@ -250,10 +255,32 @@ class OfferForm(PostalAddressSelectionForm):
             ),
         }
 
+    def rows(self):
+        """The forms of services and headings in the order they're shown
+        (the services without offer are hidden rows)"""
+
+        def position(form):
+            try:
+                return int(form["position"].value())
+            except TypeError, ValueError:
+                return 0
+
+        return sorted(
+            [
+                *(("heading", form) for form in self.formsets["headings"]),
+                *(("service", form) for form in self.formsets["services"]),
+            ],
+            key=lambda row: (position(row[1]), row[0] == "service"),
+        )
+
     def is_valid(self):
         return all([
             super().is_valid(),
-            not self.services_changeable or self.formsets["services"].is_valid(),
+            *(
+                formset.is_valid()
+                for formset in self.formsets.values()
+                if self.services_changeable
+            ),
         ])
 
     def save(self):
@@ -261,7 +288,8 @@ class OfferForm(PostalAddressSelectionForm):
         if not instance.pk:
             instance.save()
         if self.services_changeable:
-            self.formsets["services"].save()
+            for formset in self.formsets.values():
+                formset.save()
         # Totals of the services
         instance.save()
         if instance.status in Offer.NOT_PURSUED and self.cleaned_data.get(
@@ -317,6 +345,10 @@ class ServiceForm(forms.ModelForm):
             for field in self.fields.values():
                 field.disabled = True
 
+    def clean_position(self):
+        # Services without position are added at the end when saving
+        return self.cleaned_data.get("position") or 0
+
     def has_changed(self):
         if not self.instance.pk:
             # Empty new rows are skipped, also when they have been moved, and
@@ -354,6 +386,37 @@ class ServiceFormsetBase(BaseInlineFormSet):
                 services = services.none()
             self._queryset = services.select_related("project")
         return self._queryset
+
+
+class HeadingForm(forms.ModelForm):
+    class Meta:
+        model = OfferHeading
+        fields = ["position", "title", "description"]
+        widgets = {
+            "position": forms.HiddenInput,
+            "description": Textarea({"rows": 1, "class": "wb-autogrow"}),
+        }
+
+    def __init__(self, *args, editable, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["position"].required = False
+        if not editable:
+            for field in self.fields.values():
+                field.disabled = True
+
+    def has_changed(self):
+        if not self.instance.pk:
+            # Empty new rows are skipped, also when they have been moved
+            return bool(set(self.changed_data) - {"position"})
+        return super().has_changed()
+
+    def clean_position(self):
+        return self.cleaned_data.get("position") or 0
+
+
+HeadingFormset = inlineformset_factory(
+    Offer, OfferHeading, form=HeadingForm, extra=0, can_delete=True
+)
 
 
 ServiceFormset = inlineformset_factory(

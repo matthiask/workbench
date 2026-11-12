@@ -648,6 +648,21 @@ tbody th > a {
   margin-bottom: 0;
 }
 
+// Headings structure the services of offers
+.table-offer-pricing .wb-offer-heading {
+  input[name$="-title"] {
+    font-weight: 600;
+  }
+
+  td {
+    background: var(--bs-tertiary-bg);
+  }
+}
+
+.wb-service-heading {
+  background: var(--bs-tertiary-bg);
+}
+
 .table-offer-pricing tbody .form-group + .form-group {
   margin-top: 0.25rem;
 }

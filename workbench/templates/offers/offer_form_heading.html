@@ -1,0 +1,38 @@
+{% load fineforms i18n %}
+<tr id="{{ form_id }}" data-heading class="wb-offer-heading" {% if form.DELETE.value %}hidden{% endif %}>
+  <td class="text-nowrap">
+    {% if editable %}
+      <span
+        class="btn btn-quiet btn-sm btn-icon wb-grabber"
+        title="{% translate 'Sort' %}"
+        data-sortable-grabber
+      >
+        {% include 'svg/grabber.svg' %}
+      </span>
+    {% endif %}
+    {% if form.DELETE %}<input
+        type="checkbox"
+        name="{{ form.DELETE.html_name }}"
+        hidden
+        {% if form.DELETE.value %}checked{% endif %}
+      >{% endif %}
+    {% ff_errors form %}
+    {% ff_fields form exclude='title,description,DELETE' %}
+  </td>
+  <td colspan="6">
+    {% ff_field form.title %}
+    {% ff_field form.description %}
+  </td>
+  <td class="text-end">
+    {% if editable %}
+      <button
+        type="button"
+        class="btn btn-quiet btn-sm btn-icon"
+        title="{% translate 'Delete' %}"
+        data-remove-row
+      >
+        &times;
+      </button>
+    {% endif %}
+  </td>
+</tr>

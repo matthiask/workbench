@@ -529,7 +529,7 @@ class Project(Model):
         total_logged_hours_rate_undefined = Z1
 
         offers = self.offers.select_related("owned_by").prefetch_related(
-            Prefetch("deals", Deal.objects.select_related("owned_by"))
+            Prefetch("deals", Deal.objects.select_related("owned_by")), "headings"
         )
         offers_map = {offer.id: offer for offer in offers}
         services_by_offer = defaultdict(
@@ -670,6 +670,20 @@ class Project(Model):
             services_by_offer[offers_map.get(service.offer_id)]["services"].append(row)
 
         for offer, offer_data in services_by_offer.items():
+            # Services and the offer's headings in the order they're shown
+            offer_data["items"] = sorted(
+                [
+                    *offer_data["services"],
+                    *(
+                        {"heading": heading}
+                        for heading in (offer.headings.all() if offer else ())
+                    ),
+                ],
+                key=lambda item: (
+                    (item.get("heading") or item.get("service")).position,
+                    "heading" not in item,
+                ),
+            )
             offer_data["service_hours"] = service_hours[offer]
             offer_data["logged_hours"] = logged_hours[offer]
             offer_data["surcharge"] = surcharge[offer]

@@ -443,5 +443,70 @@ class Offer(ModelWithTotal):
                     new.effort_type = gettext("flat rate")
                 new.effort_rate = project.flat_rate
             new.save(skip_related_model=True)
+        for heading in self.headings.all():
+            OfferHeading.objects.create(
+                offer=offer,
+                title=heading.title,
+                description=heading.description,
+                position=heading.position,
+            )
         offer.save()
         return offer
+
+    def items(self):
+        """The services and headings in the order they are shown"""
+        return offer_items(services=self.services.all(), headings=self.headings.all())
+
+
+class OfferHeading(models.Model):
+    """Headings structure the services of an offer. They share the
+    positions of the offer's services and have no amounts"""
+
+    offer = models.ForeignKey(
+        Offer,
+        on_delete=models.CASCADE,
+        related_name="headings",
+        verbose_name=_("offer"),
+    )
+    title = models.CharField(_("title"), max_length=200)
+    description = models.TextField(_("description"), blank=True)
+    position = models.IntegerField(_("position"), default=0)
+
+    class Meta:
+        ordering = ["position", "pk"]
+        verbose_name = _("heading")
+        verbose_name_plural = _("headings")
+
+    def __str__(self):
+        return self.title
+
+
+def offer_items(*, services, headings):
+    """Services and headings ordered by their position, headings first when
+    positions are equal"""
+    return sorted(
+        [*services, *headings],
+        key=lambda item: (
+            item.position,
+            not isinstance(item, OfferHeading),
+            item.pk or 0,
+        ),
+    )
+
+
+def save_positions(items):
+    """Positions 10, 20, ... for services and headings in this order"""
+    for index, item in enumerate(items, 1):
+        if item.position != 10 * index:
+            item.position = 10 * index
+            type(item).objects.filter(pk=item.pk).update(position=item.position)
+
+
+def reorder_services(services, *, headings):
+    """Services in a new order, the headings stay where they are: each keeps
+    its place in the list of services and headings"""
+    items = offer_items(services=services, headings=headings)
+    ordered = iter(services)
+    save_positions([
+        item if isinstance(item, OfferHeading) else next(ordered) for item in items
+    ])

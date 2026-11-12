@@ -37,7 +37,7 @@ from workbench.invoices.models import (
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.notes.models import TARGETS as NOTE_TARGETS, Note, visible_content_types
-from workbench.offers.models import Offer
+from workbench.offers.models import Offer, OfferHeading
 from workbench.planning.models import (
     ExternalWork,
     Milestone,
@@ -442,7 +442,7 @@ def _offers_offer_cfg(user):
     }
     if user.features[FEATURES.CONTROLLING]:
         fields |= WITH_TOTAL
-    return {"fields": fields}
+    return {"fields": fields, "related": [(OfferHeading, "offer_id")]}
 
 
 def _projects_campaign_cfg(user):
@@ -610,6 +610,7 @@ HISTORY = {
     LoggedCost: _logbook_loggedcost_cfg,
     LoggedHours: _logbook_loggedhours_cfg,
     Offer: _offers_offer_cfg,
+    OfferHeading: {"fields": EVERYTHING},
     PlannedWork: {"fields": EVERYTHING},
     ExternalWork: {"fields": EVERYTHING},
     Holiday: {"fields": EVERYTHING},

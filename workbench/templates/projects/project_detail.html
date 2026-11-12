@@ -532,165 +532,191 @@
           data-sortable-url="{% url 'projects_service_set_order' %}"
         {% endif %}
       >
-        {% for row in offer_data.services %}
-          <div
-            class="list-group-item wb-service"
-            {% if row.service.pk %}id="service{{ row.service.pk }}" data-sortable-item="{{ row.service.pk }}"{% endif %}
-          >
-            <div class="wb-service-main">
-              <div class="wb-service-title">
-                <span>{{ row.service.title }}</span>
-                {% if row.service.is_optional %}
-                  <em class="text-secondary">({% translate 'optional' %})</em>
-                {% endif %}
-                {% pin row.service request.user %}
-                {% history_link row.service %}
+        {% for row in offer_data.items %}
+          {% if row.heading %}
+            <div
+              class="list-group-item wb-service wb-service-heading"
+              data-sortable-item="heading-{{ row.heading.pk }}"
+            >
+              <div class="wb-service-main">
+                <div class="wb-service-title"><strong>{{ row.heading.title }}</strong></div>
+                {% clamped row.heading.description "" "wb-service-description" %}
               </div>
-              {% clamped row.service.description row.service.external_reference "wb-service-description" %}
-            </div>
-
-            <div class="wb-figures">
-              {% if row.service.pk %}
-                <a
-                  class="wb-figure"
-                  href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}"
-                >
-                  <span>{{ row.logged_hours|hours }}</span>
-                  {% if row.surcharge %}<span
-                      class="wb-stat-of"
-                      title="{% translate 'hours for invoicing' %}"
-                    >+{{ row.surcharge|hours }}</span>{% endif %}
-                  {% if row.service.service_hours %}<span class="wb-stat-of">/
-                      {{ row.service.service_hours|hours }}</span>{% endif %}
-                  {% if row.service.effort_type %}
-                    <span class="wb-figure-note">{{ row.service.effort_type }}</span>
-                  {% elif row.logged_hours or row.service.service_hours %}
-                    <span class="wb-figure-note text-warning">{% translate 'undefined rate' %}</span>
-                  {% endif %}
-                  {% bar row.logged_hours row.service.service_hours surcharge=row.surcharge unit="hours" %}
-                </a>
-              {% endif %}
-              {% if row.logged_cost or row.service.cost %}
-                <a class="wb-figure" href="{% url 'logbook_loggedcost_list' %}?service={{ row.service.pk }}">
-                  <span>{{ row.logged_cost|currency }}</span>
-                  <span class="wb-stat-of">/ {{ row.service.cost|default:0|currency }}</span>
-                  {% if row.service.pk %}
-                    {% bar row.logged_cost row.service.cost %}
-                  {% endif %}
-                </a>
-              {% endif %}
-            </div>
-
-            <div class="wb-row-actions">
-              {% if row.service.pk and not offer or row.service.pk and offer.services_changeable %}
-                <span
-                  class="btn btn-quiet btn-sm btn-icon wb-grabber"
-                  title="{% translate 'Sort' %}"
-                  data-sortable-grabber
-                >
-                  {% include 'svg/grabber.svg' %}
-                </span>
-              {% endif %}
-              {% if row.service.is_logging_allowed and row.service.pk %}
-                <a
-                  href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
-                  class="btn btn-quiet btn-sm btn-icon"
-                  title="{% translate 'log hours' %}"
-                  data-ajaxmodal
-                >
-                  {% include "svg/plus.svg" %}
-                </a>
-              {% endif %}
-              {% if row.service.pk and request.user.features.CONTROLLING %}
-                <a
-                  href="{{ row.service.urls.update }}"
-                  class="btn btn-quiet btn-sm btn-icon"
-                  title="{% translate 'Update' %}"
-                  data-ajaxmodal
-                >
-                  {% include "svg/pencil.svg" %}
-                </a>
-              {% endif %}
-              {% if row.service.pk and request.user.features.CONTROLLING or row.service.pk and request.user.features.PLANNING or row.service.is_logging_allowed %}
-                <span class="dropdown">
-                  <button
-                    class="btn btn-quiet btn-sm btn-icon"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                    title="{% translate 'More actions' %}"
+              <div class="wb-row-actions">
+                {% if offer.services_changeable %}
+                  <span
+                    class="btn btn-quiet btn-sm btn-icon wb-grabber"
+                    title="{% translate 'Sort' %}"
+                    data-sortable-grabber
                   >
-                    {% include 'svg/kebab-horizontal.svg' %}
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-end">
-                    {% if row.service.is_logging_allowed %}
-                      <a
-                        class="dropdown-item"
-                        href="{{ project.urls.createcost }}?service={{ row.service.pk|default:'' }}"
-                        data-ajaxmodal
-                      >
-                        {% include "svg/plus.svg" %}
-                        {% translate 'Cost' %}
-                      </a>
-                    {% endif %}
-                    {% if row.service.pk and request.user.features.PLANNING %}
-                      <a
-                        class="dropdown-item"
-                        href="{{ project.urls.creatework }}?service={{ row.service.pk }}"
-                        data-ajaxmodal
-                      >
-                        {% translate 'Plan work' %}
-                      </a>
-                    {% endif %}
-                    {% if row.service.pk and request.user.features.CONTROLLING %}
-                      <div class="dropdown-divider"></div>
-                      <h6 class="dropdown-header">{% translate 'service'|capfirst %}</h6>
-                      <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-ajaxmodal>
-                        {% translate 'Reassign logbook entries' %}
-                      </a>
-                      <a class="dropdown-item" href="{{ row.service.urls.merge }}" data-ajaxmodal>
-                        {% translate 'Merge into another service' %}
-                      </a>
-                      <a class="dropdown-item" href="{{ row.service.urls.move }}" data-ajaxmodal>
-                        {% translate 'Move to other project' %}
-                      </a>
-                      <a
-                        class="dropdown-item"
-                        href="{{ project.urls.logbook_batch_update_hours }}?service={{ row.service.pk }}"
-                      >
-                        {% translate 'Logbook batch update' %}: {% translate 'Hours' %}
-                      </a>
-                      <a
-                        class="dropdown-item"
-                        href="{{ project.urls.logbook_batch_update_costs }}?service={{ row.service.pk }}"
-                      >
-                        {% translate 'Logbook batch update' %}: {% translate 'Costs' %}
-                      </a>
-                      <a class="dropdown-item text-danger" href="{{ row.service.urls.delete }}" data-ajaxmodal>
-                        {% translate 'Delete' %}
-                      </a>
-                      {% if not row.service.effort_rate %}
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">{% translate 'Assign service type' %}:</h6>
-                        {% for service_type in view.default_service_types %}
-                          <a
-                            class="dropdown-item"
-                            href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}"
-                          >
-                            <div class="d-flex w-100 justify-content-between gap-3">
-                              <span>{{ service_type.title }}</span>
-                              <span>{{ service_type.hourly_rate|currency }}</span>
-                            </div>
-                          </a>
-                        {% endfor %}
-                      {% endif %}
-                    {% endif %}
-                  </div>
-                </span>
-              {% endif %}
+                    {% include 'svg/grabber.svg' %}
+                  </span>
+                {% endif %}
+              </div>
             </div>
-          </div>
+          {% else %}
+            <div
+              class="list-group-item wb-service"
+              {% if row.service.pk %}
+                id="service{{ row.service.pk }}"
+                data-sortable-item="{{ row.service.pk }}"
+              {% endif %}
+            >
+              <div class="wb-service-main">
+                <div class="wb-service-title">
+                  <span>{{ row.service.title }}</span>
+                  {% if row.service.is_optional %}
+                    <em class="text-secondary">({% translate 'optional' %})</em>
+                  {% endif %}
+                  {% pin row.service request.user %}
+                  {% history_link row.service %}
+                </div>
+                {% clamped row.service.description row.service.external_reference "wb-service-description" %}
+              </div>
+
+              <div class="wb-figures">
+                {% if row.service.pk %}
+                  <a
+                    class="wb-figure"
+                    href="{% url 'logbook_loggedhours_list' %}?service={{ row.service.pk }}"
+                  >
+                    <span>{{ row.logged_hours|hours }}</span>
+                    {% if row.surcharge %}<span
+                        class="wb-stat-of"
+                        title="{% translate 'hours for invoicing' %}"
+                      >+{{ row.surcharge|hours }}</span>{% endif %}
+                    {% if row.service.service_hours %}<span class="wb-stat-of">/
+                        {{ row.service.service_hours|hours }}</span>{% endif %}
+                    {% if row.service.effort_type %}
+                      <span class="wb-figure-note">{{ row.service.effort_type }}</span>
+                    {% elif row.logged_hours or row.service.service_hours %}
+                      <span class="wb-figure-note text-warning">{% translate 'undefined rate' %}</span>
+                    {% endif %}
+                    {% bar row.logged_hours row.service.service_hours surcharge=row.surcharge unit="hours" %}
+                  </a>
+                {% endif %}
+                {% if row.logged_cost or row.service.cost %}
+                  <a class="wb-figure" href="{% url 'logbook_loggedcost_list' %}?service={{ row.service.pk }}">
+                    <span>{{ row.logged_cost|currency }}</span>
+                    <span class="wb-stat-of">/ {{ row.service.cost|default:0|currency }}</span>
+                    {% if row.service.pk %}
+                      {% bar row.logged_cost row.service.cost %}
+                    {% endif %}
+                  </a>
+                {% endif %}
+              </div>
+
+              <div class="wb-row-actions">
+                {% if row.service.pk and not offer or row.service.pk and offer.services_changeable %}
+                  <span
+                    class="btn btn-quiet btn-sm btn-icon wb-grabber"
+                    title="{% translate 'Sort' %}"
+                    data-sortable-grabber
+                  >
+                    {% include 'svg/grabber.svg' %}
+                  </span>
+                {% endif %}
+                {% if row.service.is_logging_allowed and row.service.pk %}
+                  <a
+                    href="{{ project.urls.createhours }}?service={{ row.service.pk }}"
+                    class="btn btn-quiet btn-sm btn-icon"
+                    title="{% translate 'log hours' %}"
+                    data-ajaxmodal
+                  >
+                    {% include "svg/plus.svg" %}
+                  </a>
+                {% endif %}
+                {% if row.service.pk and request.user.features.CONTROLLING %}
+                  <a
+                    href="{{ row.service.urls.update }}"
+                    class="btn btn-quiet btn-sm btn-icon"
+                    title="{% translate 'Update' %}"
+                    data-ajaxmodal
+                  >
+                    {% include "svg/pencil.svg" %}
+                  </a>
+                {% endif %}
+                {% if row.service.pk and request.user.features.CONTROLLING or row.service.pk and request.user.features.PLANNING or row.service.is_logging_allowed %}
+                  <span class="dropdown">
+                    <button
+                      class="btn btn-quiet btn-sm btn-icon"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      title="{% translate 'More actions' %}"
+                    >
+                      {% include 'svg/kebab-horizontal.svg' %}
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                      {% if row.service.is_logging_allowed %}
+                        <a
+                          class="dropdown-item"
+                          href="{{ project.urls.createcost }}?service={{ row.service.pk|default:'' }}"
+                          data-ajaxmodal
+                        >
+                          {% include "svg/plus.svg" %}
+                          {% translate 'Cost' %}
+                        </a>
+                      {% endif %}
+                      {% if row.service.pk and request.user.features.PLANNING %}
+                        <a
+                          class="dropdown-item"
+                          href="{{ project.urls.creatework }}?service={{ row.service.pk }}"
+                          data-ajaxmodal
+                        >
+                          {% translate 'Plan work' %}
+                        </a>
+                      {% endif %}
+                      {% if row.service.pk and request.user.features.CONTROLLING %}
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">{% translate 'service'|capfirst %}</h6>
+                        <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-ajaxmodal>
+                          {% translate 'Reassign logbook entries' %}
+                        </a>
+                        <a class="dropdown-item" href="{{ row.service.urls.merge }}" data-ajaxmodal>
+                          {% translate 'Merge into another service' %}
+                        </a>
+                        <a class="dropdown-item" href="{{ row.service.urls.move }}" data-ajaxmodal>
+                          {% translate 'Move to other project' %}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="{{ project.urls.logbook_batch_update_hours }}?service={{ row.service.pk }}"
+                        >
+                          {% translate 'Logbook batch update' %}: {% translate 'Hours' %}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="{{ project.urls.logbook_batch_update_costs }}?service={{ row.service.pk }}"
+                        >
+                          {% translate 'Logbook batch update' %}: {% translate 'Costs' %}
+                        </a>
+                        <a class="dropdown-item text-danger" href="{{ row.service.urls.delete }}" data-ajaxmodal>
+                          {% translate 'Delete' %}
+                        </a>
+                        {% if not row.service.effort_rate %}
+                          <div class="dropdown-divider"></div>
+                          <h6 class="dropdown-header">{% translate 'Assign service type' %}:</h6>
+                          {% for service_type in view.default_service_types %}
+                            <a
+                              class="dropdown-item"
+                              href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}"
+                            >
+                              <div class="d-flex w-100 justify-content-between gap-3">
+                                <span>{{ service_type.title }}</span>
+                                <span>{{ service_type.hourly_rate|currency }}</span>
+                              </div>
+                            </a>
+                          {% endfor %}
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
         {% empty %}
           <div class="list-group-item text-secondary">
             {% translate 'No services yet.' %}

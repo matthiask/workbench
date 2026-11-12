@@ -801,14 +801,16 @@ function initWidgets() {
       form.querySelector("[data-optional-total-row]").hidden = !optionalTotal
     }
 
-    const services = form.querySelector("[data-services]")
-    // Services are numbered in the order they're shown
+    const rows = form.querySelector("[data-services]")
+    // Services and headings are numbered in the order they're shown, the
+    // hidden services without offer keep their positions
     const renumber = () => {
-      services
-        .querySelectorAll("[data-service]:not([hidden])")
-        .forEach((service, index) => {
-          service.querySelector("input[name$='-position']").value =
-            10 * (index + 1)
+      rows
+        .querySelectorAll(
+          ":is([data-service], [data-heading]):not([hidden]) input[name$='-position']",
+        )
+        .forEach((input, index) => {
+          input.value = 10 * (index + 1)
         })
     }
     const existing = form.querySelector("[data-existing-services]")
@@ -820,22 +822,26 @@ function initWidgets() {
       }
     }
 
-    if (services && form.querySelector("[data-sortable-grabber]")) {
-      Sortable.create(services, {
-        draggable: "[data-service]",
+    if (rows && form.querySelector("[data-sortable-grabber]")) {
+      Sortable.create(rows, {
+        draggable: "[data-service], [data-heading]",
         handle: "[data-sortable-grabber]",
-        onEnd: renumber,
       })
+      form.addEventListener("submit", renumber)
     }
 
     form.addEventListener("click", (e) => {
-      const remove = e.target.closest("[data-remove-service]")
+      const remove = e.target.closest("[data-remove-row]")
       if (remove) {
-        const service = remove.closest("[data-service]")
-        service.querySelector("input[name$='-in_offer']").checked = false
-        service.hidden = true
-        const item = form.querySelector(`[data-add-service="${service.id}"]`)
-        if (item) item.hidden = false
+        const row = remove.closest("[data-service], [data-heading]")
+        row.hidden = true
+        if (row.matches("[data-heading]")) {
+          row.querySelector("input[name$='-DELETE']").checked = true
+        } else {
+          row.querySelector("input[name$='-in_offer']").checked = false
+          const item = form.querySelector(`[data-add-service="${row.id}"]`)
+          if (item) item.hidden = false
+        }
         updateExisting()
         recalculate()
         return
@@ -843,14 +849,24 @@ function initWidgets() {
 
       const add = e.target.closest("[data-add-service]")
       if (add) {
-        const service = document.getElementById(add.dataset.addService)
-        service.querySelector("input[name$='-in_offer']").checked = true
-        service.hidden = false
-        services.append(service)
+        const row = document.getElementById(add.dataset.addService)
+        row.querySelector("input[name$='-in_offer']").checked = true
+        row.hidden = false
+        rows.append(row)
         add.hidden = true
-        renumber()
         updateExisting()
         recalculate()
+        return
+      }
+
+      const addRow = e.target.closest("[data-add-row]")
+      if (addRow) {
+        const slug = addRow.dataset.addRow
+        const index = document.getElementById(`id_${slug}-TOTAL_FORMS`).value
+        window.addInlineForm(slug)
+        const row = document.getElementById(`${slug}-${index}`)
+        rows.append(row)
+        row.querySelector("input[name$='-title']")?.focus()
       }
     })
 

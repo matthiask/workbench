@@ -469,6 +469,16 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (agencies and their clients, departments of a city), `other-customer` in
   `ignore_warnings` in the API.
   Web views and API share `RelatedOfferForm` in `workbench/deals/forms.py`.
+- Offers have headings (`OfferHeading`: a title and an optional
+  description, no amounts) between their services, for structure only.
+  They share the positions of the offer's services: `Offer.items()` and
+  `offer_items()` merge both, `save_positions()` renumbers a mixed list,
+  `reorder_services()` reorders only the services and keeps the headings
+  in their place. The offer form edits services and headings in one table
+  (two formsets, renumbered when submitting; the project's services
+  without offer are hidden rows which can be added), the project page
+  sorts both (`set_order` takes `heading-<id>`), the PDF shows them as
+  headings and copies of offers keep them.
 - The owner of a deal always contributes to it (`DealForm.clean()`); the
   accepted deals report splits a deal's value between the contributors by
   weight. The API adds the owner with weight 100 when creating deals;

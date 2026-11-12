@@ -244,20 +244,38 @@ def assign_service_type(request, pk):
 
 
 def set_order(request):
-    ids = request.POST.getlist("ids")
+    """Services and headings (``heading-<id>``) of an offer, or the services
+    without offer of a project, in their new order"""
+    from workbench.offers.models import Offer, OfferHeading, save_positions
+
+    keys = []  # (model, id)
+    for id in request.POST.getlist("ids"):
+        model, _sep, pk = id.rpartition("-")
+        if pk.isdigit() and model in {"", "heading"}:
+            keys.append((OfferHeading if model else Service, int(pk)))
+    service_ids = [pk for model, pk in keys if model is Service]
+    heading_ids = [pk for model, pk in keys if model is OfferHeading]
+    objects = {
+        Service: Service.objects.in_bulk(service_ids),
+        OfferHeading: OfferHeading.objects.in_bulk(heading_ids),
+    }
     # Services of offers which have been sent stay as they were sent
     if (
         Service.objects
-        .filter(id__in=ids)
+        .filter(id__in=service_ids)
         .exclude(id__in=Service.objects.editable())
+        .exists()
+        or OfferHeading.objects
+        .filter(id__in=heading_ids)
+        .exclude(offer__status__in=[Offer.IN_PREPARATION, Offer.SERVICE_GROUP])
         .exists()
     ):
         return HttpResponse(
             _("Services of offers which have been sent can't be reordered."),
             status=403,
         )
-    for index, id in enumerate(ids):
-        Service.objects.filter(id=id).update(position=10 * (index + 1))
+    items = [objects[model].get(pk) for model, pk in keys]
+    save_positions([item for item in items if item])
     return HttpResponse("OK", status=202)  # Accepted
 
 

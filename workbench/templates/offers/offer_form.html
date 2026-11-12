@@ -16,7 +16,7 @@
 {% block form_attrs %}data-offer-form{% endblock %}
 
 {% block fields %}
-  {% with services=form.formsets.services editable=form.services_changeable titles=form.total_titles %}
+  {% with services=form.formsets.services headings=form.formsets.headings editable=form.services_changeable titles=form.total_titles %}
     <section class="card mb-3">
       <div class="card-body">
         <div class="row">
@@ -72,64 +72,32 @@
           </tr>
         </thead>
         <tbody data-services>
-          {% formset services "services" %}
-          <tr
-            id="{{ form_id }}"
-            data-service
-            {% if form.service_type %}data-autofill="{{ view.default_service_types_json }}"{% endif %}
-            {% if not form.in_offer.value %}hidden{% endif %}
-          >
-            <td class="text-nowrap">
-              {% if editable %}
-                <span
-                  class="btn btn-quiet btn-sm btn-icon wb-grabber"
-                  title="{% translate 'Sort' %}"
-                  data-sortable-grabber
-                >
-                  {% include 'svg/grabber.svg' %}
-                </span>
-              {% endif %}
-              {{ form.in_offer }}
-              {% ff_errors form %}
-              {% ff_fields form exclude='in_offer,service_type,title,description,effort_type,effort_rate,effort_hours,cost,is_optional' %}
-            </td>
-            <td>
-              {% ff_field form.title %}
-              {% ff_field form.description %}
-            </td>
-            <td>
-              {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
-              {% ff_field form.effort_type %}
-            </td>
-            <td data-effort-rate>{% ff_field form.effort_rate %}</td>
-            <td data-effort-hours>{% ff_field form.effort_hours %}</td>
-            <td data-cost>{% ff_field form.cost %}</td>
-            <td data-optional>{% ff_field form.is_optional %}</td>
-            <td class="text-end text-nowrap">
-              <span data-service-cost></span>
-              {% if editable %}
-                <button
-                  type="button"
-                  class="btn btn-quiet btn-sm btn-icon"
-                  title="{% translate 'Remove from offer' %}"
-                  data-remove-service
-                >
-                  &times;
-                </button>
-              {% endif %}
-            </td>
-          </tr>
-          {% endformset %}
+          {{ services.management_form }}
+          {{ headings.management_form }}
+          {% if editable %}
+            <script type="text/template" id="services-empty">
+              {% include "offers/offer_form_service.html" with form=services.empty_form form_id="services-empty" %}
+            </script>
+            <script type="text/template" id="headings-empty">
+              {% include "offers/offer_form_heading.html" with form=headings.empty_form form_id="headings-empty" %}
+            </script>
+          {% endif %}
+          {% for kind, row in form.rows %}
+            {% if kind == "heading" %}
+              {% include "offers/offer_form_heading.html" with form=row form_id=row.prefix %}
+            {% else %}
+              {% include "offers/offer_form_service.html" with form=row form_id=row.prefix %}
+            {% endif %}
+          {% endfor %}
         </tbody>
         {% if editable %}
           <tbody>
             <tr>
               <td colspan="8">
-                <a
-                  href="#"
-                  class="btn btn-quiet btn-sm"
-                  onclick="return addInlineForm('services')"
-                >{% include 'svg/plus.svg' %} {% translate 'New service' %}</a>
+                <button type="button" class="btn btn-quiet btn-sm" data-add-row="services">
+                  {% include 'svg/plus.svg' %}
+                  {% translate 'New service' %}
+                </button>
                 <span class="dropdown" data-existing-services>
                   <button
                     type="button"
@@ -146,7 +114,7 @@
                         <button
                           type="button"
                           class="dropdown-item"
-                          data-add-service="services-{{ forloop.counter0 }}"
+                          data-add-service="{{ service_form.prefix }}"
                           {% if service_form.in_offer.value %}hidden{% endif %}
                         >
                           <strong>{{ service_form.instance.title }}</strong>
@@ -156,6 +124,10 @@
                     {% endfor %}
                   </div>
                 </span>
+                <button type="button" class="btn btn-quiet btn-sm" data-add-row="headings">
+                  {% include 'svg/plus.svg' %}
+                  {% translate 'heading'|capfirst %}
+                </button>
               </td>
             </tr>
           </tbody>

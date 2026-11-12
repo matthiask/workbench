@@ -389,6 +389,13 @@ class PDFDocument(_PDFDocument):
         )
         self.spacer(1 * mm)
 
+    def heading_row(self, heading):
+        self.spacer(2 * mm)
+        self.h3(heading.title)
+        if heading.description.strip():
+            self.p(heading.description.strip())
+        self.spacer(1 * mm)
+
     def table_services(self, services, *, show_details=False):
         if not services:
             return
@@ -402,7 +409,11 @@ class PDFDocument(_PDFDocument):
         self.spacer(2 * mm)
 
         for service in services:
-            fn(service)
+            # Offers' headings have no amounts
+            if not hasattr(service, "service_cost"):
+                self.heading_row(service)
+            else:
+                fn(service)
             # + list(chain.from_iterable(fn(service) for service in services)),
 
     def table_total(self, instance, *, optional_total=None):
@@ -517,7 +528,7 @@ class PDFDocument(_PDFDocument):
         self.spacer(2 * mm)
         services = offer.services.all()
         self.table_services(
-            services,
+            offer.items(),
             show_details=offer.show_service_details,
         )
         self.table_total(

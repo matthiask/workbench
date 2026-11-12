@@ -41,6 +41,7 @@ def prune_audit():
             "projects_service",
             "projects_project",
             "offers_offer",
+            "offers_offerheading",
             "invoices_recurringinvoice",
             "invoices_invoice",
             "invoices_service",

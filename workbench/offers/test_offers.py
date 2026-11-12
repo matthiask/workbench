@@ -11,7 +11,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.audit.models import LoggedAction
 from workbench.invoices.models import Invoice
-from workbench.offers.models import Offer
+from workbench.offers.models import Offer, OfferHeading, reorder_services
 from workbench.projects.models import Project, Service
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
@@ -33,16 +33,25 @@ def service_data(service, **kwargs):
     } | kwargs
 
 
-def services_formset(*services):
-    """The services' formset of the offer form"""
+def _formset(prefix, rows):
     data = {
-        "services-TOTAL_FORMS": len(services),
-        "services-INITIAL_FORMS": sum("id" in service for service in services),
-        "services-MAX_NUM_FORMS": 1000,
+        f"{prefix}-TOTAL_FORMS": len(rows),
+        f"{prefix}-INITIAL_FORMS": sum("id" in row for row in rows),
+        f"{prefix}-MAX_NUM_FORMS": 1000,
     }
-    for index, service in enumerate(services):
-        data |= {f"services-{index}-{key}": value for key, value in service.items()}
+    for index, row in enumerate(rows):
+        data |= {f"{prefix}-{index}-{key}": value for key, value in row.items()}
     return data
+
+
+def services_formset(*services):
+    """The services' formset of the offer form (and no headings)"""
+    return _formset("services", services) | headings_formset()
+
+
+def headings_formset(*headings):
+    """The headings' formset of the offer form"""
+    return _formset("headings", headings)
 
 
 def offer_form_data(offer, *services, **kwargs):
@@ -938,6 +947,141 @@ class OffersTest(TestCase):
             '<input type="number" name="services-0-effort_rate" step="0.01" class="form-control" disabled id="id_services-0-effort_rate">',
             html=True,
         )
+
+    def test_offer_form_headings(self):
+        """Headings are added, changed, moved and deleted between the
+        services of the offer"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
+        first = factories.ServiceFactory.create(offer=offer, project=offer.project)
+        second = factories.ServiceFactory.create(offer=offer, project=offer.project)
+
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(offer.urls["update"])
+        self.assertContains(response, 'name="headings-__prefix__-title"')
+        self.assertContains(response, 'data-add-row="headings"')
+
+        response = self.client.post(
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(first, position=20),
+                service_data(second, position=40),
+            )
+            | headings_formset(
+                {"title": "Concept", "description": "Ideas", "position": 10},
+                {"title": "Implementation", "position": 30},
+                # Left empty, and one which was removed again
+                {"position": 50},
+                {"title": "Removed", "position": 60, "DELETE": "on"},
+            ),
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        concept, implementation = offer.headings.all()
+        self.assertEqual(offer.items(), [concept, first, implementation, second])
+        self.assertEqual(concept.description, "Ideas")
+
+        # Headings move independently of the services
+        response = self.client.post(
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(first, position=20),
+                service_data(second, position=30),
+            )
+            | headings_formset(
+                {"id": concept.id, "title": "Concept", "position": 10},
+                {
+                    "id": implementation.id,
+                    "title": "Later",
+                    "position": 40,
+                    "DELETE": "on",
+                },
+            ),
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        offer.refresh_from_db()
+        self.assertEqual(offer.items(), [concept, first, second])
+
+        response = self.client.get(offer.project.get_absolute_url())
+        self.assertContains(response, f'data-sortable-item="heading-{concept.pk}"')
+
+        pdf = self.client.get(offer.urls["pdf"])
+        self.assertEqual(pdf.status_code, 200)
+
+    def test_no_changes_to_headings_of_sent_offers(self):
+        """Headings of offers which have been sent stay as they were sent"""
+        offer = factories.OfferFactory.create(
+            status=Offer.OFFERED,
+            offered_on=in_days(-10),
+            valid_until=in_days(20),
+            postal_address="A\nStreet\nCity",
+        )
+        heading = OfferHeading.objects.create(offer=offer, title="Concept")
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.post(
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                offered_on=offer.offered_on.isoformat(),
+                valid_until=offer.valid_until.isoformat(),
+            )
+            | headings_formset({"id": heading.id, "title": "Changed", "DELETE": "on"}),
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        heading.refresh_from_db()
+        self.assertEqual(heading.title, "Concept")
+
+        response = self.client.post(
+            Service.urls["set_order"], {"ids": [f"heading-{heading.pk}"]}
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_project_page_orders_headings(self):
+        """The project page orders services and headings of offers in
+        preparation together"""
+        offer = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(offer=offer, project=offer.project)
+        heading = OfferHeading.objects.create(offer=offer, title="Concept")
+        self.client.force_login(offer.owned_by)
+
+        self.assertEqual(offer.items(), [heading, service])
+        response = self.client.post(
+            Service.urls["set_order"],
+            {"ids": [service.pk, f"heading-{heading.pk}", "heading-x", "unknown"]},
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(offer.items(), [service, heading])
+
+    def test_reorder_services_keeps_headings(self):
+        """Reordering only the services keeps the headings in their place"""
+        offer = factories.OfferFactory.create()
+        a, b, c = (
+            factories.ServiceFactory.create(offer=offer, project=offer.project)
+            for _ in range(3)
+        )
+        h1 = OfferHeading.objects.create(offer=offer, title="One", position=0)
+        h2 = OfferHeading.objects.create(
+            offer=offer, title="Two", position=b.position + 1
+        )
+        self.assertEqual(offer.items(), [h1, a, b, h2, c])
+
+        reorder_services([c, a, b], headings=offer.headings.all())
+        offer.refresh_from_db()
+        self.assertEqual(offer.items(), [h1, c, a, h2, b])
+
+    def test_copy_offer_with_headings(self):
+        """Copies of offers have the same headings"""
+        offer = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(offer=offer, project=offer.project)
+        OfferHeading.objects.create(
+            offer=offer, title="Concept", description="Ideas", position=0
+        )
+        copy = offer.copy_to(project=offer.project, owned_by=offer.owned_by)
+        self.assertEqual(
+            [str(item) for item in copy.items()], ["Concept", str(service)]
+        )
+        self.assertEqual(copy.headings.get().description, "Ideas")
 
     def test_pricing_redirects_to_the_offer_form(self):
         """The pricing has been merged into the offer form"""
