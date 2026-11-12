@@ -1,5 +1,5 @@
 {% extends "generic/object_list.html" %}
-{% load workbench %}
+{% load i18n workbench %}
 
 {% block search-form-buttons %}
   {% if request.GET and request.user.features.CONTROLLING %}
@@ -11,6 +11,18 @@
 {% endblock search-form-buttons %}
 
 {% block rows %}
+  {% if object_list %}
+    <div class="list-group-item wb-row wb-total-item">
+      <div class="wb-row-title">{% translate 'Total' %}</div>
+      <div class="wb-row-aside">
+        <span class="wb-row-amount">{{ totals.total_hours|hours }}</span>
+        {% if totals.total_hours_for_invoicing != totals.total_hours %}
+          <span class="wb-row-meta">{% translate 'hours for invoicing'|capfirst %}:
+            {{ totals.total_hours_for_invoicing|hours }}</span>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
   {% for day, sum, instances in object_list|group_hours_by_day %}
     <div class="list-group-item wb-list-heading">
       <span>{{ day|local_date_format }}</span>

@@ -16,13 +16,19 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
+from workbench.invoices.models import Invoice
 from workbench.logbook.celebrations import celebrate
-from workbench.logbook.models import Break, LoggedCost, LoggedHours
+from workbench.logbook.models import (
+    HOURS_FOR_INVOICING,
+    Break,
+    LoggedCost,
+    LoggedHours,
+)
 from workbench.offers.models import Offer
 from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.services.models import ServiceType
 from workbench.timer.models import Timestamp
-from workbench.tools.formats import currency, hours, local_date_format
+from workbench.tools.formats import Z1, Z2, currency, hours, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     ComboboxSelect,
@@ -61,6 +67,17 @@ class DetectedTimestampForm(forms.Form):
                 **kwargs,
             )
         return None
+
+
+def filter_invoice(form, queryset):
+    """Entries of an invoice, a hidden filter of the logbook search forms"""
+    if invoice := form.cleaned_data.get("invoice"):
+        form.hidden_filters.append((
+            f"{capfirst(invoice._meta.verbose_name)}: {invoice}",
+            querystring(form.request.GET, invoice=""),
+        ))
+        queryset = queryset.filter(invoice_service__invoice=invoice)
+    return queryset
 
 
 class LoggedHoursSearchForm(Form):
@@ -106,6 +123,12 @@ class LoggedHoursSearchForm(Form):
         label="",
     )
     offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
+    invoice = forms.ModelChoiceField(
+        queryset=Invoice.objects.all(),
+        required=False,
+        widget=forms.HiddenInput,
+        label="",
+    )
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
@@ -175,6 +198,7 @@ class LoggedHoursSearchForm(Form):
                 ),
             )
             queryset = queryset.filter(service__offer=offer)
+        queryset = filter_invoice(self, queryset)
         if data.get("not_archived"):
             self.hidden_filters.append((
                 _("Not archived"),
@@ -213,6 +237,12 @@ class LoggedHoursSearchForm(Form):
             xlsx.logged_hours(queryset)
             return xlsx.to_response("hours.xlsx")
         return None
+
+    def totals(self, queryset):
+        return queryset.order_by().aggregate(
+            total_hours=Sum("hours", default=Z1),
+            total_hours_for_invoicing=Sum(HOURS_FOR_INVOICING, default=Z1),
+        )
 
 
 class LoggedCostSearchForm(Form):
@@ -259,6 +289,12 @@ class LoggedCostSearchForm(Form):
         label="",
     )
     offer = forms.IntegerField(required=False, widget=forms.HiddenInput, label="")
+    invoice = forms.ModelChoiceField(
+        queryset=Invoice.objects.all(),
+        required=False,
+        widget=forms.HiddenInput,
+        label="",
+    )
     not_archived = forms.BooleanField(
         required=False, widget=forms.HiddenInput, label=""
     )
@@ -327,6 +363,7 @@ class LoggedCostSearchForm(Form):
                 ),
             )
             queryset = queryset.filter(service__offer=offer)
+        queryset = filter_invoice(self, queryset)
         if data.get("not_archived"):
             self.hidden_filters.append((
                 _("Not archived"),
@@ -345,6 +382,12 @@ class LoggedCostSearchForm(Form):
             xlsx.logged_costs(queryset)
             return xlsx.to_response("costs.xlsx")
         return None
+
+    def totals(self, queryset):
+        return queryset.order_by().aggregate(
+            total_cost=Sum("cost", default=Z2),
+            total_third_party_costs=Sum("third_party_costs", default=Z2),
+        )
 
 
 def hours_for_invoicing_much_higher(hours, hours_for_invoicing):

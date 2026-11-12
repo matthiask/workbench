@@ -1,5 +1,5 @@
 {% extends "generic/object_list.html" %}
-{% load workbench %}
+{% load i18n workbench %}
 {% block search-form-buttons %}
   {% if request.GET and request.user.features.CONTROLLING %}
     <a href="{% querystring export='xlsx' %}" class="btn btn-quiet">
@@ -10,6 +10,18 @@
 {% endblock search-form-buttons %}
 
 {% block rows %}
+  {% if object_list %}
+    <div class="list-group-item wb-row wb-total-item">
+      <div class="wb-row-title">{% translate 'Total' %}</div>
+      <div class="wb-row-aside">
+        <span class="wb-row-amount">{{ totals.total_cost|currency }}</span>
+        {% if totals.total_third_party_costs %}
+          <span class="wb-row-meta">{% translate 'third party costs'|capfirst %}:
+            {{ totals.total_third_party_costs|currency }}</span>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
   {% for cost in object_list %}
     <a class="list-group-item list-group-item-action wb-row" href="{{ cost.get_absolute_url }}" data-ajaxmodal>
       <div class="wb-row-main">

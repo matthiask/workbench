@@ -80,6 +80,18 @@
       <div class="wb-stat-label">{% translate 'third party costs'|capfirst %}</div>
       <div class="wb-stat-value">{{ object.third_party_costs|currency }}</div>
     </div>
+    {% if object.type == object.SERVICES %}
+      <div class="wb-stat">
+        <div class="wb-stat-label">{% translate 'hours'|capfirst %}</div>
+        <div class="wb-stat-value">{{ object.invoiced_hours|hours }}</div>
+        <div class="wb-stat-note">
+          {% translate 'logged' %}:
+          <a href="{% url 'logbook_loggedhours_list' %}?invoice={{ object.pk }}">{% translate 'hours' %}</a>
+          /
+          <a href="{% url 'logbook_loggedcost_list' %}?invoice={{ object.pk }}">{% translate 'cost' %}</a>
+        </div>
+      </div>
+    {% endif %}
     <div class="wb-stat">
       <div class="wb-stat-label">{% translate 'invoiced on'|capfirst %}</div>
       <div class="wb-stat-value">{{ object.invoiced_on|local_date_format|default:"&ndash;" }}</div>
@@ -154,6 +166,12 @@
               {% endif %}
             </div>
             <div class="d-flex align-items-center gap-1 text-nowrap">
+              {% if service.effort_hours %}
+                <span class="me-2 text-secondary wb-tabular">
+                  {{ service.effort_hours|hours }}{% if service.effort_rate %}
+                    &times; {{ service.effort_rate|currency }}{% endif %}
+                </span>
+              {% endif %}
               <span class="me-2 wb-tabular">{{ service.service_cost|currency }}</span>
               <a
                 class="btn btn-quiet btn-sm btn-icon"

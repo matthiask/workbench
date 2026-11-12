@@ -515,6 +515,10 @@ class Invoice(ModelWithTotal):
             lines.append(_("Service period %s") % self.service_period)
         return "\n".join(str(line) for line in lines if line)
 
+    def invoiced_hours(self):
+        """The hours of the invoice's services (hours for invoicing)"""
+        return self.services.aggregate(hours=Sum("effort_hours", default=Z1))["hours"]
+
     @property
     def subtotal_title(self):
         if self.type == self.DOWN_PAYMENT:

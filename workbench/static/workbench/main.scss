@@ -1768,6 +1768,12 @@ a.wb-row-title:hover {
   }
 }
 
+// Totals of all matches above list rows, e.g. of the logbook
+.wb-total-item {
+  background: var(--wb-surface-muted);
+  font-weight: 600;
+}
+
 .wb-row-amount {
   font-weight: 600;
   font-variant-numeric: tabular-nums;

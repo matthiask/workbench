@@ -11,6 +11,7 @@ from time_machine import travel
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.expenses.models import ExpenseReport
+from workbench.invoices.models import Invoice
 from workbench.logbook.forms import hours_for_invoicing_much_higher
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.models import Project
@@ -809,6 +810,58 @@ class LogbookTest(TestCase):
             ["Expenses are part of an expense report, cannot delete entry."],
         )
         self.assertTrue(LoggedCost.objects.filter(pk=costs.pk).exists())
+
+    def test_logged_hours_list_totals(self):
+        """The logbook list shows the totals of all matching entries, also
+        the hours of an invoice"""
+        service = factories.ServiceFactory.create(effort_rate=100)
+        # Different days, so that the sums per day differ from the totals
+        factories.LoggedHoursFactory.create(
+            service=service, hours=2, rendered_on=in_days(-1)
+        )
+        factories.LoggedHoursFactory.create(
+            service=service,
+            hours=Decimal("1.5"),
+            hours_for_invoicing=3,
+            rendered_on=in_days(-2),
+        )
+        factories.LoggedHoursFactory.create(hours=7, rendered_on=in_days(-3))
+        factories.LoggedCostFactory.create(
+            service=service, cost=50, third_party_costs=40
+        )
+        factories.LoggedCostFactory.create(service=service, cost=30)
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.get("/logbook/hours/")
+        self.assertContains(response, "10.5h")
+        response = self.client.get(f"/logbook/hours/?project={service.project.pk}")
+        self.assertContains(response, "3.5h")
+        self.assertContains(response, "5.0h")  # For invoicing
+        self.assertNotContains(response, "10.5h")
+
+        invoice = factories.InvoiceFactory.create(
+            project=service.project,
+            customer=service.project.customer,
+            contact=service.project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook(service.project.services.all())
+        factories.LoggedHoursFactory.create(service=service, hours=4)
+        response = self.client.get(f"/logbook/hours/?invoice={invoice.pk}")
+        self.assertContains(response, "3.5h")
+        self.assertContains(response, f"{invoice._meta.verbose_name.capitalize()}:")
+        self.assertNotContains(response, "7.5h")
+
+        factories.LoggedCostFactory.create(service=service, cost=1000)
+        response = self.client.get(f"/logbook/costs/?invoice={invoice.pk}")
+        self.assertContains(response, "80.00")
+        self.assertContains(response, "Third party costs:")
+        self.assertContains(response, "40.00")
+        self.assertNotContains(response, "1’080.00")
+
+        response = self.client.get(invoice.get_absolute_url())
+        self.assertContains(response, f"/logbook/hours/?invoice={invoice.pk}")
+        self.assertContains(response, "5.0h")  # Invoiced hours
 
     def test_logged_hours_list(self):
         """Filter form smoke test"""

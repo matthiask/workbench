@@ -105,7 +105,15 @@ class ListView(ToolsMixin, vanilla.ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.search_form.filter(super().get_queryset())
+        # Search forms may add totals of all matches (not only of the page)
+        self.filtered_queryset = self.search_form.filter(super().get_queryset())
+        return self.filtered_queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if totals := getattr(self.search_form, "totals", None):
+            context["totals"] = totals(self.filtered_queryset)
+        return context
 
 
 class DetailView(ToolsMixin, vanilla.DetailView):
