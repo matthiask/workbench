@@ -119,9 +119,12 @@ Guidelines:
   silently picking either.
 - One service per deliverable or phase, with a description saying what is and
   isn't included. Put assumptions and exclusions into the descriptions.
-- Longer offers with several phases or areas get headings between their
-  services, if the specification or the existing offers are structured like
-  that. Headings have no amounts and no subtotals.
+- Propose headings when the offer is longer or has a structure of its own,
+  e.g. phases, areas or deliverables with several services each (as a rule
+  of thumb from about eight services, or when the specification or the
+  existing offers are structured like that). A short offer with a few
+  services doesn't need any. Headings group the services which follow them
+  and have no amounts and no subtotals.
 - Estimate hours realistically, rather a bit high than too low. With
   guidelines, apply their factors and shares and say which ones you applied. Things the
   specification mentions as "maybe", "nice to have" or "later" become optional
@@ -133,7 +136,9 @@ Guidelines:
 ## 4. Review with the user
 
 Show the draft as a table (service, effort type, hours, rate, amount, optional)
-with the totals, and list your assumptions and open questions. With
+with the headings as rows between the services and the totals, and list your
+assumptions and open questions. If you added headings, say so, so that the
+user can drop them or ask for a different structure. With
 guidelines, go through their checklist and report what it flags. Then validate it
 on the server, which also computes the totals:
 
