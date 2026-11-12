@@ -855,22 +855,27 @@ class RecurringInvoice(ModelWithTotal):
         help_text=_("Invoices are created without projects by default."),
         default=False,
     )
-    mark_as_sent = models.BooleanField(
-        _("Mark invoices as sent?"),
-        help_text=_(
-            "Invoices are created in preparation by default. Only if they are"
-            " sent another way, not in the frozen period."
+    PREPARE = "prepare"
+    MARK_AS_SENT = "mark_as_sent"
+    SEND = "send"
+    NEW_INVOICES_CHOICES = [
+        (PREPARE, _("Create them in preparation")),
+        (
+            MARK_AS_SENT,
+            _("Create them and mark them as sent (if they are sent another way)"),
         ),
-        default=False,
-    )
-    send_automatically = models.BooleanField(
-        _("Send invoices automatically?"),
+        (SEND, _("Send them by email automatically")),
+    ]
+    new_invoices = models.CharField(
+        _("new invoices"),
+        max_length=20,
+        choices=NEW_INVOICES_CHOICES,
+        default=PREPARE,
         help_text=_(
-            "New invoices are mailed to the recipient with the subject and the"
-            " text, the owner in Cc. Invoice dates on or before the freeze date"
-            " move to the day after it."
+            "Invoices dated on or before the freeze date stay in preparation"
+            " when marking them as sent; when sending them, their date moves"
+            " to the day after it. The owner gets a copy of the mails."
         ),
-        default=False,
     )
     send_to = models.EmailField(
         _("recipient"),
@@ -958,8 +963,11 @@ class RecurringInvoice(ModelWithTotal):
             service_period_from=period_starts_on,
             service_period_until=period_ends_on,
             owned_by=self.owned_by,
+            # Invoices which are sent by email stay in preparation until the
+            # mail has been sent, see create_invoices()
             status=Invoice.SENT
-            if self.mark_as_sent and period_starts_on > FreezeDate.objects.up_to()
+            if self.new_invoices == self.MARK_AS_SENT
+            and period_starts_on > FreezeDate.objects.up_to()
             else Invoice.IN_PREPARATION,
             type=Invoice.DOWN_PAYMENT if self.create_project else Invoice.FIXED,
             postal_address=self.postal_address,
@@ -995,7 +1003,7 @@ class RecurringInvoice(ModelWithTotal):
             invoice = self.create_single_invoice(
                 period_starts_on=starts_on, period_ends_on=ends_on
             )
-            if self.send_automatically and invoice.status == Invoice.IN_PREPARATION:
+            if self.new_invoices == self.SEND:
                 send_automatically(invoice, self)
             invoices.append(invoice)
             self.next_period_starts_on = ends_on + dt.timedelta(days=1)

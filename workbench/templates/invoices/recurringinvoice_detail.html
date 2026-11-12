@@ -73,11 +73,9 @@
             <dd>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</dd>
             <dt>{{ object|label:'create_project' }}</dt>
             <dd>{{ object.create_project|yesno:_('yes,no') }}</dd>
-            <dt>{{ object|label:'mark_as_sent' }}</dt>
-            <dd>{{ object.mark_as_sent|yesno:_('yes,no') }}</dd>
-            <dt>{{ object|label:'send_automatically' }}</dt>
-            <dd>{{ object.send_automatically|yesno:_('yes,no') }}</dd>
-            {% if object.send_automatically %}
+            <dt>{{ object|label:'new_invoices' }}</dt>
+            <dd>{{ object.get_new_invoices_display }}</dd>
+            {% if object.new_invoices == object.SEND %}
               <dt>{{ object|label:'send_to' }}</dt>
               <dd>{{ object.send_to|default:"&ndash;" }}</dd>
               <dt>{{ object|label:'mail_subject' }}</dt>

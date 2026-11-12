@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 14:45+0100\n"
+"POT-Creation-Date: 2026-11-12 14:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2849,20 +2849,24 @@ msgid "Invoices are created without projects by default."
 msgstr "Standardmässig werden Rechnungen ohne eine Projektzuordnung erstellt."
 
 #: workbench/invoices/models.py
-msgid "Mark invoices as sent?"
-msgstr "Rechnungen als versendet markieren?"
+msgid "Create them in preparation"
+msgstr "In Vorbereitung erstellen"
 
 #: workbench/invoices/models.py
-msgid "Invoices are created in preparation by default. Only if they are sent another way, not in the frozen period."
-msgstr "Standardmässig werden Rechnungen in Vorbereitung erstellt. Nur wenn sie anderweitig versendet werden, nicht im eingefrorenen Zeitraum."
+msgid "Create them and mark them as sent (if they are sent another way)"
+msgstr "Erstellen und als versendet markieren (wenn sie anderweitig versendet werden)"
 
 #: workbench/invoices/models.py
-msgid "Send invoices automatically?"
-msgstr "Rechnungen automatisch versenden?"
+msgid "Send them by email automatically"
+msgstr "Automatisch per Mail versenden"
 
 #: workbench/invoices/models.py
-msgid "New invoices are mailed to the recipient with the subject and the text, the owner in Cc. Invoice dates on or before the freeze date move to the day after it."
-msgstr "Neue Rechnungen werden mit dem Betreff und dem Text an die Empfänger:in geschickt, die verantwortliche Person im Cc. Rechnungsdaten am oder vor dem Einfrierdatum werden auf den Tag danach verschoben."
+msgid "new invoices"
+msgstr "neue Rechnungen"
+
+#: workbench/invoices/models.py
+msgid "Invoices dated on or before the freeze date stay in preparation when marking them as sent; when sending them, their date moves to the day after it. The owner gets a copy of the mails."
+msgstr "Rechnungen mit einem Datum am oder vor dem Einfrierdatum bleiben beim Markieren in Vorbereitung; beim Versenden wird ihr Datum auf den Tag danach verschoben. Die verantwortliche Person erhält eine Kopie der Mails."
 
 #: workbench/invoices/models.py
 msgid "Proposed: the accounts payable address of the organization, the contact or the central address."
@@ -6821,6 +6825,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Mark invoices as sent?"
+#~ msgstr "Rechnungen als versendet markieren?"
+
+#~ msgid "Invoices are created in preparation by default. Only if they are sent another way, not in the frozen period."
+#~ msgstr "Standardmässig werden Rechnungen in Vorbereitung erstellt. Nur wenn sie anderweitig versendet werden, nicht im eingefrorenen Zeitraum."
+
+#~ msgid "New invoices are mailed to the recipient with the subject and the text, the owner in Cc. Invoice dates on or before the freeze date move to the day after it."
+#~ msgstr "Neue Rechnungen werden mit dem Betreff und dem Text an die Empfänger:in geschickt, die verantwortliche Person im Cc. Rechnungsdaten am oder vor dem Einfrierdatum werden auf den Tag danach verschoben."
 
 #, python-brace-format
 #~ msgid "{due_on} is replaced with the due date."

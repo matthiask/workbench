@@ -92,6 +92,7 @@ class RecurringTest(TestCase):
                 "discount": 0,
                 "liable_to_vat": "1",
                 "third_party_costs": 0,
+                "new_invoices": "prepare",
             },
         )
         self.assertContains(response, "No contact selected.")
@@ -110,6 +111,7 @@ class RecurringTest(TestCase):
                 "discount": 0,
                 "liable_to_vat": "1",
                 "third_party_costs": 0,
+                "new_invoices": "prepare",
                 "postal_address": "Anything",
             },
         )
@@ -129,6 +131,7 @@ class RecurringTest(TestCase):
                 "discount": 0,
                 "liable_to_vat": "1",
                 "third_party_costs": 0,
+                "new_invoices": "prepare",
                 "postal_address": "Anything\nStreet\nCity",
             },
         )
@@ -180,6 +183,7 @@ class RecurringTest(TestCase):
             "discount": 0,
             "liable_to_vat": "1",
             "third_party_costs": 0,
+            "new_invoices": "prepare",
         }
         with travel("2025-07-15 12:00"):
             response = self.client.post(ri.urls["update"], data)
@@ -381,13 +385,13 @@ class RecurringTest(TestCase):
             subtotal=100,
             postal_address="Name\nStreet\nCity",
         )
-        self.assertFalse(r.mark_as_sent)
+        self.assertEqual(r.new_invoices, RecurringInvoice.PREPARE)
         [invoice, *_rest] = r.create_invoices()
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
         Invoice.objects.all().delete()
 
         FreezeDate.objects.create(up_to=in_days(-50))
-        r.mark_as_sent = True
+        r.new_invoices = RecurringInvoice.MARK_AS_SENT
         r.next_period_starts_on = None
         r.save()
         invoices = r.create_invoices()
@@ -406,7 +410,7 @@ class RecurringTest(TestCase):
             create_invoice_on_day=0,
             subtotal=100,
             postal_address="Name\nStreet\nCity",
-            send_automatically=True,
+            new_invoices="send",
         )
         FreezeDate.objects.create(up_to=in_days(-50))
 
@@ -447,7 +451,7 @@ class RecurringTest(TestCase):
         r = factories.RecurringInvoiceFactory.create(
             subtotal=100,
             postal_address="Name\nStreet\nCity",
-            send_automatically=True,
+            new_invoices="send",
             send_to="other@example.com",
             mail_subject="Rechnung {code}",
             mail_body="{total} für {service_period}, bis {due_on}.",
@@ -496,7 +500,7 @@ class RecurringTest(TestCase):
             "discount": 0,
             "liable_to_vat": "1",
             "third_party_costs": 0,
-            "send_automatically": "on",
+            "new_invoices": "send",
         }
         response = self.client.post(r.urls["update"], data)
         self.assertRedirects(response, r.urls["detail"])
@@ -514,7 +518,7 @@ class RecurringTest(TestCase):
     def test_send_automatically_manually(self):
         """Creating the invoices by hand shows what has been sent"""
         r = factories.RecurringInvoiceFactory.create(
-            subtotal=100, postal_address="Name\nStreet\nCity", send_automatically=True
+            subtotal=100, postal_address="Name\nStreet\nCity", new_invoices="send"
         )
         r.contact.emailaddresses.create(email="contact@example.com")
         self.client.force_login(r.owned_by)
@@ -528,7 +532,7 @@ class RecurringTest(TestCase):
     def test_send_automatically_notification(self):
         """The owners' mail says whether new invoices have been sent"""
         r = factories.RecurringInvoiceFactory.create(
-            subtotal=100, postal_address="Name\nStreet\nCity", send_automatically=True
+            subtotal=100, postal_address="Name\nStreet\nCity", new_invoices="send"
         )
         r.contact.emailaddresses.create(email="contact@example.com")
         create_recurring_invoices_and_notify()

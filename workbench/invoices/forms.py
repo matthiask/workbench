@@ -1272,8 +1272,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "discount",
             "liable_to_vat",
             "create_project",
-            "mark_as_sent",
-            "send_automatically",
+            "new_invoices",
             "send_to",
             "mail_subject",
             "mail_body",
@@ -1284,6 +1283,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "description": Textarea,
             "postal_address": Textarea,
             "periodicity": forms.RadioSelect,
+            "new_invoices": forms.RadioSelect,
             "mail_body": Textarea({"rows": 12}),
         }
 
@@ -1357,8 +1357,8 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             self.propose_mail()
 
     def propose_mail(self):
-        """Suggests recipients and proposes the mail for sending
-        automatically once the recurring invoice has a customer"""
+        """Suggests recipients and proposes the mail for sending by email
+        once the recurring invoice has a customer"""
         if not self.instance.customer_id:
             return
         emails = sending.suggested_emails(self.instance)
@@ -1373,9 +1373,11 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             self.initial["mail_body"] = self.instance.mail_body or body
 
     def clean_mail(self, data):
-        """Fills in the recipient and the proposal for sending automatically,
+        """Fills in the recipient and the proposal for sending by email,
         e.g. for new recurring invoices"""
-        if not data.get("send_automatically") or not (customer := data.get("customer")):
+        if data.get("new_invoices") != RecurringInvoice.SEND or not (
+            customer := data.get("customer")
+        ):
             return
         recurring_invoice = RecurringInvoice(
             customer=customer,

@@ -249,7 +249,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   one of their addresses), `{due_on}` is replaced when sending;
   it stays in preparation if the mail fails (`SendInvoiceForm`,
   `SendInvoiceView`, `workbench/invoices/sending.py`). Recurring invoices
-  with `send_automatically` send their new invoices to their `send_to` with
+  whose `new_invoices` are sent by email (`RecurringInvoice.SEND`; the
+  other choices create them in preparation or mark them as sent) send them to their `send_to` with
   their `mail_subject` and `mail_body` (proposed in the form like above,
   with the placeholders `{code}`, `{total}`, `{due_on}` and
   `{service_period}`, `sending.fill()`); invoice dates on or before the
@@ -511,7 +512,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `row_data` and `changed_fields` as hstore keyed by column name. Renaming a
   field or column loses its history: old entries keep the old key. Only
   rename on purpose, and update the keys in the migration if the history
-  matters. The history (`HISTORY` in `workbench/tools/history.py`) lists
+  matters. Data migrations of audited tables can't alter the table in the
+  same transaction ("pending trigger events"), put schema changes after
+  them into a separate migration. The history (`HISTORY` in `workbench/tools/history.py`) lists
   related objects by a foreign key, or through generic relations
   (`generic_related()`, e.g. the notes of an object, with `content_type_id`
   as an additional filter); a config may restrict the actions and the
