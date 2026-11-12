@@ -403,6 +403,48 @@ class ContactsTest(TestCase):
             'data-suggestions="[&quot;Work&quot;, &quot;Mobile&quot;, &quot;Home&quot;]"',
         )
 
+    def test_imported_notes_migration(self):
+        """Social media lines of an old import are removed from the notes,
+        websites stay as bare URLs (urlize links them) and other text stays,
+        repeated websites only once"""
+        migration = importlib.import_module(
+            "workbench.contacts.migrations.0027_clean_imported_notes"
+        )
+        person = factories.PersonFactory.create(
+            notes=(
+                "\n(Website,http://www.example.com/)\n(Skype,someone)"
+                "\n(Website,http://www.example.com/)\nTitel: Dr.\n(Twitter,someone)"
+                "\n(FB,http://www.facebook.com/example)\n(xing,https://xing.com/x)"
+            )
+        )
+        organization = factories.OrganizationFactory.create(
+            notes="(Facebook,https://www.facebook.com/example)\n(MSN,x)\n(Google,y)"
+        )
+        untouched = factories.OrganizationFactory.create(
+            notes="Rechnungen an: info@example.com\n\nDanke (Skype,bitte)"
+        )
+        several = factories.PersonFactory.create(
+            notes=(
+                "(Websites: http://a.example.com/, http://b.example.com)\n"
+                "(Website,http://c.example.com/) wird privat weitergeführt."
+            )
+        )
+        migration.forwards(apps, None)
+        person.refresh_from_db()
+        organization.refresh_from_db()
+        untouched.refresh_from_db()
+        several.refresh_from_db()
+        self.assertEqual(person.notes, "http://www.example.com/\nTitel: Dr.")
+        self.assertEqual(
+            several.notes,
+            "http://a.example.com/ http://b.example.com\n"
+            "http://c.example.com/ wird privat weitergeführt.",
+        )
+        self.assertEqual(organization.notes, "")
+        self.assertEqual(
+            untouched.notes, "Rechnungen an: info@example.com\n\nDanke (Skype,bitte)"
+        )
+
     def test_detail_types_migration(self):
         """Spellings and synonyms of the suggested types are cleaned up, the
         prefix of details copied from the organization stays"""
