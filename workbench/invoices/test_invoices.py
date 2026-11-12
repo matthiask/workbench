@@ -31,6 +31,8 @@ def pdf_text(flowables):
                 yield from walk(child)
         elif hasattr(item, "_cellvalues"):
             yield from walk(item._cellvalues)
+        elif hasattr(item, "_content"):  # KeepTogether
+            yield from walk(item._content)
         elif hasattr(item, "text"):
             yield item.text
         elif isinstance(item, str):
