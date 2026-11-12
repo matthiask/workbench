@@ -580,6 +580,10 @@ class StatisticsTest(TestCase):
             self.assertIn(f'?{query}&amp;not_archived=1" >{hours}</a>', content)
         self.assertEqual(content.count(">+150.00</a>"), 3)
 
+        # Rows and offers with not archived entries for the live filter
+        self.assertIn('id="only-not-archived"', content)
+        self.assertEqual(content.count("data-not-archived"), 4)
+
     def test_cost_by_month_uses_hours_for_invoicing(self):
         """Work is valued with the hours for invoicing, the time spent otherwise"""
         service = factories.ServiceFactory.create(effort_rate=100)

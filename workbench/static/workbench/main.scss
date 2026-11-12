@@ -1911,6 +1911,21 @@ a.wb-row-title:hover {
 }
 
 // Rows introducing a section of a table, e.g. the months or a reason
+// Live filter of the project statistics, rows of services and offers
+// without not archived entries are hidden
+.wb-statistics-filter {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.modal-body:has(#only-not-archived:checked) .wb-statistics-table {
+  tbody:not([data-not-archived]),
+  tbody tr:not(.wb-table-heading, [data-not-archived]) {
+    display: none;
+  }
+}
+
 .wb-table-heading > th {
   background: var(--wb-surface-muted);
   color: var(--bs-secondary-color);
