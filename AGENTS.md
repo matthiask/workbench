@@ -254,7 +254,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   titles, descriptions, effort types, hours, rates and costs (no service
   type dropdown filling the rates; `overrides` of
   `Invoice.create_services()`; empty hours and costs come from the source,
-  which still decides the logbook entries a line takes). Sending them stays
+  which still decides the logbook entries a line takes). Lines copy the
+  service's description and external reference into their description
+  (`line_description()`), PDFs don't read the project's services, so
+  invoices don't change afterwards. Sending them stays
   in the web interface. "Release and send" mails an invoice in preparation
   with its PDF to the customer (suggested like payment reminders, the owner
   in Cc and Reply-To), invoiced today and due in 15 days, and marks it as

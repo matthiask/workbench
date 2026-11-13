@@ -599,7 +599,7 @@ class Invoice(ModelWithTotal):
                 invoice=self,
                 project_service=ps,
                 title=ps.title,
-                description=ps.description,
+                description=line_description(ps),
                 position=position + 1,
                 effort_rate=ps.effort_rate,
                 effort_type=ps.effort_type,
@@ -786,6 +786,21 @@ class Service(ServiceBase):
             ]
 
     delete.alters_data = True
+
+
+def line_description(project_service):
+    """The description of invoice lines: the service's description and its
+    external reference (e.g. an issue), copied so that invoices don't change
+    afterwards"""
+    return "\n".join(
+        filter(
+            None,
+            [
+                project_service.description.rstrip(),
+                project_service.external_reference.strip(),
+            ],
+        )
+    )
 
 
 def service_surplus(project_service, *, logbook_cutoff_date=None):

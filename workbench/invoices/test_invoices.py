@@ -1580,7 +1580,8 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_pdf_external_reference_of_services(self):
-        """Invoice PDFs show the external reference of the project's services"""
+        """Invoice lines contain the external reference of the project's
+        services in their description, later changes don't change invoices"""
         service = factories.ServiceFactory.create(
             external_reference="https://github.com/example/repo/issues/1"
         )
@@ -1602,6 +1603,62 @@ class InvoicesTest(TestCase):
                 text = pdf_text(pdf.story)
                 self.assertIn(service.title, text)
                 self.assertIn("https://github.com/example/repo/issues/1", text)
+
+        service.external_reference = "https://github.com/example/repo/issues/2"
+        service.save()
+        pdf = PDFDocument(io.BytesIO())
+        pdf.init_invoice_letter()
+        pdf.table_services(invoice.services.all(), show_details=True)
+        text = pdf_text(pdf.story)
+        self.assertIn("https://github.com/example/repo/issues/1", text)
+        self.assertNotIn("https://github.com/example/repo/issues/2", text)
+
+        # The form proposes it in the description, where it can be changed
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.urls["createinvoice"] + "?type=services")
+        self.assertEqual(
+            response.context["form"][f"description_{service.pk}"].value(),
+            "\n".join(
+                filter(
+                    None,
+                    [service.description, "https://github.com/example/repo/issues/2"],
+                )
+            ),
+        )
+
+    def test_migration_copies_external_references(self):
+        """Lines of invoices created since the PDFs showed the external
+        references get them into their description, older ones stay"""
+        from importlib import import_module
+
+        from django.apps import apps
+
+        migration = import_module(
+            "workbench.invoices.migrations.0038_external_reference_in_description"
+        )
+        service = factories.ServiceFactory.create(
+            description="Design", external_reference="https://example.com/1"
+        )
+        project = service.project
+        lines = {}
+        for created_at in [dt.datetime(2026, 11, 9), dt.datetime(2026, 11, 11)]:
+            invoice = factories.InvoiceFactory.create(
+                project=project,
+                customer=project.customer,
+                contact=project.contact,
+                type=Invoice.SERVICES,
+                created_at=timezone.make_aware(created_at),
+            )
+            lines[created_at.day] = invoice.services.create(
+                project_service=service, title="Design", description="Design"
+            )
+
+        migration.copy_external_references(apps, None)
+        migration.copy_external_references(apps, None)
+        for line in lines.values():
+            line.refresh_from_db()
+        self.assertEqual(lines[9].description, "Design")
+        self.assertEqual(lines[11].description, "Design\nhttps://example.com/1")
 
     def test_cancel_applied_down_payment(self):
         """Down payments applied to an invoice are cancelled after it"""

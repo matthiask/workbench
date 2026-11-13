@@ -289,16 +289,12 @@ class PDFDocument(_PDFDocument):
         self.next_frame()
 
     def service_description(self, service):
-        # Invoice services show the external reference of their project's
-        # service (e.g. an issue), offers don't
-        project_service = getattr(service, "project_service", None)
-        lines = [
-            service.description.strip(),
-            project_service.external_reference if project_service else "",
-        ]
-        for line in filter(None, lines):
-            self.p(line)
-        return any(lines)
+        # Invoice lines contain the external reference of their project's
+        # service in their description (copied when invoicing, they don't
+        # change afterwards)
+        if stripped := service.description.strip():
+            self.p(stripped)
+        return bool(stripped)
 
     def services_row(self, service):
         is_optional = getattr(service, "is_optional", False)

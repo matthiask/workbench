@@ -21,6 +21,7 @@ from workbench.invoices.models import (
     Invoice,
     RecurringInvoice,
     Service,
+    line_description,
     service_surplus,
 )
 from workbench.logbook.models import LoggedCost, LoggedHours
@@ -1032,7 +1033,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 # the service and the source
                 for field, initial in [
                     ("title", service.title),
-                    ("description", service.description),
+                    ("description", line_description(service)),
                     ("effort_type", service.effort_type),
                     ("effort_hours", None),
                     ("effort_rate", service.effort_rate),
