@@ -465,6 +465,20 @@ class InvoiceIn(InputSchema):
         " invoice, defaults to the offer's services (with something to"
         " invoice if from the logbook). Required without offer.",
     )
+    sources: dict[int, Literal["offer", "logbook", "surplus"]] = Field(
+        default_factory=dict,
+        description="Services invoices: the source of single services (by"
+        " ID) if not ``source``. ``surplus`` only invoices the work logged"
+        " beyond what has been invoiced, for services invoiced from the"
+        " offer before. The services have to be listed for invoicing:"
+        " invoicing from the logbook only lists services with something to"
+        " invoice, mix sources with the source ``offer``.",
+    )
+    disable_logging: list[int] = Field(
+        default_factory=list,
+        description="Services invoices: IDs of the services on which logging"
+        " is disabled after invoicing them.",
+    )
     logbook_cutoff_date: dt.date | None = Field(
         default=None,
         description="Services invoices from the logbook: only entries up to this date.",
@@ -572,7 +586,6 @@ def _invoice_form(request, data, error):  # noqa: C901
 
     form = make_form()
     values = form_data(form)
-    values["disable_logging"] = 0
     for field in ["title", "description", "postal_address", "tax_rate"]:
         if (value := getattr(data, field)) is not None:
             values[field] = value
@@ -616,6 +629,18 @@ def _invoice_form(request, data, error):  # noqa: C901
             values["apply_down_payment"] = data.down_payments
         else:
             error(["down_payments"], _("No down payments can be applied."))
+    # Per service fields exist for the services listed for invoicing
+    not_listed = _("Service %s isn't one of the services listed for invoicing.")
+    for id, source in data.sources.items():
+        if f"source_{id}" in form.fields:
+            values[f"source_{id}"] = source
+        else:
+            error(["sources", str(id)], not_listed % id)
+    for id in data.disable_logging:
+        if f"disable_logging_{id}" in form.fields:
+            values[f"disable_logging_{id}"] = True
+        else:
+            error(["disable_logging"], not_listed % id)
     if "selected_services" in form.fields:
         if data.services is not None:
             values["selected_services"] = data.services
@@ -659,6 +684,11 @@ def invoice_create(
         fields={
             "selected_services": ["services"],
             "apply_down_payment": ["down_payments"],
+        }
+        | {
+            field: ["sources", field.removeprefix("source_")]
+            for field in form.fields
+            if field.startswith("source_")
         },
         ignore_warnings=ignore_warnings,
     )

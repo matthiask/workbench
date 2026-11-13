@@ -273,6 +273,46 @@ class CLITest(TestCase):
         project.refresh_from_db()
         self.assertIsNone(project.internal_type)
 
+    def test_invoices_create_mixed_sources(self):
+        """Services invoices take the source of single services and disable
+        logging on some of them"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.PostalAddressFactory.create(person=project.contact)
+        capped = factories.ServiceFactory.create(
+            project=project, effort_type="Design", effort_rate=100, effort_hours=10
+        )
+        maintenance = factories.ServiceFactory.create(
+            project=project, effort_type="Dev", effort_rate=200
+        )
+        factories.LoggedHoursFactory.create(service=maintenance, hours=2)
+
+        result = self.wb(
+            "invoices",
+            "create",
+            "--project",
+            project.pk,
+            "--service",
+            capped.pk,
+            "--service",
+            f"{maintenance.pk}:logbook",
+            "--disable-logging",
+            capped.pk,
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        invoice = Invoice.objects.get()
+        self.assertEqual(invoice.subtotal, 1000 + 400)
+        capped.refresh_from_db()
+        maintenance.refresh_from_db()
+        self.assertEqual(
+            (capped.allow_logging, maintenance.allow_logging), (False, True)
+        )
+
+        result = self.wb(
+            "invoices", "create", "--project", project.pk, "--service", "1:hours"
+        )
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("1:hours", result.output)
+
     def test_invoices_create(self):
         """Invoices in preparation are created from offers or with amounts"""
         project = factories.ProjectFactory.create(owned_by=self.user)

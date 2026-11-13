@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 11:08+0100\n"
+"POT-Creation-Date: 2026-11-13 11:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2298,6 +2298,11 @@ msgid "No down payments can be applied."
 msgstr "Es können keine Anzahlungen verrechnet werden."
 
 #: workbench/invoices/api.py
+#, python-format
+msgid "Service %s isn't one of the services listed for invoicing."
+msgstr "Leistung %s ist keine der Leistungen, die zur Verrechnung aufgelistet sind."
+
+#: workbench/invoices/api.py
 msgid "Select the services to invoice, or invoice an offer."
 msgstr "Wähle die zu verrechnenden Leistungen aus oder verrechne eine Offerte."
 
@@ -2492,8 +2497,8 @@ msgid "Logbook cutoff date"
 msgstr "Logbuch-Abgrenzungstermin"
 
 #: workbench/invoices/forms.py
-msgid "Only include logbook entries up to this date. The service totals shown below may be too high if using this."
-msgstr "Logbucheinträge nur bis und mit diesem Datum berücksichtigen. Die unten angezeigten Leistungspositionen sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
+msgid "Only include logbook entries up to this date when invoicing the logbook or the surplus. The amounts shown below may be too high if using this."
+msgstr "Beim Verrechnen gemäss Logbuch oder des Mehraufwands nur Logbucheinträge bis und mit diesem Datum berücksichtigen. Die unten angezeigten Beträge sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -2502,37 +2507,45 @@ msgstr "%s erfasst aber kein Stundensatz definiert."
 
 #: workbench/invoices/forms.py workbench/logbook/forms.py
 #: workbench/projects/models.py workbench/projects/views.py
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/projects/project_detail.html
 msgid "Not offered yet"
 msgstr "Noch nicht offeriert"
 
+#: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
+msgid "as offered"
+msgstr "gemäss Offerte"
+
+#: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
+msgid "as logged"
+msgstr "gemäss Logbuch"
+
 #: workbench/invoices/forms.py
-msgid "Select all"
-msgstr "Alles auswählen"
+msgid "surplus"
+msgstr "nur Mehraufwand"
+
+#: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
+#: workbench/templates/logbook/loggedcost_detail.html
+#: workbench/templates/logbook/loggedhours_detail.html
+msgid "invoicing"
+msgstr "Verrechnung"
+
+#: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
+msgid "disable logging"
+msgstr "Erfassung sperren"
 
 #: workbench/invoices/forms.py workbench/services/apps.py
 #: workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
 msgid "services"
 msgstr "Leistungen"
 
 #: workbench/invoices/forms.py
-msgid "Disable logging on selected services from now on?"
-msgstr "Leistungserfassung auf ausgewählten Leistungen ab sofort verbieten?"
-
-#: workbench/invoices/forms.py
-msgid "Yes, disable logging from now on"
-msgstr "Ja, die Erfassung ab sofort verbieten"
-
-#: workbench/invoices/forms.py
-msgid "No, do not change anything"
-msgstr "Nein, bitte nichts ändern"
-
-#: workbench/invoices/forms.py
 #, python-format
-msgid "Some services have been invoiced from the offer already: %(services)s. Make sure the same work isn't invoiced twice."
-msgstr "Einige Leistungen wurden bereits aus der Offerte verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird."
+msgid "Some services have been invoiced from the offer already: %(services)s. Make sure the same work isn't invoiced twice, or only invoice the surplus."
+msgstr "Einige Leistungen wurden bereits aus der Offerte verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird, oder verrechne nur den Mehraufwand."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -5501,6 +5514,28 @@ msgstr "Unten stehen nur die Leistungen der Offerte."
 msgid "List all services of the project"
 msgstr "Alle Leistungen des Projekts anzeigen"
 
+#: workbench/templates/invoices/invoice_form.html
+msgid "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)."
+msgstr "Jede Leistung gemäss Offerte, gemäss Logbuch (die noch nicht verrechneten Stunden und Kosten) oder, nachdem die Offerte verrechnet wurde, nur den darüber hinaus erfassten Aufwand (Mehraufwand) verrechnen."
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "All services"
+msgstr "Alle Leistungen"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "Disable logging on all services from now on"
+msgstr "Leistungserfassung auf allen Leistungen ab sofort sperren"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "Select all"
+msgstr "Alles auswählen"
+
+#: workbench/templates/invoices/invoice_form.html
+#: workbench/templates/offers/offer_form.html
+#: workbench/templates/projects/project_detail.html
+msgid "optional"
+msgstr "optional"
+
 #: workbench/templates/invoices/invoice_list.html
 #: workbench/templates/projects/project_detail.html
 msgid "Show"
@@ -5569,11 +5604,6 @@ msgstr "Erbracht"
 
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
-msgid "invoicing"
-msgstr "Verrechnung"
-
-#: workbench/templates/logbook/loggedcost_detail.html
-#: workbench/templates/logbook/loggedhours_detail.html
 #, python-format
 msgid "Archived at %(archived_at)s"
 msgstr "Archiviert um %(archived_at)s"
@@ -5616,11 +5646,6 @@ msgstr "Hallo %(owner)s"
 #: workbench/templates/notes/notes_digest.txt
 msgid "Others have added or edited these notes on your deals, invoices and projects. Read them in Workbench:"
 msgstr "Andere haben diese Notizen bei Deinen Geschäften, Rechnungen und Projekten hinzugefügt oder bearbeitet. Lies sie in Workbench:"
-
-#: workbench/templates/offers/offer_form.html
-#: workbench/templates/projects/project_detail.html
-msgid "optional"
-msgstr "optional"
 
 #: workbench/templates/offers/offer_form.html
 msgid "New service"
@@ -6840,6 +6865,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Yes, disable logging from now on"
+#~ msgstr "Ja, die Erfassung ab sofort verbieten"
+
+#~ msgid "No, do not change anything"
+#~ msgstr "Nein, bitte nichts ändern"
 
 #~ msgid "Not archived"
 #~ msgstr "Nicht archiviert"

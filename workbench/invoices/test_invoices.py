@@ -15,7 +15,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.contacts.models import Person
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, service_surplus
 from workbench.invoices.tasks import autodunning
 from workbench.logbook.models import LoggedHours
 from workbench.offers.models import Offer
@@ -197,7 +197,6 @@ class InvoicesTest(TestCase):
             "tax_rate": "8.10",
             "postal_address": "Anything\nStreet\nCity",
             "selected_services": [service.pk],
-            "disable_logging": 0,
         }
         url = project.urls["createinvoice"] + "?type=services&source=offer"
         response = self.client.post(url, data)
@@ -232,6 +231,111 @@ class InvoicesTest(TestCase):
             response, "Some services have been invoiced from the offer already: Design"
         )
 
+    def test_services_invoice_mixing_sources(self):
+        """One invoice may contain services as offered, as logged and the
+        surplus of services invoiced from the offer before, and disable
+        logging only on some of them"""
+        project = factories.ProjectFactory.create()
+        capped = factories.ServiceFactory.create(
+            project=project,
+            title="Capped",
+            effort_type="Design",
+            effort_rate=100,
+            effort_hours=10,
+        )
+        maintenance = factories.ServiceFactory.create(
+            project=project, title="Maintenance", effort_type="Dev", effort_rate=200
+        )
+        factories.LoggedHoursFactory.create(service=capped, hours=3)
+        factories.LoggedHoursFactory.create(service=maintenance, hours=2)
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=services&source=offer"
+        data = {
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "discount": "0",
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            "postal_address": "Anything\nStreet\nCity",
+            "selected_services": [capped.pk, maintenance.pk],
+            f"source_{maintenance.pk}": "logbook",
+            f"disable_logging_{capped.pk}": "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        first = Invoice.objects.get()
+        self.assertEqual(first.subtotal, 1000 + 400)
+        self.assertEqual(
+            [(line.title, line.from_offer) for line in first.services.all()],
+            [("Capped", True), ("Maintenance", False)],
+        )
+        capped.refresh_from_db()
+        maintenance.refresh_from_db()
+        self.assertFalse(capped.allow_logging)
+        self.assertTrue(maintenance.allow_logging)
+
+        # 3h logged when invoicing the offer, 9h more makes 2h more than
+        # offered
+        capped.allow_logging = True
+        capped.save()
+        factories.LoggedHoursFactory.create(service=capped, hours=9)
+        factories.LoggedHoursFactory.create(service=maintenance, hours=1)
+
+        response = self.client.get(url)
+        self.assertContains(response, "surplus: 200.00")
+        self.assertEqual(
+            response.context["form"][f"source_{maintenance.pk}"].field.choices[-1][0],
+            "logbook",
+        )
+
+        # Invoicing the logbook again would invoice the offered hours twice
+        logbook = data | {f"source_{capped.pk}": "logbook"}
+        response = self.client.post(url, logbook)
+        self.assertContains(
+            response, "Some services have been invoiced from the offer already: Capped"
+        )
+        response = self.client.post(url, data | {f"source_{capped.pk}": "surplus"})
+        self.assertEqual(response.status_code, 302)
+        second = Invoice.objects.latest("pk")
+        self.assertEqual(
+            [(line.title, line.effort_hours) for line in second.services.all()],
+            [("Capped", 2), ("Maintenance", 1)],
+        )
+        self.assertEqual(second.subtotal, 200 + 200)
+        self.assertFalse(
+            LoggedHours.objects.filter(
+                service__project=project, archived_at__isnull=True
+            ).exists()
+        )
+
+        factories.LoggedHoursFactory.create(service=capped, hours=1)
+        response = self.client.get(url)
+        self.assertContains(response, "surplus: 100.00")
+        # Cancelled invoices don't count (and release their entries)
+        second.status = Invoice.CANCELED
+        second.save()
+        response = self.client.get(url)
+        self.assertContains(response, "surplus: 300.00")
+
+    def test_surplus_doesnt_include_work_invoiced_from_offer(self):
+        """Work logged before invoicing the offer belongs to the offered
+        amount, also if it was more than offered"""
+        service = factories.ServiceFactory.create(
+            effort_type="Design", effort_rate=100, effort_hours=10
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=15)
+        invoice = factories.InvoiceFactory.create(
+            project=service.project,
+            customer=service.project.customer,
+            contact=service.project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_offer([service])
+        self.assertEqual(service_surplus(service)["hours"], 0)
+        factories.LoggedHoursFactory.create(service=service, hours=2)
+        self.assertEqual(service_surplus(service)["hours"], 2)
+
     def test_services_invoiced_from_offer_with_logged_hours(self):
         """Invoicing the offer links the hours logged so far, the lines still
         count as invoiced from the offer"""
@@ -260,7 +364,6 @@ class InvoicesTest(TestCase):
                 "tax_rate": "8.10",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
-                "disable_logging": 0,
             },
         )
         self.assertContains(
@@ -398,7 +501,7 @@ class InvoicesTest(TestCase):
                 "tax_rate": "7.70",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
-                "disable_logging": 1,
+                f"disable_logging_{service.pk}": "on",
             },
         )
         # print(response, response.content.decode("utf-8"))
@@ -513,11 +616,17 @@ class InvoicesTest(TestCase):
         response = self.client.get(url)
         # print(response, response.content.decode("utf-8"))
 
-        self.assertContains(response, "<strong>cost-only</strong><br>10.00")
-        self.assertContains(response, "1.0h logged but no hourly rate defined.")
-        self.assertContains(response, "<strong>no-rate</strong><br>0.00")
-        self.assertContains(response, "2.0h logged but no hourly rate defined.")
-        self.assertContains(response, "<strong>with-rate</strong><br>600.00")
+        self.assertContains(
+            response,
+            'as logged: 10.00 <small class="bg-warning px-1">1.0h logged but no'
+            " hourly rate defined.</small>",
+        )
+        self.assertContains(
+            response,
+            'as logged: 0.00 <small class="bg-warning px-1">2.0h logged but no'
+            " hourly rate defined.</small>",
+        )
+        self.assertContains(response, "as logged: 600.00 (3.0h)")
         self.assertContains(response, "id_show_service_details")
         self.assertNotContains(response, f'value="{service4.pk}"')
 
@@ -539,10 +648,8 @@ class InvoicesTest(TestCase):
                     # service2.pk,  not available,
                     service3.pk,
                 ],
-                "disable_logging": 0,
             },
         )
-        print(response, response.content.decode("utf-8"))
         self.assertEqual(response.status_code, 302)
         invoice = Invoice.objects.get()
         self.assertRedirects(response, invoice.urls["detail"])
@@ -663,7 +770,6 @@ class InvoicesTest(TestCase):
                 "tax_rate": "7.70",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
-                "disable_logging": 0,
             },
         )
 
@@ -709,7 +815,6 @@ class InvoicesTest(TestCase):
                 "tax_rate": "7.70",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
-                "disable_logging": 0,
             },
         )
         invoice = Invoice.objects.get()

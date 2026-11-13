@@ -1,5 +1,5 @@
 {% extends "generic/object_form.html" %}
-{% load i18n %}
+{% load fineforms i18n %}
 {% block uplink %}
   {% if view.project %}
     <a href="{{ view.project.get_absolute_url }}" class="btn btn-quiet btn-sm uplink">
@@ -56,3 +56,111 @@
     </form>
   {% endif %}
 {% endblock before_form %}
+
+{% block fields %}
+  {% if form.service_fields_exclude %}
+    <section class="card mb-3">
+      <div class="card-body">{% ff_fields form exclude=form.service_fields_exclude %}</div>
+    </section>
+    <section class="card mb-3 wb-table-card">
+      <div class="card-header">
+        {% translate 'services'|capfirst %}
+        <small class="form-text text-muted d-block">
+          {% translate "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)." %}
+        </small>
+        <div class="d-flex flex-wrap gap-3 mt-2 small">
+          <span>
+            {% translate 'All services' %}:
+            <a href="#" data-select-all="offer">{% translate 'as offered' %}</a> &middot;
+            <a href="#" data-select-all="logbook">{% translate 'as logged' %}</a>
+          </span>
+          <label class="form-check mb-0">
+            <input type="checkbox" class="form-check-input" data-check-all="[name^=disable_logging_]">
+            {% translate 'Disable logging on all services from now on' %}
+          </label>
+        </div>
+      </div>
+      {% if form.selected_services.errors %}
+        <div class="card-body pb-0">{{ form.selected_services.errors }}</div>
+      {% endif %}
+      <table class="table table-sm mb-0 wb-invoice-services">
+        <colgroup>
+          <col width="1%">
+          <col>
+          <col width="30%">
+          <col width="1%">
+        </colgroup>
+        {% for group in form.service_groups %}
+          <tbody>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  data-check-all="[name=selected_services]"
+                  aria-label="{% translate 'Select all' %}"
+                  title="{% translate 'Select all' %}"
+                >
+              </th>
+              <th>{{ group.offer|default:_("Not offered yet") }}</th>
+              <th>{% translate 'invoicing'|capfirst %}</th>
+              <th class="text-nowrap">{% translate 'disable logging'|capfirst %}</th>
+            </tr>
+            {% for row in group.rows %}
+              <tr>
+                <td>
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="{{ row.selected.data.name }}"
+                    value="{{ row.selected.data.value }}"
+                    id="{{ row.selected.id_for_label }}"
+                    {% if row.selected.data.selected %}checked{% endif %}
+                  >
+                </td>
+                <td>
+                  <label for="{{ row.selected.id_for_label }}" class="text-break">
+                    <strong>{{ row.service.title }}</strong>
+                    {% if row.service.is_optional %}
+                      <small class="text-muted">({% translate 'optional' %})</small>
+                    {% endif %}
+                  </label>
+                  {% if row.service.description %}
+                    <div class="small text-muted text-break">{{ row.service.description|linebreaksbr }}</div>
+                  {% endif %}
+                </td>
+                <td class="small">
+                  {% for radio in row.source %}
+                    <div class="form-check">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        name="{{ radio.data.name }}"
+                        value="{{ radio.data.value }}"
+                        id="{{ radio.id_for_label }}"
+                        {% if radio.data.selected %}checked{% endif %}
+                      >
+                      <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                    </div>
+                  {% endfor %}
+                </td>
+                <td class="text-center">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="{{ row.disable_logging.html_name }}"
+                    id="{{ row.disable_logging.id_for_label }}"
+                    aria-label="{% translate 'disable logging' %}"
+                    {% if row.disable_logging.value %}checked{% endif %}
+                  >
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        {% endfor %}
+      </table>
+    </section>
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock fields %}

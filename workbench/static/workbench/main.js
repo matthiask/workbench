@@ -572,15 +572,23 @@ on("click", "[data-select-receivers]", (e, el) => {
   }
 })
 
-// "Select all" checkboxes in the group labels of checkbox lists, e.g. the
-// services of offers and invoices
-on("change", "[data-toggle-following]", (_e, el) => {
-  let sibling = el.closest(".form-text").nextElementSibling
-  while (sibling && !sibling.matches(".form-text")) {
-    for (const input of sibling.querySelectorAll("input")) {
-      input.checked = el.checked
-    }
-    sibling = sibling.nextElementSibling
+// Checkboxes changing all checkboxes of their table (or form) at once, and
+// links selecting the radio buttons with their value, e.g. the services when
+// creating invoices
+on("change", "[data-check-all]", (_e, el) => {
+  for (const input of (
+    el.closest("table") || el.closest("form")
+  ).querySelectorAll(el.dataset.checkAll)) {
+    input.checked = el.checked
+  }
+})
+
+on("click", "[data-select-all]", (e, el) => {
+  e.preventDefault()
+  for (const input of el
+    .closest("form")
+    .querySelectorAll(`input[type=radio][value="${el.dataset.selectAll}"]`)) {
+    input.checked = true
   }
 })
 

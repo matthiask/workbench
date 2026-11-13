@@ -240,7 +240,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `wb invoices create` (`POST /api/invoices/`) only creates invoices in
   preparation, validated with the web interface's creation forms
   (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
-  query parameters of the web views) and their defaults; sending them stays
+  query parameters of the web views) and their defaults; services invoices
+  take each service as offered, as logged or only the surplus (`sources`,
+  `--service ID:logbook`; the menu entry sets the default) and disable
+  logging per service (`disable_logging`). Invoicing the offer links the
+  entries logged so far; the surplus (`service_surplus()`) is the logged
+  work beyond what has been invoiced on the service, at most what hasn't
+  been invoiced from the logbook yet. Sending them stays
   in the web interface. "Release and send" mails an invoice in preparation
   with its PDF to the customer (suggested like payment reminders, the owner
   in Cc and Reply-To), invoiced today and due in 15 days, and marks it as

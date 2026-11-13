@@ -186,6 +186,21 @@ def invoice_pdf(invoice_id, output):
     download(f"invoices/{invoice_id}/pdf/", output)
 
 
+SOURCES = ("offer", "logbook", "surplus")
+
+
+def _parse_services(_ctx, _param, values):
+    services = []
+    for value in values:
+        id, _sep, source = value.partition(":")
+        if not id.isdigit() or (source and source not in SOURCES):
+            raise click.BadParameter(
+                f"{value!r} isn't an ID, optionally followed by :" + ", :".join(SOURCES)
+            )
+        services.append((int(id), source or None))
+    return services
+
+
 @invoices.command("create")
 @click.option("--project", type=int, help="Project ID.")
 @click.option(
@@ -213,9 +228,20 @@ def invoice_pdf(invoice_id, output):
 @click.option(
     "--service",
     "services",
+    multiple=True,
+    callback=_parse_services,
+    metavar="ID[:SOURCE]",
+    help="ID of a service to invoice, defaults to the offer's services."
+    " Another source than the invoice's after a colon: offer, logbook or"
+    " surplus (the work logged beyond what has been invoiced, after"
+    " invoicing the offer), e.g. 42:logbook.",
+)
+@click.option(
+    "--disable-logging",
     type=int,
     multiple=True,
-    help="ID of a service to invoice, defaults to the offer's services.",
+    metavar="ID",
+    help="ID of an invoiced service on which logging is disabled afterwards.",
 )
 @click.option(
     "--logbook-cutoff-date",
@@ -261,6 +287,7 @@ def create_invoice(
     type_,
     from_logbook,
     services,
+    disable_logging,
     down_payments,
     logbook_cutoff_date,
     title,
@@ -282,7 +309,7 @@ def create_invoice(
     interface
 
     Invoice an offer (--offer), selected services of a project (--service,
-    as offered or --from-logbook), a fixed amount, down payment or credit of
+    as offered or --from-logbook, or each with its own source), a fixed amount, down payment or credit of
     a project (--project --subtotal) or a fixed amount for a contact without
     project (--contact --title --subtotal)."""
     data = {
@@ -306,7 +333,11 @@ def create_invoice(
     data["liable_to_vat"] = liable_to_vat
     data["source"] = "logbook" if from_logbook else "offer"
     if services:
-        data["services"] = list(services)
+        data["services"] = [id for id, _source in services]
+        if sources := {id: source for id, source in services if source}:
+            data["sources"] = sources
+    if disable_logging:
+        data["disable_logging"] = list(disable_logging)
     if down_payments:
         data["down_payments"] = list(down_payments)
     for key, value in [

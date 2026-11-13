@@ -17,7 +17,12 @@ from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
 from workbench.invoices import sending
-from workbench.invoices.models import Invoice, RecurringInvoice, Service
+from workbench.invoices.models import (
+    Invoice,
+    RecurringInvoice,
+    Service,
+    service_surplus,
+)
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.forms import (
     add_delete_planned_work_field,
@@ -863,44 +868,54 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 add_delete_planned_work_field(self, self.project)
 
     def add_services_field(self):
-        source = self.request.GET.get("source")
-        if source == "logbook":
-            self.fields["logbook_cutoff_date"] = forms.DateField(
-                widget=DateInput,
-                required=False,
-                label=_("Logbook cutoff date"),
-                help_text=_(
-                    "Only include logbook entries up to this date. The service totals shown below may be too high if using this."
-                ),
+        source = (
+            Invoice.LOGBOOK
+            if self.request.GET.get("source") == "logbook"
+            else Invoice.OFFER
+        )
+        # Invoicing from the offer links the logged entries too, the cutoff
+        # date only applies to invoicing from the logbook
+        self.fields["logbook_cutoff_date"] = forms.DateField(
+            widget=DateInput,
+            required=False,
+            label=_("Logbook cutoff date"),
+            help_text=_(
+                "Only include logbook entries up to this date when invoicing"
+                " the logbook or the surplus. The amounts shown below may be"
+                " too high if using this."
+            ),
+        )
+
+        def logged(row):
+            if row["service"].effort_rate is None and row["not_archived_logged_hours"]:
+                return format_html(
+                    '{} <small class="bg-warning px-1">{}</small>',
+                    currency(row["not_archived"]),
+                    _("%s logged but no hourly rate defined.")
+                    % hours(row["not_archived_logged_hours"]),
+                )
+            if row["not_archived_logged_hours"]:
+                return format_html(
+                    "{} ({})",
+                    currency(row["not_archived"]),
+                    hours(row["not_archived_logged_hours"]),
+                )
+            return currency(row["not_archived"])
+
+        # Services which have been invoiced from the offer may have a surplus
+        from_offer = set(
+            Service.objects
+            .filter(
+                project_service__project=self.project,
+                from_offer=True,
             )
-
-            def amount(row):
-                if row["service"].effort_rate is not None:
-                    return currency(row["not_archived"])
-                if row["not_archived_logged_hours"]:
-                    return format_html(
-                        '{} <small class="bg-warning px-1">{}</small>',
-                        currency(row["not_archived"]),
-                        _("%s logged but no hourly rate defined.")
-                        % hours(row["not_archived_logged_hours"]),
-                    )
-                return currency(row["not_archived"])
-
-            def filter(services):
-                for row in services:
-                    if row["not_archived"] or row["not_archived_logged_hours"]:
-                        yield row
-
-        else:
-
-            def amount(row):
-                return currency(row["service"].service_cost)
-
-            def filter(services):
-                yield from services
+            .exclude(invoice__status=Invoice.CANCELED)
+            .values_list("project_service", flat=True)
+        )
 
         choices = []
         selected = []
+        self.service_groups = []
         # Offers for the filter above the form, which preselects their services
         # and only lists them unless all services of the project are wanted
         self.offer_filter = []
@@ -913,7 +928,14 @@ class CreateProjectInvoiceForm(InvoiceForm):
         self.toggle_all_url = f"?{params.urlencode()}"
         self.showing_all = show_all
         for offer, offer_data in self.project.grouped_services["offers"]:
-            rows = list(filter(offer_data["services"]))
+            # Invoicing from the logbook lists what hasn't been invoiced yet
+            rows = [
+                row
+                for row in offer_data["services"]
+                if source == Invoice.OFFER
+                or row["not_archived"]
+                or row["not_archived_logged_hours"]
+            ]
             # All offers with services, whatever the source; selecting one
             # without anything to invoice preselects nothing
             if offer and offer_data["services"]:
@@ -924,60 +946,107 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 selected = [
                     row["service"].id
                     for row in rows
-                    if source == "logbook" or not row["service"].is_optional
+                    if source == Invoice.LOGBOOK or not row["service"].is_optional
                 ]
             elif self.offer and not show_all:
                 continue
-            id = f"offer-{offer.pk if offer else 'none'}"
-            choices.append((
-                format_html(
-                    "<u>{}</u><br>"
-                    '<div class="form-check">'
-                    '<input type="checkbox" data-toggle-following id="{}">'
-                    '<label for="{}">{}</label>'
-                    "</div>",
-                    offer or _("Not offered yet"),
-                    id,
-                    id,
-                    _("Select all"),
-                ),
-                [
-                    (
-                        row["service"].id,
-                        format_html(
-                            '<div class="mb-2 text-break"><strong>{}</strong>'
-                            "<br>{}{}</div>",
-                            row["service"].title,
-                            format_html("{}<br>", row["service"].description)
-                            if row["service"].description
-                            else "",
-                            amount(row),
-                        ),
-                    )
-                    for row in rows
-                ],
-            ))
+            if not rows:
+                continue
 
-        self.fields["selected_services"] = forms.MultipleChoiceField(
+            choices.append((
+                str(offer or _("Not offered yet")),
+                [(row["service"].id, row["service"].title) for row in rows],
+            ))
+            group = {"offer": offer, "rows": []}
+            self.service_groups.append(group)
+            for row in rows:
+                service = row["service"]
+                sources = [
+                    (
+                        Invoice.OFFER,
+                        format_html(
+                            "{}: {}", _("as offered"), currency(service.service_cost)
+                        ),
+                    ),
+                    (
+                        Invoice.LOGBOOK,
+                        format_html("{}: {}", _("as logged"), logged(row)),
+                    ),
+                ]
+                if service.id in from_offer:
+                    surplus = service_surplus(service)
+                    sources.append((
+                        Invoice.SURPLUS,
+                        format_html(
+                            "{}: {}",
+                            _("surplus"),
+                            currency(
+                                surplus["hours"] * (service.effort_rate or Z2)
+                                + surplus["cost"]
+                            ),
+                        ),
+                    ))
+                self.fields[f"source_{service.id}"] = forms.ChoiceField(
+                    label=_("invoicing"),
+                    choices=sources,
+                    initial=source,
+                    widget=forms.RadioSelect,
+                    required=False,
+                )
+                self.fields[f"disable_logging_{service.id}"] = forms.BooleanField(
+                    label=_("disable logging"),
+                    required=False,
+                )
+                group["rows"].append({
+                    "service": service,
+                    "source": f"source_{service.id}",
+                    "disable_logging": f"disable_logging_{service.id}",
+                })
+
+        self.fields["selected_services"] = forms.TypedMultipleChoiceField(
             choices=choices,
+            coerce=int,
             initial=selected,
             label=_("services"),
-            widget=forms.CheckboxSelectMultiple(attrs={"size": 30}),
+            widget=forms.CheckboxSelectMultiple,
         )
+        self.service_fields = [
+            "selected_services",
+            *(
+                row[field]
+                for group in self.service_groups
+                for row in group["rows"]
+                for field in ("source", "disable_logging")
+            ),
+        ]
+        # The template renders them as a table
+        self.service_fields_exclude = ",".join(self.service_fields)
+        checkboxes = {
+            widget.data["value"]: widget for widget in self["selected_services"]
+        }
+        for group in self.service_groups:
+            for row in group["rows"]:
+                row["selected"] = checkboxes[row["service"].id]
+                row["source"] = self[row["source"]]
+                row["disable_logging"] = self[row["disable_logging"]]
 
-        self.fields["disable_logging"] = forms.TypedChoiceField(
-            label=_("Disable logging on selected services from now on?"),
-            choices=[
-                (1, _("Yes, disable logging from now on")),
-                (0, _("No, do not change anything")),
-            ],
-            coerce=lambda x: int(x),  # noqa: PLW0108
-            widget=forms.RadioSelect,
+    def service_sources(self):
+        """The source of each selected service, the default (from the menu
+        entry) if none was given"""
+        default = (
+            Invoice.LOGBOOK
+            if self.request.GET.get("source") == "logbook"
+            else Invoice.OFFER
         )
+        return {
+            id: self.cleaned_data.get(f"source_{id}") or default
+            for id in self.cleaned_data.get("selected_services") or ()
+        }
 
     def clean(self):
         data = super().clean()
-        if selected := data.get("selected_services"):
+        if "selected_services" in data:
+            sources = self.service_sources()
             # Invoicing new work from the logbook again is the normal case,
             # the danger is switching between the offer and the logbook
             lines = Service.objects.filter(
@@ -987,46 +1056,58 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     Invoice.PAID,
                 ],
             )
-            from_logbook = self.request.GET.get("source") == "logbook"
-            if from_logbook:
-                lines = lines.filter(from_offer=True)
-            invoiced = self.project.services.filter(
-                id__in=selected, invoice_services__in=lines
-            ).distinct()
-            if invoiced:
-                message = (
+            for source, message in [
+                (
+                    Invoice.LOGBOOK,
                     _(
                         "Some services have been invoiced from the offer already:"
-                        " %(services)s. Make sure the same work isn't invoiced twice."
-                    )
-                    if from_logbook
-                    else _(
+                        " %(services)s. Make sure the same work isn't invoiced"
+                        " twice, or only invoice the surplus."
+                    ),
+                ),
+                (
+                    Invoice.OFFER,
+                    _(
                         "Some services have been invoiced already: %(services)s."
                         " Make sure the same work isn't invoiced twice."
+                    ),
+                ),
+            ]:
+                invoiced = self.project.services.filter(
+                    id__in=[id for id, s in sources.items() if s == source],
+                    invoice_services__in=lines.filter(from_offer=True)
+                    if source == Invoice.LOGBOOK
+                    else lines,
+                ).distinct()
+                if invoiced:
+                    self.add_warning(
+                        message
+                        % {
+                            "services": ", ".join(service.title for service in invoiced)
+                        },
+                        code="services-invoiced-already",
                     )
-                )
-                self.add_warning(
-                    message
-                    % {"services": ", ".join(service.title for service in invoiced)},
-                    code="services-invoiced-already",
-                )
         return data
 
     def save(self):
         if self.request.GET.get("type") == "services":
             instance = super().save()
-            services = self.project.services.filter(
-                id__in=self.cleaned_data["selected_services"]
-            ).select_related("offer")
-            if self.request.GET.get("source") == "logbook":
-                instance.create_services_from_logbook(
-                    services,
-                    logbook_cutoff_date=self.cleaned_data.get("logbook_cutoff_date"),
-                )
-            else:
-                instance.create_services_from_offer(services)
-            if self.cleaned_data["disable_logging"]:
-                services.update(allow_logging=False)
+            sources = self.service_sources()
+            services = self.project.services.filter(id__in=sources).select_related(
+                "offer"
+            )
+            instance.create_services(
+                services,
+                sources=sources,
+                logbook_cutoff_date=self.cleaned_data.get("logbook_cutoff_date"),
+            )
+            services.filter(
+                id__in=[
+                    id
+                    for id in sources
+                    if self.cleaned_data.get(f"disable_logging_{id}")
+                ]
+            ).update(allow_logging=False)
 
         else:
             instance = super().save()

@@ -553,63 +553,42 @@ class Invoice(ModelWithTotal):
             )
         ]
 
+    # Where the lines of services invoices come from
+    OFFER = "offer"
+    LOGBOOK = "logbook"
+    # Logged work beyond what has been invoiced already, e.g. after
+    # invoicing the offer
+    SURPLUS = "surplus"
+
     def create_services_from_logbook(
         self, project_services, *, logbook_cutoff_date=None
     ):
-        assert self.project, "cannot call create_services_from_logbook without project"
+        self.create_services(
+            project_services,
+            sources=dict.fromkeys((ps.id for ps in project_services), self.LOGBOOK),
+            logbook_cutoff_date=logbook_cutoff_date,
+        )
+
+    def create_services_from_offer(self, project_services):
+        self.create_services(
+            project_services,
+            sources=dict.fromkeys((ps.id for ps in project_services), self.OFFER),
+        )
+
+    def create_services(self, project_services, *, sources, logbook_cutoff_date=None):
+        """Invoice lines for the services as offered, as logged (the entries
+        not invoiced yet) or for the surplus, by ``sources`` (service ID to
+        source); the logbook cutoff date doesn't apply to offered services"""
+        assert self.project, "cannot call create_services without project"
 
         for position, ps in enumerate(self._ordered_services(project_services)):
+            source = sources[ps.id]
             not_archived_effort = ps.loggedhours.filter(
                 archived_at__isnull=True
             ).order_by()
             not_archived_costs = ps.loggedcosts.filter(
                 archived_at__isnull=True
             ).order_by()
-
-            if logbook_cutoff_date:
-                not_archived_effort = not_archived_effort.filter(
-                    rendered_on__lte=logbook_cutoff_date
-                )
-                not_archived_costs = not_archived_costs.filter(
-                    rendered_on__lte=logbook_cutoff_date
-                )
-
-            hours = not_archived_effort.aggregate(s=Sum(HOURS_FOR_INVOICING))["s"] or Z1
-            cost = not_archived_costs.aggregate(Sum("cost"))["cost__sum"] or Z2
-
-            if hours or cost:
-                service = Service(
-                    invoice=self,
-                    project_service=ps,
-                    title=ps.title,
-                    description=ps.description,
-                    position=position + 1,
-                    effort_rate=ps.effort_rate,
-                    effort_type=ps.effort_type,
-                    effort_hours=hours,
-                    cost=cost,
-                    third_party_costs=not_archived_costs.filter(
-                        third_party_costs__isnull=False
-                    ).aggregate(Sum("third_party_costs"))["third_party_costs__sum"],
-                )
-                service.save(skip_related_model=True)
-                not_archived_effort.update(
-                    invoice_service=service, archived_at=timezone.now()
-                )
-                not_archived_costs.update(
-                    invoice_service=service, archived_at=timezone.now()
-                )
-
-        (
-            self.service_period_from,
-            self.service_period_until,
-        ) = self.service_period_from_logbook()
-        self.save()
-
-    def create_services_from_offer(self, project_services):
-        assert self.project, "cannot call create_services_from_offer without project"
-
-        for position, ps in enumerate(self._ordered_services(project_services)):
             service = Service(
                 invoice=self,
                 project_service=ps,
@@ -618,16 +597,47 @@ class Invoice(ModelWithTotal):
                 position=position + 1,
                 effort_rate=ps.effort_rate,
                 effort_type=ps.effort_type,
-                effort_hours=ps.effort_hours,
-                cost=ps.cost,
-                third_party_costs=ps.third_party_costs,
-                from_offer=True,
             )
+
+            if source == self.OFFER:
+                service.effort_hours = ps.effort_hours
+                service.cost = ps.cost
+                service.third_party_costs = ps.third_party_costs
+                service.from_offer = True
+            else:
+                if logbook_cutoff_date:
+                    not_archived_effort = not_archived_effort.filter(
+                        rendered_on__lte=logbook_cutoff_date
+                    )
+                    not_archived_costs = not_archived_costs.filter(
+                        rendered_on__lte=logbook_cutoff_date
+                    )
+                if source == self.SURPLUS:
+                    surplus = service_surplus(
+                        ps, logbook_cutoff_date=logbook_cutoff_date
+                    )
+                    service.effort_hours = surplus["hours"]
+                    service.cost = surplus["cost"]
+                    service.third_party_costs = surplus["third_party_costs"] or None
+                else:
+                    service.effort_hours = (
+                        not_archived_effort.aggregate(s=Sum(HOURS_FOR_INVOICING))["s"]
+                        or Z1
+                    )
+                    service.cost = (
+                        not_archived_costs.aggregate(s=Sum("cost"))["s"] or Z2
+                    )
+                    service.third_party_costs = not_archived_costs.filter(
+                        third_party_costs__isnull=False
+                    ).aggregate(s=Sum("third_party_costs"))["s"]
+                if not (service.effort_hours or service.cost):
+                    continue
+
             service.save(skip_related_model=True)
-            ps.loggedhours.filter(archived_at__isnull=True).update(
+            not_archived_effort.update(
                 invoice_service=service, archived_at=timezone.now()
             )
-            ps.loggedcosts.filter(archived_at__isnull=True).update(
+            not_archived_costs.update(
                 invoice_service=service, archived_at=timezone.now()
             )
 
@@ -767,6 +777,53 @@ class Service(ServiceBase):
             ]
 
     delete.alters_data = True
+
+
+def service_surplus(project_service, *, logbook_cutoff_date=None):
+    """Logged hours (for invoicing), costs and third party costs of a service
+    beyond what its lines on invoices which aren't cancelled contain, e.g.
+    after invoicing the offer and working more than offered
+
+    At most what hasn't been invoiced from the logbook yet: work logged
+    before invoicing the offer belongs to the offered amount, also if it was
+    more than offered."""
+    hours = project_service.loggedhours.order_by()
+    costs = project_service.loggedcosts.order_by()
+    if logbook_cutoff_date:
+        hours = hours.filter(rendered_on__lte=logbook_cutoff_date)
+        costs = costs.filter(rendered_on__lte=logbook_cutoff_date)
+
+    def logged(hours, costs):
+        return {
+            key: value or Z2
+            for key, value in (
+                hours.aggregate(hours=Sum(HOURS_FOR_INVOICING))
+                | costs.aggregate(
+                    cost=Sum("cost"), third_party_costs=Sum("third_party_costs")
+                )
+            ).items()
+        }
+
+    total = logged(hours, costs)
+    not_archived = logged(
+        hours.filter(archived_at__isnull=True), costs.filter(archived_at__isnull=True)
+    )
+    invoiced = (
+        Service.objects
+        .filter(project_service=project_service)
+        .exclude(invoice__status=Invoice.CANCELED)
+        .aggregate(
+            hours=Sum("effort_hours"),
+            cost=Sum("cost"),
+            third_party_costs=Sum("third_party_costs"),
+        )
+    )
+    return {
+        key: max(
+            min(not_archived[key], total[key] - (invoiced[key] or Z2)), Z2
+        ).quantize(zero)
+        for key, zero in [("hours", Z1), ("cost", Z2), ("third_party_costs", Z2)]
+    }
 
 
 class RecurringInvoiceQuerySet(SearchQuerySet):

@@ -478,6 +478,45 @@ class InvoicesAPITest(TestCase):
         hours.refresh_from_db()
         self.assertTrue(hours.invoice_service)
 
+        # Sources of single services; only listed services, and the surplus
+        # only after invoicing the offer
+        factories.LoggedHoursFactory.create(service=consulting, hours=1)
+        response = create({
+            "project": project.pk,
+            "services": [consulting.pk],
+            "sources": {consulting.pk: "surplus"},
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"],
+            ["body", "data", "sources", str(consulting.pk)],
+        )
+        response = create({
+            "project": project.pk,
+            "source": "logbook",
+            "services": [consulting.pk],
+            "sources": {offer.services.first().pk: "offer"},
+            "disable_logging": [offer.services.first().pk],
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [
+                ["body", "data", "sources", str(offer.services.first().pk)],
+                ["body", "data", "disable_logging"],
+            ],
+        )
+        response = create({
+            "project": project.pk,
+            "services": [consulting.pk],
+            "sources": {consulting.pk: "logbook"},
+            "disable_logging": [consulting.pk],
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["total_excl_tax"], "200.00")
+        consulting.refresh_from_db()
+        self.assertFalse(consulting.allow_logging)
+
         # Services invoices without offer need the services
         response = create({"project": project.pk, "type": "services"})
         self.assertEqual(response.status_code, 422)
