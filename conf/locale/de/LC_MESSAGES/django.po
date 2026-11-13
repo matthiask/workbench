@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 10:44+0100\n"
+"POT-Creation-Date: 2026-11-13 10:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3053,7 +3053,7 @@ msgstr "<entdeckt>"
 msgid "No offer"
 msgstr "Keine Offerte"
 
-#: workbench/logbook/forms.py
+#: workbench/logbook/forms.py workbench/templates/projects/project_detail.html
 msgid "Not archived"
 msgstr "Nicht archiviert"
 
@@ -5825,14 +5825,8 @@ msgid "includes discount of %(discount)s"
 msgstr "berücksichtigt Rabatt von %(discount)s"
 
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
-msgid "Hours for invoicing and costs which have not been invoiced yet"
-msgstr "Stunden für Verrechnung und Kosten, die noch nicht verrechnet wurden"
-
-#: workbench/templates/projects/project_detail.html
-#: workbench/templates/projects/project_statistics.html
-msgid "Not invoiced yet"
-msgstr "Noch nicht verrechnet"
+msgid "Hours and costs which were not invoiced using a service invoice"
+msgstr "Stunden und Kosten, welche nicht mit einer Leistungsrechnung verrechnet wurden"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Total invoiced excl. tax"
@@ -6051,6 +6045,14 @@ msgstr "Nur nicht archivierte"
 #: workbench/templates/projects/project_statistics.html
 msgid "Scheduled"
 msgstr "Geplant"
+
+#: workbench/templates/projects/project_statistics.html
+msgid "Hours for invoicing and costs which have not been invoiced yet"
+msgstr "Stunden für Verrechnung und Kosten, die noch nicht verrechnet wurden"
+
+#: workbench/templates/projects/project_statistics.html
+msgid "Not invoiced yet"
+msgstr "Noch nicht verrechnet"
 
 #: workbench/templates/reporting/accepted_deals.html
 msgid "Cumulative"

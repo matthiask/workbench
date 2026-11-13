@@ -217,9 +217,10 @@
           <div class="wb-stat">
             <div
               class="wb-stat-label"
-              title="{% translate 'Hours for invoicing and costs which have not been invoiced yet' %}"
+              title="{% translate 'Hours and costs which were not invoiced using a service invoice' %}"
             >
-              {% translate 'Not invoiced yet' %}
+              {% translate 'Not archived' %}
+              <span class="wb-stat-icon">{% include 'svg/info.svg' %}</span>
             </div>
             <div class="wb-stat-value">
               {{ project.not_archived_total.total|currency }}
