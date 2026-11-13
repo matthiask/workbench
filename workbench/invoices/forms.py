@@ -23,7 +23,6 @@ from workbench.invoices.models import (
     RecurringInvoice,
     Service,
     line_description,
-    service_surplus,
 )
 from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
 from workbench.projects.forms import (
@@ -883,15 +882,15 @@ class CreateProjectInvoiceForm(InvoiceForm):
 
     def add_services_field(self):  # noqa: C901
         # Invoicing as offered links the logged entries too, the cutoff date
-        # only applies to the logbook and the surplus
+        # only applies to the logbook
         self.fields["logbook_cutoff_date"] = forms.DateField(
             widget=DateInput,
             required=False,
             label=_("Logbook cutoff date"),
             help_text=_(
                 "Only include logbook entries up to this date when invoicing"
-                " the logbook or the surplus. The amounts shown below may be"
-                " too high if using this."
+                " the logbook. The amounts shown below may be too high if"
+                " using this."
             ),
         )
 
@@ -911,8 +910,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 )
             return currency(row["not_archived"])
 
-        # Services which have been invoiced, and whether from the offer (they
-        # may have a surplus then), with the total and the invoices
+        # Services which have been invoiced, with the total and the invoices
         invoiced = {}
         invoiced_totals = defaultdict(lambda: Z2)
         invoiced_on = defaultdict(dict)
@@ -924,10 +922,9 @@ class CreateProjectInvoiceForm(InvoiceForm):
             .order_by("invoice___code", "position")
         ):
             id = line.project_service_id
-            invoiced[id] = invoiced.get(id, False) or line.from_offer
+            invoiced[id] = True
             invoiced_totals[id] += line.service_cost
             invoiced_on[id][line.invoice.pk] = line.invoice
-        from_offer = {id for id, line_from_offer in invoiced.items() if line_from_offer}
         # All logged work, valued like the logbook is invoiced
         logged_for_invoicing = sum_by(
             LoggedHours.objects.filter(service__project=self.project),
@@ -948,14 +945,17 @@ class CreateProjectInvoiceForm(InvoiceForm):
             )
 
         def default_source(service):
-            """Work invoiced as offered is followed by the surplus, work
-            invoiced as logged by more logged work. Services which haven't
-            been invoiced yet are invoiced as offered if something has been
-            offered"""
-            if service.id in from_offer:
-                return Invoice.SURPLUS
-            if service.id in invoiced:
-                return Invoice.LOGBOOK
+            """Services which have been invoiced are invoiced as logged (after
+            invoicing the offer everything logged afterwards is the surplus),
+            others as offered if something has been offered (and not
+            declined)"""
+            if (
+                service.id not in invoiced
+                and not service.is_declined
+                and (service.effort_hours or service.cost)
+            ):
+                return Invoice.OFFER
+            return Invoice.LOGBOOK
             if service.effort_hours or service.cost:
                 return Invoice.OFFER
             return Invoice.LOGBOOK
@@ -999,7 +999,6 @@ class CreateProjectInvoiceForm(InvoiceForm):
             group = {
                 "offer": offer,
                 "rows": [],
-                "has_surplus": False,
                 "hidden": not visible,
             }
             self.has_hidden_services |= len(visible) < len(rows)
@@ -1018,20 +1017,6 @@ class CreateProjectInvoiceForm(InvoiceForm):
                         format_html("{}: {}", _("as logged"), logged(row)),
                     ),
                 ]
-                if service.id in from_offer:
-                    group["has_surplus"] = True
-                    surplus = service_surplus(service)
-                    sources.append((
-                        Invoice.SURPLUS,
-                        format_html(
-                            "{}: {}",
-                            _("surplus"),
-                            currency(
-                                surplus["hours"] * (service.effort_rate or Z2)
-                                + surplus["cost"]
-                            ),
-                        ),
-                    ))
                 self.fields[f"source_{service.id}"] = forms.ChoiceField(
                     label=_("invoicing"),
                     choices=sources,
@@ -1064,8 +1049,6 @@ class CreateProjectInvoiceForm(InvoiceForm):
                         row["not_archived_logged_cost"],
                     ),
                 }
-                if service.id in from_offer:
-                    presets[Invoice.SURPLUS] = (surplus["hours"], surplus["cost"])
                 group["rows"].append({
                     "service": service,
                     "hidden": service.id not in visible,
@@ -1162,46 +1145,29 @@ class CreateProjectInvoiceForm(InvoiceForm):
         data = super().clean()
         if "selected_services" in data:
             sources = self.service_sources()
-            # Invoicing new work from the logbook again is the normal case,
-            # the danger is switching between the offer and the logbook
-            lines = Service.objects.filter(
-                invoice__status__in=[
-                    Invoice.IN_PREPARATION,
-                    Invoice.SENT,
-                    Invoice.PAID,
-                ],
-            )
-            for source, message in [
-                (
-                    Invoice.LOGBOOK,
-                    _(
-                        "Some services have been invoiced from the offer already:"
-                        " %(services)s. Make sure the same work isn't invoiced"
-                        " twice, or only invoice the surplus."
-                    ),
-                ),
-                (
-                    Invoice.OFFER,
+            # Invoicing new work from the logbook again is the normal case
+            # (after invoicing the offer it's the surplus), invoicing the
+            # offer again isn't
+            if invoiced := (
+                self.project.services.filter(
+                    id__in=[
+                        id for id, source in sources.items() if source == Invoice.OFFER
+                    ],
+                    invoice_services__invoice__status__in=[
+                        Invoice.IN_PREPARATION,
+                        Invoice.SENT,
+                        Invoice.PAID,
+                    ],
+                ).distinct()
+            ):
+                self.add_warning(
                     _(
                         "Some services have been invoiced already: %(services)s."
                         " Make sure the same work isn't invoiced twice."
-                    ),
-                ),
-            ]:
-                invoiced = self.project.services.filter(
-                    id__in=[id for id, s in sources.items() if s == source],
-                    invoice_services__in=lines.filter(from_offer=True)
-                    if source == Invoice.LOGBOOK
-                    else lines,
-                ).distinct()
-                if invoiced:
-                    self.add_warning(
-                        message
-                        % {
-                            "services": ", ".join(service.title for service in invoiced)
-                        },
-                        code="services-invoiced-already",
                     )
+                    % {"services": ", ".join(service.title for service in invoiced)},
+                    code="services-invoiced-already",
+                )
         return data
 
     def save(self):
@@ -1226,8 +1192,10 @@ class CreateProjectInvoiceForm(InvoiceForm):
                             "effort_rate",
                             "cost",
                         ]
+                        # An empty description stays empty (e.g. without the
+                        # external reference), the others fall back
                         if (value := self.cleaned_data.get(f"{field}_{id}"))
-                        not in {None, ""}
+                        not in ({None} if field == "description" else {None, ""})
                     }
                     for id in sources
                 },

@@ -241,22 +241,22 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   preparation, validated with the web interface's creation forms
   (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
   query parameters of the web views) and their defaults; services invoices
-  take each service as offered, as logged or only the surplus (`sources`,
-  `--service ID:logbook`) and disable logging per service
-  (`disable_logging`). There is no mode for the whole invoice: services
-  invoiced as offered default to the surplus, those invoiced as logged to
-  the logbook, others to the offer if something has been offered; only
-  services with something to invoice are visible, the others are rendered
-  hidden and shown in the page on request (entries aren't lost). Invoicing the offer links the
-  entries logged so far; the surplus (`service_surplus()`) is the logged
-  work beyond what has been invoiced on the service, at most what hasn't
-  been invoiced from the logbook yet. The web form also edits the lines'
-  titles, descriptions, effort types, hours, rates and costs (no service
-  type dropdown filling the rates; `overrides` of
+  take each service as offered or as logged (`sources`, `--service
+  ID:logbook`) and disable logging per service (`disable_logging`). There
+  is no mode for the whole invoice: services which haven't been invoiced
+  default to the offer if something has been offered (and not declined),
+  others to the logbook. Invoicing the offer links the entries logged so
+  far, everything logged afterwards is the surplus, invoiced as logged
+  (also if the offered hours haven't been used up). Only services with
+  something to invoice are visible, the others are rendered hidden and
+  shown in the page on request (entries aren't lost). The web form also
+  edits the lines' titles, descriptions, effort types, hours, rates and
+  costs (no service type dropdown filling the rates; `overrides` of
   `Invoice.create_services()`; empty hours and costs come from the source,
-  which still decides the logbook entries a line takes). Lines copy the
-  service's description and external reference into their description
-  (`line_description()`), PDFs don't read the project's services, so
+  which still decides the logbook entries a line takes, an empty
+  description stays empty). Lines copy the service's description and
+  external reference into their description (`line_description()`), PDFs
+  don't read the project's services, so
   invoices don't change afterwards. Sending them stays
   in the web interface. "Release and send" mails an invoice in preparation
   with its PDF to the customer (suggested like payment reminders, the owner

@@ -474,8 +474,7 @@ class InvoicesAPITest(TestCase):
         hours.refresh_from_db()
         self.assertTrue(hours.invoice_service)
 
-        # Sources of single services; only listed services, and the surplus
-        # only after invoicing the offer
+        # Sources of single services of the project, offer or logbook
         factories.LoggedHoursFactory.create(service=consulting, hours=1)
         response = create({
             "project": project.pk,
@@ -484,7 +483,7 @@ class InvoicesAPITest(TestCase):
         })
         self.assertEqual(response.status_code, 422)
         self.assertEqual(
-            response.json()["detail"][0]["loc"],
+            response.json()["detail"][0]["loc"][:4],
             ["body", "data", "sources", str(consulting.pk)],
         )
         other = factories.ServiceFactory.create()

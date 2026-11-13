@@ -186,7 +186,7 @@ def invoice_pdf(invoice_id, output):
     download(f"invoices/{invoice_id}/pdf/", output)
 
 
-SOURCES = ("offer", "logbook", "surplus")
+SOURCES = ("offer", "logbook")
 
 
 def _parse_services(_ctx, _param, values):
@@ -226,11 +226,10 @@ def _parse_services(_ctx, _param, values):
     callback=_parse_services,
     metavar="ID[:SOURCE]",
     help="ID of a service to invoice, defaults to the offer's services with"
-    " something to invoice. How it's invoiced after a colon: offer, logbook"
-    " or surplus (the work logged beyond what has been invoiced, after"
-    " invoicing the offer), e.g. 42:logbook; defaults to the surplus after"
-    " invoicing the offer, the logbook after invoicing the logbook, and the"
-    " offer if something has been offered.",
+    " something to invoice. How it's invoiced after a colon: offer or logbook"
+    " (the work which hasn't been invoiced yet, after invoicing the offer"
+    " the surplus), e.g. 42:logbook; defaults to the offer for services with"
+    " something offered which haven't been invoiced, else to the logbook.",
 )
 @click.option(
     "--disable-logging",
@@ -304,7 +303,7 @@ def create_invoice(
     interface
 
     Invoice an offer (--offer), selected services of a project (--service,
-    as offered, as logged or the surplus), a fixed amount, down payment or
+    as offered or as logged), a fixed amount, down payment or
     credit of a project (--project --subtotal) or a fixed amount for a
     contact without project (--contact --title --subtotal)."""
     data = {

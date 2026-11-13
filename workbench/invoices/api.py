@@ -460,15 +460,13 @@ class InvoiceIn(InputSchema):
         " invoice, defaults to the offer's services with something to"
         " invoice. Required without offer.",
     )
-    sources: dict[int, Literal["offer", "logbook", "surplus"]] = Field(
+    sources: dict[int, Literal["offer", "logbook"]] = Field(
         default_factory=dict,
         description="Services invoices: how single services (by ID) are"
-        " invoiced: as offered, as logged (the hours and costs which haven't"
-        " been invoiced yet) or the surplus (the work logged beyond what has"
-        " been invoiced, after invoicing the offer). Defaults to the surplus"
-        " for services invoiced as offered, as logged for services invoiced"
-        " as logged, as offered for services with offered hours or costs"
-        " and as logged otherwise.",
+        " invoiced: as offered or as logged (the hours and costs which haven't"
+        " been invoiced yet; after invoicing the offer that's the surplus)."
+        " Defaults to the offer for services with offered hours or costs which"
+        " haven't been invoiced (nor declined), else to the logbook.",
     )
     disable_logging: list[int] = Field(
         default_factory=list,

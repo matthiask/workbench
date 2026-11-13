@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:45+0100\n"
+"POT-Creation-Date: 2026-11-13 12:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2501,8 +2501,8 @@ msgid "Logbook cutoff date"
 msgstr "Logbuch-Abgrenzungstermin"
 
 #: workbench/invoices/forms.py
-msgid "Only include logbook entries up to this date when invoicing the logbook or the surplus. The amounts shown below may be too high if using this."
-msgstr "Beim Verrechnen gemäss Logbuch oder des Mehraufwands nur Logbucheinträge bis und mit diesem Datum berücksichtigen. Die unten angezeigten Beträge sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
+msgid "Only include logbook entries up to this date when invoicing the logbook. The amounts shown below may be too high if using this."
+msgstr "Beim Verrechnen gemäss Logbuch nur Logbucheinträge bis und mit diesem Datum berücksichtigen. Die unten angezeigten Beträge sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -2523,10 +2523,6 @@ msgstr "gemäss Offerte"
 #: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
 msgid "as logged"
 msgstr "gemäss Logbuch"
-
-#: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
-msgid "surplus"
-msgstr "nur Mehraufwand"
 
 #: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
@@ -2552,11 +2548,6 @@ msgstr "Leistungen"
 #, python-format
 msgid "Total %(currency)s incl. tax"
 msgstr "Total %(currency)s inkl. MwSt"
-
-#: workbench/invoices/forms.py
-#, python-format
-msgid "Some services have been invoiced from the offer already: %(services)s. Make sure the same work isn't invoiced twice, or only invoice the surplus."
-msgstr "Einige Leistungen wurden bereits aus der Offerte verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird, oder verrechne nur den Mehraufwand."
 
 #: workbench/invoices/forms.py
 #, python-format
@@ -5515,8 +5506,8 @@ msgid "No offer, select services yourself"
 msgstr "Keine Offerte, Leistungen selbst auswählen"
 
 #: workbench/templates/invoices/invoice_form.html
-msgid "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)."
-msgstr "Jede Leistung gemäss Offerte, gemäss Logbuch (die noch nicht verrechneten Stunden und Kosten) oder, nachdem die Offerte verrechnet wurde, nur den darüber hinaus erfassten Aufwand (Mehraufwand) verrechnen."
+msgid "Invoice each service as offered or as logged (the hours and costs which haven't been invoiced yet; after invoicing the offer that's the surplus)."
+msgstr "Jede Leistung gemäss Offerte oder gemäss Logbuch verrechnen (die noch nicht verrechneten Stunden und Kosten; nachdem die Offerte verrechnet wurde, ist das der Mehraufwand)."
 
 #: workbench/templates/invoices/invoice_form.html
 msgid "Empty hours and costs are taken from the selected source, enter a value to invoice something else."
@@ -6884,6 +6875,13 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "surplus"
+#~ msgstr "nur Mehraufwand"
+
+#, python-format
+#~ msgid "Some services have been invoiced from the offer already: %(services)s. Make sure the same work isn't invoiced twice, or only invoice the surplus."
+#~ msgstr "Einige Leistungen wurden bereits aus der Offerte verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird, oder verrechne nur den Mehraufwand."
 
 #~ msgid "All services of the project are listed."
 #~ msgstr "Alle Leistungen des Projekts werden angezeigt."

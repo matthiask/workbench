@@ -52,7 +52,7 @@
       <div class="card-header">
         {% translate 'services'|capfirst %}
         <small class="form-text text-muted d-block">
-          {% translate "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)." %}
+          {% translate "Invoice each service as offered or as logged (the hours and costs which haven't been invoiced yet; after invoicing the offer that's the surplus)." %}
           {% translate "Empty hours and costs are taken from the selected source, enter a value to invoice something else." %}
         </small>
         {% if form.has_hidden_services %}
@@ -98,9 +98,6 @@
                     {% translate 'all' %}:
                     <a href="#" data-select-all="offer">{% translate 'as offered' %}</a> &middot;
                     <a href="#" data-select-all="logbook">{% translate 'as logged' %}</a>
-                    {% if group.has_surplus %}
-                      &middot; <a href="#" data-select-all="surplus">{% translate 'surplus' %}</a>
-                    {% endif %}
                   </div>
                 </th>
                 <th>{% translate 'invoice line'|capfirst %}</th>
