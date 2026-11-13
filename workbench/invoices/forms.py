@@ -1,5 +1,6 @@
 import datetime as dt
 import io
+from collections import defaultdict
 from decimal import Decimal
 
 from authlib.email import render_to_mail
@@ -24,13 +25,13 @@ from workbench.invoices.models import (
     line_description,
     service_surplus,
 )
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
 from workbench.projects.forms import (
     add_delete_planned_work_field,
     discard_offers_in_preparation,
 )
 from workbench.reporting.models import FreezeDate
-from workbench.reporting.utils import accepted_offers_by_project
+from workbench.reporting.utils import accepted_offers_by_project, sum_by
 from workbench.services.models import ServiceType
 from workbench.tools.formats import Z1, Z2, currency, hours, local_date_format
 from workbench.tools.forms import (
@@ -911,16 +912,29 @@ class CreateProjectInvoiceForm(InvoiceForm):
             return currency(row["not_archived"])
 
         # Services which have been invoiced, and whether from the offer (they
-        # may have a surplus then)
+        # may have a surplus then), with the total and the invoices
         invoiced = {}
-        for id, line_from_offer in (
+        invoiced_totals = defaultdict(lambda: Z2)
+        invoiced_on = defaultdict(dict)
+        for line in (
             Service.objects
             .filter(project_service__project=self.project)
             .exclude(invoice__status=Invoice.CANCELED)
-            .values_list("project_service", "from_offer")
+            .select_related("invoice__project")
+            .order_by("invoice___code", "position")
         ):
-            invoiced[id] = invoiced.get(id, False) or line_from_offer
+            id = line.project_service_id
+            invoiced[id] = invoiced.get(id, False) or line.from_offer
+            invoiced_totals[id] += line.service_cost
+            invoiced_on[id][line.invoice.pk] = line.invoice
         from_offer = {id for id, line_from_offer in invoiced.items() if line_from_offer}
+        # All logged work, valued like the logbook is invoiced
+        logged_for_invoicing = sum_by(
+            LoggedHours.objects.filter(service__project=self.project),
+            key="service",
+            field=HOURS_FOR_INVOICING,
+            default=Z1,
+        )
 
         def has_open_entries(row):
             return bool(row["not_archived"] or row["not_archived_logged_hours"])
@@ -1055,6 +1069,14 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 group["rows"].append({
                     "service": service,
                     "hidden": service.id not in visible,
+                    "logged_hours": row["logged_hours"],
+                    "logged": logged_for_invoicing[service.id]
+                    * (service.effort_rate or Z2)
+                    + row["logged_cost"],
+                    "invoiced": invoiced_totals[service.id]
+                    if service.id in invoiced
+                    else None,
+                    "invoices": list(invoiced_on[service.id].values()),
                     "presets": {
                         key: {"hours": hours or Z1, "cost": cost or Z2}
                         for key, (hours, cost) in presets.items()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:24+0100\n"
+"POT-Creation-Date: 2026-11-13 12:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4002,7 +4002,7 @@ msgstr "Die Leistungen versendeter Offerten lassen sich nicht umsortieren."
 msgid "projects"
 msgstr "Projekte"
 
-#: workbench/projects/charts.py
+#: workbench/projects/charts.py workbench/templates/invoices/invoice_form.html
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_projected_invoices_list.html
@@ -5457,6 +5457,7 @@ msgid "notes of the organization"
 msgstr "Bemerkungen bei der Organisation"
 
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_form.html
 msgid "logged"
 msgstr "erfasst"
 
@@ -5538,6 +5539,14 @@ msgstr "Rechnungsposition"
 #: workbench/templates/projects/project_detail.html
 msgid "optional"
 msgstr "optional"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "nothing yet"
+msgstr "noch nichts"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "in preparation"
+msgstr "in Vorbereitung"
 
 #: workbench/templates/invoices/invoice_list.html
 #: workbench/templates/projects/project_detail.html

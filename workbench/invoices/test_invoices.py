@@ -291,6 +291,18 @@ class InvoicesTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, "surplus: 200.00")
+        # What has been logged and invoiced, with links to the invoices
+        rows = {
+            row["service"]: row
+            for group in response.context["form"].service_groups
+            for row in group["rows"]
+        }
+        self.assertEqual(
+            (rows[capped]["logged_hours"], rows[capped]["logged"]), (12, 1200)
+        )
+        self.assertEqual(rows[capped]["invoiced"], 1000)
+        self.assertEqual(rows[capped]["invoices"], [first])
+        self.assertContains(response, f'href="{first.get_absolute_url()}"')
         # Invoiced as offered continues with the surplus, as logged with the
         # logbook
         form = response.context["form"]

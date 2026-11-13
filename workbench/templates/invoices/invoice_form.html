@@ -1,5 +1,5 @@
 {% extends "generic/object_form.html" %}
-{% load fineforms i18n l10n %}
+{% load fineforms i18n l10n workbench %}
 {% block uplink %}
   {% if view.project %}
     <a href="{{ view.project.get_absolute_url }}" class="btn btn-quiet btn-sm uplink">
@@ -166,6 +166,25 @@
                         <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
                       </div>
                     {% endfor %}
+                    <div class="text-muted small mt-2">
+                      {% translate 'logged'|capfirst %}:
+                      {{ row.logged_hours|hours }} &middot; {{ row.logged|currency }}
+                      <br>
+                      {% translate 'invoiced'|capfirst %}:
+                      {% if row.invoiced is None %}
+                        {% translate 'nothing yet' %}
+                      {% else %}
+                        {{ row.invoiced|currency }}
+                        {% for invoice in row.invoices %}
+                          {% if forloop.first %}({% endif %}<a
+                            href="{{ invoice.get_absolute_url }}"
+                            target="_blank"
+                            title="{{ invoice.title }}"
+                          >{{ invoice.code }}</a>{% if invoice.status == invoice.IN_PREPARATION %},
+                            {% translate 'in preparation' %}{% endif %}{% if forloop.last %}){% else %};{% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    </div>
                   </td>
                   <td>
                     <div class="wb-invoice-line">
