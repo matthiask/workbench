@@ -7,7 +7,7 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
@@ -816,7 +816,14 @@ class CreateProjectInvoiceForm(InvoiceForm):
             third_party_costs=Z2
             if type in {Invoice.SERVICES, Invoice.CREDIT}
             else None,
-            discount=self.offer.discount if self.offer else Z2,
+            # The offer's discount once, not again when invoicing the surplus
+            discount=self.offer.discount
+            if self.offer
+            and not Service.objects
+            .filter(project_service__offer=self.offer)
+            .exclude(invoice__status=Invoice.CANCELED)
+            .exists()
+            else Z2,
         )
 
         super().__init__(*args, **kwargs)
@@ -1005,12 +1012,22 @@ class CreateProjectInvoiceForm(InvoiceForm):
             self.service_groups.append(group)
             for row in rows:
                 service = row["service"]
+                # Invoicing what hasn't been offered as offered would archive
+                # the logged work without invoicing it
                 sources = [
-                    (
-                        Invoice.OFFER,
-                        format_html(
-                            "{}: {}", _("as offered"), currency(service.service_cost)
-                        ),
+                    *(
+                        [
+                            (
+                                Invoice.OFFER,
+                                format_html(
+                                    "{}: {}",
+                                    _("as offered"),
+                                    currency(service.service_cost),
+                                ),
+                            )
+                        ]
+                        if service.effort_hours or service.cost
+                        else []
                     ),
                     (
                         Invoice.LOGBOOK,
@@ -1167,6 +1184,28 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     )
                     % {"services": ", ".join(service.title for service in invoiced)},
                     code="services-invoiced-already",
+                )
+            # Invoicing as offered archives logged costs which haven't been
+            # offered without invoicing them
+            if not_offered := self.project.services.filter(
+                Exists(
+                    LoggedCost.objects.filter(
+                        service=OuterRef("pk"), archived_at__isnull=True
+                    )
+                ),
+                Q(cost__isnull=True) | Q(cost=0),
+                id__in=[
+                    id for id, source in sources.items() if source == Invoice.OFFER
+                ],
+            ):
+                self.add_warning(
+                    _(
+                        "Costs have been logged on services which haven't"
+                        " offered costs, invoicing them as offered doesn't"
+                        " invoice these costs: %(services)s."
+                    )
+                    % {"services": ", ".join(service.title for service in not_offered)},
+                    code="logged-costs-not-offered",
                 )
         return data
 

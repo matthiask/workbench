@@ -318,6 +318,99 @@ class InvoicesTest(TestCase):
             ).exists()
         )
 
+    def services_invoice_data(self, project, **kwargs):
+        return {
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "discount": "0",
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            "postal_address": "Anything\nStreet\nCity",
+        } | kwargs
+
+    def test_offer_discount_only_once(self):
+        """The offer's discount is only proposed when invoicing it the first
+        time"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, discount=100)
+        service = factories.ServiceFactory.create(
+            project=project, offer=offer, cost=1000
+        )
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + f"?type=services&offer={offer.pk}"
+        self.assertEqual(self.client.get(url).context["form"]["discount"].value(), 100)
+        response = self.client.post(
+            url,
+            self.services_invoice_data(
+                project, discount="100", selected_services=[service.pk]
+            ),
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.client.get(url).context["form"]["discount"].value(), 0)
+
+    def test_declined_services_default_to_logbook(self):
+        """Declined offers aren't a budget, their services are invoiced as
+        logged"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, status=Offer.DECLINED)
+        service = factories.ServiceFactory.create(
+            project=project,
+            offer=offer,
+            effort_type="Dev",
+            effort_rate=100,
+            effort_hours=10,
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=2)
+        self.client.force_login(project.owned_by)
+        form = self.client.get(
+            project.urls["createinvoice"] + "?type=services"
+        ).context["form"]
+        self.assertEqual(form[f"source_{service.pk}"].value(), "logbook")
+
+    def test_nothing_offered_isnt_invoiced_as_offered(self):
+        """Services without offered hours or costs can't be invoiced as
+        offered, that would archive the logged work without invoicing it"""
+        service = factories.ServiceFactory.create(effort_type="Dev", effort_rate=100)
+        project = service.project
+        factories.LoggedHoursFactory.create(service=service, hours=3)
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=services"
+        form = self.client.get(url).context["form"]
+        self.assertEqual(
+            [value for value, _label in form.fields[f"source_{service.pk}"].choices],
+            ["logbook"],
+        )
+        response = self.client.post(
+            url,
+            self.services_invoice_data(
+                project,
+                selected_services=[service.pk],
+                **{f"source_{service.pk}": "offer"},
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Invoice.objects.exists())
+
+    def test_logged_costs_not_offered(self):
+        """Invoicing as offered archives costs which haven't been offered
+        without invoicing them, that's a warning"""
+        service = factories.ServiceFactory.create(
+            title="Design", effort_type="Dev", effort_rate=100, effort_hours=10
+        )
+        project = service.project
+        factories.LoggedCostFactory.create(service=service, cost=200)
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=services"
+        data = self.services_invoice_data(project, selected_services=[service.pk])
+        response = self.client.post(url, data)
+        self.assertContains(response, 'value="logged-costs-not-offered"')
+        self.assertContains(response, "Design")
+        response = self.client.post(
+            url, data | {WarningsForm.ignore_warnings_id: "logged-costs-not-offered"}
+        )
+        self.assertEqual(response.status_code, 302)
+
     def test_services_invoice_edited_lines(self):
         """The lines' texts and amounts may be changed when creating the
         invoice, empty fields are taken from the service and the source"""

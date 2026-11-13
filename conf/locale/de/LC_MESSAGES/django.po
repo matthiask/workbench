@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:51+0100\n"
+"POT-Creation-Date: 2026-11-13 12:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2553,6 +2553,11 @@ msgstr "Total %(currency)s inkl. MwSt"
 #, python-format
 msgid "Some services have been invoiced already: %(services)s. Make sure the same work isn't invoiced twice."
 msgstr "Einige Leistungen wurden bereits verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird."
+
+#: workbench/invoices/forms.py
+#, python-format
+msgid "Costs have been logged on services which haven't offered costs, invoicing them as offered doesn't invoice these costs: %(services)s."
+msgstr "Auf Leistungen ohne offerierte Kosten wurden Kosten erfasst, die beim Verrechnen gemäss Offerte nicht verrechnet werden: %(services)s."
 
 #: workbench/invoices/forms.py
 msgid "Other invoice types must be created directly on a project."
