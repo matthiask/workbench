@@ -46,7 +46,10 @@ class OfferQuerySet(SearchQuerySet):
             Offer.IN_PREPARATION: [],
             Offer.SERVICE_GROUP: [],
         }
-        for offer in self.filter(Q(status__lte=Offer.SERVICE_GROUP) | Q(pk=include)):
+        # Numbered in ascending order, like on the project page
+        for offer in self.filter(
+            Q(status__lte=Offer.SERVICE_GROUP) | Q(pk=include)
+        ).order_by("_code"):
             offers[True if offer.id == include else offer.status].append((
                 offer.pk,
                 offer,

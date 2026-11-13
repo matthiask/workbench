@@ -411,6 +411,9 @@ class LoggedHoursForm(ModelForm):
     service_type = forms.ModelChoiceField(
         ServiceType.objects.all(), label=ServiceType._meta.verbose_name, required=False
     )
+    service_offer = forms.ModelChoiceField(
+        Offer.objects.none(), label=capfirst(_("offer")), required=False
+    )
 
     class Meta:
         model = LoggedHours
@@ -483,11 +486,20 @@ class LoggedHoursForm(ModelForm):
         else:
             self.fields["service_title"].widget.attrs["autofocus"] = True
 
+        # New services may be added to offers which receive services and
+        # allow logging, numbered in ascending order
+        self.fields["service_offer"].queryset = self.project.offers.filter(
+            status__lte=Offer.SERVICE_GROUP, work_completed_on__isnull=True
+        ).order_by("_code")
+        if not self.fields["service_offer"].queryset.exists():
+            self.fields.pop("service_offer")
+
         if self.instance.pk:
             self.fields.pop("service_title")
             self.fields.pop("service_description")
             self.fields.pop("service_external_reference")
             self.fields.pop("service_type")
+            self.fields.pop("service_offer", None)
             if (
                 not self.instance.rendered_by.features[FEATURES.LATE_LOGGING]
                 and self.instance.rendered_on < logbook_lock()
@@ -689,6 +701,7 @@ class LoggedHoursForm(ModelForm):
                 title=self.cleaned_data["service_title"],
                 description=self.cleaned_data["service_description"],
                 external_reference=self.cleaned_data["service_external_reference"],
+                offer=self.cleaned_data.get("service_offer"),
             )
             if self.project.flat_rate is not None:
                 with override(settings.WORKBENCH.PDF_LANGUAGE):

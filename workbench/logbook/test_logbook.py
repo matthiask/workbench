@@ -562,6 +562,45 @@ class LogbookTest(TestCase):
         )
         self.assertContains(response, "description-only-url")
 
+    def test_log_and_create_service_in_offer(self):
+        """New services from the logged hours form may be added to offers
+        which receive services and allow logging, in ascending order"""
+        project = factories.ProjectFactory.create()
+        second = factories.OfferFactory.create(project=project)
+        first = factories.OfferFactory.create(project=project)
+        first._code, second._code = 1, 2
+        first.save()
+        second.save()
+        factories.OfferFactory.create(project=project, work_completed_on=in_days(-1))
+        self.client.force_login(project.owned_by)
+        types = factories.service_types()
+
+        response = self.client.get(
+            project.urls["createhours"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(
+            list(response.context["form"].fields["service_offer"].queryset),
+            [first, second],
+        )
+
+        response = self.client.post(
+            project.urls["createhours"],
+            {
+                "modal-rendered_by": project.owned_by_id,
+                "modal-rendered_on": dt.date.today().isoformat(),
+                "modal-hours": "0.5",
+                "modal-description": "Test",
+                "modal-service_title": "Specific new service",
+                "modal-service_type": types.administration.pk,
+                "modal-service_offer": second.pk,
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(
+            project.services.get(title="Specific new service").offer, second
+        )
+
     def test_log_and_create_service_with_flat_rate(self):
         """Creating services through the logged hours form on projects with
         flat rates assigns the flat rate"""
