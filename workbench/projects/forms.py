@@ -595,6 +595,15 @@ class ServiceForm(ModelForm):
         )
         self.instance.project = self.project
 
+        # New services of an offer (from the offer on the project page)
+        if (
+            not self.instance.pk
+            and (offer := self.request.GET.get("offer", "")).isascii()
+            and offer.isdigit()
+            and (offer := self.fields["offer"].queryset.filter(pk=offer).first())
+        ):
+            self.initial["offer"] = offer.pk
+
         offer = self.instance.offer
         if offer and offer.status > offer.SERVICE_GROUP:
             for field in self.fields:

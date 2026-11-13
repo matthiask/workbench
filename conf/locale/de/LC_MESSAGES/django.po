@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:56+0100\n"
+"POT-Creation-Date: 2026-11-13 12:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5933,6 +5933,10 @@ msgid "Related deals"
 msgstr "Verbundene Geschäfte"
 
 #: workbench/templates/projects/project_detail.html
+msgid "Add service"
+msgstr "Leistung hinzufügen"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Expand all"
 msgstr "Alles aufklappen"
 
@@ -6911,9 +6915,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "Services from offer"
 #~ msgstr "Leistungen aus Offerte"
-
-#~ msgid "All services"
-#~ msgstr "Alle Leistungen"
 
 #~ msgid "Disable logging on all services from now on"
 #~ msgstr "Leistungserfassung auf allen Leistungen ab sofort sperren"

@@ -764,6 +764,37 @@ class ProjectsTest(TestCase):
         self.assertEqual(service.external_reference, "https://example.com/issues/1")
         self.assertEqual(service.title, "Design")
 
+    def test_add_services_to_offers(self):
+        """The project page adds services directly, also to offers which may
+        receive services (prefilled)"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project)
+        sent = factories.OfferFactory.create(
+            project=project,
+            status=Offer.OFFERED,
+            offered_on=in_days(0),
+            valid_until=in_days(30),
+        )
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.urls["detail"])
+        self.assertContains(
+            response, f'{project.urls["createservice"]}?offer={offer.pk}"'
+        )
+        self.assertNotContains(
+            response, f'{project.urls["createservice"]}?offer={sent.pk}"'
+        )
+
+        headers = {"x-requested-with": "XMLHttpRequest"}
+        response = self.client.get(
+            f"{project.urls['createservice']}?offer={offer.pk}", headers=headers
+        )
+        self.assertEqual(response.context["form"]["offer"].value(), offer.pk)
+        # Offers which don't receive services anymore aren't prefilled
+        response = self.client.get(
+            f"{project.urls['createservice']}?offer={sent.pk}", headers=headers
+        )
+        self.assertIsNone(response.context["form"]["offer"].value())
+
     def test_select(self):
         """Test the project select modal"""
         project = factories.ProjectFactory.create()

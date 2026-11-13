@@ -37,6 +37,12 @@
         {% include "svg/plus.svg" %}
         {% translate 'Hours' %}
       </a>
+      {% if request.user.features.CONTROLLING %}
+        <a href="{{ project.urls.createservice }}" class="btn btn-quiet" data-ajaxmodal>
+          {% include "svg/plus.svg" %}
+          {% translate 'service'|capfirst %}
+        </a>
+      {% endif %}
       <span class="dropdown">
         <button
           class="btn btn-quiet dropdown-toggle"
@@ -54,9 +60,6 @@
             {% translate 'Cost' %}
           </a>
           {% if request.user.features.CONTROLLING %}
-            <a href="{{ project.urls.createservice }}" class="dropdown-item" data-ajaxmodal>
-              {% translate 'service'|capfirst %}
-            </a>
             <a href="{{ project.urls.createoffer }}" class="dropdown-item">{% translate 'offer'|capfirst %}</a>
             <a href="{{ project.urls.createbudgettransfer }}" class="dropdown-item" data-ajaxmodal>
               {% translate 'budget transfer'|capfirst %}
@@ -434,6 +437,18 @@
         </div>
 
         <div class="wb-row-actions">
+          {% if request.user.features.CONTROLLING and not project.closed_on %}
+            {% if not offer or offer.services_changeable and not offer.work_completed_on %}
+              <a
+                class="btn btn-quiet btn-sm btn-icon"
+                href="{{ project.urls.createservice }}{% if offer %}?offer={{ offer.pk }}{% endif %}"
+                title="{% translate 'Add service' %}"
+                data-ajaxmodal
+              >
+                {% include 'svg/plus.svg' %}
+              </a>
+            {% endif %}
+          {% endif %}
           {% if offer %}
             <button
               type="button"
