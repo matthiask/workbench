@@ -16,7 +16,7 @@ from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, Service as InvoiceService
 from workbench.logbook.celebrations import celebrate
 from workbench.logbook.models import (
     HOURS_FOR_INVOICING,
@@ -1063,6 +1063,18 @@ def _grouped_entries(entries, *, amount_field):
         )
     }
 
+    # Hours are invoiced as amounts (also as offered, with costs), costs as
+    # costs; cancelled invoices don't count
+    line_totals = {
+        row["project_service"]: row["total"]
+        for row in InvoiceService.objects
+        .filter(project_service__in=services)
+        .exclude(invoice__status=Invoice.CANCELED)
+        .order_by()
+        .values("project_service")
+        .annotate(total=Sum("service_cost" if amount_field == "hours" else "cost"))
+    }
+
     choices = []
     amounts = {}
     for service, service_entries in sorted(
@@ -1079,7 +1091,15 @@ def _grouped_entries(entries, *, amount_field):
             if budget
             else _("%s logged") % fmt(logged),
         ]
-        if invoiced:
+        # What the customer has been charged (lines may differ from the
+        # entries: invoiced as offered, overridden, written off), and the
+        # entries invoiced with them
+        if (line_total := line_totals.get(service.pk)) is not None:
+            details.append(
+                _("%(invoiced)s invoiced for %(logged)s logged")
+                % {"invoiced": currency(line_total), "logged": fmt(invoiced or 0)}
+            )
+        elif invoiced:
             details.append(_("%s invoiced") % fmt(invoiced))
         amounts |= {entry.pk: getattr(entry, amount_field) for entry in service_entries}
         choices.append((

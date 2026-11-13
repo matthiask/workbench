@@ -302,6 +302,36 @@ class LogbookTest(TestCase):
         self.assertNotContains(response, f'value="{archived.pk}"')
         self.assertContains(response, "data-selection-total")
 
+    def test_batch_update_invoiced_amounts(self):
+        """The batch update shows what has been invoiced on the service and
+        the entries invoiced with it, which differ when invoicing the offer"""
+        service = factories.ServiceFactory.create(
+            effort_type="Dev", effort_hours=10, effort_rate=100
+        )
+        project = service.project
+        factories.LoggedHoursFactory.create(service=service, hours=3)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_offer([service])
+        hours = factories.LoggedHoursFactory.create(service=service, hours=2)
+        self.client.force_login(hours.rendered_by)
+        url = project.urls["logbook_batch_update_hours"]
+        self.assertContains(
+            self.client.get(url),
+            "2.0h not invoiced · 5.0h logged of 10.0h offered"
+            " · 1’000.00 invoiced for 3.0h logged",
+        )
+        # Cancelled invoices don't count
+        invoice.status = Invoice.CANCELED
+        invoice.save()
+        self.assertContains(
+            self.client.get(url), "5.0h not invoiced · 5.0h logged of 10.0h offered<"
+        )
+
     def test_invoiced_hours_are_locked(self):
         """Invoiced hours keep their service and hours, the description can
         still be changed"""

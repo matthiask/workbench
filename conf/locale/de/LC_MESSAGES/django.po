@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 13:27+0100\n"
+"POT-Creation-Date: 2026-11-13 13:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2815,10 +2815,6 @@ msgid "project service"
 msgstr "Projektleistung"
 
 #: workbench/invoices/models.py
-msgid "invoiced from the offer"
-msgstr "aus der Offerte verrechnet"
-
-#: workbench/invoices/models.py
 #, python-format
 msgid "The logged hours and costs of this invoice now cover the service period %(period)s. Update the invoice's service period if necessary."
 msgstr "Die erfassten Stunden und Kosten dieser Rechnung umfassen jetzt den Leistungszeitraum %(period)s. Passe den Leistungszeitraum der Rechnung falls nötig an."
@@ -3215,6 +3211,11 @@ msgstr "%(logged)s erfasst von %(budget)s offeriert"
 #, python-format
 msgid "%s logged"
 msgstr "%s erfasst"
+
+#: workbench/logbook/forms.py
+#, python-format
+msgid "%(invoiced)s invoiced for %(logged)s logged"
+msgstr "%(invoiced)s verrechnet für %(logged)s erfasst"
 
 #: workbench/logbook/forms.py
 #, python-format
@@ -6893,6 +6894,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "invoiced from the offer"
+#~ msgstr "aus der Offerte verrechnet"
 
 #~ msgid "Empty hours and costs are taken from the selected source, enter a value to invoice something else."
 #~ msgstr "Leere Stunden und Kosten werden aus der gewählten Basis übernommen, gib einen Wert ein, um etwas anderes zu verrechnen."
