@@ -220,18 +220,17 @@ Open:
   about logged work on services which weren't invoiced.
 - Lines invoiced as offered link all open entries, also those after the
   logbook cutoff date, so the service period may end after it.
-- The browser rounds the total to 5 cents with floats, the server with
-  `Decimal` (`ROUND_HALF_UP`); they may differ by 5 cents at .025.
 - Migration `0038` only copies an external reference if the whole reference
   isn't in the description yet (partly present multi-line references are
   skipped).
 
-Decisions needed:
+Decided:
 
-- Overriding a line to 0h and 0.00 skips it, its entries stay open (write
-  them off with a 0.00 line instead?).
-- Offers invoiced in instalments (e.g. 50% of the hours first): the next
-  invoice defaults to the logbook, the rest of the offer has to be entered
-  by hand (a "rest of the offer" source?).
-- Credits don't reduce what has been invoiced on a service (shown as
-  invoiced in the form).
+- Selected services are invoiced, also with 0 (their entries are written
+  off); only unselected ones are skipped.
+- The total in the browser is informative, it may differ from the server's
+  rounding by 5 cents.
+- Offers invoiced in instalments: the next invoice defaults to the logbook,
+  the rest of the offer is entered by switching to the offer (a warning).
+- Credits aren't applied to services, the form's "invoiced" doesn't
+  include them.

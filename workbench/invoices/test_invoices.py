@@ -449,6 +449,45 @@ class InvoicesTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
 
+    def test_lines_overridden_to_zero(self):
+        """Selected services are invoiced, also with 0 (their entries are
+        written off)"""
+        service = factories.ServiceFactory.create(effort_type="Dev", effort_rate=100)
+        project = service.project
+        factories.LoggedHoursFactory.create(service=service, hours=3)
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            project.urls["createinvoice"] + "?type=services",
+            self.services_invoice_data(
+                project,
+                selected_services=[service.pk],
+                **{f"effort_hours_{service.pk}": "0"},
+            ),
+        )
+        self.assertEqual(response.status_code, 302)
+        invoice = Invoice.objects.get()
+        self.assertEqual(
+            [(line.effort_hours, line.service_cost) for line in invoice.services.all()],
+            [(0, 0)],
+        )
+        self.assertFalse(
+            LoggedHours.objects.filter(
+                service=service, archived_at__isnull=True
+            ).exists()
+        )
+
+        # Also without anything to invoice
+        nothing = factories.ServiceFactory.create(project=project, title="Nothing")
+        response = self.client.post(
+            project.urls["createinvoice"] + "?type=services",
+            self.services_invoice_data(project, selected_services=[nothing.pk]),
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            [line.title for line in Invoice.objects.latest("pk").services.all()],
+            ["Nothing"],
+        )
+
     def test_services_invoice_edited_lines(self):
         """The lines' texts and amounts may be changed when creating the
         invoice, empty fields are taken from the service and the source"""

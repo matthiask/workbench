@@ -254,7 +254,8 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   costs (no service type dropdown filling the rates; `overrides` of
   `Invoice.create_services()`; empty hours and costs come from the source,
   which still decides the logbook entries a line takes, an empty
-  description stays empty). Lines copy the service's description and
+  description stays empty). Every selected service gets a line, also with
+  0 (writing off its logged work). Lines copy the service's description and
   external reference into their description (`line_description()`), PDFs
   don't read the project's services, so
   invoices don't change afterwards. Sending them stays

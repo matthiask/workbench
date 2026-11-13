@@ -566,6 +566,7 @@ class Invoice(ModelWithTotal):
             project_services,
             sources=dict.fromkeys((ps.id for ps in project_services), self.LOGBOOK),
             logbook_cutoff_date=logbook_cutoff_date,
+            skip_empty=True,
         )
 
     def create_services_from_offer(self, project_services):
@@ -575,7 +576,13 @@ class Invoice(ModelWithTotal):
         )
 
     def create_services(
-        self, project_services, *, sources, logbook_cutoff_date=None, overrides=None
+        self,
+        project_services,
+        *,
+        sources,
+        logbook_cutoff_date=None,
+        overrides=None,
+        skip_empty=False,
     ):
         """Invoice lines for the services as offered or as logged (the entries
         not invoiced yet), by ``sources`` (service ID to source); the logbook
@@ -627,7 +634,9 @@ class Invoice(ModelWithTotal):
 
             for field, value in (overrides or {}).get(ps.id, {}).items():
                 setattr(service, field, value)
-            if source != self.OFFER and not (service.effort_hours or service.cost):
+            # Selected services are invoiced, also with 0 (e.g. to write off
+            # the logged work)
+            if skip_empty and not (service.effort_hours or service.cost):
                 continue
 
             service.save(skip_related_model=True)
