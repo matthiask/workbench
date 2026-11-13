@@ -13,7 +13,7 @@
     <div class="wb-statistics-filter">
       <input type="checkbox" class="btn-check" id="only-not-archived" autocomplete="off">
       <label class="btn btn-sm btn-outline-primary" for="only-not-archived">
-        {% translate 'Only not archived' %}
+        {% translate 'Only not assigned to an invoice' %}
       </label>
     </div>
     <div class="table-responsive">
@@ -26,9 +26,9 @@
             <th></th>
             <th
               class="text-end"
-              title="{% translate 'Hours for invoicing and costs which have not been invoiced yet' %}"
+              title="{% translate 'Hours and costs which were not invoiced using a service invoice' %}"
             >
-              {% translate 'Not invoiced yet' %}
+              {% translate 'Not assigned to an invoice' %}
             </th>
             {% for user, hours in gs.logged_hours_per_user %}
               <th class="text-end">{{ user.get_short_name }}</th>

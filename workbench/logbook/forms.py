@@ -201,7 +201,7 @@ class LoggedHoursSearchForm(Form):
         queryset = filter_invoice(self, queryset)
         if data.get("not_archived"):
             self.hidden_filters.append((
-                _("Not archived"),
+                _("Not assigned to an invoice"),
                 querystring(self.request.GET, not_archived=""),
             ))
             queryset = queryset.filter(archived_at__isnull=True)
@@ -366,7 +366,7 @@ class LoggedCostSearchForm(Form):
         queryset = filter_invoice(self, queryset)
         if data.get("not_archived"):
             self.hidden_filters.append((
-                _("Not archived"),
+                _("Not assigned to an invoice"),
                 querystring(self.request.GET, not_archived=""),
             ))
             queryset = queryset.filter(archived_at__isnull=True)
