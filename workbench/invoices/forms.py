@@ -1083,6 +1083,9 @@ class CreateProjectInvoiceForm(InvoiceForm):
                         )
                 group["rows"].append({
                     "service": service,
+                    # A total of 0 writes off what could be invoiced
+                    "something_to_invoice": has_open_entries(row)
+                    or bool(service.effort_hours or service.cost),
                     "offer_hints": offer_hints,
                     "hidden": service.id not in visible,
                     "logged_hours": row["logged_hours"],

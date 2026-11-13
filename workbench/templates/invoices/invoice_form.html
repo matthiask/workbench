@@ -116,7 +116,11 @@
                 </th>
               </tr>
               {% for row in group.rows %}
-                <tr data-invoice-service {% if row.hidden %}hidden{% endif %}>
+                <tr
+                  data-invoice-service
+                  {% if row.something_to_invoice %}data-something-to-invoice{% endif %}
+                  {% if row.hidden %}hidden{% endif %}
+                >
                   <td>
                     <input
                       type="checkbox"
@@ -246,7 +250,17 @@
                       </div>
                     </div>
                   </td>
-                  <td class="text-end text-nowrap wb-first-line"><output data-amount></output></td>
+                  <td class="text-end text-nowrap wb-first-line">
+                    <span>
+                      <span
+                        class="text-warning-emphasis"
+                        data-nothing-invoiced
+                        title="{% translate "Nothing is invoiced although there is something to invoice. The logged hours and costs which haven't been invoiced yet are assigned to this invoice anyway." %}"
+                        hidden
+                      >{% include 'svg/alert.svg' %}</span>
+                      <output data-amount></output>
+                    </span>
+                  </td>
                   <td class="text-center">
                     <input
                       type="checkbox"

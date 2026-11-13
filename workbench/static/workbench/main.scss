@@ -1996,6 +1996,11 @@ a.wb-row-title:hover {
     vertical-align: middle;
   }
 
+  // Services which are invoiced
+  [data-invoice-service]:has([name="selected_services"]:checked) > td {
+    background: var(--bs-primary-bg-subtle);
+  }
+
   .form-control {
     min-width: 5rem;
   }

@@ -628,6 +628,9 @@ function updateInvoiceService(row) {
   const amount =
     value(hours) * value(row.querySelector("[data-rate]")) + value(cost)
   row.querySelector("[data-amount]").textContent = formatAmount(amount)
+  row.querySelector("[data-nothing-invoiced]").hidden = !(
+    amount === 0 && "somethingToInvoice" in row.dataset
+  )
   return amount
 }
 
