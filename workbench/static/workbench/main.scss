@@ -1981,6 +1981,17 @@ a.wb-row-title:hover {
   .form-control-sm {
     min-width: 5rem;
   }
+
+  // Hours and amounts are typed, spin buttons only crowd the numbers
+  input[type="number"] {
+    appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
 }
 
 .wb-form-page .card-body > .form-group:last-child {
