@@ -1,5 +1,5 @@
 {% extends "generic/object_form.html" %}
-{% load fineforms i18n %}
+{% load fineforms i18n l10n %}
 {% block uplink %}
   {% if view.project %}
     <a href="{{ view.project.get_absolute_url }}" class="btn btn-quiet btn-sm uplink">
@@ -57,138 +57,193 @@
   {% endif %}
 {% endblock before_form %}
 
-{% block form_width %}{% if form.service_fields_exclude %}wb-form-page-full{% endif %}{% endblock %}
-
 {% block fields %}
   {% if form.service_fields_exclude %}
     <section class="card mb-3">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-lg-7">
-            {% ff_field form.title %}
-            {% ff_field form.description %}
-            {% ff_field form.contact %}
-            {% ff_field form.customer %}
-            {% ff_field form.owned_by %}
-            {% ff_field form.postal_address %}
-            <div class="row">
-              <div class="col-sm-6">{% ff_field form.invoiced_on %}</div>
-              <div class="col-sm-6">{% ff_field form.due_on %}</div>
-            </div>
-          </div>
-          <div class="col-lg-5">
-            {% ff_fields form exclude=form.service_fields_exclude|add:",title,description,contact,customer,owned_by,postal_address,invoiced_on,due_on" %}
-          </div>
-        </div>
-      </div>
+      <div class="card-body">{% ff_fields form exclude=form.service_fields_exclude %}</div>
     </section>
-    <section class="card mb-3 wb-table-card">
+    <section class="card mb-3 wb-table-card wb-form-breakout">
       <div class="card-header">
         {% translate 'services'|capfirst %}
         <small class="form-text text-muted d-block">
           {% translate "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)." %}
+          {% translate "Empty hours and costs are taken from the selected source, enter a value to invoice something else." %}
         </small>
       </div>
       {% if form.selected_services.errors %}
         <div class="card-body pb-0">{{ form.selected_services.errors }}</div>
       {% endif %}
-      <table class="table table-sm mb-0 wb-invoice-services">
-        <colgroup>
-          <col width="1%">
-          <col>
-          <col width="25%">
-          <col width="1%">
-        </colgroup>
-        {% for group in form.service_groups %}
-          <tbody>
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  data-check-all="[name=selected_services]"
-                  aria-label="{% translate 'Select all' %}"
-                  title="{% translate 'Select all' %}"
-                >
-              </th>
-              <th>{{ group.offer|default:_("Not offered yet") }}</th>
-              <th>
-                {% translate 'invoicing'|capfirst %}
-                <div class="small fw-normal">
-                  {% translate 'all' %}:
-                  <a href="#" data-select-all="offer">{% translate 'as offered' %}</a> &middot;
-                  <a href="#" data-select-all="logbook">{% translate 'as logged' %}</a>
-                  {% if group.has_surplus %}
-                    &middot; <a href="#" data-select-all="surplus">{% translate 'surplus' %}</a>
-                  {% endif %}
-                </div>
-              </th>
-              <th class="text-nowrap text-center">
-                <label for="disable-logging-{{ forloop.counter }}">{% translate 'disable logging'|capfirst %}</label>
-                <div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0 wb-invoice-services">
+          <colgroup>
+            <col width="1%">
+            <col>
+            <col width="18%">
+            <col width="10%">
+            <col width="7%">
+            <col width="8%">
+            <col width="8%">
+            <col width="8%">
+            <col width="1%">
+          </colgroup>
+          {% for group in form.service_groups %}
+            <tbody>
+              <tr>
+                <th>
                   <input
                     type="checkbox"
                     class="form-check-input"
-                    id="disable-logging-{{ forloop.counter }}"
-                    data-check-all="[name^=disable_logging_]"
+                    data-check-all="[name=selected_services]"
+                    aria-label="{% translate 'Select all' %}"
                     title="{% translate 'Select all' %}"
                   >
-                </div>
-              </th>
-            </tr>
-            {% for row in group.rows %}
-              <tr>
-                <td>
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    name="{{ row.selected.data.name }}"
-                    value="{{ row.selected.data.value }}"
-                    id="{{ row.selected.id_for_label }}"
-                    {% if row.selected.data.selected %}checked{% endif %}
-                  >
-                </td>
-                <td>
-                  <label for="{{ row.selected.id_for_label }}" class="text-break">
-                    <strong>{{ row.service.title }}</strong>
-                    {% if row.service.is_optional %}
-                      <small class="text-muted">({% translate 'optional' %})</small>
+                </th>
+                <th>{{ group.offer|default:_("Not offered yet") }}</th>
+                <th>
+                  {% translate 'invoicing'|capfirst %}
+                  <div class="small fw-normal">
+                    {% translate 'all' %}:
+                    <a href="#" data-select-all="offer">{% translate 'as offered' %}</a> &middot;
+                    <a href="#" data-select-all="logbook">{% translate 'as logged' %}</a>
+                    {% if group.has_surplus %}
+                      &middot; <a href="#" data-select-all="surplus">{% translate 'surplus' %}</a>
                     {% endif %}
-                  </label>
-                  {% if row.service.description %}
-                    <div class="small text-muted text-break">{{ row.service.description|linebreaksbr }}</div>
-                  {% endif %}
-                </td>
-                <td class="small">
-                  {% for radio in row.source %}
-                    <div class="form-check">
-                      <input
-                        type="radio"
-                        class="form-check-input"
-                        name="{{ radio.data.name }}"
-                        value="{{ radio.data.value }}"
-                        id="{{ radio.id_for_label }}"
-                        {% if radio.data.selected %}checked{% endif %}
-                      >
-                      <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                    </div>
-                  {% endfor %}
-                </td>
-                <td class="text-center">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    name="{{ row.disable_logging.html_name }}"
-                    id="{{ row.disable_logging.id_for_label }}"
-                    aria-label="{% translate 'disable logging' %}"
-                    {% if row.disable_logging.value %}checked{% endif %}
-                  >
-                </td>
+                  </div>
+                </th>
+                <th>{% translate 'effort type'|capfirst %}</th>
+                <th class="text-end">{% translate 'hours'|capfirst %}</th>
+                <th class="text-end">{% translate 'hourly rate'|capfirst %}</th>
+                <th class="text-end">{% translate 'cost'|capfirst %}</th>
+                <th class="text-end">{% translate 'amount'|capfirst %}</th>
+                <th class="text-nowrap text-center">
+                  <label for="disable-logging-{{ forloop.counter }}">{% translate 'disable logging'|capfirst %}</label>
+                  <div>
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="disable-logging-{{ forloop.counter }}"
+                      data-check-all="[name^=disable_logging_]"
+                      title="{% translate 'Select all' %}"
+                    >
+                  </div>
+                </th>
               </tr>
-            {% endfor %}
-          </tbody>
-        {% endfor %}
-      </table>
+              {% for row in group.rows %}
+                <tr data-invoice-service>
+                  <td>
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      name="{{ row.selected.data.name }}"
+                      value="{{ row.selected.data.value }}"
+                      id="{{ row.selected.id_for_label }}"
+                      aria-label="{{ row.service.title }}"
+                      {% if row.selected.data.selected %}checked{% endif %}
+                    >
+                  </td>
+                  <td>
+                    {% if row.service.is_optional %}
+                      <small class="text-muted">{% translate 'optional'|capfirst %}</small>
+                    {% endif %}
+                    {{ row.title.errors }}
+                    <input
+                      type="text"
+                      class="form-control form-control-sm fw-semibold mb-1"
+                      name="{{ row.title.html_name }}"
+                      value="{{ row.title.value|default:'' }}"
+                      placeholder="{{ row.service.title }}"
+                      aria-label="{% translate 'title' %}"
+                    >
+                    {{ row.description.errors }}
+                    <textarea
+                      class="form-control form-control-sm"
+                      name="{{ row.description.html_name }}"
+                      rows="1"
+                      aria-label="{% translate 'description' %}"
+                    >{{ row.description.value|default:'' }}</textarea>
+                  </td>
+                  <td class="small">
+                    {% for radio, preset in row.options %}
+                      <div class="form-check">
+                        <input
+                          type="radio"
+                          class="form-check-input"
+                          name="{{ radio.data.name }}"
+                          value="{{ radio.data.value }}"
+                          id="{{ radio.id_for_label }}"
+                          data-hours="{{ preset.hours|unlocalize }}"
+                          data-cost="{{ preset.cost|unlocalize }}"
+                          {% if radio.data.selected %}checked{% endif %}
+                        >
+                        <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                      </div>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    {{ row.effort_type.errors }}
+                    <input
+                      type="text"
+                      class="form-control form-control-sm"
+                      name="{{ row.effort_type.html_name }}"
+                      value="{{ row.effort_type.value|default:'' }}"
+                      aria-label="{% translate 'effort type' %}"
+                    >
+                  </td>
+                  <td>
+                    {{ row.effort_hours.errors }}
+                    <input
+                      type="number"
+                      step="0.1"
+                      class="form-control form-control-sm text-end"
+                      name="{{ row.effort_hours.html_name }}"
+                      value="{{ row.effort_hours.value|default_if_none:''|unlocalize }}"
+                      placeholder="{{ row.effort_hours.field.widget.attrs.placeholder|unlocalize }}"
+                      data-hours
+                      aria-label="{% translate 'hours' %}"
+                    >
+                  </td>
+                  <td>
+                    {{ row.effort_rate.errors }}
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control form-control-sm text-end"
+                      name="{{ row.effort_rate.html_name }}"
+                      value="{{ row.effort_rate.value|default_if_none:''|unlocalize }}"
+                      data-rate
+                      aria-label="{% translate 'hourly rate' %}"
+                    >
+                  </td>
+                  <td>
+                    {{ row.cost.errors }}
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control form-control-sm text-end"
+                      name="{{ row.cost.html_name }}"
+                      value="{{ row.cost.value|default_if_none:''|unlocalize }}"
+                      placeholder="{{ row.cost.field.widget.attrs.placeholder|unlocalize }}"
+                      data-cost
+                      aria-label="{% translate 'cost' %}"
+                    >
+                  </td>
+                  <td class="text-end text-nowrap"><output data-amount></output></td>
+                  <td class="text-center">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      name="{{ row.disable_logging.html_name }}"
+                      id="{{ row.disable_logging.id_for_label }}"
+                      aria-label="{% translate 'disable logging' %}"
+                      {% if row.disable_logging.value %}checked{% endif %}
+                    >
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          {% endfor %}
+        </table>
+      </div>
     </section>
   {% else %}
     {{ block.super }}

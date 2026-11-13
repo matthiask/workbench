@@ -318,6 +318,66 @@ class InvoicesTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, "surplus: 300.00")
 
+    def test_services_invoice_edited_lines(self):
+        """The lines' texts and amounts may be changed when creating the
+        invoice, empty fields are taken from the service and the source"""
+        project = factories.ProjectFactory.create()
+        design = factories.ServiceFactory.create(
+            project=project,
+            title="Design",
+            description="Screens",
+            effort_type="Design",
+            effort_rate=100,
+            effort_hours=10,
+        )
+        hosting = factories.ServiceFactory.create(
+            project=project, title="Hosting", cost=500
+        )
+        hours = factories.LoggedHoursFactory.create(service=design, hours=3)
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=services&source=logbook"
+        response = self.client.get(url)
+        self.assertContains(response, 'placeholder="3.0"')
+
+        url = project.urls["createinvoice"] + "?type=services&source=offer"
+
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "postal_address": "Anything\nStreet\nCity",
+                "selected_services": [design.pk, hosting.pk],
+                f"source_{design.pk}": "logbook",
+                f"title_{design.pk}": "Design, first part",
+                f"description_{design.pk}": "",
+                f"effort_hours_{design.pk}": "2.5",
+                f"effort_rate_{design.pk}": "90",
+                f"effort_type_{design.pk}": "Visual design",
+                f"cost_{hosting.pk}": "450",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        invoice = Invoice.objects.get()
+        self.assertEqual(
+            [
+                (line.title, line.description, line.effort_hours, line.service_cost)
+                for line in invoice.services.all()
+            ],
+            [
+                ("Design, first part", "Screens", 2.5, 225),
+                ("Hosting", "", None, 450),
+            ],
+        )
+        self.assertEqual(invoice.services.first().effort_type, "Visual design")
+        # The source still decides which entries the line takes
+        hours.refresh_from_db()
+        self.assertEqual(hours.invoice_service.title, "Design, first part")
+
     def test_surplus_doesnt_include_work_invoiced_from_offer(self):
         """Work logged before invoicing the offer belongs to the offered
         amount, also if it was more than offered"""

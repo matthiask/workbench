@@ -1958,6 +1958,31 @@ a.wb-row-title:hover {
   max-width: none;
 }
 
+// Wide content (e.g. tables) of narrow form pages uses the window's width
+.wb-form-breakout {
+  width: min(calc(100vw - 3rem), 110rem);
+  max-width: none;
+  margin-inline: calc(50% - min(calc(100vw - 3rem), 110rem) / 2);
+}
+
+@media (max-width: 767.98px) {
+  .wb-form-breakout {
+    width: auto;
+    margin-inline: 0;
+  }
+}
+
+.wb-invoice-services {
+  td,
+  th {
+    vertical-align: top;
+  }
+
+  .form-control-sm {
+    min-width: 5rem;
+  }
+}
+
 .wb-form-page .card-body > .form-group:last-child {
   margin-bottom: 0;
 }

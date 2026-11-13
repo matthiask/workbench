@@ -31,7 +31,7 @@ from workbench.projects.forms import (
 from workbench.reporting.models import FreezeDate
 from workbench.reporting.utils import accepted_offers_by_project
 from workbench.services.models import ServiceType
-from workbench.tools.formats import Z2, currency, hours, local_date_format
+from workbench.tools.formats import Z1, Z2, currency, hours, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     DateInput,
@@ -867,7 +867,19 @@ class CreateProjectInvoiceForm(InvoiceForm):
             if self.is_bound and self.data.get(self.add_prefix("close_project")):
                 add_delete_planned_work_field(self, self.project)
 
-    def add_services_field(self):
+    # Fields of each service, named "<field>_<service ID>"
+    SERVICE_ROW_FIELDS = [
+        "source",
+        "title",
+        "description",
+        "effort_type",
+        "effort_hours",
+        "effort_rate",
+        "cost",
+        "disable_logging",
+    ]
+
+    def add_services_field(self):  # noqa: C901
         source = (
             Invoice.LOGBOOK
             if self.request.GET.get("source") == "logbook"
@@ -998,10 +1010,39 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     label=_("disable logging"),
                     required=False,
                 )
+                # The line's texts and amounts, empty fields are taken from
+                # the service and the source
+                for field, initial in [
+                    ("title", service.title),
+                    ("description", service.description),
+                    ("effort_type", service.effort_type),
+                    ("effort_hours", None),
+                    ("effort_rate", service.effort_rate),
+                    ("cost", None),
+                ]:
+                    self.fields[f"{field}_{service.id}"] = Service._meta.get_field(
+                        field
+                    ).formfield(required=False, initial=initial)
+                # What the sources would invoice, for placeholders
+                presets = {
+                    Invoice.OFFER: (service.effort_hours, service.cost),
+                    Invoice.LOGBOOK: (
+                        row["not_archived_logged_hours"],
+                        row["not_archived_logged_cost"],
+                    ),
+                }
+                if service.id in from_offer:
+                    presets[Invoice.SURPLUS] = (surplus["hours"], surplus["cost"])
                 group["rows"].append({
                     "service": service,
-                    "source": f"source_{service.id}",
-                    "disable_logging": f"disable_logging_{service.id}",
+                    "presets": {
+                        key: {"hours": hours or Z1, "cost": cost or Z2}
+                        for key, (hours, cost) in presets.items()
+                    },
+                    **{
+                        field: f"{field}_{service.id}"
+                        for field in self.SERVICE_ROW_FIELDS
+                    },
                 })
 
         self.fields["selected_services"] = forms.TypedMultipleChoiceField(
@@ -1017,7 +1058,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 row[field]
                 for group in self.service_groups
                 for row in group["rows"]
-                for field in ("source", "disable_logging")
+                for field in self.SERVICE_ROW_FIELDS
             ),
         ]
         # The template renders them as a table
@@ -1028,8 +1069,18 @@ class CreateProjectInvoiceForm(InvoiceForm):
         for group in self.service_groups:
             for row in group["rows"]:
                 row["selected"] = checkboxes[row["service"].id]
-                row["source"] = self[row["source"]]
-                row["disable_logging"] = self[row["disable_logging"]]
+                for field in self.SERVICE_ROW_FIELDS:
+                    row[field] = self[row[field]]
+                # The source shown, to show its amounts as placeholders
+                preset = row["presets"].get(row["source"].value()) or next(
+                    iter(row["presets"].values())
+                )
+                row["effort_hours"].field.widget.attrs["placeholder"] = preset["hours"]
+                row["cost"].field.widget.attrs["placeholder"] = preset["cost"]
+                row["options"] = [
+                    (radio, row["presets"][radio.data["value"]])
+                    for radio in row["source"]
+                ]
 
     def service_sources(self):
         """The source of each selected service, the default (from the menu
@@ -1101,6 +1152,22 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 services,
                 sources=sources,
                 logbook_cutoff_date=self.cleaned_data.get("logbook_cutoff_date"),
+                overrides={
+                    id: {
+                        field: value
+                        for field in [
+                            "title",
+                            "description",
+                            "effort_type",
+                            "effort_hours",
+                            "effort_rate",
+                            "cost",
+                        ]
+                        if (value := self.cleaned_data.get(f"{field}_{id}"))
+                        not in {None, ""}
+                    }
+                    for id in sources
+                },
             )
             services.filter(
                 id__in=[

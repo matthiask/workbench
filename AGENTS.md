@@ -246,7 +246,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   logging per service (`disable_logging`). Invoicing the offer links the
   entries logged so far; the surplus (`service_surplus()`) is the logged
   work beyond what has been invoiced on the service, at most what hasn't
-  been invoiced from the logbook yet. Sending them stays
+  been invoiced from the logbook yet. The web form also edits the lines'
+  titles, descriptions, effort types, hours, rates and costs (no service
+  type dropdown filling the rates; `overrides` of
+  `Invoice.create_services()`; empty hours and costs come from the source,
+  which still decides the logbook entries a line takes). Sending them stays
   in the web interface. "Release and send" mails an invoice in preparation
   with its PDF to the customer (suggested like payment reminders, the owner
   in Cc and Reply-To), invoiced today and due in 15 days, and marks it as

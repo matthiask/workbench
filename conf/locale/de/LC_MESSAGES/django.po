@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 11:51+0100\n"
+"POT-Creation-Date: 2026-11-13 12:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -391,6 +391,7 @@ msgstr "lesen und schreiben"
 #: workbench/planning/models.py workbench/projects/models.py
 #: workbench/reporting/models.py workbench/services/models.py
 #: workbench/templates/accounts/api_tokens.html
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
 #: workbench/templates/planning/planning_import.html
 msgid "title"
@@ -793,6 +794,7 @@ msgstr "endet am"
 #: workbench/projects/models.py workbench/services/models.py
 #: workbench/templates/awt/absence_detail.html
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/offers/offer_form.html
@@ -2969,12 +2971,14 @@ msgid "rendered on"
 msgstr "Erbracht am"
 
 #: workbench/invoices/views.py workbench/services/models.py
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/_logged_hours_per_rate.html
 msgid "effort type"
 msgstr "Aufwandtyp"
 
 #: workbench/invoices/views.py workbench/services/models.py
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/_logged_hours_per_rate.html
 #: workbench/tools/xlsx.py
@@ -2984,6 +2988,7 @@ msgstr "Stundensatz"
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/reporting/squeeze.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedhours_detail.html
 #: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/project_detail.html
@@ -2997,6 +3002,7 @@ msgstr "Stunden"
 #: workbench/invoices/views.py workbench/logbook/models.py
 #: workbench/projects/views.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/invoices/service_form.html
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/offers/offer_form.html
@@ -4326,7 +4332,7 @@ msgstr "auf Projekt"
 msgid "Leave this empty to only reserve the budget for now. It stops counting towards the source project either way."
 msgstr "Leer lassen, um das Budget vorerst nur zu reservieren. Es zählt so oder so nicht mehr zum Ursprungsprojekt."
 
-#: workbench/projects/models.py
+#: workbench/projects/models.py workbench/templates/invoices/invoice_form.html
 msgid "amount"
 msgstr "Betrag"
 
@@ -5517,6 +5523,10 @@ msgstr "Alle Leistungen des Projekts anzeigen"
 #: workbench/templates/invoices/invoice_form.html
 msgid "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)."
 msgstr "Jede Leistung gemäss Offerte, gemäss Logbuch (die noch nicht verrechneten Stunden und Kosten) oder, nachdem die Offerte verrechnet wurde, nur den darüber hinaus erfassten Aufwand (Mehraufwand) verrechnen."
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "Empty hours and costs are taken from the selected source, enter a value to invoice something else."
+msgstr "Leere Stunden und Kosten werden aus der gewählten Basis übernommen, gib einen Wert ein, um etwas anderes zu verrechnen."
 
 #: workbench/templates/invoices/invoice_form.html
 msgid "Select all"

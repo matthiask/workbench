@@ -577,7 +577,7 @@ on("click", "[data-select-receivers]", (e, el) => {
 // services of an offer when creating invoices
 on("change", "[data-check-all]", (_e, el) => {
   for (const input of (
-    el.closest("table") || el.closest("form")
+    el.closest("tbody, table") || el.closest("form")
   ).querySelectorAll(el.dataset.checkAll)) {
     input.checked = el.checked
   }
@@ -589,6 +589,40 @@ on("click", "[data-select-all]", (e, el) => {
     el.closest("tbody, table") || el.closest("form")
   ).querySelectorAll(`input[type=radio][value="${el.dataset.selectAll}"]`)) {
     input.checked = true
+    input.dispatchEvent(new Event("change", { bubbles: true }))
+  }
+})
+
+// Services of invoices being created: the selected source suggests the hours
+// and costs (as placeholders), the amount follows the inputs
+function updateInvoiceService(row) {
+  const source = row.querySelector("input[type=radio]:checked")
+  const hours = row.querySelector("[data-hours]:not([type=radio])")
+  const cost = row.querySelector("[data-cost]:not([type=radio])")
+  if (source) {
+    hours.placeholder = source.dataset.hours
+    cost.placeholder = source.dataset.cost
+  }
+  const value = (input) =>
+    Number.parseFloat(input.value || input.placeholder || "0") || 0
+  const amount =
+    value(hours) * value(row.querySelector("[data-rate]")) + value(cost)
+  row.querySelector("[data-amount]").textContent = amount
+    .toLocaleString("de-CH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    .replaceAll("’", "'")
+}
+
+for (const type of ["input", "change"]) {
+  on(type, "[data-invoice-service] input", (_e, el) => {
+    updateInvoiceService(el.closest("[data-invoice-service]"))
+  })
+}
+document.addEventListener("DOMContentLoaded", () => {
+  for (const row of document.querySelectorAll("[data-invoice-service]")) {
+    updateInvoiceService(row)
   }
 })
 

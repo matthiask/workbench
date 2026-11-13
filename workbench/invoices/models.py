@@ -575,10 +575,16 @@ class Invoice(ModelWithTotal):
             sources=dict.fromkeys((ps.id for ps in project_services), self.OFFER),
         )
 
-    def create_services(self, project_services, *, sources, logbook_cutoff_date=None):
+    def create_services(
+        self, project_services, *, sources, logbook_cutoff_date=None, overrides=None
+    ):
         """Invoice lines for the services as offered, as logged (the entries
         not invoiced yet) or for the surplus, by ``sources`` (service ID to
-        source); the logbook cutoff date doesn't apply to offered services"""
+        source); the logbook cutoff date doesn't apply to offered services
+
+        ``overrides`` (service ID to a dict of line fields) replaces the
+        title, description, hours, rate or cost of lines, the source still
+        decides which logbook entries the line takes."""
         assert self.project, "cannot call create_services without project"
 
         for position, ps in enumerate(self._ordered_services(project_services)):
@@ -630,8 +636,11 @@ class Invoice(ModelWithTotal):
                     service.third_party_costs = not_archived_costs.filter(
                         third_party_costs__isnull=False
                     ).aggregate(s=Sum("third_party_costs"))["s"]
-                if not (service.effort_hours or service.cost):
-                    continue
+
+            for field, value in (overrides or {}).get(ps.id, {}).items():
+                setattr(service, field, value)
+            if source != self.OFFER and not (service.effort_hours or service.cost):
+                continue
 
             service.save(skip_related_model=True)
             not_archived_effort.update(
