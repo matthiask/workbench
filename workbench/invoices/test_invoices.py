@@ -414,22 +414,38 @@ class InvoicesTest(TestCase):
         )
         self.assertEqual(hidden(response.context["form"]), [False])
 
-    def test_logged_costs_not_offered(self):
-        """Invoicing as offered archives costs which haven't been offered
-        without invoicing them, that's a warning"""
-        service = factories.ServiceFactory.create(
+    def test_logged_work_not_offered(self):
+        """Invoicing as offered doesn't invoice logged work of another kind
+        than offered (costs instead of hours or the other way round), which
+        may be intentional; the row says so"""
+        hours_offered = factories.ServiceFactory.create(
             title="Design", effort_type="Dev", effort_rate=100, effort_hours=10
         )
-        project = service.project
-        factories.LoggedCostFactory.create(service=service, cost=200)
+        project = hours_offered.project
+        cost_offered = factories.ServiceFactory.create(
+            project=project, title="Freelancer", cost=1000, effort_rate=100
+        )
+        factories.LoggedCostFactory.create(service=hours_offered, cost=200)
+        factories.LoggedHoursFactory.create(service=cost_offered, hours=3)
         self.client.force_login(project.owned_by)
         url = project.urls["createinvoice"] + "?type=services"
-        data = self.services_invoice_data(project, selected_services=[service.pk])
-        response = self.client.post(url, data)
-        self.assertContains(response, 'value="logged-costs-not-offered"')
-        self.assertContains(response, "Design")
+        form = self.client.get(url).context["form"]
+        self.assertEqual(
+            {
+                row["service"]: [str(hint) for hint in row["offer_hints"]]
+                for group in form.service_groups
+                for row in group["rows"]
+            },
+            {
+                hours_offered: ["Logged costs of 200.00 aren't invoiced as offered."],
+                cost_offered: ["Logged hours (3.0h) aren't invoiced as offered."],
+            },
+        )
         response = self.client.post(
-            url, data | {WarningsForm.ignore_warnings_id: "logged-costs-not-offered"}
+            url,
+            self.services_invoice_data(
+                project, selected_services=[hours_offered.pk, cost_offered.pk]
+            ),
         )
         self.assertEqual(response.status_code, 302)
 

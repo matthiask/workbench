@@ -7,7 +7,7 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
@@ -1066,8 +1066,24 @@ class CreateProjectInvoiceForm(InvoiceForm):
                         row["not_archived_logged_cost"],
                     ),
                 }
+                # Logged work of another kind than offered isn't invoiced as
+                # offered, which may be intentional (e.g. a freelancer
+                # instead of own work, or the other way round)
+                offer_hints = []
+                if service.effort_hours or service.cost:
+                    if row["not_archived_logged_cost"] and not service.cost:
+                        offer_hints.append(
+                            _("Logged costs of %s aren't invoiced as offered.")
+                            % currency(row["not_archived_logged_cost"])
+                        )
+                    if row["not_archived_logged_hours"] and not service.effort_hours:
+                        offer_hints.append(
+                            _("Logged hours (%s) aren't invoiced as offered.")
+                            % hours(row["not_archived_logged_hours"])
+                        )
                 group["rows"].append({
                     "service": service,
+                    "offer_hints": offer_hints,
                     "hidden": service.id not in visible,
                     "logged_hours": row["logged_hours"],
                     "logged": logged_for_invoicing[service.id]
@@ -1187,28 +1203,6 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     )
                     % {"services": ", ".join(service.title for service in invoiced)},
                     code="services-invoiced-already",
-                )
-            # Invoicing as offered archives logged costs which haven't been
-            # offered without invoicing them
-            if not_offered := self.project.services.filter(
-                Exists(
-                    LoggedCost.objects.filter(
-                        service=OuterRef("pk"), archived_at__isnull=True
-                    )
-                ),
-                Q(cost__isnull=True) | Q(cost=0),
-                id__in=[
-                    id for id, source in sources.items() if source == Invoice.OFFER
-                ],
-            ):
-                self.add_warning(
-                    _(
-                        "Costs have been logged on services which haven't"
-                        " offered costs, invoicing them as offered doesn't"
-                        " invoice these costs: %(services)s."
-                    )
-                    % {"services": ", ".join(service.title for service in not_offered)},
-                    code="logged-costs-not-offered",
                 )
         return data
 

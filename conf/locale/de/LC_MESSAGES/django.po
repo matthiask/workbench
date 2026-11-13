@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:54+0100\n"
+"POT-Creation-Date: 2026-11-13 12:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2534,6 +2534,16 @@ msgstr "Verrechnung"
 msgid "disable logging"
 msgstr "Erfassung sperren"
 
+#: workbench/invoices/forms.py
+#, python-format
+msgid "Logged costs of %s aren't invoiced as offered."
+msgstr "Erfasste Kosten von %s werden gemäss Offerte nicht verrechnet."
+
+#: workbench/invoices/forms.py
+#, python-format
+msgid "Logged hours (%s) aren't invoiced as offered."
+msgstr "Erfasste Stunden (%s) werden gemäss Offerte nicht verrechnet."
+
 #: workbench/invoices/forms.py workbench/services/apps.py
 #: workbench/services/models.py
 #: workbench/templates/invoices/invoice_detail.html
@@ -2553,11 +2563,6 @@ msgstr "Total %(currency)s inkl. MwSt"
 #, python-format
 msgid "Some services have been invoiced already: %(services)s. Make sure the same work isn't invoiced twice."
 msgstr "Einige Leistungen wurden bereits verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird."
-
-#: workbench/invoices/forms.py
-#, python-format
-msgid "Costs have been logged on services which haven't offered costs, invoicing them as offered doesn't invoice these costs: %(services)s."
-msgstr "Auf Leistungen ohne offerierte Kosten wurden Kosten erfasst, die beim Verrechnen gemäss Offerte nicht verrechnet werden: %(services)s."
 
 #: workbench/invoices/forms.py
 msgid "Other invoice types must be created directly on a project."
@@ -6880,6 +6885,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "Costs have been logged on services which haven't offered costs, invoicing them as offered doesn't invoice these costs: %(services)s."
+#~ msgstr "Auf Leistungen ohne offerierte Kosten wurden Kosten erfasst, die beim Verrechnen gemäss Offerte nicht verrechnet werden: %(services)s."
 
 #~ msgid "surplus"
 #~ msgstr "nur Mehraufwand"
