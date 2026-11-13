@@ -15,7 +15,6 @@
   {% if form.offer_filter %}
     <form method="get" data-autosubmit>
       <input type="hidden" name="type" value="{{ request.GET.type }}">
-      <input type="hidden" name="source" value="{{ request.GET.source }}">
       <section class="card mb-3">
         <div class="card-body">
           <div class="form-group">
@@ -24,11 +23,7 @@
               class="form-label fw-semibold"
             >{% translate 'Invoice for an offer' %}</label>
             <small class="form-text text-muted form-help-text">
-              {% if request.GET.source == "logbook" %}
-                {% translate "Takes the title and the description of the offer and selects its services with logged hours or costs which haven't been invoiced yet. You can change everything below." %}
-              {% else %}
-                {% translate "Takes the title and the description of the offer and selects its services. You can change everything below." %}
-              {% endif %}
+              {% translate "Takes the title and the description of the offer and selects its services with something to invoice. You can change everything below." %}
               {% translate "Changing the offer reloads the form, changes made below are lost." %}
             </small>
             <select name="offer" id="invoice-offer-filter" class="form-select">
@@ -39,17 +34,6 @@
                 </option>
               {% endfor %}
             </select>
-            {% if form.offer %}
-              <small class="form-text text-muted d-block mt-2">
-                {% if form.showing_all %}
-                  {% translate 'All services of the project are listed below.' %}
-                  <a href="{{ form.toggle_all_url }}">{% translate 'Only list the services of the offer' %}</a>
-                {% else %}
-                  {% translate 'Only the services of the offer are listed below.' %}
-                  <a href="{{ form.toggle_all_url }}">{% translate 'List all services of the project' %}</a>
-                {% endif %}
-              </small>
-            {% endif %}
           </div>
         </div>
       </section>
@@ -69,12 +53,22 @@
           {% translate "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)." %}
           {% translate "Empty hours and costs are taken from the selected source, enter a value to invoice something else." %}
         </small>
+        {% if form.has_hidden_services %}
+          <small class="form-text text-muted d-block" data-hidden-services-note>
+            {% if form.offer %}
+              {% translate 'Only the services of the offer with something to invoice are listed.' %}
+            {% else %}
+              {% translate 'Only services with something to invoice are listed.' %}
+            {% endif %}
+            <a href="#" data-show-hidden-services>{% translate 'List all services of the project' %}</a>
+          </small>
+        {% endif %}
       </div>
       {% if form.selected_services.errors %}
         <div class="card-body pb-0">{{ form.selected_services.errors }}</div>
       {% endif %}
       <div class="table-responsive">
-        <table class="table table-sm mb-0 wb-invoice-services">
+        <table class="table table-sm mb-0 wb-invoice-services" data-invoice-services>
           <colgroup>
             <col width="1%">
             <col>
@@ -87,7 +81,7 @@
             <col width="1%">
           </colgroup>
           {% for group in form.service_groups %}
-            <tbody>
+            <tbody {% if group.hidden %}hidden{% endif %}>
               <tr>
                 <th>
                   <input
@@ -129,7 +123,7 @@
                 </th>
               </tr>
               {% for row in group.rows %}
-                <tr data-invoice-service>
+                <tr data-invoice-service {% if row.hidden %}hidden{% endif %}>
                   <td>
                     <input
                       type="checkbox"

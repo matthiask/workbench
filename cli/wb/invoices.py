@@ -220,21 +220,17 @@ def _parse_services(_ctx, _param, values):
     help="Defaults to services with --offer or --service, else fixed.",
 )
 @click.option(
-    "--from-logbook",
-    is_flag=True,
-    help="Services invoices: the logged work which hasn't been invoiced yet"
-    " instead of the offered services.",
-)
-@click.option(
     "--service",
     "services",
     multiple=True,
     callback=_parse_services,
     metavar="ID[:SOURCE]",
-    help="ID of a service to invoice, defaults to the offer's services."
-    " Another source than the invoice's after a colon: offer, logbook or"
-    " surplus (the work logged beyond what has been invoiced, after"
-    " invoicing the offer), e.g. 42:logbook.",
+    help="ID of a service to invoice, defaults to the offer's services with"
+    " something to invoice. How it's invoiced after a colon: offer, logbook"
+    " or surplus (the work logged beyond what has been invoiced, after"
+    " invoicing the offer), e.g. 42:logbook; defaults to the surplus after"
+    " invoicing the offer, the logbook after invoicing the logbook, and the"
+    " offer if something has been offered.",
 )
 @click.option(
     "--disable-logging",
@@ -285,7 +281,6 @@ def create_invoice(
     offer,
     contact,
     type_,
-    from_logbook,
     services,
     disable_logging,
     down_payments,
@@ -309,9 +304,9 @@ def create_invoice(
     interface
 
     Invoice an offer (--offer), selected services of a project (--service,
-    as offered or --from-logbook, or each with its own source), a fixed amount, down payment or credit of
-    a project (--project --subtotal) or a fixed amount for a contact without
-    project (--contact --title --subtotal)."""
+    as offered, as logged or the surplus), a fixed amount, down payment or
+    credit of a project (--project --subtotal) or a fixed amount for a
+    contact without project (--contact --title --subtotal)."""
     data = {
         key: value
         for key, value in [
@@ -331,7 +326,6 @@ def create_invoice(
         if value is not None
     }
     data["liable_to_vat"] = liable_to_vat
-    data["source"] = "logbook" if from_logbook else "offer"
     if services:
         data["services"] = [id for id, _source in services]
         if sources := {id: source for id, source in services if source}:

@@ -880,13 +880,8 @@ class CreateProjectInvoiceForm(InvoiceForm):
     ]
 
     def add_services_field(self):  # noqa: C901
-        source = (
-            Invoice.LOGBOOK
-            if self.request.GET.get("source") == "logbook"
-            else Invoice.OFFER
-        )
-        # Invoicing from the offer links the logged entries too, the cutoff
-        # date only applies to invoicing from the logbook
+        # Invoicing as offered links the logged entries too, the cutoff date
+        # only applies to the logbook and the surplus
         self.fields["logbook_cutoff_date"] = forms.DateField(
             widget=DateInput,
             required=False,
@@ -914,62 +909,85 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 )
             return currency(row["not_archived"])
 
-        # Services which have been invoiced from the offer may have a surplus
-        from_offer = set(
+        # Services which have been invoiced, and whether from the offer (they
+        # may have a surplus then)
+        invoiced = {}
+        for id, line_from_offer in (
             Service.objects
-            .filter(
-                project_service__project=self.project,
-                from_offer=True,
-            )
+            .filter(project_service__project=self.project)
             .exclude(invoice__status=Invoice.CANCELED)
-            .values_list("project_service", flat=True)
-        )
+            .values_list("project_service", "from_offer")
+        ):
+            invoiced[id] = invoiced.get(id, False) or line_from_offer
+        from_offer = {id for id, line_from_offer in invoiced.items() if line_from_offer}
+
+        def has_open_entries(row):
+            return bool(row["not_archived"] or row["not_archived_logged_hours"])
+
+        def not_invoiced_offer(row):
+            service = row["service"]
+            return bool(
+                service.id not in invoiced
+                and not service.is_declined
+                and (service.effort_hours or service.cost)
+            )
+
+        def default_source(service):
+            """Work invoiced as offered is followed by the surplus, work
+            invoiced as logged by more logged work. Services which haven't
+            been invoiced yet are invoiced as offered if something has been
+            offered"""
+            if service.id in from_offer:
+                return Invoice.SURPLUS
+            if service.id in invoiced:
+                return Invoice.LOGBOOK
+            if service.effort_hours or service.cost:
+                return Invoice.OFFER
+            return Invoice.LOGBOOK
 
         choices = []
         selected = []
         self.service_groups = []
         # Offers for the filter above the form, which preselects their services
-        # and only lists them unless all services of the project are wanted
         self.offer_filter = []
-        show_all = self.request.GET.get("all") == "1"
-        params = self.request.GET.copy()
-        if show_all:
-            params.pop("all")
-        else:
-            params["all"] = "1"
-        self.toggle_all_url = f"?{params.urlencode()}"
-        self.showing_all = show_all
+        # All services are rendered, those without anything to invoice (and
+        # those of other offers if invoicing an offer) are hidden until wanted
+        self.has_hidden_services = False
         for offer, offer_data in self.project.grouped_services["offers"]:
-            # Invoicing from the logbook lists what hasn't been invoiced yet
-            rows = [
-                row
-                for row in offer_data["services"]
-                if source == Invoice.OFFER
-                or row["not_archived"]
-                or row["not_archived_logged_hours"]
-            ]
-            # All offers with services, whatever the source; selecting one
-            # without anything to invoice preselects nothing
-            if offer and offer_data["services"]:
+            rows = offer_data["services"]
+            # All offers with services; selecting one without anything to
+            # invoice preselects nothing
+            if offer and rows:
                 self.offer_filter.append((offer, offer == self.offer))
+            if not rows:
+                continue
+            visible = {
+                row["service"].id
+                for row in rows
+                if (not self.offer or offer == self.offer)
+                and (has_open_entries(row) or not_invoiced_offer(row))
+            }
             if self.offer and offer == self.offer:
                 # Optional services haven't been ordered, unless work has
                 # been logged on them
                 selected = [
                     row["service"].id
                     for row in rows
-                    if source == Invoice.LOGBOOK or not row["service"].is_optional
+                    if has_open_entries(row)
+                    or (not_invoiced_offer(row) and not row["service"].is_optional)
                 ]
-            elif self.offer and not show_all:
-                continue
-            if not rows:
-                continue
 
             choices.append((
                 str(offer or _("Not offered yet")),
                 [(row["service"].id, row["service"].title) for row in rows],
             ))
-            group = {"offer": offer, "rows": [], "has_surplus": False}
+            group = {
+                "offer": offer,
+                "rows": [],
+                "has_surplus": False,
+                "hidden": not visible,
+            }
+            self.has_hidden_services |= len(visible) < len(rows)
             self.service_groups.append(group)
             for row in rows:
                 service = row["service"]
@@ -1002,7 +1020,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 self.fields[f"source_{service.id}"] = forms.ChoiceField(
                     label=_("invoicing"),
                     choices=sources,
-                    initial=source,
+                    initial=default_source(service),
                     widget=forms.RadioSelect,
                     required=False,
                 )
@@ -1035,6 +1053,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     presets[Invoice.SURPLUS] = (surplus["hours"], surplus["cost"])
                 group["rows"].append({
                     "service": service,
+                    "hidden": service.id not in visible,
                     "presets": {
                         key: {"hours": hours or Z1, "cost": cost or Z2}
                         for key, (hours, cost) in presets.items()
@@ -1069,6 +1088,9 @@ class CreateProjectInvoiceForm(InvoiceForm):
         for group in self.service_groups:
             for row in group["rows"]:
                 row["selected"] = checkboxes[row["service"].id]
+                # Selected services stay visible, e.g. after validation errors
+                if row["selected"].data["selected"]:
+                    row["hidden"] = group["hidden"] = False
                 for field in self.SERVICE_ROW_FIELDS:
                     row[field] = self[row[field]]
                 # The source shown, to show its amounts as placeholders
@@ -1083,15 +1105,11 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 ]
 
     def service_sources(self):
-        """The source of each selected service, the default (from the menu
-        entry) if none was given"""
-        default = (
-            Invoice.LOGBOOK
-            if self.request.GET.get("source") == "logbook"
-            else Invoice.OFFER
-        )
+        """The source of each selected service, the default if none was
+        given"""
         return {
-            id: self.cleaned_data.get(f"source_{id}") or default
+            id: self.cleaned_data.get(f"source_{id}")
+            or self.fields[f"source_{id}"].initial
             for id in self.cleaned_data.get("selected_services") or ()
         }
 

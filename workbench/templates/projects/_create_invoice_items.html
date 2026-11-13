@@ -7,10 +7,7 @@
   class="dropdown-item"
   href="{{ project.urls.createinvoice }}?type=down-payment"
 >{% translate 'Down payment' %}</a>
-<a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=logbook">
-  {% translate 'Services from logbook' %}
-</a>
-<a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services&amp;source=offer">
-  {% translate 'Services from offer' %}
+<a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=services">
+  {% translate 'services'|capfirst %}
 </a>
 <a class="dropdown-item" href="{{ project.urls.createinvoice }}?type=credit">{% translate 'Credit' %}</a>

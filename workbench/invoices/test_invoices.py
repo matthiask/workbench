@@ -198,15 +198,21 @@ class InvoicesTest(TestCase):
             "postal_address": "Anything\nStreet\nCity",
             "selected_services": [service.pk],
         }
-        url = project.urls["createinvoice"] + "?type=services&source=offer"
-        response = self.client.post(url, data)
+        # Services which have been invoiced completely are hidden, but may
+        # be selected
+        url = project.urls["createinvoice"] + "?type=services"
+        offer = {f"source_{service.pk}": "offer"}
+        logbook = {f"source_{service.pk}": "logbook"}
+        response = self.client.post(url, data | offer)
         self.assertContains(response, 'value="services-invoiced-already"')
         self.assertContains(
             response, "Some services have been invoiced already: Design"
         )
         response = self.client.post(
             url,
-            data | {WarningsForm.ignore_warnings_id: "services-invoiced-already"},
+            data
+            | offer
+            | {WarningsForm.ignore_warnings_id: "services-invoiced-already"},
         )
         self.assertEqual(response.status_code, 302)
 
@@ -215,18 +221,19 @@ class InvoicesTest(TestCase):
         # Invoicing new work from the logbook again is the normal case
         from_offer.delete()
         factories.LoggedHoursFactory.create(service=service, hours=2)
-        logbook_url = project.urls["createinvoice"] + "?type=services&source=logbook"
-        response = self.client.post(logbook_url, data)
+        response = self.client.post(url, data | logbook)
         self.assertEqual(response.status_code, 302)
 
         # Invoicing from the logbook what has been invoiced from the offer
         response = self.client.post(
             url,
-            data | {WarningsForm.ignore_warnings_id: "services-invoiced-already"},
+            data
+            | offer
+            | {WarningsForm.ignore_warnings_id: "services-invoiced-already"},
         )
         self.assertEqual(response.status_code, 302)
         factories.LoggedHoursFactory.create(service=service, hours=1)
-        response = self.client.post(logbook_url, data)
+        response = self.client.post(url, data | logbook)
         self.assertContains(
             response, "Some services have been invoiced from the offer already: Design"
         )
@@ -249,7 +256,7 @@ class InvoicesTest(TestCase):
         factories.LoggedHoursFactory.create(service=capped, hours=3)
         factories.LoggedHoursFactory.create(service=maintenance, hours=2)
         self.client.force_login(project.owned_by)
-        url = project.urls["createinvoice"] + "?type=services&source=offer"
+        url = project.urls["createinvoice"] + "?type=services"
         data = {
             "contact": project.contact_id,
             "title": project.title,
@@ -284,6 +291,11 @@ class InvoicesTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, "surplus: 200.00")
+        # Invoiced as offered continues with the surplus, as logged with the
+        # logbook
+        form = response.context["form"]
+        self.assertEqual(form[f"source_{capped.pk}"].value(), "surplus")
+        self.assertEqual(form[f"source_{maintenance.pk}"].value(), "logbook")
         self.assertEqual(
             response.context["form"][f"source_{maintenance.pk}"].field.choices[-1][0],
             "logbook",
@@ -335,11 +347,10 @@ class InvoicesTest(TestCase):
         )
         hours = factories.LoggedHoursFactory.create(service=design, hours=3)
         self.client.force_login(project.owned_by)
-        url = project.urls["createinvoice"] + "?type=services&source=logbook"
+        url = project.urls["createinvoice"] + "?type=services"
         response = self.client.get(url)
-        self.assertContains(response, 'placeholder="3.0"')
-
-        url = project.urls["createinvoice"] + "?type=services&source=offer"
+        self.assertContains(response, 'placeholder="10.0"')
+        self.assertContains(response, 'data-hours="3.0"')
 
         response = self.client.post(
             url,
@@ -414,7 +425,7 @@ class InvoicesTest(TestCase):
 
         self.client.force_login(project.owned_by)
         response = self.client.post(
-            project.urls["createinvoice"] + "?type=services&source=logbook",
+            project.urls["createinvoice"] + "?type=services",
             {
                 "contact": project.contact_id,
                 "title": project.title,
@@ -424,6 +435,7 @@ class InvoicesTest(TestCase):
                 "tax_rate": "8.10",
                 "postal_address": "Anything\nStreet\nCity",
                 "selected_services": [service.pk],
+                f"source_{service.pk}": "logbook",
             },
         )
         self.assertContains(
@@ -432,8 +444,7 @@ class InvoicesTest(TestCase):
 
     def test_create_service_invoice_for_one_offer(self):
         """The menu of an offer creates invoices with its title, description and
-        services, the latter only if there's something to invoice when
-        invoicing the logbook"""
+        services with something to invoice, each with its default source"""
         project = factories.ProjectFactory.create()
         offer = factories.OfferFactory.create(
             project=project, title="Phase 2", description="Scope of phase 2"
@@ -445,6 +456,8 @@ class InvoicesTest(TestCase):
         nothing_logged = factories.ServiceFactory.create(
             project=project, offer=offer, cost=100
         )
+        # Nothing offered, nothing logged
+        factories.ServiceFactory.create(project=project, offer=offer)
         other = factories.ServiceFactory.create(
             project=project, effort_type="Programming", effort_rate=180
         )
@@ -452,51 +465,60 @@ class InvoicesTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(project.urls["detail"])
-        self.assertContains(
-            response,
-            f"?type=services&amp;source=logbook&amp;offer={offer.pk}",
-        )
+        self.assertContains(response, f"?type=services&amp;offer={offer.pk}")
 
         def form(query):
             response = self.client.get(project.urls["createinvoice"] + query)
             self.assertEqual(response.status_code, 200)
             return response.context["form"]
 
-        f = form(f"?type=services&source=logbook&offer={offer.pk}")
+        f = form(f"?type=services&offer={offer.pk}")
         self.assertEqual(f.offer_filter, [(offer, True)])
         self.assertEqual(f["title"].value(), f"{project.title} - Phase 2")
         self.assertEqual(f["description"].value(), "Scope of phase 2")
-        self.assertEqual(f["selected_services"].value(), [logged.pk])
-
-        f = form(f"?type=services&source=offer&offer={offer.pk}")
         self.assertEqual(f["selected_services"].value(), [logged.pk, nothing_logged.pk])
+        # Nothing offered means invoicing the logbook
+        self.assertEqual(f[f"source_{logged.pk}"].value(), "logbook")
+        self.assertEqual(f[f"source_{nothing_logged.pk}"].value(), "offer")
 
-        # With an offer, only its services are offered, unless all are wanted
-        def offered(f):
+        # With an offer, only its services with something to invoice are
+        # visible, all others are hidden until they're wanted
+        def visible(f):
             return [
+                row["service"].id
+                for group in f.service_groups
+                for row in group["rows"]
+                if not row["hidden"]
+            ]
+
+        self.assertEqual(visible(f), [logged.pk, nothing_logged.pk])
+        self.assertTrue(f.has_hidden_services)
+        self.assertIn(
+            other.pk,
+            [
                 value
                 for _group, options in f.fields["selected_services"].choices
                 for value, _label in options
-            ]
-
-        f = form(f"?type=services&source=offer&offer={offer.pk}")
-        self.assertEqual(offered(f), [logged.pk, nothing_logged.pk])
-        self.assertIn("all=1", f.toggle_all_url)
-        f = form(f"?type=services&source=offer&offer={offer.pk}&all=1")
-        self.assertEqual(offered(f), [logged.pk, nothing_logged.pk, other.pk])
-        self.assertNotIn("all=1", f.toggle_all_url)
+            ],
+        )
+        self.assertContains(
+            self.client.get(
+                project.urls["createinvoice"] + f"?type=services&offer={offer.pk}"
+            ),
+            "data-show-hidden-services",
+        )
 
         # The filter offers all offers with services, also those without
-        # anything to invoice from the logbook
+        # anything to invoice
         empty = factories.OfferFactory.create(project=project)
         factories.ServiceFactory.create(project=project, offer=empty)
-        f = form(f"?type=services&source=logbook&offer={empty.pk}")
+        f = form(f"?type=services&offer={empty.pk}")
         self.assertEqual(f.offer_filter, [(offer, False), (empty, True)])
         self.assertFalse(f["selected_services"].value())
 
         # Offers of other projects and garbage are ignored
         for value in [factories.OfferFactory.create().pk, "abc", "%C2%B2"]:
-            f = form(f"?type=services&source=logbook&offer={value}")
+            f = form(f"?type=services&offer={value}")
             self.assertEqual(f["title"].value(), project.title)
             self.assertFalse(f["selected_services"].value())
 
@@ -513,8 +535,7 @@ class InvoicesTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            project.urls["createinvoice"]
-            + f"?type=services&source=offer&offer={offer.pk}"
+            project.urls["createinvoice"] + f"?type=services&offer={offer.pk}"
         )
         form = response.context["form"]
         self.assertEqual(form["selected_services"].value(), [service.pk])
@@ -535,8 +556,7 @@ class InvoicesTest(TestCase):
         self.client.force_login(project.owned_by)
 
         response = self.client.get(
-            project.urls["createinvoice"]
-            + f"?type=services&source=offer&offer={offer.pk}"
+            project.urls["createinvoice"] + f"?type=services&offer={offer.pk}"
         )
         self.assertEqual(response.context["form"]["discount"].value(), 100)
 
@@ -544,7 +564,7 @@ class InvoicesTest(TestCase):
         """Service invoice creation from offers (services) works and results in
         the expected invoice total"""
         service = factories.ServiceFactory.create(cost=100, allow_logging=True)
-        url = service.project.urls["createinvoice"] + "?type=services&source=offer"
+        url = service.project.urls["createinvoice"] + "?type=services"
         self.client.force_login(service.project.owned_by)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -671,7 +691,7 @@ class InvoicesTest(TestCase):
             service=service3, hours=3, rendered_on=dt.date(2020, 3, 22)
         )
 
-        url = project.urls["createinvoice"] + "?type=services&source=logbook"
+        url = project.urls["createinvoice"] + "?type=services"
         self.client.force_login(project.owned_by)
         response = self.client.get(url)
         # print(response, response.content.decode("utf-8"))
@@ -688,7 +708,15 @@ class InvoicesTest(TestCase):
         )
         self.assertContains(response, "as logged: 600.00 (3.0h)")
         self.assertContains(response, "id_show_service_details")
-        self.assertNotContains(response, f'value="{service4.pk}"')
+        self.assertEqual(
+            [
+                row["service"]
+                for group in response.context["form"].service_groups
+                for row in group["rows"]
+                if row["hidden"]
+            ],
+            [service4],
+        )
 
         cost.service = service1
         cost.save()
@@ -708,6 +736,8 @@ class InvoicesTest(TestCase):
                     # service2.pk,  not available,
                     service3.pk,
                 ],
+                # Offered, invoiced as logged anyway
+                f"source_{service1.pk}": "logbook",
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -726,12 +756,19 @@ class InvoicesTest(TestCase):
         self.assertEqual(service3.invoice_services.get().invoice, invoice)
         self.assertEqual(service4.invoice_services.count(), 0)
 
-        # Invoiced entries aren't offered again
+        # Invoiced services are hidden, their entries aren't invoiced again
         response = self.client.get(url)
-        self.assertNotContains(response, f'value="{service1.pk}"')
+        self.assertEqual(
+            {
+                row["service"]
+                for group in response.context["form"].service_groups
+                for row in group["rows"]
+                if not row["hidden"]
+            },
+            {service2},
+        )
         self.assertNotContains(response, "1.0h logged but no hourly rate defined.")
         self.assertContains(response, "2.0h logged but no hourly rate defined.")
-        self.assertNotContains(response, f'value="{service3.pk}"')
 
         response = self.client.post(
             cost.urls["update"],
@@ -817,7 +854,7 @@ class InvoicesTest(TestCase):
             cost=150, service=service, description="this"
         )
 
-        url = service.project.urls["createinvoice"] + "?type=services&source=logbook"
+        url = service.project.urls["createinvoice"] + "?type=services"
         self.client.force_login(service.project.owned_by)
         response = self.client.post(
             url,

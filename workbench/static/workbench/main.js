@@ -579,7 +579,7 @@ on("change", "[data-check-all]", (_e, el) => {
   for (const input of (
     el.closest("tbody, table") || el.closest("form")
   ).querySelectorAll(el.dataset.checkAll)) {
-    input.checked = el.checked
+    if (!input.closest("[hidden]")) input.checked = el.checked
   }
 })
 
@@ -588,9 +588,22 @@ on("click", "[data-select-all]", (e, el) => {
   for (const input of (
     el.closest("tbody, table") || el.closest("form")
   ).querySelectorAll(`input[type=radio][value="${el.dataset.selectAll}"]`)) {
+    if (input.closest("[hidden]")) continue
     input.checked = true
     input.dispatchEvent(new Event("change", { bubbles: true }))
   }
+})
+
+// Services without anything to invoice are hidden until they are wanted, the
+// form keeps what has been entered already
+on("click", "[data-show-hidden-services]", (e) => {
+  e.preventDefault()
+  for (const el of document.querySelectorAll(
+    "[data-invoice-services] [hidden]",
+  )) {
+    el.hidden = false
+  }
+  document.querySelector("[data-hidden-services-note]").hidden = true
 })
 
 // Services of invoices being created: the selected source suggests the hours

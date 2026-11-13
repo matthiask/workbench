@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:01+0100\n"
+"POT-Creation-Date: 2026-11-13 12:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2541,6 +2541,7 @@ msgstr "Erfassung sperren"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
+#: workbench/templates/projects/_create_invoice_items.html
 msgid "services"
 msgstr "Leistungen"
 
@@ -5489,12 +5490,8 @@ msgid "Invoice for an offer"
 msgstr "Rechnung für eine Offerte"
 
 #: workbench/templates/invoices/invoice_form.html
-msgid "Takes the title and the description of the offer and selects its services with logged hours or costs which haven't been invoiced yet. You can change everything below."
-msgstr "Übernimmt Titel und Beschreibung der Offerte und wählt ihre Leistungen mit noch nicht verrechneten Stunden oder Kosten aus. Unten lässt sich alles anpassen."
-
-#: workbench/templates/invoices/invoice_form.html
-msgid "Takes the title and the description of the offer and selects its services. You can change everything below."
-msgstr "Übernimmt Titel und Beschreibung der Offerte und wählt ihre Leistungen aus. Unten lässt sich alles anpassen."
+msgid "Takes the title and the description of the offer and selects its services with something to invoice. You can change everything below."
+msgstr "Übernimmt Titel und Beschreibung der Offerte und wählt ihre Leistungen aus, auf denen etwas zu verrechnen ist. Unten lässt sich alles anpassen."
 
 #: workbench/templates/invoices/invoice_form.html
 msgid "Changing the offer reloads the form, changes made below are lost."
@@ -5505,28 +5502,32 @@ msgid "No offer, select services yourself"
 msgstr "Keine Offerte, Leistungen selbst auswählen"
 
 #: workbench/templates/invoices/invoice_form.html
-msgid "All services of the project are listed below."
-msgstr "Unten stehen alle Leistungen des Projekts."
-
-#: workbench/templates/invoices/invoice_form.html
-msgid "Only list the services of the offer"
-msgstr "Nur die Leistungen der Offerte anzeigen"
-
-#: workbench/templates/invoices/invoice_form.html
-msgid "Only the services of the offer are listed below."
-msgstr "Unten stehen nur die Leistungen der Offerte."
-
-#: workbench/templates/invoices/invoice_form.html
-msgid "List all services of the project"
-msgstr "Alle Leistungen des Projekts anzeigen"
-
-#: workbench/templates/invoices/invoice_form.html
 msgid "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)."
 msgstr "Jede Leistung gemäss Offerte, gemäss Logbuch (die noch nicht verrechneten Stunden und Kosten) oder, nachdem die Offerte verrechnet wurde, nur den darüber hinaus erfassten Aufwand (Mehraufwand) verrechnen."
 
 #: workbench/templates/invoices/invoice_form.html
 msgid "Empty hours and costs are taken from the selected source, enter a value to invoice something else."
 msgstr "Leere Stunden und Kosten werden aus der gewählten Basis übernommen, gib einen Wert ein, um etwas anderes zu verrechnen."
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "All services of the project are listed."
+msgstr "Alle Leistungen des Projekts werden angezeigt."
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "Only list services with something to invoice"
+msgstr "Nur Leistungen anzeigen, auf denen etwas zu verrechnen ist"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "Only the services of the offer with something to invoice are listed."
+msgstr "Nur die Leistungen der Offerte, auf denen etwas zu verrechnen ist, werden angezeigt."
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "Only services with something to invoice are listed."
+msgstr "Nur Leistungen, auf denen etwas zu verrechnen ist, werden angezeigt."
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "List all services of the project"
+msgstr "Alle Leistungen des Projekts anzeigen"
 
 #: workbench/templates/invoices/invoice_form.html
 msgid "Select all"
@@ -5750,16 +5751,6 @@ msgstr "Geschichte der Meilensteine"
 msgid "back to project planning"
 msgstr "Zurück zum Projektplan"
 
-#: workbench/templates/projects/_create_invoice_items.html
-#: workbench/templates/projects/project_detail.html
-msgid "Services from logbook"
-msgstr "Leistungen aus dem Logbuch"
-
-#: workbench/templates/projects/_create_invoice_items.html
-#: workbench/templates/projects/project_detail.html
-msgid "Services from offer"
-msgstr "Leistungen aus Offerte"
-
 #: workbench/templates/projects/_logged_hours_per_rate.html
 msgid "Logged hours per effort type and hourly rate"
 msgstr "Erfasste Stunden pro Aufwandtyp und Stundensatz"
@@ -5933,6 +5924,10 @@ msgstr "Alles zuklappen"
 #: workbench/templates/projects/project_detail.html
 msgid "Plan work"
 msgstr "Arbeit planen"
+
+#: workbench/templates/projects/project_detail.html
+msgid "Create invoice"
+msgstr "Rechnung erstellen"
 
 #: workbench/templates/projects/project_detail.html
 msgid "Reassign logbook entries"
@@ -6871,6 +6866,15 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Takes the title and the description of the offer and selects its services with logged hours or costs which haven't been invoiced yet. You can change everything below."
+#~ msgstr "Übernimmt Titel und Beschreibung der Offerte und wählt ihre Leistungen mit noch nicht verrechneten Stunden oder Kosten aus. Unten lässt sich alles anpassen."
+
+#~ msgid "Services from logbook"
+#~ msgstr "Leistungen aus dem Logbuch"
+
+#~ msgid "Services from offer"
+#~ msgstr "Leistungen aus Offerte"
 
 #~ msgid "All services"
 #~ msgstr "Alle Leistungen"

@@ -242,8 +242,12 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   (`CreateProjectInvoiceForm`, `CreatePersonInvoiceForm`, built with the
   query parameters of the web views) and their defaults; services invoices
   take each service as offered, as logged or only the surplus (`sources`,
-  `--service ID:logbook`; the menu entry sets the default) and disable
-  logging per service (`disable_logging`). Invoicing the offer links the
+  `--service ID:logbook`) and disable logging per service
+  (`disable_logging`). There is no mode for the whole invoice: services
+  invoiced as offered default to the surplus, those invoiced as logged to
+  the logbook, others to the offer if something has been offered; only
+  services with something to invoice are visible, the others are rendered
+  hidden and shown in the page on request (entries aren't lost). Invoicing the offer links the
   entries logged so far; the surplus (`service_surplus()`) is the logged
   work beyond what has been invoiced on the service, at most what hasn't
   been invoiced from the logbook yet. The web form also edits the lines'

@@ -468,11 +468,7 @@ class InvoicesAPITest(TestCase):
             project=project, effort_type="Consulting", effort_rate=200
         )
         hours = factories.LoggedHoursFactory.create(service=consulting, hours=3)
-        response = create({
-            "project": project.pk,
-            "source": "logbook",
-            "services": [consulting.pk],
-        })
+        response = create({"project": project.pk, "services": [consulting.pk]})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["total_excl_tax"], "600.00")
         hours.refresh_from_db()
@@ -491,18 +487,18 @@ class InvoicesAPITest(TestCase):
             response.json()["detail"][0]["loc"],
             ["body", "data", "sources", str(consulting.pk)],
         )
+        other = factories.ServiceFactory.create()
         response = create({
             "project": project.pk,
-            "source": "logbook",
             "services": [consulting.pk],
-            "sources": {offer.services.first().pk: "offer"},
-            "disable_logging": [offer.services.first().pk],
+            "sources": {other.pk: "offer"},
+            "disable_logging": [other.pk],
         })
         self.assertEqual(response.status_code, 422)
         self.assertEqual(
             [error["loc"] for error in response.json()["detail"]],
             [
-                ["body", "data", "sources", str(offer.services.first().pk)],
+                ["body", "data", "sources", str(other.pk)],
                 ["body", "data", "disable_logging"],
             ],
         )

@@ -454,25 +454,21 @@ class InvoiceIn(InputSchema):
         default=None,
         description="Defaults to services with an offer or services, else fixed.",
     )
-    source: Literal["offer", "logbook"] = Field(
-        default="offer",
-        description="Services invoices: the services as offered, or the"
-        " logged hours and costs which haven't been invoiced yet.",
-    )
     services: list[int] | None = Field(
         default=None,
         description="Services invoices: IDs of the project's services to"
-        " invoice, defaults to the offer's services (with something to"
-        " invoice if from the logbook). Required without offer.",
+        " invoice, defaults to the offer's services with something to"
+        " invoice. Required without offer.",
     )
     sources: dict[int, Literal["offer", "logbook", "surplus"]] = Field(
         default_factory=dict,
-        description="Services invoices: the source of single services (by"
-        " ID) if not ``source``. ``surplus`` only invoices the work logged"
-        " beyond what has been invoiced, for services invoiced from the"
-        " offer before. The services have to be listed for invoicing:"
-        " invoicing from the logbook only lists services with something to"
-        " invoice, mix sources with the source ``offer``.",
+        description="Services invoices: how single services (by ID) are"
+        " invoiced: as offered, as logged (the hours and costs which haven't"
+        " been invoiced yet) or the surplus (the work logged beyond what has"
+        " been invoiced, after invoicing the offer). Defaults to the surplus"
+        " for services invoiced as offered, as logged for services invoiced"
+        " as logged, as offered for services with offered hours or costs"
+        " and as logged otherwise.",
     )
     disable_logging: list[int] = Field(
         default_factory=list,
@@ -561,10 +557,8 @@ def _invoice_form(request, data, error):  # noqa: C901
 
     if project:
         params = {"type": type}
-        if type == Invoice.SERVICES:
-            params["source"] = data.source
-            if offer:
-                params["offer"] = str(offer.pk)
+        if type == Invoice.SERVICES and offer:
+            params["offer"] = str(offer.pk)
         request = _query(request, params)
 
         def make_form(*args):
@@ -629,7 +623,7 @@ def _invoice_form(request, data, error):  # noqa: C901
             values["apply_down_payment"] = data.down_payments
         else:
             error(["down_payments"], _("No down payments can be applied."))
-    # Per service fields exist for the services listed for invoicing
+    # Per service fields exist for the services which may be invoiced
     not_listed = _("Service %s isn't one of the services listed for invoicing.")
     for id, source in data.sources.items():
         if f"source_{id}" in form.fields:
