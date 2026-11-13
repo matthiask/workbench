@@ -1837,6 +1837,12 @@ a.wb-row-title:hover {
   margin-inline: auto;
 }
 
+// Detail pages with little content (e.g. deals), centered
+.wb-detail-narrow {
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
 .wb-heading-note {
   color: var(--bs-secondary-color);
   font-size: 0.6em;
