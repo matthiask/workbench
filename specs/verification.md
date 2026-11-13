@@ -196,3 +196,42 @@ Decided, no change:
   are public.
 - `POST /api/deals/` adds only the owner as contributor (you by default).
 - The timer token endpoints stay: the controller uses them.
+
+## Round 5 (2026-11-13): invoicing services
+
+One agent on the reworked creation of services invoices. Fixed: the
+surplus source is gone (everything logged after invoicing the offer is
+invoiced as logged; the separate computation could invoice reassigned
+entries twice), the offer's discount is only proposed once, services of
+declined offers default to the logbook, services without anything offered
+can't be invoiced as offered, logged work of another kind than offered is a
+hint in the row, the API rejects `sources` and `disable_logging` of
+services which aren't invoiced, rows with errors aren't hidden, an emptied
+description stays empty.
+
+Open:
+
+- The API and `wb invoices create` can't override the lines (title,
+  description, effort type, hours, rate, cost) nor close the project like
+  the web form.
+- A final invoice ("close the project") discards offers in preparation,
+  also the one whose services it invoices as offered; their services then
+  count as declined although they have been invoiced. Closing doesn't warn
+  about logged work on services which weren't invoiced.
+- Lines invoiced as offered link all open entries, also those after the
+  logbook cutoff date, so the service period may end after it.
+- The browser rounds the total to 5 cents with floats, the server with
+  `Decimal` (`ROUND_HALF_UP`); they may differ by 5 cents at .025.
+- Migration `0038` only copies an external reference if the whole reference
+  isn't in the description yet (partly present multi-line references are
+  skipped).
+
+Decisions needed:
+
+- Overriding a line to 0h and 0.00 skips it, its entries stay open (write
+  them off with a 0.00 line instead?).
+- Offers invoiced in instalments (e.g. 50% of the hours first): the next
+  invoice defaults to the logbook, the rest of the offer has to be entered
+  by hand (a "rest of the offer" source?).
+- Credits don't reduce what has been invoiced on a service (shown as
+  invoiced in the form).
