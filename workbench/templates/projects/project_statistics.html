@@ -28,7 +28,7 @@
               class="text-end"
               title="{% translate 'Hours for invoicing and costs which have not been invoiced yet' %}"
             >
-              {% translate 'Not archived' %}
+              {% translate 'Not invoiced yet' %}
             </th>
             {% for user, hours in gs.logged_hours_per_user %}
               <th class="text-end">{{ user.get_short_name }}</th>

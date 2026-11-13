@@ -590,7 +590,7 @@ class StatisticsTest(TestCase):
 
         response = self.client.get(project.urls["statistics"])
         content = re.sub(r"\s+", " ", response.content.decode())
-        self.assertIn("Not archived", content)
+        self.assertIn("Not invoiced yet", content)
         for query, hours in [
             (f"project={project.pk}", "7.0h"),
             (f"project={project.pk}&amp;offer={offer.pk}", "3.0h"),

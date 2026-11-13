@@ -160,7 +160,7 @@
         {% endif %}
         {% if request.user.features.CONTROLLING %}
           <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'logged costs'|capfirst %}</div>
+            <div class="wb-stat-label">{% translate 'Logged work and costs' %}</div>
             <div class="wb-stat-value">
               {{ gs.total_logged_cost|currency }}
               {% if gs.total_logged_hours_rate_undefined %}
@@ -172,7 +172,7 @@
             {% bar gs.total_logged_cost gs.total_service_cost %}
           </div>
           <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'service cost'|capfirst %}</div>
+            <div class="wb-stat-label">{% translate 'Budgeted work and costs' %}</div>
             <div class="wb-stat-value">
               {{ gs.total_service_cost|currency }}
               {% if gs.total_service_hours_rate_undefined %}
@@ -215,7 +215,12 @@
             </div>
           {% endif %}
           <div class="wb-stat">
-            <div class="wb-stat-label">{% translate 'Not archived' %}</div>
+            <div
+              class="wb-stat-label"
+              title="{% translate 'Hours for invoicing and costs which have not been invoiced yet' %}"
+            >
+              {% translate 'Not invoiced yet' %}
+            </div>
             <div class="wb-stat-value">
               {{ project.not_archived_total.total|currency }}
               {% if project.not_archived_total.hours_rate_undefined %}
