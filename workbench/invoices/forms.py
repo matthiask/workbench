@@ -1133,11 +1133,14 @@ class CreateProjectInvoiceForm(InvoiceForm):
         for group in self.service_groups:
             for row in group["rows"]:
                 row["selected"] = checkboxes[row["service"].id]
-                # Selected services stay visible, e.g. after validation errors
-                if row["selected"].data["selected"]:
-                    row["hidden"] = group["hidden"] = False
                 for field in self.SERVICE_ROW_FIELDS:
                     row[field] = self[row[field]]
+                # Selected services and those with errors stay visible, e.g.
+                # after validation errors
+                if row["selected"].data["selected"] or any(
+                    row[field].errors for field in self.SERVICE_ROW_FIELDS
+                ):
+                    row["hidden"] = group["hidden"] = False
                 # The source shown, to show its amounts as placeholders
                 preset = row["presets"].get(row["source"].value()) or next(
                     iter(row["presets"].values())

@@ -392,6 +392,28 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Invoice.objects.exists())
 
+    def test_hidden_services_with_errors_are_shown(self):
+        """Services without anything to invoice are hidden, but not when
+        they have errors"""
+        service = factories.ServiceFactory.create(effort_type="Dev", effort_rate=100)
+        project = service.project
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=services"
+
+        def hidden(form):
+            return [
+                row["hidden"] for group in form.service_groups for row in group["rows"]
+            ]
+
+        self.assertEqual(hidden(self.client.get(url).context["form"]), [True])
+        response = self.client.post(
+            url,
+            self.services_invoice_data(
+                project, **{f"effort_hours_{service.pk}": "abc"}
+            ),
+        )
+        self.assertEqual(hidden(response.context["form"]), [False])
+
     def test_logged_costs_not_offered(self):
         """Invoicing as offered archives costs which haven't been offered
         without invoicing them, that's a warning"""

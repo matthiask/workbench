@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:53+0100\n"
+"POT-Creation-Date: 2026-11-13 12:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2303,8 +2303,8 @@ msgstr "Es können keine Anzahlungen verrechnet werden."
 
 #: workbench/invoices/api.py
 #, python-format
-msgid "Service %s isn't one of the services listed for invoicing."
-msgstr "Leistung %s ist keine der Leistungen, die zur Verrechnung aufgelistet sind."
+msgid "Service %s isn't one of the services to invoice."
+msgstr "Leistung %s ist keine der Leistungen, die verrechnet werden."
 
 #: workbench/invoices/api.py
 msgid "Select the services to invoice, or invoice an offer."

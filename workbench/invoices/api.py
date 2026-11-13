@@ -621,18 +621,24 @@ def _invoice_form(request, data, error):  # noqa: C901
             values["apply_down_payment"] = data.down_payments
         else:
             error(["down_payments"], _("No down payments can be applied."))
-    # Per service fields exist for the services which may be invoiced
-    not_listed = _("Service %s isn't one of the services listed for invoicing.")
+    # Per service fields exist for the services which may be invoiced, and
+    # only apply to the services which are invoiced
+    selected = set(
+        data.services
+        if data.services is not None
+        else values.get("selected_services") or ()
+    )
+    not_selected = _("Service %s isn't one of the services to invoice.")
     for id, source in data.sources.items():
-        if f"source_{id}" in form.fields:
+        if f"source_{id}" in form.fields and id in selected:
             values[f"source_{id}"] = source
         else:
-            error(["sources", str(id)], not_listed % id)
-    for id in data.disable_logging:
-        if f"disable_logging_{id}" in form.fields:
+            error(["sources", str(id)], not_selected % id)
+    for index, id in enumerate(data.disable_logging):
+        if f"disable_logging_{id}" in form.fields and id in selected:
             values[f"disable_logging_{id}"] = True
         else:
-            error(["disable_logging"], not_listed % id)
+            error(["disable_logging", index], not_selected % id)
     if "selected_services" in form.fields:
         if data.services is not None:
             values["selected_services"] = data.services

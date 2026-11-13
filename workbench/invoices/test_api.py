@@ -498,8 +498,20 @@ class InvoicesAPITest(TestCase):
             [error["loc"] for error in response.json()["detail"]],
             [
                 ["body", "data", "sources", str(other.pk)],
-                ["body", "data", "disable_logging"],
+                ["body", "data", "disable_logging", 0],
             ],
+        )
+        # Services of the project which aren't invoiced aren't ignored silently
+        not_invoiced = factories.ServiceFactory.create(project=project)
+        response = create({
+            "project": project.pk,
+            "services": [consulting.pk],
+            "disable_logging": [not_invoiced.pk],
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "disable_logging", 0]],
         )
         response = create({
             "project": project.pk,
