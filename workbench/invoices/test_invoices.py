@@ -461,7 +461,10 @@ class InvoicesTest(TestCase):
             self.services_invoice_data(
                 project,
                 selected_services=[service.pk],
-                **{f"effort_hours_{service.pk}": "0"},
+                **{
+                    f"effort_hours_{service.pk}": "0",
+                    f"amounts_changed_{service.pk}": "1",
+                },
             ),
         )
         self.assertEqual(response.status_code, 302)
@@ -488,6 +491,39 @@ class InvoicesTest(TestCase):
             ["Nothing"],
         )
 
+    def test_unchanged_amounts_follow_the_source(self):
+        """The form fills in the source's hours and costs; unless they have
+        been changed, the source's when saving are invoiced (the cutoff date
+        applies, entries logged meanwhile are included)"""
+        service = factories.ServiceFactory.create(effort_type="Dev", effort_rate=100)
+        project = service.project
+        factories.LoggedHoursFactory.create(
+            service=service, hours=2, rendered_on=in_days(-10)
+        )
+        factories.LoggedHoursFactory.create(
+            service=service, hours=3, rendered_on=in_days(0)
+        )
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=services"
+        form = self.client.get(url).context["form"]
+        self.assertEqual(form[f"effort_hours_{service.pk}"].value(), 5)
+        data = self.services_invoice_data(
+            project,
+            selected_services=[service.pk],
+            **{f"effort_hours_{service.pk}": "5.0", f"cost_{service.pk}": "0.00"},
+        )
+        response = self.client.post(
+            url, data | {"logbook_cutoff_date": in_days(-5).isoformat()}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Invoice.objects.get().services.get().effort_hours, 2)
+
+        # Logged after loading the form
+        factories.LoggedHoursFactory.create(service=service, hours=1)
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Invoice.objects.latest("pk").services.get().effort_hours, 4)
+
     def test_services_invoice_edited_lines(self):
         """The lines' texts and amounts may be changed when creating the
         invoice, empty fields are taken from the service and the source"""
@@ -507,7 +543,8 @@ class InvoicesTest(TestCase):
         self.client.force_login(project.owned_by)
         url = project.urls["createinvoice"] + "?type=services"
         response = self.client.get(url)
-        self.assertContains(response, 'placeholder="10.0"')
+        form = response.context["form"]
+        self.assertEqual(form[f"effort_hours_{design.pk}"].value(), 10)
         self.assertContains(response, 'data-hours="3.0"')
 
         response = self.client.post(
@@ -525,9 +562,11 @@ class InvoicesTest(TestCase):
                 f"title_{design.pk}": "Design, first part",
                 f"description_{design.pk}": "",
                 f"effort_hours_{design.pk}": "2.5",
+                f"amounts_changed_{design.pk}": "1",
                 f"effort_rate_{design.pk}": "90",
                 f"effort_type_{design.pk}": "Visual design",
                 f"cost_{hosting.pk}": "450",
+                f"amounts_changed_{hosting.pk}": "1",
             },
         )
         self.assertEqual(response.status_code, 302)

@@ -53,7 +53,7 @@
         {% translate 'services'|capfirst %}
         <small class="form-text text-muted d-block">
           {% translate "Invoice each service as offered or as logged (the hours and costs which haven't been invoiced yet; after invoicing the offer that's the surplus)." %}
-          {% translate "Empty hours and costs are taken from the selected source, enter a value to invoice something else." %}
+          {% translate "Choosing a source fills in its hours and costs, change them to invoice something else." %}
         </small>
         {% if form.has_hidden_services %}
           <small class="form-text text-muted d-block" data-hidden-services-note>
@@ -209,6 +209,7 @@
                       </div>
                       <label for="{{ row.effort_hours.auto_id }}">{% translate 'hours'|capfirst %}</label>
                       <div>
+                        {{ row.amounts_changed }}
                         {{ row.effort_hours.errors }}
                         <input
                           type="number"
@@ -216,7 +217,6 @@
                           class="form-control text-end"
                           name="{{ row.effort_hours.html_name }}"
                           value="{{ row.effort_hours.value|default_if_none:''|unlocalize }}"
-                          placeholder="{{ row.effort_hours.field.widget.attrs.placeholder|unlocalize }}"
                           data-hours
                           id="{{ row.effort_hours.auto_id }}"
                         >
@@ -243,7 +243,6 @@
                           class="form-control text-end"
                           name="{{ row.cost.html_name }}"
                           value="{{ row.cost.value|default_if_none:''|unlocalize }}"
-                          placeholder="{{ row.cost.field.widget.attrs.placeholder|unlocalize }}"
                           data-cost
                           id="{{ row.cost.auto_id }}"
                         >

@@ -884,6 +884,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
         "effort_hours",
         "effort_rate",
         "cost",
+        "amounts_changed",
         "disable_logging",
     ]
 
@@ -1045,27 +1046,36 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     label=_("disable logging"),
                     required=False,
                 )
+                # Set by the browser when the hours or costs are changed
+                self.fields[f"amounts_changed_{service.id}"] = forms.BooleanField(
+                    required=False, widget=forms.HiddenInput
+                )
+                # What the sources would invoice, the form starts with the
+                # default source's
+                presets = {
+                    Invoice.OFFER: {
+                        "hours": service.effort_hours or Z1,
+                        "cost": service.cost or Z2,
+                    },
+                    Invoice.LOGBOOK: {
+                        "hours": row["not_archived_logged_hours"] or Z1,
+                        "cost": row["not_archived_logged_cost"] or Z2,
+                    },
+                }
+                preset = presets[default_source(service)]
                 # The line's texts and amounts, empty fields are taken from
                 # the service and the source
                 for field, initial in [
                     ("title", service.title),
                     ("description", line_description(service)),
                     ("effort_type", service.effort_type),
-                    ("effort_hours", None),
+                    ("effort_hours", preset["hours"]),
                     ("effort_rate", service.effort_rate),
-                    ("cost", None),
+                    ("cost", preset["cost"]),
                 ]:
                     self.fields[f"{field}_{service.id}"] = Service._meta.get_field(
                         field
                     ).formfield(required=False, initial=initial)
-                # What the sources would invoice, for placeholders
-                presets = {
-                    Invoice.OFFER: (service.effort_hours, service.cost),
-                    Invoice.LOGBOOK: (
-                        row["not_archived_logged_hours"],
-                        row["not_archived_logged_cost"],
-                    ),
-                }
                 # Logged work of another kind than offered isn't invoiced as
                 # offered, which may be intentional (e.g. a freelancer
                 # instead of own work, or the other way round)
@@ -1096,10 +1106,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     if service.id in invoiced
                     else None,
                     "invoices": list(invoiced_on[service.id].values()),
-                    "presets": {
-                        key: {"hours": hours or Z1, "cost": cost or Z2}
-                        for key, (hours, cost) in presets.items()
-                    },
+                    "presets": presets,
                     **{
                         field: f"{field}_{service.id}"
                         for field in self.SERVICE_ROW_FIELDS
@@ -1160,16 +1167,38 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     row[field].errors for field in self.SERVICE_ROW_FIELDS
                 ):
                     row["hidden"] = group["hidden"] = False
-                # The source shown, to show its amounts as placeholders
-                preset = row["presets"].get(row["source"].value()) or next(
-                    iter(row["presets"].values())
-                )
-                row["effort_hours"].field.widget.attrs["placeholder"] = preset["hours"]
-                row["cost"].field.widget.attrs["placeholder"] = preset["cost"]
                 row["options"] = [
                     (radio, row["presets"][radio.data["value"]])
                     for radio in row["source"]
                 ]
+
+    def line_overrides(self, id):
+        """What has been changed in the line of a service: an empty
+        description stays empty (e.g. without the external reference), other
+        empty fields fall back to the service. Hours and costs are only
+        overrides if they have been changed (``amounts_changed``), the
+        source's may differ when saving (new logbook entries, the cutoff
+        date)"""
+        overrides = {}
+        for field in [
+            "title",
+            "description",
+            "effort_type",
+            "effort_hours",
+            "effort_rate",
+            "cost",
+        ]:
+            value = self.cleaned_data.get(f"{field}_{id}")
+            if value is None or (
+                isinstance(value, str) and not value and field != "description"
+            ):
+                continue
+            if field in {"effort_hours", "cost"} and not self.cleaned_data.get(
+                f"amounts_changed_{id}"
+            ):
+                continue
+            overrides[field] = value
+        return overrides
 
     def service_sources(self):
         """The source of each selected service, the default if none was
@@ -1220,24 +1249,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 services,
                 sources=sources,
                 logbook_cutoff_date=self.cleaned_data.get("logbook_cutoff_date"),
-                overrides={
-                    id: {
-                        field: value
-                        for field in [
-                            "title",
-                            "description",
-                            "effort_type",
-                            "effort_hours",
-                            "effort_rate",
-                            "cost",
-                        ]
-                        # An empty description stays empty (e.g. without the
-                        # external reference), the others fall back
-                        if (value := self.cleaned_data.get(f"{field}_{id}"))
-                        not in ({None} if field == "description" else {None, ""})
-                    }
-                    for id in sources
-                },
+                overrides={id: self.line_overrides(id) for id in sources},
             )
             services.filter(
                 id__in=[

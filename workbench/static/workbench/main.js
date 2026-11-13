@@ -606,8 +606,8 @@ on("click", "[data-show-hidden-services]", (e) => {
   document.querySelector("[data-hidden-services-note]").hidden = true
 })
 
-// Services of invoices being created: the selected source suggests the hours
-// and costs (as placeholders), the amounts and the totals follow the inputs
+// Services of invoices being created: the selected source fills in the hours
+// and costs, the amounts and the totals follow the inputs
 // like in the offer form (rounded to 5 cents like Invoice._calculate_total())
 const formatAmount = (value) =>
   value.toLocaleString("de-CH", {
@@ -616,15 +616,9 @@ const formatAmount = (value) =>
   })
 
 function updateInvoiceService(row) {
-  const source = row.querySelector("input[type=radio]:checked")
   const hours = row.querySelector("[data-hours]:not([type=radio])")
   const cost = row.querySelector("[data-cost]:not([type=radio])")
-  if (source) {
-    hours.placeholder = source.dataset.hours
-    cost.placeholder = source.dataset.cost
-  }
-  const value = (input) =>
-    Number.parseFloat(input.value || input.placeholder || "0") || 0
+  const value = (input) => Number.parseFloat(input.value || "0") || 0
   const amount =
     value(hours) * value(row.querySelector("[data-rate]")) + value(cost)
   row.querySelector("[data-amount]").textContent = formatAmount(amount)
@@ -674,14 +668,27 @@ function updateInvoiceTotals(form) {
 }
 
 // Choosing a source (also the selected one again, e.g. the only one, which
-// doesn't fire change events) replaces the hours and costs entered
+// doesn't fire change events) fills in its hours and costs
 function resetInvoiceService(row) {
-  for (const input of row.querySelectorAll(
-    "[data-hours]:not([type=radio]), [data-cost]:not([type=radio])",
-  )) {
-    input.value = ""
-  }
+  const source = row.querySelector("input[type=radio]:checked")
+  if (!source) return
+  row.querySelector("[data-hours]:not([type=radio])").value =
+    source.dataset.hours
+  row.querySelector("[data-cost]:not([type=radio])").value = source.dataset.cost
+  row.querySelector("[name^=amounts_changed_]").value = ""
 }
+
+// Only changed hours and costs replace the source's when saving (logbook
+// entries may be added meanwhile, the cutoff date applies)
+on(
+  "input",
+  "[data-invoice-service] :is([data-hours], [data-cost]):not([type=radio])",
+  (_e, el) => {
+    el
+      .closest("[data-invoice-service]")
+      .querySelector("[name^=amounts_changed_]").value = "1"
+  },
+)
 
 on("click", "[data-invoice-service] input[type=radio]", (_e, el) => {
   resetInvoiceService(el.closest("[data-invoice-service]"))

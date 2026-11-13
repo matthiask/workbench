@@ -621,6 +621,11 @@ def _invoice_form(request, data, error):  # noqa: C901
             values["apply_down_payment"] = data.down_payments
         else:
             error(["down_payments"], _("No down payments can be applied."))
+    # Hours and costs of the lines come from their source (the web form
+    # sends them, equal to the source's unless they have been changed)
+    for name in values:
+        if name.startswith(("effort_hours_", "cost_")):
+            values[name] = ""
     # Per service fields exist for the services which may be invoiced, and
     # only apply to the services which are invoiced
     selected = set(
