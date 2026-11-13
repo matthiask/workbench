@@ -11,6 +11,8 @@
   {% endif %}
 {% endblock uplink %}
 
+{% block form_attrs %}{% if form.service_fields_exclude %}data-invoice-form{% endif %}{% endblock %}
+
 {% block before_form %}
   {% if form.offer_filter %}
     <form method="get" data-autosubmit>
@@ -257,6 +259,74 @@
               {% endfor %}
             </tbody>
           {% endfor %}
+          <tfoot>
+            <tr>
+              <th colspan="4" class="text-end">{{ form.subtotal.label }}</th>
+              <td class="text-end text-nowrap" data-subtotal></td>
+              <td></td>
+            </tr>
+            <tr>
+              <th colspan="4" class="text-end">
+                <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
+                {{ form.discount.errors }}
+              </th>
+              <td>
+                <input
+                  type="number"
+                  step="0.01"
+                  class="form-control text-end"
+                  name="{{ form.discount.html_name }}"
+                  id="{{ form.discount.id_for_label }}"
+                  value="{{ form.discount.value|default_if_none:''|unlocalize }}"
+                >
+              </td>
+              <td></td>
+            </tr>
+            {% if form.down_payments %}
+              <tr>
+                <th colspan="4" class="text-end fw-normal">
+                  <div class="fw-semibold">{{ form.apply_down_payment.label }}</div>
+                  {{ form.apply_down_payment.errors }}
+                  {% for checkbox, invoice in form.down_payments %}
+                    <div class="form-check d-inline-block ms-3">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        name="{{ checkbox.data.name }}"
+                        value="{{ checkbox.data.value }}"
+                        id="{{ checkbox.id_for_label }}"
+                        data-down-payment="{{ invoice.total_excl_tax|unlocalize }}"
+                        {% if checkbox.data.selected %}checked{% endif %}
+                      >
+                      <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                        {{ invoice.code }}: {{ invoice.total_excl_tax|currency }}
+                      </label>
+                    </div>
+                  {% endfor %}
+                </th>
+                <td class="text-end text-nowrap" data-down-payments></td>
+                <td></td>
+              </tr>
+            {% endif %}
+            <tr data-tax-row>
+              <th colspan="4" class="text-end">{% translate 'total excl. tax'|capfirst %}</th>
+              <td class="text-end text-nowrap" data-total-excl-tax></td>
+              <td></td>
+            </tr>
+            <tr data-tax-row>
+              <th colspan="4" class="text-end"><span data-tax-rate></span>% {% translate 'tax' %}</th>
+              <td class="text-end text-nowrap" data-tax></td>
+              <td></td>
+            </tr>
+            <tr class="wb-total-row">
+              <th colspan="4" class="text-end">
+                <span data-tax-row>{{ form.total_titles.total_incl_tax }}</span>
+                <span data-no-tax-row>{{ form.total_titles.total }}</span>
+              </th>
+              <td class="text-end text-nowrap" data-total></td>
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </section>

@@ -401,6 +401,50 @@ class InvoicesTest(TestCase):
         hours.refresh_from_db()
         self.assertEqual(hours.invoice_service.title, "Design, first part")
 
+    def test_services_invoice_totals(self):
+        """The services table has the totals with the discount and the down
+        payments, which the browser computes from their amounts"""
+        service = factories.ServiceFactory.create(cost=1000)
+        project = service.project
+        down_payment = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=300,
+            invoiced_on=in_days(0),
+            due_on=in_days(15),
+            status=Invoice.SENT,
+            postal_address="Anything\nStreet\nCity",
+        )
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type=services"
+        response = self.client.get(url)
+        self.assertContains(response, "data-invoice-form")
+        self.assertContains(response, 'data-down-payment="300.00"')
+        self.assertContains(response, 'name="discount"')
+
+        response = self.client.post(
+            url,
+            {
+                "contact": project.contact_id,
+                "title": project.title,
+                "owned_by": project.owned_by_id,
+                "discount": "100",
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "postal_address": "Anything\nStreet\nCity",
+                "selected_services": [service.pk],
+                "apply_down_payment": [down_payment.pk],
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        invoice = Invoice.objects.latest("pk")
+        self.assertEqual(
+            (invoice.subtotal, invoice.total_excl_tax, invoice.total),
+            (1000, 600, Decimal("648.60")),
+        )
+
     def test_surplus_doesnt_include_work_invoiced_from_offer(self):
         """Work logged before invoicing the offer belongs to the offered
         amount, also if it was more than offered"""

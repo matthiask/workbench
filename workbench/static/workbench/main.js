@@ -607,7 +607,14 @@ on("click", "[data-show-hidden-services]", (e) => {
 })
 
 // Services of invoices being created: the selected source suggests the hours
-// and costs (as placeholders), the amount follows the inputs
+// and costs (as placeholders), the amounts and the totals follow the inputs
+// like in the offer form (rounded to 5 cents like Invoice._calculate_total())
+const formatAmount = (value) =>
+  value.toLocaleString("de-CH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+
 function updateInvoiceService(row) {
   const source = row.querySelector("input[type=radio]:checked")
   const hours = row.querySelector("[data-hours]:not([type=radio])")
@@ -620,31 +627,66 @@ function updateInvoiceService(row) {
     Number.parseFloat(input.value || input.placeholder || "0") || 0
   const amount =
     value(hours) * value(row.querySelector("[data-rate]")) + value(cost)
-  row.querySelector("[data-amount]").textContent = amount
-    .toLocaleString("de-CH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll("’", "'")
+  row.querySelector("[data-amount]").textContent = formatAmount(amount)
+  return amount
+}
+
+function updateInvoiceTotals(form) {
+  let subtotal = 0
+  for (const row of form.querySelectorAll("[data-invoice-service]")) {
+    const amount = updateInvoiceService(row)
+    if (row.querySelector("[name=selected_services]").checked) {
+      subtotal += amount
+    }
+  }
+  const read = (sel) => Number.parseFloat(form.querySelector(sel)?.value) || 0
+  let downPayments = 0
+  for (const input of form.querySelectorAll("[data-down-payment]:checked")) {
+    downPayments += Number.parseFloat(input.dataset.downPayment) || 0
+  }
+  const liableToVat = form.querySelector("#id_liable_to_vat")?.checked
+  const taxRate = liableToVat
+    ? Number.parseFloat(
+        form.querySelector("[name='tax_rate']:checked")?.value,
+      ) || 0
+    : 0
+  const totalExclTax = subtotal - read("#id_discount") - downPayments
+  const total = Math.round((totalExclTax * (1 + taxRate / 100)) / 0.05) * 0.05
+  const write = (sel, value) => {
+    const el = form.querySelector(sel)
+    if (el) el.textContent = formatAmount(value)
+  }
+  write("[data-subtotal]", subtotal)
+  write("[data-down-payments]", -downPayments)
+  write("[data-total-excl-tax]", totalExclTax)
+  write("[data-tax]", total - totalExclTax)
+  write("[data-total]", total)
+  form.querySelector("[data-tax-rate]").textContent = taxRate
+  for (const el of form.querySelectorAll("[data-tax-row]")) {
+    el.hidden = !liableToVat
+  }
+  for (const el of form.querySelectorAll("[data-no-tax-row]")) {
+    el.hidden = !!liableToVat
+  }
 }
 
 for (const type of ["input", "change"]) {
-  on(type, "[data-invoice-service] input", (_e, el) => {
+  on(type, "[data-invoice-form] input", (_e, el) => {
     const row = el.closest("[data-invoice-service]")
     // Another source replaces hours and costs entered for the previous one
-    if (type === "change" && el.type === "radio") {
+    if (row && type === "change" && el.type === "radio") {
       for (const input of row.querySelectorAll(
         "[data-hours]:not([type=radio]), [data-cost]:not([type=radio])",
       )) {
         input.value = ""
       }
     }
-    updateInvoiceService(row)
+    updateInvoiceTotals(el.closest("[data-invoice-form]"))
   })
 }
 document.addEventListener("DOMContentLoaded", () => {
-  for (const row of document.querySelectorAll("[data-invoice-service]")) {
-    updateInvoiceService(row)
+  for (const form of document.querySelectorAll("[data-invoice-form]")) {
+    updateInvoiceTotals(form)
   }
 })
 

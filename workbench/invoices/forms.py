@@ -1103,8 +1103,30 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 for field in self.SERVICE_ROW_FIELDS
             ),
         ]
-        # The template renders them as a table
-        self.service_fields_exclude = ",".join(self.service_fields)
+        # The template renders them as a table with the totals, the
+        # computed subtotal and third party costs aren't shown
+        self.service_fields_exclude = ",".join([
+            *self.service_fields,
+            "subtotal",
+            "third_party_costs",
+            "discount",
+            "apply_down_payment",
+        ])
+        self.down_payments = []
+        if "apply_down_payment" in self.fields:
+            invoices = {
+                invoice.id: invoice
+                for invoice in self.fields["apply_down_payment"].queryset
+            }
+            self.down_payments = [
+                (checkbox, invoices[checkbox.data["value"]])
+                for checkbox in self["apply_down_payment"]
+            ]
+        currency_code = {"currency": settings.WORKBENCH.CURRENCY}
+        self.total_titles = {
+            "total": _("Total %(currency)s") % currency_code,
+            "total_incl_tax": _("Total %(currency)s incl. tax") % currency_code,
+        }
         checkboxes = {
             widget.data["value"]: widget for widget in self["selected_services"]
         }

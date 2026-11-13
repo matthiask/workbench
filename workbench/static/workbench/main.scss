@@ -1978,6 +1978,10 @@ a.wb-row-title:hover {
     vertical-align: top;
   }
 
+  tfoot :is(td, th) {
+    vertical-align: middle;
+  }
+
   .form-control {
     min-width: 5rem;
   }
