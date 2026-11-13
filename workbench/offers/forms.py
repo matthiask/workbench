@@ -240,6 +240,27 @@ class OfferForm(PostalAddressSelectionForm):
                 code="yes-please-decline",
             )
 
+        # Services without offer which are added to an offer whose work has
+        # been completed can't be logged on anymore
+        if data.get("work_completed_on") and self.services_changeable:
+            if added := [
+                form.instance.title
+                for form in self.formsets["services"]
+                # The formset assigns this offer already, the initial value
+                # says whether they were in it
+                if form.instance.pk
+                and not form.initial.get("in_offer")
+                and form["in_offer"].value()
+            ]:
+                self.add_warning(
+                    _(
+                        "The work of this offer has been completed, services"
+                        " added to it can't be logged on anymore: %(services)s."
+                    )
+                    % {"services": ", ".join(added)},
+                    code="work-completed",
+                )
+
         # Retainers are released with services without offer: other offers
         # are added to them
         others = (

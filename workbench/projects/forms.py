@@ -628,6 +628,22 @@ class ServiceForm(ModelForm):
                     " its effort type and rate cannot be changed."
                 ),
             )
+        if (
+            "offer" in self.changed_data
+            and (offer := data.get("offer"))
+            and offer.work_completed_on
+        ):
+            self.add_warning(
+                _(
+                    "The work of the offer %(offer)s has been completed on"
+                    " %(date)s, its services can't be logged on anymore."
+                )
+                % {
+                    "offer": offer,
+                    "date": local_date_format(offer.work_completed_on),
+                },
+                code="work-completed",
+            )
         # Only warn about what's changed, not about old services
         if (
             "title" in self.changed_data

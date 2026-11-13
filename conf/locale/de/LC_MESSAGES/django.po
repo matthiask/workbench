@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:33+0100\n"
+"POT-Creation-Date: 2026-11-13 12:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1712,6 +1712,7 @@ msgstr "Ansprechperson"
 
 #: workbench/credit_control/reporting.py
 #: workbench/templates/invoices/invoice_detail.html
+#: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/invoices/invoice_list.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/offers/offer_form.html
@@ -1835,8 +1836,9 @@ msgstr "Dieses Geschäft ist schon geschlossen. Ich gehe davon aus, dass Du weis
 msgid "archived value type"
 msgstr "archivierter Werttyp"
 
-#: workbench/deals/forms.py workbench/invoices/models.py
-#: workbench/offers/forms.py workbench/offers/models.py
+#: workbench/deals/forms.py workbench/invoices/forms.py
+#: workbench/invoices/models.py workbench/offers/forms.py
+#: workbench/offers/models.py
 #, python-format
 msgid "Total %(currency)s"
 msgstr "Total %(currency)s"
@@ -2545,6 +2547,12 @@ msgstr "Erfassung sperren"
 msgid "services"
 msgstr "Leistungen"
 
+#: workbench/invoices/forms.py workbench/invoices/models.py
+#: workbench/offers/forms.py workbench/offers/models.py
+#, python-format
+msgid "Total %(currency)s incl. tax"
+msgstr "Total %(currency)s inkl. MwSt"
+
 #: workbench/invoices/forms.py
 #, python-format
 msgid "Some services have been invoiced from the offer already: %(services)s. Make sure the same work isn't invoiced twice, or only invoice the surplus."
@@ -2792,12 +2800,6 @@ msgstr "Gutschrift Total %(currency)s inkl. MwSt"
 #, python-format
 msgid "Credit total %(currency)s"
 msgstr "Gutschrift Total %(currency)s"
-
-#: workbench/invoices/models.py workbench/offers/forms.py
-#: workbench/offers/models.py
-#, python-format
-msgid "Total %(currency)s incl. tax"
-msgstr "Total %(currency)s inkl. MwSt"
 
 #: workbench/invoices/models.py
 msgid "Archived invoices cannot be deleted."
@@ -3497,6 +3499,11 @@ msgid "You are setting the offer status to 'Declined'. However, if you just want
 msgstr "Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige Dinge anpassen willst und die Offerte nochmals der Kundschaft senden willst, kannst Du die Offerte auch einfach zurück auf 'In Vorbereitung' setzen."
 
 #: workbench/offers/forms.py
+#, python-format
+msgid "The work of this offer has been completed, services added to it can't be logged on anymore: %(services)s."
+msgstr "Die Arbeit an dieser Offerte ist abgeschlossen, auf hinzugefügten Leistungen kann nicht mehr erfasst werden: %(services)s."
+
+#: workbench/offers/forms.py
 msgid "This project has other offers. They are added to the budget retainer, release the retained budget with services without offer."
 msgstr "Dieses Projekt hat weitere Offerten. Sie werden zum zurückbehaltenen Budget dazugezählt. Gib das zurückbehaltene Budget mit Leistungen ohne Offerte frei."
 
@@ -4126,6 +4133,11 @@ msgstr "Offerten in Vorbereitung, welche bereits verschickt wurden, wurden abgel
 #: workbench/projects/forms.py
 msgid "Most fields are disabled because service is bound to an offer which is not in preparation anymore."
 msgstr "Die meisten Felder sind gesperrt weil die Leistung mit einer Offerte verbunden ist, welche sich nicht mehr in Vorbereitung befindet."
+
+#: workbench/projects/forms.py
+#, python-format
+msgid "The work of the offer %(offer)s has been completed on %(date)s, its services can't be logged on anymore."
+msgstr "Die Arbeit an der Offerte %(offer)s wurde am %(date)s abgeschlossen, auf ihren Leistungen kann nicht mehr erfasst werden."
 
 #: workbench/projects/forms.py
 msgid "Also reassign invoiced logbook entries"
@@ -5548,6 +5560,11 @@ msgstr "noch nichts"
 msgid "in preparation"
 msgstr "in Vorbereitung"
 
+#: workbench/templates/invoices/invoice_form.html
+#: workbench/templates/offers/offer_form.html workbench/tools/pdf.py
+msgid "tax"
+msgstr "MwSt"
+
 #: workbench/templates/invoices/invoice_list.html
 #: workbench/templates/projects/project_detail.html
 msgid "Show"
@@ -5666,10 +5683,6 @@ msgstr "Neue Leistung"
 #: workbench/templates/offers/offer_form.html
 msgid "Existing service"
 msgstr "Bestehende Leistung"
-
-#: workbench/templates/offers/offer_form.html workbench/tools/pdf.py
-msgid "tax"
-msgstr "MwSt"
 
 #: workbench/templates/offers/offer_form_heading.html
 #: workbench/templates/offers/offer_form_service.html

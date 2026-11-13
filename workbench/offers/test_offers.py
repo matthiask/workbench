@@ -753,6 +753,61 @@ class OffersTest(TestCase):
         offer.refresh_from_db()
         self.assertEqual(offer.subtotal, 700)
 
+    def test_moving_services_into_completed_offers(self):
+        """Services moved into offers whose work has been completed can't be
+        logged on anymore, that's a warning (offer form, service form, API)"""
+        offer = factories.OfferFactory.create(
+            title="Done", status=Offer.SERVICE_GROUP, work_completed_on=in_days(-1)
+        )
+        project = offer.project
+        service = factories.ServiceFactory.create(project=project, title="Late")
+        self.client.force_login(offer.owned_by)
+
+        data = offer_form_data(
+            offer,
+            service_data(service),
+            status=Offer.SERVICE_GROUP,
+            work_completed_on=offer.work_completed_on.isoformat(),
+        )
+        data.pop(WarningsForm.ignore_warnings_id)
+        response = self.client.post(offer.urls["update"], data)
+        self.assertContains(
+            response,
+            "The work of this offer has been completed, services added to it"
+            " can&#x27;t be logged on anymore: Late.",
+        )
+
+        response = self.client.post(
+            service.urls["update"],
+            {
+                "title": service.title,
+                "offer": offer.pk,
+                "effort_type": "Programming",
+                "effort_rate": "180",
+                "allow_logging": "on",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, 'value="work-completed"')
+
+        url = f"/api/services/{service.pk}/"
+        response = self.client.patch(
+            url, {"offer": offer.pk}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error.get("code") for error in response.json()["detail"]],
+            ["work-completed"],
+        )
+        response = self.client.patch(
+            f"{url}?ignore_warnings=work-completed",
+            {"offer": offer.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        service.refresh_from_db()
+        self.assertEqual(service.offer, offer)
+
     def test_budget_retainer_warning(self):
         """Budget retainers and other offers on the same project are a
         warning: the retainer is released with services without offer"""
