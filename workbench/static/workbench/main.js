@@ -572,9 +572,9 @@ on("click", "[data-select-receivers]", (e, el) => {
   }
 })
 
-// Checkboxes changing all checkboxes of their table (or form) at once, and
-// links selecting the radio buttons with their value, e.g. the services when
-// creating invoices
+// Checkboxes changing all checkboxes of their table section (or form) at
+// once, and links selecting the radio buttons with their value, e.g. the
+// services of an offer when creating invoices
 on("change", "[data-check-all]", (_e, el) => {
   for (const input of (
     el.closest("table") || el.closest("form")
@@ -585,9 +585,9 @@ on("change", "[data-check-all]", (_e, el) => {
 
 on("click", "[data-select-all]", (e, el) => {
   e.preventDefault()
-  for (const input of el
-    .closest("form")
-    .querySelectorAll(`input[type=radio][value="${el.dataset.selectAll}"]`)) {
+  for (const input of (
+    el.closest("tbody, table") || el.closest("form")
+  ).querySelectorAll(`input[type=radio][value="${el.dataset.selectAll}"]`)) {
     input.checked = true
   }
 })

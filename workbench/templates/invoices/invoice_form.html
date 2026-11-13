@@ -57,10 +57,30 @@
   {% endif %}
 {% endblock before_form %}
 
+{% block form_width %}{% if form.service_fields_exclude %}wb-form-page-full{% endif %}{% endblock %}
+
 {% block fields %}
   {% if form.service_fields_exclude %}
     <section class="card mb-3">
-      <div class="card-body">{% ff_fields form exclude=form.service_fields_exclude %}</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-7">
+            {% ff_field form.title %}
+            {% ff_field form.description %}
+            {% ff_field form.contact %}
+            {% ff_field form.customer %}
+            {% ff_field form.owned_by %}
+            {% ff_field form.postal_address %}
+            <div class="row">
+              <div class="col-sm-6">{% ff_field form.invoiced_on %}</div>
+              <div class="col-sm-6">{% ff_field form.due_on %}</div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            {% ff_fields form exclude=form.service_fields_exclude|add:",title,description,contact,customer,owned_by,postal_address,invoiced_on,due_on" %}
+          </div>
+        </div>
+      </div>
     </section>
     <section class="card mb-3 wb-table-card">
       <div class="card-header">
@@ -68,17 +88,6 @@
         <small class="form-text text-muted d-block">
           {% translate "Invoice each service as offered, as logged (the hours and costs which haven't been invoiced yet) or, after invoicing the offer, only the work logged beyond it (surplus)." %}
         </small>
-        <div class="d-flex flex-wrap gap-3 mt-2 small">
-          <span>
-            {% translate 'All services' %}:
-            <a href="#" data-select-all="offer">{% translate 'as offered' %}</a> &middot;
-            <a href="#" data-select-all="logbook">{% translate 'as logged' %}</a>
-          </span>
-          <label class="form-check mb-0">
-            <input type="checkbox" class="form-check-input" data-check-all="[name^=disable_logging_]">
-            {% translate 'Disable logging on all services from now on' %}
-          </label>
-        </div>
       </div>
       {% if form.selected_services.errors %}
         <div class="card-body pb-0">{{ form.selected_services.errors }}</div>
@@ -87,7 +96,7 @@
         <colgroup>
           <col width="1%">
           <col>
-          <col width="30%">
+          <col width="25%">
           <col width="1%">
         </colgroup>
         {% for group in form.service_groups %}
@@ -103,8 +112,29 @@
                 >
               </th>
               <th>{{ group.offer|default:_("Not offered yet") }}</th>
-              <th>{% translate 'invoicing'|capfirst %}</th>
-              <th class="text-nowrap">{% translate 'disable logging'|capfirst %}</th>
+              <th>
+                {% translate 'invoicing'|capfirst %}
+                <div class="small fw-normal">
+                  {% translate 'all' %}:
+                  <a href="#" data-select-all="offer">{% translate 'as offered' %}</a> &middot;
+                  <a href="#" data-select-all="logbook">{% translate 'as logged' %}</a>
+                  {% if group.has_surplus %}
+                    &middot; <a href="#" data-select-all="surplus">{% translate 'surplus' %}</a>
+                  {% endif %}
+                </div>
+              </th>
+              <th class="text-nowrap text-center">
+                <label for="disable-logging-{{ forloop.counter }}">{% translate 'disable logging'|capfirst %}</label>
+                <div>
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="disable-logging-{{ forloop.counter }}"
+                    data-check-all="[name^=disable_logging_]"
+                    title="{% translate 'Select all' %}"
+                  >
+                </div>
+              </th>
             </tr>
             {% for row in group.rows %}
               <tr>

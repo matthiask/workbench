@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 11:36+0100\n"
+"POT-Creation-Date: 2026-11-13 11:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2520,7 +2520,7 @@ msgstr "gemäss Offerte"
 msgid "as logged"
 msgstr "gemäss Logbuch"
 
-#: workbench/invoices/forms.py
+#: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
 msgid "surplus"
 msgstr "nur Mehraufwand"
 
@@ -5519,16 +5519,12 @@ msgid "Invoice each service as offered, as logged (the hours and costs which hav
 msgstr "Jede Leistung gemäss Offerte, gemäss Logbuch (die noch nicht verrechneten Stunden und Kosten) oder, nachdem die Offerte verrechnet wurde, nur den darüber hinaus erfassten Aufwand (Mehraufwand) verrechnen."
 
 #: workbench/templates/invoices/invoice_form.html
-msgid "All services"
-msgstr "Alle Leistungen"
-
-#: workbench/templates/invoices/invoice_form.html
-msgid "Disable logging on all services from now on"
-msgstr "Leistungserfassung auf allen Leistungen ab sofort sperren"
-
-#: workbench/templates/invoices/invoice_form.html
 msgid "Select all"
 msgstr "Alles auswählen"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "all"
+msgstr "alle"
 
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
@@ -6865,6 +6861,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "All services"
+#~ msgstr "Alle Leistungen"
+
+#~ msgid "Disable logging on all services from now on"
+#~ msgstr "Leistungserfassung auf allen Leistungen ab sofort sperren"
 
 #~ msgid "Yes, disable logging from now on"
 #~ msgstr "Ja, die Erfassung ab sofort verbieten"

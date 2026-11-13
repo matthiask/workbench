@@ -957,7 +957,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 str(offer or _("Not offered yet")),
                 [(row["service"].id, row["service"].title) for row in rows],
             ))
-            group = {"offer": offer, "rows": []}
+            group = {"offer": offer, "rows": [], "has_surplus": False}
             self.service_groups.append(group)
             for row in rows:
                 service = row["service"]
@@ -974,6 +974,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     ),
                 ]
                 if service.id in from_offer:
+                    group["has_surplus"] = True
                     surplus = service_surplus(service)
                     sources.append((
                         Invoice.SURPLUS,
