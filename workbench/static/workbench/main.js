@@ -673,16 +673,26 @@ function updateInvoiceTotals(form) {
   }
 }
 
+// Choosing a source (also the selected one again, e.g. the only one, which
+// doesn't fire change events) replaces the hours and costs entered
+function resetInvoiceService(row) {
+  for (const input of row.querySelectorAll(
+    "[data-hours]:not([type=radio]), [data-cost]:not([type=radio])",
+  )) {
+    input.value = ""
+  }
+}
+
+on("click", "[data-invoice-service] input[type=radio]", (_e, el) => {
+  resetInvoiceService(el.closest("[data-invoice-service]"))
+  updateInvoiceTotals(el.closest("[data-invoice-form]"))
+})
 for (const type of ["input", "change"]) {
   on(type, "[data-invoice-form] input", (_e, el) => {
     const row = el.closest("[data-invoice-service]")
-    // Another source replaces hours and costs entered for the previous one
+    // The "all as …" links change the radio buttons without clicks
     if (row && type === "change" && el.type === "radio") {
-      for (const input of row.querySelectorAll(
-        "[data-hours]:not([type=radio]), [data-cost]:not([type=radio])",
-      )) {
-        input.value = ""
-      }
+      resetInvoiceService(row)
     }
     updateInvoiceTotals(el.closest("[data-invoice-form]"))
   })
