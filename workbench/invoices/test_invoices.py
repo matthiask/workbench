@@ -273,8 +273,8 @@ class InvoicesTest(TestCase):
         first = Invoice.objects.get()
         self.assertEqual(first.subtotal, 1000 + 400)
         self.assertEqual(
-            [(line.title, line.from_offer) for line in first.services.all()],
-            [("Capped", True), ("Maintenance", False)],
+            [(line.title, line.effort_hours) for line in first.services.all()],
+            [("Capped", 10), ("Maintenance", 2)],
         )
         capped.refresh_from_db()
         maintenance.refresh_from_db()
