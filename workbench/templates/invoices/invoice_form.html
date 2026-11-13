@@ -69,6 +69,7 @@
       {% if form.selected_services.errors %}
         <div class="card-body pb-0">{{ form.selected_services.errors }}</div>
       {% endif %}
+      {{ form.loaded_at }}
       <div class="table-responsive">
         <table class="table table-sm mb-0 wb-invoice-services" data-invoice-services>
           <colgroup>
@@ -209,7 +210,6 @@
                       </div>
                       <label for="{{ row.effort_hours.auto_id }}">{% translate 'hours'|capfirst %}</label>
                       <div>
-                        {{ row.amounts_changed }}
                         {{ row.effort_hours.errors }}
                         <input
                           type="number"

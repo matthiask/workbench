@@ -675,20 +675,7 @@ function resetInvoiceService(row) {
   row.querySelector("[data-hours]:not([type=radio])").value =
     source.dataset.hours
   row.querySelector("[data-cost]:not([type=radio])").value = source.dataset.cost
-  row.querySelector("[name^=amounts_changed_]").value = ""
 }
-
-// Only changed hours and costs replace the source's when saving (logbook
-// entries may be added meanwhile, the cutoff date applies)
-on(
-  "input",
-  "[data-invoice-service] :is([data-hours], [data-cost]):not([type=radio])",
-  (_e, el) => {
-    el
-      .closest("[data-invoice-service]")
-      .querySelector("[name^=amounts_changed_]").value = "1"
-  },
-)
 
 on("click", "[data-invoice-service] input[type=radio]", (_e, el) => {
   resetInvoiceService(el.closest("[data-invoice-service]"))

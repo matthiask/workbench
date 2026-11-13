@@ -253,9 +253,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   edits the lines' titles, descriptions, effort types, hours, rates and
   costs (no service type dropdown filling the rates; `overrides` of
   `Invoice.create_services()`; the form fills in the source's hours and
-  costs, they're only overrides if they have been changed (`amounts_changed`,
-  set by the browser; entries logged meanwhile and the cutoff date apply
-  otherwise); the source still decides the logbook entries a line
+  costs as of loading the form (`loaded_at`, later entries aren't
+  invoiced), values equal to those aren't overrides (so the cutoff date
+  applies); the source still decides the logbook entries a line
   takes, an empty description stays empty). Every selected service gets a line, also with
   0 (writing off its logged work). Lines copy the service's description and
   external reference into their description (`line_description()`), PDFs

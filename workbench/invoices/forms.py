@@ -7,8 +7,9 @@ from authlib.email import render_to_mail
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 from django.utils.html import format_html, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
@@ -884,11 +885,15 @@ class CreateProjectInvoiceForm(InvoiceForm):
         "effort_hours",
         "effort_rate",
         "cost",
-        "amounts_changed",
         "disable_logging",
     ]
 
     def add_services_field(self):  # noqa: C901
+        self.fields["loaded_at"] = forms.CharField(
+            widget=forms.HiddenInput,
+            required=False,
+            initial=lambda: timezone.now().isoformat(),
+        )
         # Invoicing as offered links the logged entries too, the cutoff date
         # only applies to the logbook
         self.fields["logbook_cutoff_date"] = forms.DateField(
@@ -1046,10 +1051,6 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     label=_("disable logging"),
                     required=False,
                 )
-                # Set by the browser when the hours or costs are changed
-                self.fields[f"amounts_changed_{service.id}"] = forms.BooleanField(
-                    required=False, widget=forms.HiddenInput
-                )
                 # What the sources would invoice, the form starts with the
                 # default source's
                 presets = {
@@ -1122,6 +1123,7 @@ class CreateProjectInvoiceForm(InvoiceForm):
         )
         self.service_fields = [
             "selected_services",
+            "loaded_at",
             *(
                 row[field]
                 for group in self.service_groups
@@ -1172,13 +1174,36 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     for radio in row["source"]
                 ]
 
-    def line_overrides(self, id):
+    def loaded_at(self):
+        """When the form has been loaded: logbook entries logged afterwards
+        aren't invoiced (they weren't shown)"""
+        try:
+            value = dt.datetime.fromisoformat(self.cleaned_data.get("loaded_at") or "")
+        except ValueError:
+            return None
+        return value if timezone.is_aware(value) else None
+
+    def shown_amounts(self, service, source):
+        """The hours and costs of the source when the form has been loaded"""
+        if source == Invoice.OFFER:
+            return {"hours": service.effort_hours or Z1, "cost": service.cost or Z2}
+        hours = service.loggedhours.filter(archived_at__isnull=True)
+        costs = service.loggedcosts.filter(archived_at__isnull=True)
+        if loaded_at := self.loaded_at():
+            hours = hours.filter(created_at__lte=loaded_at)
+            costs = costs.filter(created_at__lte=loaded_at)
+        return {
+            "hours": hours.aggregate(s=Sum(HOURS_FOR_INVOICING))["s"] or Z1,
+            "cost": costs.aggregate(s=Sum("cost"))["s"] or Z2,
+        }
+
+    def line_overrides(self, service, source):
         """What has been changed in the line of a service: an empty
         description stays empty (e.g. without the external reference), other
-        empty fields fall back to the service. Hours and costs are only
-        overrides if they have been changed (``amounts_changed``), the
-        source's may differ when saving (new logbook entries, the cutoff
-        date)"""
+        empty fields fall back to the service. Hours and costs are overrides
+        if they differ from the source's shown in the form, otherwise the
+        source's apply (e.g. the logbook cutoff date)"""
+        shown = self.shown_amounts(service, source)
         overrides = {}
         for field in [
             "title",
@@ -1188,13 +1213,13 @@ class CreateProjectInvoiceForm(InvoiceForm):
             "effort_rate",
             "cost",
         ]:
-            value = self.cleaned_data.get(f"{field}_{id}")
+            value = self.cleaned_data.get(f"{field}_{service.id}")
             if value is None or (
                 isinstance(value, str) and not value and field != "description"
             ):
                 continue
-            if field in {"effort_hours", "cost"} and not self.cleaned_data.get(
-                f"amounts_changed_{id}"
+            if (field == "effort_hours" and value == shown["hours"]) or (
+                field == "cost" and value == shown["cost"]
             ):
                 continue
             overrides[field] = value
@@ -1249,7 +1274,11 @@ class CreateProjectInvoiceForm(InvoiceForm):
                 services,
                 sources=sources,
                 logbook_cutoff_date=self.cleaned_data.get("logbook_cutoff_date"),
-                overrides={id: self.line_overrides(id) for id in sources},
+                overrides={
+                    service.id: self.line_overrides(service, sources[service.id])
+                    for service in services
+                },
+                created_before=self.loaded_at(),
             )
             services.filter(
                 id__in=[

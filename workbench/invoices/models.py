@@ -583,6 +583,7 @@ class Invoice(ModelWithTotal):
         logbook_cutoff_date=None,
         overrides=None,
         skip_empty=False,
+        created_before=None,
     ):
         """Invoice lines for the services as offered or as logged (the entries
         not invoiced yet), by ``sources`` (service ID to source); the logbook
@@ -601,6 +602,15 @@ class Invoice(ModelWithTotal):
             not_archived_costs = ps.loggedcosts.filter(
                 archived_at__isnull=True
             ).order_by()
+            # Entries logged after loading the form weren't shown, they stay
+            # for the next invoice
+            if created_before:
+                not_archived_effort = not_archived_effort.filter(
+                    created_at__lte=created_before
+                )
+                not_archived_costs = not_archived_costs.filter(
+                    created_at__lte=created_before
+                )
             service = Service(
                 invoice=self,
                 project_service=ps,

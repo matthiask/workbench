@@ -463,7 +463,6 @@ class InvoicesTest(TestCase):
                 selected_services=[service.pk],
                 **{
                     f"effort_hours_{service.pk}": "0",
-                    f"amounts_changed_{service.pk}": "1",
                 },
             ),
         )
@@ -493,8 +492,8 @@ class InvoicesTest(TestCase):
 
     def test_unchanged_amounts_follow_the_source(self):
         """The form fills in the source's hours and costs; unless they have
-        been changed, the source's when saving are invoiced (the cutoff date
-        applies, entries logged meanwhile are included)"""
+        been changed, the source's are invoiced (the cutoff date applies),
+        without entries logged after loading the form"""
         service = factories.ServiceFactory.create(effort_type="Dev", effort_rate=100)
         project = service.project
         factories.LoggedHoursFactory.create(
@@ -518,11 +517,29 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Invoice.objects.get().services.get().effort_hours, 2)
 
-        # Logged after loading the form
+        # Entries logged after loading the form weren't shown, they stay for
+        # the next invoice
         factories.LoggedHoursFactory.create(service=service, hours=1)
-        response = self.client.post(url, data)
+        form = self.client.get(url).context["form"]
+        self.assertEqual(form[f"effort_hours_{service.pk}"].value(), 4)
+        loaded_at = form["loaded_at"].value()
+        later = factories.LoggedHoursFactory.create(
+            service=service,
+            hours=5,
+            created_at=timezone.now() + dt.timedelta(seconds=1),
+        )
+        response = self.client.post(
+            url,
+            data
+            | {
+                "loaded_at": loaded_at,
+                f"effort_hours_{service.pk}": "4.0",
+            },
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Invoice.objects.latest("pk").services.get().effort_hours, 4)
+        later.refresh_from_db()
+        self.assertIsNone(later.archived_at)
 
     def test_services_invoice_edited_lines(self):
         """The lines' texts and amounts may be changed when creating the
@@ -562,11 +579,9 @@ class InvoicesTest(TestCase):
                 f"title_{design.pk}": "Design, first part",
                 f"description_{design.pk}": "",
                 f"effort_hours_{design.pk}": "2.5",
-                f"amounts_changed_{design.pk}": "1",
                 f"effort_rate_{design.pk}": "90",
                 f"effort_type_{design.pk}": "Visual design",
                 f"cost_{hosting.pk}": "450",
-                f"amounts_changed_{hosting.pk}": "1",
             },
         )
         self.assertEqual(response.status_code, 302)
