@@ -230,7 +230,8 @@ Decided:
   off); only unselected ones are skipped.
 - The total in the browser is informative, it may differ from the server's
   rounding by 5 cents.
-- Offers invoiced in instalments: the next invoice defaults to the logbook,
-  the rest of the offer is entered by switching to the offer (a warning).
+- Offers aren't invoiced in instalments: partial payments are down
+  payments (without service lines), so the final invoice still defaults to
+  the offer and deducts them; additional work is offered as new services.
 - Credits aren't applied to services, the form's "invoiced" doesn't
   include them.
