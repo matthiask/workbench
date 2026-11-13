@@ -209,24 +209,22 @@ hint in the row, the API rejects `sources` and `disable_logging` of
 services which aren't invoiced, rows with errors aren't hidden, an emptied
 description stays empty.
 
-Open:
+Postponed:
 
 - The API and `wb invoices create` can't override the lines (title,
-  description, effort type, hours, rate, cost) nor close the project like
-  the web form.
-- Lines invoiced as offered link all open entries, also those after the
-  logbook cutoff date, so the service period may end after it.
-- Migration `0038` only copies an external reference if the whole reference
-  isn't in the description yet (partly present multi-line references are
-  skipped).
+  description, effort type, hours, rate, cost); creating invoices through
+  the API is special, revisit later. Closing projects through it isn't
+  needed.
 
 Decided:
 
+- The logbook cutoff date applies to lines invoiced as offered too (fixed).
+- Migration `0038` only copies an external reference if the whole reference
+  isn't in the description yet; that's fine.
 - A final invoice ("close the project") discards offers in preparation,
   also the one whose services it invoices as offered; their services then
   count as declined. Offers should be marked as accepted, but the accepted
   offers total doesn't matter much (deals and invoices do).
-
 - Selected services are invoiced, also with 0 (their entries are written
   off); only unselected ones are skipped.
 - The total in the browser is informative, it may differ from the server's

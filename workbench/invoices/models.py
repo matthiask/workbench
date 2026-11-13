@@ -586,8 +586,8 @@ class Invoice(ModelWithTotal):
         created_before=None,
     ):
         """Invoice lines for the services as offered or as logged (the entries
-        not invoiced yet), by ``sources`` (service ID to source); the logbook
-        cutoff date doesn't apply to offered services
+        not invoiced yet), by ``sources`` (service ID to source); lines take
+        the entries up to the logbook cutoff date
 
         ``overrides`` (service ID to a dict of line fields) replaces the
         title, description, hours, rate or cost of lines, the source still
@@ -611,6 +611,14 @@ class Invoice(ModelWithTotal):
                 not_archived_costs = not_archived_costs.filter(
                     created_at__lte=created_before
                 )
+            # Also for lines invoiced as offered, later entries stay open
+            if logbook_cutoff_date:
+                not_archived_effort = not_archived_effort.filter(
+                    rendered_on__lte=logbook_cutoff_date
+                )
+                not_archived_costs = not_archived_costs.filter(
+                    rendered_on__lte=logbook_cutoff_date
+                )
             service = Service(
                 invoice=self,
                 project_service=ps,
@@ -627,13 +635,6 @@ class Invoice(ModelWithTotal):
                 service.third_party_costs = ps.third_party_costs
                 service.from_offer = True
             else:
-                if logbook_cutoff_date:
-                    not_archived_effort = not_archived_effort.filter(
-                        rendered_on__lte=logbook_cutoff_date
-                    )
-                    not_archived_costs = not_archived_costs.filter(
-                        rendered_on__lte=logbook_cutoff_date
-                    )
                 service.effort_hours = (
                     not_archived_effort.aggregate(s=Sum(HOURS_FOR_INVOICING))["s"] or Z1
                 )

@@ -541,6 +541,37 @@ class InvoicesTest(TestCase):
         later.refresh_from_db()
         self.assertIsNone(later.archived_at)
 
+    def test_offered_lines_respect_the_cutoff_date(self):
+        """Lines invoiced as offered only take the entries up to the logbook
+        cutoff date, later ones stay for the next invoice"""
+        service = factories.ServiceFactory.create(
+            effort_type="Dev", effort_rate=100, effort_hours=10
+        )
+        project = service.project
+        early = factories.LoggedHoursFactory.create(
+            service=service, hours=2, rendered_on=in_days(-10)
+        )
+        late = factories.LoggedHoursFactory.create(
+            service=service, hours=3, rendered_on=in_days(0)
+        )
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            project.urls["createinvoice"] + "?type=services",
+            self.services_invoice_data(
+                project,
+                selected_services=[service.pk],
+                logbook_cutoff_date=in_days(-5).isoformat(),
+            ),
+        )
+        self.assertEqual(response.status_code, 302)
+        invoice = Invoice.objects.get()
+        self.assertEqual(invoice.services.get().effort_hours, 10)
+        early.refresh_from_db()
+        late.refresh_from_db()
+        self.assertEqual(early.invoice_service.invoice, invoice)
+        self.assertIsNone(late.invoice_service)
+        self.assertEqual(invoice.service_period_until, in_days(-10))
+
     def test_services_invoice_edited_lines(self):
         """The lines' texts and amounts may be changed when creating the
         invoice, empty fields are taken from the service and the source"""

@@ -894,16 +894,16 @@ class CreateProjectInvoiceForm(InvoiceForm):
             required=False,
             initial=lambda: timezone.now().isoformat(),
         )
-        # Invoicing as offered links the logged entries too, the cutoff date
-        # only applies to the logbook
+        # Invoicing as offered links the logged entries too, up to the cutoff
+        # date like invoicing the logbook
         self.fields["logbook_cutoff_date"] = forms.DateField(
             widget=DateInput,
             required=False,
             label=_("Logbook cutoff date"),
             help_text=_(
-                "Only include logbook entries up to this date when invoicing"
-                " the logbook. The amounts shown below may be too high if"
-                " using this."
+                "Only include logbook entries up to this date, later ones"
+                " stay for the next invoice. The amounts shown below may be"
+                " too high if using this."
             ),
         )
 

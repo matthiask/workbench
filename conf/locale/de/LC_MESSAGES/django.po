@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 13:18+0100\n"
+"POT-Creation-Date: 2026-11-13 13:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2501,8 +2501,8 @@ msgid "Logbook cutoff date"
 msgstr "Logbuch-Abgrenzungstermin"
 
 #: workbench/invoices/forms.py
-msgid "Only include logbook entries up to this date when invoicing the logbook. The amounts shown below may be too high if using this."
-msgstr "Beim Verrechnen gemäss Logbuch nur Logbucheinträge bis und mit diesem Datum berücksichtigen. Die unten angezeigten Beträge sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
+msgid "Only include logbook entries up to this date, later ones stay for the next invoice. The amounts shown below may be too high if using this."
+msgstr "Nur Logbucheinträge bis und mit diesem Datum berücksichtigen, spätere bleiben für die nächste Rechnung. Die unten angezeigten Beträge sind möglicherweise zu hoch, wenn diese Funktion verwendet wird."
 
 #: workbench/invoices/forms.py
 #, python-format
