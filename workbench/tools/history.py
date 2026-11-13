@@ -511,7 +511,13 @@ def _projects_service_cfg(user):
             "cost",
             "third_party_costs",
         }
-    return {"fields": fields}
+    return {
+        "fields": fields,
+        "related": [
+            (LoggedHours, "service_id"),
+            (LoggedCost, "service_id"),
+        ],
+    }
 
 
 def _reporting_costcenter_cfg(user):
