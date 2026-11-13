@@ -630,7 +630,16 @@ function updateInvoiceService(row) {
 
 for (const type of ["input", "change"]) {
   on(type, "[data-invoice-service] input", (_e, el) => {
-    updateInvoiceService(el.closest("[data-invoice-service]"))
+    const row = el.closest("[data-invoice-service]")
+    // Another source replaces hours and costs entered for the previous one
+    if (type === "change" && el.type === "radio") {
+      for (const input of row.querySelectorAll(
+        "[data-hours]:not([type=radio]), [data-cost]:not([type=radio])",
+      )) {
+        input.value = ""
+      }
+    }
+    updateInvoiceService(row)
   })
 }
 document.addEventListener("DOMContentLoaded", () => {
