@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 12:10+0100\n"
+"POT-Creation-Date: 2026-11-13 12:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5510,14 +5510,6 @@ msgid "Empty hours and costs are taken from the selected source, enter a value t
 msgstr "Leere Stunden und Kosten werden aus der gewählten Basis übernommen, gib einen Wert ein, um etwas anderes zu verrechnen."
 
 #: workbench/templates/invoices/invoice_form.html
-msgid "All services of the project are listed."
-msgstr "Alle Leistungen des Projekts werden angezeigt."
-
-#: workbench/templates/invoices/invoice_form.html
-msgid "Only list services with something to invoice"
-msgstr "Nur Leistungen anzeigen, auf denen etwas zu verrechnen ist"
-
-#: workbench/templates/invoices/invoice_form.html
 msgid "Only the services of the offer with something to invoice are listed."
 msgstr "Nur die Leistungen der Offerte, auf denen etwas zu verrechnen ist, werden angezeigt."
 
@@ -5536,6 +5528,10 @@ msgstr "Alles auswählen"
 #: workbench/templates/invoices/invoice_form.html
 msgid "all"
 msgstr "alle"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "invoice line"
+msgstr "Rechnungsposition"
 
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
@@ -6866,6 +6862,12 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "All services of the project are listed."
+#~ msgstr "Alle Leistungen des Projekts werden angezeigt."
+
+#~ msgid "Only list services with something to invoice"
+#~ msgstr "Nur Leistungen anzeigen, auf denen etwas zu verrechnen ist"
 
 #~ msgid "Takes the title and the description of the offer and selects its services with logged hours or costs which haven't been invoiced yet. You can change everything below."
 #~ msgstr "Übernimmt Titel und Beschreibung der Offerte und wählt ihre Leistungen mit noch nicht verrechneten Stunden oder Kosten aus. Unten lässt sich alles anpassen."

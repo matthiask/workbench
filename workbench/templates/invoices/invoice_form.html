@@ -72,11 +72,8 @@
           <colgroup>
             <col width="1%">
             <col>
-            <col width="18%">
-            <col width="10%">
-            <col width="7%">
-            <col width="8%">
-            <col width="8%">
+            <col width="20%">
+            <col width="22%">
             <col width="8%">
             <col width="1%">
           </colgroup>
@@ -104,10 +101,7 @@
                     {% endif %}
                   </div>
                 </th>
-                <th>{% translate 'effort type'|capfirst %}</th>
-                <th class="text-end">{% translate 'hours'|capfirst %}</th>
-                <th class="text-end">{% translate 'hourly rate'|capfirst %}</th>
-                <th class="text-end">{% translate 'cost'|capfirst %}</th>
+                <th>{% translate 'invoice line'|capfirst %}</th>
                 <th class="text-end">{% translate 'amount'|capfirst %}</th>
                 <th class="text-nowrap text-center">
                   <label for="disable-logging-{{ forloop.counter }}">{% translate 'disable logging'|capfirst %}</label>
@@ -142,7 +136,7 @@
                     {{ row.title.errors }}
                     <input
                       type="text"
-                      class="form-control form-control-sm fw-semibold mb-1"
+                      class="form-control fw-semibold mb-1"
                       name="{{ row.title.html_name }}"
                       value="{{ row.title.value|default:'' }}"
                       placeholder="{{ row.service.title }}"
@@ -150,13 +144,13 @@
                     >
                     {{ row.description.errors }}
                     <textarea
-                      class="form-control form-control-sm"
+                      class="form-control"
                       name="{{ row.description.html_name }}"
                       rows="1"
                       aria-label="{% translate 'description' %}"
                     >{{ row.description.value|default:'' }}</textarea>
                   </td>
-                  <td class="small">
+                  <td>
                     {% for radio, preset in row.options %}
                       <div class="form-check">
                         <input
@@ -174,52 +168,60 @@
                     {% endfor %}
                   </td>
                   <td>
-                    {{ row.effort_type.errors }}
-                    <input
-                      type="text"
-                      class="form-control form-control-sm"
-                      name="{{ row.effort_type.html_name }}"
-                      value="{{ row.effort_type.value|default:'' }}"
-                      aria-label="{% translate 'effort type' %}"
-                    >
-                  </td>
-                  <td>
-                    {{ row.effort_hours.errors }}
-                    <input
-                      type="number"
-                      step="0.1"
-                      class="form-control form-control-sm text-end"
-                      name="{{ row.effort_hours.html_name }}"
-                      value="{{ row.effort_hours.value|default_if_none:''|unlocalize }}"
-                      placeholder="{{ row.effort_hours.field.widget.attrs.placeholder|unlocalize }}"
-                      data-hours
-                      aria-label="{% translate 'hours' %}"
-                    >
-                  </td>
-                  <td>
-                    {{ row.effort_rate.errors }}
-                    <input
-                      type="number"
-                      step="0.01"
-                      class="form-control form-control-sm text-end"
-                      name="{{ row.effort_rate.html_name }}"
-                      value="{{ row.effort_rate.value|default_if_none:''|unlocalize }}"
-                      data-rate
-                      aria-label="{% translate 'hourly rate' %}"
-                    >
-                  </td>
-                  <td>
-                    {{ row.cost.errors }}
-                    <input
-                      type="number"
-                      step="0.01"
-                      class="form-control form-control-sm text-end"
-                      name="{{ row.cost.html_name }}"
-                      value="{{ row.cost.value|default_if_none:''|unlocalize }}"
-                      placeholder="{{ row.cost.field.widget.attrs.placeholder|unlocalize }}"
-                      data-cost
-                      aria-label="{% translate 'cost' %}"
-                    >
+                    <div class="wb-invoice-line">
+                      <label for="{{ row.effort_type.auto_id }}">{% translate 'effort type'|capfirst %}</label>
+                      <div>
+                        {{ row.effort_type.errors }}
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="{{ row.effort_type.html_name }}"
+                          value="{{ row.effort_type.value|default:'' }}"
+                          id="{{ row.effort_type.auto_id }}"
+                        >
+                      </div>
+                      <label for="{{ row.effort_hours.auto_id }}">{% translate 'hours'|capfirst %}</label>
+                      <div>
+                        {{ row.effort_hours.errors }}
+                        <input
+                          type="number"
+                          step="0.1"
+                          class="form-control text-end"
+                          name="{{ row.effort_hours.html_name }}"
+                          value="{{ row.effort_hours.value|default_if_none:''|unlocalize }}"
+                          placeholder="{{ row.effort_hours.field.widget.attrs.placeholder|unlocalize }}"
+                          data-hours
+                          id="{{ row.effort_hours.auto_id }}"
+                        >
+                      </div>
+                      <label for="{{ row.effort_rate.auto_id }}">{% translate 'hourly rate'|capfirst %}</label>
+                      <div>
+                        {{ row.effort_rate.errors }}
+                        <input
+                          type="number"
+                          step="0.01"
+                          class="form-control text-end"
+                          name="{{ row.effort_rate.html_name }}"
+                          value="{{ row.effort_rate.value|default_if_none:''|unlocalize }}"
+                          data-rate
+                          id="{{ row.effort_rate.auto_id }}"
+                        >
+                      </div>
+                      <label for="{{ row.cost.auto_id }}">{% translate 'cost'|capfirst %}</label>
+                      <div>
+                        {{ row.cost.errors }}
+                        <input
+                          type="number"
+                          step="0.01"
+                          class="form-control text-end"
+                          name="{{ row.cost.html_name }}"
+                          value="{{ row.cost.value|default_if_none:''|unlocalize }}"
+                          placeholder="{{ row.cost.field.widget.attrs.placeholder|unlocalize }}"
+                          data-cost
+                          id="{{ row.cost.auto_id }}"
+                        >
+                      </div>
+                    </div>
                   </td>
                   <td class="text-end text-nowrap"><output data-amount></output></td>
                   <td class="text-center">

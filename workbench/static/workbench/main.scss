@@ -1978,8 +1978,20 @@ a.wb-row-title:hover {
     vertical-align: top;
   }
 
-  .form-control-sm {
+  .form-control {
     min-width: 5rem;
+  }
+
+  // Effort type, hours, rate and cost of the line below each other
+  .wb-invoice-line {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 0.5rem;
+    align-items: center;
+
+    label {
+      color: var(--bs-secondary-color);
+    }
   }
 
   // Hours and amounts are typed, spin buttons only crowd the numbers
