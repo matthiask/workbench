@@ -214,10 +214,6 @@ Open:
 - The API and `wb invoices create` can't override the lines (title,
   description, effort type, hours, rate, cost) nor close the project like
   the web form.
-- A final invoice ("close the project") discards offers in preparation,
-  also the one whose services it invoices as offered; their services then
-  count as declined although they have been invoiced. Closing doesn't warn
-  about logged work on services which weren't invoiced.
 - Lines invoiced as offered link all open entries, also those after the
   logbook cutoff date, so the service period may end after it.
 - Migration `0038` only copies an external reference if the whole reference
@@ -225,6 +221,11 @@ Open:
   skipped).
 
 Decided:
+
+- A final invoice ("close the project") discards offers in preparation,
+  also the one whose services it invoices as offered; their services then
+  count as declined. Offers should be marked as accepted, but the accepted
+  offers total doesn't matter much (deals and invoices do).
 
 - Selected services are invoiced, also with 0 (their entries are written
   off); only unselected ones are skipped.
