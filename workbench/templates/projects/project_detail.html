@@ -33,12 +33,8 @@
       </div>
     </div>
     <div class="wb-page-actions">
-      <a href="{{ project.urls.createhours }}" class="btn btn-primary" data-ajaxmodal>
-        {% include "svg/plus.svg" %}
-        {% translate 'Hours' %}
-      </a>
       {% if request.user.features.CONTROLLING %}
-        <a href="{{ project.urls.createservice }}" class="btn btn-quiet" data-ajaxmodal>
+        <a href="{{ project.urls.createservice }}" class="btn btn-primary" data-ajaxmodal>
           {% include "svg/plus.svg" %}
           {% translate 'service'|capfirst %}
         </a>
