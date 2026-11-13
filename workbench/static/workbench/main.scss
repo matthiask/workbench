@@ -1982,6 +1982,16 @@ a.wb-row-title:hover {
     min-width: 5rem;
   }
 
+  // Checkboxes and text of rows on the height of the first input
+  [data-invoice-service] > td > .form-check-input {
+    margin-top: calc((1.5em + 0.75rem + 2 * var(--bs-border-width) - 1em) / 2);
+  }
+
+  [data-invoice-service] > .wb-first-line > :first-child {
+    display: block;
+    margin-top: calc(0.375rem + var(--bs-border-width));
+  }
+
   // Effort type, hours, rate and cost of the line below each other
   .wb-invoice-line {
     display: grid;

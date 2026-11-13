@@ -150,7 +150,7 @@
                       aria-label="{% translate 'description' %}"
                     >{{ row.description.value|default:'' }}</textarea>
                   </td>
-                  <td>
+                  <td class="wb-first-line">
                     {% for radio, preset in row.options %}
                       <div class="form-check">
                         <input
@@ -223,7 +223,7 @@
                       </div>
                     </div>
                   </td>
-                  <td class="text-end text-nowrap"><output data-amount></output></td>
+                  <td class="text-end text-nowrap wb-first-line"><output data-amount></output></td>
                   <td class="text-center">
                     <input
                       type="checkbox"
