@@ -256,8 +256,6 @@ def changes(*, since):
             continue
         by = {users.get(audit_user_id(a.user_name)) for a in actions}
 
-        # XXX Filter out changes done by users themselves and concerning only them?
-
         if key[0] == "planning_milestone":
             milestones[project].append(
                 change_obj(
@@ -541,6 +539,12 @@ def changes_mails():
 
     for user in sorted(set(c) | set(a)):
         if not user.is_active:
+            continue
+        # No mail listing only the recipient's own changes
+        objects = [
+            obj for project in c.get(user, {}).values() for obj in project["objects"]
+        ] + a.get(user, [])
+        if all(set(obj["by"]) == {user} for obj in objects):
             continue
         mail = render_to_mail(
             "planning/changes_mail",

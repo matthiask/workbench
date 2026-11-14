@@ -108,6 +108,33 @@ class ChangesTest(TestCase):
         self.assertEqual(changed["project_id"], (old_project, new_project))
 
     @travel("2021-10-18")
+    def test_own_changes(self):
+        """Nobody gets a mail listing only their own changes, but others'
+        changes come with their own ones"""
+        user = self.set_current_user()
+        pw = factories.PlannedWorkFactory.create(user=user, weeks=[in_days(7)])
+        owner = pw.project.owned_by
+        LoggedAction.objects.all().update(
+            created_at=timezone.now() - dt.timedelta(days=14)
+        )
+
+        pw.planned_hours = 50
+        pw.save()
+
+        updates.changes_mails()
+        self.assertEqual([m.to for m in mail.outbox], [[owner.email]])
+
+        mail.outbox = []
+        set_user_name(f"user-{owner.pk}-{owner.get_short_name()}")
+        factories.MilestoneFactory.create(project=pw.project, date=in_days(7))
+
+        updates.changes_mails()
+        self.assertEqual(len(mail.outbox), 2)
+        [own] = [m for m in mail.outbox if m.to == [user.email]]
+        self.assertIn("Updated: ", own.body)
+        self.assertIn("Created: ", own.body)
+
+    @travel("2021-10-18")
     def test_absence_changes(self):
         """Absences of people one shares projects with land in the updates"""
         self.set_current_user()
