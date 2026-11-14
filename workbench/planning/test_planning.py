@@ -179,6 +179,31 @@ class PlanningTest(TestCase):
         self.assertIsNone(record["offers"])
         self.assertEqual(record["project"]["planned_hours"], 10)
 
+    def test_only_external_work(self):
+        """Projects with nothing but external work are shown too"""
+        project = factories.ProjectFactory.create()
+        ew = ExternalWork.objects.create(
+            project=project,
+            provided_by=factories.OrganizationFactory.create(),
+            created_by=project.owned_by,
+            title="Printing",
+            weeks=[monday()],
+        )
+
+        (record,) = reporting.project_planning(project)["projects_offers"]
+        self.assertEqual([e["id"] for e in record["external_work"]], [ew.id])
+
+    def test_only_milestones(self):
+        """Milestones without any work show their project in the user's
+        planning"""
+        milestone = factories.MilestoneFactory.create(date=in_days(10))
+        user = milestone.project.owned_by
+
+        (record,) = reporting.user_planning(user, date_range)["projects_offers"]
+        self.assertEqual(record["project"]["id"], milestone.project.id)
+        (ms,) = record["project"]["milestones"]
+        self.assertEqual(ms["id"], milestone.id)
+
     def test_milestone_color_choices(self):
         """Milestone colors are chosen from swatches, not typed as hex codes"""
         milestone = factories.MilestoneFactory.create(date=in_days(10), color="#123456")

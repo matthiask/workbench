@@ -179,13 +179,12 @@ class Planning:
                 self.add_project_milestone(ew.project, ew.milestone)
                 self._project_ids.add(ew.project.pk)
 
-        # TODO: hacky, add projects anyway if there are upcoming milestones.
-        # There must be a better way.
+        # Projects are shown with their milestones even without any work
         if milestones_qs:
             for ms in milestones_qs.filter(
                 Q(date__lte=max(self.weeks)) & Q(date__gte=min(self.weeks))
-            ):
-                self._projects_offers[ms.project].update()
+            ).select_related("project"):
+                self.add_project_milestone(ms.project, ms)
                 self._project_ids.add(ms.project.pk)
 
     def add_project_milestone(self, project, milestone):
@@ -690,7 +689,12 @@ on week=abs_week and user_id=abs_user_id
             "projects_offers": sorted(
                 filter(
                     None,
-                    starmap(self._project_record, self._projects_offers.items()),
+                    (
+                        self._project_record(project, self._projects_offers[project])
+                        for project in self._projects_offers.keys()
+                        | self._projects_external_work.keys()
+                        | self._milestones.keys()
+                    ),
                 ),
                 key=lambda row: (
                     (
