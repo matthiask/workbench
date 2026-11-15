@@ -17,7 +17,9 @@
     </div>
     {# data-shortcuts: the keys say Alt instead of Ctrl except on Macs #}
     <article class="card mb-3">
-      <div class="card-body wb-help" data-shortcuts>{{ html }}</div>
+      <div class="card-body wb-help" data-shortcuts {% if text_language %}lang="{{ text_language }}"{% endif %}>
+        {{ html }}
+      </div>
     </article>
   </div>
 {% endblock content %}

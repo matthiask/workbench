@@ -62,3 +62,17 @@ class HelpTest(TestCase):
         self.assertContains(response, 'href="#die-zeitmarken-seite"')
         self.assertContains(response, '<h2 id="die-zeitmarken-seite">')
         self.assertContains(response, '<h2 id="zeitmarken">')
+
+    def test_metrics(self):
+        """The computation of the figures is in English for everybody, its
+        links to sections all lead somewhere"""
+        self.client.force_login(factories.UserFactory.create(language="de"))
+        response = self.client.get("/help/metrics/")
+        self.assertContains(response, '<h1 class="mb-0">Metrics</h1>')
+        self.assertContains(response, 'lang="en"')
+        html = response.content.decode()
+        ids = set(re.findall(r' id="([^"]+)"', html))
+        anchors = set(re.findall(r'href="#([^"]+)"', html))
+        self.assertTrue(anchors)
+        self.assertEqual(anchors - ids, set())
+        self.assertContains(self.client.get("/help/reports/"), 'href="/help/metrics/"')

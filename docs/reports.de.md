@@ -4,6 +4,10 @@ Das Menü «Berichte» zeigt die Berichte, auf die du Zugriff hast. Die
 meisten Zahlen sind Schätzungen, die eher unterschätzen: Im Zweifel
 zählt Workbench Stunden und lässt Geld weg.
 
+[Metrics](metrics.md) erklärt, wie jeder Bericht und jede Kennzahl
+berechnet wird (auf Englisch): welche Einträge zählen, welche Felder und
+Daten.
+
 ## Die Zahlen lesen
 
 - **Stunden und Stunden für Verrechnung**: Alles rund um die Zeit

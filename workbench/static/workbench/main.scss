@@ -2148,6 +2148,11 @@ kbd {
     white-space: nowrap;
   }
 
+  // Long names in the metrics' tables shouldn't widen the page
+  code {
+    overflow-wrap: anywhere;
+  }
+
   table {
     margin-bottom: 1rem;
   }

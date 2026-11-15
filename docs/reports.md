@@ -4,6 +4,9 @@ The "Reports" menu shows the reports you have access to. Most figures
 are estimates which rather underestimate: when in doubt, Workbench
 counts hours and leaves out money.
 
+[Metrics](metrics.md) explains how each report and key figure is
+computed: which records count, which fields and dates.
+
 ## Reading the figures
 
 - **Hours and hours for invoicing**: everything about time (working

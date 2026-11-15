@@ -22,6 +22,8 @@ whom) is in its handbook.
 - [Command line and API tokens](cli.md): installing and using `wb`
 - [Keyboard shortcuts](shortcuts.md): jumping to projects and people,
   logging hours, costs and breaks
+- [Metrics](metrics.md): how every report and key figure is computed,
+  for advanced users
 
 ## What Workbench doesn't do
 

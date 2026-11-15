@@ -35,9 +35,13 @@ _NAMES = {
     "cli": "cli",
     "shortcuts": "shortcuts",
 }
+# Pages for advanced users, in English only
+ENGLISH_ONLY = ("metrics",)
 PAGES = {
-    "en": {page: f"{name}.md" for page, name in _NAMES.items()},
-    "de": {page: f"{name}.de.md" for page, name in _NAMES.items()},
+    "en": {page: f"{name}.md" for page, name in _NAMES.items()}
+    | {page: f"{page}.md" for page in ENGLISH_ONLY},
+    "de": {page: f"{name}.de.md" for page, name in _NAMES.items()}
+    | {page: f"{page}.md" for page in ENGLISH_ONLY},
 }
 # The docs come from the repository, not from users: HTML like <kbd> is fine
 _markdown = MarkdownIt("commonmark", {"html": True}).enable("table")
@@ -100,5 +104,11 @@ def help_page(request, page=""):
     return render(
         request,
         "help.html",
-        {"chapters": chapters(page, language), "title": title, "html": html},
+        {
+            "chapters": chapters(page, language),
+            "title": title,
+            "html": html,
+            # The text is English, also on German pages
+            "text_language": "en" if page in ENGLISH_ONLY else None,
+        },
     )

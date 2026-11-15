@@ -25,6 +25,8 @@ wer wen einplant), steht in ihrem Handbuch.
   verwenden
 - [Tastaturkürzel](shortcuts.de.md): zu Projekten und Personen springen,
   Stunden, Kosten und Pausen erfassen
+- [Metrics](metrics.md): wie jeder Bericht und jede Kennzahl berechnet
+  wird, auf Englisch, für Fortgeschrittene
 
 ## Was Workbench nicht macht
 

@@ -1,4 +1,4 @@
-# How Workbench computes its figures
+# Metrics
 
 This document describes how the reports and key figures of Workbench are
 computed: which records count, which fields and dates are used and where the
