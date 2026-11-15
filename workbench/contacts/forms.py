@@ -185,6 +185,7 @@ class OrganizationSearchForm(Form):
     s = forms.ChoiceField(
         choices=[
             ("", _("Active")),
+            ("archived", _("Archived")),
             ("all", _("All")),
             (
                 _("Defined search"),
@@ -217,7 +218,9 @@ class OrganizationSearchForm(Form):
     def filter(self, queryset):
         data = self.cleaned_data
         queryset = queryset.search(data.get("q"))
-        if data.get("s") != "all":
+        if data.get("s") == "archived":
+            queryset = queryset.filter(is_archived=True)
+        elif data.get("s") != "all":
             queryset = queryset.active()
         if data.get("s") == "any-projects-deals":
             queryset = queryset.filter(recent_projects_or_deals("customer"))
@@ -247,6 +250,7 @@ class PersonSearchForm(Form):
     s = forms.ChoiceField(
         choices=[
             ("", _("Active")),
+            ("archived", _("Archived")),
             ("all", _("All")),
             (
                 _("Defined search"),
@@ -310,6 +314,8 @@ class PersonSearchForm(Form):
 
         if not data.get("s"):
             queryset = queryset.active()
+        elif data.get("s") == "archived":
+            queryset = queryset.filter(is_archived=True)
         elif data.get("s") == "any-projects-deals":
             queryset = queryset.filter(recent_projects_or_deals("contact")).active()
         elif data.get("s") == "missing-salutation":

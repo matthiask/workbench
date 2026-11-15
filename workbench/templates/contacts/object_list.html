@@ -20,6 +20,7 @@
         {% plural %}
           This group also contains {{ count }} archived contacts.
         {% endblocktranslate %}
+        <a href="{% querystring s='archived' %}">{% translate 'Show' %}</a>
       </p>
     {% endif %}
   {% endwith %}

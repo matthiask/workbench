@@ -1756,7 +1756,7 @@ class GroupsTest(TestCase):
         self.assertEqual(counts, {"Newsletter": (2, 1, 1, 3), "Empty": (0, 0, 0, 0)})
 
     def test_archived_members(self):
-        """People see that a group contains archived contacts, but not which"""
+        """Lists of a group leave out archived contacts but say how many there are"""
         self.client.force_login(factories.UserFactory.create())
         group = Group.objects.create(title="Newsletter")
         active = factories.PersonFactory.create(family_name="Active")
@@ -1775,6 +1775,28 @@ class GroupsTest(TestCase):
         # Asking for all contacts shows them, the note isn't needed then
         response = self.client.get(group.get_absolute_url() + "&s=all")
         self.assertNotContains(response, "archived contact")
+
+    def test_archived_filter(self):
+        """The archived contacts of a group can be listed on their own"""
+        self.client.force_login(factories.UserFactory.create())
+        group = Group.objects.create(title="Newsletter")
+        factories.PersonFactory.create(family_name="Current").groups.add(group)
+        factories.OrganizationFactory.create(name="Current Ltd").groups.add(group)
+        factories.PersonFactory.create(family_name="Gone", is_archived=True).groups.add(
+            group
+        )
+        factories.OrganizationFactory.create(
+            name="Gone Ltd", is_archived=True
+        ).groups.add(group)
+
+        response = self.client.get(group.get_absolute_url())
+        self.assertContains(response, f'href="?g={group.pk}&amp;s=archived"')
+
+        for url in [Person.urls["list"], Organization.urls["list"]]:
+            response = self.client.get(f"{url}?g={group.pk}&s=archived")
+            self.assertContains(response, "Gone")
+            self.assertNotContains(response, "Current")
+            self.assertNotContains(response, "archived contact")
 
 
 class OrganizationGroupsTest(TestCase):
