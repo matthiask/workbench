@@ -23,12 +23,15 @@ from markdown_it import MarkdownIt
 # README is the start page
 _NAMES = {
     "": "README",
+    "projects": "projects",
     "hours": "hours",
     "absences": "absences",
     "planning": "planning",
     "offers": "offers",
     "invoices": "invoices",
     "reports": "reports",
+    "deals": "deals",
+    "contacts": "contacts",
     "cli": "cli",
     "shortcuts": "shortcuts",
 }

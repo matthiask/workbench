@@ -6,6 +6,7 @@ Planung, Abwesenheiten und die Berichte daraus. Diese Hilfe erklärt, wie
 du Workbench benutzt. Wie deine Firma damit arbeitet (Benennung, Ansätze,
 wer wen einplant), steht in ihrem Handbuch.
 
+- [Projekte](projects.de.md): Typen, Leistungen, Schliessen
 - [Stunden erfassen](hours.de.md): nach jeder Aufgabe, mit Zeitmarken,
   wenn das nicht geht, Pausen
 - [Abwesenheiten und Arbeitszeit](absences.de.md): Ferien, Krankheit und
@@ -16,6 +17,10 @@ wer wen einplant), steht in ihrem Handbuch.
 - [Rechnungen](invoices.de.md): die Typen, Leistungsrechnungen,
   Anzahlungen, Versand, Zahlungen und Erinnerungen
 - [Berichte](reports.de.md): die Zahlen lesen, was jeder Bericht zeigt
+- [Geschäfte](deals.de.md): die Akquise-Pipeline, Offerten verbinden,
+  Geschäfte abschliessen
+- [Kontakte](contacts.de.md): Organisationen, Personen, Gruppen,
+  Duplikate und Archivieren
 - [Kommandozeile und API-Tokens](cli.de.md): `wb` installieren und
   verwenden
 - [Tastaturkürzel](shortcuts.de.md): zu Projekten und Personen springen,
