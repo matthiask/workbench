@@ -2603,3 +2603,50 @@ planned_work:
         result = run("me", env={"WORKBENCH_URL": "http://second.example.com"})
         self.assertIn(other.get_full_name(), result.output)
         self.assertIn("* http://first.example.com", run("auth", "list").output)
+
+    def test_skills(self):
+        """Linking the skills into Claude Code's skills, replacing stale links
+        and leaving directories of their own alone"""
+        skills = self.directory / "claude" / "skills"
+        ours = Path(wb.skills.__file__).parent
+        skills.mkdir(parents=True)
+        # Linked from an environment uv removed, a skill wb doesn't have
+        # anymore, somebody's own skill and somebody's own directory
+        gone = self.directory / "old" / "wb" / "skills"
+        (skills / "workbench-contact").symlink_to(gone / "workbench-contact")
+        (skills / "workbench-gone").symlink_to(gone / "workbench-gone")
+        (skills / "mine").symlink_to(self.directory)
+        (skills / "workbench-deals").mkdir()
+
+        with patch.dict("os.environ", {"CLAUDE_CONFIG_DIR": str(skills.parent)}):
+            result = self.wb("skills", "list")
+            self.assertIn("workbench-offer", result.output)
+            self.assertIn("not linked", result.output)
+            self.assertIn("wb skills install", result.output)
+
+            result = self.wb("skills", "install")
+            self.assertIn("Linked workbench-offer.", result.output)
+            self.assertIn("Linked workbench-contact.", result.output)
+            self.assertIn("Removed workbench-gone.", result.output)
+            self.assertIn("workbench-deals is a directory", result.output)
+            self.assertEqual(
+                (skills / "workbench-contact").readlink(), ours / "workbench-contact"
+            )
+            self.assertTrue((skills / "workbench-offer" / "SKILL.md").exists())
+            self.assertFalse((skills / "workbench-gone").is_symlink())
+            self.assertTrue((skills / "mine").is_symlink())
+
+            # Nothing to do the second time
+            result = self.wb("skills", "install")
+            self.assertNotIn("Linked", result.output)
+
+            data = json.loads(self.wb("skills", "list", "--json").output)
+            states = {skill["name"]: skill["state"] for skill in data}
+            self.assertEqual(states["workbench-offer"], "linked")
+            self.assertEqual(states["workbench-deals"], "a directory of its own")
+
+            self.wb("skills", "uninstall")
+            self.assertEqual(
+                sorted(path.name for path in skills.iterdir()),
+                ["mine", "workbench-deals"],
+            )

@@ -16,6 +16,7 @@ from wb import (  # noqa: F401 Register the commands
     reports,
     search,
     services,
+    skills,
     timestamps,
     users,
 )

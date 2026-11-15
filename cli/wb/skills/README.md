@@ -12,10 +12,15 @@ enough for looking at things and for controlling summaries). If `wb` only
 has read access, the skills ask the user to log in again instead of working
 around it. Workbench checks the user's features like in the web interface.
 
-Link them into your personal skills to use them in any directory (from the
-repository root, again when skills are added):
+They come with `wb`, link them into your personal Claude Code skills:
 
-    for skill in "$PWD"/cli/skills/workbench-*/; do ln -sfn "${skill%/}" ~/.claude/skills/; done
+    wb skills install
+
+The links point to where `wb` is installed (the checkout for editable
+installs), upgrading `wb` updates the skills. Run it again when `wb` brings
+new skills (`wb skills list` shows them), `--project` links them into the
+project in the current directory instead (`.claude/skills`),
+`wb skills uninstall` removes the links.
 
 ## workbench-address-book
 

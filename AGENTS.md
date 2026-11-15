@@ -146,6 +146,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - `wb <noun> <verb>`: `search` (terms and filters, `--include-closed` etc.,
   `include_*` in the API), `show ID` (ID or code, `by_id_or_code()`),
   `create`, `update`. Nouns without a verb show the most common list.
+- The Claude Code skills are in the package (`cli/wb/skills/`), `wb skills
+  install` links them into Claude Code's skills (to the checkout for
+  editable installs, else to uv's environment of the tool).
 - New commands get a test in `workbench/test_cli.py` (real commands against
   the API through the test client).
 - Bump the version in `cli/pyproject.toml` when changing the CLI (once per

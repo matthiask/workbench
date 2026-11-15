@@ -6,7 +6,7 @@ requires = [
 
 [project]
 name = "workbench-cli"
-version = "0.47.0"
+version = "0.48.0"
 description = "Workbench CLI"
 readme = "README.md"
 authors = [
@@ -29,4 +29,9 @@ scripts.wb = "wb:cli"
 [tool.setuptools]
 packages = [
   "wb",
+  "wb.skills",
+]
+package-data."wb.skills" = [
+  "*.md",
+  "*/**/*",
 ]
