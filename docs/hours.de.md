@@ -130,6 +130,15 @@ Kosten gehören auf ein internes Projekt.
   zurückerstatteten Spesen zu einer Abrechnung zusammen. Eine
   abgeschlossene Abrechnung bleibt abgeschlossen.
 
+**Warum inklusive MwSt?** Fremdkosten sind das Total auf der Quittung,
+inklusive MwSt, denn das wurde bezahlt (und wird bei Spesen
+zurückerstattet). Die Kosten sind wie alles auf einer Rechnung ein
+Betrag ohne MwSt: Die Rechnung schlägt die MwSt darauf. Doppelt bezahlt
+wird die MwSt trotzdem nicht: Die Firma zieht die MwSt der Quittung als
+Vorsteuer ab, die Kundschaft bezahlt die MwSt einmal, auf der Rechnung.
+Z.B. eine Quittung über 108.10 inklusive 8,1% MwSt: Fremdkosten 108.10,
+Kosten 108.10 («100%»), die Rechnung schlägt 8.76 MwSt darauf.
+
 Verrechnete Kosten behalten ihre Beträge.
 
 ## Der Timer

@@ -118,6 +118,15 @@ on an internal project.
 - "Payments" → "Expense reports" collects your expenses not reimbursed
   yet into a report. A closed report stays closed.
 
+**Why including tax?** Third party costs are the total on the receipt,
+including tax, because that's what was paid (and what's reimbursed for
+expenses). The cost, like everything on an invoice, is an amount
+excluding tax: the invoice adds the tax on top. That's no tax paid
+twice: the company deducts the tax on the receipt as input tax, the
+customer pays tax once, on the invoice. E.g. a receipt of 108.10
+including 8.1% tax: third party costs 108.10, cost 108.10 ("100%"), the
+invoice adds 8.76 tax.
+
 Costs which have been invoiced keep their amounts.
 
 ## The timer
