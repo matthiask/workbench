@@ -8,6 +8,8 @@ whom) is in its handbook.
 
 - [Logging hours](hours.md): after each task, with timestamps when
   that isn't possible, breaks
+- [Absences and working time](absences.md): vacation, sickness and
+  other absences, the annual working time
 - [Offers](offers.md): services, prices, statuses, copies and PDFs
 - [Invoices](invoices.md): the types, services invoices, down payments,
   sending, payments and reminders
