@@ -54,3 +54,11 @@ class HelpTest(TestCase):
             "/help/shortcuts/",
             fetch_redirect_response=False,
         )
+
+    def test_anchors(self):
+        """Headings have IDs like on GitHub, links to sections work"""
+        self.client.force_login(factories.UserFactory.create(language="de"))
+        response = self.client.get("/help/hours/")
+        self.assertContains(response, 'href="#die-zeitmarken-seite"')
+        self.assertContains(response, '<h2 id="die-zeitmarken-seite">')
+        self.assertContains(response, '<h2 id="zeitmarken">')

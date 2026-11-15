@@ -6,6 +6,8 @@ Planung, Abwesenheiten und die Berichte daraus. Diese Hilfe erklärt, wie
 du Workbench benutzt. Wie deine Firma damit arbeitet (Benennung, Ansätze,
 wer wen einplant), steht in ihrem Handbuch.
 
+- [Stunden erfassen](hours.de.md): nach jeder Aufgabe, mit Zeitmarken,
+  wenn das nicht geht, Pausen
 - [Tastaturkürzel](shortcuts.de.md): zu Projekten und Personen springen,
   Stunden, Kosten und Pausen erfassen
 

@@ -6,6 +6,8 @@ absences and the reports built from them. This help explains how to use
 Workbench. How your company works with it (naming, rates, who plans
 whom) is in its handbook.
 
+- [Logging hours](hours.md): after each task, with timestamps when
+  that isn't possible, breaks
 - [Keyboard shortcuts](shortcuts.md): jumping to projects and people,
   logging hours, costs and breaks
 

@@ -1,0 +1,108 @@
+# Logging hours
+
+Hours are logged on a **service** of a project, best right after
+finishing a task:
+
+- You still know what you did, which helps when discussing the work with
+  the customer later.
+- Workbench fills in the time since your latest entry, you only check it.
+- At the end of the day or week there's nothing left to catch up on.
+- Breaks are logged in passing, Workbench knows when they started.
+
+When that isn't possible (a call, a colleague at your desk, a meeting
+away from the computer), set a [timestamp](#timestamps) and log the
+hours later.
+
+## Logging hours
+
+<kbd>Ctrl-L</kbd> logs hours on the project you're looking at, else it
+asks for the project first (<kbd>Ctrl-Shift-L</kbd> always asks). The
+form fills in:
+
+- **Hours**: the time since your latest activity of the day (logged
+  hours, the end of a break, a timestamp), rounded up to the next tenth
+  of an hour, if that's at most 12 hours.
+- **Service**: the service you logged on last in this project.
+
+A new project has no services yet: fill in "New service" in the same
+form instead of choosing one. Use specific titles and descriptions, they
+may end up on an offer or invoice.
+
+**Hours for invoicing** stay empty in most cases: then the hours worked
+are invoiced. Fill them in when a different number of hours should be
+invoiced than the hours worked; they take precedence when creating
+invoices, the hours worked still count for everything about time
+(working time, planning, budgets in hours).
+
+Hours are logged in the current week (from Monday, not before the first
+of January); logging more than a day in advance asks whether that's
+right, more than a week isn't possible. Projects stay open for logging
+for 14 days after they have been closed.
+
+The form warns about entries which look wrong: a duplicate of your
+previous entry, a project closed recently, an entry already invoiced,
+hours for invoicing lower or much higher than the hours worked, and,
+where enabled, logging late and too few breaks. Check the entry and
+choose "Ignore warnings" if it's correct.
+
+## Timestamps
+
+A timestamp records when you stopped or started a task, with notes and
+optionally the project. You turn them into logged hours or breaks later
+on the [timestamps page](#the-timestamps-page).
+
+- **Stop** ends a task: its notes describe the work you just finished.
+- **Start** begins a task: its notes describe what you're starting. Use
+  it in the morning and after breaks, so that the first task of the day
+  or after the break has its beginning. A start followed by a stop is
+  one task, their notes are joined.
+- **Notes** become the description of the logged hours.
+- **Project**: a project's ID or words from its title or customer, like
+  the project search. A unique match among your pinned projects wins,
+  otherwise the match among all open projects has to be unique. The
+  project and its service are then filled in when logging the hours.
+- **Time**: today's time if you forgot to press the button at the right
+  moment.
+
+The **controller**, a small window for timestamps, opens with
+"Controller" on the timestamps page. It works without signing in, so you
+can add it to your phone's home screen and set timestamps while away from
+the computer. Its link contains your personal key: don't share it.
+
+On the command line, `wb timestamps start` and `wb timestamps stop` do
+the same (`wb timestamps --help`).
+
+## The timestamps page
+
+<kbd>Ctrl-T</kbd> (or "Timestamps" on the start page) lists your day as
+slices: each with its times, its duration, the project and the notes.
+Logged hours and breaks are part of the list, also those logged without
+a timestamp.
+
+- **+ Hours** opens the logbook form with the day, the duration, the
+  notes and the project of the slice filled in.
+- **+ Break** logs the slice as a break with its start and end.
+- **Split** divides a slice into several parts (in tenths of an hour),
+  e.g. when you worked on several projects without a timestamp in
+  between. Log each part on its own.
+- The cross deletes a timestamp you don't need.
+- Gaps of more than two minutes between slices appear as
+  "&lt;detected&gt;" and can be logged like the others.
+- Logged slices link to their entry.
+
+Hours logged on another day for this day come at the end, without times.
+The arrows show earlier days. Workbench reminds you when many timestamps
+of the current week haven't been logged yet.
+
+## Breaks
+
+<kbd>Ctrl-B</kbd> (or the plus button at the bottom left) logs a break:
+it starts at your latest activity of the day and ends now, adjust both if
+needed. <kbd>Ctrl-Shift-B</kbd> lists your breaks. Where enabled,
+Workbench warns when you've worked more than 5.5, 7 or 9 hours a day
+with less than 15, 30 or 60 minutes of breaks.
+
+## The timer
+
+The timer (in the menu with your name) still exists, but timestamps are
+the recommended way to keep track of your work.

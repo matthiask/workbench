@@ -23,6 +23,7 @@ from markdown_it import MarkdownIt
 # README is the start page
 _NAMES = {
     "": "README",
+    "hours": "hours",
     "shortcuts": "shortcuts",
 }
 PAGES = {
@@ -32,6 +33,15 @@ PAGES = {
 # The docs come from the repository, not from users: HTML like <kbd> is fine
 _markdown = MarkdownIt("commonmark", {"html": True}).enable("table")
 _link = re.compile(r'href="([^":#/]+\.md)(#[^"]*)?"')
+_heading = re.compile(r"<h([2-4])>(.*?)</h\1>")
+
+
+def _anchor(match):
+    """IDs for headings like GitHub's, so that links to sections work in
+    both places"""
+    text = re.sub(r"<[^>]+>|&[a-z]+;", "", match[2]).strip().lower()
+    slug = re.sub(r"[^\w\- ]", "", text).replace(" ", "-")
+    return f'<h{match[1]} id="{slug}">{match[2]}</h{match[1]}>'
 
 
 def url(page):
@@ -68,7 +78,7 @@ def render_page(page, language):
             return match[0]
         return f'href="{url(files[match[1]])}{match[2] or ""}"'
 
-    html = _markdown.render(text)
+    html = _heading.sub(_anchor, _markdown.render(text))
     html = re.sub(r"^<h1>.*?</h1>\n", "", html, count=1)  # The page's title
     return title, mark_safe(_link.sub(link, html))
 

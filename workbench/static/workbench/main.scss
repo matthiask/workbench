@@ -2120,9 +2120,11 @@ kbd {
 }
 
 // Help pages (docs/): readable line length
-.wb-help {
-  max-width: 48rem;
+.wb-help-page {
+  max-width: 50rem;
+}
 
+.wb-help {
   > :last-child {
     margin-bottom: 0;
   }
@@ -2140,6 +2142,10 @@ kbd {
 
   li {
     margin-bottom: 0.25rem;
+  }
+
+  kbd {
+    white-space: nowrap;
   }
 
   table {

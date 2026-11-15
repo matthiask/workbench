@@ -6,7 +6,7 @@
 
 {% block content %}
   {# The user documentation from docs/ (workbench/help.py) #}
-  <div class="wb-form-page wb-form-page-wide">
+  <div class="wb-help-page">
     <nav class="wb-help-chapters" aria-label="{% translate 'Chapters of the help' %}">
       {% for chapter in chapters %}
         <a href="{{ chapter.url }}" {% if chapter.current %}aria-current="page"{% endif %}>{{ chapter.title }}</a>
