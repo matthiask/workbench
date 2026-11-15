@@ -193,8 +193,9 @@ class ProjectedInvoicesTest(TestCase):
         self.assertContains(response, "(10’000.00 &minus;")
         self.assertContains(response, "5’000.00 third party costs)")
 
-        self.assertContains(
-            response, "budgeted work and costs without third party costs: 5’000.00"
+        self.assertRegex(
+            response.content.decode(),
+            r"budgeted work and costs without third party costs:\s+5’000.00",
         )
 
         pi.gross_margin = Decimal(6000)
