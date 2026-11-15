@@ -102,6 +102,24 @@ needed. <kbd>Ctrl-Shift-B</kbd> lists your breaks. Where enabled,
 Workbench warns when you've worked more than 5.5, 7 or 9 hours a day
 with less than 15, 30 or 60 minutes of breaks.
 
+## Logging costs
+
+<kbd>Ctrl-K</kbd> (or the plus button) logs costs on a service of a
+project, like hours: expenses, licences, a print job. Internal costs go
+on an internal project.
+
+- **Third party costs**: what was paid to others, including tax.
+- **Cost**: what the customer is invoiced. "100%" and "115%" copy the
+  third party costs, the latter with a surcharge. Workbench warns when
+  the third party costs are higher than the cost.
+- **Paid from my own pocket** (where expense reports are enabled) marks
+  expenses to be reimbursed; they need third party costs. Expenses in
+  another currency keep their original currency and amount.
+- "Payments" → "Expense reports" collects your expenses not reimbursed
+  yet into a report. A closed report stays closed.
+
+Costs which have been invoiced keep their amounts.
+
 ## The timer
 
 The timer (in the menu with your name) still exists, but timestamps are

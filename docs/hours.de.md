@@ -112,6 +112,26 @@ beides bei Bedarf an. <kbd>Ctrl-Shift-B</kbd> zeigt deine Pausen. Wo
 eingeschaltet, warnt Workbench, wenn du mehr als 5,5, 7 oder 9 Stunden am
 Tag mit weniger als 15, 30 oder 60 Minuten Pause gearbeitet hast.
 
+## Kosten erfassen
+
+<kbd>Ctrl-K</kbd> (oder der Plus-Knopf) erfasst Kosten auf einer Leistung
+eines Projekts, wie Stunden: Spesen, Lizenzen, ein Druckauftrag. Interne
+Kosten gehören auf ein internes Projekt.
+
+- **Fremdkosten**: was an andere bezahlt wurde, inklusive MwSt.
+- **Kosten**: was der Kundschaft verrechnet wird. «100%» und «115%»
+  übernehmen die Fremdkosten, letzteres mit einem Zuschlag. Workbench
+  warnt, wenn die Fremdkosten höher sind als die Kosten.
+- **Mit eigenem Geld bezahlt** (wo Spesenabrechnungen eingeschaltet
+  sind) markiert Spesen, die zurückerstattet werden; sie brauchen
+  Fremdkosten. Spesen in einer anderen Währung behalten ihre
+  Originalwährung und ihren Originalbetrag.
+- «Zahlungen» → «Spesenabrechnungen» fasst deine noch nicht
+  zurückerstatteten Spesen zu einer Abrechnung zusammen. Eine
+  abgeschlossene Abrechnung bleibt abgeschlossen.
+
+Verrechnete Kosten behalten ihre Beträge.
+
 ## Der Timer
 
 Der Timer (im Menü mit deinem Namen) gibt es noch, empfohlen sind aber

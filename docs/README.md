@@ -8,7 +8,7 @@ whom) is in its handbook.
 
 - [Projects](projects.md): types, services, closing
 - [Logging hours](hours.md): after each task, with timestamps when
-  that isn't possible, breaks
+  that isn't possible, breaks and costs
 - [Absences and working time](absences.md): vacation, sickness and
   other absences, the annual working time
 - [Planning](planning.md): planned work, milestones, capacity, importing

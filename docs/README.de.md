@@ -8,7 +8,7 @@ wer wen einplant), steht in ihrem Handbuch.
 
 - [Projekte](projects.de.md): Typen, Leistungen, Schliessen
 - [Stunden erfassen](hours.de.md): nach jeder Aufgabe, mit Zeitmarken,
-  wenn das nicht geht, Pausen
+  wenn das nicht geht, Pausen und Kosten
 - [Abwesenheiten und Arbeitszeit](absences.de.md): Ferien, Krankheit und
   andere Abwesenheiten, die Jahresarbeitszeit
 - [Planung](planning.de.md): geplante Arbeit, Meilensteine, Kapazität,
