@@ -68,8 +68,8 @@ its services, the work is logged on services created later.
   into an open project, in preparation and without dates.
 - "PDF" shows the offer, its menu downloads it, also with a signature
   line. Offers which haven't been offered or accepted carry their status
-  as a watermark. "Project offers" in the project's menu combines all
-  offers of the project, the declined ones too.
+  as a watermark. "Project offers" in the project's menu combines the
+  offers of the project, without the declined and discarded ones.
 - Offers are linked to deals on the deal ("Link offer"). Closing the deal
   accepts or declines its offers.
 

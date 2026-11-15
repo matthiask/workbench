@@ -78,8 +78,8 @@ Arbeit wird auf später erstellten Leistungen erfasst.
 - «PDF» zeigt die Offerte, ihr Menü lädt sie herunter, auch mit
   Unterschriftszeile. Offerten, die nicht offeriert oder akzeptiert sind,
   tragen ihren Status als Wasserzeichen. «Projektofferten» im Menü des
-  Projekts fasst alle Offerten des Projekts zusammen, auch die
-  abgelehnten.
+  Projekts fasst die Offerten des Projekts zusammen, ohne die
+  abgelehnten und verworfenen.
 - Offerten werden auf dem Geschäft verbunden («Offerte verbinden»). Beim
   Abschliessen des Geschäfts werden seine Offerten akzeptiert oder
   abgelehnt.

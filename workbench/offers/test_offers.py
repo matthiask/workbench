@@ -1,5 +1,6 @@
 import datetime as dt
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -155,6 +156,32 @@ class OffersTest(TestCase):
         response = self.client.get(project.urls["offers_pdf"])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["content-type"], "application/pdf")
+
+    def test_offers_pdf_not_pursued(self):
+        """The project's offers PDF leaves out declined and discarded offers"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        offer = factories.OfferFactory.create(project=project, title="Pursued")
+        factories.OfferFactory.create(
+            project=project,
+            title="Declined",
+            status=Offer.DECLINED,
+            offered_on=dt.date.today(),
+            valid_until=in_days(30),
+        )
+        factories.OfferFactory.create(
+            project=project, title="Discarded", status=Offer.DISCARDED
+        )
+
+        with patch("workbench.tools.pdf.PDFDocument.offers_pdf") as offers_pdf:
+            self.client.get(project.urls["offers_pdf"])
+        self.assertEqual(offers_pdf.call_args.kwargs["offers"], [offer])
+
+        offer.status = Offer.DISCARDED
+        offer.save()
+        response = self.client.get(project.urls["offers_pdf"])
+        self.assertRedirects(response, project.get_absolute_url())
+        self.assertEqual(messages(response), ["No offers in project."])
 
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.ALWAYS})
     def test_external_reference(self):

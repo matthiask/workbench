@@ -41,7 +41,7 @@ class ProjectOfferPDFView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        offers = list(self.object.offers.order_by("_code"))
+        offers = list(self.object.offers.not_declined().order_by("_code"))
 
         if not offers:
             messages.error(request, gettext("No offers in project."))
