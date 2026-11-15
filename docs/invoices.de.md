@@ -91,7 +91,10 @@ Nur noch ihr Status und wenige Felder lassen sich ändern.
 quartalsweise, monatlich oder wöchentlich) Fixbetragsrechnungen, einige
 Tage bevor die jeweilige Periode beginnt. Neue Rechnungen werden in
 Vorbereitung erstellt, als versendet markiert oder automatisch
-verschickt; die verantwortliche Person erhält eine Mail.
+verschickt; die verantwortliche Person erhält eine Mail. Mit «Projekt
+erstellen?» erhält jede Rechnung ihr eigenes Wartungsprojekt und ist eine
+Anzahlung darauf, die beim Verrechnen der dort erfassten Arbeit
+abgezogen wird.
 
 ## Zahlungen und Zahlungserinnerungen
 

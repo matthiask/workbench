@@ -83,7 +83,9 @@ changed.
 "Payments" → "Recurring invoices" creates fixed amount invoices
 periodically (yearly, quarterly, monthly or weekly), a number of days
 before each period begins. New invoices are created in preparation,
-marked as sent, or mailed automatically; the owner gets a mail.
+marked as sent, or mailed automatically; the owner gets a mail. With
+"Create project?" each invoice gets its own maintenance project and is a
+down payment on it, deducted when the work logged there is invoiced.
 
 ## Payments and reminders
 
