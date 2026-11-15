@@ -28,6 +28,12 @@
         </p>
         <pre class="wb-command user-select-all">uv tool install "{{ cli_install }}"
 wb login {{ base_url }}</pre>
+        <p>
+          {% blocktranslate trimmed %}
+            The Claude Code skills using <code>wb</code> come with it, link them into your skills:
+          {% endblocktranslate %}
+        </p>
+        <pre class="wb-command user-select-all">wb skills install</pre>
         <p>{% translate 'Upgrade it when <code>wb</code> tells you to:' %}</p>
         <pre class="wb-command user-select-all">{{ cli_upgrade }}</pre>
         <a href="{{ cli_readme_url }}" target="_blank" rel="noopener">{% translate 'Installation and commands' %}</a>

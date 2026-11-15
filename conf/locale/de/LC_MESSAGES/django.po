@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 13:32+0100\n"
+"POT-Creation-Date: 2026-11-15 14:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4760,6 +4760,10 @@ msgstr "Kommandozeile"
 #: workbench/templates/accounts/api_tokens.html
 msgid "Install <code>wb</code> with <a href=\"https://docs.astral.sh/uv/\">uv</a> and log in, the browser asks for the access:"
 msgstr "Installiere <code>wb</code> mit <a href=\"https://docs.astral.sh/uv/\">uv</a> und melde dich an, der Browser fragt nach dem Zugriff:"
+
+#: workbench/templates/accounts/api_tokens.html
+msgid "The Claude Code skills using <code>wb</code> come with it, link them into your skills:"
+msgstr "Die Claude-Code-Skills, die <code>wb</code> nutzen, kommen mit; verlinke sie in deine Skills:"
 
 #: workbench/templates/accounts/api_tokens.html
 msgid "Upgrade it when <code>wb</code> tells you to:"
