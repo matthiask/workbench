@@ -28,6 +28,9 @@ from wb.core import (
 )
 
 
+NEW_INVOICES = ["prepare", "mark_as_sent", "send"]
+
+
 @cli.group(invoke_without_command=True)
 @click.pass_context
 def invoices(ctx):
@@ -529,6 +532,11 @@ def recurring_invoices(ctx):
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option(
+    "--new-invoices",
+    type=click.Choice(NEW_INVOICES),
+    help="Only those creating new invoices this way.",
+)
+@click.option(
     "--include-closed",
     is_flag=True,
     help="Also those which don't renew anymore.",
@@ -537,7 +545,15 @@ def recurring_invoices(ctx):
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
 def search_recurring_invoices(
-    query, customer, owned_by, include_closed, limit, offset, as_csv, as_json
+    query,
+    customer,
+    owned_by,
+    new_invoices,
+    include_closed,
+    limit,
+    offset,
+    as_csv,
+    as_json,
 ):
     """Search recurring invoices which still renew, by customer"""
     params = {"q": " ".join(query), "include_closed": format_bool(include_closed)}
@@ -545,6 +561,8 @@ def search_recurring_invoices(
         params["customer"] = customer
     if owned_by:
         params["owned_by"] = owned_by
+    if new_invoices:
+        params["new_invoices"] = new_invoices
     data = request(
         "GET", "recurring-invoices/", params=params | page_params(limit, offset)
     )
@@ -564,6 +582,7 @@ def search_recurring_invoices(
         "Next period",
         "Ends on",
         "Total excl. tax>",
+        "New invoices",
     )
     for invoice in data["items"]:
         table.add_row(
@@ -575,9 +594,117 @@ def search_recurring_invoices(
             invoice["next_period_starts_on"] or invoice["starts_on"],
             invoice["ends_on"] or "",
             invoice["total_excl_tax"],
+            invoice["send_to"]
+            if invoice["new_invoices"] == "send"
+            else invoice["new_invoices_label"],
         )
     console.print(table)
     echo_more(data, offset, "recurring invoices")
+
+
+@recurring_invoices.command("show")
+@click.argument("invoice_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_recurring_invoice(invoice_id, as_json):
+    """Show a recurring invoice with how its new invoices are sent"""
+    data = request("GET", f"recurring-invoices/{invoice_id}/")
+    if as_json:
+        echo_json(data)
+        return
+    _echo_recurring_invoice(data)
+
+
+def _echo_recurring_invoice(data):
+    contact = data["contact"]
+    sending = data["new_invoices"] == "send"
+    echo_fields(
+        data["title"],
+        [
+            ("ID", data["id"]),
+            ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
+            ("Contact", contact and link(contact["full_name"], contact["url"])),
+            ("Owned by", data["owned_by"]),
+            ("Periodicity", data["periodicity_label"]),
+            ("Starts on", data["starts_on"]),
+            ("Ends on", data["ends_on"]),
+            ("Next period", data["next_period_starts_on"]),
+            ("Total excl. tax", data["total_excl_tax"]),
+            ("Third party costs", data["third_party_costs"]),
+            ("New invoices", data["new_invoices_label"]),
+            ("Recipient", data["send_to"] if sending else None),
+            ("Subject", data["mail_subject"] if sending else None),
+            ("URL", data["url"]),
+        ],
+        url=data["url"],
+    )
+    if data["description"]:
+        console.print()
+        console.print(data["description"])
+    if sending and data["mail_body"]:
+        console.print()
+        console.print(Text(data["mail_body"]))
+
+
+@recurring_invoices.command("update")
+@click.argument("invoice_id", type=int)
+@click.option(
+    "--new-invoices",
+    type=click.Choice(NEW_INVOICES),
+    help="Create them in preparation, mark them as sent or send them by email"
+    " automatically.",
+)
+@click.option(
+    "--send-to",
+    help="The recipient when sending by email, an empty value proposes one"
+    " (like the subject and the text).",
+)
+@click.option("--mail-subject")
+@click.option(
+    "--mail-body",
+    help="The text, or - to read it from stdin; {code}, {total}, {due_on} and"
+    " {service_period} are replaced with the values of each invoice.",
+)
+@ignore_warnings_option
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_recurring_invoice(
+    invoice_id,
+    new_invoices,
+    send_to,
+    mail_subject,
+    mail_body,
+    ignore_warnings,
+    dry_run,
+    as_json,
+):
+    """Change how new invoices are created and sent, only the given fields"""
+    data = {
+        key: value
+        for key, value in [
+            ("new_invoices", new_invoices),
+            ("send_to", send_to),
+            ("mail_subject", mail_subject),
+            ("mail_body", text_or_stdin(mail_body)),
+        ]
+        if value is not None
+    }
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"recurring-invoices/{invoice_id}/",
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
+        json=data,
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_recurring_invoice(data)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
 
 
 @cli.group("projected-invoices", invoke_without_command=True)

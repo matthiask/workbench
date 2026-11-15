@@ -391,11 +391,17 @@ The planned invoicing (gross margin, without third party costs):
     wb projected-invoices search --project 1234
     wb projected-invoices search --since 2026-11-01 --until 2026-12-31
 
-Recurring invoices, those which still renew by default (`--status closed` or
-`all` for the others):
+Recurring invoices, those which still renew by default (`--include-closed`
+for the others), and how their new invoices are created: in preparation,
+marked as sent, or sent by email automatically (the recipient, subject and
+text are proposed unless given):
 
     wb recurring-invoices search hosting
-    wb recurring-invoices search --customer 345 --status all
+    wb recurring-invoices search --customer 345 --include-closed
+    wb recurring-invoices search --new-invoices send
+    wb recurring-invoices show 123
+    wb recurring-invoices update 123 --new-invoices send --dry-run
+    wb recurring-invoices update 123 --send-to billing@example.com
 
 ## Deals
 

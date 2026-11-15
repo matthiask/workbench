@@ -27,6 +27,7 @@ from workbench.contacts.models import Person, postal_address_choices
 from workbench.invoices.forms import (
     CreatePersonInvoiceForm,
     CreateProjectInvoiceForm,
+    RecurringInvoiceForm,
     SendReminderForm,
 )
 from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
@@ -775,12 +776,18 @@ def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter
     )
 
 
+NewInvoices = Literal[
+    tuple(key for key, _label in RecurringInvoice.NEW_INVOICES_CHOICES)
+]
+
+
 class RecurringInvoiceOut(Schema):
     id: int
     url: str
     title: str
     description: str
     customer: OrganizationOut
+    contact: PersonSummary | None
     owned_by: str
     periodicity: Periodicity
     periodicity_label: str
@@ -790,12 +797,47 @@ class RecurringInvoiceOut(Schema):
     total_excl_tax: Decimal
     total: Decimal
     third_party_costs: Decimal
+    new_invoices: NewInvoices = Field(
+        description="prepare, mark_as_sent or send (by email automatically)."
+    )
+    new_invoices_label: str
+    send_to: str = Field(description="The recipient when sending by email.")
+    mail_subject: str
+    mail_body: str
+
+
+def recurring_invoice_out(invoice, request):
+    return {
+        "id": invoice.id,
+        "url": request.build_absolute_uri(invoice.get_absolute_url()),
+        "title": invoice.title,
+        "description": invoice.description,
+        "customer": organization_out(invoice.customer, request),
+        "contact": invoice.contact and person_summary(invoice.contact, request),
+        "owned_by": invoice.owned_by.get_short_name(),
+        "periodicity": invoice.periodicity,
+        "periodicity_label": invoice.get_periodicity_display(),
+        "starts_on": invoice.starts_on,
+        "ends_on": invoice.ends_on,
+        "next_period_starts_on": invoice.next_period_starts_on,
+        "total_excl_tax": invoice.total_excl_tax,
+        "total": invoice.total,
+        "third_party_costs": invoice.third_party_costs,
+        "new_invoices": invoice.new_invoices,
+        "new_invoices_label": invoice.get_new_invoices_display(),
+        "send_to": invoice.send_to,
+        "mail_subject": invoice.mail_subject,
+        "mail_body": invoice.mail_body,
+    }
 
 
 class RecurringInvoiceFilter(Schema):
     q: SearchQuery = ""
     customer: OrganizationID = None
     owned_by: ShortName = None
+    new_invoices: NewInvoices | None = Field(
+        default=None, description="Only those creating new invoices this way."
+    )
     include_closed: bool = Field(
         default=False, description="Also those which don't renew anymore."
     )
@@ -806,7 +848,9 @@ class RecurringInvoiceFilter(Schema):
 def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
     """Recurring invoices by customer, open ones by default (those whose
     auto-renewal hasn't been canceled before today)"""
-    invoices = RecurringInvoice.objects.select_related("customer", "owned_by")
+    invoices = RecurringInvoice.objects.select_related(
+        "customer", "contact", "owned_by"
+    )
     if not filters.include_closed:
         invoices = invoices.open()
     if filters.customer:
@@ -815,24 +859,68 @@ def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
         invoices = invoices.filter(
             owned_by=user_by_short_name(filters.owned_by, param="owned_by")
         )
+    if filters.new_invoices:
+        invoices = invoices.filter(new_invoices=filters.new_invoices)
     if filters.q:
         invoices = invoices.search(filters.q)
     return Serialized(
         invoices.order_by("customer__name", "title", "pk"),
-        lambda invoice: {
-            "id": invoice.id,
-            "url": request.build_absolute_uri(invoice.get_absolute_url()),
-            "title": invoice.title,
-            "description": invoice.description,
-            "customer": organization_out(invoice.customer, request),
-            "owned_by": invoice.owned_by.get_short_name(),
-            "periodicity": invoice.periodicity,
-            "periodicity_label": invoice.get_periodicity_display(),
-            "starts_on": invoice.starts_on,
-            "ends_on": invoice.ends_on,
-            "next_period_starts_on": invoice.next_period_starts_on,
-            "total_excl_tax": invoice.total_excl_tax,
-            "total": invoice.total,
-            "third_party_costs": invoice.third_party_costs,
-        },
+        lambda invoice: recurring_invoice_out(invoice, request),
     )
+
+
+@router.get("/recurring-invoices/{int:invoice_id}/", response=RecurringInvoiceOut)
+def recurring_invoice_detail(request, invoice_id: int):
+    return recurring_invoice_out(
+        get_object_or_404(RecurringInvoice, pk=invoice_id), request
+    )
+
+
+class RecurringInvoicePatch(InputSchema):
+    """Fields which aren't given are left alone"""
+
+    new_invoices: NewInvoices | None = Field(
+        default=None,
+        description="prepare, mark_as_sent or send (by email automatically).",
+    )
+    send_to: str | None = Field(
+        default=None,
+        description="The recipient when sending by email, proposed (like the"
+        " subject and the text) when empty.",
+    )
+    mail_subject: str | None = None
+    mail_body: str | None = Field(
+        default=None,
+        description="{code}, {total}, {due_on} and {service_period} are replaced"
+        " with the values of each invoice.",
+    )
+
+
+@router.patch("/recurring-invoices/{int:invoice_id}/", response=RecurringInvoiceOut)
+def recurring_invoice_update(
+    request,
+    invoice_id: int,
+    data: RecurringInvoicePatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change how new invoices are created and sent, validated like in the
+    web interface
+
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``."""
+    invoice = get_object_or_404(RecurringInvoice, pk=invoice_id)
+    values = form_data(RecurringInvoiceForm(instance=invoice, request=request))
+    for field, value in data.model_dump(exclude_unset=True).items():
+        values[field] = value or ""
+
+    form = RecurringInvoiceForm(values, instance=invoice, request=request)
+    validate_form(form, ignore_warnings=ignore_warnings)
+
+    with transaction.atomic():
+        invoice = form.save()
+        result = recurring_invoice_out(invoice, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result

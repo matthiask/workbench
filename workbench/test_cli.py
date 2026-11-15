@@ -1675,6 +1675,52 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Hosting 2027", result.output)
 
+    def test_recurring_invoices_sending(self):
+        """Switching recurring invoices to sending by email proposes the
+        recipient and the mail"""
+        recurring = factories.RecurringInvoiceFactory.create(
+            title="Hosting", postal_address="Org\nStreet\nCity"
+        )
+        recurring.customer.accounts_payable_email = "ap@example.com"
+        recurring.customer.save()
+
+        result = self.wb(
+            "recurring-invoices", "update", recurring.pk, "--new-invoices", "send"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("ap@example.com", result.output)
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.new_invoices, recurring.SEND)
+        self.assertEqual(recurring.send_to, "ap@example.com")
+        self.assertIn("{code}", recurring.mail_subject)
+
+        result = self.wb(
+            "recurring-invoices",
+            "update",
+            recurring.pk,
+            "--send-to",
+            "billing@example.com",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("billing@example.com", result.output)
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.send_to, "ap@example.com")
+
+        result = self.wb(
+            "recurring-invoices", "update", recurring.pk, "--send-to", "nonsense"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("send_to", result.output)
+
+        result = self.wb("recurring-invoices", "search", "--new-invoices", "send")
+        self.assertIn("ap@example.com", result.output)
+        result = self.wb("recurring-invoices", "search", "--new-invoices", "prepare")
+        self.assertNotIn("Hosting", result.output)
+        result = self.wb("recurring-invoices", "show", recurring.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Send them by email", result.output)
+
     def test_invoice_reminders(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         overdue = factories.InvoiceFactory.create(

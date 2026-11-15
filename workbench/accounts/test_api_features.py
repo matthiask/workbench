@@ -28,6 +28,7 @@ class APIFeaturesTest(TestCase):
             ("get", "/api/invoices/"),
             ("post", "/api/invoices/"),
             ("get", "/api/recurring-invoices/"),
+            ("patch", "/api/recurring-invoices/1/"),
             ("get", f"/api/invoices/{invoice.pk}/"),
             ("get", f"/api/invoices/{invoice.pk}/pdf/"),
             ("get", f"/api/offers/{offer.pk}/pdf/"),
