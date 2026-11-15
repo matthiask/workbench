@@ -196,6 +196,7 @@ class PlannedWorkForm(ModelForm):
                 pass
             else:
                 initial.update({
+                    "offer": offer.pk,
                     "title": offer.title,
                     "notes": offer.description,
                     "planned_hours": offer.services.aggregate(h=Sum("service_hours"))[
@@ -215,6 +216,9 @@ class PlannedWorkForm(ModelForm):
                     "notes": service.description,
                     "planned_hours": service.service_hours,
                 })
+                # The offer's choices leave out declined offers
+                if service.offer and not service.offer.is_declined:
+                    initial["offer"] = service.offer_id
 
         if pk := request.GET.get("copy"):
             try:
@@ -385,6 +389,9 @@ class ExternalWorkForm(ModelForm):
                     "notes": service.description,
                     "planned_hours": service.service_hours,
                 })
+                # The offer's choices leave out declined offers
+                if service.offer and not service.offer.is_declined:
+                    initial["offer"] = service.offer_id
 
         # if pk := request.GET.get("copy"):
         #     try:

@@ -583,6 +583,22 @@ class PlanningTest(TestCase):
         response = self.client.get(offer.project.urls["creatework"] + "?plan_offer=bla")
         self.assertEqual(response.status_code, 200)  # No crash
 
+    def test_initialize_form_selects_offer(self):
+        """Planning work for an offer or for one of its services selects the
+        offer"""
+        offer = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(project=offer.project, offer=offer)
+        self.client.force_login(service.project.owned_by)
+
+        for query in [f"plan_offer={service.offer.pk}", f"service={service.pk}"]:
+            with self.subTest(query=query):
+                response = self.client.get(
+                    service.project.urls["creatework"] + "?" + query
+                )
+                self.assertEqual(
+                    response.context["form"]["offer"].value(), service.offer.pk
+                )
+
     def test_initialize_form_using_service(self):
         """Initializing planning requests and planned work using services"""
 
