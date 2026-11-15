@@ -2091,6 +2091,69 @@ kbd {
   font-size: 0.8rem;
 }
 
+// The chapters above the help pages (workbench/help.py), the current one
+// marked
+.wb-help-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+
+  a {
+    color: var(--bs-secondary-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--bs-link-hover-color);
+    }
+
+    &[aria-current="page"] {
+      color: var(--bs-body-color);
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-color: var(--bs-primary);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.35em;
+    }
+  }
+}
+
+// Help pages (docs/): readable line length
+.wb-help {
+  max-width: 48rem;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+  }
+
+  h3,
+  h4 {
+    font-size: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  li {
+    margin-bottom: 0.25rem;
+  }
+
+  table {
+    margin-bottom: 1rem;
+  }
+
+  th,
+  td {
+    padding: 0.35rem 1rem 0.35rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+    vertical-align: top;
+  }
+}
+
 // Timestamps: slices which still need hours or a break are marked
 .wb-slice {
   align-items: center;

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-15 14:05+0100\n"
+"POT-Creation-Date: 2026-11-15 21:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1207,7 +1207,7 @@ msgstr "Fehlende oder unvollständige Postadresse"
 #: workbench/templates/contacts/duplicates.html
 #: workbench/templates/contacts/object_list.html
 #: workbench/templates/contacts/organization_detail.html
-#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
+#: workbench/tools/xlsx.py
 msgid "people"
 msgstr "Personen"
 
@@ -1507,7 +1507,6 @@ msgid "Change a postal address of %(instance)s"
 msgstr "Postadresse von %(instance)s ändern"
 
 #: workbench/contacts/views.py workbench/templates/base.html
-#: workbench/templates/shortcuts.html
 msgid "Jump to person"
 msgstr "Zu Person springen"
 
@@ -1686,7 +1685,6 @@ msgstr "Zahlungseingänge"
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/invoices/send_reminder.html
 #: workbench/templates/projects/project_detail.html
-#: workbench/templates/shortcuts.html
 msgid "invoices"
 msgstr "Rechnungen"
 
@@ -1807,7 +1805,7 @@ msgid "This deal has no related offers to settle."
 msgstr "Dieser Deal hat keine verknüpften Offerten, die erledigt werden könnten."
 
 #: workbench/deals/apps.py workbench/deals/models.py
-#: workbench/templates/base.html workbench/templates/shortcuts.html
+#: workbench/templates/base.html
 msgid "deals"
 msgstr "Geschäfte"
 
@@ -3301,7 +3299,6 @@ msgid "break"
 msgstr "Pause"
 
 #: workbench/logbook/models.py workbench/templates/base.html
-#: workbench/templates/shortcuts.html
 msgid "breaks"
 msgstr "Pausen"
 
@@ -3478,8 +3475,7 @@ msgid "The offer has no service with this ID."
 msgstr "Die Offerte hat keine Leistung mit dieser ID."
 
 #: workbench/offers/apps.py workbench/offers/models.py
-#: workbench/templates/projects/object_list.html
-#: workbench/templates/shortcuts.html workbench/tools/pdf.py
+#: workbench/templates/projects/object_list.html workbench/tools/pdf.py
 msgid "offers"
 msgstr "Offerten"
 
@@ -4006,8 +4002,7 @@ msgstr "Die Leistungen versendeter Offerten lassen sich nicht umsortieren."
 #: workbench/projects/apps.py workbench/projects/models.py
 #: workbench/reporting/squeeze.py workbench/templates/base.html
 #: workbench/templates/projects/campaign_detail.html
-#: workbench/templates/projects/object_list.html
-#: workbench/templates/shortcuts.html workbench/tools/xlsx.py
+#: workbench/templates/projects/object_list.html workbench/tools/xlsx.py
 msgid "projects"
 msgstr "Projekte"
 
@@ -4400,7 +4395,6 @@ msgid "Worth less than the time spent"
 msgstr "Weniger wert als die aufgewendete Zeit"
 
 #: workbench/projects/views.py workbench/templates/base.html
-#: workbench/templates/shortcuts.html
 msgid "Jump to project"
 msgstr "Zu Projekt springen"
 
@@ -5169,9 +5163,8 @@ msgstr "Zahlungserinnerungen"
 msgid "Time tracking"
 msgstr "Zeiterfassung"
 
-#: workbench/templates/base.html workbench/templates/shortcuts.html
-#: workbench/templates/start.html workbench/templates/timestamps.html
-#: workbench/timer/models.py
+#: workbench/templates/base.html workbench/templates/start.html
+#: workbench/templates/timestamps.html workbench/timer/models.py
 msgid "timestamps"
 msgstr "Zeitmarken"
 
@@ -5189,9 +5182,9 @@ msgstr "Jubiläen"
 msgid "Birthdays"
 msgstr "Geburtstage"
 
-#: workbench/templates/base.html workbench/templates/shortcuts.html
-msgid "Keyboard shortcuts"
-msgstr "Tastaturkürzel"
+#: workbench/templates/base.html
+msgid "Help"
+msgstr "Hilfe"
 
 #: workbench/templates/base.html
 msgid "Admin panel"
@@ -5275,6 +5268,12 @@ msgid "This group also contains %(count)s archived contact."
 msgid_plural "This group also contains %(count)s archived contacts."
 msgstr[0] "Diese Gruppe enthält zusätzlich %(count)s archivierten Kontakt."
 msgstr[1] "Diese Gruppe enthält zusätzlich %(count)s archivierte Kontakte."
+
+#: workbench/templates/contacts/object_list.html
+#: workbench/templates/invoices/invoice_list.html
+#: workbench/templates/projects/project_detail.html
+msgid "Show"
+msgstr "Anzeigen"
 
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
@@ -5449,6 +5448,10 @@ msgstr "Weiter"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+#: workbench/templates/help.html
+msgid "Chapters of the help"
+msgstr "Kapitel der Hilfe"
+
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
 msgstr "Geschichte"
@@ -5574,11 +5577,6 @@ msgstr "Es wird nichts verrechnet, obwohl es etwas zu verrechnen gäbe. Die noch
 #: workbench/templates/offers/offer_form.html workbench/tools/pdf.py
 msgid "tax"
 msgstr "MwSt"
-
-#: workbench/templates/invoices/invoice_list.html
-#: workbench/templates/projects/project_detail.html
-msgid "Show"
-msgstr "Anzeigen"
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "Create invoices"
@@ -6511,42 +6509,6 @@ msgstr "Am"
 msgid "Only showing 100 items. Additional results have been omitted."
 msgstr "Zeige nur 100 Elemente an. Weitere Resultate wurden weggelassen."
 
-#: workbench/templates/shortcuts.html
-msgid "Search everything"
-msgstr "Alles durchsuchen"
-
-#: workbench/templates/shortcuts.html
-msgid "Focus the search form in list views"
-msgstr "Suchformular fokussieren in Listenansichten"
-
-#: workbench/templates/shortcuts.html
-msgid "Submit the current form"
-msgstr "Aktuelles Formular abschicken"
-
-#: workbench/templates/shortcuts.html
-msgid "Home"
-msgstr "Start"
-
-#: workbench/templates/shortcuts.html
-msgid "Log hours in active project or in any project if none is active"
-msgstr "Stunden in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls keins aktiv ist"
-
-#: workbench/templates/shortcuts.html
-msgid "Log hours in any project"
-msgstr "Stunden in irgendeinem Projekt eintragen"
-
-#: workbench/templates/shortcuts.html
-msgid "Log costs in active project or in any project if none is active"
-msgstr "Kosten in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls keins aktiv ist"
-
-#: workbench/templates/shortcuts.html
-msgid "Log costs in any project"
-msgstr "Kosten in irgendeinem Projekt eintragen"
-
-#: workbench/templates/shortcuts.html
-msgid "Log a break"
-msgstr "Pause erfassen"
-
 #: workbench/templates/start.html
 msgid "dashboard"
 msgstr "Dashboard"
@@ -6898,6 +6860,36 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "Keyboard shortcuts"
+#~ msgstr "Tastaturkürzel"
+
+#~ msgid "Search everything"
+#~ msgstr "Alles durchsuchen"
+
+#~ msgid "Focus the search form in list views"
+#~ msgstr "Suchformular fokussieren in Listenansichten"
+
+#~ msgid "Submit the current form"
+#~ msgstr "Aktuelles Formular abschicken"
+
+#~ msgid "Home"
+#~ msgstr "Start"
+
+#~ msgid "Log hours in active project or in any project if none is active"
+#~ msgstr "Stunden in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls keins aktiv ist"
+
+#~ msgid "Log hours in any project"
+#~ msgstr "Stunden in irgendeinem Projekt eintragen"
+
+#~ msgid "Log costs in active project or in any project if none is active"
+#~ msgstr "Kosten in aktuellem Projekt eintragen, oder in irgendeinem Projekt falls keins aktiv ist"
+
+#~ msgid "Log costs in any project"
+#~ msgstr "Kosten in irgendeinem Projekt eintragen"
+
+#~ msgid "Log a break"
+#~ msgstr "Pause erfassen"
 
 #~ msgid "invoiced from the offer"
 #~ msgstr "aus der Offerte verrechnet"

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}
+  {{ title }} - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+  {# The user documentation from docs/ (workbench/help.py) #}
+  <div class="wb-form-page wb-form-page-wide">
+    <nav class="wb-help-chapters" aria-label="{% translate 'Chapters of the help' %}">
+      {% for chapter in chapters %}
+        <a href="{{ chapter.url }}" {% if chapter.current %}aria-current="page"{% endif %}>{{ chapter.title }}</a>
+      {% endfor %}
+    </nav>
+    <div class="wb-page-header">
+      <h1 class="mb-0">{{ title }}</h1>
+    </div>
+    {# data-shortcuts: the keys say Alt instead of Ctrl except on Macs #}
+    <article class="card mb-3">
+      <div class="card-body wb-help" data-shortcuts>{{ html }}</div>
+    </article>
+  </div>
+{% endblock content %}

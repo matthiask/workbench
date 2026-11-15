@@ -7,6 +7,7 @@ from django.views.i18n import JavaScriptCatalog
 
 from workbench import views
 from workbench.api import api
+from workbench.help import help_page
 
 
 admin.site.enable_nav_sidebar = False
@@ -16,7 +17,8 @@ urlpatterns = [
     path("", views.start),
     path("needs-action/", views.needs_action, name="needs_action"),
     path("404/", render, {"template_name": "404.html"}),
-    path("shortcuts/", render, {"template_name": "shortcuts.html"}, name="shortcuts"),
+    path("help/", help_page, name="help"),
+    path("help/<slug:page>/", help_page, name="help"),
     re_path(r"^admin/", admin.site.urls),
     path("", include("workbench.accounts.urls")),
     path("contacts/", include("workbench.contacts.urls")),
@@ -36,6 +38,7 @@ urlpatterns = [
     path("", include("workbench.timer.urls")),
     path("notes/", include("workbench.notes.urls")),
     # Legacy URL redirects
+    path("shortcuts/", lambda request: redirect("help", "shortcuts")),
     re_path(
         r"^projects/projects/([0-9]+)/$",
         lambda request, pk: redirect("projects_project_detail", pk=pk),

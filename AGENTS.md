@@ -101,6 +101,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   clamps) so the browser's search finds it; long descriptions use
   `{% clamped %}`. Textareas grow with their content, `.wb-no-autogrow`
   opts out.
+- The help (`/help/`, `workbench/help.py`) renders `docs/name.md` (English)
+  and `docs/name.de.md` (German) for users. It explains Workbench, not how
+  an installation uses it (naming, rates, who plans whom belong into its
+  handbook). Update both languages in the same commit as the behaviour
+  they describe; no screenshots, they go stale.
 - Charts are server-side SVG (`bar_chart()` in `workbench/tools/charts.py`,
   `charts/bar_chart.html`), colors `.wb-series-1`…`-8`, `-muted`,
   `-neutral` (good green/blue, bad orange, neutral grey).
