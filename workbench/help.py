@@ -27,6 +27,8 @@ _NAMES = {
     "absences": "absences",
     "offers": "offers",
     "invoices": "invoices",
+    "reports": "reports",
+    "cli": "cli",
     "shortcuts": "shortcuts",
 }
 PAGES = {

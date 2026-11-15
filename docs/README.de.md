@@ -13,6 +13,9 @@ wer wen einplant), steht in ihrem Handbuch.
 - [Offerten](offers.de.md): Leistungen, Preise, Status, Kopien und PDFs
 - [Rechnungen](invoices.de.md): die Typen, Leistungsrechnungen,
   Anzahlungen, Versand, Zahlungen und Erinnerungen
+- [Berichte](reports.de.md): die Zahlen lesen, was jeder Bericht zeigt
+- [Kommandozeile und API-Tokens](cli.de.md): `wb` installieren und
+  verwenden
 - [Tastaturkürzel](shortcuts.de.md): zu Projekten und Personen springen,
   Stunden, Kosten und Pausen erfassen
 

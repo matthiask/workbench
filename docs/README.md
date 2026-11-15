@@ -13,6 +13,8 @@ whom) is in its handbook.
 - [Offers](offers.md): services, prices, statuses, copies and PDFs
 - [Invoices](invoices.md): the types, services invoices, down payments,
   sending, payments and reminders
+- [Reports](reports.md): how to read the figures, what each report shows
+- [Command line and API tokens](cli.md): installing and using `wb`
 - [Keyboard shortcuts](shortcuts.md): jumping to projects and people,
   logging hours, costs and breaks
 
