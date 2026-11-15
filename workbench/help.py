@@ -24,6 +24,8 @@ from markdown_it import MarkdownIt
 _NAMES = {
     "": "README",
     "hours": "hours",
+    "offers": "offers",
+    "invoices": "invoices",
     "shortcuts": "shortcuts",
 }
 PAGES = {

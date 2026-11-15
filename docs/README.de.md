@@ -8,6 +8,9 @@ wer wen einplant), steht in ihrem Handbuch.
 
 - [Stunden erfassen](hours.de.md): nach jeder Aufgabe, mit Zeitmarken,
   wenn das nicht geht, Pausen
+- [Offerten](offers.de.md): Leistungen, Preise, Status, Kopien und PDFs
+- [Rechnungen](invoices.de.md): die Typen, Leistungsrechnungen,
+  Anzahlungen, Versand, Zahlungen und Erinnerungen
 - [Tastaturkürzel](shortcuts.de.md): zu Projekten und Personen springen,
   Stunden, Kosten und Pausen erfassen
 

@@ -8,6 +8,9 @@ whom) is in its handbook.
 
 - [Logging hours](hours.md): after each task, with timestamps when
   that isn't possible, breaks
+- [Offers](offers.md): services, prices, statuses, copies and PDFs
+- [Invoices](invoices.md): the types, services invoices, down payments,
+  sending, payments and reminders
 - [Keyboard shortcuts](shortcuts.md): jumping to projects and people,
   logging hours, costs and breaks
 
