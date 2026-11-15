@@ -311,11 +311,12 @@
                 </div>
               {% elif projected_warning == "exceeds_service_cost" %}
                 <div class="alert alert-danger py-1 mb-0" role="alert">
-                  {% translate "Projected invoices exceed the planned service cost — please review" %}
+                  {% translate "Projected invoices exceed the budgeted work and costs — please review" %}
                   <br>
                   <small>
                     {% translate "Projected" %}: {{ projected_invoices_total|currency }},
-                    {% translate "services gross margin" %}: {{ services_gross_margin|currency }}
+                    {% translate "budgeted work and costs without third party costs" %}:
+                    {{ services_gross_margin|currency }}
                     {% if gs.total_service_third_party_costs %}
                       ({{ gs.total_service_cost|currency }} &minus;
                       {{ gs.total_service_third_party_costs|currency }} {% translate "third party costs" %})
@@ -341,7 +342,8 @@
                   <br>
                   <small>
                     {% translate "Projected" %}: {{ projected_invoices_total|currency }},
-                    {% translate "services gross margin" %}: {{ services_gross_margin|currency }}
+                    {% translate "budgeted work and costs without third party costs" %}:
+                    {{ services_gross_margin|currency }}
                     {% if gs.total_service_third_party_costs %}
                       ({{ gs.total_service_cost|currency }} &minus;
                       {{ gs.total_service_third_party_costs|currency }} {% translate "third party costs" %})
