@@ -365,9 +365,8 @@ class Offer(ModelWithTotal):
             messages.error(
                 request,
                 _(
-                    "Offers can only be created from projects. Go to the project"
-                    " and add services first, then you'll be able to create the"
-                    " offer itself."
+                    "Offers can only be created from projects: go to the project"
+                    " and create the offer there."
                 ),
             )
             return False
