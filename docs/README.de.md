@@ -10,6 +10,8 @@ wer wen einplant), steht in ihrem Handbuch.
   wenn das nicht geht, Pausen
 - [Abwesenheiten und Arbeitszeit](absences.de.md): Ferien, Krankheit und
   andere Abwesenheiten, die Jahresarbeitszeit
+- [Planung](planning.de.md): geplante Arbeit, Meilensteine, Kapazität,
+  Import
 - [Offerten](offers.de.md): Leistungen, Preise, Status, Kopien und PDFs
 - [Rechnungen](invoices.de.md): die Typen, Leistungsrechnungen,
   Anzahlungen, Versand, Zahlungen und Erinnerungen

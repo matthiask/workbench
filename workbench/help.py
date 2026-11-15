@@ -25,6 +25,7 @@ _NAMES = {
     "": "README",
     "hours": "hours",
     "absences": "absences",
+    "planning": "planning",
     "offers": "offers",
     "invoices": "invoices",
     "reports": "reports",

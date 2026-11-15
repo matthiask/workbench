@@ -10,6 +10,7 @@ whom) is in its handbook.
   that isn't possible, breaks
 - [Absences and working time](absences.md): vacation, sickness and
   other absences, the annual working time
+- [Planning](planning.md): planned work, milestones, capacity, importing
 - [Offers](offers.md): services, prices, statuses, copies and PDFs
 - [Invoices](invoices.md): the types, services invoices, down payments,
   sending, payments and reminders
