@@ -20,6 +20,8 @@ LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
 ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@feinheit.ch"
+# A shared address (e.g. hosting@) rather than a feature on purpose: the
+# notice and replies to it shouldn't expose who is responsible.
 RECURRING_INVOICES_CC = env("RECURRING_INVOICES_CC", default=[])
 KEY_DATA_API_TOKEN = env("KEY_DATA_API_TOKEN", default="")
 
