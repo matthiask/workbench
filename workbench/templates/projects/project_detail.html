@@ -821,7 +821,7 @@
         {% for invoice in object.project_invoices %}
           <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action wb-invoice">
             <span class="wb-invoice-title">{{ invoice|h }}</span>
-            <span>{{ invoice.status_badge }}</span>
+            <span class="wb-invoice-status">{{ invoice.status_badge }}</span>
             <span class="text-secondary">{{ invoice.get_type_display }}</span>
             <span class="text-end text-nowrap">{{ invoice.total_excl_tax|currency }}</span>
           </a>

@@ -116,7 +116,7 @@
           {% for invoice in invoices %}
             <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action wb-invoice">
               <span class="wb-invoice-title">{{ invoice|h }}</span>
-              <span>{{ invoice.status_badge }}</span>
+              <span class="wb-invoice-status">{{ invoice.status_badge }}</span>
               <span class="text-secondary">{{ invoice.service_period|default:"" }}</span>
               <span class="text-end text-nowrap">{% total_incl_tax invoice %}</span>
             </a>

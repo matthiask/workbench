@@ -1472,8 +1472,15 @@ a:hover {
     text-align: left;
   }
 
+  // Title and status get a row each, the type and the amount share one
   .wb-invoice {
     grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 1rem;
+  }
+
+  .wb-invoice-title,
+  .wb-invoice-status {
+    grid-column: 1 / -1;
   }
 
   .wb-row-actions {
