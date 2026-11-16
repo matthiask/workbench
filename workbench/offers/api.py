@@ -294,6 +294,11 @@ class OfferFilter(DateRangeFilter):
     external_reference: str | None = Field(
         default=None, description="Exact match of one of the references"
     )
+    without_deal: bool = Field(
+        default=False,
+        description="Only offers which aren't linked to a deal; accepted ones"
+        " count on their own in the accepted deals report.",
+    )
 
 
 @router.get("/offers/", response=list[OfferOut])
@@ -323,6 +328,8 @@ def offer_list_search(request, filters: Query[OfferFilter]):
             | Q(external_reference__endswith=f"\n{url}")
             | Q(external_reference__contains=f"\n{url}\n")
         )
+    if filters.without_deal:
+        offers = offers.filter(deals__isnull=True)
     if filters.q:
         offers = offers.search(filters.q)
     offers = filter_date_range(offers, filters, "offered_on")

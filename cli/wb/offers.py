@@ -113,6 +113,12 @@ def guidelines(path, clear):
 @click.option("--customer", type=int, help="Organization ID.")
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
 @click.option("--external-reference", help="Exact match of one of the URLs.")
+@click.option(
+    "--without-deal",
+    is_flag=True,
+    help="Only offers not linked to a deal; accepted ones count on their own"
+    " in `wb deals stats`.",
+)
 @period_options("filters the offer date")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
@@ -124,6 +130,7 @@ def search_offers(
     customer,
     owned_by,
     external_reference,
+    without_deal,
     period,
     since,
     until,
@@ -144,6 +151,8 @@ def search_offers(
         params["owned_by"] = owned_by
     if external_reference:
         params["external_reference"] = external_reference
+    if without_deal:
+        params["without_deal"] = "true"
     params |= period_params(period, since, until)
     data = request("GET", "offers/", params=params | page_params(limit, offset))
     if as_csv:

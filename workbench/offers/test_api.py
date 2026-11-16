@@ -457,6 +457,8 @@ class OffersAPITest(TestCase):
             ids(f"?customer={relaunch.project.customer_id}"), [relaunch.pk]
         )
         self.assertEqual(self.client.get("/api/offers/?status=nope").status_code, 422)
+        factories.DealFactory.create().related_offers.add(other)
+        self.assertEqual(ids("?without_deal=true"), [relaunch.pk])
 
         relaunch.offered_on = dt.date(2026, 9, 10)
         relaunch.save()

@@ -276,6 +276,7 @@ created in preparation; review and send them in Workbench.
 
     wb offers search --project 1234
     wb offers search relaunch --status offered
+    wb offers search --status accepted --without-deal --period this-year
     wb offers show 5678
     wb offers pdf 5678 --signature-line -o ~/Downloads
     wb offers update 5678 --title "Relaunch 2027" --description - < text.txt
