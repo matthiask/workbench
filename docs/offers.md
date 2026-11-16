@@ -92,9 +92,10 @@ preparation and declines those sent before.
 - "Offer history" in the project's menu lists the project's offers after
   each change of the last five years, from the audit log, with the PDF of
   every offer and of the project offers as they were then. These PDFs say
-  which version they show. Moving services alone isn't recorded, so the
-  order of services can differ from back then; services deleted since are
-  ordered by the list of service types.
+  which version they show. Before November 2026 moving services alone
+  wasn't recorded, so the order of services in older versions can differ
+  from back then; services deleted since are ordered by the list of
+  service types.
 - Offers are linked to deals on the deal ("Link offer"). Closing the deal
   accepts or declines its offers.
 

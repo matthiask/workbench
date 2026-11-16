@@ -678,9 +678,10 @@ class OffersTest(TestCase):
         # Offer has been
         # - inserted
         # - updated once because of _fts
+        # - updated once when adding the service (the order of its items)
         # - updated once when saving the form (the services skip their offer)
         actions = LoggedAction.objects.for_model(offer).with_data(id=offer.id)
-        self.assertEqual([action.action for action in actions], ["I", "U", "U"])
+        self.assertEqual([action.action for action in actions], ["I", "U", "U", "U"])
 
     def test_offer_form_orders_services(self):
         """Services are saved in the order they are shown, also when nothing

@@ -106,10 +106,11 @@ Offerte.
 - «Geschichte der Offerten» im Menü des Projekts zeigt die Offerten des
   Projekts nach jeder Änderung der letzten fünf Jahre, aus dem Audit-Log,
   mit dem PDF jeder Offerte und der Projektofferten, wie sie damals waren.
-  Diese PDFs nennen den Stand, den sie zeigen. Das blosse Verschieben von
-  Leistungen wird nicht aufgezeichnet, die Reihenfolge der Leistungen kann
-  also von damals abweichen; inzwischen gelöschte Leistungen sind nach der
-  Liste der Leistungstypen geordnet.
+  Diese PDFs nennen den Stand, den sie zeigen. Vor November 2026 wurde das
+  blosse Verschieben von Leistungen nicht aufgezeichnet, die Reihenfolge
+  der Leistungen kann in älteren Ständen also von damals abweichen;
+  inzwischen gelöschte Leistungen sind nach der Liste der Leistungstypen
+  geordnet.
 - Offerten werden auf dem Geschäft verbunden («Offerte verbinden»). Beim
   Abschliessen des Geschäfts werden seine Offerten akzeptiert oder
   abgelehnt.

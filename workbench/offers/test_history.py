@@ -2,8 +2,8 @@ from django.test import TestCase
 
 from workbench import factories
 from workbench.accounts.middleware import set_user_name
-from workbench.offers.history import offer_states
-from workbench.offers.models import Offer, OfferHeading
+from workbench.offers.history import _ordered_items, offer_states
+from workbench.offers.models import Offer, OfferHeading, save_positions
 from workbench.projects.models import Service
 from workbench.services.models import ServiceType
 from workbench.tools.validation import in_days
@@ -73,11 +73,10 @@ class OfferHistoryTest(TestCase):
         [offered] = states[1].offers(project)
         self.assertEqual(offered.status, Offer.OFFERED)
         self.assertEqual(offered.owned_by, user)
-        # The deleted service has no known position, the list of service
-        # types orders it
+        # The offer saved the order, also of the service deleted since
         self.assertEqual(
             [str(item) for item in offered.history_items],
-            ["Phase 1", "Contact form", "Workshop"],
+            ["Phase 1", "Workshop", "Contact form"],
         )
         self.assertEqual(offered.total_excl_tax, 2500)
 
@@ -110,3 +109,64 @@ class OfferHistoryTest(TestCase):
         )
         [current] = offer_states(project)[0].offers(project)
         self.assertEqual([str(item) for item in current.history_items], ["Phase 1"])
+
+    def test_reordered_services(self):
+        """Earlier states keep the order of services and headings"""
+        user = factories.UserFactory.create()
+        other = factories.UserFactory.create()
+        self.save_as(user)
+        offer = factories.OfferFactory.create(owned_by=user)
+        first = factories.ServiceFactory.create(
+            project=offer.project, offer=offer, title="First", position=10
+        )
+        second = factories.ServiceFactory.create(
+            project=offer.project, offer=offer, title="Second", position=20
+        )
+        heading = OfferHeading.objects.create(offer=offer, title="Phase", position=30)
+        offer.save()
+
+        self.save_as(other)
+        save_positions([heading, second, first])
+
+        states = offer_states(offer.project)
+        self.assertEqual(
+            [
+                [str(item) for item in s.offers(offer.project)[0].history_items]
+                for s in states
+            ],
+            [["Phase", "Second", "First"], ["First", "Second", "Phase"]],
+        )
+
+    def test_order_fallback(self):
+        """Without saved order, services without known position (deleted
+        ones) come last, ordered by the list of service types"""
+        ServiceType.objects.create(title="Consulting", hourly_rate=200, position=1)
+        ServiceType.objects.create(title="Programming", hourly_rate=150, position=0)
+        services = [
+            Service(pk=1, title="Known", position=10),
+            Service(pk=2, title="Workshop", effort_type="Consulting"),
+            Service(pk=3, title="Form", effort_type="Programming"),
+        ]
+        heading = OfferHeading(pk=1, title="Phase", position=5)
+        self.assertEqual(
+            [
+                str(item)
+                for item in _ordered_items(
+                    services, [heading], missing={2, 3}, item_order=[]
+                )
+            ],
+            ["Phase", "Known", "Form", "Workshop"],
+        )
+        # The saved order wins when it knows all items
+        self.assertEqual(
+            [
+                str(item)
+                for item in _ordered_items(
+                    services,
+                    [heading],
+                    missing={2, 3},
+                    item_order=["s3", "h1", "s2", "s1"],
+                )
+            ],
+            ["Form", "Phase", "Workshop", "Known"],
+        )

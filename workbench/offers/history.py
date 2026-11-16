@@ -7,22 +7,24 @@ matter as long as we don't go back further than the audit log is kept
 (``prune_audit()``).
 
 Changes which only move services aren't logged (``position`` is excluded
-from the audit log of ``projects_service``), so the order of services is
-the one known at the time; services without known position (deleted ones)
-are ordered by the list of service types.
+from the audit log of ``projects_service``), the offers save the order in
+``Offer.item_order``. Without it (states before the field existed), the
+order is the one known at the time; services without known position
+(deleted ones) are ordered by the list of service types.
 """
 
 import datetime as dt
 from dataclasses import dataclass, field
 
 from django.db import connection
+from django.utils import timezone
 
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
-from workbench.offers.models import Offer, OfferHeading, offer_items
+from workbench.offers.models import Offer, OfferHeading, item_keys, offer_items
 from workbench.projects.models import Service
 from workbench.services.models import ServiceType
-from workbench.tools.validation import in_days
+from workbench.tools.history import parse_array
 
 
 GAP = dt.timedelta(seconds=10)
@@ -121,7 +123,11 @@ def offer_states(project, *, years=YEARS):
     rows = _current_rows(project)
     pk = str(project.pk)
     states = []
-    for group in reversed(_groups(_actions(project, since=in_days(-366 * years)))):
+    for group in reversed(
+        _groups(
+            _actions(project, since=timezone.now() - dt.timedelta(days=366 * years))
+        )
+    ):
         last = group[-1]
         states.append(
             State(
@@ -154,16 +160,23 @@ def offer_states(project, *, years=YEARS):
 def _instance(model, row):
     instance = model()
     for f in model._meta.concrete_fields:
-        if f.column in row and f.column != "fts_document":
+        if f.column in row and f.column not in {"fts_document", "item_order"}:
             value = row[f.column]
             setattr(instance, f.attname, None if value is None else f.to_python(value))
     instance._state.adding = False
     return instance
 
 
-def _ordered_items(services, headings, *, missing):
-    """``offer_items()``, but services without known position come last,
-    ordered by the list of service types"""
+def _ordered_items(services, headings, *, missing, item_order):
+    """In the order saved on the offer, else ``offer_items()``, but services
+    without known position come last, ordered by the list of service types"""
+    keys = {key: index for index, key in enumerate(item_order)}
+    items = item_keys([*services, *headings])
+    if item_order and all(key in keys for key in items):
+        return sorted(
+            [*services, *headings],
+            key=lambda item: keys[item_keys([item])[0]],
+        )
     if not missing:
         return offer_items(services=services, headings=headings)
     type_positions = {
@@ -203,7 +216,12 @@ def build_offers(rows, project):
             for heading_row in rows["offers_offerheading"].values()
             if heading_row.get("offer_id") == row["id"]
         ]
-        offer.history_items = _ordered_items(services, headings, missing=missing)
+        offer.history_items = _ordered_items(
+            services,
+            headings,
+            missing=missing,
+            item_order=parse_array(row["item_order"]) if row.get("item_order") else [],
+        )
         offers.append(offer)
     return sorted(offers, key=lambda offer: (offer._code, offer.pk))
 

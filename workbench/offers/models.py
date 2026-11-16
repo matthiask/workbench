@@ -3,6 +3,7 @@ from functools import total_ordering
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
@@ -168,6 +169,11 @@ class Offer(ModelWithTotal):
         help_text=_("One URL per line, e.g. of issues or pull requests."),
         validators=[validate_external_reference],
     )
+    # The order of the services and headings ("s<id>", "h<id>"): the audit
+    # log doesn't record positions of services, the offer history needs it
+    item_order = ArrayField(
+        models.CharField(max_length=20), default=list, blank=True, editable=False
+    )
     is_budget_retainer = models.BooleanField(
         _("is budget retainer"),
         default=False,
@@ -239,6 +245,8 @@ class Offer(ModelWithTotal):
             self.refresh_from_db()
 
         self._fts = self.fts_text()
+        if not new:
+            self.item_order = item_keys(self.items())
 
         if new:
             super().save()
@@ -501,12 +509,23 @@ def offer_items(*, services, headings):
     )
 
 
+def item_keys(items):
+    """Keys of services and headings for ``Offer.item_order``"""
+    return [
+        f"{'h' if isinstance(item, OfferHeading) else 's'}{item.pk}" for item in items
+    ]
+
+
 def save_positions(items):
     """Positions 10, 20, ... for services and headings in this order"""
     for index, item in enumerate(items, 1):
         if item.position != 10 * index:
             item.position = 10 * index
             type(item).objects.filter(pk=item.pk).update(position=item.position)
+    for offer in Offer.objects.filter(
+        pk__in={item.offer_id for item in items if item.offer_id}
+    ):
+        Offer.objects.filter(pk=offer.pk).update(item_order=item_keys(offer.items()))
 
 
 def place_heading(heading, *, before=None):
