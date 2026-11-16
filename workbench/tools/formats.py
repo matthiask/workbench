@@ -2,8 +2,9 @@ import datetime as dt
 from decimal import Decimal
 
 from django.utils.formats import date_format
+from django.utils.html import format_html
 from django.utils.timezone import is_naive, localtime, make_aware
-from django.utils.translation import ngettext
+from django.utils.translation import gettext as _, ngettext
 
 
 Z0 = Decimal(0)
@@ -31,6 +32,19 @@ def _fmt(*, fmt, value, exp, plus_sign=False):
 
 def currency(value, plus_sign=False):  # noqa: FBT002
     return _fmt(fmt="{}{:,.2f}", value=value, exp=Z2, plus_sign=plus_sign)
+
+
+def total_incl_tax(instance):
+    """The total of an offer or invoice; amounts are excl. tax unless
+    marked, so it gets a badge if tax applies"""
+    value = currency(instance.total)
+    if not instance.liable_to_vat:
+        return value
+    return format_html(
+        '{} <span class="badge text-bg-light wb-tax-badge">{}</span>',
+        value,
+        _("incl. tax"),
+    )
 
 
 def days(value, plus_sign=False):  # noqa: FBT002

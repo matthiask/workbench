@@ -7,7 +7,7 @@
     {% link_or_none object.invoice with_badge=True %}
     {% if object.invoice %}
       <div class="text-secondary">
-        {% translate 'invoice total'|capfirst %}: {{ object.invoice.total|currency }}
+        {% translate 'invoice total'|capfirst %}: {% total_incl_tax object.invoice %}
       </div>
     {% endif %}
   </dd>

@@ -20,7 +20,15 @@ from workbench.logbook.models import LoggedHours
 from workbench.notes.models import Note
 from workbench.projects.models import Project, Service
 from workbench.reporting.utils import sum_by
-from workbench.tools.formats import Z1, Z2, currency, days, hours, local_date_format
+from workbench.tools.formats import (
+    Z1,
+    Z2,
+    currency,
+    days,
+    hours,
+    local_date_format,
+    total_incl_tax,
+)
 from workbench.tools.forms import querystring as _qs
 from workbench.tools.history import EVERYTHING
 from workbench.tools.markdown import render_markdown
@@ -32,6 +40,7 @@ register = template.Library()
 register.filter(currency)
 register.filter(days)
 register.filter(hours)
+register.simple_tag(total_incl_tax)
 
 
 @register.filter
@@ -461,18 +470,4 @@ def clamped(text, external_reference="", css_class=""):
         )
         if rest_html
         else "",
-    )
-
-
-@register.simple_tag
-def total_incl_tax(instance):
-    """The total of an offer or invoice; amounts are excl. tax unless
-    marked, so it gets a badge if tax applies"""
-    value = currency(instance.total)
-    if not instance.liable_to_vat:
-        return value
-    return format_html(
-        '{} <span class="badge text-bg-light wb-tax-badge">{}</span>',
-        value,
-        _("incl. tax"),
     )

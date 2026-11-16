@@ -8,7 +8,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.invoices.models import Invoice
-from workbench.tools.formats import currency, local_date_format
+from workbench.tools.formats import currency, local_date_format, total_incl_tax
 from workbench.tools.forms import Autocomplete, DateInput, Form, ModelForm, Textarea
 
 
@@ -227,7 +227,7 @@ class AssignCreditEntriesForm(forms.Form):
                                 if invoice.invoiced_on
                                 else gettext("NO DATE YET"),
                                 "<br>",
-                                currency(invoice.total),
+                                total_incl_tax(invoice),
                                 format_html(
                                     "<br><span style='color:darkred'>{}: {}</span>",
                                     _("third party costs"),

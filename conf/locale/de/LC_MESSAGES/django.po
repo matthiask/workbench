@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 07:32+0100\n"
+"POT-Creation-Date: 2026-11-16 07:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1637,6 +1637,7 @@ msgstr "Valuta"
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/invoices/reminders.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/_budget_statistics_table.html
 #: workbench/templates/reporting/accepted_deals.html
@@ -2771,7 +2772,7 @@ msgstr "Storniert am %(day)s"
 msgid "Service period %s"
 msgstr "Leistungszeitraum %s"
 
-#: workbench/invoices/models.py workbench/templates/invoices/reminders.html
+#: workbench/invoices/models.py
 msgid "Total excl. tax"
 msgstr "Total exkl. MwSt"
 
@@ -6603,10 +6604,6 @@ msgstr "%(value)s von %(one)s (%(percentage)s%%)"
 msgid "%(percentage)s%% (%(surcharge)s%% surcharges)"
 msgstr "%(percentage)s%% (davon %(surcharge)s%% Zuschläge)"
 
-#: workbench/templatetags/workbench.py
-msgid "incl. tax"
-msgstr "inkl. MwSt"
-
 #: workbench/timer/api.py
 msgid "This service doesn't exist."
 msgstr "Diese Leistung existiert nicht."
@@ -6700,6 +6697,10 @@ msgstr "Nicht im Team %(team)s: %(users)s"
 #: workbench/tools/csv.py
 msgid "Export selected items as CSV"
 msgstr "Ausgewählte Objekte als CSV exportieren"
+
+#: workbench/tools/formats.py
+msgid "incl. tax"
+msgstr "inkl. MwSt"
 
 #: workbench/tools/formats.py
 #, python-format
