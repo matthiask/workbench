@@ -50,6 +50,11 @@
         <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
         {% if object.status == object.OPEN or object.status == object.ACCEPTED %}
           <a href="{{ object.urls.add_offer }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Link offer' %}</a>
+          <a
+            href="{{ object.urls.add_project }}"
+            class="btn btn-quiet"
+            data-ajaxmodal
+          >{% translate 'Link project' %}</a>
         {% endif %}
         <span class="dropdown">
           <button
@@ -145,6 +150,31 @@
               <div class="list-group-item text-secondary">{% translate 'No related offers' %}</div>
             {% endfor %}
           </div>
+          {% with projects=object.get_related_projects %}
+            {% if projects %}
+              <div class="card-header border-top">{{ object|label:'related_projects' }}</div>
+              <div class="list-group list-group-flush">
+                {% for project in projects %}
+                  <div class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                    <div class="min-w-0">{% link_or_none project with_badge=True %}</div>
+                    {% if object.status == object.OPEN or object.status == object.ACCEPTED %}
+                      <form method="post" action="{{ object.urls.remove_project }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="modal-project" value="{{ project.pk }}">
+                        <button
+                          type="submit"
+                          title="{% translate 'Unlink project' %}"
+                          class="btn btn-quiet btn-sm btn-icon"
+                        >
+                          {% include 'svg/x.svg' %}
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
         </section>
       </div>
     </div>

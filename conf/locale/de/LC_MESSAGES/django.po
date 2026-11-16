@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 17:17+0100\n"
+"POT-Creation-Date: 2026-11-16 17:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1805,6 +1805,11 @@ msgstr "Unbekannte Offerte %r, erwartet wird eine ID oder ein Code wie %s."
 msgid "This deal has no related offers to settle."
 msgstr "Dieser Deal hat keine verknüpften Offerten, die erledigt werden könnten."
 
+#: workbench/deals/api.py
+#, python-format
+msgid "Unknown project %r, expected an ID or a code like %s."
+msgstr "Unbekanntes Projekt %r, erwartet wird eine ID oder ein Code wie %s."
+
 #: workbench/deals/apps.py workbench/deals/models.py
 #: workbench/templates/base.html
 msgid "deals"
@@ -1945,6 +1950,30 @@ msgstr "Die Offerte %(offer)s hat den Status «%(status)s», nur Offerten in Vor
 msgid "The offer %(offer)s belongs to a project of %(customer)s, not of the deal's customer %(deal_customer)s."
 msgstr "Die Offerte %(offer)s gehört zu einem Projekt von %(customer)s, nicht vom Kunden des Geschäfts, %(deal_customer)s."
 
+#: workbench/deals/forms.py
+
+msgid "Projects can only be linked to and unlinked from open or accepted deals."
+msgstr "Projekte lassen sich nur mit offenen oder akzeptierten Geschäften verbinden und von ihnen lösen."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The project %(project)s isn't linked to this deal."
+msgstr "Das Projekt %(project)s ist nicht mit diesem Geschäft verbunden."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The project %(project)s is already linked to this deal."
+msgstr "Das Projekt %(project)s ist bereits mit diesem Geschäft verbunden."
+
+#: workbench/deals/forms.py
+msgid "Internal projects can't be linked to deals."
+msgstr "Interne Projekte lassen sich nicht mit Geschäften verbinden."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The project %(project)s belongs to %(customer)s, not to the deal's customer %(deal_customer)s."
+msgstr "Das Projekt %(project)s gehört zu %(customer)s, nicht zum Kunden des Geschäfts, %(deal_customer)s."
+
 #: workbench/deals/models.py
 msgid "is required"
 msgstr "ist obligatorisch"
@@ -2043,6 +2072,11 @@ msgstr "Abschlussnotiz"
 msgid "related offers"
 msgstr "verbundene Offerten"
 
+#: workbench/deals/models.py
+
+msgid "related projects"
+msgstr "verbundene Projekte"
+
 #: workbench/deals/models.py workbench/templates/deals/deal_form.html
 msgid "driving force"
 msgstr "treibende Kraft"
@@ -2122,6 +2156,21 @@ msgstr "Offerte mit Geschäft %(deal)s verbinden"
 #, python-format
 msgid "Successfully removed the offer %(offer)s as a related offer."
 msgstr "Die Offerte %(offer)s wurde erfolgreich von den zugehörigen Offerten entfernt."
+
+#: workbench/deals/views.py
+#, python-format
+msgid "Successfully linked the project %(project)s."
+msgstr "Das Projekt %(project)s wurde verbunden."
+
+#: workbench/deals/views.py
+#, python-format
+msgid "Link project to %(deal)s"
+msgstr "Projekt mit Geschäft %(deal)s verbinden"
+
+#: workbench/deals/views.py
+#, python-format
+msgid "Successfully unlinked the project %(project)s."
+msgstr "Das Projekt %(project)s wurde gelöst."
 
 #: workbench/expenses/apps.py workbench/expenses/forms.py
 #: workbench/logbook/forms.py
@@ -5368,6 +5417,11 @@ msgstr "Letzte Rechnungen"
 msgid "Recent offers"
 msgstr "Letzte Offerten"
 
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+msgid "Recent deals"
+msgstr "Letzte Geschäfte"
+
 #: workbench/templates/contacts/organization_duplicates.html
 msgid "Organizations with the same name or email address, archived ones included."
 msgstr "Organisationen mit demselben Namen oder derselben E-Mail-Adresse, auch archivierte."
@@ -5383,10 +5437,6 @@ msgstr "Maps"
 #: workbench/templates/contacts/person_detail.html
 msgid "Merge into this person"
 msgstr "Mit dieser Person zusammenführen"
-
-#: workbench/templates/contacts/person_detail.html
-msgid "Recent deals"
-msgstr "Letzte Geschäfte"
 
 #: workbench/templates/contacts/person_form.html
 #, python-format
@@ -5433,12 +5483,22 @@ msgid "Link offer"
 msgstr "Offerte verbinden"
 
 #: workbench/templates/deals/deal_detail.html
+
+msgid "Link project"
+msgstr "Projekt verbinden"
+
+#: workbench/templates/deals/deal_detail.html
 msgid "Unlink offer"
 msgstr "Offerte entfernen"
 
 #: workbench/templates/deals/deal_detail.html
 msgid "No related offers"
 msgstr "Keine verbundenen Offerten"
+
+#: workbench/templates/deals/deal_detail.html
+
+msgid "Unlink project"
+msgstr "Projekt lösen"
 
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/invoices/invoice_detail.html

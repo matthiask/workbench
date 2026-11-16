@@ -2050,6 +2050,20 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(set(deal.related_offers.all()), {offer, other})
 
+        # Projects, e.g. maintenance sold without offer
+        result = self.wb("deals", "projects", "add", deal.pk, offer.project.code)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(deal.related_projects.get(), offer.project)
+        self.assertIn(offer.project.code, self.wb("deals", "show", deal.pk).output)
+        result = self.wb(
+            "deals", "projects", "remove", deal.pk, offer.project.code, "--dry-run"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(deal.related_projects.count(), 1)
+        result = self.wb("deals", "projects", "remove", deal.pk, offer.project.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertFalse(deal.related_projects.exists())
+
     def test_deal_stats(self):
         deal = factories.DealFactory.create(
             title="Relaunch",

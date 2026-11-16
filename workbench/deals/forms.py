@@ -20,6 +20,7 @@ from workbench.deals.models import (
     ValueType,
 )
 from workbench.offers.models import Offer
+from workbench.projects.models import Project
 from workbench.tools.formats import Z2
 from workbench.tools.forms import (
     Autocomplete,
@@ -659,3 +660,72 @@ class RelatedOfferForm(Form):
         else:
             self.deal.related_offers.add(offer)
         return offer
+
+
+@add_prefix("modal")
+class RelatedProjectForm(Form):
+    """Link a project to an open or accepted deal, or unlink it with
+    ``remove=True``, e.g. for maintenance sold without offer: the accepted
+    deals report counts the invoices of maintenance projects without deal on
+    their own. Nothing else changes."""
+
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        widget=Autocomplete(model=Project),
+        label="",
+    )
+
+    def __init__(self, *args, deal, remove=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.deal = deal
+        self.remove = remove
+
+    def clean(self):
+        data = super().clean()
+        if self.deal.status not in {Deal.OPEN, Deal.ACCEPTED}:
+            raise ValidationError(
+                _(
+                    "Projects can only be linked to and unlinked from open or"
+                    " accepted deals."
+                )
+            )
+        if not (project := data.get("project")):
+            return data
+        linked = self.deal.related_projects.filter(pk=project.pk).exists()
+        if self.remove:
+            if not linked:
+                self.add_error(
+                    "project",
+                    _("The project %(project)s isn't linked to this deal.")
+                    % {"project": project.code},
+                )
+        elif linked:
+            self.add_error(
+                "project",
+                _("The project %(project)s is already linked to this deal.")
+                % {"project": project.code},
+            )
+        elif project.type == Project.INTERNAL:
+            self.add_error("project", _("Internal projects can't be linked to deals."))
+        elif project.customer_id != self.deal.customer_id:
+            self.add_warning(
+                _(
+                    "The project %(project)s belongs to %(customer)s, not to the"
+                    " deal's customer %(deal_customer)s."
+                )
+                % {
+                    "project": project.code,
+                    "customer": project.customer,
+                    "deal_customer": self.deal.customer,
+                },
+                code="other-customer",
+            )
+        return data
+
+    def save(self):
+        project = self.cleaned_data["project"]
+        if self.remove:
+            self.deal.related_projects.remove(project)
+        else:
+            self.deal.related_projects.add(project)
+        return project

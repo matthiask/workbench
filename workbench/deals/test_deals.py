@@ -15,6 +15,7 @@ from workbench.invoices.models import Invoice
 from workbench.management.commands.analyze_deals import gross_margin_projection
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
+from workbench.projects.models import Project
 from workbench.templatetags.workbench import deal_group
 from workbench.tools.formats import local_date_format
 from workbench.tools.forms import WarningsForm
@@ -931,6 +932,55 @@ class DealsTest(TestCase):
         Deal.objects.filter(pk=deal.pk).update(status=Deal.DECLINED)
         response = self.client.post(deal.urls["add_offer"], {"modal-offer": offered.pk})
         self.assertContains(response, "only be linked to")
+
+    def test_related_projects(self):
+        """Projects are linked to open and accepted deals, e.g. maintenance
+        sold without offer, so that the accepted deals report doesn't count
+        their invoices on their own"""
+        deal = factories.DealFactory.create(status=Deal.ACCEPTED, closed_on=in_days(-1))
+        project = factories.ProjectFactory.create(
+            customer=deal.customer, type=Project.MAINTENANCE
+        )
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.get(deal.urls["detail"])
+        self.assertContains(response, deal.urls["add_project"])
+
+        response = self.client.post(
+            deal.urls["add_project"], {"modal-project": project.pk}
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(deal.related_projects.get(), project)
+        response = self.client.post(
+            deal.urls["add_project"], {"modal-project": project.pk}
+        )
+        self.assertContains(response, "is already linked to this deal")
+
+        internal = factories.ProjectFactory.create(
+            customer=deal.customer, type=Project.INTERNAL
+        )
+        response = self.client.post(
+            deal.urls["add_project"], {"modal-project": internal.pk}
+        )
+        self.assertContains(response, "Internal projects")
+
+        other = factories.ProjectFactory.create()
+        response = self.client.post(
+            deal.urls["add_project"], {"modal-project": other.pk}
+        )
+        self.assertContains(response, "belongs to")
+
+        response = self.client.post(
+            deal.urls["remove_project"], {"modal-project": project.pk}
+        )
+        self.assertRedirects(response, deal.urls["detail"])
+        self.assertFalse(deal.related_projects.exists())
+
+        Deal.objects.filter(pk=deal.pk).update(status=Deal.DECLINED)
+        response = self.client.post(
+            deal.urls["add_project"], {"modal-project": project.pk}
+        )
+        self.assertContains(response, "open or accepted deals")
 
     def test_decline_related_offer_with_planned_work(self):
         """Declining a related offer through a deal forces a decision about

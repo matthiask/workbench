@@ -428,6 +428,54 @@ def remove_deal_offers(deal_id, offers, dry_run, as_json):
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
 
 
+@deals.group("projects")
+def deal_projects():
+    """Link projects to deals and unlink them
+
+    For work sold without offer, e.g. maintenance: `wb deals stats` counts
+    the invoices of maintenance projects without deal on their own, linked
+    projects are covered by their deal. Projects are given by ID or code."""
+
+
+@deal_projects.command("add")
+@click.argument("deal_id", type=int)
+@click.argument("projects", nargs=-1, required=True)
+@ignore_warnings_option
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def add_deal_projects(deal_id, projects, ignore_warnings, dry_run, as_json):
+    """Link projects to an open or accepted deal
+
+    Nothing else changes. Internal projects are rejected, projects of other
+    customers are a warning (other-customer)."""
+    data = request(
+        "POST",
+        f"deals/{deal_id}/projects/",
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
+        json={"projects": list(projects)},
+    )
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
+@deal_projects.command("remove")
+@click.argument("deal_id", type=int)
+@click.argument("projects", nargs=-1, required=True)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def remove_deal_projects(deal_id, projects, dry_run, as_json):
+    """Unlink projects from an open or accepted deal"""
+    data = request(
+        "POST",
+        f"deals/{deal_id}/projects/remove/",
+        params={"dry_run": format_bool(dry_run)},
+        json={"projects": list(projects)},
+    )
+    _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)
+
+
 @deals.command("stats")
 @period_options("defaults to this week")
 @users_options
@@ -680,6 +728,13 @@ def _echo_deal(data):
                 ", ".join(
                     f"{offer['code']} (ID {offer['id']}, {offer['status']})"
                     for offer in data["related_offers"]
+                ),
+            ),
+            (
+                "Related projects",
+                ", ".join(
+                    f"{project['code']} {project['title']}"
+                    for project in data.get("related_projects", [])
                 ),
             ),
             ("URL", data["url"]),

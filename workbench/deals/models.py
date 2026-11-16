@@ -183,6 +183,14 @@ class Deal(Model):
         related_name="deals",
         verbose_name=_("related offers"),
     )
+    # Work sold without offer, e.g. maintenance: the accepted deals report
+    # counts invoices of maintenance projects without deal on their own
+    related_projects = models.ManyToManyField(
+        "projects.Project",
+        blank=True,
+        related_name="deals",
+        verbose_name=_("related projects"),
+    )
 
     contributors = models.ManyToManyField(
         User,
@@ -204,6 +212,9 @@ class Deal(Model):
 
     def get_related_offers(self):
         return self.related_offers.select_related("owned_by", "project")
+
+    def get_related_projects(self):
+        return self.related_projects.select_related("owned_by")
 
     def fts_text(self):
         return " ".join(

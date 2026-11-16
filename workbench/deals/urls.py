@@ -52,6 +52,16 @@ urlpatterns = [
         name="deals_deal_remove_offer",
     ),
     path(
+        "<int:pk>/add-project/",
+        deals_only(views.add_project),
+        name="deals_deal_add_project",
+    ),
+    path(
+        "<int:pk>/remove-project/",
+        deals_only(views.remove_project),
+        name="deals_deal_remove_project",
+    ),
+    path(
         "<int:pk>/delete/",
         deals_only(generic.DeleteView.as_view(model=Deal)),
         name="deals_deal_delete",

@@ -6,6 +6,7 @@ from typing import Literal
 
 from django.db import transaction
 from django.db.models.functions import Coalesce
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.html import strip_tags
@@ -21,7 +22,12 @@ from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, DealProbability, DealStatus, OfferStatus, key
 from workbench.contacts.api import OrganizationOut, organization_out
 from workbench.contacts.models import Person
-from workbench.deals.forms import DealForm, RelatedOfferForm, SetStatusForm
+from workbench.deals.forms import (
+    DealForm,
+    RelatedOfferForm,
+    RelatedProjectForm,
+    SetStatusForm,
+)
 from workbench.deals.models import (
     AttributeGroup,
     ClosingType,
@@ -32,6 +38,7 @@ from workbench.deals.models import (
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.offers.models import Offer
 from workbench.projects.api import ProjectSummary, project_summary
+from workbench.projects.models import Project
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     Amount,
@@ -102,6 +109,9 @@ class DealOut(Schema):
     contributors: list[str]
     contributions: list[ContributionOut]
     related_offers: list[RelatedOfferOut]
+    related_projects: list[ProjectSummary] = Field(
+        description="Projects of work sold without offer, e.g. maintenance."
+    )
 
 
 def deal_out(deal, request):
@@ -146,6 +156,9 @@ def deal_out(deal, request):
             }
             for offer in deal.related_offers.all()
         ],
+        "related_projects": [
+            project_summary(project, request) for project in deal.related_projects.all()
+        ],
     }
 
 
@@ -158,6 +171,7 @@ def with_related(deals):
         "contributors",
         "contributions__user",
         "related_offers__project",
+        "related_projects",
     )
 
 
@@ -895,36 +909,70 @@ def _offer(value):
     return next((offer for offer in candidates if offer.code == value), None)
 
 
+def _project(value):
+    """The project with this ID or code, or ``None``"""
+    try:
+        return by_id_or_code(Project.objects.all(), value)
+    except Http404:
+        return None
+
+
 def _change_related_offers(request, deal_id, data, *, remove, ignore_warnings, dry_run):
+    return _change_related(
+        request,
+        deal_id,
+        data.offers,
+        field="offer",
+        lookup=_offer,
+        form_class=RelatedOfferForm,
+        unknown=_("Unknown offer %r, expected an ID or a code like %s."),
+        example="2026-0179-o02",
+        remove=remove,
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+    )
+
+
+def _change_related(
+    request,
+    deal_id,
+    values,
+    *,
+    field,
+    lookup,
+    form_class,
+    unknown,
+    example,
+    remove,
+    ignore_warnings,
+    dry_run,
+):
+    """Link offers or projects to the deal or unlink them, all or nothing"""
     deal = get_object_or_404(Deal, pk=deal_id)
     errors = []
     forms = []
     seen = set()
-    for index, value in enumerate(data.offers):
-        loc = ["body", "data", "offers", index]
-        offer = _offer(str(value).strip().casefold())
-        if not offer:
-            errors.append({
-                "loc": loc,
-                "msg": _("Unknown offer %r, expected an ID or a code like %s.")
-                % (value, "2026-0179-o02"),
-            })
+    for index, value in enumerate(values):
+        loc = ["body", "data", f"{field}s", index]
+        obj = lookup(str(value).strip().casefold())
+        if not obj:
+            errors.append({"loc": loc, "msg": unknown % (value, example)})
             continue
-        if offer.pk in seen:
+        if obj.pk in seen:
             continue
-        seen.add(offer.pk)
-        form = RelatedOfferForm(
-            {"modal-offer": offer.pk}, deal=deal, remove=remove, request=request
+        seen.add(obj.pk)
+        form = form_class(
+            {f"modal-{field}": obj.pk}, deal=deal, remove=remove, request=request
         )
         if form.is_valid(ignore_warnings=True) and not (
             set(form.warnings) - set(ignore_warnings)
         ):
             forms.append(form)
             continue
-        for field, messages in form.errors.items():
+        for name, messages in form.errors.items():
             for message in messages:
                 error = {
-                    "loc": loc if field == "offer" else ["body", "data"],
+                    "loc": loc if name == field else ["body", "data"],
                     "msg": message,
                 }
                 if error not in errors:
@@ -984,5 +1032,69 @@ def deal_offers_remove(
     Offers which aren't linked are rejected. Nothing is saved if anything is
     invalid or with ``dry_run``."""
     return _change_related_offers(
+        request, deal_id, data, remove=True, ignore_warnings=(), dry_run=dry_run
+    )
+
+
+class RelatedProjects(InputSchema):
+    projects: list[int | str] = Field(
+        min_length=1, description="IDs or codes of projects, e.g. 2026-0179."
+    )
+
+
+def _change_related_projects(
+    request, deal_id, data, *, remove, ignore_warnings, dry_run
+):
+    return _change_related(
+        request,
+        deal_id,
+        data.projects,
+        field="project",
+        lookup=_project,
+        form_class=RelatedProjectForm,
+        unknown=_("Unknown project %r, expected an ID or a code like %s."),
+        example="2026-0179",
+        remove=remove,
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+    )
+
+
+@router.post("/deals/{deal_id}/projects/", response=DealOut)
+def deal_projects_add(
+    request,
+    deal_id: int,
+    data: RelatedProjects,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Link projects to an open or accepted deal like in the web interface
+
+    For work sold without offer, e.g. maintenance: the accepted deals report
+    counts the invoices of maintenance projects without deal on their own,
+    linked projects are covered by their deal. Nothing else changes. Internal
+    projects are rejected, projects of other customers are a warning
+    (``other-customer``). Nothing is saved if anything is invalid or with
+    ``dry_run``."""
+    return _change_related_projects(
+        request,
+        deal_id,
+        data,
+        remove=False,
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+    )
+
+
+@router.post("/deals/{deal_id}/projects/remove/", response=DealOut)
+def deal_projects_remove(
+    request, deal_id: int, data: RelatedProjects, *, dry_run: DryRun = False
+):
+    """Unlink projects from an open or accepted deal
+
+    Projects which aren't linked are rejected. Nothing is saved if anything
+    is invalid or with ``dry_run``."""
+    return _change_related_projects(
         request, deal_id, data, remove=True, ignore_warnings=(), dry_run=dry_run
     )
