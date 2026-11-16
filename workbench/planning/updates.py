@@ -546,6 +546,13 @@ def changes_mails():
         ] + a.get(user, [])
         if all(set(obj["by"]) == {user} for obj in objects):
             continue
+        # Replies go to the others who made the changes
+        by = sorted({
+            other.email
+            for obj in objects
+            for other in obj["by"]
+            if other != user and other.is_active
+        })
         mail = render_to_mail(
             "planning/changes_mail",
             {
@@ -555,7 +562,7 @@ def changes_mails():
                 "WORKBENCH": settings.WORKBENCH,
             },
             to=[user.email],
-            reply_to=[user.email],
+            reply_to=by or [user.email],
         )
         mail.send()
 

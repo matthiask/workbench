@@ -110,7 +110,8 @@ class ChangesTest(TestCase):
     @travel("2021-10-18")
     def test_own_changes(self):
         """Nobody gets a mail listing only their own changes, but others'
-        changes come with their own ones"""
+        changes come with their own ones; replies go to the others who made
+        the changes"""
         user = self.set_current_user()
         pw = factories.PlannedWorkFactory.create(user=user, weeks=[in_days(7)])
         owner = pw.project.owned_by
@@ -123,6 +124,7 @@ class ChangesTest(TestCase):
 
         updates.changes_mails()
         self.assertEqual([m.to for m in mail.outbox], [[owner.email]])
+        self.assertEqual(mail.outbox[0].reply_to, [user.email])
 
         mail.outbox = []
         set_user_name(f"user-{owner.pk}-{owner.get_short_name()}")
@@ -133,6 +135,7 @@ class ChangesTest(TestCase):
         [own] = [m for m in mail.outbox if m.to == [user.email]]
         self.assertIn("Updated: ", own.body)
         self.assertIn("Created: ", own.body)
+        self.assertEqual(own.reply_to, [owner.email])
 
     @travel("2021-10-18")
     def test_absence_changes(self):
