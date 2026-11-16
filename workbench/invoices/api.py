@@ -337,6 +337,7 @@ class ReminderSent(Schema):
     to: list[str]
     cc: list[str]
     bcc: list[str]
+    reply_to: list[str]
     invoices: list[InvoiceOut]
     sent: bool
 

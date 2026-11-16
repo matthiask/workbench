@@ -1730,14 +1730,21 @@ class SendReminderForm(Form):
         self.fields["email"] = forms.EmailField(label=_("email"))
 
     def recipients(self, to):
-        """The recipient, the owners of the invoices and the sender in copy"""
+        """The recipient, the owners of the invoices and the sender in copy,
+        replies go to the sender and the owners"""
+        owners = sorted({
+            invoice.owned_by.email
+            for invoice in self.invoices
+            if invoice.owned_by.is_active
+        })
+        sender = settings.WORKBENCH.REMINDER_FROM_EMAIL
         return {
             "to": [to],
-            "cc": sorted({
-                invoice.owned_by.email
-                for invoice in self.invoices
-                if invoice.owned_by.is_active
-            }),
+            "cc": owners,
+            "reply_to": [
+                *([sender] if sender and sender not in owners else []),
+                *owners,
+            ],
             "bcc": [
                 email
                 for email in [

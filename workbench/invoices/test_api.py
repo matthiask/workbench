@@ -1,6 +1,8 @@
 import datetime as dt
+from unittest import mock
 from unittest.mock import ANY
 
+from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -348,6 +350,9 @@ class InvoicesAPITest(TestCase):
         invoice.save()
         self.assertEqual(post({"until": None}).status_code, 409)
 
+    @mock.patch.object(
+        settings.WORKBENCH, "REMINDER_FROM_EMAIL", "bookkeeping@example.com"
+    )
     def test_send_reminder(self):
         """Reminders are previewed without a recipient and sent with one"""
         invoice = factories.InvoiceFactory.create(
@@ -391,6 +396,11 @@ class InvoicesAPITest(TestCase):
         self.assertTrue(response.json()["sent"])
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["billing@example.com"])
+        # Replies reach the bookkeeping and the owners
+        self.assertEqual(
+            mail.outbox[0].reply_to,
+            ["bookkeeping@example.com", invoice.owned_by.email],
+        )
         invoice.refresh_from_db()
         self.assertEqual(invoice.last_reminded_on, dt.date.today())
 

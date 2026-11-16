@@ -95,20 +95,22 @@ def recurring_proposal(recurring_invoice, email):
 
 
 def invoice_mail(invoice, *, to, subject, body):
-    """The mail with the PDF to ``to``, the owner in Cc and Reply-To"""
+    """The mail with the PDF to ``to``, the owner in Cc, the owner and the
+    sender in Reply-To"""
     owner = [invoice.owned_by.email] if invoice.owned_by.is_active else []
+    sender = [
+        email
+        for email in [settings.WORKBENCH.REMINDER_FROM_EMAIL]
+        if email and email not in owner
+    ]
     mail = EmailMultiAlternatives(
         fill(subject, invoice),
         fill("\n".join(body.splitlines()), invoice),
         from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
         to=[to],
         cc=owner,
-        reply_to=owner,
-        bcc=[
-            email
-            for email in [settings.WORKBENCH.REMINDER_FROM_EMAIL]
-            if email and email not in owner
-        ],
+        reply_to=owner + sender,
+        bcc=sender,
     )
     with io.BytesIO() as buf, override(settings.WORKBENCH.PDF_LANGUAGE):
         pdf = PDFDocument(buf)

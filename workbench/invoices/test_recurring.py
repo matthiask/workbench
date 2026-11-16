@@ -1,6 +1,8 @@
 import datetime as dt
 from decimal import Decimal
+from unittest import mock
 
+from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.utils.translation import deactivate_all
@@ -493,6 +495,9 @@ class RecurringTest(TestCase):
         self.assertEqual(invoices[0].due_on, in_days(-49 + 15))
         self.assertEqual(invoices[0].service_period_from, in_days(-70))
 
+    @mock.patch.object(
+        settings.WORKBENCH, "REMINDER_FROM_EMAIL", "bookkeeping@example.com"
+    )
     def test_send_automatically(self):
         """Recurring invoices may send their invoices to the first suggested
         address; frozen invoice dates move to the day after the freeze date"""
@@ -532,7 +537,9 @@ class RecurringTest(TestCase):
         message = mail.outbox[1]
         self.assertEqual(message.to, ["contact@example.com"])
         self.assertEqual(message.cc, [r.owned_by.email])
-        self.assertEqual(message.reply_to, [r.owned_by.email])
+        self.assertEqual(
+            message.reply_to, [r.owned_by.email, "bookkeeping@example.com"]
+        )
         self.assertIn(invoices[1].code, message.subject)
         self.assertIn(local_date_format(invoices[1].due_on), message.body)
         self.assertEqual(len(message.attachments), 1)

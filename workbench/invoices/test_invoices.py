@@ -3,6 +3,7 @@ import io
 from decimal import Decimal
 from unittest import mock
 
+from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
@@ -2406,9 +2407,12 @@ class InvoicesTest(TestCase):
             "modal-body": "Anbei die Rechnung.",
         } | {f"modal-{key}": value for key, value in kwargs.items()}
 
+    @mock.patch.object(
+        settings.WORKBENCH, "REMINDER_FROM_EMAIL", "bookkeeping@example.com"
+    )
     def test_send(self):
         """Invoices in preparation are released and mailed to the customer
-        with the PDF, the owner in Cc and Reply-To; invoiced today, due in
+        with the PDF, the owner in Cc, the owner and the sender in Reply-To; invoiced today, due in
         15 days; the proposed subject and text can be edited"""
         invoice = factories.InvoiceFactory.create(
             invoiced_on=in_days(-10),
@@ -2461,7 +2465,10 @@ class InvoicesTest(TestCase):
         message = mail.outbox[0]
         self.assertEqual(message.to, ["contact@example.com"])
         self.assertEqual(message.cc, [invoice.owned_by.email])
-        self.assertEqual(message.reply_to, [invoice.owned_by.email])
+        # Replies reach the owner and the bookkeeping
+        self.assertEqual(
+            message.reply_to, [invoice.owned_by.email, "bookkeeping@example.com"]
+        )
         self.assertEqual(message.subject, "Ihre Rechnung")
         # The due date is replaced, unknown placeholders stay
         self.assertEqual(
