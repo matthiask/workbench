@@ -39,8 +39,8 @@ Daten.
 - **Projekt-Budgetstatistik**: pro Projekt, was verkauft wurde, die
   erfassten Leistungen zu den Ansätzen der Leistungen, was verrechnet
   wurde, und die Differenz: noch nicht verrechnete Arbeit oder im Voraus
-  verrechnet (Abgrenzungen). Stunden auf Leistungen ohne Stundensatz
-  werden nicht bewertet und separat aufgeführt.
+  verrechnet (Abgrenzungen). Stunden auf Leistungen, deren Stundensatz
+  fehlt, werden nicht bewertet und separat aufgeführt.
 - **Geplanter Umsatz**: die geplante Verrechnung offener Projekte, die
   noch nicht verrechnet ist, pro Monat, ohne Fremdkosten. Rechnungen
   brauchen die ältesten Planungen zuerst auf; nicht rechtzeitig

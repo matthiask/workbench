@@ -36,7 +36,7 @@ computed: which records count, which fields and dates.
 - **Project budget statistics**: per project what was sold, the logged
   work valued at the services' rates, what was invoiced and the
   difference: work not invoiced yet, or invoiced ahead (accruals). Hours
-  on services without a rate aren't valued and are listed separately.
+  on services whose rate is undefined aren't valued and are listed separately.
 - **Projected gross margin**: the planned invoicing of open projects
   which hasn't been invoiced yet, per month, as gross margin. Invoicing
   uses up the oldest projections first; those not invoiced in time stay

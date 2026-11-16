@@ -19,7 +19,7 @@ msgstr ""
 
 #: workbench/accounts/admin.py
 msgid "Enabled per user"
-msgstr "Pro Nutzer:in aktiviert"
+msgstr "Pro Mitarbeiter:in aktiviert"
 
 #: workbench/accounts/admin.py
 msgid "Enabled for everyone"
@@ -72,7 +72,7 @@ msgstr "Pausenmeckerei"
 
 #: workbench/accounts/features.py
 msgid "Warn if user is taking an insufficient amount of breaks."
-msgstr "Warnen, wenn die Nutzer:in nicht genügend Pausen macht."
+msgstr "Warnen, wenn die Mitarbeiter:in nicht genügend Pausen macht."
 
 #: workbench/accounts/features.py workbench/projects/models.py
 #: workbench/templates/projects/object_list.html
@@ -109,7 +109,7 @@ msgstr "Arbeitszeit-Überwachung deaktivieren"
 
 #: workbench/accounts/features.py
 msgid "Disable the annual working time warnings for this user."
-msgstr "Die Arbeitszeit-Überwachung für diese Nutzer:in deaktivieren."
+msgstr "Die Arbeitszeit-Überwachung für diese Mitarbeiter:in deaktivieren."
 
 #: workbench/accounts/features.py
 msgid "Expenses"
@@ -150,7 +150,7 @@ msgstr "Meckern bei später Leistungserfassung"
 
 #: workbench/accounts/features.py
 msgid "Annoy users when they are late with their logging."
-msgstr "Nutzer:innen nerven wenn sie ihre Stunden spät eintragen."
+msgstr "Mitarbeiter:innen nerven wenn sie ihre Stunden spät eintragen."
 
 #: workbench/accounts/features.py workbench/planning/apps.py
 #: workbench/templates/accounts/team_detail.html
@@ -207,7 +207,7 @@ msgstr "Bitte anmelden."
 
 #: workbench/accounts/models.py workbench/reporting/views.py
 msgid "All users"
-msgstr "Alle Nutzer:innen"
+msgstr "Alle Mitarbeiter:innen"
 
 #: workbench/accounts/models.py workbench/reporting/views.py
 msgid "Show mine only"
@@ -215,7 +215,7 @@ msgstr "Nur meine anzeigen"
 
 #: workbench/accounts/models.py workbench/reporting/views.py
 msgid "Inactive users"
-msgstr "Inaktive Nutzer:innen"
+msgstr "Inaktive Mitarbeiter:innen"
 
 #: workbench/accounts/models.py workbench/contacts/forms.py
 msgid "Active"
@@ -312,13 +312,13 @@ msgstr "Dieses Kürzel ist schon vergeben."
 #: workbench/templates/reporting/work_anniversaries.html
 #: workbench/timer/models.py workbench/tools/xlsx.py
 msgid "user"
-msgstr "Nutzer:in"
+msgstr "Mitarbeiter:in"
 
 #: workbench/accounts/models.py workbench/management/commands/workload.py
 #: workbench/reporting/squeeze.py workbench/reporting/views.py
 #: workbench/templates/base.html
 msgid "users"
-msgstr "Nutzer:innen"
+msgstr "Mitarbeiter:innen"
 
 #: workbench/accounts/models.py
 #, python-format
@@ -438,7 +438,7 @@ msgstr "Fehler während Abholen der Daten. Bitte nochmals versuchen."
 #: workbench/accounts/views.py
 #, python-format
 msgid "The user with email address %s is inactive."
-msgstr "Die Nutzer:in mit Emailadresse %s ist inaktiv."
+msgstr "Die Mitarbeiter:in mit Emailadresse %s ist inaktiv."
 
 #: workbench/accounts/views.py
 msgid "Welcome! Please fill in your details."
@@ -447,7 +447,7 @@ msgstr "Willkommen! Bitte fülle das folgende Formular aus."
 #: workbench/accounts/views.py
 #, python-format
 msgid "No user with email address %s found."
-msgstr "Keine Nutzer:innen mit Emailadresse %s gefunden."
+msgstr "Keine Mitarbeiter:innen mit Emailadresse %s gefunden."
 
 #: workbench/accounts/views.py
 msgid "You have been signed out."
@@ -489,7 +489,7 @@ msgstr "Wenn für dieses Jahr gesetzliche oder betriebliche Feiertage konfigurie
 
 #: workbench/awt/api.py
 msgid "Unknown user."
-msgstr "Unbekannte:r Benutzer:in."
+msgstr "Unbekannte:r Mitarbeiter:in."
 
 #: workbench/awt/api.py workbench/awt/views.py
 #, python-format
@@ -499,7 +499,7 @@ msgstr "Die Jahresarbeitszeit %(year)s des Arbeitszeitmodells %(working_time_mod
 #: workbench/awt/api.py workbench/awt/views.py
 #, python-format
 msgid "No annual working time defined for user %(user)s with working time model %(working_time_model)s."
-msgstr "Keine Jahresarbeitszeit definiert für Nutzer:in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
+msgstr "Keine Jahresarbeitszeit definiert für Mitarbeiter:in %(user)s mit Arbeitszeitmodell %(working_time_model)s."
 
 #: workbench/awt/apps.py workbench/awt/pdf.py
 #: workbench/templates/awt/year_detail.html workbench/templates/base.html
@@ -1024,7 +1024,7 @@ msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: %(comman
 #: workbench/contacts/api.py workbench/deals/api.py workbench/tools/api.py
 #, python-format
 msgid "Unknown user %r."
-msgstr "Unbekannte:r Benutzer:in %r."
+msgstr "Unbekannte:r Mitarbeiter:in %r."
 
 #: workbench/contacts/api.py
 #, python-format
@@ -1040,7 +1040,7 @@ msgstr "%(name)s (ID %(id)s) hat denselben Namen. Falls es dieselben sind, zusam
 #: workbench/planning/api.py workbench/projects/api.py
 #, python-format
 msgid "Unknown or inactive user %r."
-msgstr "Unbekannte:r oder inaktive:r Benutzer:in %r."
+msgstr "Unbekannte:r oder inaktive:r Mitarbeiter:in %r."
 
 #: workbench/contacts/api.py
 #, python-format
@@ -1236,7 +1236,7 @@ msgstr "Die Adresse wird für die ausgewählten Personen geändert."
 
 #: workbench/contacts/forms.py
 msgid "This person is linked to a user. It is therefore not possible to delete them, but you may merge them into a different person. Alternatively, you can also archive the person."
-msgstr "Diese Person ist mit einem:r Benutzer:in verknüpft. Es ist deshalb nicht möglich, sie zu löschen, aber Du kannst sie mit einer anderen Person zusammenführen. Alternativ kannst Du die Person auch archivieren."
+msgstr "Diese Person ist mit einem:r Mitarbeiter:in verknüpft. Es ist deshalb nicht möglich, sie zu löschen, aber Du kannst sie mit einer anderen Person zusammenführen. Alternativ kannst Du die Person auch archivieren."
 
 #: workbench/contacts/forms.py
 #, python-format
@@ -1289,7 +1289,7 @@ msgstr "Eine Person kann nicht mit sich selbst zusammengeführt werden."
 
 #: workbench/contacts/merge.py
 msgid "Both people are linked to a user, unlink one of them in the user's profile first."
-msgstr "Beide Personen sind mit einem:r Benutzer:in verknüpft, entferne zuerst eine der Verknüpfungen im Profil."
+msgstr "Beide Personen sind mit einem:r Mitarbeiter:in verknüpft, entferne zuerst eine der Verknüpfungen im Profil."
 
 #: workbench/contacts/merge.py
 #, python-format
@@ -3320,7 +3320,7 @@ msgstr "Pausen sollten später enden als beginnen."
 
 #: workbench/logbook/models.py
 msgid "Cannot modify breaks of other users."
-msgstr "Es ist nicht erlaubt, Pausen anderer Nutzer:innen zu ändern."
+msgstr "Es ist nicht erlaubt, Pausen anderer Mitarbeiter:innen zu ändern."
 
 #: workbench/logbook/reporting.py
 #, python-format
@@ -4443,7 +4443,7 @@ msgstr "Liquiditätsdaten können nicht für die Zukunft berechnet werden."
 
 #: workbench/reporting/api.py
 msgid "Either a user or the inactive users."
-msgstr "Entweder eine Person oder die inaktiven Nutzer:innen."
+msgstr "Entweder eine Person oder die inaktiven Mitarbeiter:innen."
 
 #: workbench/reporting/models.py workbench/reporting/views.py
 msgid "cutoff date"
@@ -4664,7 +4664,7 @@ msgstr "Hat aktuell offene Kundenprojekte"
 
 #: workbench/reporting/views.py
 msgid "Other active users"
-msgstr "Andere aktive Nutzer:innen"
+msgstr "Andere aktive Mitarbeiter:innen"
 
 #: workbench/reporting/views.py
 msgid "This filter is for open projects as of today, not for closed projects or other cutoff dates."
@@ -4981,7 +4981,7 @@ msgstr "Neue Abwesenheit"
 
 #: workbench/templates/awt/year_detail.html
 msgid "active users"
-msgstr "Aktive Nutzer:innen"
+msgstr "Aktive Mitarbeiter:innen"
 
 #: workbench/templates/awt/year_detail.html
 #, python-format
@@ -5795,7 +5795,7 @@ msgstr "Erfasst"
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/_budget_statistics_table.html
 msgid "undefined rate"
-msgstr "ohne Stundensatz"
+msgstr "Stundensatz fehlt"
 
 #: workbench/templates/projects/campaign_detail.html
 #: workbench/templates/reporting/_budget_statistics_table.html
@@ -6206,7 +6206,7 @@ msgstr "Pro Projekt wird der grössere Wert aus den Fremdkosten auf Rechnungen u
 #: workbench/templates/reporting/labor_costs_by_user.html
 #: workbench/templates/reporting/squeeze.html workbench/tools/xlsx.py
 msgid "Undefined rate"
-msgstr "Ohne Stundensatz"
+msgstr "Stundensatz fehlt"
 
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
@@ -6351,7 +6351,7 @@ msgstr "Stunden für Verrechnung"
 #: workbench/templates/reporting/squeeze.html
 #, python-format
 msgid "Hours with undefined rate: default of %(rate)s/h applied"
-msgstr "Stunden ohne Stundensatz: Standard von %(rate)s/h angewendet"
+msgstr "Stundensatz fehlt: Standard von %(rate)s/h angewendet"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Projects"
@@ -6378,7 +6378,7 @@ msgstr "Aufschlüsselung nach Person"
 msgid ""
 "Hours with undefined rate: default of\n"
 "                          %(rate)s/h applied"
-msgstr "Stunden ohne Stundensatz: Standard von %(rate)s/h angewendet"
+msgstr "Stundensatz fehlt: Standard von %(rate)s/h angewendet"
 
 #: workbench/templates/reporting/squeeze.html
 msgid "Users"
@@ -6687,7 +6687,7 @@ msgstr "Unbekanntes Team."
 #: workbench/tools/api.py
 #, python-format
 msgid "Unknown users: %s"
-msgstr "Unbekannte Benutzer:innen: %s"
+msgstr "Unbekannte Mitarbeiter:innen: %s"
 
 #: workbench/tools/api.py
 #, python-format
@@ -6830,7 +6830,7 @@ msgstr "Es scheint, dass Du iOS verwendest. Leider unterstützt iOS das direkte 
 
 #: workbench/tools/xlsx.py
 msgid "By service and user"
-msgstr "Nach Leistung und Nutzer:in"
+msgstr "Nach Leistung und Mitarbeiter:in"
 
 #: workbench/tools/xlsx.py
 msgid "By service and month"
@@ -6838,7 +6838,7 @@ msgstr "Nach Leistung und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "By user and month"
-msgstr "Nach Nutzer:in und Monat"
+msgstr "Nach Mitarbeiter:in und Monat"
 
 #: workbench/tools/xlsx.py
 msgid "Total hours"

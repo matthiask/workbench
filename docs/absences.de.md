@@ -65,7 +65,7 @@ können sich also unterscheiden. Künftige Monate zählen schon ihre vollen
 Sollstunden, deshalb sind die Totale des ganzen Jahres unter dem Jahr
 negativ.
 
-«Aktive Nutzer:innen» zeigt die Ferientage aller; die Details anderer und
+«Aktive Mitarbeiter:innen» zeigt die Ferientage aller; die Details anderer und
 ihre Krankheitstage sieht nur die Personaladministration.
 Arbeitszeitmodelle, Anstellungen und Feiertage richten die
 Administrator:innen ein.
