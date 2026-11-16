@@ -93,7 +93,22 @@ def _actions(project, *, since):
             table_name="offers_offerheading", created_at__gte=since
         ).filter(row_data__offer_id__in=offer_ids)
     )
-    return sorted(actions, key=lambda action: action.event_id)
+    return sorted(
+        (action for action in actions if not _fills_item_order(action)),
+        key=lambda action: action.event_id,
+    )
+
+
+def _fills_item_order(action):
+    """Filling in the order of offers which had none (e.g. the backfill of
+    existing offers) changes nothing which is shown: new offers get their
+    order together with their first service"""
+    return (
+        action.table_name == "offers_offer"
+        and action.action == "U"
+        and (action.changed_fields or {}).keys() == {"item_order"}
+        and action.row_data.get("item_order") in {None, "{}"}
+    )
 
 
 def _groups(actions):

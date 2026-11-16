@@ -199,3 +199,13 @@ class OfferHistoryTest(TestCase):
         self.assertEqual(
             [s.offers(offer.project)[0].title for s in states], ["Third", "Second"]
         )
+
+    def test_backfilled_item_order(self):
+        """Filling in the order of existing offers isn't a work session"""
+        user = factories.UserFactory.create()
+        self.save_as(user)
+        offer = factories.OfferFactory.create(owned_by=user)
+
+        set_user_name("")
+        Offer.objects.filter(pk=offer.pk).update(item_order=["s1"])
+        self.assertEqual(len(offer_states(offer.project)), 1)
