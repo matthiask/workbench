@@ -735,6 +735,51 @@ class DealsTest(TestCase):
         response = self.client.get("/report/deal-history/")
         self.assertContains(response, "Deal history")
 
+    def test_accepted_offers_without_deal(self):
+        """Accepted offers without deal are added to the accepted deals"""
+        deal = factories.DealFactory.create(
+            status=Deal.ACCEPTED, closed_on=dt.date.today()
+        )
+        deal.values.create(type=factories.ValueTypeFactory.create(), value=600)
+        deal.save()
+
+        def accepted_offer(**kwargs):
+            offer = factories.OfferFactory.create(**kwargs)
+            factories.ServiceFactory.create(
+                project=offer.project, offer=offer, cost=100
+            )
+            offer.status = Offer.ACCEPTED
+            offer.closed_on = dt.date.today()
+            offer.save()
+            return offer
+
+        offer = accepted_offer()
+        deal.related_offers.add(accepted_offer())
+        accepted_offer(project=factories.ProjectFactory.create(type="internal"))
+
+        stats = accepted_deals([dt.date.today(), dt.date.today()])
+        self.assertEqual(list(stats["offers"]), [offer])
+        self.assertEqual(stats["count"], 2)
+        self.assertEqual(stats["sum"], Decimal(700))
+        self.assertEqual(stats["by_month_and_valuetype"][0]["sum"], Decimal(700))
+        self.assertEqual(
+            [(row["user"], row["sum"]) for row in stats["by_user"]],
+            [(offer.owned_by, Decimal(100))],
+        )
+
+        self.client.force_login(deal.owned_by)
+        response = self.client.get("/report/accepted-deals/")
+        self.assertContains(response, "Offers without deal")
+        self.assertContains(response, offer.code)
+        response = self.client.get(
+            f"/report/accepted-deals/deals/?user={offer.owned_by.id}"
+        )
+        self.assertContains(response, offer.code)
+        data = self.client.get("/api/deals/stats/").json()["accepted"]
+        self.assertEqual(data["sum"], "700.00")
+        self.assertEqual([o["code"] for o in data["offers_without_deal"]], [offer.code])
+        self.assertEqual(data["by_month"][0]["offers_without_deal"], "100.00")
+
     def test_related_offers(self):
         """Offers can be linked to deals"""
         offer = factories.OfferFactory.create(

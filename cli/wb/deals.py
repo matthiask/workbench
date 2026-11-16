@@ -435,7 +435,8 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
     """Deals accepted and declined in a period
 
     Users filter the deals' owners; accepted deals are split between users
-    by their contributions."""
+    by their contributions. Accepted offers without deal count towards the
+    totals, attributed to their owners."""
     data = request(
         "GET",
         "deals/stats/",
@@ -460,7 +461,7 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
             else ""
         )
     )
-    if accepted["deals"]:
+    if accepted["deals"] or accepted["offers_without_deal"]:
         table = make_table("Value type", "Accepted>", "Target>", "Median age>")
         for row in accepted["by_value_type"]:
             table.add_row(
@@ -495,6 +496,28 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
                 deal["owned_by"],
                 deal["closed_on"],
                 format_amount(deal["value"]),
+            )
+        console.print(table)
+    if accepted["offers_without_deal"]:
+        table = make_table(
+            "ID>",
+            "Code",
+            "Title",
+            "Project",
+            "Owner",
+            "Closed on",
+            "Total>",
+            title="Accepted offers without deal",
+        )
+        for offer in accepted["offers_without_deal"]:
+            table.add_row(
+                link(offer["id"], offer["url"]),
+                link(offer["code"], offer["url"]),
+                offer["title"],
+                link(offer["project"]["code"], offer["project"]["url"]),
+                offer["owned_by"],
+                offer["closed_on"],
+                format_amount(offer["total_excl_tax"]),
             )
         console.print(table)
     declined = data["declined"]

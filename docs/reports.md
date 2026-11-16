@@ -65,7 +65,9 @@ computed: which records count, which fields and dates.
 ## Deals
 
 With access to deals: **accepted deals** (won value per value type
-against the targets), **declined deals** (with the reasons) and the
+against the targets; accepted offers without deal, e.g. follow-up orders,
+are added with their own column and count towards the totals),
+**declined deals** (with the reasons) and the
 **deal history** (changes to deals; the person filter is who made the
 change).
 

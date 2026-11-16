@@ -7,6 +7,8 @@ from django.utils import timezone
 
 from workbench.audit.models import LoggedAction
 from workbench.deals.models import Contribution, Deal, Value, ValueType
+from workbench.offers.models import Offer
+from workbench.projects.models import Project
 from workbench.tools.formats import Z2
 from workbench.tools.history import EVERYTHING, changes
 
@@ -25,10 +27,23 @@ def accepted_deals(date_range, *, users=None):
         .order_by("closed_on")
     )
 
+    # Accepted offers without deal, e.g. follow-up orders, count as won too
+    offers = (
+        Offer.objects
+        .accepted()
+        .filter(closed_on__range=date_range, deals__isnull=True)
+        .exclude(project__type=Project.INTERNAL)
+        .select_related("owned_by", "project__customer")
+        .order_by("closed_on", "pk")
+    )
+
     if users is not None:
         queryset = queryset.filter(owned_by__in=users)
+        offers = offers.filter(owned_by__in=users)
 
     by_user = defaultdict(dict)
+    offers_by_user = defaultdict(dict)
+    offers_by_month = defaultdict(lambda: Z2)
     by_month_and_valuetype = defaultdict(lambda: defaultdict(lambda: Z2))
     age_by_valuetype = defaultdict(list)
 
@@ -49,15 +64,21 @@ def accepted_deals(date_range, *, users=None):
                 (deal.closed_on - deal.created_at.date()).days
             )
 
+    for offer in offers:
+        offers_by_user[offer.owned_by][offer] = offer.total_excl_tax
+        offers_by_month[offer.closed_on.replace(day=1)] += offer.total_excl_tax
+
     deals = [
         {
             "user": user,
             "user_id": str(user.id),
-            "deals": deals,
-            "count": len(deals),
-            "sum": sum(deals.values(), Z2),
+            "deals": by_user.get(user, {}),
+            "offers": offers_by_user.get(user, {}),
+            "count": len(by_user.get(user, {})) + len(offers_by_user.get(user, {})),
+            "sum": sum(by_user.get(user, {}).values(), Z2)
+            + sum(offers_by_user.get(user, {}).values(), Z2),
         }
-        for user, deals in by_user.items()
+        for user in by_user.keys() | offers_by_user.keys()
     ]
 
     valuetypes |= set(ValueType.objects.filter(weekly_target__isnull=False))
@@ -65,13 +86,15 @@ def accepted_deals(date_range, *, users=None):
     months = [
         {
             "month": month,
-            "sum": sum(by_valuetype.values()),
+            "sum": sum(by_month_and_valuetype[month].values(), Z2)
+            + offers_by_month[month],
             "values": [
-                {"type": type, "value": by_valuetype.get(type, Z2)}
+                {"type": type, "value": by_month_and_valuetype[month].get(type, Z2)}
                 for type in valuetypes
             ],
+            "offers": offers_by_month[month],
         }
-        for month, by_valuetype in by_month_and_valuetype.items()
+        for month in by_month_and_valuetype.keys() | offers_by_month.keys()
     ]
     date_range_length = (date_range[1] - date_range[0]).days + 1
 
@@ -104,9 +127,12 @@ def accepted_deals(date_range, *, users=None):
             for type in valuetypes
         ],
         "valuetypes": valuetypes,
+        "offers": offers,
+        "offers_sum": sum(offers_by_month.values(), Z2),
         # Deals may have several or no contributors
-        "sum": sum((deal.value for deal in queryset), Z2),
-        "count": len(queryset),
+        "sum": sum((deal.value for deal in queryset), Z2)
+        + sum(offers_by_month.values(), Z2),
+        "count": len(queryset) + len(offers),
         "target": sum(type.weekly_target or 0 for type in valuetypes)
         * date_range_length
         / 7,

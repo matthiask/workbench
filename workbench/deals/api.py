@@ -31,6 +31,7 @@ from workbench.deals.models import (
 )
 from workbench.deals.reporting import accepted_deals, deal_history, declined_deals
 from workbench.offers.models import Offer
+from workbench.projects.api import ProjectSummary, project_summary
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     Amount,
@@ -258,6 +259,18 @@ class AcceptedByMonth(Schema):
     month: str
     sum: Amount
     values: dict[str, Amount]
+    offers_without_deal: Amount
+
+
+class AcceptedOffer(Schema):
+    id: int
+    code: str
+    url: str
+    title: str
+    project: ProjectSummary
+    owned_by: str
+    total_excl_tax: Amount
+    closed_on: dt.date
 
 
 class AcceptedDeals(Schema):
@@ -269,6 +282,10 @@ class AcceptedDeals(Schema):
     by_value_type: list[AcceptedByValueType]
     by_month: list[AcceptedByMonth]
     deals: list[DealSummary]
+    offers_without_deal: list[AcceptedOffer] = Field(
+        description="Accepted offers without deal, not on internal projects;"
+        " they count towards the totals, attributed to their owners."
+    )
 
 
 class ClosingTypeTotal(Schema):
@@ -356,10 +373,24 @@ def deal_stats(request, filters: Query[DealStatsFilter]):
                     "values": {
                         value["type"].title: value["value"] for value in row["values"]
                     },
+                    "offers_without_deal": row["offers"],
                 }
                 for row in accepted["by_month_and_valuetype"]
             ],
             "deals": [deal_summary(deal, request) for deal in accepted["deals"]],
+            "offers_without_deal": [
+                {
+                    "id": offer.id,
+                    "code": offer.code,
+                    "url": request.build_absolute_uri(offer.get_absolute_url()),
+                    "title": offer.title,
+                    "project": project_summary(offer.project, request),
+                    "owned_by": offer.owned_by.get_short_name(),
+                    "total_excl_tax": offer.total_excl_tax,
+                    "closed_on": offer.closed_on,
+                }
+                for offer in accepted["offers"]
+            ],
         },
         "declined": {
             "count": len(declined),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 14:37+0100\n"
+"POT-Creation-Date: 2026-11-16 15:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4689,6 +4689,11 @@ msgstr "Datum bis"
 
 #: workbench/reporting/views.py
 #: workbench/templates/reporting/accepted_deals.html
+msgid "Offers without deal"
+msgstr "Offerten ohne Geschäft"
+
+#: workbench/reporting/views.py
+#: workbench/templates/reporting/accepted_deals.html
 msgid "target"
 msgstr "Ziel"
 
@@ -6129,6 +6134,11 @@ msgstr "Median-Alter"
 #: workbench/templates/reporting/accepted_deals.html
 msgid "count"
 msgstr "Anzahl"
+
+#: workbench/templates/reporting/accepted_deals.html
+#: workbench/templates/reporting/accepted_deals_for_user.html
+msgid "Offer without deal"
+msgstr "Offerte ohne Geschäft"
 
 #: workbench/templates/reporting/birthdays.html
 #: workbench/templates/reporting/work_anniversaries.html

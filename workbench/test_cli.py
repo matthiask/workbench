@@ -2041,6 +2041,16 @@ planned_work:
         result = self.wb("deals", "stats", "--user", "ab")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Relaunch", result.output)
+        offer = factories.OfferFactory.create(
+            owned_by=self.user,
+            title="Follow-up",
+            status=Offer.ACCEPTED,
+            closed_on=dt.date.today(),
+        )
+        result = self.wb("deals", "stats")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Accepted offers without deal", result.output)
+        self.assertIn(offer.code, result.output)
         result = self.wb("deals", "history")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(deal.code, result.output)

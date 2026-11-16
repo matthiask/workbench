@@ -710,6 +710,7 @@ def _accepted_deals_chart(stats, date_range):
         row["month"]: {value["type"]: value["value"] for value in row["values"]}
         for row in stats["by_month_and_valuetype"]
     }
+    offers = {row["month"]: row["offers"] for row in stats["by_month_and_valuetype"]}
     weekly_target = sum(
         (type.weekly_target or 0 for type in stats["valuetypes"]), Decimal(0)
     )
@@ -730,7 +731,20 @@ def _accepted_deals_chart(stats, date_range):
                 "color": f"wb-series-{index}",
             }
             for index, type in enumerate(stats["valuetypes"], 1)
-        ],
+        ]
+        + (
+            [
+                {
+                    "label": _("Offers without deal"),
+                    "values": list(
+                        accumulate(offers.get(month, Z2) for month in months)
+                    ),
+                    "color": f"wb-series-{len(stats['valuetypes']) + 1}",
+                }
+            ]
+            if stats["offers_sum"]
+            else []
+        ),
         lines=[
             {
                 "label": capfirst(_("target")),

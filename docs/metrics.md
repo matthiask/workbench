@@ -558,7 +558,7 @@ hours = Σ `hours` (not hours for invoicing) logged in the period on projects
 with an outreach internal type; Accepted deals = the person's share of
 the deals accepted (`closed_on`) in the period, `deal.value` split by
 contribution weight like the accepted deals report
-(`accepted_deals()["by_user"]`); Per hour = deals / hours ("–" without
+(`accepted_deals()["by_user"]`, its offers without deal aren't counted); Per hour = deals / hours ("–" without
 hours). Everyone with outreach hours or contributions is listed, those
 without outreach hours last (by deals desc). The info button explains the
 columns; the rate links to a modal per person with the outreach projects
@@ -886,21 +886,24 @@ Answers: what value of deals was won in the period, per value type, month and pe
 
 Deals: status ACCEPTED, `closed_on` in [Date from, Date until] (default this week Mon–Sun). `Deal.value` = Σ of its `Value.value` rows (recomputed on save unless `skip_value_calculation`).
 
+Offers without deal (follow-up orders are often accepted without a deal): status ACCEPTED, `closed_on` in the period, no related deal, not on internal projects; amount `total_excl_tax` (revenue, like deal values), attributed in full to the offer's owner (`owned_by`, also for the users filter). They have no value type and no target, and aren't in the median ages. API: `accepted.offers_without_deal`, `by_month[].offers_without_deal`.
+
 | Figure | Computation |
 |---|---|
 | Month × value type cells | Σ Value.value per value type, by month of `closed_on`. Columns: value types occurring in the deals plus all value types with a `weekly_target`. |
-| Month "Total" | Σ of the month's values. |
+| Month "Offers without deal" | Σ `total_excl_tax` of the month's offers without deal (column only shown if there are any). |
+| Month "Total" | Σ of the month's values, offers without deal included. |
 | Total row per type | Σ over months; pie = sum vs. target. |
-| Total row, overall cell | `stats.sum` = Σ Deal.value of the deals. |
+| Total row, overall cell | `stats.sum` = Σ Deal.value of the deals + Σ `total_excl_tax` of the offers without deal; the pie compares it with the target. |
 | Target (n weeks) | Per type: weekly_target × (days in period)/7; overall: Σ weekly_targets of the shown types × days/7. |
 | Median age | Days between `created_at` date and `closed_on`; one entry per Value row; upper median (`sorted[len//2]`). Overall median over all entries. |
 | Per user: Value | Σ over deals the user contributed to of Deal.value × contribution weight / Σ weights of that deal (0 if the weights add up to 0). |
-| Per user: Count | Number of deals the user contributed to. |
-| Total row (users) | Count = number of deals; Value = Σ Deal.value (deals with several or no contributors count once). |
-| Deal list | Each deal's value; total row = `stats.sum`. |
-| Modal per user | Deal, contact/customer, Award of contract (closing type + notice), Value, Contribution (the user's share). |
+| Per user: Count | Number of deals the user contributed to + offers without deal the user owns (their full total is added to Value). |
+| Total row (users) | Count = number of deals and offers without deal; Value = `stats.sum` (deals with several or no contributors count once). |
+| Deal list | Each deal's value, then the offers without deal; total row = `stats.sum`. |
+| Modal per user | Deal, contact/customer, Award of contract (closing type + notice), Value, Contribution (the user's share); offers without deal with their customer and total. |
 
-Chart (web, `_accepted_deals_chart`): the month × value type cells cumulated from the start of the period as stacked bars for every month, and the cumulated target, per month Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
+Chart (web, `_accepted_deals_chart`): the month × value type cells (and the offers without deal) cumulated from the start of the period as stacked bars for every month, and the cumulated target, per month Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
 
 API additionally: declined `count`, `sum` (Σ Deal.value) and per closing type.
 
