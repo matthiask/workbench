@@ -1266,6 +1266,22 @@ class ContactsTest(TestCase):
             self.assertNotContains(response, "Recent invoices")
             self.assertNotContains(response, "Recent offers")
 
+    def test_organization_deals(self):
+        """The organization detail page lists its deals with the DEALS
+        feature"""
+        deal = factories.DealFactory.create(title="Pitch")
+        organization = deal.customer
+        self.client.force_login(organization.primary_contact)
+
+        response = self.client.get(organization.urls["detail"])
+        self.assertContains(response, "Recent deals")
+        self.assertContains(response, "Pitch")
+        self.assertContains(response, f"/deals/?org={organization.pk}&amp;s=all")
+
+        with override_settings(FEATURES={FEATURES.DEALS: F.NEVER}):
+            response = self.client.get(organization.urls["detail"])
+            self.assertNotContains(response, "Recent deals")
+
     def test_archived_organization_detail(self):
         """Archived organizations get a badge like archived people"""
         organization = factories.OrganizationFactory.create(

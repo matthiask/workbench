@@ -228,6 +228,9 @@ class Organization(Model):
             "project", "owned_by"
         )[:10]
 
+    def recent_deals(self):
+        return self.deal_set.select_related("owned_by").order_by("-pk")[:10]
+
     @cached_property
     def statistics(self):
         from workbench.reporting.project_budget_statistics import (

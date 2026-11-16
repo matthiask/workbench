@@ -192,7 +192,7 @@
   </div>
 
   <div class="row g-3">
-    <div class="col-lg-4">
+    <div class="col-lg-6 col-xl-3">
       <section class="card">
         <div class="card-header">
           <a
@@ -213,7 +213,7 @@
       </section>
     </div>
     {% if request.user.features.CONTROLLING %}
-      <div class="col-lg-4">
+      <div class="col-lg-6 col-xl-3">
         <section class="card">
           <div class="card-header">
             <a href="{% url 'invoices_invoice_list' %}?org={{ organization.pk }}" class="text-reset">
@@ -232,7 +232,7 @@
           </div>
         </section>
       </div>
-      <div class="col-lg-4">
+      <div class="col-lg-6 col-xl-3">
         <section class="card">
           <div class="card-header">
             <a href="{% url 'offers_offer_list' %}?org={{ organization.pk }}" class="text-reset">
@@ -244,6 +244,27 @@
               <a class="list-group-item list-group-item-action" href="{{ object.get_absolute_url }}">
                 {{ object|h }}
                 {{ object.status_badge }}
+              </a>
+            {% empty %}
+              <div class="list-group-item text-secondary">&ndash;</div>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+    {% endif %}
+    {% if request.user.features.DEALS %}
+      <div class="col-lg-6 col-xl-3">
+        <section class="card">
+          <div class="card-header">
+            <a href="{% url 'deals_deal_list' %}?org={{ organization.pk }}&amp;s=all" class="text-reset">
+              {% translate 'Recent deals' %}
+            </a>
+          </div>
+          <div class="list-group list-group-flush">
+            {% for deal in organization.recent_deals %}
+              <a class="list-group-item list-group-item-action" href="{{ deal.get_absolute_url }}">
+                {{ deal|h }}
+                {{ deal.status_badge }}
               </a>
             {% empty %}
               <div class="list-group-item text-secondary">&ndash;</div>
