@@ -488,10 +488,12 @@ class Offer(ModelWithTotal):
         )
 
     @property
-    def in_house_total(self):
+    def gross_margin(self):
         """The total excl. tax (after the discount) without the third party
-        costs of the non-optional services: the agency's own work, e.g. what
-        counts as won business; prefetch ``services`` for many offers"""
+        costs of the non-optional services, e.g. what counts as won business;
+        projects deduct the larger of offered and logged third party costs
+        instead (``gross_margin_components()``). Prefetch ``services`` for
+        many offers"""
         return self.total_excl_tax - sum(
             (
                 service.third_party_costs or Z2

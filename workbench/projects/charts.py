@@ -33,7 +33,7 @@ def projected_vs_invoiced_chart(project, *, today=None):
         "invoiced": [
             (
                 invoice.invoiced_on,
-                invoice.total_excl_tax - (invoice.third_party_costs or Z2),
+                invoice.gross_margin,
                 invoice.title,
             )
             for invoice in Invoice.objects

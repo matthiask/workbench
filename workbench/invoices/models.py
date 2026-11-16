@@ -314,9 +314,11 @@ class Invoice(ModelWithTotal):
         super()._calculate_total()
 
     @property
-    def in_house_total(self):
-        """The total excl. tax (after the discount) without the third party
-        costs: the agency's own work"""
+    def gross_margin(self):
+        """The total excl. tax (after the discount) without the invoice's
+        third party costs, like ``ProjectedInvoice.gross_margin``; projects
+        deduct the larger of invoiced and logged third party costs instead
+        (``gross_margin_components()``)"""
         return self.total_excl_tax - (self.third_party_costs or Z2)
 
     @property

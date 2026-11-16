@@ -812,7 +812,7 @@ class DealsTest(TestCase):
         )
 
         stats = accepted_deals([dt.date.today(), dt.date.today()])
-        self.assertEqual(offer.in_house_total, Decimal(300))
+        self.assertEqual(offer.gross_margin, Decimal(300))
         self.assertEqual(stats["offers_sum"], Decimal(300))
         self.assertEqual(stats["maintenance_sum"], Decimal(200))
         self.assertEqual(stats["sum"], Decimal(500))

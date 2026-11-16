@@ -293,7 +293,7 @@ class AcceptedOffer(Schema):
     project: ProjectSummary
     owned_by: str
     total_excl_tax: Amount
-    in_house_total: Amount = Field(
+    gross_margin: Amount = Field(
         description="What counts: the total excl. tax (after the discount)"
         " without the third party costs of the non-optional services."
     )
@@ -421,7 +421,7 @@ def deal_stats(request, filters: Query[DealStatsFilter]):
                     "project": project_summary(offer.project, request),
                     "owned_by": offer.owned_by.get_short_name(),
                     "total_excl_tax": offer.total_excl_tax,
-                    "in_house_total": (offer.in_house_total),
+                    "gross_margin": (offer.gross_margin),
                     "closed_on": offer.closed_on,
                 }
                 for offer in accepted["offers"]
