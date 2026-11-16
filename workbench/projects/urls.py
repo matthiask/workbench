@@ -12,7 +12,11 @@ from workbench.logbook.forms import LoggedCostForm, LoggedHoursForm
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.forms import OfferForm
 from workbench.offers.models import Offer
-from workbench.offers.views import ProjectOfferPDFView
+from workbench.offers.views import (
+    ProjectOfferPDFView,
+    offer_history,
+    offer_history_pdf,
+)
 from workbench.planning.views import (
     campaign_planning,
     campaign_planning_external,
@@ -213,6 +217,16 @@ urlpatterns = [
         "<int:pk>/external/",
         project_planning_external,
         name="projects_project_planning_external",
+    ),
+    path(
+        "<int:pk>/offer-history/",
+        controlling_only(offer_history),
+        name="projects_project_offer_history",
+    ),
+    path(
+        "<int:pk>/offer-history/<int:event_id>/pdf/",
+        controlling_only(offer_history_pdf),
+        name="projects_project_offer_history_pdf",
     ),
     path(
         "<int:pk>/offers-pdf/",

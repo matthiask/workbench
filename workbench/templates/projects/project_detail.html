@@ -112,6 +112,10 @@
             >{% translate 'Download with signature line' %}</a>
             <a class="dropdown-item" href="{{ object.urls.renumber_offers }}">{% translate 'Renumber offers' %}</a>
           {% endif %}
+          {% if request.user.features.CONTROLLING and gs.offers %}
+            {% if gs.offers|length <= 1 %}<div class="dropdown-divider"></div>{% endif %}
+            <a class="dropdown-item" href="{{ object.urls.offer_history }}">{% translate 'Offer history' %}</a>
+          {% endif %}
           <div class="dropdown-divider"></div>
           <a href="{{ project.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
         </div>

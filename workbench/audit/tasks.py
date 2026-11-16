@@ -51,5 +51,6 @@ def prune_audit():
             "projects_campaign",
             "notes_note",
         ],
+        # The offer history (workbench/offers/history.py) goes back as far
         created_at__lt=in_days(-5 * 366),
     ).delete()

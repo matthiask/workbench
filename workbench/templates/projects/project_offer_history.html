@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load i18n workbench %}
+
+{% block title %}{% translate 'Offer history' %} - {{ project }} - {{ block.super }}{% endblock %}
+
+{% block uplink %}
+  <a href="{{ project.get_absolute_url }}" class="btn btn-quiet btn-sm uplink">
+    {% include 'svg/chevron-left.svg' %}
+    {{ project }}
+  </a>
+{% endblock uplink %}
+
+{% block content %}
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">{% translate 'Offer history' %}</h1>
+      <p class="text-body-secondary mb-0">
+        {% blocktranslate trimmed count years=years %}
+          The offers of the project after each change, from the audit log of the last year.
+        {% plural %}
+          The offers of the project after each change, from the audit log of the last {{ years }} years.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+
+  {% for row in states %}
+    <section class="card mb-3">
+      <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+        <span>
+          <strong>{{ row.state.created_at|local_date_format }}</strong>
+          &middot; {{ row.user }}
+          {% if forloop.first %}<span class="badge text-bg-info">{% translate 'current' %}</span>{% endif %}
+        </span>
+        {% if row.offers %}
+          <a
+            href="{% url 'projects_project_offer_history_pdf' project.pk row.state.event_id %}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >{% translate 'Project offers' %} (PDF)</a>
+        {% endif %}
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for item in row.offers %}
+          <li class="list-group-item d-flex flex-wrap gap-2 justify-content-between">
+            <span class="min-w-0">
+              <span class="{% if not item.changed %}text-body-secondary{% endif %}">
+                {{ item.offer.code }} {{ item.offer.title }}
+              </span>
+              {{ item.offer.status_badge }}
+              {% if item.changed %}<span class="badge text-bg-warning">{% translate 'changed' %}</span>{% endif %}
+            </span>
+            <span class="text-nowrap">
+              {{ item.offer.total_excl_tax|currency }}
+              &middot;
+              <a
+                href="{% url 'projects_project_offer_history_pdf' project.pk row.state.event_id %}?offer={{ item.offer.pk }}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >PDF</a>
+            </span>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-body-secondary">{% translate 'No offers in project.' %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% empty %}
+    <p class="text-body-secondary">{% translate 'No changes in the audit log.' %}</p>
+  {% endfor %}
+{% endblock content %}

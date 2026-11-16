@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 15:33+0100\n"
+"POT-Creation-Date: 2026-11-16 15:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3647,6 +3647,7 @@ msgid "headings"
 msgstr "Zwischentitel"
 
 #: workbench/offers/views.py
+#: workbench/templates/projects/project_offer_history.html
 msgid "No offers in project."
 msgstr "Keine Offerten im Projekt."
 
@@ -5835,6 +5836,7 @@ msgid "Profitability"
 msgstr "Rentabilität"
 
 #: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_offer_history.html
 msgid "Project offers"
 msgstr "Projektofferten"
 
@@ -5845,6 +5847,11 @@ msgstr "Herunterladen mit Unterschriftszeile"
 #: workbench/templates/projects/project_detail.html
 msgid "Renumber offers"
 msgstr "Offerten neu nummerieren"
+
+#: workbench/templates/projects/project_detail.html
+#: workbench/templates/projects/project_offer_history.html
+msgid "Offer history"
+msgstr "Geschichte der Offerten"
 
 #: workbench/templates/projects/project_detail.html
 #, python-format
@@ -6020,6 +6027,25 @@ msgstr "Differenz"
 #: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "Show in the logbook"
 msgstr "Im Logbuch anzeigen"
+
+#: workbench/templates/projects/project_offer_history.html
+#, python-format
+msgid "The offers of the project after each change, from the audit log of the last year."
+msgid_plural "The offers of the project after each change, from the audit log of the last %(years)s years."
+msgstr[0] "Die Offerten des Projekts nach jeder Änderung, aus dem Audit-Log des letzten Jahres."
+msgstr[1] "Die Offerten des Projekts nach jeder Änderung, aus dem Audit-Log der letzten %(years)s Jahre."
+
+#: workbench/templates/projects/project_offer_history.html
+msgid "current"
+msgstr "aktuell"
+
+#: workbench/templates/projects/project_offer_history.html
+msgid "changed"
+msgstr "geändert"
+
+#: workbench/templates/projects/project_offer_history.html
+msgid "No changes in the audit log."
+msgstr "Keine Änderungen im Audit-Log."
 
 #: workbench/templates/projects/project_profitability.html
 #: workbench/templates/reporting/key_data.html
@@ -6825,6 +6851,10 @@ msgstr "Fixkosten"
 #: workbench/tools/pdf.py
 msgid "Our reference"
 msgstr "Unsere Referenz"
+
+#: workbench/tools/pdf.py
+msgid "Version of"
+msgstr "Stand vom"
 
 #: workbench/tools/pdf.py
 msgid "down payment invoice"

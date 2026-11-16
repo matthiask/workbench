@@ -103,6 +103,13 @@ Offerte.
   tragen ihren Status als Wasserzeichen. «Projektofferten» im Menü des
   Projekts fasst die Offerten des Projekts zusammen, ohne die
   abgelehnten und verworfenen.
+- «Geschichte der Offerten» im Menü des Projekts zeigt die Offerten des
+  Projekts nach jeder Änderung der letzten fünf Jahre, aus dem Audit-Log,
+  mit dem PDF jeder Offerte und der Projektofferten, wie sie damals waren.
+  Diese PDFs nennen den Stand, den sie zeigen. Das blosse Verschieben von
+  Leistungen wird nicht aufgezeichnet, die Reihenfolge der Leistungen kann
+  also von damals abweichen; inzwischen gelöschte Leistungen sind nach der
+  Liste der Leistungstypen geordnet.
 - Offerten werden auf dem Geschäft verbunden («Offerte verbinden»). Beim
   Abschliessen des Geschäfts werden seine Offerten akzeptiert oder
   abgelehnt.

@@ -4,6 +4,7 @@ from copy import deepcopy
 from decimal import Decimal as D
 
 from django.conf import settings
+from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.utils.text import Truncator, capfirst
 from django.utils.translation import activate, gettext as _, override
@@ -497,7 +498,11 @@ class PDFDocument(_PDFDocument):
                 self.style.table,
             )
 
-    def process_offer(self, offer):
+    def process_offer(self, offer, *, items=None, version=None):
+        """``items`` and ``version`` (a datetime) are given for earlier
+        states of offers, rebuilt from the audit log"""
+        if items is None:
+            items = offer.items()
         self.watermark(
             ""
             if offer.status in {offer.OFFERED, offer.ACCEPTED}
@@ -530,6 +535,7 @@ class PDFDocument(_PDFDocument):
                         )
                     ),
                 ),
+                *([(_("Version of"), local_date_format(version))] if version else []),
             ],
             self.style.tableColumnsLeft,
             self.style.table,
@@ -538,11 +544,8 @@ class PDFDocument(_PDFDocument):
             self.spacer(5 * mm)
             self.p(offer.description)
         self.spacer(2 * mm)
-        services = offer.services.all()
-        self.table_services(
-            offer.items(),
-            show_details=offer.show_service_details,
-        )
+        services = [item for item in items if hasattr(item, "service_cost")]
+        self.table_services(items, show_details=offer.show_service_details)
         self.table_total(
             offer,
             optional_total=sum(
@@ -661,11 +664,18 @@ class PDFDocument(_PDFDocument):
             drawing = svg2rlg(f.name)
             self.story.append(drawing)
 
-    def offers_pdf(self, *, project, offers, signature_line=False):
+    def offers_pdf(self, *, project, offers, signature_line=False, version=None):
+        """Offers of earlier states (``version`` is a datetime) have their
+        ``history_items``"""
         self.init_letter()
         self.p(offers[-1].postal_address)
         self.next_frame()
-        self.p("Zürich, %s" % local_date_format(dt.date.today()))
+        self.p(
+            "Zürich, %s"
+            % local_date_format(
+                timezone.localtime(version).date() if version else dt.date.today()
+            )
+        )
         self.spacer()
         self.h1(project.title)
         if project.description:
@@ -708,7 +718,9 @@ class PDFDocument(_PDFDocument):
         self.restart()
         for offer in offers:
             self.init_letter()
-            self.process_offer(offer)
+            self.process_offer(
+                offer, items=getattr(offer, "history_items", None), version=version
+            )
             self.restart()
 
         if signature_line:

@@ -89,6 +89,12 @@ preparation and declines those sent before.
   line. Offers which haven't been offered or accepted carry their status
   as a watermark. "Project offers" in the project's menu combines the
   offers of the project, without the declined and discarded ones.
+- "Offer history" in the project's menu lists the project's offers after
+  each change of the last five years, from the audit log, with the PDF of
+  every offer and of the project offers as they were then. These PDFs say
+  which version they show. Moving services alone isn't recorded, so the
+  order of services can differ from back then; services deleted since are
+  ordered by the list of service types.
 - Offers are linked to deals on the deal ("Link offer"). Closing the deal
   accepts or declines its offers.
 
