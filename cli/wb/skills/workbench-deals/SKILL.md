@@ -95,6 +95,11 @@ offers of a project closed on the same day often add up to one deal.
   the oldest ones.
 - A deal which already has offers of its own isn't a duplicate of an offer
   for different work, even if the amounts match.
+- Campaigns and mandates are often sold months before their offers are
+  accepted (e.g. a campaign for next year): also compare deals without
+  offers from up to a year earlier, by title.
+- When unsure, link: an offer linked to a smaller deal only counts the
+  deal, which underestimates, and that's preferred over counting twice.
 
 Present the likely pairs to the user, the clear ones (same customer, amounts
 within a few percent, closed within days) first, and link each pair only
