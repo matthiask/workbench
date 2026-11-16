@@ -290,6 +290,18 @@ class DeleteView(ToolsMixin, vanilla.DeleteView):
 class AutocompleteView(ToolsMixin, vanilla.ListView):
     filter = None
     label_from_instance = str
+    # Optional: the menu shows the title and the details in small on a second
+    # line, the label is what the input shows after choosing
+    title_from_instance = None
+    details_from_instance = None
+
+    def result(self, instance):
+        result = {"label": self.label_from_instance(instance), "value": instance.pk}
+        if self.title_from_instance:
+            result["title"] = self.title_from_instance(instance)
+        if self.details_from_instance:
+            result["details"] = self.details_from_instance(instance)
+        return result
 
     def get(self, request, *args, **kwargs):
         q = request.GET.get("q")
@@ -298,10 +310,7 @@ class AutocompleteView(ToolsMixin, vanilla.ListView):
             self.filter(queryset=queryset, request=request) if self.filter else queryset
         )
         return JsonResponse({
-            "results": [
-                {"label": self.label_from_instance(instance), "value": instance.pk}
-                for instance in queryset[:50]
-            ]
+            "results": [self.result(instance) for instance in queryset[:50]]
             if q
             else []
         })

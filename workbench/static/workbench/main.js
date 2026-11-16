@@ -1482,7 +1482,13 @@ function initAutocomplete(el) {
         const item = document.createElement("button")
         item.type = "button"
         item.className = "dropdown-item"
-        item.textContent = result.label
+        item.textContent = result.title ?? result.label
+        if (result.details) {
+          const details = document.createElement("small")
+          details.className = "wb-autocomplete-details"
+          details.textContent = result.details
+          item.append(details)
+        }
         // Keep the focus in the input until the click has been handled
         item.addEventListener("mousedown", (e) => e.preventDefault())
         item.addEventListener("click", () => choose(index))

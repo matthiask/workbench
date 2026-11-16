@@ -2391,6 +2391,18 @@ kbd {
     white-space: normal;
   }
 
+  // Second line of results, e.g. the project and offer of services
+  .wb-autocomplete-details {
+    display: block;
+    color: var(--bs-secondary-color);
+  }
+
+  .dropdown-item.active .wb-autocomplete-details,
+  .dropdown-item:active .wb-autocomplete-details {
+    color: inherit;
+    opacity: 0.8;
+  }
+
   .dropdown-item + .dropdown-item {
     border-top: var(--bs-border-width) solid
       color-mix(in srgb, var(--bs-border-color) 40%, transparent);

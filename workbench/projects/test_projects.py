@@ -507,6 +507,35 @@ class ProjectsTest(TestCase):
             {"results": []},
         )
 
+    def test_service_autocomplete_offer(self):
+        """Services with the same title on several offers can be told apart"""
+        service = factories.ServiceFactory.create(title="Testing")
+        offer = factories.OfferFactory.create(project=service.project, title="Manual")
+        offered = factories.ServiceFactory.create(
+            project=service.project, offer=offer, title="Testing"
+        )
+        self.client.force_login(service.project.owned_by)
+
+        self.assertEqual(
+            self.client.get(Service.urls["autocomplete"] + "?q=Testing").json(),
+            {
+                "results": [
+                    {
+                        "label": f"Testing ({service.project})",
+                        "value": service.id,
+                        "title": "Testing",
+                        "details": str(service.project),
+                    },
+                    {
+                        "label": f"Testing ({service.project}, Manual)",
+                        "value": offered.id,
+                        "title": "Testing",
+                        "details": f"{service.project}, Manual",
+                    },
+                ]
+            },
+        )
+
     def test_customer_update(self):
         """Updating customers of projects reassigns invoices (after asking)"""
         project = factories.ProjectFactory.create()

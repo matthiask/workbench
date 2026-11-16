@@ -77,6 +77,13 @@ def service_autocomplete_filter(*, request, queryset):
     return queryset
 
 
+def service_autocomplete_details(service):
+    # Services on several offers often share their title
+    if service.offer:
+        return f"{service.project}, {service.offer.title}"
+    return str(service.project)
+
+
 urlpatterns = [
     path("offers/", include("workbench.offers.urls")),
     # Campaigns
@@ -405,9 +412,13 @@ urlpatterns = [
             model=Service,
             queryset=Service.objects.filter(
                 project__closed_on__isnull=True
-            ).select_related("project__owned_by"),
+            ).select_related("project__owned_by", "offer"),
             filter=service_autocomplete_filter,
-            label_from_instance=lambda service: f"{service} ({service.project})",
+            label_from_instance=lambda service: (
+                f"{service} ({service_autocomplete_details(service)})"
+            ),
+            title_from_instance=str,
+            details_from_instance=service_autocomplete_details,
         ),
         name="projects_service_autocomplete",
     ),
