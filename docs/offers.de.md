@@ -104,8 +104,10 @@ Offerte.
   Projekts fasst die Offerten des Projekts zusammen, ohne die
   abgelehnten und verworfenen.
 - «Geschichte der Offerten» im Menü des Projekts zeigt die Offerten des
-  Projekts nach jeder Änderung der letzten fünf Jahre, aus dem Audit-Log,
-  mit dem PDF jeder Offerte und der Projektofferten, wie sie damals waren.
+  Projekts nach jeder Arbeitssitzung der letzten fünf Jahre, aus dem
+  Audit-Log, mit dem PDF jeder Offerte und der Projektofferten, wie sie
+  damals waren. Eine Arbeitssitzung sind alle Änderungen einer Person ohne
+  Pause von mehr als einer halben Stunde.
   Diese PDFs nennen den Stand, den sie zeigen. Vor November 2026 wurde das
   blosse Verschieben von Leistungen nicht aufgezeichnet, die Reihenfolge
   der Leistungen kann in älteren Ständen also von damals abweichen;

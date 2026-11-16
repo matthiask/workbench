@@ -90,8 +90,10 @@ preparation and declines those sent before.
   as a watermark. "Project offers" in the project's menu combines the
   offers of the project, without the declined and discarded ones.
 - "Offer history" in the project's menu lists the project's offers after
-  each change of the last five years, from the audit log, with the PDF of
-  every offer and of the project offers as they were then. These PDFs say
+  each work session of the last five years, from the audit log, with the
+  PDF of every offer and of the project offers as they were then. A work
+  session is all changes by one person without a break of more than half
+  an hour. These PDFs say
   which version they show. Before November 2026 moving services alone
   wasn't recorded, so the order of services in older versions can differ
   from back then; services deleted since are ordered by the list of

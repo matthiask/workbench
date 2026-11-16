@@ -16,9 +16,11 @@
       <h1 class="mb-1">{% translate 'Offer history' %}</h1>
       <p class="text-body-secondary mb-0">
         {% blocktranslate trimmed count years=years %}
-          The offers of the project after each change, from the audit log of the last year.
+          The offers of the project after each work session (changes by one person without a break of more than half an
+          hour), from the audit log of the last year.
         {% plural %}
-          The offers of the project after each change, from the audit log of the last {{ years }} years.
+          The offers of the project after each work session (changes by one person without a break of more than half an
+          hour), from the audit log of the last {{ years }} years.
         {% endblocktranslate %}
       </p>
     </div>

@@ -1,7 +1,11 @@
+import datetime as dt
+
+from django.db.models import F
 from django.test import TestCase
 
 from workbench import factories
 from workbench.accounts.middleware import set_user_name
+from workbench.audit.models import LoggedAction
 from workbench.offers.history import _ordered_items, offer_states
 from workbench.offers.models import Offer, OfferHeading, save_positions
 from workbench.projects.models import Service
@@ -11,7 +15,7 @@ from workbench.tools.validation import in_days
 
 class OfferHistoryTest(TestCase):
     def save_as(self, user):
-        """Separate saves: the audit log has no transaction IDs"""
+        """Changes of another person start a new work session"""
         set_user_name(f"user-{user.id}-{user.get_short_name()}")
 
     def test_offer_states(self):
@@ -169,4 +173,29 @@ class OfferHistoryTest(TestCase):
                 )
             ],
             ["Form", "Phase", "Workshop", "Known"],
+        )
+
+    def test_work_sessions(self):
+        """Changes of one person form one state until they pause for more
+        than half an hour"""
+        user = factories.UserFactory.create()
+        self.save_as(user)
+        offer = factories.OfferFactory.create(owned_by=user, title="First")
+
+        def ago(minutes):
+            LoggedAction.objects.filter(table_name="offers_offer").update(
+                created_at=F("created_at") - dt.timedelta(minutes=minutes)
+            )
+
+        ago(20)
+        offer.title = "Second"
+        offer.save()
+        self.assertEqual(len(offer_states(offer.project)), 1)
+
+        ago(40)
+        offer.title = "Third"
+        offer.save()
+        states = offer_states(offer.project)
+        self.assertEqual(
+            [s.offers(offer.project)[0].title for s in states], ["Third", "Second"]
         )

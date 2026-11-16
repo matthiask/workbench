@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 15:43+0100\n"
+"POT-Creation-Date: 2026-11-16 16:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6030,10 +6030,10 @@ msgstr "Im Logbuch anzeigen"
 
 #: workbench/templates/projects/project_offer_history.html
 #, python-format
-msgid "The offers of the project after each change, from the audit log of the last year."
-msgid_plural "The offers of the project after each change, from the audit log of the last %(years)s years."
-msgstr[0] "Die Offerten des Projekts nach jeder Änderung, aus dem Audit-Log des letzten Jahres."
-msgstr[1] "Die Offerten des Projekts nach jeder Änderung, aus dem Audit-Log der letzten %(years)s Jahre."
+msgid "The offers of the project after each work session (changes by one person without a break of more than half an hour), from the audit log of the last year."
+msgid_plural "The offers of the project after each work session (changes by one person without a break of more than half an hour), from the audit log of the last %(years)s years."
+msgstr[0] "Die Offerten des Projekts nach jeder Arbeitssitzung (Änderungen einer Person ohne Pause von mehr als einer halben Stunde), aus dem Audit-Log des letzten Jahres."
+msgstr[1] "Die Offerten des Projekts nach jeder Arbeitssitzung (Änderungen einer Person ohne Pause von mehr als einer halben Stunde), aus dem Audit-Log der letzten %(years)s Jahre."
 
 #: workbench/templates/projects/project_offer_history.html
 msgid "current"

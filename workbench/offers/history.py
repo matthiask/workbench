@@ -1,7 +1,8 @@
 """Earlier states of a project's offers, rebuilt from the audit log
 
-The audit log has no transaction IDs. Entries of the same user less than
-``GAP`` apart form one state, which approximates one save. The states are
+Entries of the same user less than ``GAP`` apart form one state: a work
+session on the offers is more useful than every single save (the audit log
+has no transaction IDs anyway). The states are
 rebuilt backwards from the current rows, so pruning old entries doesn't
 matter as long as we don't go back further than the audit log is kept
 (``prune_audit()``).
@@ -27,7 +28,7 @@ from workbench.services.models import ServiceType
 from workbench.tools.history import parse_array
 
 
-GAP = dt.timedelta(seconds=10)
+GAP = dt.timedelta(minutes=30)
 YEARS = 5
 
 MODELS = {model._meta.db_table: model for model in (Offer, Service, OfferHeading)}
@@ -35,7 +36,7 @@ MODELS = {model._meta.db_table: model for model in (Offer, Service, OfferHeading
 
 @dataclass
 class State:
-    """The offers of a project after the changes of one save"""
+    """The offers of a project after the changes of one work session"""
 
     event_id: int
     created_at: dt.datetime
@@ -119,7 +120,8 @@ def _offer_id(action):
 
 
 def offer_states(project, *, years=YEARS):
-    """The states of the project's offers after each save, newest first"""
+    """The states of the project's offers after each work session, newest
+    first"""
     rows = _current_rows(project)
     pk = str(project.pk)
     states = []
