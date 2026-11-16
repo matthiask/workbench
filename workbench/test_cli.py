@@ -2031,6 +2031,25 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(deal.related_offers.get(), offer)
 
+        # Accepted offers can be linked to accepted deals later
+        Deal.objects.filter(pk=deal.pk).update(
+            status=Deal.ACCEPTED, closed_on=dt.date.today()
+        )
+        Offer.objects.filter(pk=other.pk).update(
+            status=Offer.ACCEPTED, closed_on=dt.date.today()
+        )
+        result = self.wb(
+            "deals",
+            "offers",
+            "add",
+            deal.pk,
+            other.code,
+            "--ignore-warning",
+            "other-customer",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(set(deal.related_offers.all()), {offer, other})
+
     def test_deal_stats(self):
         deal = factories.DealFactory.create(
             title="Relaunch",

@@ -577,8 +577,10 @@ LINKABLE_OFFER_STATUSES = {Offer.IN_PREPARATION, Offer.SERVICE_GROUP, Offer.OFFE
 class RelatedOfferForm(Form):
     """Link an offer to an open deal, or unlink it with ``remove=True``
 
-    Offers of other customers' projects are a warning, e.g. for agencies and
-    their clients or several departments of the same city."""
+    Accepted offers may also be linked to accepted deals, nothing changes
+    but the accepted deals report doesn't count them twice. Offers of other
+    customers' projects are a warning, e.g. for agencies and their clients
+    or several departments of the same city."""
 
     offer = forms.ModelChoiceField(
         queryset=Offer.objects.select_related("project"),
@@ -593,7 +595,8 @@ class RelatedOfferForm(Form):
 
     def clean(self):
         data = super().clean()
-        if self.deal.status != Deal.OPEN:
+        late = not self.remove and self.deal.status == Deal.ACCEPTED
+        if self.deal.status != Deal.OPEN and not late:
             raise ValidationError(
                 _(
                     "Offers can only be linked to and unlinked from open deals,"
@@ -616,7 +619,16 @@ class RelatedOfferForm(Form):
                 _("The offer %(offer)s is already linked to this deal.")
                 % {"offer": offer.code},
             )
-        elif offer.status not in LINKABLE_OFFER_STATUSES:
+        elif late and offer.status != Offer.ACCEPTED:
+            self.add_error(
+                "offer",
+                _(
+                    "The offer %(offer)s is %(status)s, only accepted offers can"
+                    " be linked to accepted deals."
+                )
+                % {"offer": offer.code, "status": offer.get_status_display()},
+            )
+        elif not late and offer.status not in LINKABLE_OFFER_STATUSES:
             self.add_error(
                 "offer",
                 _(

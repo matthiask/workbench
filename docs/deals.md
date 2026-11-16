@@ -33,6 +33,10 @@ page lists open deals you contribute to.
 offer of another customer's project needs a confirmation (e.g. an
 agency and its client). The project shows the deals next to its offers.
 
+Accepted offers can also be linked to an accepted deal later; nothing
+changes, but the accepted deals report counts accepted offers without
+deal on their own, so a missing link counts the work twice.
+
 ## Closing a deal
 
 The **Status** button closes the deal as **accepted** (with the award of
@@ -43,4 +47,4 @@ Workbench asks whether to delete the planned work of the offers after
 the current week.
 
 Reopening a deal clears its closing date, type and notice, but leaves the
-offers as they are. Offers can only be linked to open deals.
+offers as they are. Offers can only be unlinked from open deals.

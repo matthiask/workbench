@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 16:29+0100\n"
+"POT-Creation-Date: 2026-11-16 17:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1929,6 +1929,11 @@ msgstr "Die Offerte %(offer)s ist nicht mit diesem Geschäft verbunden."
 #, python-format
 msgid "The offer %(offer)s is already linked to this deal."
 msgstr "Die Offerte %(offer)s ist bereits mit diesem Geschäft verbunden."
+
+#: workbench/deals/forms.py
+#, python-format
+msgid "The offer %(offer)s is %(status)s, only accepted offers can be linked to accepted deals."
+msgstr "Die Offerte %(offer)s hat den Status «%(status)s», mit akzeptierten Geschäften lassen sich nur akzeptierte Offerten verbinden."
 
 #: workbench/deals/forms.py
 #, python-format

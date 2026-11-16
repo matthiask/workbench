@@ -379,7 +379,7 @@ def list_attributes(as_json):
 
 @deals.group("offers")
 def deal_offers():
-    """Link offers to open deals and unlink them
+    """Link offers to deals and unlink them
 
     Offers are given by ID or code (e.g. 2026-0179-o02), like `wb deals show`
     prints them."""
@@ -392,10 +392,12 @@ def deal_offers():
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def add_deal_offers(deal_id, offers, ignore_warnings, dry_run, as_json):
-    """Link offers to an open deal
+    """Link offers to an open deal, or accepted offers to an accepted deal
 
     Only offers in preparation, service groups and offered offers can be
-    linked; closing the deal accepts or declines them. Offers of other
+    linked to open deals; closing the deal accepts or declines them.
+    Accepted offers can be linked to accepted deals later, so that the
+    accepted deals report doesn't count them twice. Offers of other
     customers' projects are a warning (other-customer), e.g. of the end
     client when the deal is with an agency."""
     data = request(

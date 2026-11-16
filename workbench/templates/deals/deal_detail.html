@@ -48,7 +48,7 @@
           </div>
         </span>
         <a href="{{ object.urls.update }}" class="btn btn-quiet">{% translate 'Update' %}</a>
-        {% if object.status == object.OPEN %}
+        {% if object.status == object.OPEN or object.status == object.ACCEPTED %}
           <a href="{{ object.urls.add_offer }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Link offer' %}</a>
         {% endif %}
         <span class="dropdown">

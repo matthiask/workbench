@@ -627,8 +627,23 @@ class DealsAPITest(TestCase):
             [(["offers", 0], f"The offer {other.code} isn't linked to this deal.")],
         )
 
-        # Only open deals
+        # Only open deals, except for accepted offers and deals
         deal.status = Deal.ACCEPTED
+        deal.save()
+        response = post(url, {"offers": [declined.pk]})
+        self.assertEqual(
+            errors(response),
+            [
+                (
+                    ["offers", 0],
+                    (
+                        f"The offer {declined.code} is Declined, only accepted offers"
+                        " can be linked to accepted deals."
+                    ),
+                )
+            ],
+        )
+        deal.status = Deal.DECLINED
         deal.save()
         for path in [url, remove]:
             response = post(path, {"offers": [offer.pk, declined.pk]})

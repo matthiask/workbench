@@ -845,7 +845,8 @@ class DealsTest(TestCase):
         )
         self.assertEqual(deal.related_offers.get(), offer)
         self.assertContains(response, "only be linked to and unlinked from open")
-        self.assertNotContains(response, deal.urls["add_offer"])
+        # Accepted deals only take accepted offers
+        self.assertContains(response, deal.urls["add_offer"])
         self.assertNotContains(response, deal.urls["remove_offer"])
 
     def test_related_offer_rules(self):
@@ -893,6 +894,43 @@ class DealsTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(deal.related_offers.get(), other)
+
+    def test_link_accepted_offers_to_accepted_deals(self):
+        """Accepted offers can be linked to accepted deals later, e.g. so
+        that the accepted deals report doesn't count them twice"""
+        deal = factories.DealFactory.create(
+            status=Deal.ACCEPTED, closed_on=in_days(-10)
+        )
+        offer = factories.OfferFactory.create(
+            project=factories.ProjectFactory.create(customer=deal.customer),
+            status=Offer.ACCEPTED,
+            closed_on=in_days(-12),
+        )
+        offered = factories.OfferFactory.create(
+            project=offer.project, status=Offer.OFFERED
+        )
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.get(deal.urls["detail"])
+        self.assertContains(response, deal.urls["add_offer"])
+
+        response = self.client.post(deal.urls["add_offer"], {"modal-offer": offered.pk})
+        self.assertContains(response, "only accepted offers can")
+
+        response = self.client.post(deal.urls["add_offer"], {"modal-offer": offer.pk})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(deal.related_offers.get(), offer)
+        offer.refresh_from_db()
+        self.assertEqual(offer.closed_on, in_days(-12))
+
+        # Unlinking still needs an open deal, declined deals stay closed
+        response = self.client.post(
+            deal.urls["remove_offer"], {"modal-offer": offer.pk}, follow=True
+        )
+        self.assertEqual(deal.related_offers.get(), offer)
+        Deal.objects.filter(pk=deal.pk).update(status=Deal.DECLINED)
+        response = self.client.post(deal.urls["add_offer"], {"modal-offer": offered.pk})
+        self.assertContains(response, "only be linked to")
 
     def test_decline_related_offer_with_planned_work(self):
         """Declining a related offer through a deal forces a decision about

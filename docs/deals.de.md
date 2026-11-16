@@ -39,6 +39,11 @@ mit einem offenen Geschäft; eine Offerte eines Projekts einer anderen
 Kundschaft braucht eine Bestätigung (z.B. eine Agentur und ihre
 Kundschaft). Das Projekt zeigt die Geschäfte bei seinen Offerten.
 
+Akzeptierte Offerten lassen sich auch nachträglich mit einem
+akzeptierten Geschäft verbinden; dabei ändert sich nichts, aber die
+gewonnenen Geschäfte zählen akzeptierte Offerten ohne Geschäft separat
+dazu, eine fehlende Verbindung zählt die Arbeit also doppelt.
+
 ## Ein Geschäft abschliessen
 
 Der Knopf **Status** schliesst das Geschäft als **akzeptiert** (mit der
@@ -50,5 +55,5 @@ geplante Arbeit der Offerten nach der laufenden Woche gelöscht werden
 soll.
 
 Ein wieder geöffnetes Geschäft verliert Abschlussdatum, -typ und -notiz,
-die Offerten bleiben aber, wie sie sind. Offerten lassen sich nur mit
-offenen Geschäften verbinden.
+die Offerten bleiben aber, wie sie sind. Offerten lassen sich nur von
+offenen Geschäften lösen.
