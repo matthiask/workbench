@@ -653,6 +653,16 @@ def _echo_recurring_invoice(data):
 
 @recurring_invoices.command("update")
 @click.argument("invoice_id", type=int)
+@click.option("--title", help="Also the title of the invoices created.")
+@click.option(
+    "--description",
+    help="Also the description of the invoices created, or - to read it from stdin.",
+)
+@click.option(
+    "--owned-by",
+    help="Short name, also responsible for the invoices created.",
+    shell_complete=complete_short_names,
+)
 @click.option(
     "--new-invoices",
     type=click.Choice(NEW_INVOICES),
@@ -675,6 +685,9 @@ def _echo_recurring_invoice(data):
 @click.option("--json", "as_json", is_flag=True)
 def update_recurring_invoice(
     invoice_id,
+    title,
+    description,
+    owned_by,
     new_invoices,
     send_to,
     mail_subject,
@@ -683,10 +696,14 @@ def update_recurring_invoice(
     dry_run,
     as_json,
 ):
-    """Change how new invoices are created and sent, only the given fields"""
+    """Change the title, description and responsible person of new invoices
+    and how they are created and sent, only the given fields"""
     data = {
         key: value
         for key, value in [
+            ("title", title),
+            ("description", text_or_stdin(description)),
+            ("owned_by", owned_by),
             ("new_invoices", new_invoices),
             ("send_to", send_to),
             ("mail_subject", mail_subject),

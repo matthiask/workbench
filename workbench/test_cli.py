@@ -1726,6 +1726,32 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Send them by email", result.output)
 
+        result = self.wb(
+            "recurring-invoices", "update", recurring.pk, "--title", "new.example.com"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.title, "new.example.com")
+        self.assertEqual(recurring.send_to, "ap@example.com")
+
+        successor = factories.UserFactory.create()
+        result = self.wb(
+            "recurring-invoices",
+            "update",
+            recurring.pk,
+            "--owned-by",
+            successor.get_short_name(),
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.owned_by, successor)
+
+        result = self.wb(
+            "recurring-invoices", "update", recurring.pk, "--owned-by", "nobody"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Unknown or inactive user", result.output)
+
     def test_invoice_reminders(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         overdue = factories.InvoiceFactory.create(

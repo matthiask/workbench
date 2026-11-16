@@ -899,6 +899,16 @@ def recurring_invoice_detail(request, invoice_id: int):
 class RecurringInvoicePatch(InputSchema):
     """Fields which aren't given are left alone"""
 
+    title: str | None = Field(
+        default=None, description="Also the title of the invoices created."
+    )
+    description: str | None = Field(
+        default=None, description="Also the description of the invoices created."
+    )
+    owned_by: str | None = Field(
+        default=None,
+        description="Short name, also responsible for the invoices created.",
+    )
     new_invoices: NewInvoices | None = Field(
         default=None,
         description="prepare, mark_as_sent or send (by email automatically).",
@@ -925,8 +935,8 @@ def recurring_invoice_update(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Change how new invoices are created and sent, validated like in the
-    web interface
+    """Change the title, description and responsible person of new invoices
+    and how they are created and sent, validated like in the web interface
 
     Warnings of the web interface are errors here unless ignored by their
     code; nothing is saved if anything is invalid or with ``dry_run``."""
@@ -934,6 +944,16 @@ def recurring_invoice_update(
     values = form_data(RecurringInvoiceForm(instance=invoice, request=request))
     for field, value in data.model_dump(exclude_unset=True).items():
         values[field] = value or ""
+    if data.owned_by:
+        user = User.objects.by_short_name(data.owned_by).filter(is_active=True).first()
+        if not user:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "owned_by"],
+                    "msg": _("Unknown or inactive user %r.") % data.owned_by,
+                }
+            ])
+        values["owned_by"] = user.pk
 
     form = RecurringInvoiceForm(values, instance=invoice, request=request)
     validate_form(form, ignore_warnings=ignore_warnings)
