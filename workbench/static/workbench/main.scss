@@ -2495,3 +2495,10 @@ details.card:not([open]) > summary.card-header {
     }
   }
 }
+
+// Whether an amount includes tax, quiet next to the amount
+.badge.wb-tax-badge {
+  font-size: 0.65em;
+  font-weight: 500;
+  vertical-align: 0.15em;
+}

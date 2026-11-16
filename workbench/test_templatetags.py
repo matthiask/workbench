@@ -5,7 +5,12 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
-from workbench.templatetags.workbench import clamped, field_value_pairs, link_or_none
+from workbench.templatetags.workbench import (
+    clamped,
+    field_value_pairs,
+    link_or_none,
+    total_incl_tax,
+)
 
 
 class TemplateTagsTest(TestCase):
@@ -32,6 +37,18 @@ class TemplateTagsTest(TestCase):
         html = clamped("word " * 20 + url, "")
         self.assertIn(">" + "word " * 19 + "word</span>", html)
         self.assertIn(f'href="{url}"', html)
+
+    def test_total_incl_tax(self):
+        """Totals incl. tax are marked, amounts are excl. tax by default"""
+        deactivate_all()
+        invoice = factories.InvoiceFactory.create(subtotal=100, liable_to_vat=True)
+        self.assertHTMLEqual(
+            total_incl_tax(invoice),
+            '107.70 <span class="badge text-bg-light wb-tax-badge">incl. tax</span>',
+        )
+        invoice.liable_to_vat = False
+        invoice.save()
+        self.assertEqual(total_incl_tax(invoice), "100.00")
 
     def test_mark_current(self):
         """{% mark_current %}"""

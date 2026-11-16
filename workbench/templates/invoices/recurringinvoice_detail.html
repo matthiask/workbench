@@ -46,10 +46,8 @@
 
   <div class="wb-stats mb-3">
     <div class="wb-stat">
-      <div class="wb-stat-label">
-        {% if object.liable_to_vat %}{% translate 'total excl. tax'|capfirst %}{% else %}{% translate 'total'|capfirst %}{% endif %}
-      </div>
-      <div class="wb-stat-value">{{ object.total_excl_tax|currency }}</div>
+      <div class="wb-stat-label">{% translate 'total'|capfirst %}</div>
+      <div class="wb-stat-value">{% total_incl_tax object %}</div>
     </div>
     <div class="wb-stat">
       <div class="wb-stat-label">{{ object|label:'periodicity' }}</div>
@@ -96,10 +94,12 @@
               <dt>{% translate 'discount'|capfirst %}</dt>
               <dd>-{{ object.discount|currency }}</dd>
             {% endif %}
-            <dt>
-              {% if object.liable_to_vat %}{% translate 'total excl. tax'|capfirst %}{% else %}{% translate 'total'|capfirst %}{% endif %}
-            </dt>
-            <dd><strong>{{ object.total_excl_tax|currency }}</strong></dd>
+            {% if object.liable_to_vat %}
+              <dt>{% translate 'total excl. tax'|capfirst %}</dt>
+              <dd>{{ object.total_excl_tax|currency }}</dd>
+            {% endif %}
+            <dt>{% translate 'total'|capfirst %}</dt>
+            <dd><strong>{% total_incl_tax object %}</strong></dd>
             <dt>{% translate 'third party costs'|capfirst %}</dt>
             <dd>{{ object.third_party_costs|currency }}</dd>
           </dl>

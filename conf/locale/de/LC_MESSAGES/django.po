@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-15 21:41+0100\n"
+"POT-Creation-Date: 2026-11-16 07:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1711,7 +1711,6 @@ msgstr "Ansprechperson"
 #: workbench/credit_control/reporting.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
-#: workbench/templates/invoices/invoice_list.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/offers/offer_form.html
 #: workbench/templates/offers/offer_list.html
@@ -6603,6 +6602,10 @@ msgstr "%(value)s von %(one)s (%(percentage)s%%)"
 #, python-format
 msgid "%(percentage)s%% (%(surcharge)s%% surcharges)"
 msgstr "%(percentage)s%% (davon %(surcharge)s%% Zuschläge)"
+
+#: workbench/templatetags/workbench.py
+msgid "incl. tax"
+msgstr "inkl. MwSt"
 
 #: workbench/timer/api.py
 msgid "This service doesn't exist."

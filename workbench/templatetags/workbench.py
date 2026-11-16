@@ -462,3 +462,17 @@ def clamped(text, external_reference="", css_class=""):
         if rest_html
         else "",
     )
+
+
+@register.simple_tag
+def total_incl_tax(instance):
+    """The total of an offer or invoice; amounts are excl. tax unless
+    marked, so it gets a badge if tax applies"""
+    value = currency(instance.total)
+    if not instance.liable_to_vat:
+        return value
+    return format_html(
+        '{} <span class="badge text-bg-light wb-tax-badge">{}</span>',
+        value,
+        _("incl. tax"),
+    )

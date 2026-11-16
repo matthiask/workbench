@@ -47,7 +47,7 @@
             {% for invoice in invoices %}
               <tr>
                 <td>{% link_or_none invoice %}</td>
-                <td class="text-nowrap text-end">{{ invoice.total_excl_tax|currency }}</td>
+                <td class="text-nowrap text-end">{% total_incl_tax invoice %}</td>
                 <td class="text-nowrap text-end">{{ invoice.invoiced_on|local_date_format }}</td>
                 <td class="text-nowrap text-end">{{ invoice.pretty_last_reminded_on }}</td>
                 <td class="text-end">

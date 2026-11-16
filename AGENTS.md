@@ -106,6 +106,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   an installation uses it (naming, rates, who plans whom belong into its
   handbook). Update both languages in the same commit as the behaviour
   they describe; no screenshots, they go stale.
+- Amounts are excl. tax unless marked: what a customer owes (invoices in
+  lists, reminders, recurring invoices) shows the total incl. tax with
+  `{% total_incl_tax %}`, which adds a badge. Offers, deals, project
+  figures and reports stay excl. tax.
 - Charts are server-side SVG (`bar_chart()` in `workbench/tools/charts.py`,
   `charts/bar_chart.html`), colors `.wb-series-1`…`-8`, `-muted`,
   `-neutral` (good green/blue, bad orange, neutral grey).
