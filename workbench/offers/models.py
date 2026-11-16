@@ -468,6 +468,25 @@ class Offer(ModelWithTotal):
         offer.save()
         return offer
 
+    def last_closed(self):
+        """The status and the date the offer was last accepted or declined
+        on, from the audit log; e.g. for offers reopened for editing"""
+        from workbench.audit.models import LoggedAction
+
+        action = (
+            LoggedAction.objects
+            .for_model(Offer)
+            .filter(row_data__id=str(self.pk), row_data__closed_on__isnull=False)
+            .order_by("-event_id")
+            .first()
+        )
+        if action is None:
+            return None
+        return (
+            int(action.row_data["status"]),
+            dt.date.fromisoformat(action.row_data["closed_on"]),
+        )
+
     def items(self):
         """The services and headings in the order they are shown"""
         return offer_items(services=self.services.all(), headings=self.headings.all())

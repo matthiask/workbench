@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
+from django.utils.html import format_html
 from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.models import User
@@ -143,6 +144,23 @@ class OfferForm(PostalAddressSelectionForm):
         self.instance.project = self.project
         # Services of offers which have been sent stay as they were sent
         self.services_changeable = self.instance.services_changeable
+        if (
+            self.instance.pk
+            and not self.instance.closed_on
+            and (last := self.instance.last_closed())
+        ):
+            status, closed_on = last
+            self.fields["closed_on"].help_text = format_html(
+                '{} <a href="#" data-field-value="{}">{}</a>',
+                (
+                    _("Last accepted on %s.")
+                    if status == Offer.ACCEPTED
+                    else _("Last closed on %s.")
+                )
+                % local_date_format(closed_on),
+                closed_on.isoformat(),
+                _("Use this date"),
+            )
         self.formsets = {
             "services": ServiceFormset(
                 self.data or None,

@@ -59,8 +59,9 @@ Projekt ein.
 Die Leistungen offerierter, akzeptierter und abgelehnter Offerten bleiben,
 wie sie versandt wurden. Um sie zu ändern, setze die Offerte zurück auf
 «In Vorbereitung» und speichere, dann bearbeite die Leistungen und
-setze die Offerte wieder auf ihren Status. Gib dabei das Datum, an dem
-sie akzeptiert oder abgelehnt wurde, wieder bei «Geschlossen am» ein.
+setze die Offerte wieder auf ihren Status. «Geschlossen am» bietet das
+Datum an, an dem sie zuletzt akzeptiert oder abgelehnt wurde, damit
+Auswertungen sie weiterhin im Monat der Annahme zählen.
 Das ist so vorgesehen:
 Offerten sollen dem besten aktuellen Wissensstand entsprechen, z.B. wenn
 eine optionale Leistung doch bestellt wird, eine Leistung wegfällt oder

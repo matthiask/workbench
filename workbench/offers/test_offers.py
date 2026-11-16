@@ -1553,3 +1553,22 @@ class OffersTest(TestCase):
         self.assertRedirects(response, offer.get_absolute_url())
         offer.refresh_from_db()
         self.assertEqual(offer.closed_on, in_days(-20))
+
+    def test_last_closed_on(self):
+        """Reopened offers show when they were last accepted"""
+        offer = factories.OfferFactory.create(
+            status=Offer.ACCEPTED, closed_on=in_days(-20)
+        )
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(offer.urls["update"])
+        self.assertNotContains(response, "Last accepted on")
+
+        Offer.objects.filter(pk=offer.pk).update(
+            status=Offer.IN_PREPARATION, closed_on=None
+        )
+        response = self.client.get(offer.urls["update"])
+        self.assertContains(
+            response,
+            f"Last accepted on {local_date_format(in_days(-20))}."
+            f' <a href="#" data-field-value="{in_days(-20).isoformat()}">',
+        )

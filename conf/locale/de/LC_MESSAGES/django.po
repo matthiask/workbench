@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 16:03+0100\n"
+"POT-Creation-Date: 2026-11-16 16:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3491,6 +3491,20 @@ msgstr "Offerten"
 #: workbench/offers/forms.py
 msgid "This offer is not in preparation anymore. Put it back into preparation to change its services."
 msgstr "Diese Offerte befindet sich nicht mehr in Vorbereitung. Setze sie zurück in Vorbereitung, um ihre Leistungen zu ändern."
+
+#: workbench/offers/forms.py
+#, python-format
+msgid "Last accepted on %s."
+msgstr "Zuletzt akzeptiert am %s."
+
+#: workbench/offers/forms.py
+#, python-format
+msgid "Last closed on %s."
+msgstr "Zuletzt geschlossen am %s."
+
+#: workbench/offers/forms.py
+msgid "Use this date"
+msgstr "Dieses Datum verwenden"
 
 #: workbench/offers/forms.py
 msgid "This offer has planning entries after the current week linked to it. Delete them now that the offer is being declined?"
@@ -7097,9 +7111,6 @@ msgstr "%(model)s mit %(attribute)s=%(id)s"
 
 #~ msgid "facts"
 #~ msgstr "Fakten"
-
-#~ msgid "Set date"
-#~ msgstr "Datum setzen"
 
 #~ msgid "Facts"
 #~ msgstr "Fakten"

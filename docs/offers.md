@@ -52,8 +52,9 @@ are set in the service's own form on the project.
 
 The services of offered, accepted and declined offers stay as they were
 sent. To change them, set the offer back to "In preparation" and save,
-then edit the services and set the offer back to its status, entering
-the date it was accepted or declined again as "closed on". That's
+then edit the services and set the offer back to its status. "Closed on"
+offers the date it was last accepted or declined, so that reports
+still count it in the month it was accepted. That's
 expected: offers should reflect the best current knowledge, e.g. when
 an optional service is ordered after all, a service is dropped or the
 hours change, so that budgets and reports stay right. Offered and
