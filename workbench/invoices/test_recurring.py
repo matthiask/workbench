@@ -5,6 +5,7 @@ from unittest import mock
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 from time_machine import travel
 
@@ -285,13 +286,19 @@ class RecurringTest(TestCase):
             )
             self.assertRedirects(response, ri.urls["detail"])
 
+    @override_settings(RECURRING_INVOICES_CC=["hosting@example.com"])
     def test_create_and_notify(self):
-        """The recurring invoices task notifies owners"""
-        factories.RecurringInvoiceFactory.create()
+        """The recurring invoices task notifies owners, replies reach the
+        owner and the addresses in Cc"""
+        r = factories.RecurringInvoiceFactory.create()
 
         create_recurring_invoices_and_notify()
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "recurring invoices")
+        self.assertEqual(mail.outbox[0].cc, ["hosting@example.com"])
+        self.assertEqual(
+            mail.outbox[0].reply_to, [r.owned_by.email, "hosting@example.com"]
+        )
 
         create_recurring_invoices_and_notify()
         self.assertEqual(len(mail.outbox), 1)
