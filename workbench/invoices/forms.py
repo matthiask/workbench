@@ -1737,7 +1737,7 @@ class SendReminderForm(Form):
             for invoice in self.invoices
             if invoice.owned_by.is_active
         })
-        sender = settings.WORKBENCH.REMINDER_FROM_EMAIL
+        sender = settings.WORKBENCH.BOOKKEEPING_EMAIL
         return {
             "to": [to],
             "cc": owners,
@@ -1749,7 +1749,7 @@ class SendReminderForm(Form):
                 email
                 for email in [
                     self.request.user.email,
-                    settings.WORKBENCH.REMINDER_FROM_EMAIL,
+                    settings.WORKBENCH.BOOKKEEPING_EMAIL,
                 ]
                 if email
             ],
@@ -1759,7 +1759,7 @@ class SendReminderForm(Form):
         mail = render_to_mail(
             "invoices/reminder_mail",
             {"WORKBENCH": settings.WORKBENCH},
-            from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
+            from_email=settings.WORKBENCH.BOOKKEEPING_EMAIL,
             **self.recipients(self.cleaned_data["email"]),
         )
         with io.BytesIO() as buf:

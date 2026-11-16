@@ -351,7 +351,7 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(post({"until": None}).status_code, 409)
 
     @mock.patch.object(
-        settings.WORKBENCH, "REMINDER_FROM_EMAIL", "bookkeeping@example.com"
+        settings.WORKBENCH, "BOOKKEEPING_EMAIL", "bookkeeping@example.com"
     )
     def test_send_reminder(self):
         """Reminders are previewed without a recipient and sent with one"""

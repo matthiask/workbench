@@ -2408,7 +2408,7 @@ class InvoicesTest(TestCase):
         } | {f"modal-{key}": value for key, value in kwargs.items()}
 
     @mock.patch.object(
-        settings.WORKBENCH, "REMINDER_FROM_EMAIL", "bookkeeping@example.com"
+        settings.WORKBENCH, "BOOKKEEPING_EMAIL", "bookkeeping@example.com"
     )
     def test_send(self):
         """Invoices in preparation are released and mailed to the customer

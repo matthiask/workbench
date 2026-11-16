@@ -496,7 +496,7 @@ class RecurringTest(TestCase):
         self.assertEqual(invoices[0].service_period_from, in_days(-70))
 
     @mock.patch.object(
-        settings.WORKBENCH, "REMINDER_FROM_EMAIL", "bookkeeping@example.com"
+        settings.WORKBENCH, "BOOKKEEPING_EMAIL", "bookkeeping@example.com"
     )
     def test_send_automatically(self):
         """Recurring invoices may send their invoices to the first suggested

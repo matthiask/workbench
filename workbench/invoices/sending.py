@@ -100,13 +100,13 @@ def invoice_mail(invoice, *, to, subject, body):
     owner = [invoice.owned_by.email] if invoice.owned_by.is_active else []
     sender = [
         email
-        for email in [settings.WORKBENCH.REMINDER_FROM_EMAIL]
+        for email in [settings.WORKBENCH.BOOKKEEPING_EMAIL]
         if email and email not in owner
     ]
     mail = EmailMultiAlternatives(
         fill(subject, invoice),
         fill("\n".join(body.splitlines()), invoice),
-        from_email=settings.WORKBENCH.REMINDER_FROM_EMAIL,
+        from_email=settings.WORKBENCH.BOOKKEEPING_EMAIL,
         to=[to],
         cc=owner,
         reply_to=owner + sender,
