@@ -13,6 +13,30 @@ from workbench.accounts.models import API_TOKEN_LIFETIME, APIToken, CoffeePairin
 
 CANDIDATES = 20
 WISHES = [
+    "I have measured out my life with coffee spoons. – T. S. Eliot",
+    (
+        "Coffee should be black as hell, strong as death and sweet as love."
+        " – Turkish proverb"
+    ),
+    (
+        "Ah! How sweet coffee tastes! Lovelier than a thousand kisses."
+        " – Bach, Coffee Cantata"
+    ),
+    "This is – excuse me – a damn fine cup of coffee. – Agent Cooper, Twin Peaks",
+    "Mmm… donuts. – Homer Simpson",
+    "The optimist sees the donut, the pessimist sees the hole.",
+    "No agenda, no minutes, no action items. Just coffee.",
+    "The only meeting nobody has to prepare for.",
+    "Today’s sprint goal: one coffee, one donut, one good conversation.",
+    "Ask what they’re working on. Then ask what they’d rather be working on.",
+    "Decaf is fine too. We don’t judge. Much.",
+    "A donut a fortnight keeps the silos away.",
+    "Status update: caffeinating.",
+    "Find out something about each other that isn’t in Workbench.",
+    "Bring questions, leave with crumbs.",
+]
+# Everyone has read these many times, they appear less often
+OLD_WISHES = [
     "I hope you’ll enjoy it :-)",
     "But even a bad cup of coffee is better than no coffee at all. – David Lynch",
     "You can’t buy happiness but you can buy coffee and that’s pretty close.",
@@ -22,6 +46,14 @@ WISHES = [
     "Time to drink some coffee.",
     "Drink coffee. Do stupid things faster with more energy.",
 ]
+OLD_WISHES_WEIGHT = 0.2
+
+
+def random_wish():
+    return random.choices(
+        WISHES + OLD_WISHES,
+        weights=[1] * len(WISHES) + [OLD_WISHES_WEIGHT] * len(OLD_WISHES),
+    )[0]
 
 
 def generate_pairings(users):
@@ -101,7 +133,7 @@ def coffee_invites():
             {
                 "group": group,
                 "names": ", ".join(user.get_full_name() for user in group),
-                "wish": random.choice(WISHES),
+                "wish": random_wish(),
                 "WORKBENCH": settings.WORKBENCH,
             },
             to=[user.email for user in group],
