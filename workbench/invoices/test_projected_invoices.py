@@ -1,14 +1,14 @@
 import datetime as dt
 from decimal import Decimal
-from unittest import mock
 
-from django.conf import settings
 from django.core import mail
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 from time_machine import travel
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.invoices.tasks import send_unsent_projected_invoices_reminders
 from workbench.reporting.key_data import projected_gross_margin
@@ -21,13 +21,13 @@ class ProjectedInvoicesTest(TestCase):
         deactivate_all()
 
     @travel("2021-11-30")
-    @mock.patch.object(
-        settings.WORKBENCH, "BOOKKEEPING_EMAIL", "bookkeeping@example.com"
-    )
+    @override_settings(FEATURES={FEATURES.PRODUCTIVITY: F.USER})
     def test_projected_invoices(self):
         """Functionality around projected gross margin and reminder mails,
-        replies reach the bookkeeping"""
+        replies reach the people with the productivity feature"""
         obj = factories.ProjectedInvoiceFactory.create(gross_margin=Decimal(1000))
+        manager = factories.UserFactory.create(_features=[FEATURES.PRODUCTIVITY])
+        factories.UserFactory.create(_features=[FEATURES.PRODUCTIVITY], is_active=False)
         pgm = projected_gross_margin()
 
         self.assertEqual(pgm["monthly_overall"][(2021, 11)], Decimal(1000))
@@ -56,7 +56,7 @@ class ProjectedInvoicesTest(TestCase):
             send_unsent_projected_invoices_reminders()
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [obj.project.owned_by.email])
-        self.assertEqual(mail.outbox[0].reply_to, ["bookkeeping@example.com"])
+        self.assertEqual(mail.outbox[0].reply_to, [manager.email])
 
     def test_projected_invoices_form(self):
         """Projected invoices aren't added to closed projects nor dated on or

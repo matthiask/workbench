@@ -97,6 +97,11 @@ def send_unsent_projected_invoices_reminders():
     for project in upi:
         by_user[project["project"].owned_by].append(project)
 
+    # Replies go to the people responsible for productivity
+    managers = [
+        user for user in User.objects.active() if user.features[FEATURES.PRODUCTIVITY]
+    ]
+
     for user, projects in by_user.items():
         body = "\n\n".join(
             PROJECTED_GROSS_MARGIN_TEMPLATE.format(
@@ -150,9 +155,7 @@ Wenn Du die Rechnungen nicht stellen kannst, aktualisiere bitte
 die geplanten Rechnungen oder schliesse das Projekt.
 """,
             to=[user.email],
-            reply_to=[
-                email for email in [settings.WORKBENCH.BOOKKEEPING_EMAIL] if email
-            ]
+            reply_to=[manager.email for manager in managers if manager != user]
             or [user.email],
         ).send()
 
