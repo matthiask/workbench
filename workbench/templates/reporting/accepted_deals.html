@@ -19,7 +19,7 @@
     </section>
   {% endif %}
   <section class="card mb-3 wb-table-card">
-    <table class="table table-sm table-hover mb-0 wb-compact-table">
+    <table class="table table-sm table-hover mb-0 wb-compact-table wb-wrap-headings">
       <thead>
         <tr>
           <th>{% translate 'month'|capfirst %}</th>
@@ -28,11 +28,11 @@
             <th></th>
           {% endfor %}
           {% if stats.offers %}
-            <th class="text-end">{% translate 'Offers without deal' %}</th>
+            <th class="text-end" title="{% translate 'Offers without deal' %}">{% translate 'offers'|capfirst %}</th>
             <th></th>
           {% endif %}
           {% if stats.maintenance %}
-            <th class="text-end">{% translate 'Maintenance without deal' %}</th>
+            <th class="text-end" title="{% translate 'Maintenance without deal' %}">{% translate 'Maintenance' %}</th>
             <th></th>
           {% endif %}
           <th class="text-end">{% translate 'total'|capfirst %}</th>
@@ -42,40 +42,40 @@
       <tbody>
         {% for row in stats.by_month_and_valuetype %}
           <tr>
-            <td>{{ row.month|date:'F Y' }}</td>
+            <td class="text-nowrap">{{ row.month|date:'F Y' }}</td>
             {% for value in row.values %}
-              <td class="text-end">{{ value.value|currency }}</td>
+              <td class="text-end">{{ value.value|currency_rounded }}</td>
               <td></td>
             {% endfor %}
             {% if stats.offers %}
-              <td class="text-end">{{ row.offers|currency }}</td>
+              <td class="text-end">{{ row.offers|currency_rounded }}</td>
               <td></td>
             {% endif %}
             {% if stats.maintenance %}
-              <td class="text-end">{{ row.maintenance|currency }}</td>
+              <td class="text-end">{{ row.maintenance|currency_rounded }}</td>
               <td></td>
             {% endif %}
-            <td class="text-end">{{ row.sum|currency }}</td>
+            <td class="text-end">{{ row.sum|currency_rounded }}</td>
             <td></td>
           </tr>
         {% endfor %}
         <tr>
           <th>{% translate 'total'|capfirst %}</th>
           {% for row in stats.by_valuetype %}
-            <th class="text-end">{{ row.sum|currency }}</th>
+            <th class="text-end">{{ row.sum|currency_rounded }}</th>
             <th>
               <div style="margin: -5px 0; display: inline-block">{% pie row.sum row.target type='good' size=28 %}</div>
             </th>
           {% endfor %}
           {% if stats.offers %}
-            <th class="text-end">{{ stats.offers_sum|currency }}</th>
+            <th class="text-end">{{ stats.offers_sum|currency_rounded }}</th>
             <th></th>
           {% endif %}
           {% if stats.maintenance %}
-            <th class="text-end">{{ stats.maintenance_sum|currency }}</th>
+            <th class="text-end">{{ stats.maintenance_sum|currency_rounded }}</th>
             <th></th>
           {% endif %}
-          <th class="text-end">{{ stats.sum|currency }}</th>
+          <th class="text-end">{{ stats.sum|currency_rounded }}</th>
           <th>
             <div style="margin: -5px 0; display: inline-block">
               {% pie stats.sum stats.target type='good' size=28 %}
@@ -83,21 +83,21 @@
           </th>
         </tr>
         <tr>
-          <th>
+          <th class="text-nowrap">
             {% translate 'target'|capfirst %} ({{ stats.weeks|stringformat:'.1f' }}
             {% translate 'weeks' %})
           </th>
           {% for row in stats.by_valuetype %}
-            <th class="text-end">{{ row.target|currency }}</th>
+            <th class="text-end">{{ row.target|currency_rounded }}</th>
             <th></th>
           {% endfor %}
           {% if stats.offers %}<th></th><th></th>{% endif %}
           {% if stats.maintenance %}<th></th><th></th>{% endif %}
-          <th class="text-end">{{ stats.target|currency }}</th>
+          <th class="text-end">{{ stats.target|currency_rounded }}</th>
           <th></th>
         </tr>
         <tr>
-          <th>{% translate 'median age' %}</th>
+          <th class="text-nowrap">{% translate 'median age' %}</th>
           {% for row in stats.by_valuetype %}
             <th class="text-end">
               {% if row.median_age is not None %}{{ row.median_age }} {% translate 'days' %}{% endif %}
@@ -140,7 +140,7 @@
               </div>
             </td>
             <td class="text-end">
-              {{ row.sum|currency }}
+              {{ row.sum|currency_rounded }}
             </td>
           </tr>
         {% endfor %}
@@ -153,7 +153,7 @@
           </th>
           <th></th>
           <th class="text-end">
-            {{ stats.sum|currency }}
+            {{ stats.sum|currency_rounded }}
           </th>
         </tr>
       </tbody>
@@ -173,7 +173,7 @@
           <tr>
             <td>{% link_or_none deal with_badge=True %}</td>
             <td class="text-end">
-              {{ deal.value|currency }}
+              {{ deal.value|currency_rounded }}
             </td>
           </tr>
         {% endfor %}
@@ -184,7 +184,7 @@
               <span class="text-body-secondary">{% translate 'Offer without deal' %}</span>
             </td>
             <td class="text-end">
-              {{ offer.total_excl_tax|currency }}
+              {{ offer.total_excl_tax|currency_rounded }}
             </td>
           </tr>
         {% endfor %}
@@ -195,7 +195,7 @@
               <span class="text-body-secondary">{% translate 'Maintenance without deal' %}</span>
             </td>
             <td class="text-end">
-              {{ row.sum|currency }}
+              {{ row.sum|currency_rounded }}
             </td>
           </tr>
         {% endfor %}
@@ -204,7 +204,7 @@
             {% translate 'total'|capfirst %}
           </th>
           <th class="text-end">
-            {{ stats.sum|currency }}
+            {{ stats.sum|currency_rounded }}
           </th>
         </tr>
       </tbody>

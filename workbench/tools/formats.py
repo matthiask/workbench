@@ -1,5 +1,5 @@
 import datetime as dt
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.utils.formats import date_format
 from django.utils.html import format_html
@@ -32,6 +32,12 @@ def _fmt(*, fmt, value, exp, plus_sign=False):
 
 def currency(value, plus_sign=False):  # noqa: FBT002
     return _fmt(fmt="{}{:,.2f}", value=value, exp=Z2, plus_sign=plus_sign)
+
+
+def currency_rounded(value):
+    """Whole francs, for reports where cents add nothing"""
+    value = Decimal(value or 0).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+    return f"{value or Decimal(0):,.0f}".replace(",", "’")
 
 
 def total_incl_tax(instance):

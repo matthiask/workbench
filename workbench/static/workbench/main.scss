@@ -1231,6 +1231,12 @@ a:hover {
 .wb-compact-table {
   font-variant-numeric: tabular-nums;
 
+  // Long words in headings (value types) are hyphenated, short ones stay
+  &.wb-wrap-headings thead th {
+    hyphens: auto;
+    hyphenate-limit-chars: 12 5 5;
+  }
+
   tr:last-child td {
     border-bottom: 0;
   }
