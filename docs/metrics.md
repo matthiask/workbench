@@ -145,7 +145,7 @@ Period: 1 Jan of (current year − 3) to 31 Dec of the current year. `workbench/
 
 | Label (DE) | Computation |
 |---|---|
-| Leistungsstunden in offenen Aufträgen | Σ Service.service_hours of budgeted services on open projects of type `order`. `key_data.py:service_hours_in_open_orders` |
+| Budgetierte Stunden in offenen Aufträgen | Σ Service.service_hours of budgeted services on open projects of type `order`. `key_data.py:service_hours_in_open_orders` |
 | Erfasste Stunden in offenen Aufträgen | Σ LoggedHours.hours (time, not hours_for_invoicing; all dates) on services of open `order` projects. `key_data.py:logged_hours_in_open_orders` |
 | Total exkl. MwSt aller offenen Rechnungen (EN "Sent invoices total excl. tax") | Σ Invoice.total_excl_tax with status `SENT` (any invoiced_on, any project/none). `key_data.py:sent_invoices_total` |
 | Total exkl. MwSt aller fälligen Rechnungen | Σ Invoice.total_excl_tax with status `SENT` and `due_on <= today`. `key_data.py:due_invoices_total` |
@@ -320,7 +320,7 @@ Sorting: web by delta ascending; API by delta descending.
 | "(+x h)" ohne Stundensatz | `effort_hours_with_rate_undefined` | Σ `hours` on services with `effort_rate IS NULL`, `rendered_on <= cutoff` |
 | Fremdkosten | `third_party_costs` | Σ `LoggedCost.third_party_costs` (not NULL) not yet put on a services invoice on the cutoff date (`invoice_service IS NULL`, or its invoice is dated after the cutoff), `rendered_on <= cutoff`. Display only, not deducted from anything. |
 | Verrechnet | `invoiced` | Σ `Invoice.total_excl_tax`, status SENT/PAID, `invoiced_on <= cutoff`. Third party costs on invoices are **not** deducted. |
-| Leistungsstunden: "logged / budgeted" | `hours` / `service_hours` | `hours` = Σ `LoggedHours.hours` (all services, incl. declined/optional/rate-less), `rendered_on <= cutoff`; `service_hours` = Σ `service_hours` of budgeted services (no cutoff). |
+| Budgetierte Stunden: "logged / budgeted" | `hours` / `service_hours` | `hours` = Σ `LoggedHours.hours` (all services, incl. declined/optional/rate-less), `rendered_on <= cutoff`; `service_hours` = Σ `service_hours` of budgeted services (no cutoff). |
 | Δ | `delta` | `logbook − invoiced` (`cost + effort_cost − invoiced`). Positive = work not invoiced, negative = accruals. |
 | geplanter Umsatz (report only) | `projected_gross_margin` | Σ `ProjectedInvoice.gross_margin`, **open projects only** (`closed_on IS NULL` today), all dates. |
 | column headed with cutoff date "dd.mm." | `projected_gross_margin_on_cutoff_date` | same, only projections with `invoiced_on <= cutoff`. |
@@ -616,7 +616,7 @@ and counting accepted offers only.
 | Budgetverschiebungen | `budget_adjustment` (only shown if ≠ 0) |
 | Umsatz bereinigt | `max(max(offered if open else 0, projected, invoiced) + budget_adjustment, 0)` |
 | **Stunden** section | |
-| Leistungsstunden | `hours_offered` = budgeted service hours (displayed for closed projects too, but not used there) |
+| Budgetierte Stunden | `hours_offered` = budgeted service hours (displayed for closed projects too, but not used there) |
 | Erfasste Stunden auf diesen Leistungen | `hours_logged_budgeted` |
 | Erfasste Stunden auf anderen Leistungen | `hours_logged − hours_logged_budgeted` |
 | Relevante Stunden | `relevant_hours(hours_offered if open else 0, hours_logged, hours_logged_budgeted)` |

@@ -4701,7 +4701,7 @@ msgstr "Leistungstypen"
 #: workbench/templates/reporting/_budget_statistics_table.html
 #: workbench/tools/xlsx.py
 msgid "service hours"
-msgstr "Leistungsstunden"
+msgstr "budgetierte Stunden"
 
 #: workbench/services/models.py workbench/templates/offers/offer_form.html
 msgid "service cost"
@@ -6037,7 +6037,7 @@ msgstr "Budgetverschiebungen"
 
 #: workbench/templates/projects/project_profitability.html
 msgid "Service hours"
-msgstr "Leistungsstunden"
+msgstr "Budgetierte Stunden"
 
 #: workbench/templates/projects/project_profitability.html
 msgid "Hours logged on these services"
@@ -6078,11 +6078,11 @@ msgstr "Budget, das auf andere Projekte verschoben wurde, wird abgezogen; Budget
 
 #: workbench/templates/projects/project_profitability.html
 msgid "Service hours are the hours entered in the services, except for optional services and services of declined offers or budget retainers. Hours of offers which haven't been accepted yet are included even though their amount isn't."
-msgstr "Leistungsstunden sind die in den Leistungen erfassten Stunden, ausser bei optionalen Leistungen und Leistungen von abgelehnten Offerten oder von Offerten, die Budget zurückbehalten. Stunden von noch nicht akzeptierten Offerten zählen mit, auch wenn ihr Betrag noch nicht mitzählt."
+msgstr "Budgetierte Stunden sind die in den Leistungen erfassten Stunden, ausser bei optionalen Leistungen und Leistungen von abgelehnten Offerten oder von Offerten, die Budget zurückbehalten. Stunden von noch nicht akzeptierten Offerten zählen mit, auch wenn ihr Betrag noch nicht mitzählt."
 
 #: workbench/templates/projects/project_profitability.html
 msgid "The relevant hours are the service hours or the hours logged on these services, whichever is larger. Hours logged on other services (for example optional services) are always added on top."
-msgstr "Massgebend ist der grössere Wert aus Leistungsstunden und auf diesen Leistungen erfassten Stunden. Stunden, die auf anderen Leistungen (z.B. optionalen Leistungen) erfasst wurden, werden immer dazugezählt."
+msgstr "Massgebend ist der grössere Wert aus budgetierten Stunden und auf diesen Leistungen erfassten Stunden. Stunden, die auf anderen Leistungen (z.B. optionalen Leistungen) erfasst wurden, werden immer dazugezählt."
 
 #: workbench/templates/projects/project_profitability.html
 msgid "The rate for accepted offers only uses their amount and their hours. It shows how profitable the project is if no further offers are accepted and no work happens outside of the accepted offers."
@@ -6144,7 +6144,7 @@ msgstr "Erreicht"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Service hours in open orders"
-msgstr "Leistungsstunden in offenen Aufträgen"
+msgstr "Budgetierte Stunden in offenen Aufträgen"
 
 #: workbench/templates/reporting/key_data.html
 msgid "Logged hours in open orders"
