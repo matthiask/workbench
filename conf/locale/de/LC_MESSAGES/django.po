@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 07:43+0100\n"
+"POT-Creation-Date: 2026-11-16 07:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -919,7 +919,7 @@ msgid "vacation days overrides"
 msgstr "Manuell definierte Ferientage"
 
 #: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
-msgid "running net work hours"
+msgid "running balance"
 msgstr "Stundensaldo fortlaufend"
 
 #: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
@@ -988,7 +988,7 @@ msgid "working time"
 msgstr "Arbeitszeit"
 
 #: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
-msgid "net work hours per month"
+msgid "balance per month"
 msgstr "Stundensaldo pro Monat"
 
 #: workbench/awt/pdf.py workbench/templates/awt/_year_details.html
@@ -2953,7 +2953,7 @@ msgstr "Bitte aktualisiere die Liste der Zahlungseingänge. Zahlungserinnerungen
 msgid "No overdue invoices with missing recent reminders."
 msgstr "Keine überfälligen Rechnungen mit fehlenden Zahlungserinnerungen."
 
-#: workbench/invoices/tasks.py
+#: workbench/invoices/tasks.py workbench/planning/xlsx.py
 msgid "Responsible"
 msgstr "Verantwortlich"
 
@@ -3881,10 +3881,6 @@ msgstr "Typ"
 #: workbench/planning/xlsx.py
 msgid "Title"
 msgstr "Titel"
-
-#: workbench/planning/xlsx.py
-msgid "User/Provider"
-msgstr "Mitarbeiter:in"
 
 #: workbench/planning/xlsx.py
 msgid "Service Type"
@@ -6208,7 +6204,7 @@ msgstr "Pro Projekt wird der grössere Wert aus den Fremdkosten auf Rechnungen u
 
 #: workbench/templates/reporting/labor_costs.html
 #: workbench/templates/reporting/labor_costs_by_user.html
-#: workbench/tools/xlsx.py
+#: workbench/templates/reporting/squeeze.html workbench/tools/xlsx.py
 msgid "Undefined rate"
 msgstr "Ohne Stundensatz"
 
@@ -6353,12 +6349,8 @@ msgid "Hours for invoicing"
 msgstr "Stunden für Verrechnung"
 
 #: workbench/templates/reporting/squeeze.html
-msgid "Without rate"
-msgstr "Ohne Stundensatz"
-
-#: workbench/templates/reporting/squeeze.html
 #, python-format
-msgid "Hours without rate: default of %(rate)s/h applied"
+msgid "Hours with undefined rate: default of %(rate)s/h applied"
 msgstr "Stunden ohne Stundensatz: Standard von %(rate)s/h angewendet"
 
 #: workbench/templates/reporting/squeeze.html
@@ -6384,7 +6376,7 @@ msgstr "Aufschlüsselung nach Person"
 #: workbench/templates/reporting/squeeze.html
 #, python-format
 msgid ""
-"Hours without rate: default of\n"
+"Hours with undefined rate: default of\n"
 "                          %(rate)s/h applied"
 msgstr "Stunden ohne Stundensatz: Standard von %(rate)s/h angewendet"
 

@@ -499,10 +499,10 @@ Anna: `4'000 / 7'000 × 6'000 = 3'428.57` (171.43/h); Ben: `3'000 / 7'000 ×
 
 Per-project modal ("User breakdown"): header Gross margin /
 Hours (= relevant hours) / Rate; per person Hours, Hours for invoicing
-(`HOURS_FOR_INVOICING` in the period), Without rate
+(`HOURS_FOR_INVOICING` in the period), Undefined rate
 (`hours_rate_unknown`), Gross margin (person margin), Rate (person
 rate, red < 150); footer shows period totals and the project rate. Note "Hours
-without rate: default of 150/h applied" if any.
+with undefined rate: default of 150/h applied" if any.
 
 XLSX additionally: offered hours (only open projects), logged hours (all
 time), period hours for invoicing, period rate (`gross_margin_in_range /
@@ -521,7 +521,7 @@ Everyone who logged hours in the period (also only on internal projects).
 | Absence days | Σ absence days in the period (see below) |
 | Hours | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
 | Rate | `gross_margin / hours_in_range`: the overall rate of the person, internal hours included on purpose (not only the rate on profitable projects) |
-| Gross margin | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Hours, Hours for invoicing, Without rate, Gross margin, Rate) |
+| Gross margin | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Hours, Hours for invoicing, Undefined rate, Gross margin, Rate) |
 | External % | `100 × external_hours / total_hours` (external = hours on non-internal projects, `workbench/projects/reporting.py:hours_per_type`) |
 | Target ext. % | `profitable_percentage = 100 − Σ InternalTypeUser.percentage` (per-user override, else the internal type's default percentage) |
 | Δ ext. % | `External % − Target ext. %`, red if < 0 |
@@ -694,7 +694,7 @@ Productivity in the sense of the `PRODUCTIVITY` feature ("Productivity") is the 
 
 ### Annual working time
 
-- Where: web `/report/annual-working-time/` (`awt_year_report`, `workbench/awt/views.py:annual_working_time_view`), with `?year=`, `?user=<id>|active` and `?export=pdf` (one PDF, or a ZIP of PDFs plus an XLSX sheet "Running net work hours" and a holiday list, `workbench/awt/pdf.py:annual_working_time_pdf`). API: `GET /api/reports/working-time/?year=&user=&all=&weekly=` (`workbench/awt/api.py:working_time`), CLI `wb reports working-time`.
+- Where: web `/report/annual-working-time/` (`awt_year_report`, `workbench/awt/views.py:annual_working_time_view`), with `?year=`, `?user=<id>|active` and `?export=pdf` (one PDF, or a ZIP of PDFs plus an XLSX sheet "Running balance" and a holiday list, `workbench/awt/pdf.py:annual_working_time_pdf`). API: `GET /api/reports/working-time/?year=&user=&all=&weekly=` (`workbench/awt/api.py:working_time`), CLI `wb reports working-time`.
 - Access: your own report needs no feature. Everyone sees the summary of everyone (web `active`, API `all` with `summary`) for planning: employment, balance as of the cutoff and its trend, vacation days left and planned, other planned absences and the vacation planning warning. The details of others (monthly figures, absences, sickness days, unconfirmed paid leave, the company-wide tiles and the PDF/ZIP) require `PERSONNEL_ADMINISTRATION`; without, the web ignores `?user=<id>` and shows your own report, the API answers 403 and returns `all` without `users`.
 - Answers: did the person work their target time this year, counting absences, and how many vacation days are left?
 
@@ -720,8 +720,8 @@ Productivity in the sense of the `PRODUCTIVITY` feature ("Productivity") is the 
 | Countable absence hours | `(vacation + sickness + paid + school + correction + vacation_days_correction) × wtpd` |
 | Logged hours | `Σ LoggedHours.hours` with `rendered_on` in that month |
 | Working time | `logged hours + countable absence hours` |
-| Net work hours per month | `working time − target time` |
-| Running net work hours | cumulative sum of the monthly balances from January. The total is `Σ` of all 12 months, rounded to 0.1 (`Z1`). |
+| Balance per month | `working time − target time` |
+| Running balance | cumulative sum of the monthly balances from January. The total is `Σ` of all 12 months, rounded to 0.1 (`Z1`). |
 | Vacation days credit | `remaining` after all vacation, if > 0. The display is rounded **up** to 0.01. |
 | Balance | `Σ monthly balances + wtpd × vacation days credit`. "balance_days" = `balance / wtpd`, rounded up to 0.01. |
 
@@ -749,7 +749,7 @@ Assume wtpd = 8 h and March has `Year.march` = 22 days. The person works 80% all
 - Target time March = (22 × 1 − 1) × 0.8 × 8 = **134.4 h**
 - Vacation days available per month = 5 × 5 / 12 × 0.8 = 1.667, which makes **20 days** per year
 - Countable absence hours = 4 × 8 = **32 h** (absence days are full days at wtpd. The person enters 4 days for their week off, which equals 4 × 6.4 h × 5/4)
-- Working time = 110 + 32 = 142 h. **Net work hours per month = 142 − 134.4 = +7.6 h**
+- Working time = 110 + 32 = 142 h. **Balance per month = 142 − 134.4 = +7.6 h**
 - The week view of that week: target = 4 weekdays × 6.4 = 25.6 h, and the 4 vacation days are spread over 5 weekdays = 0.8 days/day × 8 h = 32 h.
 - Year end: suppose these were the only vacation days. Then the credit is 16 days, and `balance = Σ monthly balances + 16 × 8 = Σ + 128 h`.
 

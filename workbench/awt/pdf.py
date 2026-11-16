@@ -39,7 +39,7 @@ def annual_working_time_pdf(statistics):
                 )
             has_holidays = statistics.get("has_holidays", False)
             xlsx = WorkbenchXLSXDocument()
-            xlsx.add_sheet(_("running net work hours"))
+            xlsx.add_sheet(_("running balance"))
             xlsx.table(
                 [""]
                 + [date_format(day, "M") for day in data["months"]["months"]]
@@ -216,7 +216,7 @@ def user_stats_pdf(data):
             [_("working time")]
             + [hours(value) if value else "" for value in data["working_time"]]
             + [hours(data["totals"]["working_time"])],
-            [_("net work hours per month")]
+            [_("balance per month")]
             + [hours(value) for value in data["monthly_sums"]]
             + [""],
         ))
@@ -226,7 +226,7 @@ def user_stats_pdf(data):
 
         table = []
         table.append(
-            [_("running net work hours")]
+            [_("running balance")]
             + [hours(value) for value in data["running_sums"]]
             + [hours(data["totals"]["running_sum"])]
         )

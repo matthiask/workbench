@@ -63,7 +63,7 @@ class PlanningXLSXDocument:
         headers = [
             _("Type"),
             _("Title"),
-            _("User/Provider"),
+            _("Responsible"),
             _("Service Type"),
             _("Hours"),
             _("Start"),

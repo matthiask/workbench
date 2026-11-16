@@ -54,7 +54,7 @@
                       <th>{% translate 'User' %}</th>
                       <th class="text-end">{% translate 'Hours' %}</th>
                       <th class="text-end">{% translate 'Hours for invoicing' %}</th>
-                      <th class="text-end">{% translate 'Without rate' %}</th>
+                      <th class="text-end">{% translate 'Undefined rate' %}</th>
                       <th class="text-end">{% translate 'Gross margin' %}</th>
                       <th class="text-end">{% translate 'Rate' %}</th>
                     </tr>
@@ -92,8 +92,8 @@
                 </table>
                 {% if p.hours_rate_unknown %}
                   <p class="text-muted small mt-2">
-                    {% blocktranslate with rate=data.default_hourly_rate|currency trimmed %}Hours without rate: default
-                      of
+                    {% blocktranslate with rate=data.default_hourly_rate|currency trimmed %}Hours with undefined rate:
+                      default of
                       {{ rate }}/h applied{% endblocktranslate %}
                   </p>
                 {% endif %}
@@ -205,7 +205,7 @@
                       <th>{% translate 'Project' %}</th>
                       <th class="text-end">{% translate 'Hours' %}</th>
                       <th class="text-end">{% translate 'Hours for invoicing' %}</th>
-                      <th class="text-end">{% translate 'Without rate' %}</th>
+                      <th class="text-end">{% translate 'Undefined rate' %}</th>
                       <th class="text-end">{% translate 'Gross margin' %}</th>
                       <th class="text-end">{% translate 'Rate' %}</th>
                     </tr>
@@ -241,7 +241,7 @@
                 </table>
                 {% if ud.hours_rate_unknown %}
                   <p class="text-muted small mt-2">
-                    {% blocktranslate with rate=data.default_hourly_rate|currency %}Hours without rate: default of
+                    {% blocktranslate with rate=data.default_hourly_rate|currency %}Hours with undefined rate: default of
                           {{ rate }}/h applied{% endblocktranslate %}
                   </p>
                 {% endif %}
