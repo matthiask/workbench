@@ -34,6 +34,17 @@ WISHES = [
     "Status update: caffeinating.",
     "Find out something about each other that isn’t in Workbench.",
     "Bring questions, leave with crumbs.",
+    "Tea. Earl Grey. Hot. – Captain Picard",
+    ("…a liquid that was almost, but not quite, entirely unlike tea. – Douglas Adams"),
+    "It’s always tea-time. – The Hatter, Alice in Wonderland",
+    "And is there honey still for tea? – Rupert Brooke",
+    (
+        "You can never get a cup of tea large enough or a book long enough to suit"
+        " me. – C. S. Lewis"
+    ),
+    "Time for a little something. – Winnie-the-Pooh",
+    "C is for cookie, that’s good enough for me. – Cookie Monster",
+    "Tea drinkers welcome. Donuts are neutral ground.",
 ]
 # Everyone has read these many times, they appear less often
 OLD_WISHES = [
