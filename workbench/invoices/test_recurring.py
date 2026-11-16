@@ -36,8 +36,10 @@ class RecurringTest(TestCase):
         self.assertContains(response, invoice.get_absolute_url())
 
     def test_link_existing_invoices(self):
-        """The migration links existing invoices with the same customer and
-        title in the periods created so far, unambiguous ones only"""
+        """The migration links existing invoices of the same customer with
+        the same title in the periods created so far, covering exactly a
+        period, or with the same title and subtotal before the start;
+        unambiguous ones only"""
         from importlib import import_module
 
         from django.apps import apps
@@ -65,7 +67,7 @@ class RecurringTest(TestCase):
                 customer=ri.customer,
                 title=kwargs.pop("title", "Hosting"),
                 service_period_from=day,
-                service_period_until=day,
+                service_period_until=kwargs.pop("until", day),
                 **kwargs,
             )
 
@@ -74,6 +76,14 @@ class RecurringTest(TestCase):
         ambiguous = invoice(dt.date(2021, 1, 1), subtotal=300)
         not_yet = invoice(dt.date(2022, 1, 1), subtotal=100)
         other_title = invoice(dt.date(2020, 1, 1), subtotal=100, title="Domains")
+        period = invoice(
+            dt.date(2020, 1, 1),
+            until=dt.date(2020, 12, 31),
+            subtotal=90,
+            title="Domains",
+        )
+        edited_period = invoice(dt.date(2019, 6, 1), subtotal=100)
+        before = invoice(dt.date(2019, 6, 1), subtotal=90)
 
         migration.link_recurring_invoices(apps, None)
 
@@ -86,6 +96,9 @@ class RecurringTest(TestCase):
         self.assertIsNone(recurring(ambiguous))
         self.assertIsNone(recurring(not_yet))
         self.assertIsNone(recurring(other_title))
+        self.assertEqual(recurring(period), ri)
+        self.assertEqual(recurring(edited_period), ri)
+        self.assertIsNone(recurring(before))
 
     def test_recurring_invoice(self):
         """Creating recurring invoices and invoices from a RI works as expected"""
