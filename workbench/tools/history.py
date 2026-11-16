@@ -377,7 +377,10 @@ def _invoices_service_cfg(user):
 def _invoices_recurringinvoice_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
-    return {"fields": EVERYTHING}
+    return {
+        "fields": EVERYTHING,
+        "related": [(Invoice, "recurring_invoice_id")],
+    }
 
 
 def _invoices_projectedinvoice_cfg(user):

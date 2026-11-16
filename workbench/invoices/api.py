@@ -60,6 +60,12 @@ router = Router(auth=user_auth(feature=FEATURES.CONTROLLING), tags=["invoices"])
 STATUSES = KEYS["invoice_status"]
 
 
+class RecurringInvoiceSummary(Schema):
+    id: int
+    title: str
+    url: str
+
+
 class InvoiceOut(Schema):
     id: int
     code: str
@@ -71,6 +77,7 @@ class InvoiceOut(Schema):
     status: InvoiceStatus
     status_label: str
     project: ProjectSummary | None
+    recurring_invoice: RecurringInvoiceSummary | None
     customer: OrganizationOut
     owned_by: str
     invoiced_on: dt.date | None
@@ -97,6 +104,13 @@ def invoice_out(invoice, request):
         "status_label": invoice.get_status_display(),
         "project": project_summary(invoice.project, request)
         if invoice.project
+        else None,
+        "recurring_invoice": {
+            "id": recurring.id,
+            "title": recurring.title,
+            "url": request.build_absolute_uri(recurring.get_absolute_url()),
+        }
+        if (recurring := invoice.recurring_invoice)
         else None,
         "customer": organization_out(invoice.customer, request),
         "owned_by": invoice.owned_by.get_short_name(),
@@ -193,7 +207,9 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
 
     ``open`` are invoices in preparation or sent, ``overdue`` invoices sent and
     due for more than 15 days (as for reminders)."""
-    invoices = Invoice.objects.select_related("project", "customer", "owned_by")
+    invoices = Invoice.objects.select_related(
+        "project", "recurring_invoice", "customer", "owned_by"
+    )
     if filters.project:
         invoices = invoices.filter(project=filters.project)
     if filters.customer:
@@ -382,7 +398,9 @@ def postpone_reminders(request, invoice_id: int, data: PostponeReminders):
     """Leave a sent invoice out of the reminders until a date, e.g. while a
     question of the customer is being clarified"""
     invoice = get_object_or_404(
-        Invoice.objects.select_related("project", "customer", "owned_by"),
+        Invoice.objects.select_related(
+            "project", "recurring_invoice", "customer", "owned_by"
+        ),
         pk=invoice_id,
     )
     if invoice.status != Invoice.SENT:
@@ -712,7 +730,9 @@ def invoice_create(
 def invoice_detail(request, invoice_id: str):
     """An invoice by its ID or code (2026-0042-0001, or 00042 without project)"""
     invoice = by_id_or_code(
-        Invoice.objects.select_related("project", "customer", "owned_by"),
+        Invoice.objects.select_related(
+            "project", "recurring_invoice", "customer", "owned_by"
+        ),
         invoice_id,
     )
     return invoice_out(invoice, request) | {"services": _invoice_services(invoice)}

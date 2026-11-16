@@ -94,7 +94,8 @@ Vorbereitung erstellt, als versendet markiert oder automatisch
 verschickt; die verantwortliche Person erhält eine Mail. Mit «Projekt
 erstellen?» erhält jede Rechnung ihr eigenes Wartungsprojekt und ist eine
 Anzahlung darauf, die beim Verrechnen der dort erfassten Arbeit
-abgezogen wird.
+abgezogen wird. Die Rechnungen verlinken ihre Stapelrechnung, die sie
+auflistet.
 
 ## Zahlungen und Zahlungserinnerungen
 

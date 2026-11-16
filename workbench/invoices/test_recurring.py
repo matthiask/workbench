@@ -20,6 +20,73 @@ class RecurringTest(TestCase):
     def setUp(self):
         deactivate_all()
 
+    def test_link_to_recurring_invoice(self):
+        """Invoices link to their recurring invoice, which lists them"""
+        ri = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date(2018, 1, 1), periodicity="yearly"
+        )
+        with travel("2019-01-01 12:00"):
+            invoice = ri.create_invoices()[0]
+        self.assertEqual(invoice.recurring_invoice, ri)
+
+        self.client.force_login(ri.owned_by)
+        response = self.client.get(invoice.get_absolute_url())
+        self.assertContains(response, ri.get_absolute_url())
+        response = self.client.get(ri.get_absolute_url())
+        self.assertContains(response, invoice.get_absolute_url())
+
+    def test_link_existing_invoices(self):
+        """The migration links existing invoices with the same customer and
+        title in the periods created so far, unambiguous ones only"""
+        from importlib import import_module
+
+        from django.apps import apps
+
+        migration = import_module(
+            "workbench.invoices.migrations.0041_link_recurring_invoices"
+        )
+
+        ri = factories.RecurringInvoiceFactory.create(
+            title="Hosting",
+            starts_on=dt.date(2020, 1, 1),
+            next_period_starts_on=dt.date(2022, 1, 1),
+            subtotal=100,
+        )
+        other = factories.RecurringInvoiceFactory.create(
+            customer=ri.customer,
+            title="Hosting",
+            starts_on=dt.date(2021, 1, 1),
+            next_period_starts_on=dt.date(2022, 1, 1),
+            subtotal=200,
+        )
+
+        def invoice(day, **kwargs):
+            return factories.InvoiceFactory.create(
+                customer=ri.customer,
+                title=kwargs.pop("title", "Hosting"),
+                service_period_from=day,
+                service_period_until=day,
+                **kwargs,
+            )
+
+        linked = invoice(dt.date(2020, 1, 1), subtotal=100)
+        by_subtotal = invoice(dt.date(2021, 1, 1), subtotal=200)
+        ambiguous = invoice(dt.date(2021, 1, 1), subtotal=300)
+        not_yet = invoice(dt.date(2022, 1, 1), subtotal=100)
+        other_title = invoice(dt.date(2020, 1, 1), subtotal=100, title="Domains")
+
+        migration.link_recurring_invoices(apps, None)
+
+        def recurring(invoice):
+            invoice.refresh_from_db()
+            return invoice.recurring_invoice
+
+        self.assertEqual(recurring(linked), ri)
+        self.assertEqual(recurring(by_subtotal), other)
+        self.assertIsNone(recurring(ambiguous))
+        self.assertIsNone(recurring(not_yet))
+        self.assertIsNone(recurring(other_title))
+
     def test_recurring_invoice(self):
         """Creating recurring invoices and invoices from a RI works as expected"""
         person = factories.PersonFactory.create(

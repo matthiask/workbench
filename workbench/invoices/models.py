@@ -144,6 +144,14 @@ class Invoice(ModelWithTotal):
         verbose_name=_("project"),
         related_name="invoices",
     )
+    recurring_invoice = models.ForeignKey(
+        "RecurringInvoice",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("recurring invoice"),
+        related_name="invoices",
+    )
 
     invoiced_on = models.DateField(_("invoiced on"), blank=True, null=True)
     due_on = models.DateField(_("due on"), blank=True, null=True)
@@ -1006,6 +1014,7 @@ class RecurringInvoice(ModelWithTotal):
             customer=self.customer,
             contact=self.contact,
             project=project,
+            recurring_invoice=self,
             invoiced_on=invoiced_on,
             due_on=invoiced_on + dt.timedelta(days=15),
             title=self.title,

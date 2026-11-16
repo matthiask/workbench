@@ -137,6 +137,12 @@ def _echo_invoice(data):
                 if (project := data["project"])
                 else None,
             ),
+            (
+                "Recurring invoice",
+                link(recurring["title"], recurring["url"])
+                if (recurring := data.get("recurring_invoice"))
+                else None,
+            ),
             ("Owned by", data["owned_by"]),
             ("Invoiced on", data["invoiced_on"]),
             ("Due on", data["due_on"]),

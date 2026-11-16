@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 07:54+0100\n"
+"POT-Creation-Date: 2026-11-16 08:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1684,6 +1684,7 @@ msgstr "Zahlungseingänge"
 #: workbench/credit_control/reporting.py workbench/invoices/apps.py
 #: workbench/invoices/models.py workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/invoices/send_reminder.html
 #: workbench/templates/projects/project_detail.html
 msgid "invoices"
@@ -2615,6 +2616,10 @@ msgid "Services"
 msgstr "Leistungen"
 
 #: workbench/invoices/models.py
+msgid "recurring invoice"
+msgstr "Stapelrechnung"
+
+#: workbench/invoices/models.py
 msgid "due on"
 msgstr "Fällig am"
 
@@ -2897,10 +2902,6 @@ msgstr "Vorgeschlagen: die Kreditorenadresse der Organisation, der Kontakt oder 
 #, python-brace-format
 msgid "{code}, {total}, {due_on} and {service_period} are replaced with the values of each invoice."
 msgstr "{code}, {total}, {due_on} und {service_period} werden durch die Werte der jeweiligen Rechnung ersetzt."
-
-#: workbench/invoices/models.py
-msgid "recurring invoice"
-msgstr "Stapelrechnung"
 
 #: workbench/invoices/models.py workbench/invoices/tasks.py
 #: workbench/templates/base.html

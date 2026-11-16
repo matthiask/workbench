@@ -135,6 +135,10 @@
             </dd>
             <dt>{% translate 'Service period' %}</dt>
             <dd>{{ object.service_period|default:"&ndash;" }}</dd>
+            {% if object.recurring_invoice %}
+              <dt>{{ object|label:'recurring_invoice' }}</dt>
+              <dd>{% link_or_none object.recurring_invoice %}</dd>
+            {% endif %}
             <dt>{% translate 'postal address'|capfirst %}</dt>
             <dd>{{ object.postal_address|linebreaksbr|default:"&ndash;" }}</dd>
             <dt>{% translate 'description'|capfirst %}</dt>

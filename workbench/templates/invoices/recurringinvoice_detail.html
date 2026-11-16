@@ -108,5 +108,23 @@
     </div>
   </div>
 
+  {% with invoices=object.invoices.all %}
+    {% if invoices %}
+      <section class="card my-3">
+        <div class="card-header">{% translate 'invoices'|capfirst %}</div>
+        <div class="list-group list-group-flush">
+          {% for invoice in invoices %}
+            <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action wb-invoice">
+              <span class="wb-invoice-title">{{ invoice|h }}</span>
+              <span>{{ invoice.status_badge }}</span>
+              <span class="text-secondary">{{ invoice.service_period|default:"" }}</span>
+              <span class="text-end text-nowrap">{% total_incl_tax invoice %}</span>
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  {% endwith %}
+
   {% notes object %}
 {% endblock content %}

@@ -24,7 +24,7 @@ from workbench.accounts.models import APIToken
 from workbench.api_keys import KEYS
 from workbench.contacts.models import Group, Organization, Person
 from workbench.deals.models import AttributeGroup, Deal
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, Project, Service
 from workbench.timer.models import Timestamp
@@ -1674,6 +1674,11 @@ planned_work:
         result = self.wb("recurring-invoices", "search", "hosting")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Hosting 2027", result.output)
+
+        recurring = RecurringInvoice.objects.get(title="Hosting 2027")
+        invoice = factories.InvoiceFactory.create(recurring_invoice=recurring)
+        result = self.wb("invoices", "show", invoice.pk)
+        self.assertRegex(result.output, r"Recurring invoice\s+Hosting 2027")
 
     def test_recurring_invoices_sending(self):
         """Switching recurring invoices to sending by email proposes the
