@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 from collections import defaultdict
 from itertools import pairwise, takewhile
 
@@ -8,14 +9,19 @@ from django.db.models import Q
 from workbench.invoices.utils import recurring as recurring_days
 
 
+def _words(title):
+    return set(re.findall(r"\w{4,}", title.lower()))
+
+
 def link_recurring_invoices(apps, schema_editor):
     """Link invoices created by recurring invoices before invoices remembered
     them. Generous, the link is only informational. Invoices of the same
     customer which
 
     - have the same title and start in the periods created so far,
-    - cover exactly one of these periods (titles and amounts may have been
-      edited), or
+    - cover exactly one of these periods and have the same subtotal or a
+      word in common in the title (titles or amounts may have been edited),
+      or
     - have the same title and subtotal and start before the next period (the
       service period may have been edited).
 
@@ -54,6 +60,12 @@ def link_recurring_invoices(apps, schema_editor):
         if recurring.ends_on:
             invoices = invoices.filter(service_period_from__lte=recurring.ends_on)
         for invoice in invoices:
+            if (
+                invoice.title != recurring.title
+                and invoice.subtotal != recurring.subtotal
+                and not _words(invoice.title) & _words(recurring.title)
+            ):
+                continue
             candidates[invoice][recurring] = (
                 invoice.title == recurring.title,
                 invoice.subtotal == recurring.subtotal,

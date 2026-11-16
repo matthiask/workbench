@@ -80,7 +80,13 @@ class RecurringTest(TestCase):
             dt.date(2020, 1, 1),
             until=dt.date(2020, 12, 31),
             subtotal=90,
-            title="Domains",
+            title="hosting.example.com",
+        )
+        unrelated = invoice(
+            dt.date(2020, 1, 1),
+            until=dt.date(2020, 12, 31),
+            subtotal=90,
+            title="Kitchen",
         )
         edited_period = invoice(dt.date(2019, 6, 1), subtotal=100)
         before = invoice(dt.date(2019, 6, 1), subtotal=90)
@@ -97,6 +103,7 @@ class RecurringTest(TestCase):
         self.assertIsNone(recurring(not_yet))
         self.assertIsNone(recurring(other_title))
         self.assertEqual(recurring(period), ri)
+        self.assertIsNone(recurring(unrelated))
         self.assertEqual(recurring(edited_period), ri)
         self.assertIsNone(recurring(before))
 
