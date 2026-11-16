@@ -32,6 +32,15 @@
               <td class="text-end">{{ contribution|currency }}</td>
             </tr>
           {% endfor %}
+          {% for project, value in row.maintenance.items %}
+            <tr>
+              <td>{% link_or_none project with_badge=True %}</td>
+              <td>{{ project.customer }}</td>
+              <td>{% translate 'Maintenance without deal' %}</td>
+              <td class="text-end">{{ value|currency }}</td>
+              <td class="text-end">{{ value|currency }}</td>
+            </tr>
+          {% endfor %}
           {% for offer, value in row.offers.items %}
             <tr>
               <td>{% link_or_none offer with_badge=True %}</td>

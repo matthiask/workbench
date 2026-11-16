@@ -236,8 +236,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - Accepted deals also count accepted offers without deal (deals come first,
   offers later in the funnel), in their own column without value type:
   services only keep their effort type as free text, not their service
-  type, so mapping offers to value types would be guesswork. Invoiced work
-  without offer (maintenance) isn't counted, decided against on purpose.
+  type, so mapping offers to value types would be guesswork. Likewise the
+  invoiced work on maintenance projects without accepted offer and without
+  deal (directly via `Deal.related_projects` or through an offer), credited
+  to the project owner: it replaces the catch-all deals created only for the
+  statistics. Deals selling maintenance or mandates link their projects.
 - Offer headings share the positions of the services (`Offer.items()`,
   `save_positions()`; `reorder_services()` keeps headings in place).
 - Audit log (`LoggedAction`, a database trigger) is keyed by column name:

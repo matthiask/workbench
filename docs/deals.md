@@ -37,6 +37,11 @@ Accepted offers can also be linked to an accepted deal later; nothing
 changes, but the accepted deals report counts accepted offers without
 deal on their own, so a missing link counts the work twice.
 
+"Link project" links projects to open or accepted deals, for work sold
+without offer such as a maintenance contract or a mandate. The accepted
+deals report counts the invoices of maintenance projects without deal
+on their own; a linked project is covered by its deal.
+
 ## Closing a deal
 
 The **Status** button closes the deal as **accepted** (with the award of

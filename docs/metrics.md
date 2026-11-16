@@ -886,24 +886,27 @@ Answers: what value of deals was won in the period, per value type, month and pe
 
 Deals: status ACCEPTED, `closed_on` in [Date from, Date until] (default this week Mon–Sun). `Deal.value` = Σ of its `Value.value` rows (recomputed on save unless `skip_value_calculation`).
 
-Offers without deal (follow-up orders are often accepted without a deal): status ACCEPTED, `closed_on` in the period, no related deal, not on internal projects; amount `total_excl_tax` (revenue, like deal values), attributed in full to the offer's owner (`owned_by`, also for the users filter). They have no value type and no target, and aren't in the median ages. Deals come first and offers later, when the funnel narrows: an accepted offer without deal skipped ahead in the funnel and is clearly won. Invoiced work without offer (e.g. maintenance) isn't counted on purpose, it would only approximate deals created for the statistics. API: `accepted.offers_without_deal`, `by_month[].offers_without_deal`.
+Offers without deal (follow-up orders are often accepted without a deal): status ACCEPTED, `closed_on` in the period, no related deal, not on internal projects; amount `total_excl_tax` (revenue, like deal values), attributed in full to the offer's owner (`owned_by`, also for the users filter). They have no value type and no target, and aren't in the median ages. Deals come first and offers later, when the funnel narrows: an accepted offer without deal skipped ahead in the funnel and is clearly won. API: `accepted.offers_without_deal`, `by_month[].offers_without_deal`.
+
+Maintenance without deal (replaces deals created only for the statistics, e.g. quarterly catch-all deals): Σ `Invoice.total_excl_tax` of invoiced invoices (SENT/PAID, all types) with `invoiced_on` in the period on `MAINTENANCE` projects without accepted offer and without deal, neither linked directly (`Deal.related_projects`) nor through one of their offers (any deal status); attributed in full to the project's owner (also for the users filter), by month of `invoiced_on`. No value type, no target, not in the median ages. Projects with an accepted offer count through the offer, invoiced work beyond it isn't counted (underestimates). Deals selling maintenance or a mandate without offer link the project, then the deal counts instead. API: `accepted.maintenance_without_deal`, `by_month[].maintenance_without_deal`.
 
 | Figure | Computation |
 |---|---|
 | Month × value type cells | Σ Value.value per value type, by month of `closed_on`. Columns: value types occurring in the deals plus all value types with a `weekly_target`. |
 | Month "Offers without deal" | Σ `total_excl_tax` of the month's offers without deal (column only shown if there are any). |
-| Month "Total" | Σ of the month's values, offers without deal included. |
+| Month "Maintenance without deal" | Σ invoiced in the month on maintenance projects without deal (column only shown if there are any). |
+| Month "Total" | Σ of the month's values, offers and maintenance without deal included. |
 | Total row per type | Σ over months; pie = sum vs. target. |
-| Total row, overall cell | `stats.sum` = Σ Deal.value of the deals + Σ `total_excl_tax` of the offers without deal; the pie compares it with the target. |
+| Total row, overall cell | `stats.sum` = Σ Deal.value of the deals + Σ `total_excl_tax` of the offers without deal + Σ maintenance without deal; the pie compares it with the target. |
 | Target (n weeks) | Per type: weekly_target × (days in period)/7; overall: Σ weekly_targets of the shown types × days/7. |
 | Median age | Days between `created_at` date and `closed_on`; one entry per Value row; upper median (`sorted[len//2]`). Overall median over all entries. |
 | Per user: Value | Σ over deals the user contributed to of Deal.value × contribution weight / Σ weights of that deal (0 if the weights add up to 0). |
-| Per user: Count | Number of deals the user contributed to + offers without deal the user owns (their full total is added to Value). |
-| Total row (users) | Count = number of deals and offers without deal; Value = `stats.sum` (deals with several or no contributors count once). |
-| Deal list | Each deal's value, then the offers without deal; total row = `stats.sum`. |
-| Modal per user | Deal, contact/customer, Award of contract (closing type + notice), Value, Contribution (the user's share); offers without deal with their customer and total. |
+| Per user: Count | Number of deals the user contributed to + offers without deal the user owns + maintenance projects without deal the user owns (their full totals are added to Value). |
+| Total row (users) | Count = number of deals, offers without deal and maintenance projects without deal; Value = `stats.sum` (deals with several or no contributors count once). |
+| Deal list | Each deal's value, then the offers without deal, then the maintenance projects without deal (invoiced in the period); total row = `stats.sum`. |
+| Modal per user | Deal, contact/customer, Award of contract (closing type + notice), Value, Contribution (the user's share); offers and maintenance projects without deal with their customer and amount. |
 
-Chart (web, `_accepted_deals_chart`): the month × value type cells (and the offers without deal) cumulated from the start of the period as stacked bars for every month, and the cumulated target, per month Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
+Chart (web, `_accepted_deals_chart`): the month × value type cells (and the offers and maintenance without deal) cumulated from the start of the period as stacked bars for every month, and the cumulated target, per month Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
 
 API additionally: declined `count`, `sum` (Σ Deal.value) and per closing type.
 

@@ -44,6 +44,12 @@ akzeptierten Geschäft verbinden; dabei ändert sich nichts, aber die
 gewonnenen Geschäfte zählen akzeptierte Offerten ohne Geschäft separat
 dazu, eine fehlende Verbindung zählt die Arbeit also doppelt.
 
+«Projekt verbinden» verbindet Projekte mit offenen oder akzeptierten
+Geschäften, für Arbeit, die ohne Offerte verkauft wird, etwa ein
+Wartungsvertrag oder ein Mandat. Die gewonnenen Geschäfte zählen die
+Rechnungen von Wartungsprojekten ohne Geschäft separat dazu; ein
+verbundenes Projekt ist durch sein Geschäft abgedeckt.
+
 ## Ein Geschäft abschliessen
 
 Der Knopf **Status** schliesst das Geschäft als **akzeptiert** (mit der

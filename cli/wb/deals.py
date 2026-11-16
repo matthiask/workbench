@@ -486,7 +486,9 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
 
     Users filter the deals' owners; accepted deals are split between users
     by their contributions. Accepted offers without deal count towards the
-    totals, attributed to their owners."""
+    totals, attributed to their owners, and so does the invoiced work on
+    maintenance projects without deal and accepted offer, attributed to the
+    project owners."""
     data = request(
         "GET",
         "deals/stats/",
@@ -511,7 +513,8 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
             else ""
         )
     )
-    if accepted["deals"] or accepted["offers_without_deal"]:
+    maintenance = accepted.get("maintenance_without_deal", [])
+    if accepted["deals"] or accepted["offers_without_deal"] or maintenance:
         table = make_table("Value type", "Accepted>", "Target>", "Median age>")
         for row in accepted["by_value_type"]:
             table.add_row(
@@ -568,6 +571,19 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
                 offer["owned_by"],
                 offer["closed_on"],
                 format_amount(offer["total_excl_tax"]),
+            )
+        console.print(table)
+    if maintenance:
+        table = make_table(
+            "Project", "Title", "Owner", "Invoiced>", title="Maintenance without deal"
+        )
+        for row in maintenance:
+            project = row["project"]
+            table.add_row(
+                link(project["code"], project["url"]),
+                project["title"],
+                row["owned_by"],
+                format_amount(row["total_excl_tax"]),
             )
         console.print(table)
     declined = data["declined"]

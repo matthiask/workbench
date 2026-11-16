@@ -711,6 +711,9 @@ def _accepted_deals_chart(stats, date_range):
         for row in stats["by_month_and_valuetype"]
     }
     offers = {row["month"]: row["offers"] for row in stats["by_month_and_valuetype"]}
+    maintenance = {
+        row["month"]: row["maintenance"] for row in stats["by_month_and_valuetype"]
+    }
     weekly_target = sum(
         (type.weekly_target or 0 for type in stats["valuetypes"]), Decimal(0)
     )
@@ -743,6 +746,19 @@ def _accepted_deals_chart(stats, date_range):
                 }
             ]
             if stats["offers_sum"]
+            else []
+        )
+        + (
+            [
+                {
+                    "label": _("Maintenance without deal"),
+                    "values": list(
+                        accumulate(maintenance.get(month, Z2) for month in months)
+                    ),
+                    "color": f"wb-series-{len(stats['valuetypes']) + 2}",
+                }
+            ]
+            if stats["maintenance_sum"]
             else []
         ),
         lines=[

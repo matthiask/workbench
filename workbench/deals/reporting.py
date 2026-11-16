@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from workbench.audit.models import LoggedAction
 from workbench.deals.models import Contribution, Deal, Value, ValueType
+from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
 from workbench.tools.formats import Z2
@@ -37,13 +38,36 @@ def accepted_deals(date_range, *, users=None):
         .order_by("closed_on", "pk")
     )
 
+    # Maintenance sold without deal and without offer, e.g. ongoing work for
+    # existing customers: what was invoiced in the period, credited to the
+    # project owner. Linking the project (or an offer of it) to a deal says
+    # the deal covers it.
+    maintenance = (
+        Invoice.objects
+        .invoiced()
+        .filter(
+            invoiced_on__range=date_range,
+            project__in=Project.objects
+            .filter(type=Project.MAINTENANCE)
+            .exclude(offers__status=Offer.ACCEPTED)
+            .exclude(deals__isnull=False)
+            .exclude(offers__deals__isnull=False),
+        )
+        .select_related("project__owned_by", "project__customer")
+        .order_by("invoiced_on", "pk")
+    )
+
     if users is not None:
         queryset = queryset.filter(owned_by__in=users)
         offers = offers.filter(owned_by__in=users)
+        maintenance = maintenance.filter(project__owned_by__in=users)
 
     by_user = defaultdict(dict)
     offers_by_user = defaultdict(dict)
     offers_by_month = defaultdict(lambda: Z2)
+    maintenance_by_user = defaultdict(lambda: defaultdict(lambda: Z2))
+    maintenance_by_month = defaultdict(lambda: Z2)
+    maintenance_by_project = {}
     by_month_and_valuetype = defaultdict(lambda: defaultdict(lambda: Z2))
     age_by_valuetype = defaultdict(list)
 
@@ -68,17 +92,37 @@ def accepted_deals(date_range, *, users=None):
         offers_by_user[offer.owned_by][offer] = offer.total_excl_tax
         offers_by_month[offer.closed_on.replace(day=1)] += offer.total_excl_tax
 
-    deals = [
-        {
+    for invoice in maintenance:
+        project = invoice.project
+        maintenance_by_user[project.owned_by][project] += invoice.total_excl_tax
+        maintenance_by_month[invoice.invoiced_on.replace(day=1)] += (
+            invoice.total_excl_tax
+        )
+        row = maintenance_by_project.setdefault(
+            project, {"project": project, "sum": Z2, "invoices": []}
+        )
+        row["sum"] += invoice.total_excl_tax
+        row["invoices"].append(invoice)
+
+    def user_row(user):
+        user_deals = by_user.get(user, {})
+        user_offers = offers_by_user.get(user, {})
+        user_maintenance = dict(maintenance_by_user.get(user, {}))
+        return {
             "user": user,
             "user_id": str(user.id),
-            "deals": by_user.get(user, {}),
-            "offers": offers_by_user.get(user, {}),
-            "count": len(by_user.get(user, {})) + len(offers_by_user.get(user, {})),
-            "sum": sum(by_user.get(user, {}).values(), Z2)
-            + sum(offers_by_user.get(user, {}).values(), Z2),
+            "deals": user_deals,
+            "offers": user_offers,
+            "maintenance": user_maintenance,
+            "count": len(user_deals) + len(user_offers) + len(user_maintenance),
+            "sum": sum(user_deals.values(), Z2)
+            + sum(user_offers.values(), Z2)
+            + sum(user_maintenance.values(), Z2),
         }
-        for user in by_user.keys() | offers_by_user.keys()
+
+    deals = [
+        user_row(user)
+        for user in by_user.keys() | offers_by_user.keys() | maintenance_by_user.keys()
     ]
 
     valuetypes |= set(ValueType.objects.filter(weekly_target__isnull=False))
@@ -87,14 +131,18 @@ def accepted_deals(date_range, *, users=None):
         {
             "month": month,
             "sum": sum(by_month_and_valuetype[month].values(), Z2)
-            + offers_by_month[month],
+            + offers_by_month[month]
+            + maintenance_by_month[month],
             "values": [
                 {"type": type, "value": by_month_and_valuetype[month].get(type, Z2)}
                 for type in valuetypes
             ],
             "offers": offers_by_month[month],
+            "maintenance": maintenance_by_month[month],
         }
-        for month in by_month_and_valuetype.keys() | offers_by_month.keys()
+        for month in by_month_and_valuetype.keys()
+        | offers_by_month.keys()
+        | maintenance_by_month.keys()
     ]
     date_range_length = (date_range[1] - date_range[0]).days + 1
 
@@ -129,10 +177,15 @@ def accepted_deals(date_range, *, users=None):
         "valuetypes": valuetypes,
         "offers": offers,
         "offers_sum": sum(offers_by_month.values(), Z2),
+        "maintenance": sorted(
+            maintenance_by_project.values(), key=lambda row: row["project"].code
+        ),
+        "maintenance_sum": sum(maintenance_by_month.values(), Z2),
         # Deals may have several or no contributors
         "sum": sum((deal.value for deal in queryset), Z2)
-        + sum(offers_by_month.values(), Z2),
-        "count": len(queryset) + len(offers),
+        + sum(offers_by_month.values(), Z2)
+        + sum(maintenance_by_month.values(), Z2),
+        "count": len(queryset) + len(offers) + len(maintenance_by_project),
         "target": sum(type.weekly_target or 0 for type in valuetypes)
         * date_range_length
         / 7,

@@ -274,6 +274,13 @@ class AcceptedByMonth(Schema):
     sum: Amount
     values: dict[str, Amount]
     offers_without_deal: Amount
+    maintenance_without_deal: Amount
+
+
+class AcceptedMaintenance(Schema):
+    project: ProjectSummary
+    owned_by: str = Field(description="The project's owner.")
+    total_excl_tax: Amount = Field(description="Invoiced in the period.")
 
 
 class AcceptedOffer(Schema):
@@ -299,6 +306,12 @@ class AcceptedDeals(Schema):
     offers_without_deal: list[AcceptedOffer] = Field(
         description="Accepted offers without deal, not on internal projects;"
         " they count towards the totals, attributed to their owners."
+    )
+    maintenance_without_deal: list[AcceptedMaintenance] = Field(
+        description="Invoiced in the period on maintenance projects without"
+        " accepted offer and without deal (neither linked directly nor through"
+        " an offer); they count towards the totals, attributed to the project"
+        " owners."
     )
 
 
@@ -388,6 +401,7 @@ def deal_stats(request, filters: Query[DealStatsFilter]):
                         value["type"].title: value["value"] for value in row["values"]
                     },
                     "offers_without_deal": row["offers"],
+                    "maintenance_without_deal": row["maintenance"],
                 }
                 for row in accepted["by_month_and_valuetype"]
             ],
@@ -404,6 +418,14 @@ def deal_stats(request, filters: Query[DealStatsFilter]):
                     "closed_on": offer.closed_on,
                 }
                 for offer in accepted["offers"]
+            ],
+            "maintenance_without_deal": [
+                {
+                    "project": project_summary(row["project"], request),
+                    "owned_by": row["project"].owned_by.get_short_name(),
+                    "total_excl_tax": row["sum"],
+                }
+                for row in accepted["maintenance"]
             ],
         },
         "declined": {

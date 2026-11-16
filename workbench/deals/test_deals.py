@@ -781,6 +781,69 @@ class DealsTest(TestCase):
         self.assertEqual([o["code"] for o in data["offers_without_deal"]], [offer.code])
         self.assertEqual(data["by_month"][0]["offers_without_deal"], "100.00")
 
+    def test_maintenance_without_deal(self):
+        """Invoices of maintenance projects without deal are added to the
+        accepted deals, credited to the project owner"""
+
+        def invoiced(project, amount):
+            return factories.InvoiceFactory.create(
+                project=project,
+                customer=project.customer,
+                contact=project.contact,
+                status=Invoice.SENT,
+                subtotal=amount,
+                liable_to_vat=False,
+            )
+
+        maintenance = factories.ProjectFactory.create(type=Project.MAINTENANCE)
+        invoiced(maintenance, 300)
+        # Not counted: order projects, maintenance with an accepted offer,
+        # linked to a deal directly or through an offer
+        invoiced(factories.ProjectFactory.create(type=Project.ORDER), 1000)
+        offered = factories.ProjectFactory.create(type=Project.MAINTENANCE)
+        factories.OfferFactory.create(project=offered, status=Offer.ACCEPTED)
+        invoiced(offered, 1000)
+        linked = factories.ProjectFactory.create(type=Project.MAINTENANCE)
+        factories.DealFactory.create(customer=linked.customer).related_projects.add(
+            linked
+        )
+        invoiced(linked, 1000)
+        via_offer = factories.ProjectFactory.create(type=Project.MAINTENANCE)
+        factories.DealFactory.create(customer=via_offer.customer).related_offers.add(
+            factories.OfferFactory.create(project=via_offer)
+        )
+        invoiced(via_offer, 1000)
+
+        stats = accepted_deals([dt.date.today(), dt.date.today()])
+        self.assertEqual(
+            [(row["project"], row["sum"]) for row in stats["maintenance"]],
+            [(maintenance, Decimal(300))],
+        )
+        self.assertEqual(stats["sum"], Decimal(300))
+        self.assertEqual(stats["by_month_and_valuetype"][0]["maintenance"], 300)
+        self.assertEqual(
+            [(row["user"], row["sum"]) for row in stats["by_user"]],
+            [(maintenance.owned_by, Decimal(300))],
+        )
+        stats = accepted_deals([dt.date.today(), dt.date.today()], users=[])
+        self.assertEqual(stats["sum"], 0)
+
+        self.client.force_login(maintenance.owned_by)
+        response = self.client.get("/report/accepted-deals/")
+        self.assertContains(response, "Maintenance without deal")
+        self.assertContains(response, maintenance.code)
+        response = self.client.get(
+            f"/report/accepted-deals/deals/?user={maintenance.owned_by.id}"
+        )
+        self.assertContains(response, maintenance.code)
+        data = self.client.get("/api/deals/stats/").json()["accepted"]
+        self.assertEqual(data["sum"], "300.00")
+        self.assertEqual(
+            [row["project"]["code"] for row in data["maintenance_without_deal"]],
+            [maintenance.code],
+        )
+        self.assertEqual(data["by_month"][0]["maintenance_without_deal"], "300.00")
+
     def test_related_offers(self):
         """Offers can be linked to deals"""
         offer = factories.OfferFactory.create(

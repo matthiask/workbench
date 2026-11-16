@@ -31,6 +31,10 @@
             <th class="text-end">{% translate 'Offers without deal' %}</th>
             <th></th>
           {% endif %}
+          {% if stats.maintenance %}
+            <th class="text-end">{% translate 'Maintenance without deal' %}</th>
+            <th></th>
+          {% endif %}
           <th class="text-end">{% translate 'total'|capfirst %}</th>
           <th></th>
         </tr>
@@ -47,6 +51,10 @@
               <td class="text-end">{{ row.offers|currency }}</td>
               <td></td>
             {% endif %}
+            {% if stats.maintenance %}
+              <td class="text-end">{{ row.maintenance|currency }}</td>
+              <td></td>
+            {% endif %}
             <td class="text-end">{{ row.sum|currency }}</td>
             <td></td>
           </tr>
@@ -61,6 +69,10 @@
           {% endfor %}
           {% if stats.offers %}
             <th class="text-end">{{ stats.offers_sum|currency }}</th>
+            <th></th>
+          {% endif %}
+          {% if stats.maintenance %}
+            <th class="text-end">{{ stats.maintenance_sum|currency }}</th>
             <th></th>
           {% endif %}
           <th class="text-end">{{ stats.sum|currency }}</th>
@@ -80,6 +92,7 @@
             <th></th>
           {% endfor %}
           {% if stats.offers %}<th></th><th></th>{% endif %}
+          {% if stats.maintenance %}<th></th><th></th>{% endif %}
           <th class="text-end">{{ stats.target|currency }}</th>
           <th></th>
         </tr>
@@ -92,6 +105,7 @@
             <th></th>
           {% endfor %}
           {% if stats.offers %}<th></th><th></th>{% endif %}
+          {% if stats.maintenance %}<th></th><th></th>{% endif %}
           <th class="text-end">
             {% if stats.median_age is not None %}{{ stats.median_age }} {% translate 'days' %}{% endif %}
           </th>
@@ -171,6 +185,17 @@
             </td>
             <td class="text-end">
               {{ offer.total_excl_tax|currency }}
+            </td>
+          </tr>
+        {% endfor %}
+        {% for row in stats.maintenance %}
+          <tr>
+            <td>
+              {% link_or_none row.project with_badge=True %}
+              <span class="text-body-secondary">{% translate 'Maintenance without deal' %}</span>
+            </td>
+            <td class="text-end">
+              {{ row.sum|currency }}
             </td>
           </tr>
         {% endfor %}

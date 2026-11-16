@@ -2087,6 +2087,21 @@ planned_work:
         result = self.wb("offers", "search", "--status", "accepted", "--without-deal")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(offer.code, result.output)
+
+        project = factories.ProjectFactory.create(
+            type=Project.MAINTENANCE, title="Hosting and support"
+        )
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            status=Invoice.SENT,
+            subtotal=500,
+        )
+        result = self.wb("deals", "stats")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Maintenance without deal", result.output)
+        self.assertIn(project.code, result.output)
         result = self.wb("deals", "history")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(deal.code, result.output)

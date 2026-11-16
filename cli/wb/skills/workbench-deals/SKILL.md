@@ -1,6 +1,6 @@
 ---
 name: workbench-deals
-description: Keep the Workbench sales pipeline up to date with the `wb` CLI. Use when the user wants to review, update, clean up, close, win or lose deals, update probabilities or expected decision dates, link offers to deals, find accepted offers counted twice next to their deal, or asks about the state of the pipeline or of a deal in Workbench.
+description: Keep the Workbench sales pipeline up to date with the `wb` CLI. Use when the user wants to review, update, clean up, close, win or lose deals, update probabilities or expected decision dates, link offers to deals, find accepted offers or maintenance counted twice next to their deal, link projects to deals, or asks about the state of the pipeline or of a deal in Workbench.
 ---
 
 # Keeping the Workbench sales pipeline up to date
@@ -103,9 +103,28 @@ after the user confirmed it:
     wb deals offers add <deal_id> <offer> ... --dry-run
 
 Never link on your own: an offer for the same customer may well be a
-follow-up order which is won business of its own. Deals summing up the work
-without deal of a period must not contain work which was offered, accepted
-offers count by themselves.
+follow-up order which is won business of its own.
+
+### Maintenance without deal
+
+The report also counts what was invoiced on maintenance projects without
+accepted offer and without deal, credited to the project owner. Catch-all
+deals summing up such work for the statistics aren't needed anymore; don't
+create new ones. A deal which sells maintenance or a mandate without offer
+links its project instead, so that its invoices aren't counted a second
+time; this also works for accepted deals and changes nothing else:
+
+    wb deals projects add <deal_id> <project> ... --dry-run
+    wb deals projects remove <deal_id> <project> ... --dry-run
+
+To find maintenance which a deal already covers, compare the projects of
+`wb deals stats --period <period> --json` (`maintenance_without_deal`) with
+the accepted deals of the same customers which have no offers and no
+projects (`wb deals show`), e.g. a maintenance contract deal next to a
+maintenance project with about the same yearly amount. Suggest the links,
+link only after the user confirmed each one. Deals which only existed for
+the statistics are the user's call: ask before declining or deleting
+them.
 
 ## 4. Close deals
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 17:51+0100\n"
+"POT-Creation-Date: 2026-11-16 17:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1951,7 +1951,6 @@ msgid "The offer %(offer)s belongs to a project of %(customer)s, not of the deal
 msgstr "Die Offerte %(offer)s gehört zu einem Projekt von %(customer)s, nicht vom Kunden des Geschäfts, %(deal_customer)s."
 
 #: workbench/deals/forms.py
-
 msgid "Projects can only be linked to and unlinked from open or accepted deals."
 msgstr "Projekte lassen sich nur mit offenen oder akzeptierten Geschäften verbinden und von ihnen lösen."
 
@@ -2073,7 +2072,6 @@ msgid "related offers"
 msgstr "verbundene Offerten"
 
 #: workbench/deals/models.py
-
 msgid "related projects"
 msgstr "verbundene Projekte"
 
@@ -4763,6 +4761,13 @@ msgstr "Offerten ohne Geschäft"
 
 #: workbench/reporting/views.py
 #: workbench/templates/reporting/accepted_deals.html
+#: workbench/templates/reporting/accepted_deals_for_user.html
+
+msgid "Maintenance without deal"
+msgstr "Wartung ohne Geschäft"
+
+#: workbench/reporting/views.py
+#: workbench/templates/reporting/accepted_deals.html
 msgid "target"
 msgstr "Ziel"
 
@@ -5483,7 +5488,6 @@ msgid "Link offer"
 msgstr "Offerte verbinden"
 
 #: workbench/templates/deals/deal_detail.html
-
 msgid "Link project"
 msgstr "Projekt verbinden"
 
@@ -5496,7 +5500,6 @@ msgid "No related offers"
 msgstr "Keine verbundenen Offerten"
 
 #: workbench/templates/deals/deal_detail.html
-
 msgid "Unlink project"
 msgstr "Projekt lösen"
 
