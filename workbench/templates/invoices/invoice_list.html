@@ -48,8 +48,8 @@
         {{ invoice.status_badge }}
         <span
           class="wb-row-amount"
-          title="{% translate 'total excl. tax'|capfirst %}"
-        >{{ invoice.total_excl_tax|currency }}</span>
+          title="{% translate 'total'|capfirst %}"
+        >{{ invoice.total|currency }}</span>
       </div>
     </a>
   {% endfor %}

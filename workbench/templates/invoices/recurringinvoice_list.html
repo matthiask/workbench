@@ -12,7 +12,7 @@
       </div>
       <div class="wb-row-aside">
         {{ invoice.status_badge }}
-        <span class="wb-row-amount">{{ invoice.total_excl_tax|currency }}</span>
+        <span class="wb-row-amount" title="{% translate 'total'|capfirst %}">{{ invoice.total|currency }}</span>
       </div>
     </a>
   {% endfor %}
