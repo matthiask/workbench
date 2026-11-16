@@ -58,7 +58,11 @@ Projekt ein.
 
 Die Leistungen offerierter, akzeptierter und abgelehnter Offerten bleiben,
 wie sie versandt wurden. Um sie zu ändern, setze die Offerte zurück auf
-«In Vorbereitung» und speichere, dann bearbeite die Leistungen.
+«In Vorbereitung» und speichere, dann bearbeite die Leistungen und
+setze die Offerte wieder auf ihren Status. Das ist so vorgesehen:
+Offerten sollen dem besten aktuellen Wissensstand entsprechen, z.B. wenn
+eine optionale Leistung doch bestellt wird, eine Leistung wegfällt oder
+sich die Stunden ändern, damit Budgets und Auswertungen stimmen.
 Offerierte und akzeptierte Offerten lassen sich nicht löschen.
 
 Beim Ablehnen oder Verwerfen einer Offerte fragt Workbench, ob ihre
@@ -67,10 +71,26 @@ Schliessen eines Projekts werden Offerten in Vorbereitung verworfen und
 schon versandte abgelehnt.
 
 **Arbeit abgeschlossen am** beendet die Erfassung auf den Leistungen der
-Offerte. Eine Offerte, die **Budget zurückbehält**, dient nur der
-Budgetierung: Auf ihren Leistungen werden keine Stunden erfasst, die
-Arbeit wird auf später erstellten Leistungen ohne Offerte erfasst. Diese
-geben das zurückbehaltene Budget frei.
+Offerte.
+
+## Arten von Offerten
+
+- **Offerten** werden der Kundschaft versandt, die sie akzeptiert oder
+  ablehnt. Akzeptierte Offerten sind das, was verkauft ist.
+- **Leistungsgruppen** werden nie versandt. Sie gruppieren Leistungen,
+  z.B. pro Jahr oder pro Meilenstein, damit sich Stunden, Budgets und
+  Rechnungen pro Gruppe verfolgen lassen. Ihre Leistungen lassen sich
+  weiterhin ändern, und beim Erfassen lassen sich darin neue Leistungen
+  erstellen. Ihre Leistungen zählen zum Budget, aber nicht als verkauft.
+  Die Offertenliste zeigt sie nur, wenn nach ihrem Status gefiltert wird.
+- Offerten, die **Budget zurückbehalten** («behält Budget zurück»), sind
+  akzeptierte Offerten, die nur Budget zurückbehalten. Auf ihren
+  Leistungen werden keine Stunden erfasst. Die Arbeit wird auf später
+  erstellten Leistungen ohne Offerte erfasst, die das zurückbehaltene
+  Budget freigeben. Das Projekt zeigt das noch zurückbehaltene Budget.
+  Weitere Offerten des Projekts werden zum zurückbehaltenen Budget
+  dazugezählt, das Offertenformular warnt, wenn ein Projekt beides
+  erhält.
 
 ## Kopien, PDFs und Geschäfte
 

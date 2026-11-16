@@ -52,16 +52,33 @@ are set in the service's own form on the project.
 
 The services of offered, accepted and declined offers stay as they were
 sent. To change them, set the offer back to "In preparation" and save,
-then edit the services. Offered and accepted offers can't be deleted.
+then edit the services and set the offer back to its status. That's
+expected: offers should reflect the best current knowledge, e.g. when
+an optional service is ordered after all, a service is dropped or the
+hours change, so that budgets and reports stay right. Offered and
+accepted offers can't be deleted.
 
 Declining or discarding an offer asks whether to delete its planned work
 after the current week. Closing a project discards its offers in
 preparation and declines those sent before.
 
-**Work completed on** ends logging on the offer's services. A **budget
-retainer** only retains budget: no hours are logged on its services, the
-work is logged on services without offer created later, which free the
-retained budget.
+**Work completed on** ends logging on the offer's services.
+
+## Kinds of offers
+
+- **Offers** are sent to the customer, who accepts or declines them.
+  Accepted offers are what has been sold.
+- **Service groups** are never sent. They group services, e.g. per year
+  or per milestone, so that hours, budgets and invoices can be followed
+  per group. Their services stay editable, and new services can be
+  created in them while logging. Their services count as budget, but not
+  as sold. The offer list only shows them when filtering by their status.
+- **Budget retainers** ("is budget retainer") are accepted offers which
+  only retain budget. No hours are logged on their services. The work is
+  logged on services without offer created later, which free the
+  retained budget. The project shows the budget still retained. Other
+  offers of the project are added to the retained budget, the offer form
+  warns when a project gets both.
 
 ## Copies, PDFs and deals
 
