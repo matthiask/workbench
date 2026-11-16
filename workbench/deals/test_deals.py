@@ -781,6 +781,40 @@ class DealsTest(TestCase):
         self.assertEqual([o["code"] for o in data["offers_without_deal"]], [offer.code])
         self.assertEqual(data["by_month"][0]["offers_without_deal"], "100.00")
 
+    def test_without_third_party_costs(self):
+        """Offers and maintenance without deal count without their third
+        party costs"""
+        offer = factories.OfferFactory.create()
+        factories.ServiceFactory.create(
+            project=offer.project, offer=offer, cost=1000, third_party_costs=600
+        )
+        factories.ServiceFactory.create(
+            project=offer.project,
+            offer=offer,
+            cost=500,
+            third_party_costs=500,
+            is_optional=True,
+        )
+        offer.status = Offer.ACCEPTED
+        offer.closed_on = dt.date.today()
+        offer.save()
+
+        project = factories.ProjectFactory.create(type=Project.MAINTENANCE)
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            status=Invoice.SENT,
+            subtotal=300,
+            third_party_costs=100,
+            liable_to_vat=False,
+        )
+
+        stats = accepted_deals([dt.date.today(), dt.date.today()])
+        self.assertEqual(stats["offers_sum"], Decimal(400))
+        self.assertEqual(stats["maintenance_sum"], Decimal(200))
+        self.assertEqual(stats["sum"], Decimal(600))
+
     def test_maintenance_without_deal(self):
         """Invoices of maintenance projects without deal are added to the
         accepted deals, credited to the project owner"""

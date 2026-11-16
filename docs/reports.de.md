@@ -72,8 +72,8 @@ Daten.
 Mit Zugriff auf Geschäfte: **gewonnene Geschäfte** (gewonnener Wert pro
 Werttyp gegenüber den Zielen; akzeptierte Offerten ohne Geschäft, z.B.
 Folgeaufträge, und die verrechnete Arbeit auf Wartungsprojekten ohne
-Geschäft und ohne akzeptierte Offerte kommen mit eigenen Spalten dazu und
-zählen zu den Totalen), **verlorene Geschäfte** (mit den
+Geschäft und ohne akzeptierte Offerte kommen mit eigenen Spalten und ohne
+Fremdkosten dazu und zählen zu den Totalen), **verlorene Geschäfte** (mit den
 Gründen) und die **Geschichte der Geschäfte** (Änderungen an Geschäften;
 der Personenfilter ist, wer geändert hat).
 

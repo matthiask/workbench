@@ -35,6 +35,7 @@ def accepted_deals(date_range, *, users=None):
         .filter(closed_on__range=date_range, deals__isnull=True)
         .exclude(project__type=Project.INTERNAL)
         .select_related("owned_by", "project__customer")
+        .prefetch_related("services")
         .order_by("closed_on", "pk")
     )
 
@@ -88,20 +89,28 @@ def accepted_deals(date_range, *, users=None):
                 (deal.closed_on - deal.created_at.date()).days
             )
 
+    # Third party costs aren't won business, deals don't contain them either
     for offer in offers:
-        offers_by_user[offer.owned_by][offer] = offer.total_excl_tax
-        offers_by_month[offer.closed_on.replace(day=1)] += offer.total_excl_tax
+        offer.won = offer.total_excl_tax - sum(
+            (
+                service.third_party_costs or Z2
+                for service in offer.services.all()
+                if not service.is_optional
+            ),
+            Z2,
+        )
+        offers_by_user[offer.owned_by][offer] = offer.won
+        offers_by_month[offer.closed_on.replace(day=1)] += offer.won
 
     for invoice in maintenance:
         project = invoice.project
-        maintenance_by_user[project.owned_by][project] += invoice.total_excl_tax
-        maintenance_by_month[invoice.invoiced_on.replace(day=1)] += (
-            invoice.total_excl_tax
-        )
+        won = invoice.total_excl_tax - (invoice.third_party_costs or Z2)
+        maintenance_by_user[project.owned_by][project] += won
+        maintenance_by_month[invoice.invoiced_on.replace(day=1)] += won
         row = maintenance_by_project.setdefault(
             project, {"project": project, "sum": Z2, "invoices": []}
         )
-        row["sum"] += invoice.total_excl_tax
+        row["sum"] += won
         row["invoices"].append(invoice)
 
     def user_row(user):

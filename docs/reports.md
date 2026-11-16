@@ -67,8 +67,8 @@ computed: which records count, which fields and dates.
 With access to deals: **accepted deals** (won value per value type
 against the targets; accepted offers without deal, e.g. follow-up orders,
 and the invoiced work on maintenance projects without deal and without
-accepted offer are added with their own columns and count towards the
-totals),
+accepted offer are added with their own columns, without third party
+costs, and count towards the totals),
 **declined deals** (with the reasons) and the
 **deal history** (changes to deals; the person filter is who made the
 change).

@@ -241,6 +241,7 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   deal (directly via `Deal.related_projects` or through an offer), credited
   to the project owner: it replaces the catch-all deals created only for the
   statistics. Deals selling maintenance or mandates link their projects.
+  Both count without third party costs, like deal values.
 - Offer headings share the positions of the services (`Offer.items()`,
   `save_positions()`; `reorder_services()` keeps headings in place).
 - Audit log (`LoggedAction`, a database trigger) is keyed by column name:

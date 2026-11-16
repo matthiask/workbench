@@ -280,7 +280,9 @@ class AcceptedByMonth(Schema):
 class AcceptedMaintenance(Schema):
     project: ProjectSummary
     owned_by: str = Field(description="The project's owner.")
-    total_excl_tax: Amount = Field(description="Invoiced in the period.")
+    total_excl_tax: Amount = Field(
+        description="Invoiced in the period, without third party costs."
+    )
 
 
 class AcceptedOffer(Schema):
@@ -291,6 +293,9 @@ class AcceptedOffer(Schema):
     project: ProjectSummary
     owned_by: str
     total_excl_tax: Amount
+    won: Amount = Field(
+        description="What counts: the total excl. tax without third party costs."
+    )
     closed_on: dt.date
 
 
@@ -415,6 +420,7 @@ def deal_stats(request, filters: Query[DealStatsFilter]):
                     "project": project_summary(offer.project, request),
                     "owned_by": offer.owned_by.get_short_name(),
                     "total_excl_tax": offer.total_excl_tax,
+                    "won": offer.won,
                     "closed_on": offer.closed_on,
                 }
                 for offer in accepted["offers"]
