@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 07:35+0100\n"
+"POT-Creation-Date: 2026-11-16 07:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -936,8 +936,8 @@ msgstr "Betriebsferien"
 msgid "vacation days credit"
 msgstr "Guthaben an Ferientagen"
 
-#: workbench/awt/pdf.py workbench/reporting/squeeze.py
-#: workbench/templates/awt/_year_details.html
+#: workbench/awt/pdf.py workbench/invoices/models.py
+#: workbench/reporting/squeeze.py workbench/templates/awt/_year_details.html
 #: workbench/templates/logbook/loggedcost_list.html
 #: workbench/templates/logbook/loggedhours_list.html
 #: workbench/templates/projects/project_statistics.html
@@ -2779,6 +2779,14 @@ msgstr "Total exkl. MwSt"
 #: workbench/invoices/models.py
 msgid "Subtotal"
 msgstr "Zwischentotal"
+
+#: workbench/invoices/models.py
+msgid "Down payment total"
+msgstr "Total Akonto"
+
+#: workbench/invoices/models.py
+msgid "Credit total"
+msgstr "Gutschrift Total"
 
 #: workbench/invoices/models.py
 #, python-format

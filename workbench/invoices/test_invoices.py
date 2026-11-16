@@ -2338,6 +2338,20 @@ class InvoicesTest(TestCase):
         invoice.postpone_reminders_until = in_days(Invoice.MAX_POSTPONE_REMINDERS_DAYS)
         invoice.clean_fields(exclude={"postal_address"})
 
+    def test_detail_total_incl_tax(self):
+        """The detail page marks the total incl. tax with a badge, the PDF
+        keeps its title"""
+        invoice = factories.InvoiceFactory.create(
+            type=Invoice.DOWN_PAYMENT, subtotal=100, liable_to_vat=True
+        )
+        self.client.force_login(invoice.owned_by)
+        response = self.client.get(invoice.get_absolute_url())
+        self.assertContains(
+            response, '<div class="wb-stat-label">Down payment total</div>'
+        )
+        self.assertContains(response, "wb-tax-badge", count=2)
+        self.assertNotContains(response, invoice.total_title)
+
     def test_postpone_reminders_warning(self):
         """Reminders are postponed in a modal of their own (not in the invoice
         form), postponing far out warns before saving"""

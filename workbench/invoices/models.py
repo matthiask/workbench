@@ -526,6 +526,15 @@ class Invoice(ModelWithTotal):
         return _("Subtotal")
 
     @property
+    def total_label(self):
+        """total_title for the detail page, which marks the amount instead"""
+        if self.type == self.DOWN_PAYMENT:
+            return _("Down payment total")
+        if self.type == self.CREDIT:
+            return _("Credit total")
+        return _("Total")
+
+    @property
     def total_title(self):
         if self.type == self.DOWN_PAYMENT:
             return (

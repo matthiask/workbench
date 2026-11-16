@@ -91,8 +91,8 @@
 
   <div class="wb-stats mb-3">
     <div class="wb-stat">
-      <div class="wb-stat-label">{{ object.total_title }}</div>
-      <div class="wb-stat-value">{{ object.total|currency }}</div>
+      <div class="wb-stat-label">{{ object.total_label }}</div>
+      <div class="wb-stat-value">{% total_incl_tax object %}</div>
     </div>
     <div class="wb-stat">
       <div class="wb-stat-label">{% translate 'third party costs'|capfirst %}</div>
@@ -162,8 +162,8 @@
               <dt>{% translate 'total excl. tax'|capfirst %}</dt>
               <dd>{{ object.total_excl_tax|currency }}</dd>
             {% endif %}
-            <dt>{{ object.total_title }}</dt>
-            <dd><strong>{{ object.total|currency }}</strong></dd>
+            <dt>{{ object.total_label }}</dt>
+            <dd><strong>{% total_incl_tax object %}</strong></dd>
           </dl>
         </div>
       </section>
