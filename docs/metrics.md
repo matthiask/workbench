@@ -886,7 +886,7 @@ Answers: what value of deals was won in the period, per value type, month and pe
 
 Deals: status ACCEPTED, `closed_on` in [Date from, Date until] (default this week Mon–Sun). `Deal.value` = Σ of its `Value.value` rows (recomputed on save unless `skip_value_calculation`).
 
-Offers without deal (follow-up orders are often accepted without a deal): status ACCEPTED, `closed_on` in the period, no related deal, not on internal projects; amount `total_excl_tax` (revenue, like deal values), attributed in full to the offer's owner (`owned_by`, also for the users filter). They have no value type and no target, and aren't in the median ages. API: `accepted.offers_without_deal`, `by_month[].offers_without_deal`.
+Offers without deal (follow-up orders are often accepted without a deal): status ACCEPTED, `closed_on` in the period, no related deal, not on internal projects; amount `total_excl_tax` (revenue, like deal values), attributed in full to the offer's owner (`owned_by`, also for the users filter). They have no value type and no target, and aren't in the median ages. Deals come first and offers later, when the funnel narrows: an accepted offer without deal skipped ahead in the funnel and is clearly won. Invoiced work without offer (e.g. maintenance) isn't counted on purpose, it would only approximate deals created for the statistics. API: `accepted.offers_without_deal`, `by_month[].offers_without_deal`.
 
 | Figure | Computation |
 |---|---|
