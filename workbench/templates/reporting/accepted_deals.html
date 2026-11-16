@@ -184,7 +184,7 @@
               <span class="text-body-secondary">{% translate 'Offer without deal' %}</span>
             </td>
             <td class="text-end">
-              {{ offer.won|currency_rounded }}
+              {{ offer.in_house_total|currency_rounded }}
             </td>
           </tr>
         {% endfor %}

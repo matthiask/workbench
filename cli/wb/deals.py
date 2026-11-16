@@ -570,7 +570,7 @@ def deal_stats(period, since, until, users, team, as_csv, as_json):
                 link(offer["project"]["code"], offer["project"]["url"]),
                 offer["owned_by"],
                 offer["closed_on"],
-                format_amount(offer.get("won", offer["total_excl_tax"])),
+                format_amount(offer.get("in_house_total") or offer["total_excl_tax"]),
             )
         console.print(table)
     if maintenance:

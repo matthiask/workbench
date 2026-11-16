@@ -91,20 +91,13 @@ def accepted_deals(date_range, *, users=None):
 
     # Third party costs aren't won business, deals don't contain them either
     for offer in offers:
-        offer.won = offer.total_excl_tax - sum(
-            (
-                service.third_party_costs or Z2
-                for service in offer.services.all()
-                if not service.is_optional
-            ),
-            Z2,
-        )
-        offers_by_user[offer.owned_by][offer] = offer.won
-        offers_by_month[offer.closed_on.replace(day=1)] += offer.won
+        won = offer.in_house_total
+        offers_by_user[offer.owned_by][offer] = won
+        offers_by_month[offer.closed_on.replace(day=1)] += won
 
     for invoice in maintenance:
         project = invoice.project
-        won = invoice.total_excl_tax - (invoice.third_party_costs or Z2)
+        won = invoice.in_house_total
         maintenance_by_user[project.owned_by][project] += won
         maintenance_by_month[invoice.invoiced_on.replace(day=1)] += won
         row = maintenance_by_project.setdefault(

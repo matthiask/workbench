@@ -487,6 +487,20 @@ class Offer(ModelWithTotal):
             dt.date.fromisoformat(action.row_data["closed_on"]),
         )
 
+    @property
+    def in_house_total(self):
+        """The total excl. tax (after the discount) without the third party
+        costs of the non-optional services: the agency's own work, e.g. what
+        counts as won business; prefetch ``services`` for many offers"""
+        return self.total_excl_tax - sum(
+            (
+                service.third_party_costs or Z2
+                for service in self.services.all()
+                if not service.is_optional
+            ),
+            Z2,
+        )
+
     def items(self):
         """The services and headings in the order they are shown"""
         return offer_items(services=self.services.all(), headings=self.headings.all())

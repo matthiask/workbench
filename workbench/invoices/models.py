@@ -314,6 +314,12 @@ class Invoice(ModelWithTotal):
         super()._calculate_total()
 
     @property
+    def in_house_total(self):
+        """The total excl. tax (after the discount) without the third party
+        costs: the agency's own work"""
+        return self.total_excl_tax - (self.third_party_costs or Z2)
+
+    @property
     def code(self):
         return (
             "%s-%04d" % (self.project.code, self._code)

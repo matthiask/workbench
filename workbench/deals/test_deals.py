@@ -782,8 +782,8 @@ class DealsTest(TestCase):
         self.assertEqual(data["by_month"][0]["offers_without_deal"], "100.00")
 
     def test_without_third_party_costs(self):
-        """Offers and maintenance without deal count without their third
-        party costs"""
+        """Offers and maintenance without deal count their in-house work:
+        after the discount, without third party costs"""
         offer = factories.OfferFactory.create()
         factories.ServiceFactory.create(
             project=offer.project, offer=offer, cost=1000, third_party_costs=600
@@ -797,6 +797,7 @@ class DealsTest(TestCase):
         )
         offer.status = Offer.ACCEPTED
         offer.closed_on = dt.date.today()
+        offer.discount = 100
         offer.save()
 
         project = factories.ProjectFactory.create(type=Project.MAINTENANCE)
@@ -811,9 +812,10 @@ class DealsTest(TestCase):
         )
 
         stats = accepted_deals([dt.date.today(), dt.date.today()])
-        self.assertEqual(stats["offers_sum"], Decimal(400))
+        self.assertEqual(offer.in_house_total, Decimal(300))
+        self.assertEqual(stats["offers_sum"], Decimal(300))
         self.assertEqual(stats["maintenance_sum"], Decimal(200))
-        self.assertEqual(stats["sum"], Decimal(600))
+        self.assertEqual(stats["sum"], Decimal(500))
 
     def test_maintenance_without_deal(self):
         """Invoices of maintenance projects without deal are added to the
