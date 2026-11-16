@@ -73,11 +73,17 @@ IGNORE_WARNINGS = Query(
 def form_data(form):
     """The data of an unbound form with the instance's current values, to
     change some of them and validate the result with the same form like the
-    web interface does"""
-    return {
-        name: "" if (value := form[name].value()) is None else value
-        for name in form.fields
-    }
+    web interface does
+
+    Fields with callable defaults compare with a hidden initial value like in
+    the web interface, else they would always count as changed."""
+    data = {}
+    for name, field in form.fields.items():
+        value = "" if (value := form[name].value()) is None else value
+        data[name] = value
+        if field.show_hidden_initial:
+            data[form[name].html_initial_name] = value
+    return data
 
 
 def raise_form_errors(form, *, fields=None, ignore_warnings=()):

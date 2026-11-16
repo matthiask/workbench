@@ -27,6 +27,7 @@ from workbench.deals.models import AttributeGroup, Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, Project, Service
+from workbench.reporting.models import FreezeDate
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days, monday
 
@@ -1751,6 +1752,22 @@ planned_work:
         )
         self.assertEqual(result.exit_code, 1)
         self.assertIn("Unknown or inactive user", result.output)
+
+    def test_recurring_invoice_update_frozen_start(self):
+        """Recurring invoices which started before the freeze date can still
+        be changed"""
+        FreezeDate.objects.create(up_to=dt.date(2024, 12, 31))
+        recurring = factories.RecurringInvoiceFactory.create(
+            title="old.example.com",
+            starts_on=dt.date(2020, 1, 1),
+            postal_address="Org\nStreet\nCity",
+        )
+        result = self.wb(
+            "recurring-invoices", "update", recurring.pk, "--title", "new.example.com"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.title, "new.example.com")
 
     def test_invoice_reminders(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
