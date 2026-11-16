@@ -1,6 +1,6 @@
 ---
 name: workbench-deals
-description: Keep the Workbench sales pipeline up to date with the `wb` CLI. Use when the user wants to review, update, clean up, close, win or lose deals, update probabilities or expected decision dates, or asks about the state of the pipeline or of a deal in Workbench.
+description: Keep the Workbench sales pipeline up to date with the `wb` CLI. Use when the user wants to review, update, clean up, close, win or lose deals, update probabilities or expected decision dates, link offers to deals, find accepted offers counted twice next to their deal, or asks about the state of the pipeline or of a deal in Workbench.
 ---
 
 # Keeping the Workbench sales pipeline up to date
@@ -62,14 +62,41 @@ create`. Offers are given by ID or code (`wb deals show` prints codes):
     wb deals offers add <deal_id> <offer> ... --dry-run
     wb deals offers remove <deal_id> <offer> ... --dry-run
 
-- Only open deals can be changed, and only offers in preparation, service
-  groups and offered offers can be linked. Linking an offer twice or removing
-  one which isn't linked is an error.
+- Open deals take offers in preparation, service groups and offered offers;
+  accepted deals take accepted offers (nothing changes, see below). Only
+  open deals can be unlinked from. Linking an offer twice or removing one
+  which isn't linked is an error.
 - Offers of another customer's projects (agencies and their clients,
   departments of the same city) are rejected; add `--ignore-warning
   other-customer` only after the user confirmed the link.
 - Ask the user which deal an offer belongs to when the customer has several
   open deals.
+
+### Accepted offers without deal
+
+The accepted deals report (`wb deals stats`) counts accepted offers without
+deal on their own, since deals come first and offers later in the funnel.
+An accepted offer which belongs to an accepted deal but isn't linked to it is
+counted twice. Look for them in reviews, e.g. for the last quarter (the
+period of offers filters the offer date, so look further back and compare
+their `closed_on`):
+
+    wb offers search --status accepted --without-deal --since 2026-04-01 --json
+    wb deals search --status accepted --period last-quarter --json
+
+Compare by customer (the offer's project's customer), closing date and
+amount: offers count `total_excl_tax`, deals their `value`. Several offers
+of a project closed on the same day often add up to one deal. Present the
+likely pairs to the user, the clear ones (same customer, amounts within a few
+percent, closed within days) first, and link each pair only after the user
+confirmed it:
+
+    wb deals offers add <deal_id> <offer> ... --dry-run
+
+Never link on your own: an offer for the same customer may well be a
+follow-up order which is won business of its own. Deals summing up the work
+without deal of a period must not contain work which was offered, accepted
+offers count by themselves.
 
 ## 4. Close deals
 

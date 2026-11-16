@@ -166,9 +166,11 @@ After the user confirmed the deal:
     wb deals offers add <deal_id> <offer_code> --dry-run
     wb deals offers add <deal_id> <offer_code>
 
-Only open deals accept offers. An offer of another customer's project (e.g.
-the deal is with an agency, the project with its client) is rejected; only
-add `--ignore-warning other-customer` if the user confirms the link is right.
+Only open deals accept offers in preparation (an accepted deal only takes
+accepted offers). Link the offer now: once it's accepted without deal, the
+accepted deals report counts it on its own, next to its deal. An offer of
+another customer's project (e.g. the deal is with an agency, the project
+with its client) is rejected; only add `--ignore-warning other-customer` if the user confirms the link is right.
 
 ## Revising an offer
 
