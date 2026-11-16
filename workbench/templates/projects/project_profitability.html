@@ -69,7 +69,7 @@
       <th colspan="2">{% translate 'Hours' %}</th>
     </tr>
     <tr>
-      <td>{% translate 'Service hours' %}</td>
+      <td>{% translate 'Budgeted hours' %}</td>
       <td class="text-end">{{ squeeze.hours_offered|hours }}</td>
     </tr>
     <tr>
@@ -132,14 +132,14 @@
       </li>
       <li>
         {% blocktranslate trimmed %}
-          Service hours are the hours entered in the services, except for optional services and services of declined
+          Budgeted hours are the hours entered in the services, except for optional services and services of declined
           offers or budget retainers. Hours of offers which haven't been accepted yet are included even though their
           amount isn't.
         {% endblocktranslate %}
       </li>
       <li>
         {% blocktranslate trimmed %}
-          The relevant hours are the service hours or the hours logged on these services, whichever is larger. Hours
+          The relevant hours are the budgeted hours or the hours logged on these services, whichever is larger. Hours
           logged on other services (for example optional services) are always added on top.
         {% endblocktranslate %}
       </li>

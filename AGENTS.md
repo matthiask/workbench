@@ -60,6 +60,11 @@ fl mm   # makemessages
 fl cm   # compilemessages
 ```
 
+Labels mean the same in all languages and stay consistent across pages.
+Renaming a model field's label doesn't need a migration: edit the old
+migrations, which is fine as long as the generated SQL doesn't change
+(`makemigrations --check`).
+
 Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag before any new entry or it won't be used.
 
 # Conventions

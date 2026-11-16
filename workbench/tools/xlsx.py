@@ -293,7 +293,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                 capfirst(_("third party costs")),
                 _("Invoiced"),
                 _("Total hours"),
-                capfirst(_("service hours")),
+                capfirst(_("budgeted hours")),
                 _("Delta"),
                 capfirst(_("projected gross margin")),
                 statistics["cutoff_date"],

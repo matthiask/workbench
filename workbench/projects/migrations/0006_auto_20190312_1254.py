@@ -22,7 +22,10 @@ class Migration(migrations.Migration):
             model_name="service",
             name="service_hours",
             field=models.DecimalField(
-                decimal_places=1, default=0, max_digits=10, verbose_name="service hours"
+                decimal_places=1,
+                default=0,
+                max_digits=10,
+                verbose_name="budgeted hours",
             ),
         ),
     ]

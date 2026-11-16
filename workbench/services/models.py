@@ -35,7 +35,7 @@ class ServiceBase(Model):
     description = models.TextField(_("description"), blank=True)
     position = models.IntegerField(_("position"), default=0)
 
-    service_hours = HoursFieldAllowNegatives(_("service hours"), default=0)
+    service_hours = HoursFieldAllowNegatives(_("budgeted hours"), default=0)
     service_cost = MoneyField(_("service cost"), default=0)
 
     effort_type = models.CharField(_("effort type"), max_length=50, blank=True)

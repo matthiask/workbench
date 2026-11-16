@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 default=0,
                 max_digits=4,
                 validators=[django.core.validators.MinValueValidator(0)],
-                verbose_name="service hours",
+                verbose_name="budgeted hours",
             ),
         ),
         migrations.AddField(

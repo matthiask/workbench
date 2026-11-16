@@ -71,7 +71,7 @@
           <div class="wb-stat-value">{{ statistics.overall.invoiced|currency }}</div>
         </div>
         <div class="wb-stat">
-          <div class="wb-stat-label">{% translate 'service hours'|capfirst %}</div>
+          <div class="wb-stat-label">{% translate 'budgeted hours'|capfirst %}</div>
           <div class="wb-stat-value">
             {{ statistics.overall.hours|hours }}
             <span class="wb-stat-of">/ {{ statistics.overall.service_hours|hours }}</span>
