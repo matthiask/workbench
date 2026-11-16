@@ -231,6 +231,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - Offers are only linked to open deals and only while not closed; closing a
   deal settles its offers. The deal owner always contributes
   (`DealForm.clean()`).
+- Accepted deals also count accepted offers without deal (deals come first,
+  offers later in the funnel), in their own column without value type:
+  services only keep their effort type as free text, not their service
+  type, so mapping offers to value types would be guesswork. Invoiced work
+  without offer (maintenance) isn't counted, decided against on purpose.
 - Offer headings share the positions of the services (`Offer.items()`,
   `save_positions()`; `reorder_services()` keeps headings in place).
 - Audit log (`LoggedAction`, a database trigger) is keyed by column name:
