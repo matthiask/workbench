@@ -87,7 +87,12 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "closed_on",
-                    models.DateField(blank=True, null=True, verbose_name="closed on"),
+                    models.DateField(
+                        blank=True,
+                        help_text="Accepted or declined on, today if empty.",
+                        null=True,
+                        verbose_name="closed on",
+                    ),
                 ),
                 ("title", models.CharField(max_length=200, verbose_name="title")),
                 (

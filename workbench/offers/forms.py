@@ -107,6 +107,7 @@ class OfferForm(PostalAddressSelectionForm):
         fields = (
             "offered_on",
             "valid_until",
+            "closed_on",
             "title",
             "description",
             "owned_by",
@@ -218,12 +219,12 @@ class OfferForm(PostalAddressSelectionForm):
         if self.instance.closed_on and data["status"] < Offer.ACCEPTED:
             self.add_warning(
                 _(
-                    "You are attempting to set status to '%(to)s',"
-                    " but the offer has already been closed on %(closed)s."
-                    " Are you sure?"
+                    "The offer has been closed on %(closed)s. Enter this"
+                    ' date again as "closed on" when setting it back to'
+                    " '%(status)s'."
                 )
                 % {
-                    "to": s_dict[data["status"]],
+                    "status": s_dict[self.instance.status],
                     "closed": local_date_format(self.instance.closed_on),
                 },
                 code="status-change-but-already-closed",

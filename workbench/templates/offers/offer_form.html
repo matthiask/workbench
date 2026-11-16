@@ -32,8 +32,9 @@
               <div class="col-sm-6">{% ff_field form.offered_on %}</div>
               <div class="col-sm-6">{% ff_field form.valid_until %}</div>
             </div>
+            {% ff_field form.closed_on %}
             {% ff_field form.postal_address %}
-            {% ff_fields form exclude='title,description,external_reference,owned_by,status,offered_on,valid_until,postal_address,subtotal,discount,liable_to_vat,tax_rate,show_service_details,work_completed_on,is_budget_retainer' %}
+            {% ff_fields form exclude='title,description,external_reference,owned_by,status,offered_on,valid_until,closed_on,postal_address,subtotal,discount,liable_to_vat,tax_rate,show_service_details,work_completed_on,is_budget_retainer' %}
           </div>
         </div>
       </div>

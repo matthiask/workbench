@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 08:01+0100\n"
+"POT-Creation-Date: 2026-11-16 14:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3506,8 +3506,8 @@ msgstr "Die Arbeit kann nicht in der Zukunft abgeschlossen werden."
 
 #: workbench/offers/forms.py
 #, python-format
-msgid "You are attempting to set status to '%(to)s', but the offer has already been closed on %(closed)s. Are you sure?"
-msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde schon am %(closed)s geschlossen. Bist Du sicher?"
+msgid "The offer has been closed on %(closed)s. Enter this date again as \"closed on\" when setting it back to '%(status)s'."
+msgstr "Die Offerte wurde am %(closed)s geschlossen. Gib dieses Datum wieder als «Geschlossen am» ein, wenn du sie zurück auf «%(status)s» setzt."
 
 #: workbench/offers/forms.py
 msgid "You are setting the offer status to 'Declined'. However, if you just want to change a few things and send the offer to the client again then you could just as well put the offer back into preparation."
@@ -3574,6 +3574,10 @@ msgstr "offeriert am"
 #: workbench/offers/models.py workbench/tools/pdf.py
 msgid "valid until"
 msgstr "Gültig bis"
+
+#: workbench/offers/models.py
+msgid "Accepted or declined on, today if empty."
+msgstr "Akzeptiert oder abgelehnt am, heute wenn leer."
 
 #: workbench/offers/models.py workbench/templates/projects/project_detail.html
 msgid "work completed on"
@@ -6865,6 +6869,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "You are attempting to set status to '%(to)s', but the offer has already been closed on %(closed)s. Are you sure?"
+#~ msgstr "Du versuchst, den Status auf '%(to)s' zu setzen, aber die Offerte wurde schon am %(closed)s geschlossen. Bist Du sicher?"
 
 #~ msgid "services gross margin"
 #~ msgstr "Umsatz bereinigt der Leistungen"

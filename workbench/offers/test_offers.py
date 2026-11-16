@@ -335,7 +335,7 @@ class OffersTest(TestCase):
                 "status": Offer.IN_PREPARATION,
             },
         )
-        self.assertContains(response, "but the offer")
+        self.assertContains(response, "Enter this date again")
 
         response = self.client.post(
             offer.urls["update"],
@@ -1524,3 +1524,31 @@ class OffersTest(TestCase):
             "attachment; filename*=utf-8''"
             f"{project.code}_M%C3%BCller-S%C3%B6hne-AG_Website-Relaunch-2027_Offerten.pdf",
         )
+
+    def test_closed_on_editable(self):
+        """The acceptance date can be edited"""
+        offer = factories.OfferFactory.create(
+            status=Offer.ACCEPTED,
+            offered_on=in_days(-30),
+            valid_until=in_days(30),
+        )
+        self.client.force_login(offer.owned_by)
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Stuff",
+                "owned_by": offer.owned_by_id,
+                "discount": "0",
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "postal_address": "Anything\nStreet\nCity",
+                **services_formset(),
+                "offered_on": in_days(-30).isoformat(),
+                "valid_until": in_days(30).isoformat(),
+                "closed_on": in_days(-20).isoformat(),
+                "status": Offer.ACCEPTED,
+            },
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        offer.refresh_from_db()
+        self.assertEqual(offer.closed_on, in_days(-20))

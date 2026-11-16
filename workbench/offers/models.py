@@ -147,7 +147,12 @@ class Offer(ModelWithTotal):
 
     offered_on = models.DateField(_("offered on"), blank=True, null=True)
     valid_until = models.DateField(_("valid until"), blank=True, null=True)
-    closed_on = models.DateField(_("closed on"), blank=True, null=True)
+    closed_on = models.DateField(
+        _("closed on"),
+        blank=True,
+        null=True,
+        help_text=_("Accepted or declined on, today if empty."),
+    )
     work_completed_on = models.DateField(
         _("work completed on"),
         blank=True,
