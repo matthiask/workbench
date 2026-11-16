@@ -84,12 +84,21 @@ their `closed_on`):
     wb offers search --status accepted --without-deal --since 2026-04-01 --json
     wb deals search --status accepted --period last-quarter --json
 
-Compare by customer (the offer's project's customer), closing date and
-amount: offers count `total_excl_tax`, deals their `value`. Several offers
-of a project closed on the same day often add up to one deal. Present the
-likely pairs to the user, the clear ones (same customer, amounts within a few
-percent, closed within days) first, and link each pair only after the user
-confirmed it:
+Compare by customer (the offer's project's customer), closing date, title
+and amount: offers count `total_excl_tax`, deals their `value`. Several
+offers of a project closed on the same day often add up to one deal.
+
+- A deal whose linked offers (`wb offers show` has their totals) already
+  reach its value is full: further offers of the project are follow-up
+  orders and count on their own.
+- A deal with a gap takes the offers which fill it; when several fit, take
+  the oldest ones.
+- A deal which already has offers of its own isn't a duplicate of an offer
+  for different work, even if the amounts match.
+
+Present the likely pairs to the user, the clear ones (same customer, amounts
+within a few percent, closed within days) first, and link each pair only
+after the user confirmed it:
 
     wb deals offers add <deal_id> <offer> ... --dry-run
 
