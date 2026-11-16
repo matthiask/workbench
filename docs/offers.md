@@ -59,8 +59,9 @@ after the current week. Closing a project discards its offers in
 preparation and declines those sent before.
 
 **Work completed on** ends logging on the offer's services. A **budget
-retainer** is an offer only used for budgeting: no hours are logged on
-its services, the work is logged on services created later.
+retainer** only retains budget: no hours are logged on its services, the
+work is logged on services without offer created later, which free the
+retained budget.
 
 ## Copies, PDFs and deals
 

@@ -69,7 +69,8 @@ schon versandte abgelehnt.
 **Arbeit abgeschlossen am** beendet die Erfassung auf den Leistungen der
 Offerte. Eine Offerte, die **Budget zurückbehält**, dient nur der
 Budgetierung: Auf ihren Leistungen werden keine Stunden erfasst, die
-Arbeit wird auf später erstellten Leistungen erfasst.
+Arbeit wird auf später erstellten Leistungen ohne Offerte erfasst. Diese
+geben das zurückbehaltene Budget frei.
 
 ## Kopien, PDFs und Geschäfte
 

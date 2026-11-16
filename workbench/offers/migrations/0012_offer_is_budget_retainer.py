@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name="is_budget_retainer",
             field=models.BooleanField(
                 default=False,
-                help_text="The offer is only used for budgeting; services have to be created later when rendering actual work.",
+                help_text="The offer only retains budget. Services without offer created later for the actual work free it.",
                 verbose_name="is budget retainer",
             ),
         ),
