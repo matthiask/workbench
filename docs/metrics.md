@@ -2,8 +2,7 @@
 
 This document describes how the reports and key figures of Workbench are
 computed: which records count, which fields and dates are used and where the
-code lives. German labels are the ones of the user interface
-(`conf/locale/de/LC_MESSAGES/django.po`).
+code lives. Labels are those of the English user interface.
 
 Verified against the code in October 2026. When you change how a figure is
 computed, update this document in the same commit.
@@ -32,9 +31,9 @@ Contents:
 - **Value** of logged hours uses `HOURS_FOR_INVOICING = Coalesce(hours_for_invoicing,
   hours)` (`workbench/logbook/models.py`): `hours_for_invoicing` is optional and
   says what the work is worth if that is more than the time spent.
-- **Logbook value ("Logbuch")** = Σ `LoggedCost.cost` + Σ `Service.effort_rate
+- **Logbook value ("Logbook")** = Σ `LoggedCost.cost` + Σ `Service.effort_rate
   × HOURS_FOR_INVOICING`. Hours on services without an effort rate are not valued
-  (no fallback rate) and are shown separately as hours "ohne Stundensatz"; a
+  (no fallback rate) and are shown separately as hours with "Undefined rate"; a
   rate of 0.00 values them at 0. Archived entries are included.
   `workbench/reporting/utils.py:effort_cost_by_project`
 - `LoggedCost.third_party_costs` ("Total incl. tax for third-party services")
@@ -70,14 +69,14 @@ Contents:
 - **Discarded offers** (`Offer.DISCARDED`, never sent and not pursued, e.g.
   offers in preparation of projects being closed) count like declined ones
   everywhere: "declined" in this document means `Offer.NOT_PURSUED`.
-- **Budget retainer** offers (`Offer.is_budget_retainer`, "behält Budget
-  zurück") are only used for budgeting; their services don't count as budget,
+- **Budget retainer** offers (`Offer.is_budget_retainer`, "is budget
+  retainer") are only used for budgeting; their services don't count as budget,
   the actual services are created later, usually without offers of their own.
 - **Accepted offers per project** (`accepted_offers_by_project()` in
   `workbench/reporting/utils.py`): Σ `total_excl_tax`, Σ `discount` and Σ
   `Service.third_party_costs` of the accepted offers, budget retainers
   included: retainers are released with services without offer, so they
-  don't overlap with the other offers. Used by "verkauft",
+  don't overlap with the other offers. Used by "Sold",
   the offered gross margin (squeeze, key data, cash data) and the cash data's
   accepted offers not invoiced.
 - **Open projects**: `closed_on` empty. `open(on=D)`: `closed_on` empty or
@@ -128,13 +127,13 @@ are part of the sum but get nothing allocated.
 Per project at cutoff date C (`workbench/reporting/project_budget_statistics.py`):
 Δ = logbook value (`rendered_on ≤ C`) − Σ `total_excl_tax` of invoiced
 invoices (`invoiced_on ≤ C`). Positive deltas are **work not invoiced**
-("Nicht verrechnete Arbeit"), negative deltas **accruals** ("Abgrenzungen",
+("Work not invoiced"), negative deltas **accruals** ("Accruals",
 invoiced ahead of work). Several reports reuse these figures, see
-[Project budget statistics](#project-budget-statistics-projekt-budgetstatistik).
+[Project budget statistics](#project-budget-statistics).
 
 ## Financial overview
 
-### Key data (Kennzahlen)
+### Key data
 
 Web: `/report/key-data/` (URL name `report_key_data`), feature CONTROLLING. Detail modals: `key-data/gross-profit/YYYY.MM/`, `key-data/third-party-costs/YYYY.MM/`.
 Answers: how much revenue, corrected for third party costs and accruals, did the agency make per month/year over the last four calendar years, per FTE, and how were hours distributed.
@@ -143,60 +142,60 @@ Period: 1 Jan of (current year − 3) to 31 Dec of the current year. `workbench/
 
 #### Stat tiles
 
-| Label (DE) | Computation |
+| Label | Computation |
 |---|---|
-| Budgetierte Stunden in offenen Aufträgen | Σ Service.service_hours of budgeted services on open projects of type `order`. `key_data.py:service_hours_in_open_orders` |
-| Erfasste Stunden in offenen Aufträgen | Σ LoggedHours.hours (time, not hours_for_invoicing; all dates) on services of open `order` projects. `key_data.py:logged_hours_in_open_orders` |
-| Total exkl. MwSt aller offenen Rechnungen (EN "Sent invoices total excl. tax") | Σ Invoice.total_excl_tax with status `SENT` (any invoiced_on, any project/none). `key_data.py:sent_invoices_total` |
-| Total exkl. MwSt aller fälligen Rechnungen | Σ Invoice.total_excl_tax with status `SENT` and `due_on <= today`. `key_data.py:due_invoices_total` |
-| Total exkl. MwSt aller offenen Offerten | Σ Offer.total_excl_tax with status `OFFERED` on open projects (no valid_until check, internal projects not excluded). `key_data.py:open_offers_total`, `OfferQuerySet.offered` |
-| Durchschnittliche Anstellungsdauer der aktuellen Mitarbeiter:innen | SQL: per active user Σ (min(date_until, current_date) − date_from) over their `Employment` rows which have started (only the past part counts, open ends included); average over users / 365.24, in years, 2 decimals. `workbench/accounts/reporting.py:average_employment_duration` |
-| Durchschnittliche Anstellungsdauer aller Mitarbeiter:innen | Same over all users (active or not). |
+| Budgeted hours in open orders | Σ Service.service_hours of budgeted services on open projects of type `order`. `key_data.py:service_hours_in_open_orders` |
+| Logged hours in open orders | Σ LoggedHours.hours (time, not hours_for_invoicing; all dates) on services of open `order` projects. `key_data.py:logged_hours_in_open_orders` |
+| Sent invoices total excl. tax | Σ Invoice.total_excl_tax with status `SENT` (any invoiced_on, any project/none). `key_data.py:sent_invoices_total` |
+| Total excl. tax of all invoices due today or earlier | Σ Invoice.total_excl_tax with status `SENT` and `due_on <= today`. `key_data.py:due_invoices_total` |
+| Open offers total excl. tax | Σ Offer.total_excl_tax with status `OFFERED` on open projects (no valid_until check, internal projects not excluded). `key_data.py:open_offers_total`, `OfferQuerySet.offered` |
+| Average employment duration of current users | SQL: per active user Σ (min(date_until, current_date) − date_from) over their `Employment` rows which have started (only the past part counts, open ends included); average over users / 365.24, in years, 2 decimals. `workbench/accounts/reporting.py:average_employment_duration` |
+| Average employment duration of all users | Same over all users (active or not). |
 
 #### Monthly table (and the two charts)
 
 One row per month (`key_data.py:gross_margin_by_month`); a month is **left out** if gross profit, third party costs, accrual delta and projected gross margin are all zero/empty.
 
-| Column (DE) | Computation |
+| Column | Computation |
 |---|---|
-| Umsatz ("Gross profit") | Σ Invoice.total_excl_tax of invoiced invoices (SENT/PAID) with `invoiced_on` in the month. All types (incl. down payments, credits), all projects incl. internal and invoices without project. `key_data.py:gross_profit_by_month`. Modal lists these invoices. |
-| Fremdkosten | Negative. Per project, the deduction up to a month is max(Σ third party costs of invoiced down payment invoices, Σ of the other invoiced invoices, Σ `LoggedCost.third_party_costs`), each sum over `invoiced_on` / `rendered_on` up to the month, all time; each month gets the increase. Same rule as `third_party_costs()` in squeeze. `key_data.py:third_party_costs_by_month`. The modal lists the logged costs and invoices of the month. |
-| Abgrenzungen (muted value) | Accruals at month end: stored `Accruals.accruals` whose `cutoff_date` falls in the month; for the current month computed live with cutoff today. Value = `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff).external()`. `key_data.py:accruals_by_month`, `reporting/models.py:AccrualsQuerySet.accruals` |
+| Gross profit | Σ Invoice.total_excl_tax of invoiced invoices (SENT/PAID) with `invoiced_on` in the month. All types (incl. down payments, credits), all projects incl. internal and invoices without project. `key_data.py:gross_profit_by_month`. Modal lists these invoices. |
+| Third party costs | Negative. Per project, the deduction up to a month is max(Σ third party costs of invoiced down payment invoices, Σ of the other invoiced invoices, Σ `LoggedCost.third_party_costs`), each sum over `invoiced_on` / `rendered_on` up to the month, all time; each month gets the increase. Same rule as `third_party_costs()` in squeeze. `key_data.py:third_party_costs_by_month`. The modal lists the logged costs and invoices of the month. |
+| Accruals (muted value) | Accruals at month end: stored `Accruals.accruals` whose `cutoff_date` falls in the month; for the current month computed live with cutoff today. Value = `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff).external()`. `key_data.py:accruals_by_month`, `reporting/models.py:AccrualsQuerySet.accruals` |
 | (delta column, unlabelled) | Accrual of this month − accrual of the previous existing record (any earlier month; the first record has no change). Months without a record: delta 0. |
-| Umsatz bereinigt ("Gross margin") | Umsatz + Fremdkosten (negative) + accrual delta. |
-| Geplant ("Projected", links to projected gross margin report) | `projected_gross_margin()["monthly_overall"]` for the month: projected gross margin not yet invoiced of all open projects (internal not excluded). Only shown if non-zero. |
+| Gross margin | Gross profit + third party costs (negative) + accrual delta. |
+| Projected (links to projected gross margin report) | `projected_gross_margin()["monthly_overall"]` for the month: projected gross margin not yet invoiced of all open projects (internal not excluded). Only shown if non-zero. |
 | FTE | Σ over all `Employment` rows of percentage/100 × (employment days in month / days in month). `workbench/awt/reporting.py:full_time_equivalents_by_month` |
-| Umsatz / FTE ("Margin / FTE") | Umsatz bereinigt / FTE (empty if FTE 0). |
+| Margin / FTE | Gross margin / FTE (empty if FTE 0). |
 
-**Year rows**: Σ of the displayed months for Umsatz, Fremdkosten, accrual deltas, Umsatz bereinigt, Geplant; FTE = arithmetic mean of the FTE of the displayed months only; Umsatz/FTE = year gross margin / mean FTE. `views.py:key_data_view`
+**Year rows**: Σ of the displayed months for gross profit, third party costs, accrual deltas, gross margin, projected; FTE = arithmetic mean of the FTE of the displayed months only; Margin / FTE = year gross margin / mean FTE. `views.py:key_data_view`
 
-**Hochrechnung row** (current year extrapolation), factor f = 365.24 / (1 + days since 1 Jan). It only uses what is dated up to today: invoices and logged third party costs with a future date are shown in their month but neither extrapolated nor part of "so far".
-- Umsatz: Umsatz so far × f
-- Umsatz bereinigt: gross margin so far × f
-- Geplant column: gross margin so far (not extrapolated) + Σ projected gross margin of the current year's months (projections not invoiced yet). Adding the projections to the extrapolation would count the rest of the year twice.
-- Umsatz / FTE: Geplant / mean FTE of the year
+**Projection row** (current year extrapolation), factor f = 365.24 / (1 + days since 1 Jan). It only uses what is dated up to today: invoices and logged third party costs with a future date are shown in their month but neither extrapolated nor part of "so far".
+- Gross profit: gross profit so far × f
+- Gross margin: gross margin so far × f
+- Projected column: gross margin so far (not extrapolated) + Σ projected gross margin of the current year's months (projections not invoiced yet). Adding the projections to the extrapolation would count the rest of the year twice.
+- Margin / FTE: projected / mean FTE of the year
 
-**Chart "Umsatz minus Fremdkosten minus Abgrenzungen"**: Umsatz bereinigt per calendar month; current year as bars plus the current year's projected gross margin as an extra bar series ("geplanter Umsatz"), the three earlier years as lines. `views.py:_years_chart`
-**Chart "… pro FTE"**: per quarter, Σ of the monthly Umsatz/FTE values (months not displayed contribute 0); current year bars, earlier years lines.
+**Chart "Revenue minus third party costs and accruals"**: gross margin per calendar month; current year as bars plus the current year's projected gross margin as an extra bar series ("Projected gross margin"), the three earlier years as lines. `views.py:_years_chart`
+**Chart "… per FTE"**: per quarter, Σ of the monthly Margin / FTE values (months not displayed contribute 0); current year bars, earlier years lines.
 
-#### Hours distribution (Stundenverteilung chart + table)
+#### Hours distribution (chart + table)
 
 From `workbench/reporting/green_hours.py:green_hours_by_month` (SQL), all logged hours of all users, by month of `rendered_on`:
 - Total = Σ LoggedHours.hours in month.
-- Profitabel = Σ hours on `order` projects × project factor; factor = (Σ budgeted service_hours of the project, lifetime) / (Σ logged hours of the project, lifetime) if < 1, else 1. Budgeted here = not optional and (no offer or offer not declined and not budget retainer).
-- Wartung = Σ hours on `maintenance` projects. Intern = Σ hours on `internal` projects.
-- Überzogen = Total − Profitabel − Wartung − Intern.
-- grün % = 100 × (Profitabel + Wartung) / Total, rounded to integer. Year row: sums of months, same formula. Percent columns next to each figure: share of total.
+- Profitable = Σ hours on `order` projects × project factor; factor = (Σ budgeted service_hours of the project, lifetime) / (Σ logged hours of the project, lifetime) if < 1, else 1. Budgeted here = not optional and (no offer or offer not declined and not budget retainer).
+- Maintenance = Σ hours on `maintenance` projects. Internal = Σ hours on `internal` projects.
+- Overdrawn = Total − profitable − maintenance − internal.
+- Green % = 100 × (profitable + maintenance) / Total, rounded to integer. Year row: sums of months, same formula. Percent columns next to each figure: share of total.
 - Chart: monthly shares in % of total.
 
 #### Caveats from code
 - Accruals are snapshots: the fairy tasks recompute (`update_or_create`) the stored accruals of every month-end of the last two years on each run (`reporting/tasks.py:create_accruals_for_last_month`), with current data (current invoice status, current project types). Older stored records stay as they were.
-- Last month's figures are final only after the fairy tasks have run in the new month. Before, last month has no stored record: its Umsatz bereinigt lacks the accrual delta, the current month's delta (live, cutoff today) is taken against the month before last instead, and the key data API's `accruals` (computed live at the month end) doesn't match the delta in its `gross_margin`. The month in progress uses the cutoff today in both. Months before the first stored record behave the same way. Computing the missing record live would cost another run of the project budget statistics for every request, for a gap of a few hours a month.
+- Last month's figures are final only after the fairy tasks have run in the new month. Before, last month has no stored record: its gross margin lacks the accrual delta, the current month's delta (live, cutoff today) is taken against the month before last instead, and the key data API's `accruals` (computed live at the month end) doesn't match the delta in its `gross_margin`. The month in progress uses the cutoff today in both. Months before the first stored record behave the same way. Computing the missing record live would cost another run of the project budget statistics for every request, for a gap of a few hours a month.
 - Projections not invoiced in time stay in their original month (AGENTS.md; `projected_gross_margin`).
 
 ---
 
-### Key data API (Kennzahlen, JSON)
+### Key data API (JSON)
 
 `GET /api/reports/key-data/?month=YYYY-MM` (also `/api/key-data/`, hidden). Auth: static `ReportingToken` (settings.KEY_DATA_API_TOKEN) or user with CONTROLLING. Default month: last month. Decimals as floats (`jsonable()`). `workbench/reporting/api.py:key_data`, `workbench/reporting/key_data_api.py:key_data_for_month`
 Answers: the key figures of one month for integrations.
@@ -207,8 +206,8 @@ web interface; the static reporting token gets everything.
 
 | Field | Computation |
 |---|---|
-| `gross_margin` | "Umsatz bereinigt" of the month exactly as in the web view (0.00 if the month row is left out). |
-| `green_hours_percentage` | grün % of the month (null if no hours). |
+| `gross_margin` | "Gross margin" of the month exactly as in the web view (0.00 if the month row is left out). |
+| `green_hours_percentage` | Green % of the month (null if no hours). |
 | `previous_months[3]` | For each of the 3 preceding months: `green_hours_percentage`, `canceled_invoices_total_excl_tax`. |
 | `open_invoices_total_excl_tax` | Σ total_excl_tax of invoices outstanding on the last day of the month, today for the month in progress (current status: later canceled ones excluded). |
 | `canceled_invoices_total_excl_tax` | Σ total_excl_tax of invoices with status `CANCELED` and `closed_on` in the month. Invoices in preparation can't be cancelled (they are deleted) since November 2026; older data may contain invoices cancelled before they were sent. |
@@ -240,68 +239,68 @@ Answers: what money is owed to the agency and what is expected to be invoiced, a
 | `accepted_offers_not_invoiced.total_excl_tax` | Revenue: Σ over open external projects of max(accepted offers total − Σ invoiced Invoice.total_excl_tax, 0). Accepted offers per project as defined above (budget retainers included). |
 | `accepted_offers_not_invoiced.not_in_planned_invoicing_excl_tax` | Gross margin: Σ over the same projects of max(max(offered GM − invoiced GM, 0) − projected-not-invoiced delta of the project, 0). |
 | `work_not_invoiced.total_excl_tax` | `delta_positive` (logged costs + effort cost − invoiced, positive projects only) of open external projects at cutoff. |
-| `work_not_invoiced.in_planned_invoicing_excl_tax` | "davon geplant" of the [project budget statistics](#project-budget-statistics-projekt-budgetstatistik). |
-| `work_not_invoiced.beyond_offers_excl_tax` | "davon über Offerte" of the project budget statistics; doesn't overlap with the planned part. |
+| `work_not_invoiced.in_planned_invoicing_excl_tax` | "thereof planned" of the [project budget statistics](#project-budget-statistics). |
+| `work_not_invoiced.beyond_offers_excl_tax` | "thereof beyond offers" of the project budget statistics; doesn't overlap with the planned part. |
 
 Caveats from code: "The split into planned invoicing is an approximation (rates vs. gross margin)"; figures based on projects leave out internal projects, open invoices include all invoices; "Dates in the current week are evaluated at the time of the request so that invoices paid since monday do not show up as open anymore."
 
 ---
 
-### Projected gross margin (geplanter Umsatz)
+### Projected gross margin
 
 Web: `/report/projected-gross-margin/` (`report_projected_gross_margin`), CONTROLLING. API: `GET /api/reports/projected-gross-margin/` (CONTROLLING). `workbench/reporting/views.py:projected_gross_margin`, `key_data.py:projected_gross_margin`
 Answers: which projected invoicing (as gross margin) of open projects has not been invoiced yet, and in which month it is planned.
 
 Projects: all open projects (internal not excluded) with at least one ProjectedInvoice and delta > 0.
 
-| Column (DE) | Computation |
+| Column | Computation |
 |---|---|
-| Geplant ("Projected") | Σ ProjectedInvoice.gross_margin of the project (all dates). |
-| Umsatz bereinigt ("gross margin") | Invoiced gross margin (all invoiced invoices, all dates, minus max(invoice TPC, logged TPC)). |
-| Delta | Geplant − Umsatz bereinigt (API: `not_invoiced`). |
+| Projected | Σ ProjectedInvoice.gross_margin of the project (all dates). |
+| Gross margin | Invoiced gross margin (all invoiced invoices, all dates, minus max(invoice TPC, logged TPC)). |
+| Delta | Projected − gross margin (API: `not_invoiced`). |
 | Month columns | Delta allocated to the projections newest-first (see definitions), summed per month of `ProjectedInvoice.invoiced_on`. Only months with any allocation are shown. |
 | Total row | `monthly_overall` per month. |
 
 Sorting (web): by the list of monthly values descending (i.e. by the earliest month's amount first). API: by delta descending.
 
-Chart (web, `_projected_gross_margin_chart`): `monthly_overall` per month; months before the current month (projections not invoiced in time) as "überfällig".
+Chart (web, `_projected_gross_margin_chart`): `monthly_overall` per month; months before the current month (projections not invoiced in time) as "overdue".
 
 ---
 
-### Open items list (Offene-Posten-Liste)
+### Open items list
 
 Web: `/report/open-items-list/` (`report_open_items_list`), CONTROLLING, XLSX export. API: `GET /api/reports/open-items/?date=` (CONTROLLING). `views.py:OpenItemsForm.open_items_list`
-Answers: which invoices were sent but not paid on the cutoff date (Stichtag, default today).
+Answers: which invoices were sent but not paid on the cutoff date (default today).
 
-- List: invoices outstanding on the cutoff date (status SENT/PAID now, invoiced_on ≤ cutoff, closed_on > cutoff or empty), ordered by invoiced_on. Columns: Rechnung, Verrechnet am, Total exkl. MwSt (`total_excl_tax`), Total (`total`, incl. tax).
-- Tiles "Total exkl. MwSt" / "Total": Σ total_excl_tax / Σ total of the list.
-- "Fällig in Kalenderwoche": per Monday of the week of `due_on` (missing due_on → current week via `monday(None)`), Σ total_excl_tax and Σ total.
-- Chart (web, `_open_items_chart`): "überfällig" = Σ total_excl_tax of invoices with `due_on` before the cutoff date as one bar, then Σ total_excl_tax per week of `due_on` from the cutoff date's week on (weeks without invoices shown as empty).
+- List: invoices outstanding on the cutoff date (status SENT/PAID now, invoiced_on ≤ cutoff, closed_on > cutoff or empty), ordered by invoiced_on. Columns: Invoice, Invoiced on, Total excl. tax (`total_excl_tax`), Total (`total`, incl. tax).
+- Tiles "Total excl. tax" / "Total": Σ total_excl_tax / Σ total of the list.
+- "Due in calendar week": per Monday of the week of `due_on` (missing due_on → current week via `monday(None)`), Σ total_excl_tax and Σ total.
+- Chart (web, `_open_items_chart`): "overdue" = Σ total_excl_tax of invoices with `due_on` before the cutoff date as one bar, then Σ total_excl_tax per week of `due_on` from the cutoff date's week on (weeks without invoices shown as empty).
 - Note: invoices canceled after the cutoff date are missing for past cutoff dates (status is current).
 
 ---
 
-### Third party costs ("Bank spielen" / Playing bank)
+### Third party costs ("Playing bank")
 
-Web: `/report/playing-bank/` (URL name `report_third_party_costs`, menu "Bank spielen"), CONTROLLING. API: `GET /api/reports/third-party-costs/?this_year=` (CONTROLLING). `workbench/reporting/third_party_costs.py:playing_bank`, `views.py:PlayingBankForm`
+Web: `/report/playing-bank/` (URL name `report_third_party_costs`, menu "Playing bank"), CONTROLLING. API: `GET /api/reports/third-party-costs/?this_year=` (CONTROLLING). `workbench/reporting/third_party_costs.py:playing_bank`, `views.py:PlayingBankForm`
 Answers: per project, how much third party costs the agency has advanced (logged) vs. passed on to customers (invoiced).
 
-Project filter: "Offen" (default: open projects) or "Immer noch offen oder geschlossen im laufenden Jahr" (closed_on empty or ≥ 1 Jan this year). All project types. Only projects with any of the three sums are listed.
+Project filter: "Open" (default: open projects) or "Still open or closed during the current year" (closed_on empty or ≥ 1 Jan this year). All project types. Only projects with any of the three sums are listed.
 
-| Column (DE) | Computation |
+| Column | Computation |
 |---|---|
-| Offeriert | Σ Service.third_party_costs (≠ 0) of budgeted services. |
-| Erfasst (Vergangenheit) | Σ LoggedCost.third_party_costs (≠ 0) with rendered_on ≤ today (linked to invoice services or not). |
-| Erfasst (Zukunft) | Same with rendered_on > today. |
-| Verrechnet | Invoiced third party costs from `third_party_costs_components()`: the larger of those on down payment invoices and on the other invoices. |
-| Delta | (Erfasst past + future) − Verrechnet; positive = not yet passed on. |
+| Offered | Σ Service.third_party_costs (≠ 0) of budgeted services. |
+| Logged (past) | Σ LoggedCost.third_party_costs (≠ 0) with rendered_on ≤ today (linked to invoice services or not). |
+| Logged (future) | Same with rendered_on > today. |
+| Invoiced | Invoiced third party costs from `third_party_costs_components()`: the larger of those on down payment invoices and on the other invoices. |
+| Delta | (logged past + future) − invoiced; positive = not yet passed on. |
 | Header totals | Σ of each column; Delta header shows Σ negative deltas (API `total_invoiced_too_much`) and Σ positive deltas (`total_not_invoiced`). |
 
 Sorting: web by delta ascending; API by delta descending.
 
 ## Project budgets
 
-### Project budget statistics (Projekt-Budgetstatistik)
+### Project budget statistics
 
 - Web: `report_project_budget_statistics` (`/report/project-budget-statistics/`, XLSX export via `?export=xlsx`), feature **CONTROLLING** (`controlling_only`). API: `GET /api/reports/budget/` (`auth=CONTROLLING`), params `date`, `owned_by` (short name or `inactive`), `internal`, `closed`, `filter` (`no-invoices`, `maintenance`, `old-projects`, `no-projected-gross-margin`). The campaign page reuses the table (`Campaign.statistics`, without discount/projection columns). Accruals snapshots and budget alerts reuse the function.
 - Answers: per project, how much work (valued at effort rates) has been logged vs. what was sold and what was invoiced, i.e. which work is not invoiced yet and where we invoiced ahead (accruals).
@@ -310,47 +309,47 @@ Sorting: web by delta ascending; API by delta descending.
 
 **Per-project figures** (`workbench/reporting/project_budget_statistics.py:project_budget_statistics`):
 
-| Label (DE) | Key | Formula |
+| Label | Key | Formula |
 |---|---|---|
-| verkauft (tooltip "Offeriert und akzeptiert") | `sold` | total of the accepted offers per project (`accepted_offers_by_project()`: budget retainers included; discount already deducted; optional services not in total) **+ net budget transfers** (`BudgetTransfer.objects.adjustments`). Transfers out of a project can make it negative (e.g. a project invoiced with a fixed amount without offers); the transfer form warns (`budget-transfer-beyond-offers`), since all work not invoiced then counts as "über Offerte". No cutoff date filter on offers or transfers. |
-| Rabatt (report only) | `discount` | −Σ `Offer.discount` of the same accepted offers as "verkauft" (`accepted_offers_by_project()`). Shown as a negative number. No cutoff. |
-| Logbuch | `logbook` | `cost` + `effort_cost` (see building blocks), entries with `rendered_on <= cutoff`. |
+| Sold (tooltip "Offered and accepted") | `sold` | total of the accepted offers per project (`accepted_offers_by_project()`: budget retainers included; discount already deducted; optional services not in total) **+ net budget transfers** (`BudgetTransfer.objects.adjustments`). Transfers out of a project can make it negative (e.g. a project invoiced with a fixed amount without offers); the transfer form warns (`budget-transfer-beyond-offers`), since all work not invoiced then counts as "thereof beyond offers". No cutoff date filter on offers or transfers. |
+| Discount (report only) | `discount` | −Σ `Offer.discount` of the same accepted offers as "Sold" (`accepted_offers_by_project()`). Shown as a negative number. No cutoff. |
+| Logbook | `logbook` | `cost` + `effort_cost` (see building blocks), entries with `rendered_on <= cutoff`. |
 | (hidden in table, API/XLSX) | `cost` | Σ `LoggedCost.cost`, `rendered_on <= cutoff` |
 | (hidden, API) | `effort_cost` | Σ `effort_rate × HOURS_FOR_INVOICING`, `rendered_on <= cutoff`, rate NULL skipped |
-| "(+x h)" ohne Stundensatz | `effort_hours_with_rate_undefined` | Σ `hours` on services with `effort_rate IS NULL`, `rendered_on <= cutoff` |
-| Fremdkosten | `third_party_costs` | Σ `LoggedCost.third_party_costs` (not NULL) not yet put on a services invoice on the cutoff date (`invoice_service IS NULL`, or its invoice is dated after the cutoff), `rendered_on <= cutoff`. Display only, not deducted from anything. |
-| Verrechnet | `invoiced` | Σ `Invoice.total_excl_tax`, status SENT/PAID, `invoiced_on <= cutoff`. Third party costs on invoices are **not** deducted. |
-| Budgetierte Stunden: "logged / budgeted" | `hours` / `service_hours` | `hours` = Σ `LoggedHours.hours` (all services, incl. declined/optional/rate-less), `rendered_on <= cutoff`; `service_hours` = Σ `service_hours` of budgeted services (no cutoff). |
+| "(+x h)" undefined rate | `effort_hours_with_rate_undefined` | Σ `hours` on services with `effort_rate IS NULL`, `rendered_on <= cutoff` |
+| Third party costs | `third_party_costs` | Σ `LoggedCost.third_party_costs` (not NULL) not yet put on a services invoice on the cutoff date (`invoice_service IS NULL`, or its invoice is dated after the cutoff), `rendered_on <= cutoff`. Display only, not deducted from anything. |
+| Invoiced | `invoiced` | Σ `Invoice.total_excl_tax`, status SENT/PAID, `invoiced_on <= cutoff`. Third party costs on invoices are **not** deducted. |
+| Budgeted hours: "logged / budgeted" | `hours` / `service_hours` | `hours` = Σ `LoggedHours.hours` (all services, incl. declined/optional/rate-less), `rendered_on <= cutoff`; `service_hours` = Σ `service_hours` of budgeted services (no cutoff). |
 | Δ | `delta` | `logbook − invoiced` (`cost + effort_cost − invoiced`). Positive = work not invoiced, negative = accruals. |
-| geplanter Umsatz (report only) | `projected_gross_margin` | Σ `ProjectedInvoice.gross_margin`, **open projects only** (`closed_on IS NULL` today), all dates. |
+| Projected gross margin (report only) | `projected_gross_margin` | Σ `ProjectedInvoice.gross_margin`, **open projects only** (`closed_on IS NULL` today), all dates. |
 | column headed with cutoff date "dd.mm." | `projected_gross_margin_on_cutoff_date` | same, only projections with `invoiced_on <= cutoff`. |
 
 Sorted by `delta` descending (closed-filter: by `closed_on` descending).
 
 **Overall figures (tiles + total row):**
 
-| Label (DE) | Key | Formula |
+| Label | Key | Formula |
 |---|---|---|
-| verkauft, Logbuch, Verrechnet, Rabatt, Fremdkosten, hours, … | same keys | plain sum of the per-project values |
-| Nicht verrechnete Arbeit | `delta_positive` | Σ `delta` of projects with `delta > 0` |
-| Abgrenzungen | `delta_negative` | Σ `delta` of projects with `delta < 0` (negative number) |
-| davon geplant (tooltip "Durch noch nicht verrechneten geplanten Umsatz gedeckt (Näherung)") | `delta_planned` | Σ over projects with `delta > 0` of `planned = min(delta, P, max(P − I, 0))`, `P` = `projected_gross_margin` (all projections, open projects only), `I` = invoiced gross margin from `gross_margin_components()["invoiced"]` = SENT/PAID invoices with `invoiced_on <= cutoff` − `max(third party costs on those invoices, logged third party costs with rendered_on <= cutoff)` (`gross_margin_components(invoiced_until=cutoff)`) (`workbench/reporting/squeeze.py:third_party_costs`). |
-| davon über Offerte (tooltip "Mehr erfasst als offeriert und verrechnet, z.B. Stunden über der Offerte und Rabatte") | `delta_beyond_offer` | Σ over projects with `delta > 0` **and `sold != 0`** of `min(max(logbook − max(sold, invoiced), 0), delta − planned)`: the rest not covered by planned invoicing which was logged beyond the offers. Projects without any sold amount contribute nothing. |
+| Sold, Logbook, Invoiced, Discount, Third party costs, hours, … | same keys | plain sum of the per-project values |
+| Work not invoiced | `delta_positive` | Σ `delta` of projects with `delta > 0` |
+| Accruals | `delta_negative` | Σ `delta` of projects with `delta < 0` (negative number) |
+| Thereof planned (tooltip "Covered by projected gross margin which has not been invoiced yet (approximation)") | `delta_planned` | Σ over projects with `delta > 0` of `planned = min(delta, P, max(P − I, 0))`, `P` = `projected_gross_margin` (all projections, open projects only), `I` = invoiced gross margin from `gross_margin_components()["invoiced"]` = SENT/PAID invoices with `invoiced_on <= cutoff` − `max(third party costs on those invoices, logged third party costs with rendered_on <= cutoff)` (`gross_margin_components(invoiced_until=cutoff)`) (`workbench/reporting/squeeze.py:third_party_costs`). |
+| Thereof beyond offers (tooltip "Logged beyond the accepted offers and the invoiced total, e.g. hours over the offer and discounts") | `delta_beyond_offer` | Σ over projects with `delta > 0` **and `sold != 0`** of `min(max(logbook − max(sold, invoiced), 0), delta − planned)`: the rest not covered by planned invoicing which was logged beyond the offers. Projects without any sold amount contribute nothing. |
 
-The two "davon" figures don't overlap: planned invoicing comes first because it may cover additional work which has been agreed, "über Offerte" is taken from the rest. Together they are at most `delta_positive`.
+The two "thereof" figures don't overlap: planned invoicing comes first because it may cover additional work which has been agreed, "beyond offers" is taken from the rest. Together they are at most `delta_positive`.
 
-With a past cutoff date the totals (Logbuch, Verrechnet, delta, accruals) are as of the cutoff date, but "verkauft" and the splits "davon geplant" and "davon über Offerte" use today's offers, projections and budget transfers: they aren't versioned. The cash data API therefore leaves these splits out for past dates.
+With a past cutoff date the totals (Logbook, Invoiced, delta, accruals) are as of the cutoff date, but "Sold" and the splits "thereof planned" and "thereof beyond offers" use today's offers, projections and budget transfers: they aren't versioned. The cash data API therefore leaves these splits out for past dates.
 
 **Worked example** (one open project, cutoff today):
-- Accepted offer: subtotal 10,500, discount 500 → total 10,000. Budget transfer in from another project: +1,000. → **verkauft 11,000**, Rabatt −500.
-- Logged 100 h at effort rate 120 (hours_for_invoicing empty) = 12,000; 5 h on a service without rate; logged cost 800 with third party costs 600, not yet invoiced. → **Logbuch 12,800 (+5 h)**, Fremdkosten 600.
-- Invoiced (sent): 8,000. → **Δ = 12,800 − 8,000 = +4,800** → counts toward "Nicht verrechnete Arbeit".
-- Projected gross margin 9,000; invoiced GM = 8,000 − max(0, 600) = 7,400; planned = max(9,000 − 7,400, 0) = 1,600 → davon geplant = min(4,800, 1,600) = **1,600**.
-- davon über Offerte = min(max(12,800 − max(11,000, 8,000), 0), 4,800 − 1,600) = **1,800**.
-- If instead 14,000 had been invoiced: Δ = −1,200 → counted in **Abgrenzungen** −1,200, nothing in the "davon" figures.
+- Accepted offer: subtotal 10,500, discount 500 → total 10,000. Budget transfer in from another project: +1,000. → **Sold 11,000**, Discount −500.
+- Logged 100 h at effort rate 120 (hours_for_invoicing empty) = 12,000; 5 h on a service without rate; logged cost 800 with third party costs 600, not yet invoiced. → **Logbook 12,800 (+5 h)**, third party costs 600.
+- Invoiced (sent): 8,000. → **Δ = 12,800 − 8,000 = +4,800** → counts toward "Work not invoiced".
+- Projected gross margin 9,000; invoiced GM = 8,000 − max(0, 600) = 7,400; planned = max(9,000 − 7,400, 0) = 1,600 → thereof planned = min(4,800, 1,600) = **1,600**.
+- thereof beyond offers = min(max(12,800 − max(11,000, 8,000), 0), 4,800 − 1,600) = **1,800**.
+- If instead 14,000 had been invoiced: Δ = −1,200 → counted in **Accruals** −1,200, nothing in the "thereof" figures.
 
 **Caveats (from code comments/docs):**
-- "davon geplant" mixes logbook values (effort rates) with gross margin and "is only an approximation" (comment at `project_budget_statistics.py:132-136`).
+- "thereof planned" mixes logbook values (effort rates) with gross margin and "is only an approximation" (comment at `project_budget_statistics.py:132-136`).
 - Hours on services without effort rate are not valued (`effort_cost_by_project` docstring); the logbook understates such projects.
 - Budget transfers: "Budget which was invoiced on one project but is worked off on another (or reserved for that) belongs to the project which does the work." Only money moves; hours stay where they were logged.
 - Figures use the logbook value at effort rates, i.e. revenue-like, not cost/gross margin; third party costs are neither deducted from `logbook` nor from `invoiced`.
@@ -365,31 +364,31 @@ Code: `workbench/reporting/project_budget_statistics.py:project_budget_statistic
 
 ### Project key figures (project detail `.wb-stats`)
 
-- `projects_project_detail`, `workbench/templates/projects/project_detail.html`; "Stunden" and "Kosten" tiles visible to everyone, the rest requires **CONTROLLING**. No cutoff date: everything as of now, archived entries included unless stated.
+- `projects_project_detail`, `workbench/templates/projects/project_detail.html`; "Hours" and "Cost" tiles visible to everyone, the rest requires **CONTROLLING**. No cutoff date: everything as of now, archived entries included unless stated.
 - Answers: how far the project's logged hours and logged value have progressed against its budgeted services and accepted offers, and how much has been invoiced.
 
 Source: `Project.grouped_services` (dict, `workbench/projects/models.py:Project.grouped_services`), `Project.not_archived_total`, `Project.project_invoices_total_excl_tax`.
 
-| Label (DE) | Template value | Formula |
+| Label | Template value | Formula |
 |---|---|---|
-| Stunden: "logged / budgeted" | `gs.logged_hours` / `gs.service_hours` | Σ `LoggedHours.hours` over all services of the project / Σ `service_hours` of services that are not declined, not optional, not on a budget retainer offer (same as `budgeted()`). The bar adds `gs.surcharge` (Σ `hours_for_invoicing − hours` of entries whose hours for invoicing are higher) as a lighter segment: work invoiced above the time spent uses up the budget too. Lower hours for invoicing don't shorten the bar. The bars of offers and services on the project page and in the statistics, the project list and the logbook form do the same (`{% bar value one surcharge=… %}`). |
-| Kosten: "logged / budgeted" (only if either ≠ 0) | `gs.logged_cost` / `gs.service_cost` | Σ `LoggedCost.cost` / Σ `Service.cost` (fixed cost part only, no effort) of budgeted services. |
-| Erfasste Leistungen und Kosten (+x h ohne Stundensatz) | `gs.total_logged_cost` | Σ `LoggedCost.cost` + Σ `effort_rate × HOURS_FOR_INVOICING` per service with a rate; hours on rate-less services shown as `total_logged_hours_rate_undefined`. Same as report "Logbuch" without cutoff. Bar against `total_service_cost`. |
-| Budgetierte Leistungen und Kosten (+x h ohne Stundensatz) | `gs.total_service_cost` | Σ `service_cost` of budgeted services (all offer statuses except declined; incl. services without offer). Rate-less hours: Σ `service_hours` of rate-less services not declined, not optional and not retainer. |
-| Noch nicht akzeptiert (note) | `gs.not_accepted_service_cost` | `total_service_cost − accepted_offers_service_cost`, where the latter = Σ `service_cost` of budgeted services on ACCEPTED offers. So it covers services without offer **and** services on offers in preparation / offered. |
-| Zurückbehaltung von Budget (only if any offer `is_budget_retainer`) | `gs.budget_retainment` | `budget_retainer_total − released_service_cost`; `budget_retainer_total` = Σ `total_excl_tax` of **accepted** retainer offers, `released_service_cost` = Σ `service_cost` of budgeted services **without offer** (services of other offers aren't released from the retainer). Note: "<retainer total> verkauft, <released_service_cost> freigegeben (inkl. <discount> Rabatt)" with discount = Σ discount of accepted retainer offers. |
-| Akzeptiertes Offertentotal (if no retainer offers) | `gs.accepted_offers_total_excl_tax` | Σ `total_excl_tax` of ACCEPTED offers; note "includes discount of" Σ discount of accepted offers. Budget transfers are **not** included here. |
-| Keiner Rechnung zugeordnet | `project.not_archived_total.total` | Σ `LoggedCost.cost` + effort value (`effort_cost_by_project`) of entries with `archived_at IS NULL`; plus rate-less hours. |
-| Total verrechnet exkl. MwSt | `project.project_invoices_total_excl_tax` | Σ `total_excl_tax` of the project's SENT/PAID invoices (all dates). |
-| Budgetwarnung ab X – gesendet am … | `project.budget_alert_at`, `budget_alert_sent_at` | see Budget alerts |
+| Hours: "logged / budgeted" | `gs.logged_hours` / `gs.service_hours` | Σ `LoggedHours.hours` over all services of the project / Σ `service_hours` of services that are not declined, not optional, not on a budget retainer offer (same as `budgeted()`). The bar adds `gs.surcharge` (Σ `hours_for_invoicing − hours` of entries whose hours for invoicing are higher) as a lighter segment: work invoiced above the time spent uses up the budget too. Lower hours for invoicing don't shorten the bar. The bars of offers and services on the project page and in the statistics, the project list and the logbook form do the same (`{% bar value one surcharge=… %}`). |
+| Cost: "logged / budgeted" (only if either ≠ 0) | `gs.logged_cost` / `gs.service_cost` | Σ `LoggedCost.cost` / Σ `Service.cost` (fixed cost part only, no effort) of budgeted services. |
+| Logged work and costs (+x h undefined rate) | `gs.total_logged_cost` | Σ `LoggedCost.cost` + Σ `effort_rate × HOURS_FOR_INVOICING` per service with a rate; hours on rate-less services shown as `total_logged_hours_rate_undefined`. Same as report "Logbook" without cutoff. Bar against `total_service_cost`. |
+| Budgeted work and costs (+x h undefined rate) | `gs.total_service_cost` | Σ `service_cost` of budgeted services (all offer statuses except declined; incl. services without offer). Rate-less hours: Σ `service_hours` of rate-less services not declined, not optional and not retainer. |
+| Not accepted yet (note) | `gs.not_accepted_service_cost` | `total_service_cost − accepted_offers_service_cost`, where the latter = Σ `service_cost` of budgeted services on ACCEPTED offers. So it covers services without offer **and** services on offers in preparation / offered. |
+| Budget retainment (only if any offer `is_budget_retainer`) | `gs.budget_retainment` | `budget_retainer_total − released_service_cost`; `budget_retainer_total` = Σ `total_excl_tax` of **accepted** retainer offers, `released_service_cost` = Σ `service_cost` of budgeted services **without offer** (services of other offers aren't released from the retainer). Note: "<retainer total> sold, <released_service_cost> freed (incl. <discount> discount)" with discount = Σ discount of accepted retainer offers. |
+| Accepted offer total (if no retainer offers) | `gs.accepted_offers_total_excl_tax` | Σ `total_excl_tax` of ACCEPTED offers; note "includes discount of" Σ discount of accepted offers. Budget transfers are **not** included here. |
+| Not assigned to an invoice | `project.not_archived_total.total` | Σ `LoggedCost.cost` + effort value (`effort_cost_by_project`) of entries with `archived_at IS NULL`; plus rate-less hours. |
+| Total invoiced excl. tax | `project.project_invoices_total_excl_tax` | Σ `total_excl_tax` of the project's SENT/PAID invoices (all dates). |
+| Budget alert at X – sent at … | `project.budget_alert_at`, `budget_alert_sent_at` | see Budget alerts |
 
-Warning (retainers): if `budget_retainment > 0` and `total_logged_cost > 1.1 × total_service_cost` → "Dieses Projekt verwendet Offerten, welche das Budget zurückhalten. Die aufgeschriebenen Kosten sind wesentlich höher als die freigegebenen Kosten."
+Warning (retainers): if `budget_retainment > 0` and `total_logged_cost > 1.1 × total_service_cost` → "This project uses budget retaining offers. The logged cost is significantly larger than the allocated cost."
 
 Per offer (service list): `service_hours`, `logged_hours`, `service_cost` (Σ `Service.cost`), `logged_cost` (Σ `LoggedCost.cost`) per offer, budgeted services only for the service side.
 
-Statistics modal (`projects/project_statistics.html`, everyone): per service, offer and the project the scheduled and logged hours, the logged hours per person, and "Keiner Rechnung zugeordnet": Σ `HOURS_FOR_INVOICING` and Σ `LoggedCost.cost` of entries with `archived_at IS NULL` (`not_archived_logged_hours`, `not_archived_logged_cost`), i.e. what an invoice from the logbook would take, without valuing the hours (the value is the "Keiner Rechnung zugeordnet" tile, which requires CONTROLLING). All services count, also declined and optional ones. The figures link to the logbook filtered by `not_archived=1`. "Nur keiner Rechnung zugeordnete" hides the services and offers without such entries (CSS only).
+Statistics modal (`projects/project_statistics.html`, everyone): per service, offer and the project the scheduled and logged hours, the logged hours per person, and "Not assigned to an invoice": Σ `HOURS_FOR_INVOICING` and Σ `LoggedCost.cost` of entries with `archived_at IS NULL` (`not_archived_logged_hours`, `not_archived_logged_cost`), i.e. what an invoice from the logbook would take, without valuing the hours (the value is the "Not assigned to an invoice" tile, which requires CONTROLLING). All services count, also declined and optional ones. The figures link to the logbook filtered by `not_archived=1`. "Only not assigned to an invoice" hides the services and offers without such entries (CSS only).
 
-**Worked example:** services A (20 h × 150 = 3,000, accepted offer), B (10 h × 150 = 1,500, offer still "offered"), C (optional, 5 h, accepted offer). Logged 25 h × 150 + 200 cost = 3,950. → Stunden 25 / 30; Budgetierte Leistungen und Kosten 4,500, Noch nicht akzeptiert 1,500; Erfasste Leistungen und Kosten 3,950; Akzeptiertes Offertentotal 3,000 (if no discount).
+**Worked example:** services A (20 h × 150 = 3,000, accepted offer), B (10 h × 150 = 1,500, offer still "offered"), C (optional, 5 h, accepted offer). Logged 25 h × 150 + 200 cost = 3,950. → Hours 25 / 30; Budgeted work and costs 4,500, Not accepted yet 1,500; Logged work and costs 3,950; Accepted offer total 3,000 (if no discount).
 
 Caveats: Budget retainer offers hold budget, real services are added later ("services have to be created later when rendering actual work", `Offer.is_budget_retainer` help text); retainment is the part of the retainer not yet released into services without an offer of their own. Other offers are added to the retainer (see `accepted_offers_by_project()`), the offer form warns when a project gets both (`budget-retainer`).
 
@@ -399,9 +398,9 @@ Warning "Projected invoices exceed the accepted offer total": Σ `ProjectedInvoi
 
 ---
 
-### Budget transfers (Budgetverschiebung)
+### Budget transfers
 
-- Created from the project's "New" dropdown (`projects_project_createbudgettransfer`), edited/deleted via `projects_budgettransfer_update/delete`. Requires `CONTROLLING` (the form shows the project's gross margin). Fields: von Projekt, auf Projekt (optional), title, amount, notes. No date.
+- Created from the project's "New" dropdown (`projects_project_createbudgettransfer`), edited/deleted via `projects_budgettransfer_update/delete`. Requires `CONTROLLING` (the form shows the project's gross margin). Fields: from project, to project (optional), title, amount, notes. No date.
 - Answers: which share of a project's invoiced budget is worked off on (or reserved for) another project.
 
 Formula (`workbench/projects/models.py:BudgetTransferQuerySet.adjustments`): per transfer, `from_project −= amount` immediately; `to_project += amount` only if set (otherwise "reserved", money has left but arrived nowhere).
@@ -416,21 +415,21 @@ Example: Project A sold 50,000; transfer 10,000 to B → A sold 40,000, B sold +
 
 ---
 
-### Budget alerts (Budgetwarnung)
+### Budget alerts
 
-- Field `Project.budget_alert_at` ("Mail senden, wenn die aufgeschriebenen Kosten erreichen"), sent by `workbench/projects/tasks.py:send_budget_alerts` from `fairy_tasks`.
+- Field `Project.budget_alert_at` ("Send a mail when the logged cost reaches"), sent by `workbench/projects/tasks.py:send_budget_alerts` from `fairy_tasks`.
 - Answers: has a project's logged value reached the threshold its owner configured?
 
 Logic:
 - Candidates: open projects (`closed_on IS NULL`) with `budget_alert_at` set and `budget_alert_sent_at` empty (internal projects included).
 - Trigger: `project_budget_statistics(projects)` with cutoff today; alert if `logbook >= budget_alert_at` (logbook = logged cost + effort value incl. HOURS_FOR_INVOICING; rate-less hours not counted).
-- One mail per owner listing project, URL, Logbuch, Warnen ab, Verkauft (= report `sold`, incl. budget transfers). Then `budget_alert_sent_at = now`.
+- One mail per owner listing project, URL, Logbook, Alert at, Sold (= report `sold`, incl. budget transfers). Then `budget_alert_sent_at = now`.
 - Re-armed when `budget_alert_at` changes (`Project.save` clears `budget_alert_sent_at`).
-- Form help text "Cost cap" = total of the accepted offers per project (`accepted_offers_by_project()`), with 75/80/90 % shortcuts (`workbench/projects/forms.py`); like "verkauft" but without budget transfers.
+- Form help text "Cost cap" = total of the accepted offers per project (`accepted_offers_by_project()`), with 75/80/90 % shortcuts (`workbench/projects/forms.py`); like "Sold" but without budget transfers.
 
 ## Profitability
 
-### Squeeze (Squeeze)
+### Squeeze
 
 Web: `report_squeeze` (`/report/squeeze/`, `productivity_only`, i.e. feature
 `PRODUCTIVITY`), XLSX via `?export=xlsx`; API `GET /api/reports/squeeze/`
@@ -443,9 +442,8 @@ Answers: how much (estimated, all-time) project gross margin each person
 "earned" through the hours they logged in the period, compared with what is
 expected of them.
 
-Warning shown if today < 9th of the month after the period end ("Die Rechnungen
-für den gewählten Zeitraum sind möglicherweise noch nicht vollständig
-(Stichtag: …)"); the API returns the same as `may_be_incomplete`
+Warning shown if today < 9th of the month after the period end ("Invoices for
+the selected period may not be complete yet (cutoff: …)"); the API returns the same as `may_be_incomplete`
 (`workbench/reporting/views.py:squeeze_view`, `workbench/reporting/api.py:squeeze_api`).
 
 #### Which projects
@@ -478,59 +476,59 @@ rate per hour spent, at the expense of the others on the project.
 
 **Worked example.** Project, open, gross margin 60'000, relevant hours 400 →
 rate 150/h. In the period Anna logs 20h on a service at 200/h (weight 4'000),
-Ben 20h on a service at 0.00/h (weight 20 × 150 = 3'000, counted as "ohne
-Stundensatz").
+Ben 20h on a service at 0.00/h (weight 20 × 150 = 3'000, counted as "Without
+rate").
 `period_margin = 40 / 400 × 60'000 = 6'000`.
 Anna: `4'000 / 7'000 × 6'000 = 3'428.57` (171.43/h); Ben: `3'000 / 7'000 ×
 6'000 = 2'571.43` (128.57/h).
 
-#### Projects table ("Projekte"), sorted by period gross margin desc
+#### Projects table ("Projects"), sorted by period gross margin desc
 
-| UI label (de) | Computation |
+| Label | Computation |
 |---|---|
-| Projekt | project |
-| Offeriert | `offered` (accepted offers per project − the larger of their service third party costs and the logged ones, see `accepted_offers_by_project()`); 0 for closed projects |
-| Geplant *offen* | `projected` = Σ `ProjectedInvoice.gross_margin`, open projects only |
-| Verrechnet | `invoiced` = SENT/PAID invoices `total_excl_tax` − `third_party_costs()` (max of invoice vs. logged third party costs) |
-| Umsatz bereinigt *geschätzt* | `gross_margin` (formula above; incl. budget transfers, floored at 0) |
-| Relevante Stunden | `hours` = `relevant_hours(...)` (offered hours only for open projects) |
-| Ansatz | `gross_margin / hours`; red if < 150 |
-| Stunden im Zeitraum | Σ hours of all people in the period |
-| Deckungsbeitrag im Zeitraum | Σ attributed person margins = `period_margin`; links to the per-person modal |
+| Project | project |
+| Offered | `offered` (accepted offers per project − the larger of their service third party costs and the logged ones, see `accepted_offers_by_project()`); 0 for closed projects |
+| Projected *open* | `projected` = Σ `ProjectedInvoice.gross_margin`, open projects only |
+| Invoiced | `invoiced` = SENT/PAID invoices `total_excl_tax` − `third_party_costs()` (max of invoice vs. logged third party costs) |
+| Gross margin *estimated* | `gross_margin` (formula above; incl. budget transfers, floored at 0) |
+| Relevant hours | `hours` = `relevant_hours(...)` (offered hours only for open projects) |
+| Rate | `gross_margin / hours`; red if < 150 |
+| Period hours | Σ hours of all people in the period |
+| Period gross margin | Σ attributed person margins = `period_margin`; links to the per-person modal |
 | Total row | Σ period hours, Σ period gross margin |
 
-Per-project modal ("Aufschlüsselung nach Person"): header Umsatz bereinigt /
-Stunden (= relevant hours) / Ansatz; per person Stunden, Stunden für Verrechnung
-(`HOURS_FOR_INVOICING` in the period), Ohne Stundensatz
-(`hours_rate_unknown`), Umsatz bereinigt (person margin), Ansatz (person
-rate, red < 150); footer shows period totals and the project rate. Note "Stunden
-ohne Stundensatz: Standard von 150/h angewendet" if any.
+Per-project modal ("User breakdown"): header Gross margin /
+Hours (= relevant hours) / Rate; per person Hours, Hours for invoicing
+(`HOURS_FOR_INVOICING` in the period), Without rate
+(`hours_rate_unknown`), Gross margin (person margin), Rate (person
+rate, red < 150); footer shows period totals and the project rate. Note "Hours
+without rate: default of 150/h applied" if any.
 
 XLSX additionally: offered hours (only open projects), logged hours (all
 time), period hours for invoicing, period rate (`gross_margin_in_range /
 hours_in_range`), hours at default rate, and per user hours / hours for invoicing /
 gross margin / rate / hours at default rate.
 
-#### Users table ("Mitarbeiter:innen"), sorted by Delta desc
+#### Users table ("Users"), sorted by Delta desc
 
 Everyone who logged hours in the period (also only on internal projects).
 
-| UI label (de) | Computation |
+| Label | Computation |
 |---|---|
-| Mitarbeiter:in | user |
-| Fachbereich | `specialist_field.name`, else "<unbekannt>" (translated) |
-| Anstellungsverhältnis % | average of `employment_percentages()[user][month]` over the months of the period, weighted with the days of each month in the period; monthly values pro-rate partial-month employments by calendar days (`workbench/awt/reporting.py:employment_percentages`) |
-| Abwesenheitstage | Σ absence days in the period (see below) |
-| Stunden | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
-| Ansatz | `gross_margin / hours_in_range`: the overall rate of the person, internal hours included on purpose (not only the rate on profitable projects) |
-| Umsatz bereinigt | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Stunden, Stunden für Verrechnung, Ohne Stundensatz, Umsatz bereinigt, Ansatz) |
-| Extern % | `100 × external_hours / total_hours` (external = hours on non-internal projects, `workbench/projects/reporting.py:hours_per_type`) |
-| Richtwert extern % | `profitable_percentage = 100 − Σ InternalTypeUser.percentage` (per-user override, else the internal type's default percentage) |
-| Δ ext. % | `Extern % − Richtwert extern %`, red if < 0 |
-| Erwarteter Ansatz | `specialist_field.expected_hourly_rate`, else 150 |
-| Erwarteter Deckungsbeitrag | `expected_rate × 8 × max(0, working_days × employment% / 100 − absence_days) × profitable% / 100`, with `working_days = (date_until − date_from + 1) × 250 / 365.24`. Absence days are full days, also for part-time employments (like the annual working time and planning). |
-| Delta | `Umsatz bereinigt − Erwarteter Deckungsbeitrag`, red if < 0 |
-| Total row | Σ employment %, Σ absence days, Σ hours, total rate = Σ margin / Σ hours, Σ margin, total Extern % from `hours_per_type` totals, Σ expected margin, Σ delta |
+| User | user |
+| Specialist field | `specialist_field.name`, else "<unknown>" |
+| Employment % | average of `employment_percentages()[user][month]` over the months of the period, weighted with the days of each month in the period; monthly values pro-rate partial-month employments by calendar days (`workbench/awt/reporting.py:employment_percentages`) |
+| Absence days | Σ absence days in the period (see below) |
+| Hours | `hours_in_range` = Σ all hours the person logged in the period on **all** projects (internal ones too) |
+| Rate | `gross_margin / hours_in_range`: the overall rate of the person, internal hours included on purpose (not only the rate on profitable projects) |
+| Gross margin | Σ the person's attributed period margins over all projects; links to the per-project modal (per project Hours, Hours for invoicing, Without rate, Gross margin, Rate) |
+| External % | `100 × external_hours / total_hours` (external = hours on non-internal projects, `workbench/projects/reporting.py:hours_per_type`) |
+| Target ext. % | `profitable_percentage = 100 − Σ InternalTypeUser.percentage` (per-user override, else the internal type's default percentage) |
+| Δ ext. % | `External % − Target ext. %`, red if < 0 |
+| Expected rate | `specialist_field.expected_hourly_rate`, else 150 |
+| Expected margin | `expected_rate × 8 × max(0, working_days × employment% / 100 − absence_days) × profitable% / 100`, with `working_days = (date_until − date_from + 1) × 250 / 365.24`. Absence days are full days, also for part-time employments (like the annual working time and planning). |
+| Delta | `Gross margin − Expected margin`, red if < 0 |
+| Total row | Σ employment %, Σ absence days, Σ hours, total rate = Σ margin / Σ hours, Σ margin, total External % from `hours_per_type` totals, Σ expected margin, Σ delta |
 
 Absence days: absences overlapping the period (or without `ends_on` starting in
 it) with reason vacation, paid, school, or correction with `days > 0`
@@ -541,26 +539,26 @@ API/XLSX only: `invoiced_per_external_hour = gross_margin / hours_in_range /
 (1 − internal_hours / total_hours)` (≈ gross margin per external hour), 0
 without external hours.
 
-#### Specialist fields ("Fachbereiche"), sorted by rate desc
+#### Specialist fields, sorted by rate desc
 
-Σ over the users of the field: Stunden (`hours_in_range`), Umsatz bereinigt,
-Ansatz = Σ margin / Σ hours, Extern % = `100 × Σ external / Σ total hours`.
-Users without a field are grouped as "unbekannt".
+Σ over the users of the field: Hours (`hours_in_range`), Gross margin,
+Rate = Σ margin / Σ hours, External % = `100 × Σ external / Σ total hours`.
+Users without a field are grouped as "unknown".
 
-#### Organizations ("Organisationen"), sorted by rate desc
+#### Organizations, sorted by rate desc
 
 Per `project.customer`: Σ of the person contributions (margin, period hours) of
-its projects; Ansatz = margin / hours. Internal projects count with their
+its projects; Rate = margin / hours. Internal projects count with their
 (usually 0) margin under the own organization.
 
 #### Outreach, sorted by deals per hour desc
 
-Only shown if internal types are marked `is_outreach`. Per person: Stunden
-Outreach = Σ `hours` (not hours for invoicing) logged in the period on projects
-with an outreach internal type; Gewonnene Geschäfte = the person's share of
+Only shown if internal types are marked `is_outreach`. Per person: Outreach
+hours = Σ `hours` (not hours for invoicing) logged in the period on projects
+with an outreach internal type; Accepted deals = the person's share of
 the deals accepted (`closed_on`) in the period, `deal.value` split by
 contribution weight like the accepted deals report
-(`accepted_deals()["by_user"]`); Pro Stunde = deals / hours ("–" without
+(`accepted_deals()["by_user"]`); Per hour = deals / hours ("–" without
 hours). Everyone with outreach hours or contributions is listed, those
 without outreach hours last (by deals desc). The info button explains the
 columns; the rate links to a modal per person with the outreach projects
@@ -573,7 +571,7 @@ after the outreach, so the ratio only means something over longer periods.
 #### Caveats from the code
 
 - All figures are estimates that should rather underestimate (`relevant_hours`
-  docstring, profitability modal "Annahmen").
+  docstring, profitability modal "Assumptions").
 - Gross margin and relevant hours are all-time, only the slice is per period;
   invoices of the period may be incomplete until the 9th of the next month.
 - A rate of 0.00 means "paid elsewhere (package price)", not worthless, hence
@@ -594,7 +592,7 @@ Code: `workbench/reporting/squeeze.py:squeeze_data`, `:outreach`, `:build_xlsx`,
 
 ---
 
-### Project profitability modal (Rentabilität)
+### Project profitability modal
 
 URL `projects_project_profitability` (`/projects/<pk>/profitability/`,
 `controlling_only`, button shown with feature `CONTROLLING`). The same dict
@@ -607,26 +605,26 @@ and counting accepted offers only.
 
 `project_gross_margin(project)`:
 
-| UI label (de) | Computation |
+| Label | Computation |
 |---|---|
-| **Umsatz bereinigt** section | |
-| Akzeptierte Offerten | `offered` (accepted offers − the larger of their service third party costs and the logged ones); shown also for closed projects with "(bei geschlossenen Projekten nicht verwendet)" |
-| Geplante Rechnungen | `projected` (0 for closed projects) |
-| Verrechnet | `invoiced` (SENT/PAID − `third_party_costs()`) |
-| Budgetverschiebungen | `budget_adjustment` (only shown if ≠ 0) |
-| Umsatz bereinigt | `max(max(offered if open else 0, projected, invoiced) + budget_adjustment, 0)` |
-| **Stunden** section | |
-| Budgetierte Stunden | `hours_offered` = budgeted service hours (displayed for closed projects too, but not used there) |
-| Erfasste Stunden auf diesen Leistungen | `hours_logged_budgeted` |
-| Erfasste Stunden auf anderen Leistungen | `hours_logged − hours_logged_budgeted` |
-| Relevante Stunden | `relevant_hours(hours_offered if open else 0, hours_logged, hours_logged_budgeted)` |
-| Ansatz (overall rate) | `gross_margin / hours` |
-| **Nur akzeptierte Offerten** (shown if `offered` ≠ 0) | |
-| Umsatz bereinigt | `offered` (no budget adjustment, no max(); also for closed projects) |
-| Offerierte Stunden | `hours_accepted_offered` = Σ `service_hours` of budgeted services of accepted offers; with an accepted budget retainer offer also of the services without offer, which their budget pays for (retainer services themselves are never budgeted) |
-| Erfasste Stunden | `hours_accepted_logged` = Σ hours logged on services of accepted offers (optional services included; with a retainer also on services without offer) |
-| Relevante Stunden | `relevant_hours(hours_accepted_offered, hours_accepted_logged, hours logged on budgeted services of accepted offers)` |
-| Ansatz (rate on accepted offers) | `offered / hours_accepted` |
+| **Gross margin** section | |
+| Accepted offers | `offered` (accepted offers − the larger of their service third party costs and the logged ones); shown also for closed projects with "(not used for closed projects)" |
+| Projected invoices | `projected` (0 for closed projects) |
+| Invoiced | `invoiced` (SENT/PAID − `third_party_costs()`) |
+| Budget transfers | `budget_adjustment` (only shown if ≠ 0) |
+| Gross margin | `max(max(offered if open else 0, projected, invoiced) + budget_adjustment, 0)` |
+| **Hours** section | |
+| Budgeted hours | `hours_offered` = budgeted service hours (displayed for closed projects too, but not used there) |
+| Hours logged on these services | `hours_logged_budgeted` |
+| Hours logged on other services | `hours_logged − hours_logged_budgeted` |
+| Relevant hours | `relevant_hours(hours_offered if open else 0, hours_logged, hours_logged_budgeted)` |
+| Rate (overall rate) | `gross_margin / hours` |
+| **Accepted offers only** (shown if `offered` ≠ 0) | |
+| Gross margin | `offered` (no budget adjustment, no max(); also for closed projects) |
+| Offered hours | `hours_accepted_offered` = Σ `service_hours` of budgeted services of accepted offers; with an accepted budget retainer offer also of the services without offer, which their budget pays for (retainer services themselves are never budgeted) |
+| Logged hours | `hours_accepted_logged` = Σ hours logged on services of accepted offers (optional services included; with a retainer also on services without offer) |
+| Relevant hours | `relevant_hours(hours_accepted_offered, hours_accepted_logged, hours logged on budgeted services of accepted offers)` |
+| Rate (rate on accepted offers) | `offered / hours_accepted` |
 
 Overall rate vs. accepted-offers rate: the overall rate divides the best
 margin estimate by all budgeted hours (offers not yet accepted and services
@@ -647,7 +645,7 @@ warning, not an error).
 
 ---
 
-### Labor costs (Personalaufwand)
+### Labor costs
 
 Web: `report_labor_costs` (`/report/labor-costs/`, `labor_costs_only`, i.e.
 feature `LABOR_COSTS`). No API, no CLI. Default period: the current week
@@ -663,22 +661,22 @@ which supplies `hourly_labor_costs` (HLC) and `green_hours_target` (GHT, both se
 or both empty). Uses `hours`, not `hours_for_invoicing`. Raw SQL in
 `LABOR_COSTS_SQL` / `REVENUE_SQL`.
 
-| UI label (de) | Computation |
+| Label | Computation |
 |---|---|
-| Projekt / cost center row ("Keine Kostenstelle definiert" if none) | projects grouped by `project.cost_center`, cost centers ordered by id (none last), projects by Nettopreis desc; cost center rows and Total are sums |
-| Stunden | Σ hours in the period |
-| Ohne Stundensatz | Σ hours without an employment with HLC on that day |
-| Nettopreis | Σ `hours × HLC` |
-| Rentabilitätskosten | Σ `hours × HLC × 100 / GHT` (labor cost grossed up for the share of productive "green" hours) |
-| Fremdkosten | Σ `LoggedCost.third_party_costs` (not NULL) with `rendered_on` in the period |
-| Kosten | `Rentabilitätskosten + Fremdkosten` (template `addf`) |
-| Ertrag | Σ per entry max(`hours × HLC`, `HOURS_FOR_INVOICING × service.effort_rate`) (missing values count as 0) + Σ `LoggedCost.cost` with `rendered_on` in the period |
+| Project / cost center row ("No cost center defined" if none) | projects grouped by `project.cost_center`, cost centers ordered by id (none last), projects by net cost desc; cost center rows and Total are sums |
+| Hours | Σ hours in the period |
+| Undefined rate | Σ hours without an employment with HLC on that day |
+| Net cost | Σ `hours × HLC` |
+| Productivity costs | Σ `hours × HLC × 100 / GHT` (labor cost grossed up for the share of productive "green" hours) |
+| Third party costs | Σ `LoggedCost.third_party_costs` (not NULL) with `rendered_on` in the period |
+| Cost | `productivity costs + third party costs` (template `addf`) |
+| Revenue | Σ per entry max(`hours × HLC`, `HOURS_FOR_INVOICING × service.effort_rate`) (missing values count as 0) + Σ `LoggedCost.cost` with `rendered_on` in the period |
 
-User modal ("Personalaufwand"): per user Stunden, Ohne Stundensatz, Nettopreis,
-Rentabilitätskosten for the selected project / cost center / everything, plus
-a Fremdkosten row and a total row.
+User modal ("Labor costs"): per user Hours, Undefined rate, Net cost,
+Productivity costs for the selected project / cost center / everything, plus
+a third party costs row and a total row.
 
-Caveats: hours without HLC add to Stunden but not to costs; Ertrag values
+Caveats: hours without HLC add to hours but not to costs; revenue values
 work at least at its labor cost (so work at 0.00/h still counts at cost).
 
 Code: `workbench/reporting/labor_costs.py:_labor_costs_by_project_id`,
@@ -690,42 +688,42 @@ Code: `workbench/reporting/labor_costs.py:_labor_costs_by_project_id`,
 
 ## Time and people
 
-Productivity in the sense of the `PRODUCTIVITY` feature ("Produktivität") is the squeeze report (`report_squeeze`, `/api/reports/squeeze/`), see [Squeeze](#squeeze-squeeze).
+Productivity in the sense of the `PRODUCTIVITY` feature ("Productivity") is the squeeze report (`report_squeeze`, `/api/reports/squeeze/`), see [Squeeze](#squeeze).
 
 ---
 
-### Annual working time (Jahresarbeitszeit)
+### Annual working time
 
-- Where: web `/report/annual-working-time/` (`awt_year_report`, `workbench/awt/views.py:annual_working_time_view`), with `?year=`, `?user=<id>|active` and `?export=pdf` (one PDF, or a ZIP of PDFs plus an XLSX sheet "Stundensaldo fortlaufend" and a holiday list, `workbench/awt/pdf.py:annual_working_time_pdf`). API: `GET /api/reports/working-time/?year=&user=&all=&weekly=` (`workbench/awt/api.py:working_time`), CLI `wb reports working-time`.
+- Where: web `/report/annual-working-time/` (`awt_year_report`, `workbench/awt/views.py:annual_working_time_view`), with `?year=`, `?user=<id>|active` and `?export=pdf` (one PDF, or a ZIP of PDFs plus an XLSX sheet "Running net work hours" and a holiday list, `workbench/awt/pdf.py:annual_working_time_pdf`). API: `GET /api/reports/working-time/?year=&user=&all=&weekly=` (`workbench/awt/api.py:working_time`), CLI `wb reports working-time`.
 - Access: your own report needs no feature. Everyone sees the summary of everyone (web `active`, API `all` with `summary`) for planning: employment, balance as of the cutoff and its trend, vacation days left and planned, other planned absences and the vacation planning warning. The details of others (monthly figures, absences, sickness days, unconfirmed paid leave, the company-wide tiles and the PDF/ZIP) require `PERSONNEL_ADMINISTRATION`; without, the web ignores `?user=<id>` and shows your own report, the API answers 403 and returns `all` without `users`.
 - Answers: did the person work their target time this year, counting absences, and how many vacation days are left?
 
 #### Inputs
-- `Year` per working time model (WTM) and year: `january…december` = target days for full-time employment ("Soll-Arbeitstage bei 100%"; `create_holidays` fills these with the weekday count) and `working_time_per_day` (wtpd). Years with wtpd ≤ 0 are reported as misconfigured and skipped. Users without a `Year` for their WTM show up as warnings and are left out.
+- `Year` per working time model (WTM) and year: `january…december` = target days for full-time employment ("Target days for full time employment"; `create_holidays` fills these with the weekday count) and `working_time_per_day` (wtpd). Years with wtpd ≤ 0 are reported as misconfigured and skipped. Users without a `Year` for their WTM show up as warnings and are left out.
 - `Employment`: `date_from`, `date_until` (default `date.max`), `percentage`, `vacation_weeks` (for a full year). Saving an employment cuts the previous one off the day before.
-- `Holiday` per WTM: `date`, `fraction` (e.g. 0.25 for Gründonnerstag), `kind` public/company. They are generated by `workbench/awt/holidays.py:get_public_holidays` + `get_zurich_holidays` (Easter by Lichtenberg's formula; Sechseläuten and Knabenschiessen are 0.5) through `workbench/awt/tasks.py:create_holidays` for this year and the next two years.
+- `Holiday` per WTM: `date`, `fraction` (e.g. 0.25 for Maundy Thursday), `kind` public/company. They are generated by `workbench/awt/holidays.py:get_public_holidays` + `get_zurich_holidays` (Easter by Lichtenberg's formula; Sechseläuten and Knabenschiessen are 0.5) through `workbench/awt/tasks.py:create_holidays` for this year and the next two years.
 - `Absence`: `starts_on`, `ends_on` (optional), `days` (working days as entered, not scaled by percentage), `reason`. The reason `other` sets `is_working_time=False`, and those absences don't count ("Only shown for completeness"). Start and end must be in the same year.
 - `VacationDaysOverride` per user and year: `absolute` (replaces) or `relative` (adds days).
 
 #### Per month m (all 12 months, summed over the employments in that month)
 `partial = calendar days employed in m / calendar days of m` (`monthly_days`, `days_per_month`). `pct = percentage/100`.
 
-| Figure (German label) | Computation |
+| Figure | Computation |
 |---|---|
-| Soll-Arbeitstage bei 100% | `Year.<month>`, shown as is |
-| Gesetzliche Feiertage / Betriebsferien | `Σ fraction` of the WTM's holidays of that kind on weekdays (Mon–Fri) **within the employment period** (`holiday_days_by_month`), at most one day per date (several holidays on the same day count once). Not scaled by pct. |
+| Target days for full time employment | `Year.<month>`, shown as is |
+| Public holiday days / company holiday days | `Σ fraction` of the WTM's holidays of that kind on weekdays (Mon–Fri) **within the employment period** (`holiday_days_by_month`), at most one day per date (several holidays on the same day count once). Not scaled by pct. |
 | Pensum | `Σ 100 × pct × partial`. The total column is the 12-month average. |
-| Verfügbare Ferientage | `Σ vacation_weeks × 5 / 12 × pct × partial`. The total is replaced or adjusted by the override ("Manuell definierte Ferientage"). |
-| Sollstunden | `Σ (Year.month × partial − (public + company holiday days in the employment)) × pct × wtpd`. Holidays are not scaled by `partial` because they are already restricted to the employment. |
-| Bezogene Ferientage, Krankheitstage, Bezahlter Urlaub, Schulbesuch durch Auszubildende, Arbeitszeit-Korrektur | `Σ absence.days` per reason (`absence_<reason>`) for absences with `starts_on` in the year and `is_working_time`. Absences spanning months are split **by calendar days**: `days × calendar_days_in_month / total_calendar_days`. Employments aren't checked: absences outside them count against a target of zero, so the absence form warns about them (`outside-employment`, only for users with employments). |
-| Korrektur anrechenbarer Ferientage | Vacation absences are processed in `starts_on` order, per month chunk `d`. If `d > remaining` then `correction += remaining − d` (≤ 0), and then `remaining = max(0, remaining − d)`. `remaining` starts at the available vacation days (after the override). Vacation beyond the entitlement doesn't count as working time. |
-| Anrechenbare Abwesenheitsstunden | `(vacation + sickness + paid + school + correction + vacation_days_correction) × wtpd` |
-| Erfasste Stunden | `Σ LoggedHours.hours` with `rendered_on` in that month |
-| Arbeitszeit | `Erfasste Stunden + Anrechenbare Abwesenheitsstunden` |
-| Stundensaldo pro Monat | `Arbeitszeit − Sollstunden` |
-| Stundensaldo fortlaufend | cumulative sum of the monthly balances from January. The total is `Σ` of all 12 months, rounded to 0.1 (`Z1`). |
-| Guthaben an Ferientagen | `remaining` after all vacation, if > 0. The display is rounded **up** to 0.01. |
-| Bilanz | `Σ monthly balances + wtpd × vacation days credit`. "balance_days" = `Bilanz / wtpd`, rounded up to 0.01. |
+| Vacation days available | `Σ vacation_weeks × 5 / 12 × pct × partial`. The total is replaced or adjusted by the override ("Vacation days override"). |
+| Target time | `Σ (Year.month × partial − (public + company holiday days in the employment)) × pct × wtpd`. Holidays are not scaled by `partial` because they are already restricted to the employment. |
+| Vacation days taken, sickness days, paid leave, school attendance of apprentices, working time correction | `Σ absence.days` per reason (`absence_<reason>`) for absences with `starts_on` in the year and `is_working_time`. Absences spanning months are split **by calendar days**: `days × calendar_days_in_month / total_calendar_days`. Employments aren't checked: absences outside them count against a target of zero, so the absence form warns about them (`outside-employment`, only for users with employments). |
+| Vacation days correction | Vacation absences are processed in `starts_on` order, per month chunk `d`. If `d > remaining` then `correction += remaining − d` (≤ 0), and then `remaining = max(0, remaining − d)`. `remaining` starts at the available vacation days (after the override). Vacation beyond the entitlement doesn't count as working time. |
+| Countable absence hours | `(vacation + sickness + paid + school + correction + vacation_days_correction) × wtpd` |
+| Logged hours | `Σ LoggedHours.hours` with `rendered_on` in that month |
+| Working time | `logged hours + countable absence hours` |
+| Net work hours per month | `working time − target time` |
+| Running net work hours | cumulative sum of the monthly balances from January. The total is `Σ` of all 12 months, rounded to 0.1 (`Z1`). |
+| Vacation days credit | `remaining` after all vacation, if > 0. The display is rounded **up** to 0.01. |
+| Balance | `Σ monthly balances + wtpd × vacation days credit`. "balance_days" = `balance / wtpd`, rounded up to 0.01. |
 
 As of figures (`balance_cutoff`, `vacation_days_taken_and_planned`); hours and vacation days are separate, unused vacation days can't be converted into hours:
 
@@ -737,9 +735,9 @@ As of figures (`balance_cutoff`, `vacation_days_taken_and_planned`); hours and v
 
 The web report of a person (`workbench/awt/charts.py`) shows these as tiles, the running balance per week (`working_time_by_week`, weeks after `as_of` lighter) with dashed lines at ±40 h (`BALANCE_LIMIT`, the limit of the contracts, only a hint), and per month the logged hours and countable absence hours by reason (vacation less the vacation days correction) against the target time. The monthly table above is in the collapsed "Details" section, the PDF is unchanged.
 
-The overview of everyone (`?user=active`, `workbench/awt/views.py:overview`) lists one row per person (active people first): pensum, `balance_as_of` (beyond ±40 h marked), a sparkline of the running balance up to `as_of`, vacation days left and planned, sickness days, and notes (vacation planning, unconfirmed paid leave, inactive), with a totals row. Tiles above it: Krankheitstage, plus "Geschätzte X Tage pro 100% und Jahr" = `Σ sickness days / (Σ working time / 250 / 8)` (hard-coded 250 days × 8 h), Bezahlter Urlaub, Schulbesuch, Arbeitszeit-Korrektur and the vacation days taken. Hours and vacation days are never added up here.
+The overview of everyone (`?user=active`, `workbench/awt/views.py:overview`) lists one row per person (active people first): pensum, `balance_as_of` (beyond ±40 h marked), a sparkline of the running balance up to `as_of`, vacation days left and planned, sickness days, and notes (vacation planning, unconfirmed paid leave, inactive), with a totals row. Tiles above it: sickness days, plus "Estimated X days per full time equivalent per year" = `Σ sickness days / (Σ working time / 250 / 8)` (hard-coded 250 days × 8 h), paid leave, school attendance, working time correction and the vacation days taken. Hours and vacation days are never added up here.
 
-Vacation planning warning ("Ferienplanung!", `vacation_planning_warnings`, only for active users). It fires if `Σ planned vacation days / available days < 0.5` ("Weniger als die Hälfte…"), or if no vacation absence lasts at least 14 calendar days (`ends_on − starts_on ≥ 13`). The second check is only made if vacation entitlement exists in more than 6 months.
+Vacation planning warning ("Vacation planning!", `vacation_planning_warnings`, only for active users). It fires if `Σ planned vacation days / available days < 0.5` ("Less than half of all vacation days planned."), or if no vacation absence lasts at least 14 calendar days (`ends_on − starts_on ≥ 13`). The second check is only made if vacation entitlement exists in more than 6 months.
 
 Monthly warning mails (`annual_working_time_warnings`, `workbench/awt/tasks.py:annual_working_time_warnings_mails`) go out on the day the previous month gets locked. They cover active users without `DISABLE_AWT_MONITORING` whose `|running balance at the end of last month| > 40 h`.
 
@@ -748,24 +746,24 @@ This view covers January 1 up to today, per Monday-week. Each weekday contribute
 
 #### Worked example (made-up)
 Assume wtpd = 8 h and March has `Year.march` = 22 days. The person works 80% all year with 5 vacation weeks. There is one public holiday (fraction 1, a Monday) in March, and a 4-day vacation (Tue–Fri of the same week, entered as `days = 4`). The person logged 110 h in March.
-- Sollstunden March = (22 × 1 − 1) × 0.8 × 8 = **134.4 h**
-- Verfügbare Ferientage per month = 5 × 5 / 12 × 0.8 = 1.667, which makes **20 days** per year
-- Anrechenbare Abwesenheitsstunden = 4 × 8 = **32 h** (absence days are full days at wtpd. The person enters 4 days for their week off, which equals 4 × 6.4 h × 5/4)
-- Arbeitszeit = 110 + 32 = 142 h. **Stundensaldo pro Monat = 142 − 134.4 = +7.6 h**
+- Target time March = (22 × 1 − 1) × 0.8 × 8 = **134.4 h**
+- Vacation days available per month = 5 × 5 / 12 × 0.8 = 1.667, which makes **20 days** per year
+- Countable absence hours = 4 × 8 = **32 h** (absence days are full days at wtpd. The person enters 4 days for their week off, which equals 4 × 6.4 h × 5/4)
+- Working time = 110 + 32 = 142 h. **Net work hours per month = 142 − 134.4 = +7.6 h**
 - The week view of that week: target = 4 weekdays × 6.4 = 25.6 h, and the 4 vacation days are spread over 5 weekdays = 0.8 days/day × 8 h = 32 h.
-- Year end: suppose these were the only vacation days. Then the credit is 16 days, and `Bilanz = Σ monthly balances + 16 × 8 = Σ + 128 h`.
+- Year end: suppose these were the only vacation days. Then the credit is 16 days, and `balance = Σ monthly balances + 16 × 8 = Σ + 128 h`.
 
 #### Caveats (from code and template)
 - "Monthly sums may not be exact: absences spanning month boundaries are split by calendar days, not by working days. The annual total is correct." (template note)
 - The employment `partial` factor is calendar days, not working days.
-- Future months of the current year already carry their full target. So "Stundensaldo" total / "Bilanz" mid-year is strongly negative, and only the running balance up to the current month is meaningful during the year (unclear whether this is intended).
+- Future months of the current year already carry their full target. So the "Net work hours" total / "Balance" mid-year is strongly negative, and only the running balance up to the current month is meaningful during the year (unclear whether this is intended).
 - Older `Year.months` values may have had holidays baked in. `manage.py import_holidays` raises them back towards the weekday count so that holidays aren't subtracted twice (`workbench/management/commands/import_holidays.py:_adjust_year_months_smart`).
 
 Code: `workbench/awt/reporting.py:annual_working_time`, `Months`, `holiday_days_by_month`, `holidays_of_year`, `working_time_by_week`, `vacation_planning_warnings`, `annual_working_time_warnings`. Helpers: `employment_percentages`, `full_time_equivalents_by_month`, `workbench/awt/utils.py:monthly_days`.
 
 ---
 
-### Green hours (Grüne Stunden)
+### Green hours
 
 - Where: `/report/green-hours/` (`report_green_hours`), `GET /api/reports/green-hours/`. Feature: `CONTROLLING`.
 - Answers: how much of each person's logged time in the period was within budget, beyond budget, maintenance or internal.
@@ -777,12 +775,12 @@ This is intended: green hours only say whether the hours fit the planned budget,
 
 | Figure | Computation (hours in the period, per user) |
 |---|---|
-| Profitabel | `factor × hours` on Order projects |
-| Überzogen | `(1 − factor) × hours` on Order projects |
-| Wartung | hours on Maintenance projects |
-| Intern | hours on Internal projects |
+| Profitable | `factor × hours` on Order projects |
+| Overdrawn | `(1 − factor) × hours` on Order projects |
+| Maintenance | hours on Maintenance projects |
+| Internal | hours on Internal projects |
 | Total | sum of the four |
-| grün | `100 × (profitable + maintenance) / total` |
+| Green | `100 × (profitable + maintenance) / total` |
 | external_percentage (API only) | `100 − 100 × internal / total` |
 
 The users are the filter's users, or everyone who logged hours. The total row (key 0) sums the listed users, and rows with total 0 are dropped. Per-column percentages in the template are `x / total`.
@@ -791,7 +789,7 @@ Code: `workbench/reporting/green_hours.py:green_hours`, `green_hours_by_month`.
 
 ---
 
-### Hours per customer (Stunden pro Kundschaft)
+### Hours per customer
 
 - Where: `/report/hours-per-customer/` (`report_hours_per_customer`), `GET /api/reports/hours-per-customer/`. No feature, any logged-in user.
 - Answers: who logged how many hours for which customer in the period.
@@ -800,60 +798,60 @@ Code: `workbench/reporting/green_hours.py:green_hours`, `green_hours_by_month`.
 
 ---
 
-### Hours per type (Stunden pro Typ)
+### Hours per type
 
 - Where: `/report/hours-per-type/` (`report_hours_per_type`), `GET /api/reports/hours-per-type/`. Feature: `CONTROLLING`.
 - Answers: how each person's hours split between external work and the internal types, compared with their target shares.
 
 | Figure | Computation |
 |---|---|
-| Extern (Stunden) | hours on non-internal projects (Order + Maintenance) |
-| per internal type (Stunden) | hours on internal projects grouped by `project.internal_type` |
-| Richtwert, internal type | `InternalTypeUser.percentage` (the user's own value, or the type's default if empty), 0 if not assigned |
-| Richtwert, Extern | `100 − Σ` of the user's internal Richtwerte |
-| Erreicht | `100 × hours of the type / user's total hours` |
+| External (hours) | hours on non-internal projects (Order + Maintenance) |
+| per internal type (hours) | hours on internal projects grouped by `project.internal_type` |
+| Target value, internal type | `InternalTypeUser.percentage` (the user's own value, or the type's default if empty), 0 if not assigned |
+| Target value, external | `100 − Σ` of the user's internal target values |
+| Reached | `100 × hours of the type / user's total hours` |
 | Total / external / internal | per user and summed over users |
 
-Highlights: external is green if Erreicht ≥ Richtwert and orange if it is more than 10 points below. Internal types are blue if above and orange if below half. The last internal type turns orange if it is more than 5 points above. The target percentages are not scaled by employment.
+Highlights: external is green if reached ≥ target value and orange if it is more than 10 points below. Internal types are blue if above and orange if below half. The last internal type turns orange if it is more than 5 points above. The target percentages are not scaled by employment.
 Code: `workbench/projects/reporting.py:hours_per_type`, `highlight_external`, `highlight_internal`.
 
 ---
 
-### Logging statistics (Logbuch-Statistik)
+### Logging statistics
 
 - Where: `/report/logging/` (`report_logging`), `GET /api/reports/logging/`. Feature: `CONTROLLING`. All users, no team filter.
 - Answers: how much, how promptly and with which breaks people log their time.
 
 | Figure | Computation (logged hours with `rendered_on` in the period) |
 |---|---|
-| Anzahl / Summe / Durchschnitt | `COUNT(hours)`, `SUM(hours)`, `AVG(hours)` per user. The total average is `Σ sum / Σ count`. |
-| Zeitpunkt der Erfassung | `AVG(created_at − (rendered_on + 12 h))` in hours: "Gleicher Tag" if < 8 h, "Nächster Tag" if < 30 h, otherwise "Spät" (shown in days) |
-| Tage mit zuwenig Pausenzeit | days with logged hours where `hours ≥ 9 and breaks < 60 min`, `≥ 7 and < 30 min`, or `≥ 5.5 and < 15 min`. Breaks are `logbook_break` per day of `starts_at`. The figure is shown as "X of Y logged days", with a warning if the ratio is > 20%. |
+| Count / Sum / Average | `COUNT(hours)`, `SUM(hours)`, `AVG(hours)` per user. The total average is `Σ sum / Σ count`. |
+| Point in time of logging | `AVG(created_at − (rendered_on + 12 h))` in hours: "Same day" if < 8 h, "Next day" if < 30 h, otherwise "Late" (shown in days) |
+| Days with insufficient breaks | days with logged hours where `hours ≥ 9 and breaks < 60 min`, `≥ 7 and < 30 min`, or `≥ 5.5 and < 15 min`. Breaks are `logbook_break` per day of `starts_at`. The figure is shown as "X of Y logged days", with a warning if the ratio is > 20%. |
 
 Code: `workbench/logbook/reporting.py:logbook_stats`, `mean_logging_delay`, `classify_logging_delay`, `logged_hours_stats`, `insufficient_breaks`.
 
 ---
 
-### Planning vs logbook (Planung vs Logbuch)
+### Planning vs logbook
 
 - Where: `/report/planning-vs-logbook/` (`report_planning_vs_logbook`), `GET /api/reports/planning-vs-logbook/`. No feature. Users come from the filter, or all users.
 - Answers: per customer, how the logged hours compare with the planned hours in the period.
 
 | Figure | Computation |
 |---|---|
-| Geplant | `PlannedWork` of the users (provisional included, any project state). `planned_hours / n_weeks / 5` per weekday, times the number of weekdays of that week inside the period, so partial first and last weeks are prorated. Grouped by `project.customer` and week. |
-| Erfasst | `Σ hours` of the users' logged hours in the period by `project.customer` and week (internal projects included) |
-| Differenz | `Erfasst − Geplant`. Red if `|diff| ≥ 16 h` or `≥ 20%` of `max(planned, logged)`, orange if `≥ 8 h` or `≥ 10%`, and orange if one side is zero. Rows are sorted by `|diff|`. |
-| Zuteilung | `(logged_c / total_logged) / (planned_c / total_planned) × 100`, rounded to an integer. It is ∞ (None) if there are logged hours without planned hours, and 0 if nothing was logged. Red at ≥ 20 points from 100, orange at ≥ 10. Rows are faded if `planned_c < 0.25 × √total_planned`. |
+| Planned | `PlannedWork` of the users (provisional included, any project state). `planned_hours / n_weeks / 5` per weekday, times the number of weekdays of that week inside the period, so partial first and last weeks are prorated. Grouped by `project.customer` and week. |
+| Logged | `Σ hours` of the users' logged hours in the period by `project.customer` and week (internal projects included) |
+| Diff | `logged − planned`. Red if `|diff| ≥ 16 h` or `≥ 20%` of `max(planned, logged)`, orange if `≥ 8 h` or `≥ 10%`, and orange if one side is zero. Rows are sorted by `|diff|`. |
+| Allocation | `(logged_c / total_logged) / (planned_c / total_planned) × 100`, rounded to an integer. It is ∞ (None) if there are logged hours without planned hours, and 0 if nothing was logged. Red at ≥ 20 points from 100, orange at ≥ 10. Rows are faded if `planned_c < 0.25 × √total_planned`. |
 | overall ratio (`logged_percentage`) | `total_logged / total_planned × 100`, rounded to an integer |
 
 Code: `workbench/planning/reporting.py:planning_vs_logbook`, `_add_allocation`, `_diff_css_class`.
 
 ---
 
-### Planning capacity (Verbleibende Kapazität pro Woche)
+### Planning capacity (Remaining capacity per week)
 
-- Where: the user planning (`/users/<pk>/planning/`, `accounts_user_planning`) and the team planning (`/teams/<pk>/planning/`, active members) use the range today − 14 days … + 400 days, and the retrospective uses −180 … +14 days. API: `capacity` in `GET /api/planning/export/` when users or a team are given (active users only). XLSX export sheet "Capacity Analysis" ("Gesamtkapazität"). Label from `djangojs.po`. No feature.
+- Where: the user planning (`/users/<pk>/planning/`, `accounts_user_planning`) and the team planning (`/teams/<pk>/planning/`, active members) use the range today − 14 days … + 400 days, and the retrospective uses −180 … +14 days. API: `capacity` in `GET /api/planning/export/` when users or a team are given (active users only). XLSX export sheet "Capacity Analysis" ("Total Capacity"). Label from `djangojs.po`. No feature.
 - Answers: how many hours per week each person still has free after planned work, absences and holidays (negative means overbooked).
 
 Per user and week (Monday to Friday), over all employments touching the week (`date_until` inclusive):
@@ -881,26 +879,26 @@ Code: `workbench/planning/reporting.py:Planning.capacity`, `Planning.add_absence
 
 ## Deals
 
-### Accepted deals (Gewonnene Geschäfte)
+### Accepted deals
 
 Web: `/report/accepted-deals/` (`report_accepted_deals`), feature DEALS; per-user modal `accepted-deals/deals/?user=ID`. API: `GET /api/deals/stats/` → `accepted` (DEALS; `users` filter = deal owners). `workbench/deals/reporting.py:accepted_deals`, `workbench/deals/api.py:deal_stats`
 Answers: what value of deals was won in the period, per value type, month and person, vs. targets.
 
-Deals: status ACCEPTED, `closed_on` in [Datum von, Datum bis] (default this week Mon–Sun). `Deal.value` = Σ of its `Value.value` rows (recomputed on save unless `skip_value_calculation`).
+Deals: status ACCEPTED, `closed_on` in [Date from, Date until] (default this week Mon–Sun). `Deal.value` = Σ of its `Value.value` rows (recomputed on save unless `skip_value_calculation`).
 
-| Figure (DE) | Computation |
+| Figure | Computation |
 |---|---|
 | Month × value type cells | Σ Value.value per value type, by month of `closed_on`. Columns: value types occurring in the deals plus all value types with a `weekly_target`. |
 | Month "Total" | Σ of the month's values. |
 | Total row per type | Σ over months; pie = sum vs. target. |
 | Total row, overall cell | `stats.sum` = Σ Deal.value of the deals. |
-| Ziel (n Wochen) | Per type: weekly_target × (days in period)/7; overall: Σ weekly_targets of the shown types × days/7. |
-| Median-Alter | Days between `created_at` date and `closed_on`; one entry per Value row; upper median (`sorted[len//2]`). Overall median over all entries. |
-| Per user: Wert | Σ over deals the user contributed to of Deal.value × contribution weight / Σ weights of that deal (0 if the weights add up to 0). |
-| Per user: Anzahl | Number of deals the user contributed to. |
-| Total row (users) | Anzahl = number of deals; Wert = Σ Deal.value (deals with several or no contributors count once). |
+| Target (n weeks) | Per type: weekly_target × (days in period)/7; overall: Σ weekly_targets of the shown types × days/7. |
+| Median age | Days between `created_at` date and `closed_on`; one entry per Value row; upper median (`sorted[len//2]`). Overall median over all entries. |
+| Per user: Value | Σ over deals the user contributed to of Deal.value × contribution weight / Σ weights of that deal (0 if the weights add up to 0). |
+| Per user: Count | Number of deals the user contributed to. |
+| Total row (users) | Count = number of deals; Value = Σ Deal.value (deals with several or no contributors count once). |
 | Deal list | Each deal's value; total row = `stats.sum`. |
-| Modal per user | Deal, contact/customer, Projektvergabe (closing type + notice), Wert, Beitrag (the user's share). |
+| Modal per user | Deal, contact/customer, Award of contract (closing type + notice), Value, Contribution (the user's share). |
 
 Chart (web, `_accepted_deals_chart`): the month × value type cells cumulated from the start of the period as stacked bars for every month, and the cumulated target, per month Σ weekly_targets × (days of the month within the period)/7. Only shown if the period contains at least two complete months (and at most 36 months).
 
@@ -908,21 +906,21 @@ API additionally: declined `count`, `sum` (Σ Deal.value) and per closing type.
 
 ---
 
-### Declined deals (Verlorene Geschäfte)
+### Declined deals
 
 Web: `/report/declined-deals/` (`report_declined_deals`), DEALS. API: `/api/deals/stats/` → `declined`. `deals/reporting.py:declined_deals`
 Answers: which deals were lost in the period and why.
 
-Deals with status DECLINED and `closed_on` in the period (default this week), newest first. Columns: Geschäft, Kundschaft (contact with organization, else customer), Verlustgrund (closing_type + closing_notice), Wert (Deal.value). No totals in the web view; API: count, Σ value, count/Σ per closing type.
+Deals with status DECLINED and `closed_on` in the period (default this week), newest first. Columns: Deal, Customer (contact with organization, else customer), Reason for losing (closing_type + closing_notice), Value (Deal.value). No totals in the web view; API: count, Σ value, count/Σ per closing type.
 
 ---
 
-### Deal history (Geschichte der Geschäfte)
+### Deal history
 
 Web: `/report/deal-history/` (`report_deal_history`), DEALS. API: `GET /api/deals/history/`. `deals/reporting.py:deal_history`
 Answers: what changed on deals in the period, and who changed it.
 
-Audit log entries (`LoggedAction` for Deal) with `created_at` between Datum von 00:00 and Datum bis 23:59:59.999 (local time; default this week). Tracked fields: title, value, probability, decision_expected_on, status, closing_type, closing_notice (plus id). Team/user filter filters by the **user who made the change**; changes without a user are always included. No computed figures.
+Audit log entries (`LoggedAction` for Deal) with `created_at` between Date from 00:00 and Date until 23:59:59.999 (local time; default this week). Tracked fields: title, value, probability, decision_expected_on, status, closing_type, closing_notice (plus id). Team/user filter filters by the **user who made the change**; changes without a user are always included. No computed figures.
 
 ## Known inconsistencies
 
