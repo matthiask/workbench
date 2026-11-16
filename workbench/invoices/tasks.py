@@ -150,7 +150,10 @@ Wenn Du die Rechnungen nicht stellen kannst, aktualisiere bitte
 die geplanten Rechnungen oder schliesse das Projekt.
 """,
             to=[user.email],
-            reply_to=[user.email],
+            reply_to=[
+                email for email in [settings.WORKBENCH.BOOKKEEPING_EMAIL] if email
+            ]
+            or [user.email],
         ).send()
 
 

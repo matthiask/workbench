@@ -1,6 +1,8 @@
 import datetime as dt
 from decimal import Decimal
+from unittest import mock
 
+from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.utils.translation import deactivate_all
@@ -19,8 +21,12 @@ class ProjectedInvoicesTest(TestCase):
         deactivate_all()
 
     @travel("2021-11-30")
+    @mock.patch.object(
+        settings.WORKBENCH, "BOOKKEEPING_EMAIL", "bookkeeping@example.com"
+    )
     def test_projected_invoices(self):
-        """Functionality around projected gross margin and reminder mails"""
+        """Functionality around projected gross margin and reminder mails,
+        replies reach the bookkeeping"""
         obj = factories.ProjectedInvoiceFactory.create(gross_margin=Decimal(1000))
         pgm = projected_gross_margin()
 
@@ -49,8 +55,8 @@ class ProjectedInvoicesTest(TestCase):
         with travel("2021-11-28"):
             send_unsent_projected_invoices_reminders()
         self.assertEqual(len(mail.outbox), 1)
-
-        # print(mail.outbox[0].__dict__)
+        self.assertEqual(mail.outbox[0].to, [obj.project.owned_by.email])
+        self.assertEqual(mail.outbox[0].reply_to, ["bookkeeping@example.com"])
 
     def test_projected_invoices_form(self):
         """Projected invoices aren't added to closed projects nor dated on or
