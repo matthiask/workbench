@@ -40,6 +40,14 @@ def currency_rounded(value):
     return f"{value or Decimal(0):,.0f}".replace(",", "’")
 
 
+def currency_thousands(value):
+    """Thousands of francs with one decimal (TCHF), for overviews"""
+    value = (Decimal(value or 0) / 1000).quantize(
+        Decimal("0.1"), rounding=ROUND_HALF_UP
+    )
+    return f"{value or Decimal('0.0'):,.1f}".replace(",", "’")
+
+
 def total_incl_tax(instance):
     """The total of an offer or invoice; amounts are excl. tax unless
     marked, so it gets a badge if tax applies"""

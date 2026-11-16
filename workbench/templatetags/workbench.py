@@ -25,6 +25,7 @@ from workbench.tools.formats import (
     Z2,
     currency,
     currency_rounded,
+    currency_thousands,
     days,
     hours,
     local_date_format,
@@ -40,6 +41,7 @@ register = template.Library()
 
 register.filter(currency)
 register.filter(currency_rounded)
+register.filter(currency_thousands)
 register.filter(days)
 register.filter(hours)
 register.simple_tag(total_incl_tax)

@@ -892,7 +892,7 @@ Maintenance without deal (replaces deals created only for the statistics, e.g. q
 
 | Figure | Computation |
 |---|---|
-| Month × value type cells | Σ Value.value per value type, by month of `closed_on`. Columns: value types occurring in the deals plus all value types with a `weekly_target`. |
+| Month × value type cells | Σ Value.value per value type, by month of `closed_on`. The web shows this table in TCHF (one decimal), the lists below in whole francs; the API keeps cents. Columns: value types occurring in the deals plus all value types with a `weekly_target`. |
 | Month "Offers without deal" | Σ `total_excl_tax` of the month's offers without deal (column only shown if there are any). |
 | Month "Maintenance without deal" | Σ invoiced in the month on maintenance projects without deal (column only shown if there are any). |
 | Month "Total" | Σ of the month's values, offers and maintenance without deal included. |
