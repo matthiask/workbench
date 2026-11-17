@@ -76,9 +76,10 @@ preparation and declines those sent before.
   created in them while logging. Their services count as budget, but not
   as sold. The offer list only shows them when filtering by their status.
 - **Budget retainers** ("is budget retainer") are accepted offers which
-  only retain budget. No hours are logged on their services. The work is
-  logged on services without offer created later, which free the
-  retained budget. The project shows the budget still retained. Other
+  only retain budget and release none for work: no hours are logged on
+  their services. Services without offer release the retained budget
+  with their budgeted hours or costs, the work is logged on them. The
+  project shows the budget still retained. Other
   offers of the project are added to the retained budget, the offer form
   warns when a project gets both.
 

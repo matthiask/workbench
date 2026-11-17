@@ -87,10 +87,11 @@ Offerte.
   erstellen. Ihre Leistungen zählen zum Budget, aber nicht als verkauft.
   Die Offertenliste zeigt sie nur, wenn nach ihrem Status gefiltert wird.
 - Offerten, die **Budget zurückbehalten** («behält Budget zurück»), sind
-  akzeptierte Offerten, die nur Budget zurückbehalten. Auf ihren
-  Leistungen werden keine Stunden erfasst. Die Arbeit wird auf später
-  erstellten Leistungen ohne Offerte erfasst, die das zurückbehaltene
-  Budget freigeben. Das Projekt zeigt das noch zurückbehaltene Budget.
+  akzeptierte Offerten, die nur Budget zurückbehalten und keines für
+  Arbeit freigeben: Auf ihren Leistungen werden keine Stunden erfasst.
+  Leistungen ohne Offerte geben das zurückbehaltene Budget mit ihren
+  budgetierten Stunden oder Kosten frei, auf ihnen wird die Arbeit
+  erfasst. Das Projekt zeigt das noch zurückbehaltene Budget.
   Weitere Offerten des Projekts werden zum zurückbehaltenen Budget
   dazugezählt, das Offertenformular warnt, wenn ein Projekt beides
   erhält.

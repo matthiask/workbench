@@ -3662,8 +3662,8 @@ msgid "is budget retainer"
 msgstr "behält Budget zurück"
 
 #: workbench/offers/models.py
-msgid "The offer only retains budget. Services without offer created later for the actual work free it."
-msgstr "Die Offerte behält nur Budget zurück. Leistungen ohne Offerte, die später für die eigentliche Arbeit erstellt werden, geben es frei."
+msgid "The offer only retains budget, it releases none for work. Services without offer release it with their budgeted hours or costs."
+msgstr "Die Offerte behält nur Budget zurück, für Arbeit gibt sie keines frei. Leistungen ohne Offerte geben es mit ihren budgetierten Stunden oder Kosten frei."
 
 #: workbench/offers/models.py
 msgid "Offered on date missing for selected state."

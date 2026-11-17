@@ -178,8 +178,8 @@ class Offer(ModelWithTotal):
         _("is budget retainer"),
         default=False,
         help_text=_(
-            "The offer only retains budget. Services without offer created later for"
-            " the actual work free it."
+            "The offer only retains budget, it releases none for work. Services"
+            " without offer release it with their budgeted hours or costs."
         ),
     )
 
