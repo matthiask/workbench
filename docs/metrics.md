@@ -895,6 +895,27 @@ Offers without deal (follow-up orders are often accepted without a deal): status
 
 Maintenance without deal (replaces deals created only for the statistics, e.g. quarterly catch-all deals): Σ `Invoice.gross_margin` (`total_excl_tax − third_party_costs`) of invoiced invoices (SENT/PAID, all types) with `invoiced_on` in the period on `MAINTENANCE` projects without accepted offer and without deal, neither linked directly (`Deal.related_projects`) nor through one of their offers (any deal status); attributed in full to the project's owner (also for the users filter), by month of `invoiced_on`. No value type, no target, not in the median ages. Projects with an accepted offer count through the offer, invoiced work beyond it isn't counted (underestimates). Deals selling maintenance or a mandate without offer link the project, then the deal counts instead. API: `accepted.maintenance_without_deal`, `by_month[].maintenance_without_deal`.
 
+In other words, maintenance without deal counts when it's invoiced, not
+when it's logged or sold:
+
+- An invoice counts once it's sent (or paid), in the month of its invoice
+  date. Invoices in preparation don't count yet; an invoice set back to in
+  preparation or cancelled drops out again. Credits are deducted.
+- It counts with its gross margin: the total excl. tax after the discount,
+  without the invoice's third party costs. Hours logged but not invoiced
+  yet don't count.
+- The whole amount is credited to the project's owner, not to the people
+  who logged the hours.
+- The project drops out as soon as it has an accepted offer (the offer
+  counts instead, when it's accepted) or is linked to a deal, directly or
+  through one of its offers (the deal counts instead, when it's accepted).
+  This also removes invoices of earlier periods from the report, so
+  figures of past periods can change. A maintenance contract sold with a
+  deal should therefore be linked to the deal ("Link project") so that
+  it's counted once, with the deal.
+- There's nothing to maintain by hand: every maintenance project
+  (project type "Maintenance") qualifies automatically.
+
 | Figure | Computation |
 |---|---|
 | Month × value type cells | Σ Value.value per value type, by month of `closed_on`. The web shows this table in TCHF (one decimal), the lists below in whole francs; the API keeps cents. Columns: value types occurring in the deals plus all value types with a `weekly_target`. |
