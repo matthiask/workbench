@@ -1862,6 +1862,19 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Phase 1", result.output)
 
+    def test_show_deals(self):
+        """Projects and offers show their deals"""
+        offer = factories.OfferFactory.create(title="Phase 1")
+        deal = factories.DealFactory.create(title="Website relaunch")
+        deal.related_offers.add(offer)
+        for command in [
+            ("projects", "show", offer.project.code),
+            ("offers", "show", offer.code),
+        ]:
+            result = self.wb(*command)
+            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertIn(f"{deal.code} Website relaunch (Open)", result.output)
+
     @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
     def test_campaigns(self):
         campaign = factories.CampaignFactory.create(title="Relaunch")

@@ -544,6 +544,19 @@ def echo_fields(title, fields, *, url=None):
     console.print(grid)
 
 
+def deal_links(deals):
+    """The deals of an offer or project, one per line"""
+    if not deals:
+        return None
+    return Text("\n").join(
+        Text(
+            f"{deal['code']} {deal['title']} ({deal['status_label']})",
+            style=Style(link=deal["url"]),
+        )
+        for deal in deals
+    )
+
+
 def echo_offer(offer):
     echo_fields(
         f"{offer['code'] or '(new offer)'} {offer['title']}",
@@ -565,6 +578,7 @@ def echo_offer(offer):
             ("Closed on", offer.get("closed_on")),
             ("Work completed on", offer.get("work_completed_on")),
             ("External reference", offer.get("external_reference")),
+            ("Deals", deal_links(offer.get("deals"))),
             ("URL", offer["url"]),
         ],
         url=offer["url"],

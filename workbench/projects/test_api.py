@@ -1005,6 +1005,38 @@ class ProjectsAPITest(TestCase):
         response = self.client.delete(f"/api/services/{second.pk}/")
         self.assertEqual(response.status_code, 422)
 
+    def test_deals(self):
+        """Projects and offers list their deals, projects also those linked
+        through an offer; null without the deals feature"""
+        offer = factories.OfferFactory.create()
+        project = offer.project
+        other = factories.OfferFactory.create(project=project)
+        direct = factories.DealFactory.create(title="Maintenance")
+        direct.related_projects.add(project)
+        through = factories.DealFactory.create(title="Relaunch")
+        through.related_offers.add(offer)
+        factories.DealFactory.create()
+        self.client.force_login(project.owned_by)
+
+        def titles(url):
+            deals = self.client.get(url).json()["deals"]
+            return None if deals is None else [deal["title"] for deal in deals]
+
+        self.assertEqual(
+            titles(f"/api/projects/{project.pk}/"), ["Relaunch", "Maintenance"]
+        )
+        self.assertEqual(titles(f"/api/offers/{offer.pk}/"), ["Relaunch"])
+        self.assertEqual(titles(f"/api/offers/{other.pk}/"), [])
+        deal = self.client.get(f"/api/offers/{offer.pk}/").json()["deals"][0]
+        self.assertEqual(deal["status"], "open")
+        self.assertEqual(deal["code"], through.code)
+
+        with override_settings(
+            FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.DEALS: F.NEVER}
+        ):
+            self.assertIsNone(titles(f"/api/projects/{project.pk}/"))
+            self.assertIsNone(titles(f"/api/offers/{offer.pk}/"))
+
     @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
     def test_services_rates_require_controlling(self):
         """Rates require the controlling feature, like on the project page"""

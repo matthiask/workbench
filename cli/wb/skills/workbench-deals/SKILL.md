@@ -188,9 +188,8 @@ ask when unsure.
 The stats find what was invoiced; the planned invoicing also finds what's
 expected. Its projects which are maintenance (`wb projects show <id>
 --json`: `type`) and have no accepted or offered offer (`offers`) nor a
-deal (the customer's deals, `wb deals search --customer <id> --status
-accepted` and open ones, list their projects in `wb deals show`) are
-candidates too, before anything is invoiced. Planned invoicing is
+deal (`deals`, linked directly or through an offer) are candidates too,
+before anything is invoiced. Planned invoicing is
 gross margin already, like deal values.
 
 Most maintenance projects are yearly mandates ("… 2027") and get one deal

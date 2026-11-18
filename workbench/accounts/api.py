@@ -160,7 +160,7 @@ def overview(request):
             for offer in Offer.objects
             .maybe_actionable(user=user)
             .select_related("project__customer")
-            .prefetch_related("services", "headings")
+            .prefetch_related("services", "headings", "deals")
         ]
         if features[FEATURES.CONTROLLING]
         else None,

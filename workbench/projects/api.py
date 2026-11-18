@@ -23,13 +23,21 @@ from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.api_codes import by_id_or_code
-from workbench.api_keys import InvoiceStatus, InvoiceType, OfferStatus, ProjectType, key
+from workbench.api_keys import (
+    DealStatus,
+    InvoiceStatus,
+    InvoiceType,
+    OfferStatus,
+    ProjectType,
+    key,
+)
 from workbench.contacts.api import (
     OrganizationOut,
     PersonSummary,
     organization_out,
     person_summary,
 )
+from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import (
@@ -83,6 +91,32 @@ class ProjectSummary(Schema):
     customer: ProjectCustomer = Field(
         description="Part of the project's label; details are in the organization."
     )
+
+
+class DealRef(Schema):
+    id: int
+    code: str
+    url: str
+    title: str
+    status: DealStatus
+    status_label: str
+
+
+def deal_refs(deals, request):
+    """Deals linked to an offer or project, None without the deals feature"""
+    if not request.user.features[FEATURES.DEALS]:
+        return None
+    return [
+        {
+            "id": deal.id,
+            "code": deal.code,
+            "url": request.build_absolute_uri(deal.get_absolute_url()),
+            "title": deal.title,
+            "status": key("deal_status", deal.status),
+            "status_label": deal.get_status_display(),
+        }
+        for deal in deals
+    ]
 
 
 def project_summary(project, request):
@@ -483,18 +517,31 @@ def project_stats(request, filters: Query[StatsFilter]):
     return [project_stats(project) for project in projects]
 
 
-@router.get("/projects/{project_id}/", response=ProjectOut)
+class ProjectDetail(ProjectOut):
+    deals: list[DealRef] | None = Field(
+        description="Deals linked to the project, directly or through one of"
+        " its offers; null without the deals feature."
+    )
+
+
+@router.get("/projects/{project_id}/", response=ProjectDetail)
 def project_detail(request, project_id: str):
     """A project by its ID or code (2026-0042)"""
-    return project_out(
-        by_id_or_code(
-            Project.objects.select_related(
-                "customer", "contact", "owned_by", "internal_type", "campaign"
-            ),
-            project_id,
+    project = by_id_or_code(
+        Project.objects.select_related(
+            "customer", "contact", "owned_by", "internal_type", "campaign"
         ),
-        request,
+        project_id,
     )
+    return project_out(project, request) | {
+        "deals": deal_refs(
+            Deal.objects
+            .filter(Q(related_projects=project) | Q(related_offers__project=project))
+            .distinct()
+            .order_by("-pk"),
+            request,
+        )
+    }
 
 
 class ProjectIn(InputSchema):

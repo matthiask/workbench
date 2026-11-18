@@ -25,9 +25,11 @@ from workbench.offers.models import (
     validate_external_reference,
 )
 from workbench.projects.api import (
+    DealRef,
     ProjectOut,
     ProjectSummary,
     ServiceTypeOut,
+    deal_refs,
     project_out,
     project_summary,
 )
@@ -197,6 +199,9 @@ class OfferOut(Schema):
     total: Decimal
     services: list[OfferServiceOut]
     headings: list[OfferHeadingOut]
+    deals: list[DealRef] | None = Field(
+        description="Deals the offer is linked to; null without the deals feature."
+    )
     warnings: list[OfferWarning] = Field(
         default=[],
         description="Things to look at in the services which were just written,"
@@ -251,6 +256,7 @@ def offer_out(offer, services, request):
         "total": offer.total,
         "services": services,
         "headings": list(offer.headings.all()) if offer.pk else [],
+        "deals": deal_refs(offer.deals.all() if offer.pk else [], request),
     }
 
 
@@ -259,7 +265,7 @@ def _project_offers(project, request):
         offer_out(offer, list(offer.services.all()), request)
         for offer in project.offers.select_related(
             "project__customer", "owned_by"
-        ).prefetch_related("services", "headings")
+        ).prefetch_related("services", "headings", "deals")
     ]
 
 
@@ -308,7 +314,7 @@ def offer_list_search(request, filters: Query[OfferFilter]):
     offers = (
         Offer.objects
         .select_related("project__customer", "owned_by")
-        .prefetch_related("services", "headings")
+        .prefetch_related("services", "headings", "deals")
         .order_by("-pk")
     )
     if filters.project:
