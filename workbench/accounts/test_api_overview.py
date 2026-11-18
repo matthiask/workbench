@@ -4,6 +4,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.accounts.models import SpecialistField
 from workbench.tools.validation import monday
 
 
@@ -38,7 +39,13 @@ class OverviewAPITest(TestCase):
     def test_users(self):
         """Users can be searched, active users by default"""
         user = factories.UserFactory.create(
-            _full_name="Hans Muster", _short_name="hm", email="hans@example.com"
+            _full_name="Hans Muster",
+            _short_name="hm",
+            email="hans@example.com",
+            specialist_field=SpecialistField.objects.create(
+                name="Development",
+                value_type=factories.ValueTypeFactory.create(title="Programming"),
+            ),
         )
         factories.TeamFactory.create(name="Design").members.add(user)
         factories.UserFactory.create(_full_name="Hans Alt", is_active=False)
@@ -56,6 +63,8 @@ class OverviewAPITest(TestCase):
                     "email": "hans@example.com",
                     "is_active": True,
                     "teams": ["Design"],
+                    "specialist_field": "Development",
+                    "value_type": "Programming",
                 }
             ],
         )

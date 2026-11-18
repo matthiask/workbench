@@ -73,6 +73,11 @@ class UserOut(Schema):
     email: str
     is_active: bool
     teams: list[str]
+    specialist_field: str | None
+    value_type: str | None = Field(
+        description="The value type of the specialist field, e.g. for splitting"
+        " the value of work between value types by who did it."
+    )
 
 
 class UserFilter(Schema):
@@ -85,7 +90,12 @@ class UserFilter(Schema):
 def user_list(request, filters: Query[UserFilter]):
     """Search users by name, short name or email address, e.g. for the short
     names which identify them in other APIs"""
-    users = User.objects.prefetch_related("teams").order_by("_full_name", "pk")
+    users = (
+        User.objects
+        .select_related("specialist_field__value_type")
+        .prefetch_related("teams")
+        .order_by("_full_name", "pk")
+    )
     if not filters.include_inactive:
         users = users.filter(is_active=True)
     for term in filters.q.split():
@@ -104,6 +114,12 @@ def user_list(request, filters: Query[UserFilter]):
             "email": user.email,
             "is_active": user.is_active,
             "teams": [team.name for team in user.teams.all()],
+            "specialist_field": field.name
+            if (field := user.specialist_field)
+            else None,
+            "value_type": field.value_type.title
+            if field and field.value_type
+            else None,
         },
     )
 
