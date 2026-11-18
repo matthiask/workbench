@@ -183,6 +183,15 @@ ask when unsure.
 ### Maintenance without deal
 
     wb deals stats --period <period> --json     # maintenance_without_deal
+    wb projected-invoices search --period <period> --json
+
+The stats find what was invoiced; the planned invoicing also finds what's
+expected. Its projects which are maintenance (`wb projects show <id>
+--json`: `type`) and have no accepted or offered offer (`offers`) nor a
+deal (the customer's deals, `wb deals search --customer <id> --status
+accepted` and open ones, list their projects in `wb deals show`) are
+candidates too, before anything is invoiced. Planned invoicing is
+gross margin already, like deal values.
 
 A linked project's invoices count with the deal only, **in all periods**:
 linking a long-running maintenance project removes its earlier invoices
@@ -191,9 +200,10 @@ yearly mandate project, "… 2027"), with a deal for what they're expected to
 bring in that period. For long-running projects, point this out and leave
 them alone unless the user decides otherwise.
 
-The value is a conservative estimate, like the planned invoicing: the
-project's planned invoicing for the period (`wb projected-invoices search`),
-else what was invoiced in the previous period, rounded down. Don't correct
+The value is the project's planned invoicing for the period (`wb
+projected-invoices search --project <id> --period <period>`), which is
+already a conservative estimate; without any, what was invoiced in the
+previous period, rounded down. Don't correct
 it upwards later unless the difference is large. Use the services of the
 project's offers or service groups, else its logged hours (`wb hours
 search --project <id>`), for the split by value type. Mandates sold before
