@@ -170,9 +170,10 @@ the user wants to.
 
     wb offers search --status accepted --without-deal --period <period> --json
 
-First check each offer against the accepted deals as in section 3, also
-those closed after the period (mandates close at the start of their period,
-e.g. on 2027-01-01, and may already have their deal) and the open ones: an offer
+First check each offer against the accepted deals as in section 3, from
+the period's start on without an end (`--since` only: mandates close at the
+start of their period, e.g. on 2027-01-01, and may already have their deal),
+and against the open ones: an offer
 which belongs to an existing deal gets linked, not a new deal. For the rest,
 one deal per offer (or per project, for offers of a project accepted the
 same day):
