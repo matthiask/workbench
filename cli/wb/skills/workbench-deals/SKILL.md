@@ -193,12 +193,12 @@ accepted` and open ones, list their projects in `wb deals show`) are
 candidates too, before anything is invoiced. Planned invoicing is
 gross margin already, like deal values.
 
-A linked project's invoices count with the deal only, **in all periods**:
-linking a long-running maintenance project removes its earlier invoices
-from the report too. Link only projects which cover one period (e.g. a
-yearly mandate project, "… 2027"), with a deal for what they're expected to
-bring in that period. For long-running projects, point this out and leave
-them alone unless the user decides otherwise.
+Most maintenance projects are yearly mandates ("… 2027") and get one deal
+for what they're expected to bring in that year. A linked project's
+invoices count with the deal only, **in all periods**: for the rare project
+running for several years, linking it also removes its earlier invoices
+from the report. Point those out and leave them alone unless the user
+decides otherwise.
 
 The value is the project's planned invoicing for the period (`wb
 projected-invoices search --project <id> --period <period>`), which is
