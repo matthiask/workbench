@@ -740,6 +740,13 @@ def _echo_deal(data):
             ("Closed on", data["closed_on"]),
             ("Closing type", data["closing_type"]),
             (
+                "Attributes",
+                ", ".join(
+                    f"{group}={attribute}"
+                    for group, attribute in data.get("attributes", {}).items()
+                ),
+            ),
+            (
                 "Related offers",
                 ", ".join(
                     f"{offer['code']} (ID {offer['id']}, {offer['status']})"

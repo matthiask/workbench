@@ -150,6 +150,8 @@ class DealsAPITest(TestCase):
         self.assertEqual(created.value, 5000)
         self.assertEqual([a.title for a in created.attributes.all()], ["Referral"])
         self.assertEqual(list(created.contributors.all()), [user])
+        # Output like the input, so that other deals can copy them
+        self.assertEqual(response.json()["attributes"], {"Source": "Referral"})
 
         # Deals created for others: the owner contributes
         other = factories.UserFactory.create(_short_name="cd")

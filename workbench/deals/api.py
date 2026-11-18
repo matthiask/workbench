@@ -112,6 +112,9 @@ class DealOut(Schema):
     related_projects: list[ProjectSummary] = Field(
         description="Projects of work sold without offer, e.g. maintenance."
     )
+    attributes: dict[str, str] = Field(
+        description="Attribute by attribute group, like the input."
+    )
 
 
 def deal_out(deal, request):
@@ -159,6 +162,12 @@ def deal_out(deal, request):
         "related_projects": [
             project_summary(project, request) for project in deal.related_projects.all()
         ],
+        "attributes": {
+            attribute.group.title: attribute.title
+            for attribute in sorted(
+                deal.attributes.all(), key=lambda a: (a.group.position, a.group.id)
+            )
+        },
     }
 
 
@@ -172,6 +181,7 @@ def with_related(deals):
         "contributions__user",
         "related_offers__project",
         "related_projects__customer",
+        "attributes__group",
     )
 
 
