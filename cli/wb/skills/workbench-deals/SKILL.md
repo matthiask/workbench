@@ -145,7 +145,8 @@ what it's made from, so nothing is counted twice.
 Deal values are gross margin: an offer's services without their third party
 costs, after the discount (spread over the services in proportion). Split
 them by value type using the services' `service_type` (`wb offers show
-<offer> --json`). Propose a mapping from service types to `wb deals
+<offer> --json`), or their `effort_type` when the rate deviates from the
+service type's and `service_type` is empty. Propose a mapping from service types to `wb deals
 value-types` once, e.g. programming services to programming and project
 management to the value type of the work it manages, let the user correct
 it, then use it for the whole session. Services which fit no value type are
@@ -203,9 +204,10 @@ The value is the project's planned invoicing for the period (`wb
 projected-invoices search --project <id> --period <period>`), which is
 already a conservative estimate; without any, what was invoiced in the
 previous period, rounded down. Don't correct
-it upwards later unless the difference is large. Use the services of the
-project's offers or service groups, else its logged hours (`wb hours
-search --project <id>`), for the split by value type. Mandates sold before
+it upwards later unless the difference is large. Split it by value type
+like the project's work: `wb services search --project <id> --json`, the
+`effort_type` of each service weighted with its `logged_hours` times
+`effort_rate` (the offered `service_hours` for work not logged yet). Mandates sold before
 the period starts are open deals with high probability and the period's
 start as decision date; accept them when the period starts, with that date.
 
