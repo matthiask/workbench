@@ -177,11 +177,10 @@ same day):
     wb deals offers add <deal_id> <offer> --dry-run
 
 Accepted deals take accepted offers only, so close the deal before linking.
-The closing date is the offer's, so the deal lands in the same month as the
-offer did, except for mandates and maintenance for a period (a year, a
-quarter, "… 2027"): their deals are closed on the start of that period,
-even when the offer was accepted earlier, and open ones expect the decision
-then. Follow-up orders are mostly direct requests without competition;
+The closing date is about when the work can start: usually the offer's
+closing date, but mandates and maintenance for a period (a year, a quarter,
+"… 2027") are closed on the start of that period, even when the offer was
+accepted earlier, and open ones expect the decision then. Follow-up orders are mostly direct requests without competition;
 ask when unsure.
 
 ### Maintenance without deal
