@@ -117,6 +117,28 @@ def show_deal(deal_id, as_json):
     echo_json(data) if as_json else _echo_deal(data)
 
 
+@deals.command("delete")
+@click.argument("deal_id")
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def delete_deal(deal_id, dry_run, as_json):
+    """Delete a deal, by ID or code, e.g. a duplicate
+
+    Deals which have been lost are declined instead (`wb deals close`), so
+    that the reports keep them. Linked offers and projects stay."""
+    data = request(
+        "DELETE", f"deals/{deal_id}/", params={"dry_run": format_bool(dry_run)}
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_deal(data)
+    console.print()
+    console.print(
+        "Dry run, nothing has been deleted." if dry_run else f"Deleted {data['code']}."
+    )
+
+
 def _key_values(values, option):
     """Parse ``KEY=VALUE`` options into a dict"""
     result = {}

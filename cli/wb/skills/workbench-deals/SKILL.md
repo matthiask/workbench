@@ -274,6 +274,10 @@ or declines its related offers which haven't been accepted yet.
 
 ## Rules
 
+- Deleting deals (`wb deals delete <deal> --dry-run`) is only for duplicates
+  and mistakes, and only after the user confirmed each one: deals which were
+  lost are declined, so that the reports keep them.
+
 - Run every change with `--dry-run` first, show the user what changes and
   only run it without `--dry-run` after their explicit approval.
 - Never close, decline or reopen deals on your own, and never invent values,

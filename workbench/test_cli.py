@@ -1862,6 +1862,17 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Phase 1", result.output)
 
+    def test_deals_delete(self):
+        deal = factories.DealFactory.create(title="Duplicate")
+        result = self.wb("deals", "delete", deal.code, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        self.assertTrue(Deal.objects.filter(pk=deal.pk).exists())
+        result = self.wb("deals", "delete", deal.code)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted {deal.code}.", result.output)
+        self.assertFalse(Deal.objects.filter(pk=deal.pk).exists())
+
     def test_show_deals(self):
         """Projects and offers show their deals"""
         offer = factories.OfferFactory.create(title="Phase 1")

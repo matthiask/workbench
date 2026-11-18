@@ -2,9 +2,11 @@ import datetime as dt
 import html
 import re
 from decimal import Decimal
+from itertools import islice
 from typing import Literal
 
 from django.db import transaction
+from django.db.models import ProtectedError
 from django.db.models.functions import Coalesce
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -558,6 +560,39 @@ def deal_detail(request, deal_id: str):
         by_id_or_code(with_related(Deal.objects.all()), deal_id),
         request,
     )
+
+
+@router.delete("/deals/{deal_id}/", response=DealOut)
+def deal_delete(request, deal_id: str, *, dry_run: DryRun = False):
+    """Delete a deal like in the web interface, e.g. a duplicate; deals which
+    have been lost are declined instead, so that the reports keep them
+
+    Linked offers and projects stay, only their link goes away. Returns the
+    deleted deal."""
+    deal = by_id_or_code(with_related(Deal.objects.all()), deal_id)
+    result = deal_out(deal, request)
+    with transaction.atomic():
+        try:
+            deal.delete()
+        except ProtectedError as exc:
+            raise ValidationError([
+                {
+                    "loc": ["path", "deal_id"],
+                    "msg": _(
+                        "Cannot delete '%(object)s'"
+                        " because of related objects (%(related)s)."
+                    )
+                    % {
+                        "object": deal,
+                        "related": ", ".join(
+                            str(o) for o in islice(exc.protected_objects, 10)
+                        ),
+                    },
+                }
+            ]) from exc
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
 
 
 class DealIn(InputSchema):

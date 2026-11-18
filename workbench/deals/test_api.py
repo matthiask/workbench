@@ -114,6 +114,25 @@ class DealsAPITest(TestCase):
         response = self.client.post("/api/deals/", {}, content_type="application/json")
         self.assertEqual(response.status_code, 403)
 
+    def test_delete(self):
+        """Deals are deleted like in the web interface, their offers stay"""
+        deal = factories.DealFactory.create(status=Deal.ACCEPTED)
+        offer = factories.OfferFactory.create(status=Offer.ACCEPTED)
+        deal.related_offers.add(offer)
+        self.client.force_login(deal.owned_by)
+
+        response = self.client.delete(f"/api/deals/{deal.code}/?dry_run=true")
+        self.assertEqual(response.json()["related_offers"][0]["id"], offer.pk)
+        self.assertTrue(Deal.objects.filter(pk=deal.pk).exists())
+
+        response = self.client.delete(f"/api/deals/{deal.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(Deal.objects.filter(pk=deal.pk).exists())
+        self.assertTrue(Offer.objects.filter(pk=offer.pk).exists())
+
+        response = self.client.delete(f"/api/deals/{deal.pk}/")
+        self.assertEqual(response.status_code, 404)
+
     def test_create(self):
         """Deals are created like in the web interface"""
         user = factories.UserFactory.create(_short_name="ab")
