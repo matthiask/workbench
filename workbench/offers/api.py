@@ -258,7 +258,7 @@ def _project_offers(project, request):
     return [
         offer_out(offer, list(offer.services.all()), request)
         for offer in project.offers.select_related(
-            "project", "owned_by"
+            "project__customer", "owned_by"
         ).prefetch_related("services", "headings")
     ]
 
@@ -307,7 +307,7 @@ def offer_list_search(request, filters: Query[OfferFilter]):
     """Search offers, newest first; the period filters the offer date"""
     offers = (
         Offer.objects
-        .select_related("project", "owned_by")
+        .select_related("project__customer", "owned_by")
         .prefetch_related("services", "headings")
         .order_by("-pk")
     )
@@ -341,7 +341,9 @@ def offer_list_search(request, filters: Query[OfferFilter]):
 @router.get("/offers/{offer_id}/", response=OfferOut)
 def offer_detail(request, offer_id: str):
     """An offer by its ID or code (2026-0042-o01)"""
-    offer = by_id_or_code(Offer.objects.select_related("project", "owned_by"), offer_id)
+    offer = by_id_or_code(
+        Offer.objects.select_related("project__customer", "owned_by"), offer_id
+    )
     return offer_out(offer, list(offer.services.all()), request)
 
 
@@ -831,7 +833,9 @@ def offer_heading_create(
     """Add a heading to an offer (by ID or code) in preparation or a service
     group, in front of one of its services or at the end"""
     offer = _heading_offer(
-        by_id_or_code(Offer.objects.select_related("project", "owned_by"), offer_id)
+        by_id_or_code(
+            Offer.objects.select_related("project__customer", "owned_by"), offer_id
+        )
     )
     before = _heading_before(offer, data.before)
     heading = OfferHeading(offer=offer, title=data.title, description=data.description)

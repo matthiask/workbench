@@ -288,7 +288,9 @@ def outreach(date_range):
         .annotate(hours_sum=Sum("hours"))
     ):
         hours_by_project[row["rendered_by"]][row["service__project"]] = row["hours_sum"]
-    projects = Project.objects.in_bulk(chain.from_iterable(hours_by_project.values()))
+    projects = Project.objects.select_related("customer").in_bulk(
+        chain.from_iterable(hours_by_project.values())
+    )
     deals = {row["user"]: row["deals"] for row in accepted_deals(date_range)["by_user"]}
     users = User.objects.in_bulk(hours_by_project.keys())
     rows = []

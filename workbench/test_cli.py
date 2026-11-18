@@ -762,6 +762,8 @@ planned_work:
         result = self.wb("hours", "search", "--csv")
         self.assertTrue(result.output.startswith("id,url,rendered_on,"), result.output)
         self.assertIn("project.code", result.output.splitlines()[0])
+        self.assertIn("project.customer.name", result.output.splitlines()[0])
+        self.assertIn(project.customer.name, result.output)
         self.assertIn("Wireframes", result.output)
         result = self.wb("hours", "search", "--period", "last-year")
         self.assertNotIn("Wireframes", result.output)

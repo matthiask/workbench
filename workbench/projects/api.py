@@ -70,11 +70,19 @@ from workbench.tools.formats import Z1, Z2
 router = Router(tags=["projects"])
 
 
+class ProjectCustomer(Schema):
+    id: int
+    name: str
+
+
 class ProjectSummary(Schema):
     id: int
     code: str
     title: str
     url: str
+    customer: ProjectCustomer = Field(
+        description="Part of the project's label; details are in the organization."
+    )
 
 
 def project_summary(project, request):
@@ -83,6 +91,7 @@ def project_summary(project, request):
         "code": project.code,
         "title": project.title,
         "url": request.build_absolute_uri(project.get_absolute_url()),
+        "customer": {"id": project.customer.id, "name": project.customer.name},
     }
 
 
@@ -720,7 +729,7 @@ def _sum_of(model, field, **filters):
 def _services():
     return (
         Service.objects
-        .select_related("project", "offer__project")
+        .select_related("project__customer", "offer__project")
         .annotate(
             logged_hours=_sum_of(LoggedHours, "hours"),
             invoiced_hours=_sum_of(LoggedHours, "hours", invoice_service__isnull=False),

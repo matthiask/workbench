@@ -160,11 +160,11 @@ def service_hours_in_open_orders():
 def projected_gross_margin(projects=None):
     if projects is None:
         projects = Project.objects.open()
-    open_projects = projects.select_related("owned_by")
+    open_projects = projects.select_related("owned_by", "customer")
 
     projected = ProjectedInvoice.objects.filter(
         project__in=open_projects
-    ).select_related("project__owned_by")
+    ).select_related("project__owned_by", "project__customer")
 
     projects = defaultdict(lambda: {"projected": []})
     for pi in projected:

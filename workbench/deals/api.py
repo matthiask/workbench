@@ -171,7 +171,7 @@ def with_related(deals):
         "contributors",
         "contributions__user",
         "related_offers__project",
-        "related_projects",
+        "related_projects__customer",
     )
 
 

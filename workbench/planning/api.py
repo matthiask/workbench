@@ -722,11 +722,11 @@ def planning_export(request, filters: Query[PlanningExportFilter]):
     project or campaign. The capacity (hours not planned yet, less absences
     and holidays) is reported for users and teams."""
     work = PlannedWork.objects.select_related(
-        "project", "offer__project", "user", "service_type", "milestone"
+        "project__customer", "offer__project", "user", "service_type", "milestone"
     )
-    milestones = Milestone.objects.select_related("project")
+    milestones = Milestone.objects.select_related("project__customer")
     external_work = ExternalWork.objects.select_related(
-        "project", "provided_by", "service_type", "milestone"
+        "project__customer", "provided_by", "service_type", "milestone"
     )
     if filters.project is not None:
         work = work.filter(project=filters.project)

@@ -57,7 +57,7 @@ class OpenItemsForm(Form):
             Invoice.objects
             .outstanding(on=self.cleaned_data["cutoff_date"])
             .order_by("invoiced_on", "pk")
-            .select_related("owned_by", "customer", "project")
+            .select_related("owned_by", "customer", "project__customer")
         )
 
         weeks = defaultdict(lambda: {"total_excl_tax": Z2, "total": Z2})
@@ -519,7 +519,7 @@ class ProjectBudgetStatisticsForm(Form):
         else:
             queryset = queryset.exclude(type=Project.INTERNAL)
         queryset = self.apply_owned_by(queryset)
-        return queryset.select_related("owned_by")
+        return queryset.select_related("owned_by", "customer")
 
     def statistics(self):
         """The statistics, recently closed projects first when looking at
@@ -573,7 +573,7 @@ class PlayingBankForm(Form):
                 Q(closed_on__isnull=True)
                 | Q(closed_on__gte=dt.date.today().replace(month=1, day=1))
             )
-        return queryset.select_related("owned_by")
+        return queryset.select_related("owned_by", "customer")
 
 
 @filter_form(PlayingBankForm)

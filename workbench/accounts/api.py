@@ -157,16 +157,17 @@ def overview(request):
         ],
         "offers": [
             offer_out(offer, list(offer.services.all()), request)
-            for offer in Offer.objects.maybe_actionable(user=user).prefetch_related(
-                "services", "headings"
-            )
+            for offer in Offer.objects
+            .maybe_actionable(user=user)
+            .select_related("project__customer")
+            .prefetch_related("services", "headings")
         ]
         if features[FEATURES.CONTROLLING]
         else None,
         "invoices": [
             invoice_out(invoice, request)
             for invoice in Invoice.objects.maybe_actionable(user=user).select_related(
-                "customer"
+                "customer", "project__customer"
             )
         ]
         if features[FEATURES.CONTROLLING]

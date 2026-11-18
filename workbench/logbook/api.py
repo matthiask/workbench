@@ -47,6 +47,7 @@ class LoggedHoursOut(Schema):
     project: ProjectSummary
     service_id: int
     service: str
+    offer_id: int | None = Field(description="The offer of the service, if any.")
     archived_at: dt.datetime | None
     invoice: InvoiceSummary | None = Field(
         description="The invoice which contains the entry, if any."
@@ -110,6 +111,7 @@ def _entry_out(entry, request):
         "project": project_summary(entry.service.project, request),
         "service_id": entry.service_id,
         "service": entry.service.title,
+        "offer_id": entry.service.offer_id,
         "archived_at": entry.archived_at,
         "invoice": {
             "id": invoice.id,
@@ -130,7 +132,9 @@ def logged_hours_list(request, filters: Query[LoggedHoursListFilter]):
         hours = hours.filter(hours_for_invoicing__isnull=False)
     return Serialized(
         hours.select_related(
-            "rendered_by", "service__project", "invoice_service__invoice__project"
+            "rendered_by",
+            "service__project__customer",
+            "invoice_service__invoice__project",
         ).order_by("-rendered_on", "-created_at", "-pk"),
         lambda row: (
             _entry_out(row, request)
@@ -154,6 +158,7 @@ class LoggedCostOut(Schema):
     project: ProjectSummary
     service_id: int
     service: str
+    offer_id: int | None = Field(description="The offer of the service, if any.")
     archived_at: dt.datetime | None
     invoice: InvoiceSummary | None = Field(
         description="The invoice which contains the entry, if any."
@@ -186,7 +191,9 @@ def logged_cost_list(request, filters: Query[LoggedCostFilter]):
     )
     return Serialized(
         costs.select_related(
-            "rendered_by", "service__project", "invoice_service__invoice__project"
+            "rendered_by",
+            "service__project__customer",
+            "invoice_service__invoice__project",
         ).order_by("-rendered_on", "-created_at", "-pk"),
         lambda row: (
             _entry_out(row, request)

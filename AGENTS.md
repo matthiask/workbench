@@ -148,7 +148,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `UsersFilter`; cutoff dates are called `date`. Short names identify users,
   case-insensitively; unknown ones are rejected (`user_by_short_name()`).
 - Organizations and projects are nested with ID, name or code and URL
-  (`organization_out()`, `project_summary()`).
+  (`organization_out()`, `project_summary()`); nested projects include their
+  customer's ID and name as part of their label (attributes stay in `show`). Querysets serializing projects
+  `select_related("project__customer")` (`test_api_queries.py` checks).
 - Messages added during API requests are dropped
   (`api_messages_middleware`).
 - On purpose: hours aren't logged through the API (the logbook form's

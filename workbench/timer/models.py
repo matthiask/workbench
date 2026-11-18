@@ -190,6 +190,7 @@ class TimestampQuerySet(models.QuerySet):
                 "logged_hours__service__project__owned_by",
                 "logged_break",
                 "project__owned_by",
+                "project__customer",
                 "service",
             )
         )

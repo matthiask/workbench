@@ -14,7 +14,10 @@ class LogbookAPITest(TestCase):
     def test_hours(self):
         """Logged hours can be filtered, the total includes all matches"""
         user = factories.UserFactory.create(_short_name="ab")
-        service = factories.ServiceFactory.create(title="Design")
+        offer = factories.OfferFactory.create()
+        service = factories.ServiceFactory.create(
+            title="Design", project=offer.project, offer=offer
+        )
         mine = factories.LoggedHoursFactory.create(
             service=service,
             rendered_by=user,
@@ -36,7 +39,13 @@ class LogbookAPITest(TestCase):
         self.assertEqual(data["count"], 2)
         self.assertEqual([row["id"] for row in data["items"]], [mine.pk, other.pk])
         self.assertEqual(data["items"][0]["project"]["code"], service.project.code)
+        self.assertEqual(
+            data["items"][0]["project"]["customer"]["name"],
+            service.project.customer.name,
+        )
         self.assertEqual(data["items"][0]["service"], "Design")
+        self.assertEqual(data["items"][0]["offer_id"], offer.pk)
+        self.assertIsNone(data["items"][1]["offer_id"])
         self.assertEqual(data["items"][0]["rendered_by"], "ab")
 
         # Pages of matches, the total and the count include all of them

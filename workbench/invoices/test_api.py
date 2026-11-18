@@ -161,6 +161,10 @@ class InvoicesAPITest(TestCase):
                         "code": project.code,
                         "title": project.title,
                         "url": f"http://testserver{project.get_absolute_url()}",
+                        "customer": {
+                            "id": project.customer.pk,
+                            "name": project.customer.name,
+                        },
                     },
                     "invoiced_on": in_days(30).isoformat(),
                     "gross_margin": "1000.00",

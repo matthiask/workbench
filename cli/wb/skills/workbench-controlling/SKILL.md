@@ -29,6 +29,16 @@ Use `--json` for exact numbers, the tables for a quick look:
 Periods are years (`2026`), months (`2026-09`), quarters (`2026-Q3`) or
 relative (`last-month`, `this-quarter`).
 
+For details behind a figure, filter logged hours and costs on the server
+(`--customer`, `--project`, `--offer`, `--rendered-by`, `--period`). Write
+large results to a file and sum them with a tool rather than reading them:
+
+    wb hours search --rendered-by <short name> --period 2026 --limit 10000 --csv > <scratchpad>/hours.csv
+
+Each row has the project with its customer (`project.customer.name`), the
+service and its offer (`offer_id`); the total is in the table footer or in
+`total_hours` of `--json`.
+
 For overdue invoices, look at their notes: customers' payment promises or
 disputes change how an open invoice should be described.
 

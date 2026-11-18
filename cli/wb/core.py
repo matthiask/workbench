@@ -973,7 +973,13 @@ def echo_period(data):
     help="Use another installation for this command, any unique part of its URL.",
 )
 def cli():
-    pass
+    """Workbench on the command line
+
+    Lists are tables; --csv (one row per result, nested fields like
+    project.customer.name as columns) and --json are for scripts and agents.
+    Filter on the server (--customer, --project, --period, ...) instead of
+    fetching everything, and write large results to a file to analyze them
+    with a tool instead of reading them whole."""
 
 
 def text_or_stdin(value):

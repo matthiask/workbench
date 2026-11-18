@@ -208,7 +208,7 @@ def invoice_list(request, filters: Query[InvoiceFilter]):
     ``open`` are invoices in preparation or sent, ``overdue`` invoices sent and
     due for more than 15 days (as for reminders)."""
     invoices = Invoice.objects.select_related(
-        "project", "recurring_invoice", "customer", "owned_by"
+        "project__customer", "recurring_invoice", "customer", "owned_by"
     )
     if filters.project:
         invoices = invoices.filter(project=filters.project)
@@ -250,7 +250,7 @@ class Reminders(Schema):
 
 def _overdue():
     return Invoice.objects.overdue().select_related(
-        "customer", "contact__organization", "owned_by", "project"
+        "customer", "contact__organization", "owned_by", "project__customer"
     )
 
 
@@ -785,7 +785,7 @@ class ProjectedInvoiceFilter(DateRangeFilter):
 def projected_invoice_list_search(request, filters: Query[ProjectedInvoiceFilter]):
     """Planned invoicing (gross margin, third party costs are not included),
     oldest first; the period filters the planned invoice date"""
-    projected = ProjectedInvoice.objects.select_related("project")
+    projected = ProjectedInvoice.objects.select_related("project__customer")
     if filters.project:
         projected = projected.filter(project=filters.project)
     if filters.customer:
