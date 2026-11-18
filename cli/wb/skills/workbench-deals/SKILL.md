@@ -241,8 +241,13 @@ significant, then treat them like maintenance.
 
 Offers sent long ago whose validity has expired belong to their owners for
 declining, not into the funnel: list them separately. Several offers of a
-project sent together (areas, quarters of a mandate) make one deal. For the
-others, open deals with the offer linked, so the funnel sees them: probability and
+project sent together (areas, quarters of a mandate) make one deal. Compare the
+others with all deals of the customer by title and amount, the open ones and
+the accepted ones of the last year, deals without offers included: the
+owner may have created the deal before the offer. An open deal takes the
+offer; an accepted deal means the offer was won, its owner accepts it and
+then it's linked. Only the rest get new
+open deals with the offer linked, so the funnel sees them: probability and
 decision date from the user, or normal and the offer's `valid_until` as a
 proposal. Closing the deal later accepts or declines the offer; an offer
 accepted on its own leaves its deal open, so look for open deals whose
