@@ -153,7 +153,8 @@ it, then use it for the whole session. Consulting, concepts and project
 management usually follow the project: web consulting when it includes
 programming, communication consulting otherwise. Flat rate services and
 services without effort type are assigned by their titles (a "Paketpreis
-Website" is programming). Services which fit no value type are the user's
+Website" is programming and web consulting, half each unless the hours say
+otherwise). Services which fit no value type are the user's
 call; never drop them silently.
 
 ### Attributes and contributions
