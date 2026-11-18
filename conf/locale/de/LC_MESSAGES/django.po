@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 13:00+0100\n"
+"POT-Creation-Date: 2026-11-18 13:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2639,6 +2639,10 @@ msgstr "Optional, aber nützlich um Felder unten rasch zu füllen."
 #: workbench/invoices/forms.py workbench/invoices/models.py
 msgid "Cannot modify a service bound to an invoice which is not in preparation anymore."
 msgstr "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht mehr bearbeiten."
+
+#: workbench/invoices/forms.py
+msgid "All ways of sending"
+msgstr "Alle Versandarten"
 
 #: workbench/invoices/forms.py workbench/invoices/sending.py
 msgid "No email address."

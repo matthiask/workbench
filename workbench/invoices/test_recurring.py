@@ -319,6 +319,20 @@ class RecurringTest(TestCase):
         code(f"owned_by={user.id}")
         code("owned_by=-1")  # mine
         code("owned_by=0")  # only inactive
+        code("new_invoices=send")
+
+    def test_list_new_invoices(self):
+        """The list filters by how new invoices are created and sent"""
+        prepare = factories.RecurringInvoiceFactory.create(title="Prepare")
+        send = factories.RecurringInvoiceFactory.create(
+            title="Send", new_invoices=RecurringInvoice.SEND
+        )
+        self.client.force_login(prepare.owned_by)
+
+        response = self.client.get("/recurring-invoices/?new_invoices=send")
+        self.assertEqual(list(response.context["object_list"]), [send])
+        response = self.client.get("/recurring-invoices/?new_invoices=prepare")
+        self.assertEqual(list(response.context["object_list"]), [prepare])
 
     def test_pretty_status(self):
         """Recurring invoice status badge"""

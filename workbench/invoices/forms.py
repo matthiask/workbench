@@ -1490,6 +1490,15 @@ class RecurringInvoiceSearchForm(Form):
         widget=forms.Select(attrs={"class": "form-select"}),
         label="",
     )
+    new_invoices = forms.ChoiceField(
+        choices=[
+            ("", _("All ways of sending")),
+            *RecurringInvoice.NEW_INVOICES_CHOICES,
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1504,6 +1513,8 @@ class RecurringInvoiceSearchForm(Form):
             queryset = queryset.open()
         elif data.get("s") == "closed":
             queryset = queryset.closed()
+        if data.get("new_invoices"):
+            queryset = queryset.filter(new_invoices=data["new_invoices"])
         queryset = self.apply_renamed(queryset, "org", "customer")
         queryset = self.apply_owned_by(queryset)
         return queryset.select_related("customer", "contact__organization", "owned_by")
