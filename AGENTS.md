@@ -231,9 +231,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   contact. Central email addresses and phone numbers of organizations
   aren't copied to their people. Group titles are unique (case-insensitive).
 - Offers are only linked to open deals and only while not closed; closing a
-  deal settles its offers. Exception: accepted offers can be linked to
-  accepted deals later (nothing changes, but the accepted deals report
-  doesn't count them twice). Unlinking needs an open deal. The deal owner
+  deal settles its offers. Exception: accepted deals take all offers which
+  haven't been declined (nothing changes, the offer keeps its status; e.g.
+  the detailed offer of the contract the deal sums up, and the accepted
+  deals report doesn't count them twice). Unlinking needs an open deal. The deal owner
   always contributes (`DealForm.clean()`).
 - Accepted deals also count accepted offers without deal (deals come first,
   offers later in the funnel), in their own column without value type:

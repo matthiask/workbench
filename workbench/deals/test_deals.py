@@ -995,9 +995,10 @@ class DealsTest(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(deal.related_offers.get(), other)
 
-    def test_link_accepted_offers_to_accepted_deals(self):
-        """Accepted offers can be linked to accepted deals later, e.g. so
-        that the accepted deals report doesn't count them twice"""
+    def test_link_offers_to_accepted_deals(self):
+        """Offers which haven't been declined can be linked to accepted deals
+        later, e.g. so that the accepted deals report doesn't count them
+        twice, or the detailed offer of a contract the deal sums up"""
         deal = factories.DealFactory.create(
             status=Deal.ACCEPTED, closed_on=in_days(-10)
         )
@@ -1009,13 +1010,25 @@ class DealsTest(TestCase):
         offered = factories.OfferFactory.create(
             project=offer.project, status=Offer.OFFERED
         )
+        declined = factories.OfferFactory.create(
+            project=offer.project, status=Offer.DECLINED
+        )
         self.client.force_login(deal.owned_by)
 
         response = self.client.get(deal.urls["detail"])
         self.assertContains(response, deal.urls["add_offer"])
 
+        response = self.client.post(
+            deal.urls["add_offer"], {"modal-offer": declined.pk}
+        )
+        self.assertContains(response, "declined and discarded offers can")
+
+        # Sent offers stay sent, the deal stays accepted
         response = self.client.post(deal.urls["add_offer"], {"modal-offer": offered.pk})
-        self.assertContains(response, "only accepted offers can")
+        self.assertEqual(response.status_code, 201)
+        offered.refresh_from_db()
+        self.assertEqual(offered.status, Offer.OFFERED)
+        deal.related_offers.remove(offered)
 
         response = self.client.post(deal.urls["add_offer"], {"modal-offer": offer.pk})
         self.assertEqual(response.status_code, 201)

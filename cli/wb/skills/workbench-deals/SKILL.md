@@ -63,7 +63,9 @@ create`. Offers are given by ID or code (`wb deals show` prints codes):
     wb deals offers remove <deal_id> <offer> ... --dry-run
 
 - Open deals take offers in preparation, service groups and offered offers;
-  accepted deals take accepted offers (nothing changes, see below). Only
+  accepted deals take all offers which haven't been declined, e.g. the
+  detailed offer of the contract the deal sums up (nothing changes, the
+  offer keeps its status, see below). Only
   open deals can be unlinked from. Linking an offer twice or removing one
   which isn't linked is an error.
 - Offers of another customer's projects (agencies and their clients,
@@ -185,7 +187,7 @@ same day):
     wb deals close <deal_id> accepted --closing-type "<type>" --closed-on <offer closed_on> --keep-offers --dry-run
     wb deals offers add <deal_id> <offer> --dry-run
 
-Accepted deals take accepted offers only, so close the deal before linking.
+Accepted deals take accepted offers, so close the deal before linking.
 The closing date is about when the work can start: usually the offer's
 closing date, but mandates and maintenance for a period (a year, a quarter,
 "… 2027") are closed on the start of that period, even when the offer was
@@ -244,9 +246,9 @@ declining, not into the funnel: list them separately. Several offers of a
 project sent together (areas, quarters of a mandate) make one deal. Compare the
 others with all deals of the customer by title and amount, the open ones and
 the accepted ones of the last year, deals without offers included: the
-owner may have created the deal before the offer. An open deal takes the
-offer; an accepted deal means the offer was won, its owner accepts it and
-then it's linked. Only the rest get new
+owner may have created the deal before the offer. An open or accepted deal takes
+the offer (an accepted one keeps the offer's status: the deal sums up the
+contract, the offer details it). Only the rest get new
 open deals with the offer linked, so the funnel sees them: probability and
 decision date from the user, or normal and the offer's `valid_until` as a
 proposal. Closing the deal later accepts or declines the offer; an offer

@@ -578,8 +578,9 @@ LINKABLE_OFFER_STATUSES = {Offer.IN_PREPARATION, Offer.SERVICE_GROUP, Offer.OFFE
 class RelatedOfferForm(Form):
     """Link an offer to an open deal, or unlink it with ``remove=True``
 
-    Accepted offers may also be linked to accepted deals, nothing changes
-    but the accepted deals report doesn't count them twice. Offers of other
+    Accepted deals also take offers which haven't been declined, e.g. the
+    detailed offer of a contract the deal sums up; nothing changes, but the
+    accepted deals report doesn't count them twice. Offers of other
     customers' projects are a warning, e.g. for agencies and their clients
     or several departments of the same city."""
 
@@ -620,12 +621,12 @@ class RelatedOfferForm(Form):
                 _("The offer %(offer)s is already linked to this deal.")
                 % {"offer": offer.code},
             )
-        elif late and offer.status != Offer.ACCEPTED:
+        elif late and offer.status in {Offer.DECLINED, Offer.DISCARDED}:
             self.add_error(
                 "offer",
                 _(
-                    "The offer %(offer)s is %(status)s, only accepted offers can"
-                    " be linked to accepted deals."
+                    "The offer %(offer)s is %(status)s, declined and discarded"
+                    " offers can't be linked to accepted deals."
                 )
                 % {"offer": offer.code, "status": offer.get_status_display()},
             )

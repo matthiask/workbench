@@ -33,9 +33,11 @@ page lists open deals you contribute to.
 offer of another customer's project needs a confirmation (e.g. an
 agency and its client). The project shows the deals next to its offers.
 
-Accepted offers can also be linked to an accepted deal later; nothing
-changes, but the accepted deals report counts accepted offers without
-deal on their own, so a missing link counts the work twice.
+Offers can also be linked to an accepted deal later, unless they have
+been declined, e.g. the detailed offer of a contract the deal sums up;
+nothing changes, the offer keeps its status. The accepted deals report
+counts accepted offers without deal on their own, so a missing link
+counts the work twice.
 
 "Link project" links projects to open or accepted deals, for work sold
 without offer such as a maintenance contract or a mandate. The accepted

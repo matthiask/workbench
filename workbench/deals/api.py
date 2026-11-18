@@ -1077,12 +1077,12 @@ def deal_offers_add(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Link offers to an open deal like in the web interface, or accepted
-    offers to an accepted deal
+    """Link offers to an open or accepted deal like in the web interface
 
     Only offers which are in preparation, service groups or offered can be
-    linked to open deals. Accepted offers can be linked to accepted deals
-    later, nothing changes but the accepted deals report doesn't count them
+    linked to open deals. Accepted deals take all offers which haven't been
+    declined, e.g. the detailed offer of the contract the deal sums up;
+    nothing changes but the accepted deals report doesn't count them
     twice. Offers of other customers' projects are a warning in the web
     interface (``other-customer``, e.g. of the end client when the deal is
     with an agency). Nothing is saved if anything is invalid or with

@@ -648,7 +648,8 @@ class DealsAPITest(TestCase):
             [(["offers", 0], f"The offer {other.code} isn't linked to this deal.")],
         )
 
-        # Only open deals, except for accepted offers and deals
+        # Only open deals, except for accepted deals: they take offers which
+        # haven't been declined
         deal.status = Deal.ACCEPTED
         deal.save()
         response = post(url, {"offers": [declined.pk]})
@@ -658,8 +659,8 @@ class DealsAPITest(TestCase):
                 (
                     ["offers", 0],
                     (
-                        f"The offer {declined.code} is Declined, only accepted offers"
-                        " can be linked to accepted deals."
+                        f"The offer {declined.code} is Declined, declined and"
+                        " discarded offers can't be linked to accepted deals."
                     ),
                 )
             ],

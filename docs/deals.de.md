@@ -39,10 +39,12 @@ mit einem offenen Geschäft; eine Offerte eines Projekts einer anderen
 Kundschaft braucht eine Bestätigung (z.B. eine Agentur und ihre
 Kundschaft). Das Projekt zeigt die Geschäfte bei seinen Offerten.
 
-Akzeptierte Offerten lassen sich auch nachträglich mit einem
-akzeptierten Geschäft verbinden; dabei ändert sich nichts, aber die
-gewonnenen Geschäfte zählen akzeptierte Offerten ohne Geschäft separat
-dazu, eine fehlende Verbindung zählt die Arbeit also doppelt.
+Offerten lassen sich auch nachträglich mit einem akzeptierten Geschäft
+verbinden, ausser sie wurden abgelehnt, etwa die detaillierte Offerte zu
+einem Auftrag, den das Geschäft zusammenfasst; dabei ändert sich nichts,
+die Offerte behält ihren Status. Die gewonnenen Geschäfte zählen
+akzeptierte Offerten ohne Geschäft separat dazu, eine fehlende Verbindung
+zählt die Arbeit also doppelt.
 
 «Projekt verbinden» verbindet Projekte mit offenen oder akzeptierten
 Geschäften, für Arbeit, die ohne Offerte verkauft wird, etwa ein

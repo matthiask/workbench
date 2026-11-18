@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 17:54+0100\n"
+"POT-Creation-Date: 2026-11-18 13:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1771,6 +1771,11 @@ msgstr "Zahlungseingänge zuweisen"
 msgid "Export debtors"
 msgstr "Debitoren exportieren"
 
+#: workbench/deals/api.py workbench/projects/api.py workbench/tools/models.py
+#, python-format
+msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
+msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
+
 #: workbench/deals/api.py
 #, python-format
 msgid "Unknown value type. Choices: %s"
@@ -1937,8 +1942,8 @@ msgstr "Die Offerte %(offer)s ist bereits mit diesem Geschäft verbunden."
 
 #: workbench/deals/forms.py
 #, python-format
-msgid "The offer %(offer)s is %(status)s, only accepted offers can be linked to accepted deals."
-msgstr "Die Offerte %(offer)s hat den Status «%(status)s», mit akzeptierten Geschäften lassen sich nur akzeptierte Offerten verbinden."
+msgid "The offer %(offer)s is %(status)s, declined and discarded offers can't be linked to accepted deals."
+msgstr "Die Offerte %(offer)s hat den Status «%(status)s», abgelehnte und verworfene Offerten lassen sich nicht mit akzeptierten Geschäften verbinden."
 
 #: workbench/deals/forms.py
 #, python-format
@@ -3536,7 +3541,8 @@ msgid "The offer has no service with this ID."
 msgstr "Die Offerte hat keine Leistung mit dieser ID."
 
 #: workbench/offers/apps.py workbench/offers/models.py
-#: workbench/templates/projects/object_list.html workbench/tools/pdf.py
+#: workbench/templates/projects/object_list.html
+#: workbench/templates/reporting/accepted_deals.html workbench/tools/pdf.py
 msgid "offers"
 msgstr "Offerten"
 
@@ -4062,11 +4068,6 @@ msgstr "Auf dieser Leistung wurden bereits Stunden oder Kosten erfasst, sie kann
 msgid "This service has been invoiced already, it cannot be deleted."
 msgstr "Diese Leistung wurde bereits verrechnet, sie kann nicht gelöscht werden."
 
-#: workbench/projects/api.py workbench/tools/models.py
-#, python-format
-msgid "Cannot delete '%(object)s' because of related objects (%(related)s)."
-msgstr "Kann '%(object)s' wegen Abhängigkeiten nicht löschen (%(related)s)."
-
 #: workbench/projects/api.py
 msgid "Expected the IDs of all services of one offer, or of all services without offer of one project, once."
 msgstr "Erwartet werden die IDs aller Leistungen einer Offerte oder aller Leistungen ohne Offerte eines Projekts, jede genau einmal."
@@ -4318,6 +4319,7 @@ msgid "campaign"
 msgstr "Kampagne"
 
 #: workbench/projects/models.py workbench/reporting/views.py
+#: workbench/templates/reporting/accepted_deals.html
 msgid "Maintenance"
 msgstr "Wartung"
 
@@ -4762,7 +4764,6 @@ msgstr "Offerten ohne Geschäft"
 #: workbench/reporting/views.py
 #: workbench/templates/reporting/accepted_deals.html
 #: workbench/templates/reporting/accepted_deals_for_user.html
-
 msgid "Maintenance without deal"
 msgstr "Wartung ohne Geschäft"
 
