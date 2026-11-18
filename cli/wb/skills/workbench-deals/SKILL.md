@@ -149,8 +149,12 @@ them by value type using the services' `service_type` (`wb offers show
 service type's and `service_type` is empty. Propose a mapping from service types to `wb deals
 value-types` once, e.g. programming services to programming and project
 management to the value type of the work it manages, let the user correct
-it, then use it for the whole session. Services which fit no value type are
-the user's call; never drop them silently.
+it, then use it for the whole session. Consulting, concepts and project
+management usually follow the project: web consulting when it includes
+programming, communication consulting otherwise. Flat rate services and
+services without effort type are assigned by their titles (a "Paketpreis
+Website" is programming). Services which fit no value type are the user's
+call; never drop them silently.
 
 ### Attributes and contributions
 
@@ -158,7 +162,8 @@ Required attributes (`wb deals attributes`) come from the customer's earlier
 deals (`wb deals search --customer <id> --status accepted`, same industry;
 the source of follow-up orders is usually existing customers). Ask when the
 customer has no earlier deals. The offer's or project's owner owns the deal;
-ask who else contributed only when the user wants to.
+ask who takes over for owners who left, and who else contributed only when
+the user wants to.
 
 ### Accepted offers without deal
 
@@ -189,7 +194,10 @@ ask when unsure.
     wb projected-invoices search --period <period> --json
 
 The stats find what was invoiced; the planned invoicing also finds what's
-expected. Its projects which are maintenance (`wb projects show <id>
+expected. Before creating a deal, also search the deals by title (`wb deals
+search "Wartung 2026" --status accepted`): earlier deals for the same
+maintenance may be filed under a slightly different customer or link other
+projects of it. Its projects which are maintenance (`wb projects show <id>
 --json`: `type`) and have no accepted or offered offer (`offers`) nor a
 deal (`deals`, linked directly or through an offer) are candidates too,
 before anything is invoiced. Planned invoicing is
@@ -207,9 +215,10 @@ projected-invoices search --project <id> --period <period>`), which is
 already a conservative estimate; without any, what was invoiced in the
 previous period, rounded down. Don't correct
 it upwards later unless the difference is large. Split it by value type
-like the project's work: `wb services search --project <id> --json`, the
-`effort_type` of each service weighted with its `logged_hours` times
-`effort_rate` (the offered `service_hours` for work not logged yet). Maintenance deals are
+by who did the work: the hours logged on the projects (`wb hours search
+--project <id>`) by the `value_type` of each person's specialist field
+(`wb users --json`, `--include-inactive` for people who left); hours of
+people without one (e.g. interns) are left out of the split. Maintenance deals are
 closed on the start of their period (`--closed-on 2026-01-01` for 2026), not
 on the first invoice; mandates sold before the period starts are open deals
 with high probability and the period's start as decision date, accepted
@@ -226,7 +235,10 @@ significant, then treat them like maintenance.
 
     wb offers search --status offered --without-deal --json
 
-Open deals with the offer linked, so the funnel sees them: probability and
+Offers sent long ago whose validity has expired belong to their owners for
+declining, not into the funnel: list them separately. Several offers of a
+project sent together (areas, quarters of a mandate) make one deal. For the
+others, open deals with the offer linked, so the funnel sees them: probability and
 decision date from the user, or normal and the offer's `valid_until` as a
 proposal. Closing the deal later accepts or declines the offer; an offer
 accepted on its own leaves its deal open, so look for open deals whose
