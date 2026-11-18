@@ -1,6 +1,6 @@
 ---
 name: workbench-deals
-description: Keep the Workbench sales pipeline up to date with the `wb` CLI. Use when the user wants to review, update, clean up, close, win or lose deals, update probabilities or expected decision dates, link offers to deals, find accepted offers or maintenance counted twice next to their deal, link projects to deals, or asks about the state of the pipeline or of a deal in Workbench.
+description: Keep the Workbench sales pipeline up to date with the `wb` CLI. Use when the user wants to review, update, clean up, close, win or lose deals, update probabilities or expected decision dates, link offers to deals, find accepted offers or maintenance counted twice next to their deal, link projects to deals, create deals for accepted or offered offers and maintenance without deal (so that their values count by value type and the funnel shows them), or asks about the state of the pipeline or of a deal in Workbench.
 ---
 
 # Keeping the Workbench sales pipeline up to date
@@ -131,7 +131,98 @@ link only after the user confirmed each one. Deals which only existed for
 the statistics are the user's call: ask before declining or deleting
 them.
 
-## 4. Close deals
+## 4. Deals for everything that's going on
+
+The accepted deals report counts offers and maintenance without deal, but
+only in their sum: they have no value type, so the targets per value type
+(e.g. programming) don't see them. The funnel only sees open deals. When the
+user wants the pipeline to show all the work, sold or about to be, create
+the missing deals from what Workbench already knows. Each deal is linked to
+what it's made from, so nothing is counted twice.
+
+### Values by value type
+
+Deal values are gross margin: an offer's services without their third party
+costs, after the discount (spread over the services in proportion). Split
+them by value type using the services' `service_type` (`wb offers show
+<offer> --json`). Propose a mapping from service types to `wb deals
+value-types` once, e.g. programming services to programming and project
+management to the value type of the work it manages, let the user correct
+it, then use it for the whole session. Services which fit no value type are
+the user's call; never drop them silently.
+
+### Attributes and contributions
+
+Required attributes (`wb deals attributes`) come from the customer's earlier
+deals (`wb deals search --customer <id> --status accepted`, same industry;
+the source of follow-up orders is usually existing customers). Ask when the
+customer has no earlier deals. The offer's or project's owner owns the deal;
+ask who else contributed only when the user wants to.
+
+### Accepted offers without deal
+
+    wb offers search --status accepted --without-deal --period <period> --json
+
+First check each offer against the accepted deals as in section 3: an offer
+which belongs to an existing deal gets linked, not a new deal. For the rest,
+one deal per offer (or per project, for offers of a project accepted the
+same day):
+
+    wb deals create --title "<offer title>" --customer <id> --owned-by <owner> \
+      --probability high --decision-expected-on <closed_on> \
+      --value "<type>=<amount>" ... --attribute "<group>=<attribute>" ... \
+      --description "Created from offer <code>" --dry-run
+    wb deals close <deal_id> accepted --closing-type "<type>" --closed-on <offer closed_on> --keep-offers --dry-run
+    wb deals offers add <deal_id> <offer> --dry-run
+
+Accepted deals take accepted offers only, so close the deal before linking.
+The closing date is the offer's, so the deal lands in the same month as the
+offer did. Follow-up orders are mostly direct requests without competition;
+ask when unsure.
+
+### Maintenance without deal
+
+    wb deals stats --period <period> --json     # maintenance_without_deal
+
+A linked project's invoices count with the deal only, **in all periods**:
+linking a long-running maintenance project removes its earlier invoices
+from the report too. Link only projects which cover one period (e.g. a
+yearly mandate project, "… 2027"), with a deal for what they're expected to
+bring in that period. For long-running projects, point this out and leave
+them alone unless the user decides otherwise.
+
+The value is a conservative estimate, like the planned invoicing: the
+project's planned invoicing for the period (`wb projected-invoices search`),
+else what was invoiced in the previous period, rounded down. Don't correct
+it upwards later unless the difference is large. Use the services of the
+project's offers or service groups, else its logged hours (`wb hours
+search --project <id>`), for the split by value type. Mandates sold before
+the period starts are open deals with high probability and the period's
+start as decision date; accept them when the period starts, with that date.
+
+Recurring invoices are mostly third party costs passed on (hosting,
+licenses) and have little gross margin: ignore them unless their margin is
+significant, then treat them like maintenance.
+
+### Offered offers without deal
+
+    wb offers search --status offered --without-deal --json
+
+Open deals with the offer linked, so the funnel sees them: probability and
+decision date from the user, or normal and the offer's `valid_until` as a
+proposal. Closing the deal later accepts or declines the offer; an offer
+accepted on its own leaves its deal open, so look for open deals whose
+offers are all settled and close them like the offers.
+
+### Present before creating
+
+List the proposed deals in a table (customer, title, owner, values per value
+type, attributes, closing date, what gets linked) and create them only
+after the user approved the list, one `--dry-run` per command first. Deals
+created this way are visible to everyone like any other deal, and count in
+the outreach report of their contributors; mention that.
+
+## 5. Close deals
 
 Closing works like in Workbench: accepting or declining a deal also accepts
 or declines its related offers which haven't been accepted yet.
@@ -152,6 +243,7 @@ or declines its related offers which haven't been accepted yet.
 - Run every change with `--dry-run` first, show the user what changes and
   only run it without `--dry-run` after their explicit approval.
 - Never close, decline or reopen deals on your own, and never invent values,
-  probabilities, dates or reasons.
+  probabilities, dates or reasons. Values derived from offers, invoices and
+  the planned invoicing (section 4) are proposals the user approves.
 - `wb deals stats --period last-month` and `wb deals history --period
   this-week` show what was won, lost and changed, e.g. for a weekly review.

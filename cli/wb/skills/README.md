@@ -71,10 +71,15 @@ the past, missing dates or values, no notes for a long time) and asks the
 user what they know. It then updates probabilities, decision dates and
 values, adds notes (which notify the deal's owner) and closes deals as won
 or lost, which also accepts or declines their offers like in Workbench. It
-links offers to open deals and unlinks them.
+links offers to open deals and unlinks them. On request it creates the
+missing deals for accepted and offered offers and for maintenance without
+deal, split by value type from the services, so that the targets per value
+type and the funnel see all the work; each deal is linked to its offer or
+project, so nothing is counted twice.
 
 It changes only what the user told it, and never closes, declines or reopens
-deals on its own or invents values, probabilities, dates or reasons.
+deals on its own or invents values, probabilities, dates or reasons; values
+it derives from offers and invoices are proposals the user approves.
 
 ## workbench-mailing-list
 
