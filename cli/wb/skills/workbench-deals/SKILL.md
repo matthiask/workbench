@@ -178,7 +178,10 @@ same day):
 
 Accepted deals take accepted offers only, so close the deal before linking.
 The closing date is the offer's, so the deal lands in the same month as the
-offer did. Follow-up orders are mostly direct requests without competition;
+offer did, except for mandates and maintenance for a period (a year, a
+quarter, "… 2027"): their deals are closed on the start of that period,
+even when the offer was accepted earlier, and open ones expect the decision
+then. Follow-up orders are mostly direct requests without competition;
 ask when unsure.
 
 ### Maintenance without deal
@@ -207,9 +210,14 @@ previous period, rounded down. Don't correct
 it upwards later unless the difference is large. Split it by value type
 like the project's work: `wb services search --project <id> --json`, the
 `effort_type` of each service weighted with its `logged_hours` times
-`effort_rate` (the offered `service_hours` for work not logged yet). Mandates sold before
-the period starts are open deals with high probability and the period's
-start as decision date; accept them when the period starts, with that date.
+`effort_rate` (the offered `service_hours` for work not logged yet). Maintenance deals are
+closed on the start of their period (`--closed-on 2026-01-01` for 2026), not
+on the first invoice; mandates sold before the period starts are open deals
+with high probability and the period's start as decision date, accepted
+when the period starts, with that date. Group them by customer and period
+(one deal "<customer> – Wartung & Support 2026" linking all its maintenance
+projects of the year) and leave customers with only a few thousand francs a
+year as maintenance without deal.
 
 Recurring invoices are mostly third party costs passed on (hosting,
 licenses) and have little gross margin: ignore them unless their margin is
