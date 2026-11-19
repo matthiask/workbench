@@ -1,10 +1,10 @@
 {% load workbench %}
-{# One line: who, what and on which project; the full title on hover #}
+{# One line: who, what, on which project and when; the full title on hover #}
 <a
   class="list-group-item list-group-item-action wb-feed-row{% if more %} wb-more{% endif %}"
   href="{{ hours.get_absolute_url }}"
   data-ajaxmodal
-  title="{{ hours.service.project_service_title }}: {{ hours.description }}"
+  title="{{ hours.service.project_service_title }}: {{ hours.description }} ({{ hours.hours|hours }})"
   {% if more %}hidden{% endif %}
 >
   <span class="wb-feed-who">{{ hours.rendered_by.get_short_name }}</span>
@@ -12,5 +12,7 @@
     {{ hours.description }}
     <span class="wb-feed-context">{{ hours.service.project.title }}</span>
   </span>
-  <span class="wb-feed-amount">{{ hours.hours|hours }}</span>
+  <span class="wb-feed-time">
+    {% if hours.created_at|date:'Y-m-d' == today %}{{ hours.created_at|date:'H:i' }}{% else %}{{ hours.created_at|date:'d.m.' }}{% endif %}
+  </span>
 </a>

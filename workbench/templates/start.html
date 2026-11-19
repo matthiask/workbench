@@ -74,6 +74,7 @@
               class="text-reset"
             >{% translate 'What others are doing' %}</a>
           </div>
+          {% now 'Y-m-d' as today %}
           <div class="list-group list-group-flush">
             {% for hours in others_hours %}
               {% include 'logbook/_loggedhours_feed_row.html' %}

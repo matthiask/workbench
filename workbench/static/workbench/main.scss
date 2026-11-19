@@ -2315,9 +2315,11 @@ kbd {
   font-size: 0.8rem;
 }
 
-.wb-feed-amount {
+.wb-feed-time {
   flex-shrink: 0;
   margin-left: auto;
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }
 

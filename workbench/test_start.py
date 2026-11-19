@@ -1,4 +1,7 @@
+import datetime as dt
+
 from django.test import TestCase
+from django.utils import timezone
 
 from workbench import factories
 from workbench.tools.validation import monday
@@ -26,12 +29,19 @@ class StartTest(TestCase):
                 service=own.service,
                 description=f"Their work {i}",
             )
+        yesterday = factories.LoggedHoursFactory.create(rendered_by=other)
+        yesterday.created_at -= dt.timedelta(days=1)
+        yesterday.save()
         self.client.force_login(user)
 
         response = self.client.get("/")
         self.assertContains(response, "My own work", count=1)
-        self.assertContains(response, "wb-feed-row", count=OTHERS_HOURS_SHOWN + 2)
-        self.assertContains(response, "Show 2 more")
+        # Older entries show their date instead of the time
+        self.assertContains(
+            response, timezone.localtime(yesterday.created_at).strftime("%d.%m.")
+        )
+        self.assertContains(response, "wb-feed-row", count=OTHERS_HOURS_SHOWN + 3)
+        self.assertContains(response, "Show 3 more")
 
     def test_hours_rings_link(self):
         """The rings show today's and this week's hours, their link this week's"""
