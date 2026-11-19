@@ -72,6 +72,15 @@ class APITokenTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_invalid_token_on_writes(self):
+        """Invalid tokens are a 401 on writes too, not the CSRF failure of the
+        session authentication, so that wb logs in again"""
+        client = Client(enforce_csrf_checks=True)
+        response = client.delete(
+            "/api/tokens/current/", headers={"authorization": "Bearer wb_nope"}
+        )
+        self.assertEqual(response.status_code, 401)
+
     def test_me(self):
         """The authenticated user"""
         user = factories.UserFactory.create(_short_name="ab", _full_name="A B")

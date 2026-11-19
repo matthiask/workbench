@@ -54,6 +54,13 @@ class UserSession(SessionAuth):
         super().__init__()
         self.feature = feature
 
+    def __call__(self, request):
+        # Invalid tokens are a 401, not the CSRF failure which the session
+        # authentication checks first
+        if request.headers.get("authorization", "").lower().startswith("bearer "):
+            return None
+        return super().__call__(request)
+
     def authenticate(self, request, key):
         return check_feature(super().authenticate(request, key), self.feature)
 
