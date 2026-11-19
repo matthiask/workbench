@@ -474,7 +474,11 @@ def discount_help(invoice):
     granted = sum(
         (offer.discount for offer in offers if offer.status == Offer.ACCEPTED), Z2
     )
-    invoices = invoice.project.invoices.exclude(status=Invoice.CANCELED)
+    # The final invoice deducts down payments after their discount, the
+    # customer doesn't get it
+    invoices = invoice.project.invoices.exclude(status=Invoice.CANCELED).exclude(
+        type=Invoice.DOWN_PAYMENT
+    )
     if invoice.pk:
         invoices = invoices.exclude(pk=invoice.pk)
     given = invoices.aggregate(s=Sum("discount", default=Z2))["s"]

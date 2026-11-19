@@ -491,6 +491,15 @@ class InvoicesTest(TestCase):
         factories.InvoiceFactory.create(
             **common, status=Invoice.CANCELED, subtotal=5000, discount=900
         )
+        # The final invoice deducts the down payment after its discount, the
+        # customer doesn't get it
+        factories.InvoiceFactory.create(
+            **common,
+            type=Invoice.DOWN_PAYMENT,
+            status=Invoice.SENT,
+            subtotal=1000,
+            discount=100,
+        )
         self.client.force_login(project.owned_by)
 
         response = self.client.get(project.urls["createinvoice"] + "?type=services")
