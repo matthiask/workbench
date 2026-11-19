@@ -918,12 +918,15 @@ class CreateProjectInvoiceForm(InvoiceForm):
             third_party_costs=Z2
             if type in {Invoice.SERVICES, Invoice.CREDIT}
             else None,
-            # The offer's discount once, not again when invoicing the surplus
+            # The offer's discount until an invoice of its services carries
+            # a discount, not again when invoicing the surplus; partial
+            # invoices without discount don't count
             discount=self.offer.discount
             if self.offer
-            and not Service.objects
-            .filter(project_service__offer=self.offer)
-            .exclude(invoice__status=Invoice.CANCELED)
+            and not Invoice.objects
+            .filter(services__project_service__offer=self.offer)
+            .exclude(status=Invoice.CANCELED)
+            .exclude(discount=0)
             .exists()
             else Z2,
         )

@@ -370,6 +370,40 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("1500.00", result.output)
 
+    def test_invoices_create_offer_discount(self):
+        """Invoicing an offer takes its discount until an invoice of its
+        services carries one, a partial invoice without discount doesn't
+        use it up"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.PostalAddressFactory.create(person=project.contact)
+        offer = factories.OfferFactory.create(project=project, discount=100)
+        first, second = [
+            factories.ServiceFactory.create(project=project, offer=offer, cost=1000)
+            for _i in range(2)
+        ]
+
+        result = self.wb(
+            "invoices",
+            "create",
+            "--offer",
+            offer.pk,
+            "--service",
+            first.pk,
+            "--discount",
+            "0",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb("invoices", "create", "--offer", offer.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        invoice = Invoice.objects.latest("pk")
+        self.assertEqual(
+            (
+                invoice.discount,
+                list(invoice.services.values_list("project_service", flat=True)),
+            ),
+            (100, [second.pk]),
+        )
+
     def test_pdfs(self):
         """Invoices and offers are saved as PDF"""
         invoice = factories.InvoiceFactory.create(

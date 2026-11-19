@@ -419,6 +419,44 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.client.get(url).context["form"]["discount"].value(), 0)
 
+    def test_offer_discount_until_given(self):
+        """Invoicing an offer proposes its discount until an invoice of its
+        services carries a discount, also after a partial invoice without
+        one; cancelled invoices don't count"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, discount=100)
+        first, _second = [
+            factories.ServiceFactory.create(project=project, offer=offer, cost=1000)
+            for _i in range(2)
+        ]
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + f"?type=services&offer={offer.pk}"
+
+        def invoice(service, discount):
+            response = self.client.post(
+                project.urls["createinvoice"] + "?type=services",
+                self.services_invoice_data(
+                    project, discount=discount, selected_services=[service.pk]
+                ),
+            )
+            self.assertEqual(response.status_code, 302)
+            return Invoice.objects.latest("pk")
+
+        partial = invoice(first, "0")
+        self.assertEqual(self.client.get(url).context["form"]["discount"].value(), 100)
+
+        partial.delete()
+        discounted = invoice(first, "100")
+        self.assertEqual(self.client.get(url).context["form"]["discount"].value(), 0)
+
+        discounted.status = Invoice.CANCELED
+        discounted.save()
+        self.assertEqual(self.client.get(url).context["form"]["discount"].value(), 100)
+
+        # Invoices on the project start without discount
+        response = self.client.get(project.urls["createinvoice"] + "?type=services")
+        self.assertEqual(response.context["form"]["discount"].value(), 0)
+
     def test_declined_services_default_to_logbook(self):
         """Declined offers aren't a budget, their services are invoiced as
         logged"""

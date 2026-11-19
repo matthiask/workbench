@@ -515,7 +515,11 @@ class InvoiceIn(InputSchema):
     third_party_costs: Decimal = Field(
         default=Z2, description="Fixed amount and down payment invoices."
     )
-    discount: Decimal = Z2
+    discount: Decimal | None = Field(
+        default=None,
+        description="Invoices of an offer default to its discount until an"
+        " invoice of its services carries a discount, others to 0.",
+    )
     liable_to_vat: bool = True
     tax_rate: Decimal | None = Field(
         default=None, description="Defaults to the current tax rate."

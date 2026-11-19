@@ -27,7 +27,11 @@ can only be fixed amounts.
 
 At the top, choose the offer to invoice or "No offer, select services
 yourself". Choosing an offer takes its title, description, services and
-discount. Per service, **invoicing** chooses the source:
+discount. The whole discount, until an invoice of the offer's services
+(not cancelled) carries a discount: a first partial invoice without
+discount doesn't use it up, invoicing the surplus doesn't get it again.
+Invoices without offer start without discount. Per service,
+**invoicing** chooses the source:
 
 - **as offered**: the offered hours and costs. The default when something
   has been offered, the offer hasn't been declined and the service hasn't

@@ -29,8 +29,12 @@ Verkauf alter Geräte) erstellst du bei einer Person oder Organisation mit
 
 Wähle oben die Offerte, die du verrechnest, oder «Keine Offerte,
 Leistungen selbst auswählen». Mit einer Offerte übernimmt die Rechnung
-ihren Titel, ihre Beschreibung, ihre Leistungen und ihren Rabatt. Pro
-Leistung wählt **Verrechnung** die Quelle:
+ihren Titel, ihre Beschreibung, ihre Leistungen und ihren Rabatt. Den
+ganzen Rabatt, bis eine Rechnung über Leistungen der Offerte (nicht
+storniert) einen Rabatt enthält: Eine erste Teilrechnung ohne Rabatt
+verbraucht ihn nicht, die Verrechnung des Mehraufwands erhält ihn nicht
+nochmals. Rechnungen ohne Offerte beginnen ohne Rabatt. Pro Leistung
+wählt **Verrechnung** die Quelle:
 
 - **gemäss Offerte**: die offerierten Stunden und Kosten. Vorgabe, wenn
   etwas offeriert wurde, die Offerte nicht abgelehnt ist und die Leistung
