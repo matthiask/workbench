@@ -42,6 +42,11 @@ Projekt ein.
   einem eigenen Total auf.
 - Das Total ist die Summe der Leistungen minus Rabatt, plus MwSt,
   gerundet auf fünf Rappen.
+- Der **Rabatt** ist ein Betrag. Er kann als Prozentsatz der Leistungen
+  ohne Fremdkosten eingegeben werden (der nicht optionalen Leistungen, was
+  wir anderen bezahlen, zählt nicht), gerundet auf fünf Rappen. Der
+  Prozentsatz zeigt, was der Betrag ausmacht, und folgt den Leistungen;
+  der Betrag ändert sich nicht, wenn sich die Leistungen ändern.
 - Auf Projekten mit Pauschalsatz erhalten neue Leistungen den
   Pauschalsatz.
 

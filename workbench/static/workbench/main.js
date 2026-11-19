@@ -1005,6 +1005,8 @@ function initWidgets() {
     function recalculate() {
       let subtotal = 0
       let optionalTotal = 0
+      // The base of percentage discounts: what we pay others doesn't count
+      let exclThirdPartyCosts = 0
 
       for (const service of form.querySelectorAll("tbody [data-service]")) {
         if (!inOffer(service)) continue
@@ -1017,7 +1019,15 @@ function initWidgets() {
         )?.checked
 
         if (isOptional) optionalTotal += serviceCost
-        else subtotal += serviceCost
+        else {
+          subtotal += serviceCost
+          exclThirdPartyCosts +=
+            serviceCost -
+            Math.min(
+              Number.parseFloat(service.dataset.thirdPartyCosts) || 0,
+              read("[data-cost] input", service),
+            )
+        }
 
         const cell = service.querySelector("[data-service-cost]")
         cell.textContent = format(serviceCost)
@@ -1048,6 +1058,11 @@ function initWidgets() {
         el.hidden = !!liableToVat
       }
       form.querySelector("[data-optional-total-row]").hidden = !optionalTotal
+      const base = form.querySelector("[data-percentage-base]")
+      if (base) {
+        base.dataset.percentageBase = exclThirdPartyCosts.toFixed(2)
+        showPercentages()
+      }
     }
 
     const rows = form.querySelector("[data-services]")

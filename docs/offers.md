@@ -37,6 +37,11 @@ are set in the service's own form on the project.
   them with their own total.
 - The total is the sum of the services minus the discount, plus VAT,
   rounded to five cents.
+- The **discount** is an amount. It can be entered as a percentage of the
+  services excl. third party costs (the non-optional services, what we pay
+  others doesn't count), rounded to five cents. The percentage shows what
+  the amount amounts to and follows the services; the amount doesn't
+  change when the services change.
 - On projects with a flat rate, new services get the flat rate.
 
 ## Statuses

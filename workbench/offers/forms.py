@@ -14,7 +14,7 @@ from workbench.contacts.models import Organization
 from workbench.offers.models import Offer, OfferHeading
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
-from workbench.tools.formats import local_date_format
+from workbench.tools.formats import Z2, local_date_format
 from workbench.tools.forms import (
     Autocomplete,
     Form,
@@ -22,6 +22,7 @@ from workbench.tools.forms import (
     Textarea,
     add_prefix,
     delete_planned_work_field,
+    percentage_input,
 )
 from workbench.tools.models import ProtectedError, SlowCollector
 
@@ -329,6 +330,23 @@ class OfferForm(PostalAddressSelectionForm):
                 _("Total %(currency)s excl. tax for optional services") % currency
             ),
         }
+
+    @property
+    def discount_percentage(self):
+        """The discount as a percentage of the services excl. third party
+        costs, the base follows the services while editing (``main.js``)"""
+        return percentage_input(
+            "#id_discount",
+            [
+                (
+                    _("services excl. third party costs"),
+                    self.instance.service_cost_excl_third_party_costs
+                    if self.instance.pk
+                    else Z2,
+                )
+            ],
+            disabled=self.fields["discount"].disabled,
+        )
 
     def rows(self):
         """The forms of services and headings in the order they're shown

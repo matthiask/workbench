@@ -66,8 +66,9 @@ class ServiceBase(Model):
     @property
     def service_cost_excl_third_party_costs(self):
         """The base of percentage discounts: what we pay others doesn't
-        count, markups on third party costs do"""
-        return self.service_cost - (self.third_party_costs or Z2)
+        count, markups on third party costs do. Third party costs are a part
+        of the cost, at most all of it"""
+        return self.service_cost - min(self.third_party_costs or Z2, self.cost or Z2)
 
     def project_service_title(self):
         title = "{}: {}{}{}".format(

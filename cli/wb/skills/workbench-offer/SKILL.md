@@ -114,6 +114,11 @@ Guidelines:
   `effort_type` overrides the label, `hourly_rate` the rate. Only set
   `hourly_rate` when the specification or the user asks for a specific rate,
   never invent discounts.
+- Discounts are amounts. When the user asks for a percentage, compute it
+  from the services excl. third party costs: Σ of the service cost minus the
+  third party costs of the non-optional services (`wb offers show`), rounded
+  to 5 cents, and set it with `wb offers update ID --discount AMOUNT`. Say
+  which base you used.
 - If the existing offers use rates which differ from the service types (e.g.
   a reduced rate for a nonprofit), ask the user which rates to use instead of
   silently picking either.

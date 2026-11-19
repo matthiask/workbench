@@ -1597,3 +1597,24 @@ class OffersTest(TestCase):
         self.assertEqual(
             offer.service_cost_excl_third_party_costs, Decimal(1200 + 1500)
         )
+
+    def test_discount_percentage(self):
+        """The discount can be entered as a percentage of the services excl.
+        third party costs; the rows carry their third party costs, so that
+        the base follows the services while editing"""
+        offer = factories.OfferFactory.create(discount=270)
+        factories.ServiceFactory.create(
+            project=offer.project,
+            offer=offer,
+            cost=2200,
+            third_party_costs=2000,
+            effort_type="Programming",
+            effort_rate=100,
+            effort_hours=25,
+        )
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.get(offer.urls["update"])
+        self.assertContains(response, 'data-percentage="#id_discount"')
+        self.assertContains(response, 'data-percentage-base="2700.00"')
+        self.assertContains(response, 'data-third-party-costs="2000.00"')

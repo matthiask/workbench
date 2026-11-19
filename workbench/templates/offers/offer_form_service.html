@@ -1,7 +1,8 @@
-{% load fineforms i18n %}
+{% load fineforms i18n l10n %}
 <tr
   id="{{ form_id }}"
   data-service
+  data-third-party-costs="{{ form.instance.third_party_costs|default_if_none:0|unlocalize }}"
   {% if form.service_type %}data-autofill="{{ view.default_service_types_json }}"{% endif %}
   {% if not form.in_offer.value %}hidden{% endif %}
 >

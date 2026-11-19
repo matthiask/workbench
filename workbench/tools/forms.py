@@ -176,7 +176,7 @@ def delete_planned_work_field(label):
     )
 
 
-def percentage_input(target, bases):
+def percentage_input(target, bases, *, disabled=False):
     """An input filling x% of a base into the field ``target`` (a CSS
     selector), rounded to 5 cents, which also shows the field's amount as a
     percentage of the base (``main.js``). ``bases`` are ``(label, amount)``
@@ -201,9 +201,10 @@ def percentage_input(target, bases):
     return format_html(
         '<span class="wb-percentage"><input type="number" step="any"'
         ' class="form-control form-control-sm" data-percentage="{}"'
-        ' aria-label="{}">{}</span>',
+        ' aria-label="{}"{}>{}</span>',
         target,
         _("percentage"),
+        mark_safe(" disabled") if disabled else "",
         format_html(_("% of {base}"), base=base),
     )
 
