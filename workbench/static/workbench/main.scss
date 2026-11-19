@@ -707,10 +707,22 @@ tbody th > a {
     }
   }
 
-  // Amounts don't need the whole width
+  // The fields don't need the whole width
+  :is(input, select) {
+    max-width: 12rem;
+  }
+
+  // Hours and amounts are typed, spin buttons only crowd the numbers (like
+  // in the invoice form)
   input[type="number"] {
-    max-width: 9rem;
     text-align: end;
+    appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
   }
 }
 
