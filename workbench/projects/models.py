@@ -796,7 +796,9 @@ class Project(Model):
 
     @cached_property
     def project_invoices(self):
-        return self.invoices.select_related("contact__organization").reverse()
+        return self.invoices.select_related(
+            "contact__organization", "owned_by"
+        ).reverse()
 
     @cached_property
     def project_invoices_total_excl_tax(self):
