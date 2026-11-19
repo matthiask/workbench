@@ -15,35 +15,8 @@
     </div>
   </div>
 
-  {% with user_hours=request.user.hours %}
-    <div class="wb-stats mb-3">
-      <a
-        class="wb-stat wb-stat-link"
-        href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={% now 'Y-m-d' %}"
-      >
-        <div class="wb-stat-label">{% translate 'today'|capfirst %}</div>
-        <div class="wb-stat-value">
-          {% hours_ring user_hours.today user_hours.today_target 'today' %}
-          {{ user_hours.today|hours }}
-          {% if user_hours.today_target %}<span class="wb-stat-of">/
-              {{ user_hours.today_target|hours }}</span>{% endif %}
-        </div>
-      </a>
-      <a class="wb-stat wb-stat-link" href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}">
-        <div class="wb-stat-label">{% translate 'this week'|capfirst %}</div>
-        <div class="wb-stat-value">
-          {% hours_ring user_hours.week user_hours.week_target 'week' %}
-          {{ user_hours.week|hours }}
-          {% if user_hours.week_target %}<span class="wb-stat-of">/ {{ user_hours.week_target|hours }}</span>{% endif %}
-        </div>
-      </a>
-    </div>
-  {% endwith %}
-
   <div class="row g-3">
-    <div class="col-lg-6">
-      {% if needs_action %}{% include '_needs_action.html' %}{% endif %}
-
+    <div class="col-lg-7">
       <section class="card mb-3">
         <div class="card-header">
           <a href="{% url 'projects_project_list' %}" class="text-reset">{% translate 'active projects'|capfirst %}</a>
@@ -72,24 +45,6 @@
         {% endif %}
       </section>
 
-      {% if birthdays %}
-        <section class="card mb-3 d-none d-md-block">
-          <div class="card-header">{% translate "Birthdays" %}</div>
-          <div class="list-group list-group-flush">
-            {% for birthday in birthdays %}
-              <a
-                href="{% url 'contacts_person_detail' pk=birthday.id %}"
-                class="list-group-item list-group-item-action wb-row {% if birthday.is_active_user %}fw-semibold{% endif %}"
-              >
-                <span>{{ birthday.given_name }} {{ birthday.family_name }}</span>
-                <span class="wb-row-meta">{{ birthday.birthday }}</span>
-              </a>
-            {% endfor %}
-          </div>
-        </section>
-      {% endif %}
-    </div>
-    <div class="col-lg-6">
       <section class="card mb-3">
         <div class="card-header">
           <a
@@ -107,23 +62,46 @@
           <div class="card-body text-secondary">{% translate 'no hours today'|capfirst %}</div>
         {% endif %}
       </section>
-      <section class="card mb-3">
-        <div class="card-header">
-          <a
-            href="{% url 'logbook_loggedhours_list' %}"
-            class="text-reset"
-          >{% translate "all users' hours"|capfirst %}</a>
-        </div>
-        {% if all_users_hours %}
+    </div>
+    <div class="col-lg-5">
+      {% if needs_action %}{% include '_needs_action.html' %}{% endif %}
+
+      {% if others_hours %}
+        <section class="card mb-3 wb-feed">
+          <div class="card-header">
+            <a
+              href="{% url 'logbook_loggedhours_list' %}"
+              class="text-reset"
+            >{% translate 'What others are doing' %}</a>
+          </div>
           <div class="list-group list-group-flush">
-            {% for hours in all_users_hours %}
-              {% include 'logbook/_loggedhours_row.html' %}
+            {% for hours in others_hours %}
+              {% include 'logbook/_loggedhours_feed_row.html' %}
+            {% endfor %}
+            {% include "_show_more.html" with more=more_others_hours %}
+            {% for hours in more_others_hours %}
+              {% include 'logbook/_loggedhours_feed_row.html' with more=True %}
             {% endfor %}
           </div>
-        {% else %}
-          <div class="card-body text-secondary">{% translate 'no hours today'|capfirst %}</div>
-        {% endif %}
-      </section>
+        </section>
+      {% endif %}
+
+      {% if birthdays %}
+        <section class="card mb-3 d-none d-md-block">
+          <div class="card-header">{% translate "Birthdays" %}</div>
+          <div class="list-group list-group-flush">
+            {% for birthday in birthdays %}
+              <a
+                href="{% url 'contacts_person_detail' pk=birthday.id %}"
+                class="list-group-item list-group-item-action wb-row {% if birthday.is_active_user %}fw-semibold{% endif %}"
+              >
+                <span>{{ birthday.given_name }} {{ birthday.family_name }}</span>
+                <span class="wb-row-meta">{{ birthday.birthday }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
     </div>
   </div>
 {% endblock content %}

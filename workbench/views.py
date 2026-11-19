@@ -28,6 +28,8 @@ from workbench.tools.validation import in_days
 
 # Long categories show their first entries, the others on request
 NEEDS_ACTION_SHOWN = 3
+OTHERS_HOURS_SHOWN = 10
+OTHERS_HOURS_LIMIT = 30
 SEARCH_SHOWN = 5
 SEARCH_LIMIT = 100
 
@@ -110,12 +112,15 @@ def _todays_hours(user):
     )
 
 
-def _all_users_hours():
-    return (
+def _others_hours(user):
+    """What the others are doing, the user's own hours are listed separately"""
+    return split_more(
         LoggedHours.objects
         .filter(rendered_on__gte=in_days(-7))
-        .select_related("service__project__owned_by", "rendered_by", "timestamp")
-        .order_by("-created_at")[:20]
+        .exclude(rendered_by=user)
+        .select_related("service__project", "rendered_by")
+        .order_by("-created_at")[:OTHERS_HOURS_LIMIT],
+        OTHERS_HOURS_SHOWN,
     )
 
 
@@ -156,13 +161,15 @@ def start(request):
     request.user.take_a_break_warning(request=request)
     request.user.unlogged_timestamps_warning(request=request)
 
+    others_hours, more_others_hours = _others_hours(request.user)
     return render(
         request,
         "start.html",
         {
             "needs_action": _needs_action(request.user),
             "todays_hours": _todays_hours(request.user),
-            "all_users_hours": _all_users_hours(),
+            "others_hours": others_hours,
+            "more_others_hours": more_others_hours,
             "birthdays": _birthdays(),
         },
     )

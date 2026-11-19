@@ -7,7 +7,7 @@
       <a class="navbar-brand" href="/">{{ WORKBENCH.TITLE }}</a>
 
       <div class="wb-navbar-quick d-flex d-lg-none align-items-center ms-auto">
-        {% include "_hours_rings.html" %}
+        {% include "_hours_rings.html" with show_today=True %}
         {% include "_theme_toggle.html" %}
       </div>
 

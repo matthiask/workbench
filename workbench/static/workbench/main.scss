@@ -2258,7 +2258,12 @@ kbd {
   .wb-needs-action-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0 0.5rem;
+
+    // The note goes on a line of its own instead of cutting the title short
+    @media (max-width: 767.98px) {
+      flex-wrap: wrap;
+    }
   }
 
   .wb-needs-action-title {
@@ -2279,6 +2284,41 @@ kbd {
     font-size: 0.8rem;
     white-space: nowrap;
   }
+}
+
+// Background chatter on the dashboard, one line per entry
+.wb-feed-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-block: 0.3rem;
+  font-size: 0.875rem;
+}
+
+.wb-feed-who {
+  flex-shrink: 0;
+  min-width: 2.5rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+}
+
+.wb-feed-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-feed-context {
+  margin-left: 0.25rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+}
+
+.wb-feed-amount {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
 }
 
 // A pill on the bottom edge of the last entry shown, without a row of its own
