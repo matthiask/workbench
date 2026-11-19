@@ -308,6 +308,25 @@ class ProjectsTest(TestCase):
             response, '<span class="wb-figure-note">Projektleitung</span>'
         )
 
+    def test_service_actions(self):
+        """The services share one menu, rendering it per service made large
+        projects slow"""
+        project = factories.ProjectFactory.create()
+        with_rate = factories.ServiceFactory.create(
+            project=project, effort_type="Programming", effort_rate=180
+        )
+        without_rate = factories.ServiceFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.get_absolute_url())
+        self.assertContains(response, 'id="service-actions"', count=1)
+        self.assertContains(response, "/projects/service/2147483647/merge/", count=1)
+        self.assertNotContains(response, with_rate.urls["merge"])
+        self.assertContains(response, f'data-service-actions="{with_rate.pk}"')
+        self.assertContains(response, f'data-service-actions="{without_rate.pk}"')
+        # Assigning a service type only offered without rate
+        self.assertContains(response, "data-without-rate", count=1)
+
     def test_service_hours_without_rate(self):
         """Optional services don't count towards the budgeted hours without
         an effort rate, like towards all other budgeted totals"""

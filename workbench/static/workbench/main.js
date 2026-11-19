@@ -747,6 +747,27 @@ on("click", "[data-foreign-currency]", (e, el) => {
   _sel("#id_modal-are_expenses").checked = true
 })
 
+// The services of a project share one menu (#service-actions), filled in for
+// the service when opening it
+on("show.bs.dropdown", "[data-service-actions]", (_e, button) => {
+  const menu = button.nextElementSibling
+  if (menu.childElementCount) return
+  const template = _sel("#service-actions")
+  const placeholder = template.dataset.placeholder
+  const pk = button.dataset.serviceActions
+  menu.append(template.content.cloneNode(true))
+  for (const el of menu.querySelectorAll("[data-if-logging-allowed]")) {
+    if (!("loggingAllowed" in button.dataset)) el.remove()
+  }
+  for (const el of menu.querySelectorAll("[data-if-without-rate]")) {
+    if ("withoutRate" in button.dataset) el.replaceWith(...el.childNodes)
+    else el.remove()
+  }
+  for (const link of menu.querySelectorAll("a[href]")) {
+    link.href = link.getAttribute("href").replaceAll(placeholder, pk)
+  }
+})
+
 // Long lists show the other entries on request (_show_more.html)
 on("click", "[data-show-more]", (_e, el) => {
   const toggle = el.closest(".wb-show-more")

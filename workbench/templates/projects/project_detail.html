@@ -661,73 +661,13 @@
                       aria-haspopup="true"
                       aria-expanded="false"
                       title="{% translate 'More actions' %}"
+                      data-service-actions="{{ row.service.pk }}"
+                      {% if row.service.is_logging_allowed %}data-logging-allowed{% endif %}
+                      {% if not row.service.effort_rate %}data-without-rate{% endif %}
                     >
                       {% include 'svg/kebab-horizontal.svg' %}
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end">
-                      {% if row.service.is_logging_allowed %}
-                        <a
-                          class="dropdown-item"
-                          href="{{ project.urls.createcost }}?service={{ row.service.pk|default:'' }}"
-                          data-ajaxmodal
-                        >
-                          {% include "svg/plus.svg" %}
-                          {% translate 'Cost' %}
-                        </a>
-                      {% endif %}
-                      {% if row.service.pk and request.user.features.PLANNING %}
-                        <a
-                          class="dropdown-item"
-                          href="{{ project.urls.creatework }}?service={{ row.service.pk }}"
-                          data-ajaxmodal
-                        >
-                          {% translate 'Plan work' %}
-                        </a>
-                      {% endif %}
-                      {% if row.service.pk and request.user.features.CONTROLLING %}
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">{% translate 'service'|capfirst %}</h6>
-                        <a class="dropdown-item" href="{{ row.service.urls.reassign_logbook }}" data-ajaxmodal>
-                          {% translate 'Reassign logbook entries' %}
-                        </a>
-                        <a class="dropdown-item" href="{{ row.service.urls.merge }}" data-ajaxmodal>
-                          {% translate 'Merge into another service' %}
-                        </a>
-                        <a class="dropdown-item" href="{{ row.service.urls.move }}" data-ajaxmodal>
-                          {% translate 'Move to other project' %}
-                        </a>
-                        <a
-                          class="dropdown-item"
-                          href="{{ project.urls.logbook_batch_update_hours }}?service={{ row.service.pk }}"
-                        >
-                          {% translate 'Logbook batch update' %}: {% translate 'Hours' %}
-                        </a>
-                        <a
-                          class="dropdown-item"
-                          href="{{ project.urls.logbook_batch_update_costs }}?service={{ row.service.pk }}"
-                        >
-                          {% translate 'Logbook batch update' %}: {% translate 'Costs' %}
-                        </a>
-                        <a class="dropdown-item text-danger" href="{{ row.service.urls.delete }}" data-ajaxmodal>
-                          {% translate 'Delete' %}
-                        </a>
-                        {% if not row.service.effort_rate %}
-                          <div class="dropdown-divider"></div>
-                          <h6 class="dropdown-header">{% translate 'Assign service type' %}:</h6>
-                          {% for service_type in view.default_service_types %}
-                            <a
-                              class="dropdown-item"
-                              href="{{ row.service.urls.assign_service_type }}?service_type={{ service_type.pk }}"
-                            >
-                              <div class="d-flex w-100 justify-content-between gap-3">
-                                <span>{{ service_type.title }}</span>
-                                <span>{{ service_type.hourly_rate|currency }}</span>
-                              </div>
-                            </a>
-                          {% endfor %}
-                        {% endif %}
-                      {% endif %}
-                    </div>
+                    <div class="dropdown-menu dropdown-menu-end"></div>
                   </span>
                 {% endif %}
               </div>
@@ -831,6 +771,63 @@
   {% endif %}
 
   {% notes project %}
+
+  {# The menu of all services, filled in when opening it: rendering it per service made large projects slow #}
+  {% with pk=2147483647 %}
+    <template id="service-actions" data-placeholder="{{ pk }}">
+      <a
+        class="dropdown-item"
+        href="{{ project.urls.createcost }}?service={{ pk }}"
+        data-ajaxmodal
+        data-if-logging-allowed
+      >
+        {% include "svg/plus.svg" %}
+        {% translate 'Cost' %}
+      </a>
+      {% if request.user.features.PLANNING %}
+        <a class="dropdown-item" href="{{ project.urls.creatework }}?service={{ pk }}" data-ajaxmodal>
+          {% translate 'Plan work' %}
+        </a>
+      {% endif %}
+      {% if request.user.features.CONTROLLING %}
+        <div class="dropdown-divider"></div>
+        <h6 class="dropdown-header">{% translate 'service'|capfirst %}</h6>
+        <a class="dropdown-item" href="{% url 'projects_service_reassign_logbook' pk %}" data-ajaxmodal>
+          {% translate 'Reassign logbook entries' %}
+        </a>
+        <a class="dropdown-item" href="{% url 'projects_service_merge' pk %}" data-ajaxmodal>
+          {% translate 'Merge into another service' %}
+        </a>
+        <a class="dropdown-item" href="{% url 'projects_service_move' pk %}" data-ajaxmodal>
+          {% translate 'Move to other project' %}
+        </a>
+        <a class="dropdown-item" href="{{ project.urls.logbook_batch_update_hours }}?service={{ pk }}">
+          {% translate 'Logbook batch update' %}: {% translate 'Hours' %}
+        </a>
+        <a class="dropdown-item" href="{{ project.urls.logbook_batch_update_costs }}?service={{ pk }}">
+          {% translate 'Logbook batch update' %}: {% translate 'Costs' %}
+        </a>
+        <a class="dropdown-item text-danger" href="{% url 'projects_service_delete' pk %}" data-ajaxmodal>
+          {% translate 'Delete' %}
+        </a>
+        <div data-if-without-rate>
+          <div class="dropdown-divider"></div>
+          <h6 class="dropdown-header">{% translate 'Assign service type' %}:</h6>
+          {% for service_type in view.default_service_types %}
+            <a
+              class="dropdown-item"
+              href="{% url 'projects_service_assign_service_type' pk %}?service_type={{ service_type.pk }}"
+            >
+              <div class="d-flex w-100 justify-content-between gap-3">
+                <span>{{ service_type.title }}</span>
+                <span>{{ service_type.hourly_rate|currency }}</span>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </template>
+  {% endwith %}
 {% endblock content %}
 
 {% block createhours-url %}{{ project.urls.createhours }}{% endblock %}
