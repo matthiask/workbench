@@ -419,6 +419,16 @@ class InvoicesTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.client.get(url).context["form"]["discount"].value(), 0)
 
+    def test_down_payments_dont_close_projects(self):
+        """Down payments come first, they aren't final invoices"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        url = project.urls["createinvoice"] + "?type="
+        self.assertNotContains(
+            self.client.get(url + "down-payment"), 'name="close_project"'
+        )
+        self.assertContains(self.client.get(url + "fixed"), 'name="close_project"')
+
     def test_offer_discount_until_given(self):
         """Invoicing an offer proposes its discount until an invoice of its
         services carries a discount, also after a partial invoice without

@@ -1087,7 +1087,8 @@ class CreateProjectInvoiceForm(InvoiceForm):
             for _code, warning in warnings:
                 messages.warning(self.request, warning)
 
-        if not self.project.closed_on:
+        # Down payments come first, they don't close projects
+        if not self.project.closed_on and invoice_type != Invoice.DOWN_PAYMENT:
             self.fields["close_project"] = forms.BooleanField(
                 label=_("This is the final invoice, close the project"),
                 help_text=_(
