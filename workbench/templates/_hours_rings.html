@@ -1,7 +1,7 @@
 {% load i18n workbench %}{% with user_hours=request.user.hours %}
   <a
     class="nav-link hours-rings"
-    href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}"
+    href="{% url 'logbook_loggedhours_list' %}?rendered_by={{ request.user.pk }}&amp;date_from={{ user_hours.week_from|date:'Y-m-d' }}"
     title="{% translate 'today' %}: {{ user_hours.today|hours }}{% if user_hours.today_target %} / {{ user_hours.today_target|hours }}{% endif %}, {% translate 'this week' %}: {{ user_hours.week|hours }}{% if user_hours.week_target %} / {{ user_hours.week_target|hours }}{% endif %}"
   >
     {% if show_today %}

@@ -243,10 +243,11 @@ class User(Model, AbstractBaseUser):
 
     @cached_property
     def hours(self):
+        week_from = monday()
         per_day = {
             row["rendered_on"]: row["hours__sum"]
             for row in self.loggedhours
-            .filter(rendered_on__gte=monday())
+            .filter(rendered_on__gte=week_from)
             .order_by()
             .values("rendered_on")
             .annotate(Sum("hours"))
@@ -256,6 +257,7 @@ class User(Model, AbstractBaseUser):
         return {
             "today": per_day.get(dt.date.today(), Decimal("0.0")),
             "week": sum(per_day.values(), Decimal("0.0")),
+            "week_from": week_from,
             "today_target": target and target[0],
             "week_target": target and target[1],
         }
