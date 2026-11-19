@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.db.models import Q, Sum
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from django.utils.html import format_html, format_html_join
+from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
@@ -26,6 +26,7 @@ from workbench.invoices.models import (
     line_description,
 )
 from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
+from workbench.offers.models import Offer
 from workbench.projects.forms import (
     add_delete_planned_work_field,
     discard_offers_in_preparation,
@@ -414,6 +415,117 @@ def amount_help_text(invoice):
     return format_html_join(" ", "{}", ((fact,) for fact in facts))
 
 
+def discount_help(invoice):
+    """The discounts of the project's offers, what the invoices gave so far
+    and helpers filling in the remaining discount or a percentage of the
+    services excl. third party costs of this invoice
+
+    Only facts and helpers: which invoice carries how much of the offers'
+    discounts doesn't matter, the total does. Invoices created on the
+    project start without discount."""
+    offers = list(
+        invoice.project.offers
+        .filter(status__in=[Offer.OFFERED, Offer.ACCEPTED])
+        .exclude(discount=0)
+        .prefetch_related("services")
+    )
+    if not offers:
+        return None
+
+    percentages = []
+    facts = []
+    for offer in offers:
+        base = offer.service_cost_excl_third_party_costs
+        percentage = (
+            (offer.discount / base * 100).quantize(Decimal("0.0")) if base else None
+        )
+        if percentage and percentage not in percentages:
+            percentages.append(percentage)
+        facts.append(
+            format_html(
+                _("Offer {offer}{not_accepted}: discount {discount}{percentage}."),
+                offer=f"{offer.code} {offer.title}",
+                not_accepted=""
+                if offer.status == Offer.ACCEPTED
+                else format_html(" ({})", _("not accepted yet")),
+                discount=currency(offer.discount),
+                percentage=format_html(
+                    " ({})",
+                    _("{percentage}% of the services excl. third party costs").format(
+                        percentage=percentage
+                    ),
+                )
+                if percentage is not None
+                else "",
+            )
+        )
+
+    granted = sum(
+        (offer.discount for offer in offers if offer.status == Offer.ACCEPTED), Z2
+    )
+    invoices = invoice.project.invoices.exclude(status=Invoice.CANCELED)
+    if invoice.pk:
+        invoices = invoices.exclude(pk=invoice.pk)
+    given = invoices.aggregate(s=Sum("discount", default=Z2))["s"]
+    facts.append(
+        format_html(
+            _(
+                "The accepted offers granted discounts of {granted}, the"
+                " invoices so far gave {given}."
+            ),
+            granted=currency(granted),
+            given=currency(given),
+        )
+    )
+
+    links = []
+    if (remaining := granted - given) > 0:
+        links.append(
+            format_html(
+                '<a href="#" data-field-value="{}" data-field-target="#id_discount">'
+                "{}</a>",
+                remaining,
+                format_html(
+                    _("Remaining discount: {remaining}"), remaining=currency(remaining)
+                ),
+            )
+        )
+    links.extend(
+        format_html(
+            '<a href="#" data-percentage-value="{}" data-percentage-for="#id_discount">'
+            "{}%</a>",
+            percentage,
+            percentage,
+        )
+        for percentage in percentages
+    )
+    base = (
+        sum(
+            (
+                line.service_cost_excl_third_party_costs
+                for line in invoice.services.all()
+            ),
+            Z2,
+        )
+        if invoice.pk
+        else Z2
+    )
+    percentage = percentage_input(
+        "#id_discount",
+        [(_("the services excl. third party costs of this invoice"), base)],
+    )
+    facts.append(
+        format_html(
+            _("Use {links} or {percentage}."),
+            links=format_html_join(", ", "{}", ((link,) for link in links)),
+            percentage=percentage,
+        )
+        if links
+        else format_html(_("Use {percentage}."), percentage=percentage)
+    )
+    return format_html_join(mark_safe("<br>"), "{}", ((fact,) for fact in facts))
+
+
 class InvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -531,6 +643,15 @@ class InvoiceForm(PostalAddressSelectionForm):
             and (help_text := amount_help_text(self.instance))
         ):
             self.fields["subtotal"].help_text = help_text
+
+        self.discount_help = None
+        if (
+            self.instance.type == Invoice.SERVICES
+            and self.instance.project_id
+            and not self.instance.is_freezed
+            and (help_text := discount_help(self.instance))
+        ):
+            self.discount_help = self.fields["discount"].help_text = help_text
 
         self.order_fields(
             field
@@ -1033,6 +1154,19 @@ class CreateProjectInvoiceForm(InvoiceForm):
             default=Z1,
         )
 
+        # Like create_services_from_logbook(), the third party costs of the
+        # logged costs which haven't been invoiced yet
+        logged_third_party_costs = sum_by(
+            LoggedCost.objects.filter(
+                service__project=self.project,
+                archived_at__isnull=True,
+                third_party_costs__isnull=False,
+            ),
+            key="service",
+            field="third_party_costs",
+            default=Z2,
+        )
+
         def has_open_entries(row):
             return bool(row["not_archived"] or row["not_archived_logged_hours"])
 
@@ -1144,10 +1278,12 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     Invoice.OFFER: {
                         "hours": service.effort_hours or Z1,
                         "cost": service.cost or Z2,
+                        "third_party_costs": service.third_party_costs or Z2,
                     },
                     Invoice.LOGBOOK: {
                         "hours": row["not_archived_logged_hours"] or Z1,
                         "cost": row["not_archived_logged_cost"] or Z2,
+                        "third_party_costs": logged_third_party_costs[service.id],
                     },
                 }
                 preset = presets[default_source(service)]

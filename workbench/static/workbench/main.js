@@ -547,9 +547,11 @@ on("click", "[data-multiply-cost]", (e, el) => {
 
 on("click", "[data-field-value]", (e, el) => {
   e.preventDefault()
-  for (const field of el
-    .closest(".form-group")
-    .querySelectorAll("input, textarea, select")) {
+  // The field of the help text, or the one named by data-field-target
+  const fields = el.dataset.fieldTarget
+    ? document.querySelectorAll(el.dataset.fieldTarget)
+    : el.closest(".form-group").querySelectorAll("input, textarea, select")
+  for (const field of fields) {
     // Percentage inputs in help texts follow the field
     if (field.closest(".wb-percentage")) continue
     setValue(field, el.dataset.fieldValue, { change: true })
@@ -587,6 +589,16 @@ function showPercentages() {
 }
 
 on("input", "[data-percentage]", (_e, el) => fillPercentage(el))
+// Links filling in a percentage, e.g. the discount percentages of the offers
+on("click", "[data-percentage-value]", (e, el) => {
+  e.preventDefault()
+  const input = document.querySelector(
+    `[data-percentage="${el.dataset.percentageFor}"]`,
+  )
+  if (!input) return
+  input.value = el.dataset.percentageValue
+  fillPercentage(input)
+})
 on("change", "[data-percentage-base]", (_e, el) => {
   const input = el.closest(".wb-percentage").querySelector("[data-percentage]")
   if (input.value) fillPercentage(input)
@@ -668,15 +680,26 @@ function updateInvoiceService(row) {
   row.querySelector("[data-nothing-invoiced]").hidden = !(
     amount === 0 && "somethingToInvoice" in row.dataset
   )
-  return amount
+  // The third party costs of the source, at most the cost
+  const source = row.querySelector("input[type=radio]:checked")
+  const thirdPartyCosts = Math.min(
+    Number.parseFloat(source?.dataset.thirdPartyCosts) || 0,
+    value(cost),
+  )
+  row.querySelector("[data-third-party-costs]").textContent =
+    formatAmount(thirdPartyCosts)
+  row.querySelector("[data-third-party-costs-note]").hidden = !thirdPartyCosts
+  return { amount, thirdPartyCosts }
 }
 
 function updateInvoiceTotals(form) {
   let subtotal = 0
+  let thirdPartyCosts = 0
   for (const row of form.querySelectorAll("[data-invoice-service]")) {
-    const amount = updateInvoiceService(row)
+    const line = updateInvoiceService(row)
     if (row.querySelector("[name=selected_services]").checked) {
-      subtotal += amount
+      subtotal += line.amount
+      thirdPartyCosts += line.thirdPartyCosts
     }
   }
   const read = (sel) => Number.parseFloat(form.querySelector(sel)?.value) || 0
@@ -697,6 +720,17 @@ function updateInvoiceTotals(form) {
     if (el) el.textContent = formatAmount(value)
   }
   write("[data-subtotal]", subtotal)
+  write("[data-excl-third-party-costs]", subtotal - thirdPartyCosts)
+  form.querySelector("[data-excl-third-party-costs-row]").hidden =
+    !thirdPartyCosts
+  // The base of the discount percentage
+  const base = form.querySelector(
+    ".wb-percentage:has([data-percentage='#id_discount']) [data-percentage-base]",
+  )
+  if (base) {
+    base.dataset.percentageBase = (subtotal - thirdPartyCosts).toFixed(2)
+    showPercentages()
+  }
   write("[data-down-payments]", -downPayments)
   write("[data-total-excl-tax]", totalExclTax)
   write("[data-tax]", total - totalExclTax)

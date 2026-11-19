@@ -457,6 +457,81 @@ class InvoicesTest(TestCase):
         response = self.client.get(project.urls["createinvoice"] + "?type=services")
         self.assertEqual(response.context["form"]["discount"].value(), 0)
 
+    def test_discount_help(self):
+        """Services invoices show the discounts of the offers, what the
+        invoices gave so far and fill in the rest or a percentage of the
+        services excl. third party costs; the rows know their third party
+        costs"""
+        project = factories.ProjectFactory.create()
+        concept = factories.OfferFactory.create(
+            project=project, title="Konzept", status=Offer.ACCEPTED, discount=2000
+        )
+        design = factories.ServiceFactory.create(
+            project=project, offer=concept, cost=22000, third_party_costs=2000
+        )
+        concept.save()
+        build = factories.OfferFactory.create(
+            project=project, title="Umsetzung", status=Offer.OFFERED, discount=2000
+        )
+        factories.ServiceFactory.create(project=project, offer=build, cost=40000)
+        build.save()
+        common = {
+            "project": project,
+            "customer": project.customer,
+            "contact": project.contact,
+        }
+        factories.InvoiceFactory.create(
+            **common, status=Invoice.SENT, subtotal=5000, discount=500
+        )
+        factories.InvoiceFactory.create(
+            **common, status=Invoice.CANCELED, subtotal=5000, discount=900
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["createinvoice"] + "?type=services")
+        self.assertContains(
+            response,
+            f"Offer {concept.code} Konzept: discount 2’000.00 (10.0% of the"
+            " services excl. third party costs).",
+        )
+        self.assertContains(
+            response,
+            f"Offer {build.code} Umsetzung (not accepted yet): discount"
+            " 2’000.00 (5.0% of the services excl. third party costs).",
+        )
+        self.assertContains(
+            response,
+            "The accepted offers granted discounts of 2’000.00, the invoices"
+            " so far gave 500.00.",
+        )
+        self.assertContains(
+            response,
+            '<a href="#" data-field-value="1500.00" data-field-target="#id_discount">'
+            "Remaining discount: 1’500.00</a>",
+        )
+        self.assertContains(response, 'data-percentage-value="10.0"')
+        self.assertContains(response, 'data-percentage-value="5.0"')
+        self.assertContains(response, 'data-percentage="#id_discount"')
+        self.assertContains(response, 'data-third-party-costs="2000.00"')
+
+        # Editing an invoice in preparation: its own lines are the base, its
+        # own discount doesn't count as given
+        invoice = factories.InvoiceFactory.create(
+            **common, type=Invoice.SERVICES, discount=300
+        )
+        invoice.create_services_from_offer([design])
+        response = self.client.get(invoice.urls["update"])
+        self.assertContains(response, "the invoices so far gave 500.00.")
+        self.assertContains(response, 'data-percentage-base="20000.00"')
+
+        # Without discounted offers there's nothing to show
+        concept.discount = build.discount = 0
+        concept.save()
+        build.save()
+        response = self.client.get(project.urls["createinvoice"] + "?type=services")
+        self.assertNotContains(response, "granted discounts")
+        self.assertNotContains(response, 'data-percentage="#id_discount"')
+
     def test_declined_services_default_to_logbook(self):
         """Declined offers aren't a budget, their services are invoiced as
         logged"""

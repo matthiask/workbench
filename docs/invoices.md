@@ -48,6 +48,16 @@ something to invoice are listed, "List all services of the project"
 shows the rest. A service invoiced with 0 still links its open entries,
 which writes them off.
 
+Lines show their third party costs, the totals the services excl. third
+party costs. If offers of the project have a discount, the discount's
+help lists them (with their percentage of the services excl. third party
+costs), compares what the accepted offers granted with the discounts of
+the invoices so far and fills in the remaining discount, the offers'
+percentages of this invoice's services excl. third party costs, or any
+other percentage. What matters is that the customer gets the discounts
+once in total, not which invoice carries them; if less was delivered
+than offered, a smaller discount may be right.
+
 ## Fixed amounts and down payments
 
 The amount's help shows the total excl. tax of the accepted offers

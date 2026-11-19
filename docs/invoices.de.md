@@ -53,6 +53,17 @@ verrechnen werden aufgeführt, «Alle Leistungen des Projekts anzeigen»
 zeigt den Rest. Eine mit 0 verrechnete Leistung verknüpft trotzdem ihre
 offenen Einträge und schreibt sie so ab.
 
+Die Positionen zeigen ihre Fremdkosten, die Totale die Leistungen ohne
+Fremdkosten. Haben Offerten des Projekts einen Rabatt, führt die Hilfe
+zum Rabatt sie auf (mit ihrem Prozentsatz der Leistungen ohne
+Fremdkosten), vergleicht, was die akzeptierten Offerten gewähren, mit den
+Rabatten der bisherigen Rechnungen und setzt den verbleibenden Rabatt,
+die Prozentsätze der Offerten auf die Leistungen ohne Fremdkosten dieser
+Rechnung oder einen beliebigen Prozentsatz ein. Entscheidend ist, dass
+die Kundschaft die Rabatte insgesamt einmal erhält, nicht welche Rechnung
+sie enthält; wurde weniger geliefert als offeriert, kann ein kleinerer
+Rabatt richtig sein.
+
 ## Fixbeträge und Anzahlungen
 
 Die Hilfe zum Betrag zeigt das Total exkl. MwSt der akzeptierten

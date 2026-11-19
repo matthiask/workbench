@@ -165,6 +165,7 @@
                           id="{{ radio.id_for_label }}"
                           data-hours="{{ preset.hours|unlocalize }}"
                           data-cost="{{ preset.cost|unlocalize }}"
+                          data-third-party-costs="{{ preset.third_party_costs|unlocalize }}"
                           {% if radio.data.selected %}checked{% endif %}
                         >
                         <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
@@ -259,6 +260,10 @@
                       >{% include 'svg/alert.svg' %}</span>
                       <output data-amount></output>
                     </span>
+                    <div class="small text-muted" data-third-party-costs-note hidden>
+                      {% translate 'thereof third party costs' %}
+                      <output data-third-party-costs></output>
+                    </div>
                   </td>
                   <td class="text-center">
                     <input
@@ -280,6 +285,13 @@
               <td class="text-end text-nowrap" data-subtotal></td>
               <td></td>
             </tr>
+            <tr data-excl-third-party-costs-row hidden>
+              <th colspan="4" class="text-end fw-normal small text-muted">
+                {% translate 'thereof services excl. third party costs' %}
+              </th>
+              <td class="text-end text-nowrap small text-muted" data-excl-third-party-costs></td>
+              <td></td>
+            </tr>
             <tr>
               <th colspan="4" class="text-end">
                 <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
@@ -297,6 +309,12 @@
               </td>
               <td></td>
             </tr>
+            {% if form.discount_help %}
+              <tr>
+                <td colspan="4" class="text-end small text-muted">{{ form.discount_help }}</td>
+                <td colspan="2"></td>
+              </tr>
+            {% endif %}
             {% if form.down_payments %}
               <tr>
                 <th colspan="4" class="text-end fw-normal">

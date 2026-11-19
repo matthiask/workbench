@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 12:12+0100\n"
+"POT-Creation-Date: 2026-11-19 12:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2500,6 +2500,44 @@ msgstr "ohne Fremdkosten"
 #, python-brace-format
 msgid "Use {percentages} or {percentage}."
 msgstr "Verrechne {percentages} oder {percentage}."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Offer {offer}{not_accepted}: discount {discount}{percentage}."
+msgstr "Offerte {offer}{not_accepted}: Rabatt {discount}{percentage}."
+
+#: workbench/invoices/forms.py
+msgid "not accepted yet"
+msgstr "noch nicht akzeptiert"
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "{percentage}% of the services excl. third party costs"
+msgstr "{percentage}% der Leistungen ohne Fremdkosten"
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "The accepted offers granted discounts of {granted}, the invoices so far gave {given}."
+msgstr "Die akzeptierten Offerten gewähren Rabatte von {granted}, die bisherigen Rechnungen gaben {given}."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Remaining discount: {remaining}"
+msgstr "Verbleibender Rabatt: {remaining}"
+
+#: workbench/invoices/forms.py
+msgid "the services excl. third party costs of this invoice"
+msgstr "den Leistungen ohne Fremdkosten dieser Rechnung"
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Use {links} or {percentage}."
+msgstr "Verwende {links} oder {percentage}."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Use {percentage}."
+msgstr "Verwende {percentage}."
 
 #: workbench/invoices/forms.py
 msgid "Determined by project."
@@ -5710,6 +5748,14 @@ msgstr "in Vorbereitung"
 #: workbench/templates/invoices/invoice_form.html
 msgid "Nothing is invoiced although there is something to invoice. The logged hours and costs which haven't been invoiced yet are assigned to this invoice anyway."
 msgstr "Es wird nichts verrechnet, obwohl es etwas zu verrechnen gäbe. Die noch nicht verrechneten Stunden und Kosten werden trotzdem dieser Rechnung zugeordnet."
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "thereof third party costs"
+msgstr "davon Fremdkosten"
+
+#: workbench/templates/invoices/invoice_form.html
+msgid "thereof services excl. third party costs"
+msgstr "davon Leistungen ohne Fremdkosten"
 
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html workbench/tools/pdf.py
