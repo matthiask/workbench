@@ -488,6 +488,19 @@ class Offer(ModelWithTotal):
         )
 
     @property
+    def service_cost_excl_third_party_costs(self):
+        """The base of percentage discounts: the non-optional services
+        without third party costs. Prefetch ``services`` for many offers"""
+        return sum(
+            (
+                service.service_cost_excl_third_party_costs
+                for service in self.services.all()
+                if not service.is_optional
+            ),
+            Z2,
+        )
+
+    @property
     def gross_margin(self):
         """The total excl. tax (after the discount) without the third party
         costs of the non-optional services, e.g. what counts as won business;

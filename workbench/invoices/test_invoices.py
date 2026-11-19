@@ -171,7 +171,76 @@ class InvoicesTest(TestCase):
             offer.save()
         self.client.force_login(project.owned_by)
         response = self.client.get(project.urls["createinvoice"] + "?type=fixed")
-        self.assertContains(response, "Total excl. tax of accepted offers: 13’000.00")
+        self.assertContains(response, "Accepted offers: 13’000.00")
+
+    def test_amount_helpers(self):
+        """Down payments and fixed amount invoices show the accepted offers,
+        what has been invoiced so far and offer percentages of both bases;
+        the rest is only filled in by fixed amount invoices, whose down
+        payments are deducted when they're applied"""
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(
+            project=project, status=Offer.ACCEPTED, discount=2000
+        )
+        factories.ServiceFactory.create(
+            project=project, offer=offer, cost=22000, third_party_costs=2000
+        )
+        offer.save()
+        common = {
+            "project": project,
+            "customer": project.customer,
+            "contact": project.contact,
+            "status": Invoice.SENT,
+        }
+        factories.InvoiceFactory.create(
+            **common, type=Invoice.FIXED, subtotal=6000, discount=1000
+        )
+        factories.InvoiceFactory.create(
+            **common, type=Invoice.DOWN_PAYMENT, subtotal=3000
+        )
+        factories.InvoiceFactory.create(
+            **{**common, "status": Invoice.CANCELED},
+            type=Invoice.FIXED,
+            subtotal=9999,
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.get(project.urls["createinvoice"] + "?type=fixed")
+        self.assertContains(
+            response,
+            "Accepted offers: 20’000.00 (without third party costs: 18’000.00)."
+            " Invoiced so far: 5’000.00, down payments: 3’000.00"
+            " (not applied yet: 3’000.00).",
+        )
+        self.assertContains(
+            response,
+            '<a href="#" data-field-value="15000.00">Fill in the rest: 15’000.00</a>',
+        )
+        self.assertContains(response, 'data-percentage="#id_subtotal"')
+        self.assertContains(response, '<option value="20000.00">')
+        self.assertContains(response, '<option value="18000.00">')
+        self.assertContains(response, 'data-field-value="10000.00">50%</a>')
+
+        response = self.client.get(project.urls["createinvoice"] + "?type=down-payment")
+        self.assertContains(response, "Invoiced so far: 5’000.00")
+        self.assertNotContains(response, "Fill in the rest")
+        self.assertContains(response, 'data-percentage="#id_subtotal"')
+
+        # Editing an invoice in preparation leaves itself out
+        invoice = factories.InvoiceFactory.create(
+            **{**common, "status": Invoice.IN_PREPARATION},
+            type=Invoice.FIXED,
+            subtotal=4000,
+        )
+        response = self.client.get(invoice.urls["update"])
+        self.assertContains(response, "Invoiced so far: 5’000.00")
+        self.assertContains(response, 'data-field-value="15000.00"')
+
+        # Projects without accepted offers have nothing to show
+        other = factories.ProjectFactory.create(owned_by=project.owned_by)
+        response = self.client.get(other.urls["createinvoice"] + "?type=fixed")
+        self.assertNotContains(response, "Accepted offers")
+        self.assertNotContains(response, "data-percentage")
 
     def test_services_invoiced_already(self):
         """Invoicing services again is a warning"""

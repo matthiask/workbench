@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 11:30+0100\n"
+"POT-Creation-Date: 2026-11-19 12:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -723,7 +723,7 @@ msgid "date until"
 msgstr "Datum bis"
 
 #: workbench/awt/models.py workbench/awt/pdf.py workbench/projects/models.py
-#: workbench/templates/awt/year_detail.html
+#: workbench/templates/awt/year_detail.html workbench/tools/forms.py
 msgid "percentage"
 msgstr "Prozent"
 
@@ -2464,6 +2464,44 @@ msgid "This down payment has been applied to an invoice, cancel that invoice fir
 msgstr "Diese Anzahlung wurde bereits mit einer Rechnung verrechnet, storniere zuerst diese Rechnung:"
 
 #: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Accepted offers: {total} (without third party costs: {excl})."
+msgstr "Akzeptierte Offerten: {total} (ohne Fremdkosten: {excl})."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Accepted offers: {total}."
+msgstr "Akzeptierte Offerten: {total}."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Invoiced so far: {invoiced}, down payments: {down_payments} (not applied yet: {not_applied})."
+msgstr "Bisher verrechnet: {invoiced}, Anzahlungen: {down_payments} (noch nicht angewendet: {not_applied})."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Invoiced so far: {invoiced}."
+msgstr "Bisher verrechnet: {invoiced}."
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Fill in the rest: {rest}"
+msgstr "Den Rest einsetzen: {rest}"
+
+#: workbench/invoices/forms.py workbench/projects/charts.py
+msgid "accepted offers"
+msgstr "akzeptierte Offerten"
+
+#: workbench/invoices/forms.py
+msgid "without third party costs"
+msgstr "ohne Fremdkosten"
+
+#: workbench/invoices/forms.py
+#, python-brace-format
+msgid "Use {percentages} or {percentage}."
+msgstr "Verrechne {percentages} oder {percentage}."
+
+#: workbench/invoices/forms.py
 msgid "Determined by project."
 msgstr "Durch Projekt bestimmt."
 
@@ -2542,11 +2580,6 @@ msgstr "Die erfassten Stunden und Kosten dieser Rechnung wurden beim Stornieren 
 #, python-format
 msgid "The down payments (%(down_payments)s) exceed this invoice, its total would be negative."
 msgstr "Die Anzahlungen (%(down_payments)s) übersteigen diese Rechnung, ihr Total wäre negativ."
-
-#: workbench/invoices/forms.py
-#, python-brace-format
-msgid "Total excl. tax of accepted offers: {accepted}. Use {percentages}."
-msgstr "Total exkl. MwSt der akzeptieren Offerten: {accepted}. Verrechne {percentages}."
 
 #: workbench/invoices/forms.py
 msgid "This is the final invoice, close the project"
@@ -2793,8 +2826,7 @@ msgid "Paid on %(closed_on)s"
 msgstr "Bezahlt am %(closed_on)s"
 
 #: workbench/invoices/models.py workbench/projects/forms.py
-#: workbench/templates/_hours_rings.html workbench/templates/start.html
-#: workbench/templates/timestamps.html
+#: workbench/templates/_hours_rings.html workbench/templates/timestamps.html
 msgid "today"
 msgstr "heute"
 
@@ -4101,10 +4133,6 @@ msgstr "Projekte"
 msgid "invoiced"
 msgstr "Verrechnet"
 
-#: workbench/projects/charts.py
-msgid "accepted offers"
-msgstr "akzeptierte Offerten"
-
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
 msgstr "Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgelöst, wenn diese Kampagne gelöscht wird."
@@ -4681,7 +4709,7 @@ msgid "outreach"
 msgstr "Outreach"
 
 #: workbench/reporting/utils.py workbench/templates/_hours_rings.html
-#: workbench/templates/start.html workbench/templates/timestamps.html
+#: workbench/templates/timestamps.html
 msgid "this week"
 msgstr "diese Woche"
 
@@ -6072,6 +6100,22 @@ msgid "Create invoice"
 msgstr "Rechnung erstellen"
 
 #: workbench/templates/projects/project_detail.html
+msgid "No services yet."
+msgstr "Noch keine Leistungen."
+
+#: workbench/templates/projects/project_detail.html
+msgid "moved to"
+msgstr "verschoben auf"
+
+#: workbench/templates/projects/project_detail.html
+msgid "reserved, no target project yet"
+msgstr "reserviert, noch kein Zielprojekt"
+
+#: workbench/templates/projects/project_detail.html
+msgid "moved from"
+msgstr "verschoben von"
+
+#: workbench/templates/projects/project_detail.html
 msgid "Reassign logbook entries"
 msgstr "Logbucheinträge neu zuweisen"
 
@@ -6090,22 +6134,6 @@ msgstr "Kosten"
 #: workbench/templates/projects/project_detail.html
 msgid "Assign service type"
 msgstr "Leistungstyp zuweisen"
-
-#: workbench/templates/projects/project_detail.html
-msgid "No services yet."
-msgstr "Noch keine Leistungen."
-
-#: workbench/templates/projects/project_detail.html
-msgid "moved to"
-msgstr "verschoben auf"
-
-#: workbench/templates/projects/project_detail.html
-msgid "reserved, no target project yet"
-msgstr "reserviert, noch kein Zielprojekt"
-
-#: workbench/templates/projects/project_detail.html
-msgid "moved from"
-msgstr "verschoben von"
 
 #: workbench/templates/projects/project_hours_for_invoicing.html
 msgid "Logged hours whose hours for invoicing differ from the time spent. The hours for invoicing are what the work is worth, they are used for invoicing and for the value of the work."
@@ -6861,6 +6889,15 @@ msgid "Please decide whether the linked planning entries should be deleted."
 msgstr "Bitte entscheide, ob die verknüpften Planungseinträge gelöscht werden sollen."
 
 #: workbench/tools/forms.py
+msgid "base"
+msgstr "Basis"
+
+#: workbench/tools/forms.py
+#, python-brace-format
+msgid "% of {base}"
+msgstr "% von {base}"
+
+#: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
 msgstr "Kann automatisch mit der Organisation des Kontaktes gefüllt werden."
 
@@ -7000,6 +7037,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-brace-format
+#~ msgid "Total excl. tax of accepted offers: {accepted}. Use {percentages}."
+#~ msgstr "Total exkl. MwSt der akzeptieren Offerten: {accepted}. Verrechne {percentages}."
 
 #, python-format
 #~ msgid "You are attempting to set status to '%(to)s', but the offer has already been closed on %(closed)s. Are you sure?"

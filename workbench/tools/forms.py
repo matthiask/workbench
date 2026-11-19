@@ -1,5 +1,6 @@
 import json
 import time
+from decimal import Decimal
 from functools import wraps
 from urllib.parse import urlencode
 
@@ -7,7 +8,7 @@ from django import forms
 from django.forms.utils import flatatt
 from django.urls import reverse
 from django.utils.encoding import force_str
-from django.utils.html import escape, format_html
+from django.utils.html import escape, format_html, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
@@ -172,6 +173,38 @@ def delete_planned_work_field(label):
                 "Please decide whether the linked planning entries should be deleted."
             )
         },
+    )
+
+
+def percentage_input(target, bases):
+    """An input filling x% of a base into the field ``target`` (a CSS
+    selector), rounded to 5 cents, which also shows the field's amount as a
+    percentage of the base (``main.js``). ``bases`` are ``(label, amount)``
+    pairs, a choice if there are several"""
+    if len(bases) == 1:
+        base = format_html(
+            '<span data-percentage-base="{}">{}</span>',
+            bases[0][1].quantize(Decimal("0.00")),
+            bases[0][0],
+        )
+    else:
+        base = format_html(
+            '<select class="form-select form-select-sm" data-percentage-base'
+            ' aria-label="{}">{}</select>',
+            _("base"),
+            format_html_join(
+                "",
+                '<option value="{}">{}</option>',
+                ((amount.quantize(Decimal("0.00")), label) for label, amount in bases),
+            ),
+        )
+    return format_html(
+        '<span class="wb-percentage"><input type="number" step="any"'
+        ' class="form-control form-control-sm" data-percentage="{}"'
+        ' aria-label="{}">{}</span>',
+        target,
+        _("percentage"),
+        format_html(_("% of {base}"), base=base),
     )
 
 

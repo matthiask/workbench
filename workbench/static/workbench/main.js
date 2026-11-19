@@ -550,9 +550,52 @@ on("click", "[data-field-value]", (e, el) => {
   for (const field of el
     .closest(".form-group")
     .querySelectorAll("input, textarea, select")) {
+    // Percentage inputs in help texts follow the field
+    if (field.closest(".wb-percentage")) continue
     setValue(field, el.dataset.fieldValue, { change: true })
   }
 })
+
+// Percentage inputs (percentage_input()) fill in x% of their base, rounded
+// to 5 cents, and show the field's amount as a percentage of the base
+function percentageBase(input) {
+  const base = input
+    .closest(".wb-percentage")
+    .querySelector("[data-percentage-base]")
+  return Number.parseFloat(base.value ?? base.dataset.percentageBase) || 0
+}
+
+function fillPercentage(input) {
+  const target = document.querySelector(input.dataset.percentage)
+  const percentage = Number.parseFloat(input.value)
+  const base = percentageBase(input)
+  if (!target || Number.isNaN(percentage) || !base) return
+  const amount = Math.round((base * percentage) / 100 / 0.05) * 0.05
+  setValue(target, amount.toFixed(2), { change: true })
+  target.dispatchEvent(new Event("input", { bubbles: true }))
+}
+
+function showPercentages() {
+  for (const input of document.querySelectorAll("[data-percentage]")) {
+    // Don't overwrite what's being typed
+    if (input === document.activeElement) continue
+    const target = document.querySelector(input.dataset.percentage)
+    const amount = Number.parseFloat(target?.value)
+    const base = percentageBase(input)
+    input.value = !amount || !base ? "" : ((amount / base) * 100).toFixed(1)
+  }
+}
+
+on("input", "[data-percentage]", (_e, el) => fillPercentage(el))
+on("change", "[data-percentage-base]", (_e, el) => {
+  const input = el.closest(".wb-percentage").querySelector("[data-percentage]")
+  if (input.value) fillPercentage(input)
+  else showPercentages()
+})
+for (const type of ["input", "change"]) {
+  on(type, "input:not([data-percentage])", showPercentages)
+}
+document.addEventListener("DOMContentLoaded", showPercentages)
 
 on("click", "[data-set-period]", (e, el) => {
   e.preventDefault()

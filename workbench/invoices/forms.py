@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.db.models import Q, Sum
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from django.utils.html import format_html, mark_safe
+from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
@@ -42,6 +42,7 @@ from workbench.tools.forms import (
     SuggestionsInput,
     Textarea,
     add_prefix,
+    percentage_input,
 )
 from workbench.tools.pdf import PDFDocument, pdf_response
 from workbench.tools.validation import in_days
@@ -321,6 +322,98 @@ class SettleInvoiceForm(ModelForm):
         return data
 
 
+def amount_help_text(invoice):
+    """The accepted offers, what has been invoiced so far and percentages of
+    the accepted offers for down payments and fixed amount invoices
+
+    Invoiced so far is the work invoiced (subtotal minus discount), down
+    payments are listed separately: the final invoice deducts the ones it
+    applies from its subtotal, the rest mustn't deduct them a second time"""
+    project = invoice.project
+    accepted = accepted_offers_by_project([project.pk])
+    if project.pk not in accepted:
+        return None
+    accepted = accepted[project.pk]
+    total = accepted["total"]
+    excl_third_party_costs = total - accepted["third_party_costs"]
+
+    invoices = project.invoices.exclude(status=Invoice.CANCELED)
+    if invoice.pk:
+        invoices = invoices.exclude(pk=invoice.pk)
+    invoiced = sum(
+        (
+            row.subtotal - row.discount
+            for row in invoices.filter(type__in=[Invoice.FIXED, Invoice.SERVICES])
+        ),
+        Z2,
+    )
+    down_payments = list(invoices.filter(type=Invoice.DOWN_PAYMENT))
+
+    facts = [
+        format_html(
+            _("Accepted offers: {total} (without third party costs: {excl})."),
+            total=currency(total),
+            excl=currency(excl_third_party_costs),
+        )
+        if accepted["third_party_costs"]
+        else format_html(_("Accepted offers: {total}."), total=currency(total))
+    ]
+    if down_payments:
+        facts.append(
+            format_html(
+                _(
+                    "Invoiced so far: {invoiced}, down payments: {down_payments}"
+                    " (not applied yet: {not_applied})."
+                ),
+                invoiced=currency(invoiced),
+                down_payments=currency(
+                    sum((row.total_excl_tax for row in down_payments), Z2)
+                ),
+                not_applied=currency(
+                    sum(
+                        (
+                            row.total_excl_tax
+                            for row in down_payments
+                            if not row.down_payment_applied_to_id
+                        ),
+                        Z2,
+                    )
+                ),
+            )
+        )
+    else:
+        facts.append(
+            format_html(_("Invoiced so far: {invoiced}."), invoiced=currency(invoiced))
+        )
+    if invoice.type == Invoice.FIXED and (rest := total - invoiced) > 0:
+        facts.append(
+            format_html(
+                '<a href="#" data-field-value="{}">{}</a>.',
+                rest,
+                format_html(_("Fill in the rest: {rest}"), rest=currency(rest)),
+            )
+        )
+
+    bases = [(_("accepted offers"), total)]
+    if accepted["third_party_costs"]:
+        bases.append((_("without third party costs"), excl_third_party_costs))
+    facts.append(
+        format_html(
+            _("Use {percentages} or {percentage}."),
+            percentages=format_html_join(
+                ", ",
+                '<a href="#" data-field-value="{}">{}%</a>',
+                (
+                    ((total / 100 * percentage).quantize(Z2), percentage)
+                    for percentage in (50, 100)
+                ),
+            ),
+            percentage=percentage_input("#id_subtotal", bases),
+        )
+    )
+    return format_html_join(" ", "{}", ((fact,) for fact in facts))
+
+
 class InvoiceForm(PostalAddressSelectionForm):
     user_fields = default_to_current_user = ("owned_by",)
 
@@ -430,6 +523,14 @@ class InvoiceForm(PostalAddressSelectionForm):
                     )
                     for invoice in eligible_down_payment_invoices
                 ]
+
+        if (
+            self.instance.type in {Invoice.DOWN_PAYMENT, Invoice.FIXED}
+            and self.instance.project_id
+            and not self.instance.is_freezed
+            and (help_text := amount_help_text(self.instance))
+        ):
+            self.fields["subtotal"].help_text = help_text
 
         self.order_fields(
             field
@@ -840,23 +941,6 @@ class CreateProjectInvoiceForm(InvoiceForm):
             self.add_services_field()
             self.fields.pop("service_period_from")
             self.fields.pop("service_period_until")
-
-        if self.instance.type in {self.instance.DOWN_PAYMENT, self.instance.FIXED}:
-            project = self.instance.project
-            accepted = accepted_offers_by_project([project.pk])[project.pk]["total"]
-            self.fields["subtotal"].help_text = mark_safe(
-                _(
-                    "Total excl. tax of accepted offers: {accepted}. Use {percentages}."
-                ).format(
-                    accepted=currency(accepted),
-                    percentages=mark_safe(
-                        ", ".join(
-                            f'<a href="#" data-field-value="{(accepted / 100 * percentage).quantize(Z2)}">{percentage}%</a>'
-                            for percentage in (50, 100)
-                        )
-                    ),
-                )
-            )
 
         if self.request.method == "GET" and (
             warnings := self.project.create_invoice_warnings(invoice_type)

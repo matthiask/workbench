@@ -1572,3 +1572,28 @@ class OffersTest(TestCase):
             f"Last accepted on {local_date_format(in_days(-20))}."
             f' <a href="#" data-field-value="{in_days(-20).isoformat()}">',
         )
+
+    def test_service_cost_excl_third_party_costs(self):
+        """The base of percentage discounts: the service cost without what
+        we pay others, of the non-optional services"""
+        offer = factories.OfferFactory.create()
+        for cost, third_party_costs, optional in [
+            (2200, 2000, False),
+            (500, None, False),
+            (1000, 800, True),
+        ]:
+            factories.ServiceFactory.create(
+                project=offer.project,
+                offer=offer,
+                effort_type="Programming",
+                effort_rate=100,
+                effort_hours=10,
+                cost=cost,
+                third_party_costs=third_party_costs,
+                is_optional=optional,
+            )
+        service = offer.services.get(cost=2200)
+        self.assertEqual(service.service_cost_excl_third_party_costs, Decimal(1200))
+        self.assertEqual(
+            offer.service_cost_excl_third_party_costs, Decimal(1200 + 1500)
+        )

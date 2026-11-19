@@ -11,8 +11,7 @@
 
 Auf dem Projekt führt «Neu» die Typen unter «Rechnung» auf; «Rechnung
 erstellen» im Menü einer Offerte erstellt eine Leistungsrechnung für
-diese Offerte. Bei Fixbetrag und Anzahlung bietet die Hilfe zum Betrag
-Prozente der akzeptierten Offerten an. Workbench warnt, wenn das Projekt
+diese Offerte. Workbench warnt, wenn das Projekt
 schon eine Rechnung in Vorbereitung hat und wenn Fixbetrags- und
 Leistungsrechnungen gemischt werden, was dieselbe Arbeit doppelt
 verrechnen könnte.
@@ -49,6 +48,21 @@ schliesst eine Leistung für die Erfassung. Nur Leistungen mit etwas zu
 verrechnen werden aufgeführt, «Alle Leistungen des Projekts anzeigen»
 zeigt den Rest. Eine mit 0 verrechnete Leistung verknüpft trotzdem ihre
 offenen Einträge und schreibt sie so ab.
+
+## Fixbeträge und Anzahlungen
+
+Die Hilfe zum Betrag zeigt das Total exkl. MwSt der akzeptierten
+Offerten (nach ihren Rabatten) und was bisher verrechnet wurde. «Bisher
+verrechnet» ist die verrechnete Arbeit (Zwischentotal minus Rabatt der
+Fixbetrags- und Leistungsrechnungen), Anzahlungen stehen separat, mit dem
+Teil, der noch nicht angewendet wurde. Eine Fixbetragsrechnung kann den
+Rest einsetzen: Die Anzahlungen, die sie anwendet, werden davon
+abgezogen, nicht doppelt gezählt.
+
+Ein Prozentsatz setzt diesen Anteil der akzeptierten Offerten ein oder,
+wenn ihre Leistungen Fremdkosten haben, der akzeptierten Offerten ohne
+Fremdkosten, auf 5 Rappen gerundet. Anzahlungen und Fixbeträge zeigen
+keinen Rabatt: Ihre Basis ist schon nach den Rabatten der Offerten.
 
 ## Anzahlungen
 

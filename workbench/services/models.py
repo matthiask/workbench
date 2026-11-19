@@ -63,6 +63,12 @@ class ServiceBase(Model):
     def __lt__(self, other):
         return self.position < other.position if isinstance(other, ServiceBase) else 1
 
+    @property
+    def service_cost_excl_third_party_costs(self):
+        """The base of percentage discounts: what we pay others doesn't
+        count, markups on third party costs do"""
+        return self.service_cost - (self.third_party_costs or Z2)
+
     def project_service_title(self):
         title = "{}: {}{}{}".format(
             self.project,

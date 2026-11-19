@@ -10,9 +10,7 @@
 ## Creating an invoice
 
 On the project, "New" lists the types under "Invoice"; "Create invoice"
-in an offer's menu creates a services invoice for that offer. For a fixed
-amount and a down payment, the amount's help offers percentages of the
-accepted offers. Workbench warns when the project already has an invoice
+in an offer's menu creates a services invoice for that offer. Workbench warns when the project already has an invoice
 in preparation and when mixing fixed amount and services invoices, which
 risks invoicing the same work twice.
 
@@ -45,6 +43,21 @@ Hints show logged hours and costs which aren't invoiced as offered. The
 something to invoice are listed, "List all services of the project"
 shows the rest. A service invoiced with 0 still links its open entries,
 which writes them off.
+
+## Fixed amounts and down payments
+
+The amount's help shows the total excl. tax of the accepted offers
+(after their discounts) and what has been invoiced so far. "Invoiced so
+far" is the work invoiced (subtotal minus discount of the fixed amount
+and services invoices), down payments are listed separately with the
+part which hasn't been applied yet. A fixed amount invoice can fill in
+the rest: the down payments it applies are deducted from it, not counted
+twice.
+
+A percentage fills in that share of the accepted offers or, if their
+services have third party costs, of the accepted offers without third
+party costs, rounded to 5 cents. Down payments and fixed amount invoices
+show no discount: their base is after the offers' discounts already.
 
 ## Down payments
 

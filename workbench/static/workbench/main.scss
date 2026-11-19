@@ -523,6 +523,23 @@ tbody th > a {
   height: 4px;
 }
 
+// percentage_input(): fills in x% of a base
+.wb-percentage {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: baseline;
+
+  input {
+    width: 5.5rem;
+    text-align: end;
+  }
+
+  select {
+    width: auto;
+  }
+}
+
 // Hover target for the tooltip of the bar template tag, taller than the bar
 .wb-bar {
   padding: 0.5rem 0;
