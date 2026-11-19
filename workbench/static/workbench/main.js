@@ -686,7 +686,7 @@ function updateInvoiceService(row) {
     Number.parseFloat(source?.dataset.thirdPartyCosts) || 0,
     value(cost),
   )
-  row.querySelector("[data-third-party-costs]").textContent =
+  row.querySelector("output[data-third-party-costs]").textContent =
     formatAmount(thirdPartyCosts)
   row.querySelector("[data-third-party-costs-note]").hidden = !thirdPartyCosts
   return { amount, thirdPartyCosts }
