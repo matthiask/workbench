@@ -1058,7 +1058,7 @@ function initWidgets() {
           exclThirdPartyCosts +=
             serviceCost -
             Math.min(
-              Number.parseFloat(service.dataset.thirdPartyCosts) || 0,
+              read("[data-third-party-costs] input", service),
               read("[data-cost] input", service),
             )
         }

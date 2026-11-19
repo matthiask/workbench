@@ -31,6 +31,9 @@ def service_data(service, **kwargs):
         "effort_rate": service.effort_rate or "",
         "effort_hours": service.effort_hours or "",
         "cost": service.cost or "",
+        "third_party_costs": ""
+        if service.third_party_costs is None
+        else service.third_party_costs,
     } | kwargs
 
 
@@ -1617,4 +1620,46 @@ class OffersTest(TestCase):
         response = self.client.get(offer.urls["update"])
         self.assertContains(response, 'data-percentage="#id_discount"')
         self.assertContains(response, 'data-percentage-base="2700.00"')
-        self.assertContains(response, 'data-third-party-costs="2000.00"')
+
+    def test_offer_form_third_party_costs(self):
+        """Third party costs are entered in the offer form, also for new
+        services"""
+        offer = factories.OfferFactory.create(postal_address="A\nStreet\nCity")
+        service = factories.ServiceFactory.create(
+            offer=offer, project=offer.project, cost=500, third_party_costs=400
+        )
+        self.client.force_login(offer.owned_by)
+
+        response = self.client.get(offer.urls["update"])
+        self.assertContains(response, 'name="services-0-third_party_costs"')
+
+        response = self.client.post(
+            offer.urls["update"],
+            offer_form_data(
+                offer,
+                service_data(service, third_party_costs=450),
+                {
+                    "position": 20,
+                    "in_offer": "on",
+                    "title": "Hosting",
+                    "cost": 1200,
+                    "third_party_costs": 1000,
+                },
+            ),
+        )
+        self.assertRedirects(response, offer.get_absolute_url())
+        self.assertEqual(
+            list(offer.services.values_list("title", "third_party_costs")),
+            [("Any service", 450), ("Hosting", 1000)],
+        )
+        offer.refresh_from_db()
+        self.assertEqual(offer.service_cost_excl_third_party_costs, 50 + 200)
+
+        # Third party costs are a part of the cost
+        response = self.client.post(
+            offer.urls["update"],
+            offer_form_data(
+                offer, service_data(service, cost="", third_party_costs=100)
+            ),
+        )
+        self.assertContains(response, "Cannot be empty if third party costs is set.")

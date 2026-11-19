@@ -1,8 +1,7 @@
-{% load fineforms i18n l10n %}
+{% load fineforms i18n %}
 <tr
   id="{{ form_id }}"
   data-service
-  data-third-party-costs="{{ form.instance.third_party_costs|default_if_none:0|unlocalize }}"
   {% if form.service_type %}data-autofill="{{ view.default_service_types_json }}"{% endif %}
   {% if not form.in_offer.value %}hidden{% endif %}
 >
@@ -18,20 +17,24 @@
     {% endif %}
     {{ form.in_offer }}
     {% ff_errors form %}
-    {% ff_fields form exclude='in_offer,service_type,title,description,effort_type,effort_rate,effort_hours,cost,is_optional' %}
+    {% ff_fields form exclude='in_offer,service_type,title,description,effort_type,effort_rate,effort_hours,cost,third_party_costs,is_optional' %}
   </td>
   <td>
     {% ff_field form.title %}
     {% ff_field form.description %}
   </td>
   <td>
-    {% if form.service_type %}{% ff_field form.service_type %}{% endif %}
-    {% ff_field form.effort_type %}
+    {# Stacked with their labels like the lines of invoices #}
+    <div class="wb-offer-line">
+      {% if form.service_type %}<div>{% ff_field form.service_type %}</div>{% endif %}
+      <div>{% ff_field form.effort_type %}</div>
+      <div data-effort-hours>{% ff_field form.effort_hours %}</div>
+      <div data-effort-rate>{% ff_field form.effort_rate %}</div>
+      <div data-cost>{% ff_field form.cost %}</div>
+      <div data-third-party-costs>{% ff_field form.third_party_costs %}</div>
+      <div data-optional>{% ff_field form.is_optional %}</div>
+    </div>
   </td>
-  <td data-effort-rate>{% ff_field form.effort_rate %}</td>
-  <td data-effort-hours>{% ff_field form.effort_hours %}</td>
-  <td data-cost>{% ff_field form.cost %}</td>
-  <td data-optional>{% ff_field form.is_optional %}</td>
   <td class="text-end text-nowrap">
     <span data-service-cost></span>
     {% if editable %}

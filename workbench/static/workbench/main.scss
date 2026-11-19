@@ -673,6 +673,47 @@ tbody th > a {
   margin-bottom: 0;
 }
 
+// The effort and the costs of a service stacked with their labels, like the
+// lines of invoices
+.table-offer-pricing .wb-offer-line {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+
+  > div,
+  > div > .form-group {
+    display: contents;
+  }
+
+  // The wrapper of the input and its errors
+  > div > .form-group > div {
+    min-width: 0;
+  }
+
+  label {
+    display: block;
+    margin: 0;
+    color: var(--bs-secondary-color);
+  }
+
+  // The checkbox spans both columns
+  > [data-optional] {
+    display: block;
+    grid-column: 1 / -1;
+
+    .form-check-label {
+      display: inline;
+    }
+  }
+
+  // Amounts don't need the whole width
+  input[type="number"] {
+    max-width: 9rem;
+    text-align: end;
+  }
+}
+
 // Headings structure the services of offers
 .table-offer-pricing .wb-offer-heading {
   input[name$="-title"] {

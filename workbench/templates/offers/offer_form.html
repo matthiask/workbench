@@ -46,11 +46,7 @@
         <colgroup>
           <col>
           <col>
-          <col width="16%">
-          <col width="8%">
-          <col width="7%">
-          <col width="8%">
-          <col>
+          <col width="34%">
           <col width="8%">
         </colgroup>
         <thead class="sticky">
@@ -60,14 +56,7 @@
               {% translate 'title'|capfirst %} / {% translate 'description' %}
             </th>
             <th>
-              {% if editable %}{% translate 'service type'|capfirst %} /
-                {% translate 'effort type' %}{% else %}{% translate 'effort type'|capfirst %}{% endif %}
-            </th>
-            <th>{% translate 'hourly rate'|capfirst %}</th>
-            <th>{% translate 'hours'|capfirst %}</th>
-            <th>{% translate 'cost'|capfirst %}</th>
-            <th title="{{ services.empty_form.is_optional.help_text }}">
-              {% translate 'optional'|capfirst %}
+              {% translate 'effort'|capfirst %} / {% translate 'cost' %}
             </th>
             <th class="text-end">{% translate 'service cost'|capfirst %}</th>
           </tr>
@@ -94,7 +83,7 @@
         {% if editable %}
           <tbody>
             <tr>
-              <td colspan="8">
+              <td colspan="4">
                 <button type="button" class="btn btn-quiet btn-sm" data-add-row="services">
                   {% include 'svg/plus.svg' %}
                   {% translate 'New service' %}
@@ -135,11 +124,11 @@
         {% endif %}
         <tfoot>
           <tr>
-            <th colspan="7" class="text-end">{{ form.subtotal.label }}</th>
+            <th colspan="3" class="text-end">{{ form.subtotal.label }}</th>
             <td class="text-end text-nowrap" data-subtotal></td>
           </tr>
           <tr>
-            <th colspan="7" class="text-end">
+            <th colspan="3" class="text-end">
               <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
               {{ form.discount.errors }}
               <div class="fw-normal small">{{ form.discount_percentage }}</div>
@@ -147,22 +136,22 @@
             <td>{{ form.discount }}</td>
           </tr>
           <tr data-tax-row>
-            <th colspan="7" class="text-end">{% translate 'total excl. tax'|capfirst %}</th>
+            <th colspan="3" class="text-end">{% translate 'total excl. tax'|capfirst %}</th>
             <td class="text-end text-nowrap" data-total-excl-tax></td>
           </tr>
           <tr data-tax-row>
-            <th colspan="7" class="text-end"><span data-tax-rate></span>% {% translate 'tax' %}</th>
+            <th colspan="3" class="text-end"><span data-tax-rate></span>% {% translate 'tax' %}</th>
             <td class="text-end text-nowrap" data-tax></td>
           </tr>
           <tr class="wb-total-row">
-            <th colspan="7" class="text-end">
+            <th colspan="3" class="text-end">
               <span data-tax-row>{{ titles.total_incl_tax }}</span>
               <span data-no-tax-row>{{ titles.total }}</span>
             </th>
             <td class="text-end text-nowrap" data-total></td>
           </tr>
           <tr data-optional-total-row>
-            <th colspan="7" class="text-end fw-normal fst-italic">
+            <th colspan="3" class="text-end fw-normal fst-italic">
               <span data-tax-row>{{ titles.optional_excl_tax }}</span>
               <span data-no-tax-row>{{ titles.optional }}</span>
             </th>

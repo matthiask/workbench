@@ -525,6 +525,7 @@ ServiceFormset = inlineformset_factory(
         "effort_rate",
         "effort_hours",
         "cost",
+        "third_party_costs",
         "is_optional",
     ),
     widgets={
