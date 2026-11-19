@@ -266,9 +266,9 @@ Steps 1–4 are implemented (and the `workbench-offer` skill, CLI 0.52.1).
 - **Third party costs are capped at the cost**, in Python
   (`service_cost_excl_third_party_costs`) and in JavaScript, since they're
   a part of the cost.
-- **Third party costs can't be entered in the offer form** (only in the
-  service's own form): the rows carry the saved ones, so a new service or
-  changed third party costs only count in the percentage after saving.
+- **Third party costs are entered in the offer form** too (they were only
+  in the service's own form); the rows stack effort and costs with their
+  labels like the lines of invoices.
 - **Percentages are shown with one decimal**, recomputed from the rounded
   amount once the input loses focus (33.33% shows as 33.3%).
 - The JavaScript formats amounts with `'` (de-CH), the server with `’`;
