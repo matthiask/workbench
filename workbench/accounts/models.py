@@ -3,7 +3,6 @@ import hashlib
 import secrets
 from decimal import ROUND_UP, Decimal
 from functools import total_ordering
-from itertools import chain
 
 from django.conf import settings
 from django.contrib import messages
@@ -302,9 +301,9 @@ class User(Model, AbstractBaseUser):
         for project in pinned:
             project.is_pinned = True
 
-        return chain(
-            pinned,
-            Project.objects
+        return [
+            *pinned,
+            *Project.objects
             .filter(
                 Q(
                     closed_on__isnull=True,
@@ -323,7 +322,7 @@ class User(Model, AbstractBaseUser):
             )
             .exclude(id__in=[project.pk for project in pinned])
             .select_related("customer", "contact__organization", "owned_by"),
-        )
+        ]
 
     @cached_property
     def features(self):
