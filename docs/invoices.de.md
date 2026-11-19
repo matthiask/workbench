@@ -56,7 +56,7 @@ offenen Einträge und schreibt sie so ab.
 Die Positionen zeigen ihre Fremdkosten, die Totale die Leistungen ohne
 Fremdkosten. Haben Offerten des Projekts einen Rabatt, führt die Hilfe
 zum Rabatt sie auf (mit ihrem Prozentsatz der Leistungen ohne
-Fremdkosten), vergleicht, was die akzeptierten Offerten gewähren, mit den
+Fremdkosten; Offerten in Vorbereitung zur Information), vergleicht, was die akzeptierten Offerten gewähren, mit den
 Rabatten der bisherigen Rechnungen und setzt den verbleibenden Rabatt,
 die Prozentsätze der Offerten auf die Leistungen ohne Fremdkosten dieser
 Rechnung oder einen beliebigen Prozentsatz ein. Entscheidend ist, dass

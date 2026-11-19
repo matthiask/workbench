@@ -12,7 +12,7 @@ from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.utils.html import format_html, format_html_join, mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, pgettext_lazy
 from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
 
 from workbench.accounts.models import User
@@ -395,9 +395,12 @@ def amount_help_text(invoice):
             )
         )
 
-    bases = [(_("accepted offers"), total)]
+    bases = [(pgettext_lazy("percentage of", "accepted offers"), total)]
     if accepted["third_party_costs"]:
-        bases.append((_("without third party costs"), excl_third_party_costs))
+        bases.append((
+            pgettext_lazy("percentage of", "accepted offers without third party costs"),
+            excl_third_party_costs,
+        ))
     facts.append(
         format_html(
             _("Use {percentages} or {percentage}."),
@@ -425,7 +428,7 @@ def discount_help(invoice):
     project start without discount."""
     offers = list(
         invoice.project.offers
-        .filter(status__in=[Offer.OFFERED, Offer.ACCEPTED])
+        .filter(status__in=[Offer.IN_PREPARATION, Offer.OFFERED, Offer.ACCEPTED])
         .exclude(discount=0)
         .prefetch_related("services")
     )
@@ -439,15 +442,23 @@ def discount_help(invoice):
         percentage = (
             (offer.discount / base * 100).quantize(Decimal("0.0")) if base else None
         )
-        if percentage and percentage not in percentages:
+        # Offers in preparation are only an information, they haven't
+        # promised the customer anything yet
+        if (
+            percentage
+            and percentage not in percentages
+            and offer.status != Offer.IN_PREPARATION
+        ):
             percentages.append(percentage)
         facts.append(
             format_html(
                 _("Offer {offer}{not_accepted}: discount {discount}{percentage}."),
                 offer=f"{offer.code} {offer.title}",
-                not_accepted=""
-                if offer.status == Offer.ACCEPTED
-                else format_html(" ({})", _("not accepted yet")),
+                not_accepted={
+                    Offer.ACCEPTED: "",
+                    Offer.OFFERED: format_html(" ({})", _("not accepted yet")),
+                    Offer.IN_PREPARATION: format_html(" ({})", _("in preparation")),
+                }[offer.status],
                 discount=currency(offer.discount),
                 percentage=format_html(
                     " ({})",

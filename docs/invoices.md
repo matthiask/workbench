@@ -51,7 +51,7 @@ which writes them off.
 Lines show their third party costs, the totals the services excl. third
 party costs. If offers of the project have a discount, the discount's
 help lists them (with their percentage of the services excl. third party
-costs), compares what the accepted offers granted with the discounts of
+costs; offers in preparation as an information), compares what the accepted offers granted with the discounts of
 the invoices so far and fills in the remaining discount, the offers'
 percentages of this invoice's services excl. third party costs, or any
 other percentage. What matters is that the customer gets the discounts

@@ -475,6 +475,11 @@ class InvoicesTest(TestCase):
         )
         factories.ServiceFactory.create(project=project, offer=build, cost=40000)
         build.save()
+        draft = factories.OfferFactory.create(
+            project=project, title="Phase 2", discount=300
+        )
+        factories.ServiceFactory.create(project=project, offer=draft, cost=1000)
+        draft.save()
         common = {
             "project": project,
             "customer": project.customer,
@@ -501,9 +506,16 @@ class InvoicesTest(TestCase):
         )
         self.assertContains(
             response,
+            f"Offer {draft.code} Phase 2 (in preparation): discount"
+            " 300.00 (30.0% of the services excl. third party costs).",
+        )
+        self.assertContains(
+            response,
             "The accepted offers granted discounts of 2’000.00, the invoices"
             " so far gave 500.00.",
         )
+        # Offers in preparation are only an information
+        self.assertNotContains(response, 'data-percentage-value="30.0"')
         self.assertContains(
             response,
             '<a href="#" data-field-value="1500.00" data-field-target="#id_discount">'
@@ -525,9 +537,10 @@ class InvoicesTest(TestCase):
         self.assertContains(response, 'data-percentage-base="20000.00"')
 
         # Without discounted offers there's nothing to show
-        concept.discount = build.discount = 0
+        concept.discount = build.discount = draft.discount = 0
         concept.save()
         build.save()
+        draft.save()
         response = self.client.get(project.urls["createinvoice"] + "?type=services")
         self.assertNotContains(response, "granted discounts")
         self.assertNotContains(response, 'data-percentage="#id_discount"')
