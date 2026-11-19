@@ -90,9 +90,9 @@ as today.
 - Next to the amount: a percentage input and a choice of base:
   - **Accepted offers**: Σ `total_excl_tax` of the accepted offers (as
     today).
-  - **Without third party costs**: the same minus the third party costs
-    of their non-optional services (`accepted_offers_by_project()` has
-    them already).
+  - **Accepted offers without third party costs**: the same minus the
+    third party costs of their non-optional services
+    (`accepted_offers_by_project()` has them already).
 - Typing a percentage fills in the amount, rounded to 5 cents. The 50%
   and 100% links stay as shortcuts (of the first base).
 - The facts, so that the total can be checked, if the project has
@@ -166,7 +166,8 @@ creating them and when editing them in preparation:
 - Per offer (accepted or offered, not declined) with a discount:
   "Offer 2027-0012-01 Konzept: discount 2,000.00 (10.0% of the services
   excl. third party costs)." Offers which haven't been accepted yet are
-  marked as such.
+  marked as such. Offers in preparation are listed too, as an
+  information: marked "in preparation", without a percentage link.
 - The total: "The accepted offers granted discounts of x, the invoices
   so far gave y." Compares at the project level, Σ `discount` of the
   project's invoices (not cancelled) against Σ `discount` of its
@@ -248,37 +249,27 @@ One commit each, tests first:
 4. The facts and links in services invoice forms, the third party costs
    of the rows (section 5).
 
-## 9. Status and questions for review
+## 9. Status and decisions from the review
 
 Steps 1–4 are implemented (and the `workbench-offer` skill, CLI 0.52.1).
-Open questions, decided provisionally:
 
-1. **The API didn't give offer discounts at all**: `InvoiceIn.discount`
-   defaulted to 0, so `wb invoices create --offer` never got the offer's
-   discount (section 1 assumed it did). It now defaults to the form's value
-   (the offer's discount until an invoice of its services carries one).
-   That changes what `wb` and the skills create, e.g. the
-   `lmvz-offerten` skill creating invoices per offer. Right?
-2. **Third party costs aren't fields of the offer form** (section 4
-   assumed they were). The rows carry the stored third party costs as a
-   data attribute; new services and changed costs use those, so the base
-   is only exact after saving.
-3. **Third party costs are capped at the cost**, in Python
-   (`service_cost_excl_third_party_costs`) and in JavaScript, since they're
-   a part of the cost.
-4. **Offers in preparation** aren't listed in the discount help of services
-   invoices, only offered and accepted ones (they're not a promise to the
-   customer yet).
-5. **"Invoiced so far" on fixed amount invoices** includes services
-   invoices of work beyond the offers (surplus, services without offer),
-   so the rest may be too low on such projects. It's a fact next to the
-   field, not a rule; leave it?
-6. **German wording**: "Verrechne 50%, 100% oder [ ]% von akzeptierte
-   Offerten" (the select's labels are lowercase nouns) and "Verwende … oder
-   [ ]% von den Leistungen ohne Fremdkosten dieser Rechnung". Better
-   phrasing welcome.
-7. **Percentages are shown with one decimal** and recomputed from the
-   rounded amount once the input loses focus, e.g. 33.33% shows as 33.3%.
-8. The JavaScript formats amounts with `'` (de-CH), the server with `’`;
-   pre-existing in the invoice form, visible now that both are next to each
-   other.
+- **The API gives offer discounts too**: `InvoiceIn.discount` defaulted
+  to 0, so `wb invoices create --offer` never got the offer's discount
+  (section 1 assumed it did). It now defaults to the form's value.
+- **Offers in preparation** are listed in the discount help as an
+  information (section 5).
+- **"Invoiced so far" on fixed amount invoices** includes work beyond the
+  offers, so the rest may be too low on such projects: expected when
+  mixing invoice types, which is rare.
+- **German**: "% der akzeptierten Offerten" (`pgettext` "percentage of"
+  for the bases).
+- **Third party costs are capped at the cost**, in Python
+  (`service_cost_excl_third_party_costs`) and in JavaScript, since they're
+  a part of the cost.
+- **Third party costs can't be entered in the offer form** (only in the
+  service's own form): the rows carry the saved ones, so a new service or
+  changed third party costs only count in the percentage after saving.
+- **Percentages are shown with one decimal**, recomputed from the rounded
+  amount once the input loses focus (33.33% shows as 33.3%).
+- The JavaScript formats amounts with `'` (de-CH), the server with `’`;
+  pre-existing in the invoice form.
