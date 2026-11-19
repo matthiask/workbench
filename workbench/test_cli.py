@@ -2676,6 +2676,21 @@ planned_work:
         self.assertFalse(APIToken.objects.filter(title="Agent").exists())
         self.assertNotIn("testserver", wb.core.CONFIG.read_text())
 
+        # Unreachable: forgotten anyway, but the token is still valid
+        token, secret = APIToken.create_for(
+            user=self.user, title="Agent", access="read"
+        )
+        with patch.object(
+            wb.core.requests,
+            "request",
+            side_effect=wb.core.requests.ConnectionError("Unreachable"),
+        ):
+            result = self.wb("logout", token=secret)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("couldn't revoke the token", result.output)
+        self.assertNotIn("testserver", wb.core.CONFIG.read_text())
+        self.assertTrue(APIToken.objects.filter(pk=token.pk).exists())
+
     def test_auth_urls(self):
         """Installations are identified by the scheme and the host only"""
         _token, old = APIToken.create_for(user=self.user, title="Old", access="write")

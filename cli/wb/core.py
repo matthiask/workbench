@@ -419,15 +419,19 @@ def format_error(error):
     return message
 
 
+def _send_unchecked(method, url, path, token, **kwargs):
+    return requests.request(
+        method,
+        urljoin(url, f"/api/{path}"),
+        headers={"authorization": f"Bearer {token}", "x-workbench-cli": VERSION},
+        timeout=30,
+        **kwargs,
+    )
+
+
 def _send(method, url, path, token, **kwargs):
     try:
-        return requests.request(
-            method,
-            urljoin(url, f"/api/{path}"),
-            headers={"authorization": f"Bearer {token}", "x-workbench-cli": VERSION},
-            timeout=30,
-            **kwargs,
-        )
+        return _send_unchecked(method, url, path, token, **kwargs)
     except requests.RequestException as exc:
         terminate(str(exc))
 
@@ -439,8 +443,13 @@ def logout(url):
     expired ones) count as gone."""
     revoked = True
     if token := read_config()["installations"].get(url, {}).get("token"):
-        response = _send("DELETE", url, "tokens/current/", token)
-        revoked = response.status_code in {200, 401}
+        try:
+            response = _send_unchecked("DELETE", url, "tokens/current/", token)
+        except requests.RequestException as exc:
+            click.echo(str(exc), err=True)
+            revoked = False
+        else:
+            revoked = response.status_code in {200, 401}
     forget_installation(url)
     return revoked
 

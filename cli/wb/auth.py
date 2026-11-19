@@ -87,11 +87,9 @@ def logout():
     if revoke_and_forget(url):
         click.echo(f"Logged out from {url}.")
     else:
-        click.secho(
+        terminate(
             f"Forgot {url}, but couldn't revoke the token. Delete it on the API"
-            " tokens page.",
-            fg="yellow",
-            err=True,
+            " tokens page."
         )
 
 
