@@ -11,6 +11,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.invoices.tasks import send_unsent_projected_invoices_reminders
+from workbench.offers.models import Offer
 from workbench.reporting.key_data import projected_gross_margin
 from workbench.reporting.models import FreezeDate
 from workbench.tools.validation import in_days
@@ -196,8 +197,10 @@ class ProjectedInvoicesTest(TestCase):
         pi.save()
         self.assertEqual(projected_warning(), "incomplete")
         response = self.client.get(project.get_absolute_url())
-        self.assertContains(response, "(10’000.00 &minus;")
-        self.assertContains(response, "5’000.00 third party costs)")
+        self.assertRegex(
+            response.content.decode(),
+            r"\(10’000.00\s+&minus; 5’000.00\s+third party costs\)",
+        )
 
         self.assertRegex(
             response.content.decode(),
@@ -210,4 +213,28 @@ class ProjectedInvoicesTest(TestCase):
         response = self.client.get(project.get_absolute_url())
         self.assertContains(
             response, "Projected invoices exceed the budgeted work and costs"
+        )
+
+    def test_projected_warning_discount(self):
+        """Projected invoices are compared to the gross margin after discounts"""
+        offer = factories.OfferFactory.create(status=Offer.ACCEPTED)
+        factories.ServiceFactory.create(
+            project=offer.project, offer=offer, cost=Decimal(20000)
+        )
+        offer.discount = Decimal(2000)
+        offer.save()
+        pi = factories.ProjectedInvoiceFactory.create(
+            project=offer.project, gross_margin=Decimal(18000)
+        )
+        self.client.force_login(offer.project.owned_by)
+
+        response = self.client.get(offer.project.get_absolute_url())
+        self.assertIsNone(response.context["projected_warning"])
+
+        pi.gross_margin = Decimal(16000)
+        pi.save()
+        response = self.client.get(offer.project.get_absolute_url())
+        self.assertEqual(response.context["projected_warning"], "incomplete")
+        self.assertRegex(
+            response.content.decode(), r"\(20’000.00\s+&minus; 2’000.00\s+discount\)"
         )

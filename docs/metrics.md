@@ -399,6 +399,8 @@ Caveats: Budget retainer offers hold budget, real services are added later ("ser
 
 Chart (CONTROLLING, `workbench/projects/charts.py:budget_chart`): cumulative per week (per month if the project spans more than 26 weeks) from the first logged entry, invoice or accepted offer until today or the closing date: logbook value (Σ `LoggedCost.cost` + Σ `effort_rate × HOURS_FOR_INVOICING`, hours without effort rate not valued, like the tiles), invoiced (Σ `total_excl_tax` of invoiced invoices by `invoiced_on`) and accepted offers (Σ `total_excl_tax` by `closed_on`, else `offered_on`, budget retainers included). Not shown if nothing valued has been logged.
 
+Warnings "Projected invoices appear to be incomplete" and "Projected invoices exceed the budgeted work and costs" (open projects with budgeted services): Σ `ProjectedInvoice.gross_margin` is compared to the services' gross margin = `gs.total_service_cost` − `gs.total_discount` (Σ discount of the offers not declined and not budget retainers, i.e. of the offers whose services `total_service_cost` counts) − `gs.total_service_third_party_costs`. Incomplete: falls short by more than 1,000 (`PROJECTED_INVOICE_LEEWAY`) while the services' gross margin exceeds the invoiced gross margin; exceeds: larger at all.
+
 Warning "Projected invoices exceed the accepted offer total": Σ `ProjectedInvoice.gross_margin` exceeds `project_gross_margin(project)["offered"]` by more than 1,000 (`PROJECTED_INVOICE_LEEWAY`); the third party costs it shows are the total of the counting side of `accepted_offers_by_project()` minus `offered`.
 
 ---

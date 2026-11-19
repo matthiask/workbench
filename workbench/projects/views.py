@@ -84,11 +84,12 @@ class ProjectDetailView(generic.DetailView):
         squeeze = project_gross_margin(self.object)
         accepted_offers = accepted_offers_by_project([self.object.id])[self.object.id]
 
-        # Projected invoices are entered as gross margin, that is, without
-        # third party costs. Compare them to the gross margin of services and
-        # accepted offers, not to their totals.
+        # Projected invoices are entered as gross margin, that is, after
+        # discounts and without third party costs. Compare them to the gross
+        # margin of services and accepted offers, not to their totals.
         services_gross_margin = (
             grouped_services["total_service_cost"]
+            - grouped_services["total_discount"]
             - grouped_services["total_service_third_party_costs"]
         )
         projected_warning = None

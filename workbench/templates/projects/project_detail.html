@@ -321,9 +321,12 @@
                     {% translate "Projected" %}: {{ projected_invoices_total|currency }},
                     {% translate "budgeted work and costs without third party costs" %}:
                     {{ services_gross_margin|currency }}
-                    {% if gs.total_service_third_party_costs %}
-                      ({{ gs.total_service_cost|currency }} &minus;
-                      {{ gs.total_service_third_party_costs|currency }} {% translate "third party costs" %})
+                    {% if gs.total_discount or gs.total_service_third_party_costs %}
+                      ({{ gs.total_service_cost|currency }}{% if gs.total_discount %}
+                        &minus; {{ gs.total_discount|currency }}
+                        {% translate "discount" %}{% endif %}{% if gs.total_service_third_party_costs %}
+                        &minus; {{ gs.total_service_third_party_costs|currency }}
+                        {% translate "third party costs" %}{% endif %})
                     {% endif %}
                   </small>
                 </div>
@@ -348,9 +351,12 @@
                     {% translate "Projected" %}: {{ projected_invoices_total|currency }},
                     {% translate "budgeted work and costs without third party costs" %}:
                     {{ services_gross_margin|currency }}
-                    {% if gs.total_service_third_party_costs %}
-                      ({{ gs.total_service_cost|currency }} &minus;
-                      {{ gs.total_service_third_party_costs|currency }} {% translate "third party costs" %})
+                    {% if gs.total_discount or gs.total_service_third_party_costs %}
+                      ({{ gs.total_service_cost|currency }}{% if gs.total_discount %}
+                        &minus; {{ gs.total_discount|currency }}
+                        {% translate "discount" %}{% endif %}{% if gs.total_service_third_party_costs %}
+                        &minus; {{ gs.total_service_third_party_costs|currency }}
+                        {% translate "third party costs" %}{% endif %})
                     {% endif %}
                   </small>
                 </div>
