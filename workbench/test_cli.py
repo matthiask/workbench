@@ -2641,6 +2641,41 @@ planned_work:
         token = re.search(r'token = "([^"]+)"', config).group(1)
         self.assertEqual(APIToken.objects.for_secret(token).user, self.user)
 
+    def test_tokens_and_logout(self):
+        """wb tokens lists and revokes tokens, wb logout revokes wb's own"""
+        laptop, _secret = APIToken.create_for(
+            user=self.user, title="Laptop", access="write"
+        )
+        result = self.wb("tokens")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Laptop", result.output)
+        self.assertRegex(result.output, r"\*\d+ +Tests")
+
+        current, secret = APIToken.create_for(
+            user=self.user, title="Tests", access="write"
+        )
+        result = self.wb("tokens", "delete", current.pk, laptop.pk, token=secret)
+        self.assertEqual(result.exit_code, 0, result.output)
+        # The token wb uses goes last
+        self.assertEqual(
+            result.output,
+            f"Revoked Laptop ({laptop.pk}).\n"
+            f"Revoked Tests ({current.pk}). Logged out from http://testserver.\n",
+        )
+        self.assertFalse(
+            APIToken.objects.filter(pk__in=[laptop.pk, current.pk]).exists()
+        )
+        self.assertNotIn("testserver", wb.core.CONFIG.read_text())
+
+        _token, secret = APIToken.create_for(
+            user=self.user, title="Agent", access="read"
+        )
+        result = self.wb("logout", token=secret)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Logged out from http://testserver.", result.output)
+        self.assertFalse(APIToken.objects.filter(title="Agent").exists())
+        self.assertNotIn("testserver", wb.core.CONFIG.read_text())
+
     def test_auth_urls(self):
         """Installations are identified by the scheme and the host only"""
         _token, old = APIToken.create_for(user=self.user, title="Old", access="write")

@@ -226,6 +226,15 @@ def save_config(url, token, access=None):
     write_config(config)
 
 
+def forget_installation(url):
+    """Remove the installation and its token from the configuration"""
+    config = read_config()
+    config["installations"].pop(url, None)
+    if config["current"] == url:
+        config["current"] = None
+    write_config(config)
+
+
 # The installation selected with --installation for this invocation, and
 # whether wb already said which installation it uses
 _selected_installation = None
@@ -421,6 +430,19 @@ def _send(method, url, path, token, **kwargs):
         )
     except requests.RequestException as exc:
         terminate(str(exc))
+
+
+def logout(url):
+    """Revoke the installation's token and forget the installation
+
+    Returns whether the token is gone on the server, invalid tokens (e.g.
+    expired ones) count as gone."""
+    revoked = True
+    if token := read_config()["installations"].get(url, {}).get("token"):
+        response = _send("DELETE", url, "tokens/current/", token)
+        revoked = response.status_code in {200, 401}
+    forget_installation(url)
+    return revoked
 
 
 def request(method, path, *, optional=False, raw=False, **kwargs):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 13:32+0100\n"
+"POT-Creation-Date: 2026-11-19 10:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,14 +33,18 @@ msgstr "Nicht verfügbar"
 msgid "feature"
 msgstr "Feature"
 
+#: workbench/accounts/api.py
+msgid "This request wasn't authenticated with a token."
+msgstr "Diese Anfrage wurde nicht mit einem Token authentifiziert."
+
+#: workbench/accounts/api.py workbench/accounts/api_auth.py
+msgid "This API token only allows reading, not changes."
+msgstr "Dieses API-Token erlaubt nur das Lesen, keine Änderungen."
+
 #: workbench/accounts/api_auth.py workbench/accounts/features.py
 #, python-brace-format
 msgid "You do not have access to the required feature '{feature}'."
 msgstr "Du hast keinen Zugriff auf das notwendige Feature '{feature}'."
-
-#: workbench/accounts/api_auth.py
-msgid "This API token only allows reading, not changes."
-msgstr "Dieses API-Token erlaubt nur das Lesen, keine Änderungen."
 
 #: workbench/accounts/apps.py workbench/templates/base.html
 msgid "accounts"

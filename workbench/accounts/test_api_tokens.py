@@ -306,3 +306,61 @@ class APITokenTest(TestCase):
 
         prune_api_tokens()
         self.assertEqual(set(APIToken.objects.all()), {recent, valid})
+
+    def test_list_and_revoke(self):
+        """Users list and revoke their own tokens through the API, read only
+        tokens may only revoke themselves"""
+        user = factories.UserFactory.create()
+        write, write_secret = APIToken.create_for(
+            user=user, title="Laptop", access="write"
+        )
+        read, read_secret = APIToken.create_for(user=user, title="Agent", access="read")
+        expired, _secret = APIToken.create_for(user=user, title="Old", access="read")
+        APIToken.objects.filter(pk=expired.pk).update(expires_at=timezone.now())
+        other, _secret = APIToken.create_for(
+            user=factories.UserFactory.create(), title="Other", access="write"
+        )
+
+        def auth(secret):
+            return {"authorization": f"Bearer {secret}"}
+
+        response = self.client.get("/api/tokens/", headers=auth(read_secret))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [(token["title"], token["current"]) for token in response.json()],
+            [("Agent", True), ("Laptop", False)],
+        )
+
+        # Read only tokens may not revoke others
+        response = self.client.delete(
+            f"/api/tokens/{write.pk}/", headers=auth(read_secret)
+        )
+        self.assertEqual(response.status_code, 403)
+        # Tokens of other users aren't found
+        response = self.client.delete(
+            f"/api/tokens/{other.pk}/", headers=auth(write_secret)
+        )
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.delete("/api/tokens/current/", headers=auth(read_secret))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["title"], "Agent")
+        self.assertTrue(response.json()["current"])
+        self.assertFalse(APIToken.objects.filter(pk=read.pk).exists())
+        response = self.client.get("/api/tokens/", headers=auth(read_secret))
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.delete(
+            f"/api/tokens/{write.pk}/", headers=auth(write_secret)
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.client.get("/api/tokens/", headers=auth(write_secret)).status_code,
+            401,
+        )
+
+        # Sessions have no current token
+        self.client.force_login(user)
+        response = self.client.delete("/api/tokens/current/")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(self.client.get("/api/tokens/").json(), [])

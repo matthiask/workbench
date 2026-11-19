@@ -51,5 +51,6 @@ create a token on the "API tokens" page and use `wb login URL --token`.
   write.
 - It's shown once only, copy it right away.
 - It expires 30 days after its last use; each use extends it.
-- The bin icon revokes it immediately. Tokens of people who left stop
-  working.
+- The bin icon revokes it immediately, so does `wb tokens delete ID`
+  (`wb tokens` lists your tokens). `wb logout` revokes the token `wb`
+  uses on this computer. Tokens of people who left stop working.

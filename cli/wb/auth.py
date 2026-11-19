@@ -15,6 +15,7 @@ from wb.core import (
     cli,
     complete_installations,
     console,
+    current_installation,
     echo_deal_list,
     echo_fields,
     echo_invoice_list,
@@ -23,6 +24,7 @@ from wb.core import (
     find_installation,
     installation_url,
     link,
+    logout as revoke_and_forget,
     make_table,
     read_config,
     request,
@@ -70,6 +72,27 @@ def login(url, paste_token, access):
         terminate("Choose the access: `wb login --read` or `wb login --write`.")
     else:
         browser_login(url, access)
+
+
+@cli.command()
+def logout():
+    """Revoke wb's token for the current installation and forget it
+
+    Use `wb -i NAME logout` for other installations, `wb tokens` lists and
+    revokes your other tokens."""
+    if not (url := current_installation()):
+        terminate("Not configured yet, nothing to log out from.")
+    if url not in read_config()["installations"]:
+        terminate(f"Not logged in to {url}.")
+    if revoke_and_forget(url):
+        click.echo(f"Logged out from {url}.")
+    else:
+        click.secho(
+            f"Forgot {url}, but couldn't revoke the token. Delete it on the API"
+            " tokens page.",
+            fg="yellow",
+            err=True,
+        )
 
 
 class _CompleteOptions:

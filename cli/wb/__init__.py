@@ -18,6 +18,7 @@ from wb import (  # noqa: F401 Register the commands
     services,
     skills,
     timestamps,
+    tokens,
     users,
 )
 from wb.core import cli

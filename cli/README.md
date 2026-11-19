@@ -54,6 +54,10 @@ opens the browser again by itself and asks for the same access. On computers wit
 browser, create a token in Workbench ("API tokens" in the user menu, choose its
 access there) and use `wb login URL --token`.
 
+`wb logout` revokes the token `wb` uses and forgets the installation. `wb
+tokens` lists your tokens, `wb tokens delete ID` revokes them, e.g. the token
+of a computer you don't use anymore or one which leaked.
+
 Logging in to another installation adds it and makes it the current one.
 Switch between them with any unique part of their URL:
 

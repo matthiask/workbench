@@ -55,5 +55,7 @@ erstellst du ein Token auf der Seite «API-Tokens» und verwendest
 - Es wird nur einmal angezeigt, kopiere es sofort.
 - Es läuft 30 Tage nach der letzten Verwendung ab; jede Verwendung
   verlängert es.
-- Das Papierkorb-Symbol widerruft es sofort. Tokens von Personen, die
+- Das Papierkorb-Symbol widerruft es sofort, ebenso `wb tokens delete ID`
+  (`wb tokens` listet deine Tokens auf). `wb logout` widerruft das Token,
+  das `wb` auf diesem Computer verwendet. Tokens von Personen, die
   gegangen sind, funktionieren nicht mehr.
