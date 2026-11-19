@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 12:19+0100\n"
+"POT-Creation-Date: 2026-11-19 13:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2488,13 +2488,15 @@ msgstr "Bisher verrechnet: {invoiced}."
 msgid "Fill in the rest: {rest}"
 msgstr "Den Rest einsetzen: {rest}"
 
-#: workbench/invoices/forms.py workbench/projects/charts.py
+#: workbench/invoices/forms.py
+msgctxt "percentage of"
 msgid "accepted offers"
-msgstr "akzeptierte Offerten"
+msgstr "akzeptierten Offerten"
 
 #: workbench/invoices/forms.py
-msgid "without third party costs"
-msgstr "ohne Fremdkosten"
+msgctxt "percentage of"
+msgid "accepted offers without third party costs"
+msgstr "akzeptierten Offerten ohne Fremdkosten"
 
 #: workbench/invoices/forms.py
 #, python-brace-format
@@ -2509,6 +2511,10 @@ msgstr "Offerte {offer}{not_accepted}: Rabatt {discount}{percentage}."
 #: workbench/invoices/forms.py
 msgid "not accepted yet"
 msgstr "noch nicht akzeptiert"
+
+#: workbench/invoices/forms.py workbench/templates/invoices/invoice_form.html
+msgid "in preparation"
+msgstr "in Vorbereitung"
 
 #: workbench/invoices/forms.py
 #, python-brace-format
@@ -2527,7 +2533,7 @@ msgstr "Verbleibender Rabatt: {remaining}"
 
 #: workbench/invoices/forms.py
 msgid "the services excl. third party costs of this invoice"
-msgstr "den Leistungen ohne Fremdkosten dieser Rechnung"
+msgstr "Leistungen ohne Fremdkosten dieser Rechnung"
 
 #: workbench/invoices/forms.py
 #, python-brace-format
@@ -4175,6 +4181,10 @@ msgstr "Projekte"
 msgid "invoiced"
 msgstr "Verrechnet"
 
+#: workbench/projects/charts.py
+msgid "accepted offers"
+msgstr "akzeptierte Offerten"
+
 #: workbench/projects/forms.py
 msgid "Projects are linked with this campaign. They will be released when deleting this campaign."
 msgstr "Projekte sind mit dieser Kampagne verbunden. Die Verbindung wird aufgelöst, wenn diese Kampagne gelöscht wird."
@@ -5742,10 +5752,6 @@ msgid "nothing yet"
 msgstr "noch nichts"
 
 #: workbench/templates/invoices/invoice_form.html
-msgid "in preparation"
-msgstr "in Vorbereitung"
-
-#: workbench/templates/invoices/invoice_form.html
 msgid "Nothing is invoiced although there is something to invoice. The logged hours and costs which haven't been invoiced yet are assigned to this invoice anyway."
 msgstr "Es wird nichts verrechnet, obwohl es etwas zu verrechnen gäbe. Die noch nicht verrechneten Stunden und Kosten werden trotzdem dieser Rechnung zugeordnet."
 
@@ -6945,7 +6951,7 @@ msgstr "Basis"
 #: workbench/tools/forms.py
 #, python-brace-format
 msgid "% of {base}"
-msgstr "% von {base}"
+msgstr "% der {base}"
 
 #: workbench/tools/forms.py
 msgid "Is automatically filled using the organization's contact."
@@ -7087,6 +7093,9 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#~ msgid "without third party costs"
+#~ msgstr "ohne Fremdkosten"
 
 #, python-brace-format
 #~ msgid "Total excl. tax of accepted offers: {accepted}. Use {percentages}."
