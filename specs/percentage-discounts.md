@@ -170,7 +170,8 @@ creating them and when editing them in preparation:
   information: marked "in preparation", without a percentage link.
 - The total: "The accepted offers granted discounts of x, the invoices
   so far gave y." Compares at the project level, Σ `discount` of the
-  project's invoices (not cancelled) against Σ `discount` of its
+  project's invoices (not cancelled, without down payments: the final
+  invoice deducts them after their discount) against Σ `discount` of its
   accepted offers; manual discounts (e.g. on the surplus) count too.
   Credits don't count: there have been three in all (the last in 2024),
   and what was paid is a fact.
