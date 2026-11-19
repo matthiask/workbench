@@ -293,9 +293,12 @@
               <td></td>
             </tr>
             <tr>
-              <th colspan="4" class="text-end">
-                <label for="{{ form.discount.id_for_label }}">{{ form.discount.label }}</label>
+              <th colspan="4" class="text-end fw-normal">
+                <label for="{{ form.discount.id_for_label }}" class="fw-semibold">{{ form.discount.label }}</label>
                 {{ form.discount.errors }}
+                {% if form.discount_help %}
+                  <div class="small text-muted">{{ form.discount_help }}</div>
+                {% endif %}
               </th>
               <td>
                 <input
@@ -309,12 +312,6 @@
               </td>
               <td></td>
             </tr>
-            {% if form.discount_help %}
-              <tr>
-                <td colspan="4" class="text-end small text-muted">{{ form.discount_help }}</td>
-                <td colspan="2"></td>
-              </tr>
-            {% endif %}
             {% if form.down_payments %}
               <tr>
                 <th colspan="4" class="text-end fw-normal">
