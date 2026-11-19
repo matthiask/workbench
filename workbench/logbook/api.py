@@ -38,6 +38,7 @@ class LoggedHoursOut(Schema):
     url: str
     rendered_on: dt.date
     rendered_by: str
+    created_at: dt.datetime = Field(description="When the entry was logged.")
     hours: Decimal
     hours_for_invoicing: Decimal | None = Field(
         description="If set, the work is valued and invoiced with these hours"
@@ -107,6 +108,7 @@ def _entry_out(entry, request):
         "url": request.build_absolute_uri(entry.get_absolute_url()),
         "rendered_on": entry.rendered_on,
         "rendered_by": entry.rendered_by.get_short_name(),
+        "created_at": entry.created_at,
         "description": entry.description,
         "project": project_summary(entry.service.project, request),
         "service_id": entry.service_id,
@@ -151,6 +153,7 @@ class LoggedCostOut(Schema):
     url: str
     rendered_on: dt.date
     rendered_by: str
+    created_at: dt.datetime = Field(description="When the entry was logged.")
     cost: Decimal
     third_party_costs: Decimal | None
     are_expenses: bool

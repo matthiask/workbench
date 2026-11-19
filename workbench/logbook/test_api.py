@@ -47,6 +47,12 @@ class LogbookAPITest(TestCase):
         self.assertEqual(data["items"][0]["offer_id"], offer.pk)
         self.assertIsNone(data["items"][1]["offer_id"])
         self.assertEqual(data["items"][0]["rendered_by"], "ab")
+        # When the entry was logged, not only when the work was done
+        self.assertAlmostEqual(
+            dt.datetime.fromisoformat(data["items"][0]["created_at"]),
+            mine.created_at,
+            delta=dt.timedelta(milliseconds=1),
+        )
 
         # Pages of matches, the total and the count include all of them
         data = self.client.get("/api/logbook/hours/?limit=1&offset=1").json()
@@ -132,6 +138,15 @@ class LogbookAPITest(TestCase):
         self.assertEqual(data["total_cost"], "150.00")
         self.assertEqual(data["total_third_party_costs"], "80.00")
         self.assertEqual(data["count"], 2)
+        created = {
+            row["id"]: dt.datetime.fromisoformat(row["created_at"])
+            for row in data["items"]
+        }
+        self.assertAlmostEqual(
+            created[hosting.pk],
+            hosting.created_at,
+            delta=dt.timedelta(milliseconds=1),
+        )
 
         self.assertEqual(ids("?q=hosting"), {hosting.pk})
         self.assertEqual(ids("?expenses=true"), {expense.pk})
