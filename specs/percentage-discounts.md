@@ -247,3 +247,38 @@ One commit each, tests first:
    services carries one (section 5).
 4. The facts and links in services invoice forms, the third party costs
    of the rows (section 5).
+
+## 9. Status and questions for review
+
+Steps 1–4 are implemented (and the `workbench-offer` skill, CLI 0.52.1).
+Open questions, decided provisionally:
+
+1. **The API didn't give offer discounts at all**: `InvoiceIn.discount`
+   defaulted to 0, so `wb invoices create --offer` never got the offer's
+   discount (section 1 assumed it did). It now defaults to the form's value
+   (the offer's discount until an invoice of its services carries one).
+   That changes what `wb` and the skills create, e.g. the
+   `lmvz-offerten` skill creating invoices per offer. Right?
+2. **Third party costs aren't fields of the offer form** (section 4
+   assumed they were). The rows carry the stored third party costs as a
+   data attribute; new services and changed costs use those, so the base
+   is only exact after saving.
+3. **Third party costs are capped at the cost**, in Python
+   (`service_cost_excl_third_party_costs`) and in JavaScript, since they're
+   a part of the cost.
+4. **Offers in preparation** aren't listed in the discount help of services
+   invoices, only offered and accepted ones (they're not a promise to the
+   customer yet).
+5. **"Invoiced so far" on fixed amount invoices** includes services
+   invoices of work beyond the offers (surplus, services without offer),
+   so the rest may be too low on such projects. It's a fact next to the
+   field, not a rule; leave it?
+6. **German wording**: "Verrechne 50%, 100% oder [ ]% von akzeptierte
+   Offerten" (the select's labels are lowercase nouns) and "Verwende … oder
+   [ ]% von den Leistungen ohne Fremdkosten dieser Rechnung". Better
+   phrasing welcome.
+7. **Percentages are shown with one decimal** and recomputed from the
+   rounded amount once the input loses focus, e.g. 33.33% shows as 33.3%.
+8. The JavaScript formats amounts with `'` (de-CH), the server with `’`;
+   pre-existing in the invoice form, visible now that both are next to each
+   other.
