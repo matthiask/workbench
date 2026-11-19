@@ -16,7 +16,7 @@
   </div>
 
   <div class="row g-3">
-    <div class="col-lg-7">
+    <div class="col-lg-6">
       <section class="card mb-3">
         <div class="card-header">
           <a href="{% url 'projects_project_list' %}" class="text-reset">{% translate 'active projects'|capfirst %}</a>
@@ -63,7 +63,7 @@
         {% endif %}
       </section>
     </div>
-    <div class="col-lg-5">
+    <div class="col-lg-6">
       {% if needs_action %}{% include '_needs_action.html' %}{% endif %}
 
       {% if others_hours %}
