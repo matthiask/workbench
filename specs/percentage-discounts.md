@@ -6,7 +6,7 @@ Basecamp to-do "Manuelles Prozentrechnen vermeiden (Anzahlungsrechnungen,
 Rabatte)?" (November 2026): people compute discounts and down payments in
 a spreadsheet next to Workbench and enter the result as an amount. That's
 tedious and error-prone: was the base right, were third party costs left
-out, has the customer got the whole discount in the end?
+ out, has the customer got the whole discount in the end?
 
 Wanted:
 
@@ -76,8 +76,8 @@ The base of percentage discounts, a helper on `ServiceBase`:
 or 0)`. A long name rather than a new, unexplained term: Workbench
 already says "service cost" and "third party costs". Effort, costs
 without third party costs (e.g. fees for open data) and markups on third
-party costs count; what we pay others doesn't. For an offer: Σ over its
-non-optional services. Labelled "services excl. third party costs"
+party costs count; what we pay others doesn't. The same name on `Offer`:
+Σ over its non-optional services. Labelled "services excl. third party costs"
 ("Leistungen ohne Fremdkosten").
 
 ## 3. Down payments and fixed amount invoices
@@ -95,10 +95,22 @@ as today.
     them already).
 - Typing a percentage fills in the amount, rounded to 5 cents. The 50%
   and 100% links stay as shortcuts (of the first base).
-- The facts, so that the total can be checked: the accepted offers'
-  total, invoiced so far (Σ `total_excl_tax` of the project's invoices,
-  not cancelled, down payments included) and the rest, with a link
-  filling in the rest.
+- The facts, so that the total can be checked, if the project has
+  accepted offers:
+  - the accepted offers' total,
+  - invoiced so far: Σ (`subtotal − discount`) of the project's fixed
+    amount and services invoices (not cancelled), i.e. the work invoiced,
+    without deducting down payments,
+  - the down payments: Σ `total_excl_tax` of the down payment invoices
+    (not cancelled), and how much of it hasn't been applied yet,
+  - the rest: accepted offers − invoiced so far.
+- Fixed amount invoices get a link filling in the rest. The final
+  invoice deducts the down payments selected under "Apply down payment
+  invoices" from it, as today. Counting the down payments in "invoiced
+  so far" would deduct them twice. Down payment invoices get no such
+  link: a down payment of the whole rest isn't wanted.
+- Shown when creating and when editing invoices in preparation (today
+  the 50% and 100% links only appear when creating).
 - No automatic text in the description.
 - API and CLI: unchanged, they take amounts.
 
@@ -138,7 +150,9 @@ surplus still gets none.
 Open: an earlier invoice mixing services of several offers counts for
 each of them, although its discount may have been meant for one only.
 Rare (invoices from an offer contain that offer's services); the facts
-below show it.
+below show it. Likewise, a partial invoice which gave only a part of the
+discount by hand means that the next one gets none prefilled; the
+remaining discount and its link below catch that.
 
 Invoicing a part of the offer gets the whole discount, as today. The
 amount stays editable; the facts below show what's left.
@@ -146,21 +160,35 @@ amount stays editable; the facts below show what's left.
 ### Invoices on the project: no discount, the facts
 
 Invoices created on the project start without discount. Below the
-discount, on all services invoices of a project with discounted offers:
+discount, on services invoices of a project with discounted offers, when
+creating them and when editing them in preparation:
 
 - Per offer (accepted or offered, not declined) with a discount:
   "Offer 2027-0012-01 Konzept: discount 2,000.00 (10.0% of the services
-  excl. third party costs)."
-- The total: "The offers granted discounts of x, the invoices so far gave
-  y." Compares at the project level, Σ `discount` of the project's
-  invoices (not cancelled) against Σ `discount` of its accepted offers;
-  manual discounts (e.g. on the surplus) count too.
+  excl. third party costs)." Offers which haven't been accepted yet are
+  marked as such.
+- The total: "The accepted offers granted discounts of x, the invoices
+  so far gave y." Compares at the project level, Σ `discount` of the
+  project's invoices (not cancelled) against Σ `discount` of its
+  accepted offers; manual discounts (e.g. on the surplus) count too.
+  Credits don't count: there have been three in all (the last in 2024),
+  and what was paid is a fact.
 - Links which fill in the amount:
   - "Remaining discount: x − y" (if positive), e.g. for a final invoice.
   - "x% of the services excl. third party costs of this invoice", one
     link per distinct percentage of the offers (e.g. 10%, 5%), for an
     analogous discount on the surplus or on services without offer.
 - The same percentage input as on offers.
+
+The percentage and the link of this invoice follow the selected lines
+live (`updateInvoiceTotals()` in `main.js`). The rows don't know their
+third party costs today: each source (as offered, as logged) gets a data
+attribute with its third party costs, like its hours and costs
+(`create_services_from_offer()`: the service's third party costs, or the
+logged ones). The rows show them ("thereof third party costs x"), and
+the totals show the services excl. third party costs, which helps
+interpreting the percentages. A cost edited below its third party costs
+counts at most the cost as third party costs.
 
 Credits and recurring invoices: unchanged.
 
@@ -191,24 +219,31 @@ Project "Kampagne 2027":
    "Remaining discount: 2,000" and "5% of the services excl. third party
    costs of this invoice" if the project manager wants to give the 5% on
    the surplus too.
-5. Had the project been invoiced with a fixed amount invoice instead,
-   its help text would show the accepted offers' total (58,000, after
-   discounts), invoiced so far and the rest.
+5. Had the project been invoiced with a final fixed amount invoice
+   after the down payment instead, its help text would show the accepted
+   offers' total 58,000 (after discounts), invoiced so far 0, the down
+   payment 17,400 (not applied yet) and the rest 58,000. The link fills
+   in 58,000, applying the down payment deducts 17,400: total excl. tax
+   40,600.
 
 ## 7. Reports and key figures
 
 Nothing changes in the computations: they use the stored `discount` and
 `total_excl_tax`. `docs/metrics.md` stays as it is unless it describes the
 "once" rule; `docs/offers.md` and `docs/invoices.md` (both languages)
-describe the helpers and when invoices get the offers' discount.
+describe the helpers and when invoices get the offers' discount
+(`docs/invoices.md`: "Choosing an offer takes its title, description,
+services and discount" gets the new rule).
 
 ## 8. Implementation steps
 
 One commit each, tests first:
 
-1. `service_cost_excl_third_party_costs` and the down payment percentage
-   helper with the invoiced so far facts (sections 2 and 3).
+1. `service_cost_excl_third_party_costs` (services and offers) and the
+   down payment percentage helper with the facts and the rest link,
+   also when editing (sections 2 and 3).
 2. Offer discount percentage helper (section 4).
 3. Invoicing an offer: the discount unless an earlier invoice of its
    services carries one (section 5).
-4. The facts and links in services invoice forms (section 5).
+4. The facts and links in services invoice forms, the third party costs
+   of the rows (section 5).
