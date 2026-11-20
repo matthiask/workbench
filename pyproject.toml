@@ -13,6 +13,7 @@ dependencies = [
   "django-admin-ordering>=0.20",
   "django-authlib>=0.17.2",
   "django-bootstrap5>=26.1",
+  "django-canonical-domain>=0.11",
   "django-colorfield>=0.14",
   "django-cors-headers>=4.9",
   "django-countries>=8.2",

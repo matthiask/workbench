@@ -18,6 +18,8 @@ DEBUG = env("DEBUG", default=bool({"runserver", "shell"}.intersection(sys.argv))
 TESTING = env("TESTING", default="test" in sys.argv)
 LIVE = env("LIVE", default=False)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default=[])
+# Redirects to the canonical domain (and to HTTPS), see django-canonical-domain
+SECURE_SSL_HOST = env("SECURE_SSL_HOST", default=None)
 ADMINS = MANAGERS = [("Matthias Kestenholz", "mk@feinheit.ch")]
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = "workbench@feinheit.ch"
 # A shared address (e.g. hosting@) rather than a feature on purpose: the
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
         "fineforms",
         "ninja",
         "django.forms",
+        "canonical_domain",
         "workbench.accounts",
         "workbench.audit",
         "workbench.awt",
@@ -85,6 +88,7 @@ LOGIN_REQUIRED_EXEMPT = (
 MIDDLEWARE = [
     m
     for m in [
+        "canonical_domain.middleware.canonical_domain",
         "django.middleware.security.SecurityMiddleware" if LIVE else "",
         "debug_toolbar.middleware.DebugToolbarMiddleware" if DEBUG_TOOLBAR else "",
         "django.contrib.sessions.middleware.SessionMiddleware",
@@ -240,7 +244,7 @@ WORKBENCH = {
             "italic": font("ZuricBTLigIta.ttf"),
             "bolditalic": font("ZuricBTBolIta.ttf"),
         },
-        URL="https://workbench.feinheit.ch",
+        URL="https://workbench.feinheit.app",
         BOOKKEEPING_EMAIL="buchhaltung@feinheit.ch",
         FEATURES={
             FEATURES.AUTODUNNING: F.USER,

@@ -224,6 +224,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-canonical-domain"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7b/8f/a1a19c58a9e122cea7945a11e21c55d25c9cbff1a39737ceb308685dd197/django_canonical_domain-0.11.0.tar.gz", hash = "sha256:7681753d8ea0c06fa3ffe36deef8b91caa9298ccf9a3cd8abe122fa3f5fab6ac", size = 5582, upload-time = "2024-08-09T08:27:19.903Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/53/14/5f3fa516e005eb92a8b63569f1814f2b84d5fc06f27857183453a8dd1fe5/django_canonical_domain-0.11.0-py3-none-any.whl", hash = "sha256:1b5b87a281bbc8586e2a6255d03de5dcecd705ba7dc8299def4a746dd40aa477", size = 4935, upload-time = "2024-08-09T08:27:21.331Z" },
+]
+
+[[package]]
 name = "django-colorfield"
 version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
@@ -978,6 +990,7 @@ dependencies = [
     { name = "django-admin-ordering" },
     { name = "django-authlib" },
     { name = "django-bootstrap5" },
+    { name = "django-canonical-domain" },
     { name = "django-colorfield" },
     { name = "django-cors-headers" },
     { name = "django-countries" },
@@ -1019,6 +1032,7 @@ requires-dist = [
     { name = "django-admin-ordering", specifier = ">=0.20" },
     { name = "django-authlib", specifier = ">=0.17.2" },
     { name = "django-bootstrap5", specifier = ">=26.1" },
+    { name = "django-canonical-domain", specifier = ">=0.11" },
     { name = "django-colorfield", specifier = ">=0.14" },
     { name = "django-cors-headers", specifier = ">=4.9" },
     { name = "django-countries", specifier = ">=8.2" },
