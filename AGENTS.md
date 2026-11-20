@@ -153,9 +153,13 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `select_related("project__customer")` (`test_api_queries.py` checks).
 - Messages added during API requests are dropped
   (`api_messages_middleware`).
-- On purpose: hours aren't logged through the API (the logbook form's
-  warnings matter); dates of birth aren't in the API; creating people
-  rejects duplicates (mostly fed by LLMs).
+- Deletions check `allow_delete()` with `check_allow_delete()` (its
+  messages become errors); forms reading the web interface's query
+  parameters get `without_query(request)`.
+- On purpose: dates of birth aren't in the API; creating people rejects
+  duplicates (mostly fed by LLMs). Hours and costs are logged with the
+  logbook forms, all of their warnings can be ignored by code (else
+  agents go back to automating the browser, which ignores all at once).
 
 ## `wb` command line interface
 

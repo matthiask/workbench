@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-20 09:46+0100\n"
+"POT-Creation-Date: 2026-11-20 11:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1043,7 +1043,8 @@ msgstr "Die Abwesenheit wurde bestätigt."
 msgid "Your wb is too old for this Workbench, please upgrade it: %(command)s"
 msgstr "Dein wb ist zu alt für diese Workbench, bitte aktualisiere es: %(command)s"
 
-#: workbench/contacts/api.py workbench/deals/api.py workbench/tools/api.py
+#: workbench/contacts/api.py workbench/deals/api.py workbench/logbook/api.py
+#: workbench/tools/api.py
 #, python-format
 msgid "Unknown user %r."
 msgstr "Unbekannte:r Mitarbeiter:in %r."
@@ -3214,6 +3215,10 @@ msgstr "Konnte die Rechnung nicht versenden: {}"
 #, python-brace-format
 msgid "The invoice has been sent to {}."
 msgstr "Die Rechnung wurde an {} versendet."
+
+#: workbench/logbook/api.py
+msgid "These hours cannot be changed anymore."
+msgstr "Diese Stunden können nicht mehr geändert werden."
 
 #: workbench/logbook/celebrations.py
 msgid "Week complete 🏁"

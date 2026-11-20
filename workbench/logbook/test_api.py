@@ -5,6 +5,9 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.invoices.models import Invoice
+from workbench.logbook.models import LoggedHours
+from workbench.timer.models import Timestamp
+from workbench.tools.validation import in_days
 
 
 class LogbookAPITest(TestCase):
@@ -152,3 +155,169 @@ class LogbookAPITest(TestCase):
         self.assertEqual(ids("?expenses=true"), {expense.pk})
         self.assertEqual(ids("?rendered_by=AB"), {hosting.pk})
         self.assertEqual(ids(f"?project={expense.service.project_id}"), {expense.pk})
+
+
+class LogbookChangesAPITest(TestCase):
+    def tearDown(self):
+        deactivate_all()
+
+    def post(self, url, data, *, ignore=()):
+        if ignore:
+            url += ("&" if "?" in url else "?") + "&".join(
+                f"ignore_warnings={code}" for code in ignore
+            )
+        return self.client.post(url, data, content_type="application/json")
+
+    def test_create_hours(self):
+        """Hours are logged like in the web interface, warnings are errors
+        unless they're ignored by their code"""
+        service = factories.ServiceFactory.create()
+        user = service.project.owned_by
+        self.client.force_login(user)
+        data = {"service": service.pk, "hours": 1.5, "description": "Wireframes"}
+
+        response = self.post("/api/logbook/hours/?dry_run=1", data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertEqual(LoggedHours.objects.count(), 0)
+
+        response = self.post("/api/logbook/hours/", data)
+        self.assertEqual(response.status_code, 200, response.content)
+        result = response.json()
+        entry = LoggedHours.objects.get()
+        self.assertEqual(result["id"], entry.pk)
+        self.assertEqual(result["hours"], "1.5")
+        self.assertEqual(entry.rendered_by, user)
+        self.assertEqual(entry.rendered_on, dt.date.today())
+        self.assertEqual(entry.created_by, user)
+        self.assertIsNone(entry.hours_for_invoicing)
+
+        response = self.post("/api/logbook/hours/", data)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error.get("code") for error in response.json()["detail"]],
+            ["maybe-duplicate"],
+        )
+        response = self.post("/api/logbook/hours/", data, ignore=["maybe-duplicate"])
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(LoggedHours.objects.count(), 2)
+
+    def test_create_hours_errors(self):
+        """Errors of the form and unknown users are located at their field"""
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+
+        def errors(**kwargs):
+            data = {"service": service.pk, "hours": 1, "description": "Test"}
+            response = self.post("/api/logbook/hours/", data | kwargs)
+            self.assertEqual(response.status_code, 422)
+            return [error["loc"][-1] for error in response.json()["detail"]]
+
+        self.assertEqual(errors(rendered_on=in_days(10).isoformat()), ["rendered_on"])
+        self.assertEqual(errors(rendered_by="nobody"), ["rendered_by"])
+        self.assertEqual(errors(hours=0), ["hours"])
+        self.assertEqual(errors(service_title="New"), ["service_title"])
+
+        service.allow_logging = False
+        service.save()
+        self.assertEqual(errors(), ["service"])
+
+        response = self.post(
+            "/api/logbook/hours/", {"service": 0, "hours": 1, "description": "Test"}
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(LoggedHours.objects.count(), 0)
+
+    def test_query_parameters_of_the_web_interface(self):
+        """Query parameters only meant for the web interface's form (copying
+        entries, timestamps of the timer) are ignored"""
+        entry = factories.LoggedHoursFactory.create(description="Original")
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+
+        response = self.post(
+            f"/api/logbook/hours/?copy={entry.pk}&detected_ends_at=2026-11-20T12:00:00",
+            {"service": service.pk, "hours": 1, "description": "Test"},
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["description"], "Test")
+        self.assertEqual(Timestamp.objects.count(), 0)
+
+    def test_update_hours(self):
+        """Changes are validated like in the web interface, hours of past
+        weeks keep their hours"""
+        entry = factories.LoggedHoursFactory.create(description="Before", hours=1)
+        self.client.force_login(entry.rendered_by)
+        url = f"/api/logbook/hours/{entry.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch({"description": "After"}, "?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], entry.pk)
+        self.assertEqual(response.json()["description"], "After")
+        entry.refresh_from_db()
+        self.assertEqual(entry.description, "Before")
+
+        response = patch({"description": "After", "hours_for_invoicing": 2})
+        self.assertEqual(response.status_code, 200, response.content)
+        entry.refresh_from_db()
+        self.assertEqual(entry.description, "After")
+        self.assertEqual(entry.hours, 1)
+        self.assertEqual(entry.hours_for_invoicing, 2)
+
+        response = patch({"hours_for_invoicing": 0.5})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error.get("code") for error in response.json()["detail"]],
+            ["hours-for-invoicing-lower"],
+        )
+        response = patch(
+            {"hours_for_invoicing": None}, "?ignore_warnings=hours-for-invoicing-lower"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        entry.refresh_from_db()
+        self.assertIsNone(entry.hours_for_invoicing)
+
+        LoggedHours.objects.filter(pk=entry.pk).update(rendered_on=in_days(-30))
+        response = patch({"hours": 2})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "hours"]],
+        )
+        response = patch({"description": "Later"})
+        self.assertEqual(response.status_code, 200, response.content)
+
+    def test_delete_hours(self):
+        """Hours are deleted like in the web interface, the reasons why not
+        are errors"""
+        entry = factories.LoggedHoursFactory.create()
+        self.client.force_login(entry.rendered_by)
+        url = f"/api/logbook/hours/{entry.pk}/"
+
+        response = self.client.delete(f"{url}?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertTrue(LoggedHours.objects.filter(pk=entry.pk).exists())
+
+        LoggedHours.objects.filter(pk=entry.pk).update(rendered_on=in_days(-30))
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["path", "hours_id"],
+                    "msg": "Cannot delete logged hours from past weeks.",
+                }
+            ],
+        )
+
+        LoggedHours.objects.filter(pk=entry.pk).update(rendered_on=dt.date.today())
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], entry.pk)
+        self.assertFalse(LoggedHours.objects.filter(pk=entry.pk).exists())

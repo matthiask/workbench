@@ -2,28 +2,44 @@ import datetime as dt
 from decimal import Decimal
 from typing import Any
 
+from django.db import transaction
 from django.db.models import Sum
+from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
+from ninja.errors import ValidationError
 from ninja.pagination import paginate
 
+from workbench.accounts.models import User
 from workbench.api_keys import InvoiceStatus, key
+from workbench.logbook.forms import LoggedHoursForm
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
+from workbench.projects.models import Service
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     DateRangeFilter,
+    DryRun,
+    InputSchema,
+    Number,
     OrganizationID,
     ProjectID,
     SearchQuery,
     Serialized,
     ShortName,
     TotalsPagination,
+    check_allow_delete,
     filter_date_range,
+    form_data,
     user_by_short_name,
+    validate_form,
+    without_query,
 )
 from workbench.tools.formats import Z1, Z2
 
 
-# Read-only on purpose: The warnings of the logbook forms are useful
+# Changes are validated with the forms of the web interface, their warnings
+# are errors unless they're ignored by their code
 router = Router(tags=["logbook"])
 
 
@@ -138,10 +154,7 @@ def logged_hours_list(request, filters: Query[LoggedHoursListFilter]):
             "service__project__customer",
             "invoice_service__invoice__project",
         ).order_by("-rendered_on", "-created_at", "-pk"),
-        lambda row: (
-            _entry_out(row, request)
-            | {"hours": row.hours, "hours_for_invoicing": row.hours_for_invoicing}
-        ),
+        lambda row: _hours_out(row, request),
         totals={
             "total_hours": hours.order_by().aggregate(Sum("hours"))["hours__sum"] or Z1
         },
@@ -211,3 +224,171 @@ def logged_cost_list(request, filters: Query[LoggedCostFilter]):
             "total_third_party_costs": totals["third_party_costs"] or Z2,
         },
     )
+
+
+def _hours_out(entry, request):
+    return _entry_out(entry, request) | {
+        "hours": entry.hours,
+        "hours_for_invoicing": entry.hours_for_invoicing,
+    }
+
+
+def _rendered_by(short_name):
+    if user := User.objects.by_short_name(short_name).first():
+        return user.pk
+    raise ValidationError([
+        {
+            "loc": ["body", "data", "rendered_by"],
+            "msg": _("Unknown user %r.") % short_name,
+        }
+    ])
+
+
+def _values(values, fields):
+    """Apply the fields of the API to the data of a logbook form"""
+    for field, value in fields.items():
+        if field == "rendered_by":
+            values[field] = _rendered_by(value)
+        elif field == "description":
+            values[field] = value.strip()
+        else:
+            values[field] = "" if value is None else value
+    return values
+
+
+def _check_disabled(form, fields, message):
+    """Fields which can't be changed anymore are errors, the form would
+    silently keep their values"""
+    if disabled := [f for f in fields if form.fields[f].disabled]:
+        raise ValidationError([
+            {"loc": ["body", "data", field], "msg": message} for field in disabled
+        ])
+
+
+def _save(form, request, out, *, dry_run):
+    """Save the form, roll back with ``dry_run``; new entries have no ID
+    and URL then"""
+    is_new = not form.instance.pk
+    with transaction.atomic():
+        entry = form.save()
+        result = out(entry, request)
+        if dry_run:
+            transaction.set_rollback(True)
+            if is_new:
+                result |= {"id": None, "url": None}
+    return result
+
+
+class LoggedHoursResult(LoggedHoursOut):
+    id: int | None = Field(description="Null with dry_run.")
+    url: str | None = Field(description="Null with dry_run.")
+
+
+class LoggedHoursFields(InputSchema):
+    rendered_on: dt.date | None = Field(default=None, description="Defaults to today.")
+    rendered_by: str | None = Field(
+        default=None, description="Short name of a user, defaults to you."
+    )
+    hours: Number | None = Field(default=None, gt=0)
+    hours_for_invoicing: Number | None = Field(
+        default=None,
+        ge=0,
+        description="If set, the work is valued and invoiced with these hours"
+        " instead of the hours; null removes them.",
+    )
+    description: str | None = Field(default=None, min_length=1)
+
+
+class LoggedHoursCreate(LoggedHoursFields):
+    service: int = Field(description="ID of a service which allows logging.")
+    hours: Number = Field(gt=0)
+    description: str = Field(min_length=1)
+
+
+class LoggedHoursPatch(LoggedHoursFields):
+    """Fields which aren't given are left alone"""
+
+    service: int | None = Field(
+        default=None,
+        description="ID of another service of the same project which allows logging.",
+    )
+
+
+@router.post("/logbook/hours/", response=LoggedHoursResult)
+def logged_hours_create(
+    request,
+    data: LoggedHoursCreate,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Log hours, validated like in the web interface
+
+    Warnings of the web interface (e.g. ``maybe-duplicate`` or
+    ``take-a-break``) are errors unless they are ignored by their code.
+    The ID and the URL are null with ``dry_run``."""
+    service = get_object_or_404(
+        Service.objects.select_related("project"), pk=data.service
+    )
+    request = without_query(request)
+    values = _values(
+        {
+            "rendered_by": request.user.pk,
+            "rendered_on": dt.date.today(),
+            "hours_for_invoicing": "",
+        },
+        data.model_dump(exclude_unset=True),
+    )
+    form = LoggedHoursForm(
+        values, project=service.project, request=request, prefix=None
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+    return _save(form, request, _hours_out, dry_run=dry_run)
+
+
+@router.patch("/logbook/hours/{int:hours_id}/", response=LoggedHoursOut)
+def logged_hours_update(
+    request,
+    hours_id: int,
+    data: LoggedHoursPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change logged hours, validated like in the web interface
+
+    Hours of past weeks keep their date, person and hours (except for people
+    who may log late), invoiced hours only allow changing the description.
+    Warnings are errors unless they are ignored by their code."""
+    entry = get_object_or_404(
+        LoggedHours.objects.select_related("service__project"), pk=hours_id
+    )
+    request = without_query(request)
+    form = LoggedHoursForm(instance=entry, request=request, prefix=None)
+    fields = data.model_dump(exclude_unset=True)
+    _check_disabled(form, fields, _("These hours cannot be changed anymore."))
+    form = LoggedHoursForm(
+        _values(form_data(form), fields),
+        instance=entry,
+        request=request,
+        prefix=None,
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+    return _save(form, request, _hours_out, dry_run=dry_run)
+
+
+@router.delete("/logbook/hours/{int:hours_id}/", response=LoggedHoursOut)
+def logged_hours_delete(request, hours_id: int, *, dry_run: DryRun = False):
+    """Delete logged hours like in the web interface: not when they have
+    been invoiced or are from past weeks (except for people who may log
+    late)
+
+    Returns the deleted entry."""
+    entry = get_object_or_404(
+        LoggedHours.objects.select_related("service__project"), pk=hours_id
+    )
+    check_allow_delete(entry, request, ["path", "hours_id"])
+    result = _hours_out(entry, request)
+    if not dry_run:
+        entry.delete()
+    return result

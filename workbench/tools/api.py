@@ -1,3 +1,4 @@
+import copy
 import datetime as dt
 import re
 from decimal import ROUND_HALF_UP, Decimal
@@ -5,6 +6,7 @@ from typing import Annotated
 
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.http import QueryDict
 from django.utils.translation import gettext as _
 from ninja import P, Query, Schema
 from ninja.errors import ValidationError as NinjaValidationError
@@ -84,6 +86,27 @@ def form_data(form):
         if field.show_hidden_initial:
             data[form[name].html_initial_name] = value
     return data
+
+
+def check_allow_delete(instance, request, loc):
+    """Raise the reasons why ``allow_delete()`` refuses deleting the
+    instance like in the web interface, where they're messages"""
+    storage = request._messages
+    before = len(storage._queued_messages)
+    if not instance.allow_delete(instance, request):
+        raise NinjaValidationError([
+            {"loc": loc, "msg": str(message)}
+            for message in storage._queued_messages[before:]
+        ])
+    del storage._queued_messages[before:]
+
+
+def without_query(request):
+    """The request without query parameters, for forms which read
+    parameters of the web interface from ``request.GET``"""
+    request = copy.copy(request)
+    request.GET = QueryDict()
+    return request
 
 
 def raise_form_errors(form, *, fields=None, ignore_warnings=()):
