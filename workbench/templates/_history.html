@@ -4,7 +4,8 @@
     <a href="{% url 'history' change.version.table_name 'id' change.version.row_data.id %}" data-ajaxmodal>
       {{ change.version.get_action_display }} {{ change.version.table_name }} {{ change.version.row_data.id }}
     </a>
-    / {{ change.pretty_user_name|default:'🧙' }} / {{ change.version.created_at|local_date_format }}
+    / {{ change.pretty_user_name|default:'🧙' }}{% if change.version.via_api_token %}
+      <span class="badge text-bg-secondary">API</span>{% endif %} / {{ change.version.created_at|local_date_format }}
   </h4>
   <ul class="wb-history-changes">
     {% for pretty in change.changes %}<li>{{ pretty }}</li>{% endfor %}

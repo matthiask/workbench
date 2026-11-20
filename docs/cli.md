@@ -52,8 +52,8 @@ web interface. `wb services search --project ID` finds the service.
 create a token on the "API tokens" page and use `wb login URL --token`.
 
 - A token acts in your name, with your access: read only or read and
-  write. The history of changes made with it lists your name; the
-  administration's audit log also shows the token.
+  write. The history lists changes made with it under your name, marked
+  "API"; the administration's audit log also shows the token.
 - It's shown once only, copy it right away.
 - It expires 30 days after its last use; each use extends it.
 - The bin icon revokes it immediately, so does `wb tokens delete ID`

@@ -58,6 +58,14 @@ class LoggedAction(models.Model):
     def user_id(self):
         return audit_user_id(self.user_name)
 
+    @property
+    def via_api_token(self):
+        """Changes made with an API token, see ``set_user_name()``"""
+        return bool(
+            self.user_name
+            and re.search(r"^user-[0-9]+-.*-token-[0-9]+$", self.user_name)
+        )
+
     @cached_property
     def new_row_data(self):
         if self.changed_fields:

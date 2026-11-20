@@ -8,6 +8,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.middleware import set_user_name
+from workbench.accounts.models import APIToken
 from workbench.audit.models import LoggedAction
 from workbench.projects.models import Project
 from workbench.tools.history import EVERYTHING, Prettifier
@@ -36,6 +37,21 @@ class HistoryTest(TestCase):
 
         response = self.client.get(f"/history/accounts_user/id/{user3.pk}/")
         self.assertContains(response, f"INSERT accounts_user {user3.pk}")
+
+    def test_api_badge(self):
+        """Changes made with API tokens are marked in the history"""
+        project = factories.ProjectFactory.create()
+        user = project.owned_by
+        token, _secret = APIToken.create_for(user=user, title="CLI", access="write")
+        set_user_name(user, token=token)
+        project.title = "Changed"
+        project.save()
+
+        self.client.force_login(user)
+        response = self.client.get(f"/history/projects_project/id/{project.pk}/")
+        self.assertContains(
+            response, '<span class="badge text-bg-secondary">API</span>', count=1
+        )
 
     def test_history(self):
         """Initial values and changed values"""
