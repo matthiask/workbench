@@ -24,6 +24,7 @@ from workbench.logbook.models import (
     LoggedCost,
     LoggedHours,
 )
+from workbench.logbook.tasks import is_reported_move, personnel_administration
 from workbench.offers.models import Offer
 from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.services.models import ServiceType
@@ -544,6 +545,24 @@ class LoggedHoursForm(ModelForm):
             )
         }
 
+    def _reported_to_personnel_administration(self, data):
+        """Whether ``changes_by_others_mails()`` will list this change"""
+        if not data.get("rendered_by"):
+            return False
+        before = self.instance.rendered_by if self.instance.pk else None
+        if {before, data["rendered_by"]} - {None} == {self.request.user}:
+            return False
+        if self.instance.pk and not (
+            {"hours", "rendered_by"} & set(self.changed_data)
+            or (
+                "rendered_on" in self.changed_data
+                and data.get("rendered_on")
+                and is_reported_move(self.instance.rendered_on, data["rendered_on"])
+            )
+        ):
+            return False
+        return bool(personnel_administration())
+
     def clean(self):  # noqa: C901
         data = super().clean()
         errors = {}
@@ -618,6 +637,16 @@ class LoggedHoursForm(ModelForm):
                     ),
                     code="you-are-late",
                 )
+
+        if self._reported_to_personnel_administration(data):
+            self.add_warning(
+                _(
+                    "These are someone else's hours. Logging, changing and"
+                    " deleting them is reported to personnel administration"
+                    " weekly."
+                ),
+                code="hours-of-others",
+            )
 
         if (
             data.get("hours")

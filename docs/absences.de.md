@@ -75,7 +75,9 @@ in der Vorwoche jemand anders als die Person, der sie gehören, erfasst,
 gelöscht oder geändert hat: geänderte Stunden, eine andere Person oder
 ein anderer Monat. Änderungen der Beschreibung, der verrechenbaren
 Stunden oder innerhalb desselben Monats ändern die Jahresarbeitszeit
-nicht und fehlen deshalb.
+nicht und fehlen deshalb, ebenso Verschiebungen innerhalb derselben
+Woche. Das Formular im Logbuch weist vorher darauf hin, wenn eine
+Änderung aufgeführt wird.
 
 ## Die Ringe oben
 

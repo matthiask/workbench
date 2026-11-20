@@ -69,7 +69,9 @@ Personnel administration gets a mail on Mondays listing the logged hours
 someone else than the person they belong to has logged, deleted or
 changed in the previous week: changed hours, another person or another
 month. Changes of the description, of the hours for invoicing or within
-the same month don't affect the annual working time and aren't listed.
+the same month don't affect the annual working time and aren't listed,
+neither are moves within the same week. The logbook form says beforehand
+when a change will be listed.
 
 ## The rings at the top
 

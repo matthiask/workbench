@@ -14,7 +14,7 @@ from workbench.logbook.forms import (
     LoggedHoursSearchForm,
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
-from workbench.logbook.views import create
+from workbench.logbook.views import LoggedHoursDeleteView, create
 
 
 urlpatterns = [
@@ -56,9 +56,7 @@ urlpatterns = [
     ),
     path(
         "hours/<int:pk>/delete/",
-        generic.DeleteView.as_view(
-            model=LoggedHours, template_name="modal_confirm_delete.html"
-        ),
+        LoggedHoursDeleteView.as_view(model=LoggedHours),
         name="logbook_loggedhours_delete",
     ),
     path(

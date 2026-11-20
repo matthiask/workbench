@@ -1382,6 +1382,11 @@ class ChangesByOthersTest(TestCase):
             rendered_on=dt.date(2026, 5, 18),
             description="Other month",
         )
+        same_week = factories.LoggedHoursFactory.create(
+            rendered_by=person,
+            rendered_on=dt.date(2026, 4, 30),
+            description="Same week",
+        )
         deleted = factories.LoggedHoursFactory.create(
             rendered_by=person, rendered_on=monday, description="Deleted entry"
         )
@@ -1396,6 +1401,9 @@ class ChangesByOthersTest(TestCase):
         same_month.save()
         other_month.rendered_on = dt.date(2026, 4, 30)
         other_month.save()
+        # Another month, but the same week
+        same_week.rendered_on = dt.date(2026, 5, 1)
+        same_week.save()
         deleted.delete()
         factories.LoggedHoursFactory.create(
             rendered_by=person, rendered_on=monday, description="Logged for you"
@@ -1417,6 +1425,7 @@ class ChangesByOthersTest(TestCase):
         self.assertNotIn("Own work", body)
         self.assertNotIn("Text only", body)
         self.assertNotIn("Same month", body)
+        self.assertNotIn("Same week", body)
 
         # Nothing happened the week before
         mail.outbox.clear()
@@ -1463,3 +1472,63 @@ class ChangesByOthersTest(TestCase):
         self.assertNotIn("Logged and deleted", body)
         self.assertEqual(body.count("Logged and changed"), 1)
         self.assertIn("4.0h: Logged and changed", body)
+
+    def test_warning_changing_hours_of_others(self):
+        """Changing someone else's hours warns that personnel administration
+        is informed, changing the description doesn't"""
+        factories.UserFactory.create(_features=[FEATURES.PERSONNEL_ADMINISTRATION])
+        hours = factories.LoggedHoursFactory.create()
+        colleague = factories.UserFactory.create()
+        self.client.force_login(colleague)
+        data = {
+            "modal-rendered_by": hours.rendered_by_id,
+            "modal-rendered_on": hours.rendered_on.isoformat(),
+            "modal-service": hours.service_id,
+            "modal-hours": "1.0",
+            "modal-hours_for_invoicing": "1.0",
+            "modal-description": "Test 2",
+        }
+        headers = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.post(hours.urls["update"], data, headers=headers)
+        self.assertEqual(response.status_code, 202)
+
+        response = self.client.post(
+            hours.urls["update"],
+            data | {"modal-hours": "2.0", "modal-hours_for_invoicing": "2.0"},
+            headers=headers,
+        )
+        self.assertContains(response, "hours-of-others")
+        self.assertContains(response, "personnel administration")
+
+        response = self.client.post(
+            hours.urls["update"],
+            data
+            | {
+                "modal-hours": "2.0",
+                "modal-hours_for_invoicing": "2.0",
+                WarningsForm.ignore_warnings_id: "hours-of-others",
+            },
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 202)
+
+        # Logging hours for someone else
+        response = self.client.post(
+            hours.service.project.urls["createhours"],
+            data,
+            headers=headers,
+        )
+        self.assertContains(response, "hours-of-others")
+
+        # Deleting asks for a confirmation mentioning it
+        response = self.client.get(
+            hours.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertContains(response, "personnel administration")
+
+        self.client.force_login(hours.rendered_by)
+        response = self.client.get(
+            hours.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertNotContains(response, "personnel administration")

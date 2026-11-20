@@ -78,6 +78,7 @@ class CelebrationsTest(TestCase):
                 "modal-service": service.id,
                 "modal-hours": "0.5",
                 "modal-description": "Test",
+                WarningsForm.ignore_warnings_id: "hours-of-others",
             },
             headers={"x-requested-with": "XMLHttpRequest"},
         )

@@ -12,10 +12,22 @@ from workbench.audit.models import LoggedAction, audit_user_id
 from workbench.logbook.models import LoggedHours
 from workbench.projects.models import Service
 from workbench.tools.formats import hours, local_date_format
+from workbench.tools.validation import monday
 
 
 #: Changes of an entry by the same person this close to each other are one
 COALESCE = dt.timedelta(hours=1)
+
+
+def is_reported_move(old_day, new_day):
+    """
+    The annual working time sums up months, moving hours within a month
+    doesn't change it. Moving them within a week is a correction while
+    logging (the logbook locks weeks), even across the end of a month.
+    """
+    return old_day.replace(day=1) != new_day.replace(day=1) and monday(
+        old_day
+    ) != monday(new_day)
 
 
 def _changes(old, new, users):
@@ -32,15 +44,10 @@ def _changes(old, new, users):
                 users.get(int(new["rendered_by_id"]), new["rendered_by_id"]),
             )
         )
-    # The annual working time sums up months, moving hours within a month
-    # doesn't change it
-    if old["rendered_on"][:7] != new["rendered_on"][:7]:
-        changes.append(
-            "{} → {}".format(
-                local_date_format(dt.date.fromisoformat(old["rendered_on"])),
-                local_date_format(dt.date.fromisoformat(new["rendered_on"])),
-            )
-        )
+    old_day = dt.date.fromisoformat(old["rendered_on"])
+    new_day = dt.date.fromisoformat(new["rendered_on"])
+    if is_reported_move(old_day, new_day):
+        changes.append(f"{local_date_format(old_day)} → {local_date_format(new_day)}")
     return changes
 
 
@@ -115,6 +122,15 @@ def changes_by_others(start, end):
     return rows
 
 
+def personnel_administration():
+    """The recipients of ``changes_by_others_mails()``"""
+    return [
+        user
+        for user in User.objects.active()
+        if user.features[FEATURES.PERSONNEL_ADMINISTRATION]
+    ]
+
+
 def changes_by_others_mails(*, today=None):
     """
     Send personnel administration a weekly mail (on Mondays) with the logged
@@ -124,12 +140,7 @@ def changes_by_others_mails(*, today=None):
     today = today or dt.date.today()
     if today.weekday() != 0:
         return
-    recipients = [
-        user
-        for user in User.objects.active()
-        if user.features[FEATURES.PERSONNEL_ADMINISTRATION]
-    ]
-    if not recipients:
+    if not (recipients := personnel_administration()):
         return
 
     end = timezone.make_aware(dt.datetime.combine(today, dt.time.min))
