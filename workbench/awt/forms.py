@@ -8,6 +8,11 @@ from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import Team, User
+from workbench.awt.changes import (
+    ABSENCE_WARNING,
+    is_reported_move,
+    personnel_administration,
+)
 from workbench.awt.models import Absence, Year
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
 from workbench.tools.validation import monday
@@ -126,6 +131,28 @@ class AbsenceForm(ModelForm, WarningsForm):
                 if choice[0] != Absence.CORRECTION
             ]
 
+    def _reported_to_personnel_administration(self, data):
+        """Whether ``changes_by_others_mails()`` will list this change"""
+        if not data.get("user") or not data.get("starts_on"):
+            return False
+        before = self.instance.user if self.instance.pk else None
+        if {before, data["user"]} - {None} == {self.request.user}:
+            return False
+        if Absence.CORRECTION in {self.instance.reason, data.get("reason")}:
+            return False
+        if self.instance.pk and not (
+            {"user", "days", "reason"} & set(self.changed_data)
+            or any(
+                is_reported_move(
+                    getattr(self.instance, field) or self.instance.starts_on,
+                    data.get(field) or data["starts_on"],
+                )
+                for field in ["starts_on", "ends_on"]
+            )
+        ):
+            return False
+        return bool(personnel_administration())
+
     def clean(self):
         data = super().clean()
         if (days := data.get("days")) is not None and (
@@ -175,6 +202,9 @@ class AbsenceForm(ModelForm, WarningsForm):
                 % {"user": user},
                 code="outside-employment",
             )
+
+        if self._reported_to_personnel_administration(data):
+            self.add_warning(ABSENCE_WARNING, code="absence-of-others")
 
         # Only sickness descriptions are private. A new absence without the
         # description replaces the absence instead.

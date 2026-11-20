@@ -11,8 +11,10 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
+from workbench.awt.changes import changes_by_others_mails
 from workbench.awt.models import Absence, Employment, Holiday, Year
 from workbench.awt.reporting import (
     active_users,
@@ -1265,6 +1267,7 @@ class AWTTest(TestCase):
                     "modal-starts_on": dt.date.today().isoformat(),
                     "modal-days": 1,
                     "modal-reason": reason,
+                    WarningsForm.ignore_warnings_id: "absence-of-others",
                 },
                 headers={"x-requested-with": "XMLHttpRequest"},
             )
@@ -1372,3 +1375,96 @@ class AWTTest(TestCase):
         self.client.force_login(user)
         response = self.client.get("/report/annual-working-time/?export=pdf&year=2018")
         self.assertRedirects(response, "/report/annual-working-time/?year=2018")
+
+
+@override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
+class AbsenceChangesByOthersTest(TestCase):
+    def test_changes_by_others_mail(self):
+        """The weekly mail to personnel administration lists absences others
+        entered, changed or deleted, except for working time corrections"""
+        admin = factories.UserFactory.create(
+            _features=[FEATURES.PERSONNEL_ADMINISTRATION]
+        )
+        colleague = factories.UserFactory.create()
+        person = factories.UserFactory.create()
+        next_monday = in_days(7 - dt.date.today().weekday())
+
+        set_user_name(person)
+        factories.AbsenceFactory.create(user=person, starts_on=dt.date(2026, 3, 2))
+        changed = factories.AbsenceFactory.create(
+            user=person, starts_on=dt.date(2026, 4, 6)
+        )
+        text_only = factories.AbsenceFactory.create(
+            user=person, starts_on=dt.date(2026, 5, 4)
+        )
+        deleted = factories.AbsenceFactory.create(
+            user=person, starts_on=dt.date(2026, 6, 1)
+        )
+
+        set_user_name(colleague)
+        changed.days = 2
+        changed.save()
+        text_only.description = "Secret"
+        text_only.save()
+        deleted.delete()
+        factories.AbsenceFactory.create(
+            user=person,
+            starts_on=dt.date(2026, 7, 6),
+            reason=Absence.PAID,
+            description="Secret too",
+        )
+        factories.AbsenceFactory.create(
+            user=person, starts_on=dt.date(2026, 8, 3), reason=Absence.CORRECTION
+        )
+
+        changes_by_others_mails(today=next_monday)
+        [message] = mail.outbox
+        self.assertEqual(message.to, [admin.email])
+        body = message.body
+        self.assertNotIn("02.03.2026", body)  # Entered by the person
+        self.assertIn("06.04.2026", body)
+        self.assertIn("1.00d → 2.00d", body)
+        self.assertNotIn("04.05.2026", body)  # Only the description changed
+        self.assertIn("01.06.2026", body)
+        self.assertIn("06.07.2026", body)
+        self.assertIn("Paid leave", body)
+        self.assertNotIn("03.08.2026", body)  # Working time correction
+        self.assertNotIn("Secret", body)
+
+    def test_warning_changing_absences_of_others(self):
+        """Changing someone else's absence warns that personnel administration
+        is informed, except for working time corrections"""
+        hr = factories.UserFactory.create(_features=[FEATURES.PERSONNEL_ADMINISTRATION])
+        absence = factories.AbsenceFactory.create()
+        headers = {"x-requested-with": "XMLHttpRequest"}
+        data = {
+            "modal-user": absence.user_id,
+            "modal-starts_on": absence.starts_on.isoformat(),
+            "modal-days": "2",
+            "modal-reason": "vacation",
+        }
+        self.client.force_login(hr)
+
+        response = self.client.post(absence.urls["update"], data, headers=headers)
+        self.assertContains(response, "absence-of-others")
+
+        response = self.client.post(
+            absence.urls["update"],
+            data | {WarningsForm.ignore_warnings_id: "absence-of-others"},
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 202)
+
+        response = self.client.post(
+            "/absences/create/",
+            data | {"modal-reason": "correction", "modal-days": "-1"},
+            headers=headers,
+        )
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get(absence.urls["delete"], headers=headers)
+        self.assertContains(response, "alert-warning")
+
+        self.client.force_login(absence.user)
+        response = self.client.get(absence.urls["delete"], headers=headers)
+        self.assertNotContains(response, "alert-warning")

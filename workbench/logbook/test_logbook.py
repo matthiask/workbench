@@ -12,11 +12,11 @@ from time_machine import travel
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.middleware import set_user_name
+from workbench.awt.changes import changes_by_others_mails
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import hours_for_invoicing_much_higher
 from workbench.logbook.models import LoggedCost, LoggedHours
-from workbench.logbook.tasks import changes_by_others_mails
 from workbench.projects.models import Project
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages

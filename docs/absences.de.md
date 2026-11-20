@@ -70,14 +70,14 @@ ihre Krankheitstage sieht nur die Personaladministration.
 Arbeitszeitmodelle, Anstellungen und Feiertage richten die
 Administrator:innen ein.
 
-Die Personaladministration erhält montags ein Mail mit den Stunden, die
-in der Vorwoche jemand anders als die Person, der sie gehören, erfasst,
-gelöscht oder geändert hat: geänderte Stunden, eine andere Person oder
-ein anderer Monat. Änderungen der Beschreibung, der verrechenbaren
-Stunden oder innerhalb desselben Monats ändern die Jahresarbeitszeit
-nicht und fehlen deshalb, ebenso Verschiebungen innerhalb derselben
-Woche. Das Formular im Logbuch weist vorher darauf hin, wenn eine
-Änderung aufgeführt wird.
+Die Personaladministration erhält montags ein Mail mit den Stunden und
+Abwesenheiten, die in der Vorwoche jemand anders als die Person, der sie
+gehören, erfasst, gelöscht oder geändert hat: geänderte Stunden oder
+Tage, eine andere Person, ein anderer Grund oder Monat. Änderungen der
+Beschreibung, der verrechenbaren Stunden oder innerhalb desselben Monats
+ändern die Jahresarbeitszeit nicht und fehlen deshalb, ebenso
+Verschiebungen innerhalb derselben Woche und Arbeitszeitkorrekturen. Die
+Formulare weisen vorher darauf hin, wenn eine Änderung aufgeführt wird.
 
 ## Die Ringe oben
 

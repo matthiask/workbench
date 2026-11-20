@@ -14,6 +14,11 @@ from django.utils.translation import gettext, gettext_lazy as _, override
 
 from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
+from workbench.awt.changes import (
+    HOURS_WARNING,
+    is_reported_move,
+    personnel_administration,
+)
 from workbench.contacts.models import Organization
 from workbench.expenses.models import ExchangeRates
 from workbench.invoices.models import Invoice, Service as InvoiceService
@@ -24,7 +29,6 @@ from workbench.logbook.models import (
     LoggedCost,
     LoggedHours,
 )
-from workbench.logbook.tasks import is_reported_move, personnel_administration
 from workbench.offers.models import Offer
 from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.services.models import ServiceType
@@ -639,14 +643,7 @@ class LoggedHoursForm(ModelForm):
                 )
 
         if self._reported_to_personnel_administration(data):
-            self.add_warning(
-                _(
-                    "These are someone else's hours. Logging, changing and"
-                    " deleting them is reported to personnel administration"
-                    " weekly."
-                ),
-                code="hours-of-others",
-            )
+            self.add_warning(HOURS_WARNING, code="hours-of-others")
 
         if (
             data.get("hours")

@@ -1,0 +1,8 @@
+{% extends "modal_confirm_delete.html" %}
+
+{% block body %}
+  {{ block.super }}
+  {% if reported_warning %}
+    <div class="alert alert-warning mb-0">{{ reported_warning }}</div>
+  {% endif %}
+{% endblock body %}

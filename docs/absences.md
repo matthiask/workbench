@@ -66,12 +66,12 @@ and sickness days are only visible to personnel administration. Working
 time models, employments and holidays are set up by the administrators.
 
 Personnel administration gets a mail on Mondays listing the logged hours
-someone else than the person they belong to has logged, deleted or
-changed in the previous week: changed hours, another person or another
-month. Changes of the description, of the hours for invoicing or within
-the same month don't affect the annual working time and aren't listed,
-neither are moves within the same week. The logbook form says beforehand
-when a change will be listed.
+and absences someone else than the person they belong to has entered,
+deleted or changed in the previous week: changed hours or days, another
+person, reason or month. Changes of the description, of the hours for
+invoicing or within the same month don't affect the annual working time
+and aren't listed, neither are moves within the same week nor working
+time corrections. The forms say beforehand when a change will be listed.
 
 ## The rings at the top
 

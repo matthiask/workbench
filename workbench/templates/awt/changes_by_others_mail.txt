@@ -1,0 +1,19 @@
+{% load i18n workbench %}{% autoescape off %}{% blocktranslate with day=week_start|date:"d.m.Y" %}Changes by others (week of {{ day }}){% endblocktranslate %}
+
+{% blocktranslate trimmed %}
+These logged hours and absences were entered, deleted or changed by someone else than the person they belong to. The changes affect the annual working time.
+{% endblocktranslate %}
+{% if hours %}
+{% translate "Logged hours" %}
+{% for row in hours %}
+{{ row.owner }}, {{ row.rendered_on|date:"d.m.Y" }}, {{ row.hours|hours }}: {{ row.description|truncatewords:20 }}
+{% if row.service %}  {{ row.service.project }}: {{ row.service.title }}
+  {{ WORKBENCH.URL }}{{ row.service.project.get_absolute_url }}
+{% endif %}  {% if row.kind == "I" %}{% translate "logged" %}{% elif row.kind == "D" %}{% translate "deleted" %}{% else %}{{ row.changes|join:", " }}{% endif %} ({{ row.editor }}, {{ row.changed_at|date:"d.m.Y H:i" }})
+{% endfor %}{% endif %}{% if absences %}
+{% translate "Absences" %}
+{% for row in absences %}
+{{ row.owner }}, {{ row.starts_on|date:"d.m.Y" }} - {{ row.ends_on|date:"d.m.Y" }}, {{ row.days|days }}: {{ row.reason|capfirst }}
+{% if row.kind != "D" %}  {{ WORKBENCH.URL }}{% url "awt_absence_detail" row.data.id %}
+{% endif %}  {% if row.kind == "I" %}{% translate "entered" %}{% elif row.kind == "D" %}{% translate "deleted" %}{% else %}{{ row.changes|join:", " }}{% endif %} ({{ row.editor }}, {{ row.changed_at|date:"d.m.Y H:i" }})
+{% endfor %}{% endif %}{% endautoescape %}

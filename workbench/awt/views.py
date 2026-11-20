@@ -10,8 +10,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
+from workbench import generic
 from workbench.accounts.features import FEATURES, feature_required
 from workbench.accounts.models import User
+from workbench.awt.changes import is_reported, personnel_administration
 from workbench.awt.charts import (
     BALANCE_LIMIT,
     balance_chart,
@@ -275,3 +277,23 @@ def suggested_days(request):
     return JsonResponse({
         "days": suggested_absence_days(data["user"], data["starts_on"], data["ends_on"])
     })
+
+
+class ReportedDeleteView(generic.DeleteView):
+    """
+    Deleting someone else's logged hours or absences is listed in
+    ``changes_by_others_mails()``, the confirmation says so
+    """
+
+    template_name = "awt/reported_confirm_delete.html"
+    owner_field = None
+    warning = None
+
+    def get_context_data(self, **kwargs):
+        if (
+            getattr(self.object, self.owner_field) != self.request.user
+            and is_reported(self.object)
+            and personnel_administration()
+        ):
+            kwargs["reported_warning"] = self.warning
+        return super().get_context_data(**kwargs)

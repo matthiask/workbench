@@ -1,9 +1,10 @@
 from django.urls import path
 
 from workbench import generic
+from workbench.awt.changes import ABSENCE_WARNING
 from workbench.awt.forms import AbsenceForm, AbsenceSearchForm
 from workbench.awt.models import Absence, Holiday
-from workbench.awt.views import confirm_absence, suggested_days
+from workbench.awt.views import ReportedDeleteView, confirm_absence, suggested_days
 
 
 urlpatterns = [
@@ -33,8 +34,8 @@ urlpatterns = [
     ),
     path(
         "<int:pk>/delete/",
-        generic.DeleteView.as_view(
-            model=Absence, template_name="modal_confirm_delete.html"
+        ReportedDeleteView.as_view(
+            model=Absence, owner_field="user", warning=ABSENCE_WARNING
         ),
         name="awt_absence_delete",
     ),

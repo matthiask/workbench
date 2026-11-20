@@ -3,6 +3,8 @@ from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
 from workbench import generic
+from workbench.awt.changes import HOURS_WARNING
+from workbench.awt.views import ReportedDeleteView
 from workbench.logbook.forms import (
     BreakForm,
     BreakSearchForm,
@@ -14,7 +16,7 @@ from workbench.logbook.forms import (
     LoggedHoursSearchForm,
 )
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
-from workbench.logbook.views import LoggedHoursDeleteView, create
+from workbench.logbook.views import create
 
 
 urlpatterns = [
@@ -56,7 +58,9 @@ urlpatterns = [
     ),
     path(
         "hours/<int:pk>/delete/",
-        LoggedHoursDeleteView.as_view(model=LoggedHours),
+        ReportedDeleteView.as_view(
+            model=LoggedHours, owner_field="rendered_by", warning=HOURS_WARNING
+        ),
         name="logbook_loggedhours_delete",
     ),
     path(
