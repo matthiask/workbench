@@ -25,6 +25,7 @@ from workbench.api_keys import KEYS
 from workbench.contacts.models import Group, Organization, Person
 from workbench.deals.models import AttributeGroup, Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
 from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.models import FreezeDate
@@ -2519,6 +2520,105 @@ planned_work:
         result = self.wb("me", token="wb_nope")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("wb login", result.output)
+
+    def test_log_hours(self):
+        """Log, change and delete hours; warnings stop with their code"""
+        service = factories.ServiceFactory.create(title="Design")
+        log = ["hours", "create", service.pk, "1.5", "Wireframes"]
+
+        result = self.wb(*log, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing changed: Logged (new)", result.output)
+        self.assertFalse(LoggedHours.objects.exists())
+
+        result = self.wb(*log)
+        self.assertEqual(result.exit_code, 0, result.output)
+        entry = LoggedHours.objects.get()
+        self.assertIn(f"Logged {entry.pk} ", result.output)
+        self.assertIn("ab 1.5h", result.output)
+        self.assertEqual(entry.rendered_by, self.user)
+
+        result = self.wb(*log)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning maybe-duplicate", result.output)
+        result = self.wb(*log, "--ignore-warning", "maybe-duplicate")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(LoggedHours.objects.count(), 2)
+
+        result = self.wb(
+            "hours",
+            "update",
+            entry.pk,
+            "--description",
+            "-",
+            "--hours-for-invoicing",
+            "2",
+            input="Wireframes and sketches",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("1.5h → 2.0h", result.output)
+        entry.refresh_from_db()
+        self.assertEqual(entry.description, "Wireframes and sketches")
+        result = self.wb("hours", "update", entry.pk, "--clear-hours-for-invoicing")
+        self.assertEqual(result.exit_code, 0, result.output)
+        entry.refresh_from_db()
+        self.assertIsNone(entry.hours_for_invoicing)
+        result = self.wb("hours", "update", entry.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Nothing to change.", result.output)
+
+        result = self.wb("hours", "delete", entry.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted {entry.pk} ", result.output)
+        self.assertFalse(LoggedHours.objects.filter(pk=entry.pk).exists())
+
+    def test_log_costs(self):
+        """Log, change and delete costs"""
+        service = factories.ServiceFactory.create(title="Hosting")
+        result = self.wb(
+            "costs",
+            "create",
+            service.pk,
+            "100",
+            "Server",
+            "--third-party-costs",
+            "120",
+            "--rendered-on",
+            in_days(-1).isoformat(),
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning third-party-costs-higher", result.output)
+        result = self.wb(
+            "costs",
+            "create",
+            service.pk,
+            "130",
+            "Server",
+            "--third-party-costs",
+            "120",
+            "--rendered-on",
+            in_days(-1).isoformat(),
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("130.00 (third party 120.00)", result.output)
+        entry = LoggedCost.objects.get()
+        self.assertEqual(entry.rendered_on, in_days(-1))
+
+        result = self.wb(
+            "costs", "update", entry.pk, "--expenses", "--clear-third-party-costs"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("third_party_costs", result.output)
+        result = self.wb("costs", "update", entry.pk, "--expenses")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("(expenses)", result.output)
+
+        result = self.wb("costs", "delete", entry.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertTrue(LoggedCost.objects.filter(pk=entry.pk).exists())
+        result = self.wb("costs", "delete", entry.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertFalse(LoggedCost.objects.exists())
 
     def test_timestamps(self):
         """Tasks are started and stopped like with the old tst command"""

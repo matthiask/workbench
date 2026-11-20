@@ -50,6 +50,10 @@ die gearbeiteten Stunden und, wo eingeschaltet, spätes Erfassen und zu
 wenig Pausen. Prüfe den Eintrag und wähle «Warnungen ignorieren», wenn er
 stimmt.
 
+Auf der [Kommandozeile](cli.de.md) erfassen `wb hours create` und
+`wb costs create` Stunden und Kosten mit denselben Prüfungen; Warnungen
+halten mit ihrem Code an, `--ignore-warning CODE` akzeptiert sie.
+
 ## Zeitmarken
 
 Eine Zeitmarke hält fest, wann du eine Aufgabe beendet oder begonnen

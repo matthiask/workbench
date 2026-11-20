@@ -45,6 +45,10 @@ hours for invoicing lower or much higher than the hours worked, and,
 where enabled, logging late and too few breaks. Check the entry and
 choose "Ignore warnings" if it's correct.
 
+On the [command line](cli.md), `wb hours create` and `wb costs create`
+log hours and costs with the same checks; warnings stop with their code,
+`--ignore-warning CODE` accepts them.
+
 ## Timestamps
 
 A timestamp records when you stopped or started a task, with notes and

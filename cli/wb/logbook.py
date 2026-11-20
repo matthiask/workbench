@@ -10,6 +10,7 @@ from wb.core import (
     echo_json,
     echo_more,
     format_bool,
+    ignore_warnings_option,
     link,
     make_table,
     me,
@@ -18,13 +19,82 @@ from wb.core import (
     period_options,
     period_params,
     request,
+    terminate,
+    text_or_stdin,
 )
+
+
+def _change_params(dry_run, ignore_warnings=()):
+    return {"dry_run": format_bool(dry_run), "ignore_warnings": list(ignore_warnings)}
+
+
+def _echo_entry(data, amount, *, dry_run, as_json, prefix):
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        prefix = "Dry run, nothing changed: " + prefix
+    console.print(
+        f"{prefix}{link(data['id'] or '(new)', data['url'])} {data['rendered_on']}"
+        f" {data['rendered_by']} {amount}"
+        f" | {link(data['project']['code'], data['project']['url'])}"
+        f" {data['service']} ({data['service_id']}) | {data['description']}"
+    )
+
+
+def _echo_hours(data, **kwargs):
+    amount = f"{data['hours']}h"
+    if data["hours_for_invoicing"] is not None:
+        amount += f" → {data['hours_for_invoicing']}h"
+    _echo_entry(data, amount, **kwargs)
+
+
+def _echo_cost(data, **kwargs):
+    amount = data["cost"]
+    if data["third_party_costs"] is not None:
+        amount += f" (third party {data['third_party_costs']})"
+    if data["are_expenses"]:
+        amount += " (expenses)"
+    _echo_entry(data, amount, **kwargs)
+
+
+def _values(**values):
+    """The given values, descriptions given as ``-`` are read from stdin"""
+    data = {key: value for key, value in values.items() if value is not None}
+    if "description" in data:
+        data["description"] = text_or_stdin(data["description"])
+    return data
+
+
+def _clear(data, field, flag):
+    if flag and data.get(field) is not None:
+        option = field.replace("_", "-")
+        terminate(f"--clear-{option} and --{option} contradict each other.")
+    if flag:
+        data[field] = None
+
+
+_rendered_on_option = click.option(
+    "--rendered-on",
+    type=click.DateTime(["%Y-%m-%d"]),
+    help="Date the work was done (YYYY-MM-DD), defaults to today.",
+)
+_rendered_by_option = click.option(
+    "--rendered-by",
+    help="Short name, defaults to you. Hours of others are reported to"
+    " personnel administration.",
+    shell_complete=complete_short_names,
+)
+
+
+def _date(value):
+    return value.date().isoformat() if value else None
 
 
 @cli.group(invoke_without_command=True)
 @click.pass_context
 def hours(ctx):
-    """Look at logged hours, log them in Workbench
+    """Look at, log, change and delete hours
 
     Without a command, lists your hours of this week."""
     if ctx.invoked_subcommand is None:
@@ -123,9 +193,124 @@ def search_hours(
     echo_more(data, offset, "entries", note="The total includes all of them.")
 
 
+@hours.command("create")
+@click.argument("service_id", type=int)
+@click.argument("hours", type=float)
+@click.argument("description")
+@_rendered_on_option
+@_rendered_by_option
+@click.option(
+    "--hours-for-invoicing",
+    type=float,
+    help="Value and invoice the work with these hours, e.g. if it's worth more"
+    " than the time spent.",
+)
+@ignore_warnings_option
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_hours(
+    service_id,
+    hours,
+    description,
+    rendered_on,
+    rendered_by,
+    hours_for_invoicing,
+    ignore_warnings,
+    dry_run,
+    as_json,
+):
+    """Log hours on a service (`wb services search` finds its ID)
+
+    Checked like in the web interface: warnings (e.g. a duplicate, a missing
+    break) stop with their code, `--ignore-warning CODE` accepts them after
+    you've checked. A DESCRIPTION of `-` is read from stdin."""
+    data = request(
+        "POST",
+        "logbook/hours/",
+        params=_change_params(dry_run, ignore_warnings),
+        json=_values(
+            service=service_id,
+            hours=hours,
+            description=description,
+            rendered_on=_date(rendered_on),
+            rendered_by=rendered_by,
+            hours_for_invoicing=hours_for_invoicing,
+        ),
+    )
+    _echo_hours(data, dry_run=dry_run, as_json=as_json, prefix="Logged ")
+
+
+@hours.command("update")
+@click.argument("hours_id", type=int)
+@click.option("--service", type=int, help="Another service of the same project.")
+@click.option("--hours", type=float)
+@click.option("--description", help="`-` reads it from stdin.")
+@_rendered_on_option
+@_rendered_by_option
+@click.option("--hours-for-invoicing", type=float)
+@click.option(
+    "--clear-hours-for-invoicing",
+    is_flag=True,
+    help="Value and invoice the work with the hours again.",
+)
+@ignore_warnings_option
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_hours(
+    hours_id,
+    service,
+    hours,
+    description,
+    rendered_on,
+    rendered_by,
+    hours_for_invoicing,
+    clear_hours_for_invoicing,
+    ignore_warnings,
+    dry_run,
+    as_json,
+):
+    """Change logged hours, only the given fields
+
+    Like in the web interface, hours of past weeks keep their date, person
+    and hours, invoiced hours only allow changing the description."""
+    data = _values(
+        service=service,
+        hours=hours,
+        description=description,
+        rendered_on=_date(rendered_on),
+        rendered_by=rendered_by,
+        hours_for_invoicing=hours_for_invoicing,
+    )
+    _clear(data, "hours_for_invoicing", clear_hours_for_invoicing)
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"logbook/hours/{hours_id}/",
+        params=_change_params(dry_run, ignore_warnings),
+        json=data,
+    )
+    _echo_hours(data, dry_run=dry_run, as_json=as_json, prefix="Changed ")
+
+
+@hours.command("delete")
+@click.argument("hours_id", type=int)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def delete_hours(hours_id, dry_run, as_json):
+    """Delete logged hours
+
+    Like in the web interface, not when they have been invoiced or are from
+    past weeks."""
+    data = request(
+        "DELETE", f"logbook/hours/{hours_id}/", params=_change_params(dry_run)
+    )
+    _echo_hours(data, dry_run=dry_run, as_json=as_json, prefix="Deleted ")
+
+
 @cli.group()
 def costs():
-    """Look at logged costs, log them in Workbench"""
+    """Look at, log, change and delete costs"""
 
 
 @costs.command("search")
@@ -203,3 +388,122 @@ def search_costs(
     table.columns[6].footer = data["total_third_party_costs"]
     console.print(table)
     echo_more(data, offset, "entries", note="The totals include all of them.")
+
+
+_cost_options = [
+    click.option(
+        "--third-party-costs",
+        type=float,
+        help="Total incl. tax for third parties contained in the cost.",
+    ),
+    click.option(
+        "--expense-currency",
+        help="Currency of expenses paid in a foreign currency, with --expense-cost.",
+    ),
+    click.option(
+        "--expense-cost", type=float, help="Expenses in the foreign currency."
+    ),
+    _rendered_on_option,
+    _rendered_by_option,
+]
+
+
+def _with_cost_options(fn):
+    for option in reversed(_cost_options):
+        fn = option(fn)
+    return fn
+
+
+@costs.command("create")
+@click.argument("service_id", type=int)
+@click.argument("cost", type=float)
+@click.argument("description")
+@_with_cost_options
+@click.option(
+    "--expenses",
+    is_flag=True,
+    help="Paid from your own pocket, needs --third-party-costs.",
+)
+@ignore_warnings_option
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def create_cost(
+    service_id, cost, description, expenses, ignore_warnings, dry_run, as_json, **values
+):
+    """Log costs (excl. tax) on a service (`wb services search` finds its ID)
+
+    Checked like in the web interface: warnings stop with their code,
+    `--ignore-warning CODE` accepts them after you've checked. A DESCRIPTION
+    of `-` is read from stdin."""
+    values["rendered_on"] = _date(values["rendered_on"])
+    data = request(
+        "POST",
+        "logbook/costs/",
+        params=_change_params(dry_run, ignore_warnings),
+        json=_values(
+            service=service_id,
+            cost=cost,
+            description=description,
+            are_expenses=expenses or None,
+            **values,
+        ),
+    )
+    _echo_cost(data, dry_run=dry_run, as_json=as_json, prefix="Logged ")
+
+
+@costs.command("update")
+@click.argument("cost_id", type=int)
+@click.option("--service", type=int, help="Another service of the same project.")
+@click.option("--cost", type=float, help="Excl. tax.")
+@click.option("--description", help="`-` reads it from stdin.")
+@_with_cost_options
+@click.option(
+    "--clear-third-party-costs", is_flag=True, help="Remove the third party costs."
+)
+@click.option(
+    "--expenses/--no-expenses", default=None, help="Paid from your own pocket?"
+)
+@ignore_warnings_option
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def update_cost(
+    cost_id,
+    clear_third_party_costs,
+    expenses,
+    ignore_warnings,
+    dry_run,
+    as_json,
+    **values,
+):
+    """Change logged costs, only the given fields
+
+    Like in the web interface, invoiced costs keep their service, date,
+    person and amounts, costs of expense reports their date, person and
+    expenses."""
+    values["rendered_on"] = _date(values["rendered_on"])
+    data = _values(**values, are_expenses=expenses)
+    _clear(data, "third_party_costs", clear_third_party_costs)
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"logbook/costs/{cost_id}/",
+        params=_change_params(dry_run, ignore_warnings),
+        json=data,
+    )
+    _echo_cost(data, dry_run=dry_run, as_json=as_json, prefix="Changed ")
+
+
+@costs.command("delete")
+@click.argument("cost_id", type=int)
+@click.option("--dry-run", is_flag=True, help="Validate only.")
+@click.option("--json", "as_json", is_flag=True)
+def delete_cost(cost_id, dry_run, as_json):
+    """Delete logged costs
+
+    Like in the web interface, not when they have been invoiced or are part
+    of an expense report."""
+    data = request(
+        "DELETE", f"logbook/costs/{cost_id}/", params=_change_params(dry_run)
+    )
+    _echo_cost(data, dry_run=dry_run, as_json=as_json, prefix="Deleted ")

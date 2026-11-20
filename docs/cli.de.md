@@ -1,8 +1,8 @@
 # Kommandozeile und API-Tokens
 
 `wb` ist das Kommandozeilen-Werkzeug von Workbench: Es sucht, zeigt und
-ändert Projekte, Offerten, Rechnungen, Geschäfte, Kontakte,
-Abwesenheiten und die Planung und gibt die Berichte aus. Assistenten wie
+ändert Projekte, Offerten, Rechnungen, Geschäfte, Kontakte, erfasste
+Stunden und Kosten, Abwesenheiten und die Planung und gibt die Berichte aus. Assistenten wie
 Claude Code verwenden es ebenfalls.
 
 ## Installieren
@@ -39,10 +39,12 @@ Befehle folgen `wb <Nomen> <Verb>`, z.B. `wb projects search`,
 eine Warnung zeigt, hält `wb` an und gibt den Code der Warnung aus;
 `--ignore-warning CODE` akzeptiert sie, nachdem du sie geprüft hast.
 
-Stunden werden absichtlich nicht mit `wb` erfasst: Die Warnungen des
-Logbuch-Formulars sind wichtig. `wb timestamps start` und `wb timestamps
-stop` setzen [Zeitmarken](hours.de.md#zeitmarken), die du im Web
-erfasst.
+`wb hours create SERVICE STUNDEN BESCHREIBUNG` und `wb costs create`
+[erfassen Stunden und Kosten](hours.de.md) mit den Prüfungen und
+Warnungen des Logbuch-Formulars, `update` und `delete` ändern und
+entfernen sie wie in der Weboberfläche. `wb services search --project ID`
+findet die Leistung. `wb timestamps start` und `wb timestamps stop`
+setzen [Zeitmarken](hours.de.md#zeitmarken).
 
 ## API-Tokens
 

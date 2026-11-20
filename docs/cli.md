@@ -1,8 +1,8 @@
 # Command line and API tokens
 
 `wb` is Workbench's command line tool: it searches, shows and changes
-projects, offers, invoices, deals, contacts, absences and planning, and
-prints the reports. Assistants such as Claude Code use it too.
+projects, offers, invoices, deals, contacts, logged hours and costs,
+absences and planning, and prints the reports. Assistants such as Claude Code use it too.
 
 ## Installing
 
@@ -38,9 +38,12 @@ Changes are checked like in the web interface. Where the web interface
 shows a warning, `wb` stops and prints the warning's code;
 `--ignore-warning CODE` accepts it after you've checked.
 
-On purpose, hours aren't logged with `wb`: the logbook form's warnings
-matter. `wb timestamps start` and `wb timestamps stop` set
-[timestamps](hours.md#timestamps) which you log on the web.
+`wb hours create SERVICE HOURS DESCRIPTION` and `wb costs create`
+[log hours and costs](hours.md) with the checks and warnings of the
+logbook form, `update` and `delete` change and remove them like in the
+web interface. `wb services search --project ID` finds the service.
+`wb timestamps start` and `wb timestamps stop` set
+[timestamps](hours.md#timestamps).
 
 ## API tokens
 
