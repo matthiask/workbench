@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 13:08+0100\n"
+"POT-Creation-Date: 2026-11-20 09:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3120,14 +3120,12 @@ msgstr "Erbracht am"
 
 #: workbench/invoices/views.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_form.html
-#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/_logged_hours_per_rate.html
 msgid "effort type"
 msgstr "Aufwandtyp"
 
 #: workbench/invoices/views.py workbench/services/models.py
 #: workbench/templates/invoices/invoice_form.html
-#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/_logged_hours_per_rate.html
 #: workbench/tools/xlsx.py
 msgid "hourly rate"
@@ -3138,7 +3136,6 @@ msgstr "Stundensatz"
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/logbook/loggedhours_detail.html
-#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/project_detail.html
 #: workbench/templates/projects/project_hours_for_invoicing.html
 #: workbench/templates/reporting/labor_costs.html
@@ -4865,7 +4862,7 @@ msgstr "Ziel"
 msgid "Invoices for the selected period may not be complete yet (cutoff: %(cutoff)s)."
 msgstr "Die Rechnungen für den gewählten Zeitraum sind möglicherweise noch nicht vollständig (Stichtag: %(cutoff)s)."
 
-#: workbench/services/models.py workbench/templates/offers/offer_form.html
+#: workbench/services/models.py
 msgid "service type"
 msgstr "Leistungstyp"
 
@@ -5665,6 +5662,7 @@ msgstr "Bemerkungen bei der Organisation"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/invoice_form.html
+#: workbench/templates/logbook/changes_by_others_mail.txt
 msgid "logged"
 msgstr "erfasst"
 
@@ -5688,6 +5686,7 @@ msgstr "Zwischentotal"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
+#: workbench/templates/projects/project_detail.html
 #: workbench/templates/reporting/_budget_statistics_table.html
 #: workbench/tools/models.py workbench/tools/pdf.py workbench/tools/xlsx.py
 msgid "discount"
@@ -5742,7 +5741,6 @@ msgid "invoice line"
 msgstr "Rechnungsposition"
 
 #: workbench/templates/invoices/invoice_form.html
-#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/project_detail.html
 msgid "optional"
 msgstr "optional"
@@ -5806,6 +5804,7 @@ msgid "copy"
 msgstr "kopieren"
 
 #: workbench/templates/invoices/service_form.html
+#: workbench/templates/offers/offer_form.html
 #: workbench/templates/projects/service_form.html
 msgid "effort"
 msgstr "Aufwand"
@@ -5813,6 +5812,19 @@ msgstr "Aufwand"
 #: workbench/templates/logbook/_loggedhours_row.html workbench/timer/models.py
 msgid "timestamp"
 msgstr "Zeitmarke"
+
+#: workbench/templates/logbook/changes_by_others_mail.txt
+#, python-format
+msgid "Logged hours changed by others (week of %(day)s)"
+msgstr "Von anderen geänderte Stunden (Woche vom %(day)s)"
+
+#: workbench/templates/logbook/changes_by_others_mail.txt
+msgid "These logged hours were logged, deleted or changed by someone else than the person they belong to. The changes affect the annual working time."
+msgstr "Diese Stunden wurden von jemand anderem als der Person, der sie gehören, erfasst, gelöscht oder geändert. Die Änderungen wirken sich auf die Jahresarbeitszeit aus."
+
+#: workbench/templates/logbook/changes_by_others_mail.txt
+msgid "deleted"
+msgstr "gelöscht"
 
 #: workbench/templates/logbook/loggedcost_detail.html
 #: workbench/templates/logbook/loggedhours_detail.html

@@ -19,6 +19,7 @@ from workbench.invoices.tasks import (
     send_unsent_projected_invoices_reminders,
     tuesday_autodunning,
 )
+from workbench.logbook.tasks import changes_by_others_mails
 from workbench.notes.tasks import send_notes_digest
 from workbench.planning.updates import changes_mails
 from workbench.projects.tasks import send_budget_alerts
@@ -45,3 +46,4 @@ class Command(BaseCommand):
         archive_unused_contacts()
         work_anniversaries_notice()
         send_notes_digest()
+        changes_by_others_mails()

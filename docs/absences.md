@@ -65,6 +65,12 @@ so the totals of the whole year are negative during the year.
 and sickness days are only visible to personnel administration. Working
 time models, employments and holidays are set up by the administrators.
 
+Personnel administration gets a mail on Mondays listing the logged hours
+someone else than the person they belong to has logged, deleted or
+changed in the previous week: changed hours, another person or another
+month. Changes of the description, of the hours for invoicing or within
+the same month don't affect the annual working time and aren't listed.
+
 ## The rings at the top
 
 The two rings next to your name show today's and this week's logged

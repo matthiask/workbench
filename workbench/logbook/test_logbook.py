@@ -2,6 +2,7 @@ import datetime as dt
 import io
 from decimal import Decimal
 
+from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -10,10 +11,12 @@ from time_machine import travel
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
+from workbench.accounts.middleware import set_user_name
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import Invoice
 from workbench.logbook.forms import hours_for_invoicing_much_higher
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.tasks import changes_by_others_mails
 from workbench.projects.models import Project
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code, messages
@@ -1341,3 +1344,122 @@ class LogbookTest(TestCase):
 
         hours.refresh_from_db()
         self.assertEqual(hours.service, service)
+
+
+@override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
+class ChangesByOthersTest(TestCase):
+    def test_changes_by_others_mail(self):
+        """Personnel administration gets a weekly mail listing the logged hours
+        others have logged, changed or deleted, as far as they affect the
+        annual working time"""
+        admin = factories.UserFactory.create(
+            _features=[FEATURES.PERSONNEL_ADMINISTRATION]
+        )
+        colleague = factories.UserFactory.create()
+        person = factories.UserFactory.create()
+        monday = in_days(-dt.date.today().weekday())
+        next_monday = monday + dt.timedelta(days=7)
+
+        set_user_name(person)
+        own = factories.LoggedHoursFactory.create(
+            rendered_by=person, rendered_on=monday, description="Own work"
+        )
+        own.hours = 3
+        own.save()
+        changed = factories.LoggedHoursFactory.create(
+            rendered_by=person, rendered_on=monday, description="Changed hours"
+        )
+        text_only = factories.LoggedHoursFactory.create(
+            rendered_by=person, rendered_on=monday, description="Text only"
+        )
+        same_month = factories.LoggedHoursFactory.create(
+            rendered_by=person,
+            rendered_on=dt.date(2026, 5, 18),
+            description="Same month",
+        )
+        other_month = factories.LoggedHoursFactory.create(
+            rendered_by=person,
+            rendered_on=dt.date(2026, 5, 18),
+            description="Other month",
+        )
+        deleted = factories.LoggedHoursFactory.create(
+            rendered_by=person, rendered_on=monday, description="Deleted entry"
+        )
+
+        set_user_name(colleague)
+        changed.hours = Decimal("2.5")
+        changed.save()
+        text_only.description = "Text only (edited)"
+        text_only.hours_for_invoicing = 0
+        text_only.save()
+        same_month.rendered_on = dt.date(2026, 5, 4)
+        same_month.save()
+        other_month.rendered_on = dt.date(2026, 4, 30)
+        other_month.save()
+        deleted.delete()
+        factories.LoggedHoursFactory.create(
+            rendered_by=person, rendered_on=monday, description="Logged for you"
+        )
+
+        changes_by_others_mails(today=monday + dt.timedelta(days=1))
+        self.assertEqual(len(mail.outbox), 0)
+
+        changes_by_others_mails(today=next_monday)
+        self.assertEqual(len(mail.outbox), 1)
+        [message] = mail.outbox
+        self.assertEqual(message.to, [admin.email])
+        body = message.body
+        self.assertIn("Changed hours", body)
+        self.assertIn("1.0h → 2.5h", body)
+        self.assertIn("Deleted entry", body)
+        self.assertIn("Logged for you", body)
+        self.assertIn("18.05.2026 → 30.04.2026", body)
+        self.assertNotIn("Own work", body)
+        self.assertNotIn("Text only", body)
+        self.assertNotIn("Same month", body)
+
+        # Nothing happened the week before
+        mail.outbox.clear()
+        changes_by_others_mails(today=monday)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_changes_by_others_coalesced(self):
+        """Changes of an entry by the same person in quick succession are one
+        change, from the state before the first to the state after the last"""
+        factories.UserFactory.create(_features=[FEATURES.PERSONNEL_ADMINISTRATION])
+        colleague = factories.UserFactory.create()
+        person = factories.UserFactory.create()
+        next_monday = in_days(7 - dt.date.today().weekday())
+
+        set_user_name(person)
+        twice = factories.LoggedHoursFactory.create(
+            rendered_by=person, description="Changed twice"
+        )
+        back = factories.LoggedHoursFactory.create(
+            rendered_by=person, description="Changed back"
+        )
+
+        set_user_name(colleague)
+        for value in [2, 3]:
+            twice.hours = value
+            twice.save()
+        for value in [2, 1]:
+            back.hours = value
+            back.save()
+        factories.LoggedHoursFactory.create(
+            rendered_by=person, description="Logged and deleted"
+        ).delete()
+        logged = factories.LoggedHoursFactory.create(
+            rendered_by=person, description="Logged and changed"
+        )
+        logged.hours = 4
+        logged.save()
+
+        changes_by_others_mails(today=next_monday)
+        body = mail.outbox[0].body
+        self.assertIn("1.0h → 3.0h", body)
+        self.assertNotIn("1.0h → 2.0h", body)
+        self.assertNotIn("Changed back", body)
+        self.assertNotIn("Logged and deleted", body)
+        self.assertEqual(body.count("Logged and changed"), 1)
+        self.assertIn("4.0h: Logged and changed", body)
