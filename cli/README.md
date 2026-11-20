@@ -46,8 +46,8 @@ explicitly: `--read` only allows looking things up, `--write` also allows
 changes like creating offers or closing deals. Read access is the safer choice
 for tools and agents which only answer questions:
 
-    wb login https://workbench.feinheit.ch --read
-    wb login https://workbench.feinheit.ch --write
+    wb login https://workbench.feinheit.app --read
+    wb login https://workbench.feinheit.app --write
 
 Check it with `wb me`. Access expires 30 days after its last use; `wb` then
 opens the browser again by itself and asks for the same access. On computers without a
