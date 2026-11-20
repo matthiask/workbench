@@ -6,10 +6,15 @@ from django.urls import reverse
 from django.utils.translation import activate, gettext as _
 
 
-def set_user_name(user):
-    """The user the audit log records for changes, a user or a name"""
+def set_user_name(user, *, token=None):
+    """The user the audit log records for changes, a user or a name
+
+    Changes made with an API token add the token, ``audit_user_id()`` only
+    reads the prefix."""
     if not isinstance(user, str):
         user = "user-%d-%s" % (user.id, user.get_short_name())
+    if token:
+        user = f"{user}-token-{token.id}"
     connections["default"].cursor().execute(
         "SET SESSION application_name TO %s", [user]
     )

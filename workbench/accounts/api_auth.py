@@ -33,7 +33,7 @@ class UserToken(HttpBearer):
             request.api_token = token
             # The user middleware only does this for sessions
             activate(user.language)
-            set_user_name(user)
+            set_user_name(user, token=token)
             if (
                 token.access == APIToken.Access.READ
                 and not self.allow_read_only

@@ -51,7 +51,8 @@ erstellst du ein Token auf der Seite «API-Tokens» und verwendest
 `wb login URL --token`.
 
 - Ein Token handelt in deinem Namen, mit deinem Zugriff: nur lesen oder
-  lesen und schreiben.
+  lesen und schreiben. Der Verlauf von Änderungen damit zeigt deinen
+  Namen; das Audit-Log der Administration zeigt auch das Token.
 - Es wird nur einmal angezeigt, kopiere es sofort.
 - Es läuft 30 Tage nach der letzten Verwendung ab; jede Verwendung
   verlängert es.

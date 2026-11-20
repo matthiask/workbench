@@ -280,9 +280,10 @@ class APITokenTest(TestCase):
         )
 
     def test_audit_user(self):
-        """Changes through the API are logged with the token's user"""
+        """Changes through the API are logged with the token's user, the
+        token is part of the audit log's user name"""
         project = factories.ProjectFactory.create()
-        _token, secret = APIToken.create_for(
+        token, secret = APIToken.create_for(
             user=project.owned_by, title="CLI", access="write"
         )
 
@@ -301,6 +302,11 @@ class APITokenTest(TestCase):
             .latest("event_id")
         )
         self.assertEqual(action.user_id, project.owned_by.id, action.user_name)
+        self.assertEqual(
+            action.user_name,
+            f"user-{project.owned_by.id}-{project.owned_by.get_short_name()}"
+            f"-token-{token.id}",
+        )
 
     def test_prune_expired_tokens(self):
         """The fairy tasks delete tokens a while after they expired"""

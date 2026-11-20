@@ -48,7 +48,8 @@ matter. `wb timestamps start` and `wb timestamps stop` set
 create a token on the "API tokens" page and use `wb login URL --token`.
 
 - A token acts in your name, with your access: read only or read and
-  write.
+  write. The history of changes made with it lists your name; the
+  administration's audit log also shows the token.
 - It's shown once only, copy it right away.
 - It expires 30 days after its last use; each use extends it.
 - The bin icon revokes it immediately, so does `wb tokens delete ID`
