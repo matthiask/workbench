@@ -1,11 +1,14 @@
 import datetime as dt
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
+from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import Invoice
-from workbench.logbook.models import LoggedHours
+from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days
 
@@ -158,6 +161,8 @@ class LogbookAPITest(TestCase):
 
 
 class LogbookChangesAPITest(TestCase):
+    fixtures = ["exchangerates.json"]
+
     def tearDown(self):
         deactivate_all()
 
@@ -321,3 +326,121 @@ class LogbookChangesAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["id"], entry.pk)
         self.assertFalse(LoggedHours.objects.filter(pk=entry.pk).exists())
+
+    def test_create_cost(self):
+        """Costs are logged like in the web interface, warnings are errors
+        unless they're ignored by their code"""
+        service = factories.ServiceFactory.create()
+        user = service.project.owned_by
+        self.client.force_login(user)
+        data = {
+            "service": service.pk,
+            "cost": 100,
+            "third_party_costs": 120,
+            "description": "Hosting",
+        }
+
+        response = self.post("/api/logbook/costs/", data)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error.get("code") for error in response.json()["detail"]],
+            ["third-party-costs-higher"],
+        )
+        response = self.post(
+            "/api/logbook/costs/?dry_run=1", data, ignore=["third-party-costs-higher"]
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertEqual(LoggedCost.objects.count(), 0)
+
+        response = self.post(
+            "/api/logbook/costs/", data, ignore=["third-party-costs-higher"]
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        entry = LoggedCost.objects.get()
+        self.assertEqual(response.json()["cost"], "100.00")
+        self.assertEqual(entry.rendered_by, user)
+        self.assertEqual(entry.created_by, user)
+        self.assertEqual(entry.rendered_on, dt.date.today())
+        self.assertFalse(entry.are_expenses)
+
+        response = self.post(
+            "/api/logbook/costs/",
+            {
+                "service": service.pk,
+                "cost": 10,
+                "are_expenses": True,
+                "description": "Taxi",
+            },
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"][-1] for error in response.json()["detail"]],
+            ["third_party_costs"],
+        )
+
+    @override_settings(
+        FEATURES={FEATURES.EXPENSES: F.NEVER, FEATURES.FOREIGN_CURRENCIES: F.NEVER}
+    )
+    def test_cost_features(self):
+        """Fields of features the user doesn't have are errors, not ignored"""
+        service = factories.ServiceFactory.create()
+        self.client.force_login(service.project.owned_by)
+
+        response = self.post(
+            "/api/logbook/costs/",
+            {
+                "service": service.pk,
+                "cost": 10,
+                "third_party_costs": 10,
+                "are_expenses": True,
+                "description": "Taxi",
+            },
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"][-1] for error in response.json()["detail"]],
+            ["are_expenses"],
+        )
+        self.assertEqual(LoggedCost.objects.count(), 0)
+
+    def test_update_and_delete_cost(self):
+        """Costs of expense reports keep their expenses and aren't deleted"""
+        entry = factories.LoggedCostFactory.create(
+            are_expenses=True, third_party_costs=10, description="Taxi"
+        )
+        user = entry.rendered_by
+        self.client.force_login(user)
+        url = f"/api/logbook/costs/{entry.pk}/"
+
+        def patch(data):
+            return self.client.patch(url, data, content_type="application/json")
+
+        response = patch({"cost": 12, "description": "Taxi to the airport"})
+        self.assertEqual(response.status_code, 200, response.content)
+        entry.refresh_from_db()
+        self.assertEqual(entry.cost, 12)
+        self.assertEqual(entry.description, "Taxi to the airport")
+
+        report = ExpenseReport.objects.create(created_by=user, owned_by=user)
+        report.expenses.set([entry])
+        response = patch({"third_party_costs": 11})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"][-1] for error in response.json()["detail"]],
+            ["third_party_costs"],
+        )
+        response = patch({"description": "Taxi"})
+        self.assertEqual(response.status_code, 200, response.content)
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["path", "cost_id"]],
+        )
+
+        report.expenses.clear()
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(LoggedCost.objects.filter(pk=entry.pk).exists())

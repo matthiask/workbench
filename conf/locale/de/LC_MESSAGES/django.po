@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-20 11:09+0100\n"
+"POT-Creation-Date: 2026-11-20 11:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3217,8 +3217,16 @@ msgid "The invoice has been sent to {}."
 msgstr "Die Rechnung wurde an {} versendet."
 
 #: workbench/logbook/api.py
+msgid "This field isn't available to you."
+msgstr "Dieses Feld steht dir nicht zur Verfügung."
+
+#: workbench/logbook/api.py
 msgid "These hours cannot be changed anymore."
 msgstr "Diese Stunden können nicht mehr geändert werden."
+
+#: workbench/logbook/api.py
+msgid "These costs cannot be changed anymore."
+msgstr "Diese Kosten können nicht mehr geändert werden."
 
 #: workbench/logbook/celebrations.py
 msgid "Week complete 🏁"

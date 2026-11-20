@@ -12,7 +12,7 @@ from ninja.pagination import paginate
 
 from workbench.accounts.models import User
 from workbench.api_keys import InvoiceStatus, key
-from workbench.logbook.forms import LoggedHoursForm
+from workbench.logbook.forms import LoggedCostForm, LoggedHoursForm
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Service
@@ -193,6 +193,14 @@ class LoggedCostFilter(LoggedHoursFilter):
     expenses: bool = Field(default=False, description="Only costs which are expenses.")
 
 
+def _cost_out(entry, request):
+    return _entry_out(entry, request) | {
+        "cost": entry.cost,
+        "third_party_costs": entry.third_party_costs,
+        "are_expenses": entry.are_expenses,
+    }
+
+
 @router.get("/logbook/costs/", response=list[LoggedCostOut])
 @paginate(LoggedCostPagination)
 def logged_cost_list(request, filters: Query[LoggedCostFilter]):
@@ -211,14 +219,7 @@ def logged_cost_list(request, filters: Query[LoggedCostFilter]):
             "service__project__customer",
             "invoice_service__invoice__project",
         ).order_by("-rendered_on", "-created_at", "-pk"),
-        lambda row: (
-            _entry_out(row, request)
-            | {
-                "cost": row.cost,
-                "third_party_costs": row.third_party_costs,
-                "are_expenses": row.are_expenses,
-            }
-        ),
+        lambda row: _cost_out(row, request),
         totals={
             "total_cost": totals["cost"] or Z2,
             "total_third_party_costs": totals["third_party_costs"] or Z2,
@@ -256,13 +257,24 @@ def _values(values, fields):
     return values
 
 
-def _check_disabled(form, fields, message):
+def _check_fields(form, fields, message):
     """Fields which can't be changed anymore are errors, the form would
-    silently keep their values"""
-    if disabled := [f for f in fields if form.fields[f].disabled]:
-        raise ValidationError([
-            {"loc": ["body", "data", field], "msg": message} for field in disabled
-        ])
+    silently keep their values; so are fields of features the user doesn't
+    have"""
+    errors = [
+        {"loc": ["body", "data", field], "msg": message}
+        for field in fields
+        if field in form.fields and form.fields[field].disabled
+    ] + [
+        {
+            "loc": ["body", "data", field],
+            "msg": _("This field isn't available to you."),
+        }
+        for field in fields
+        if field != "service" and field not in form.fields
+    ]
+    if errors:
+        raise ValidationError(errors)
 
 
 def _save(form, request, out, *, dry_run):
@@ -271,6 +283,8 @@ def _save(form, request, out, *, dry_run):
     is_new = not form.instance.pk
     with transaction.atomic():
         entry = form.save()
+        # Values as stored, e.g. amounts with two decimal places
+        entry.refresh_from_db()
         result = out(entry, request)
         if dry_run:
             transaction.set_rollback(True)
@@ -366,7 +380,7 @@ def logged_hours_update(
     request = without_query(request)
     form = LoggedHoursForm(instance=entry, request=request, prefix=None)
     fields = data.model_dump(exclude_unset=True)
-    _check_disabled(form, fields, _("These hours cannot be changed anymore."))
+    _check_fields(form, fields, _("These hours cannot be changed anymore."))
     form = LoggedHoursForm(
         _values(form_data(form), fields),
         instance=entry,
@@ -389,6 +403,135 @@ def logged_hours_delete(request, hours_id: int, *, dry_run: DryRun = False):
     )
     check_allow_delete(entry, request, ["path", "hours_id"])
     result = _hours_out(entry, request)
+    if not dry_run:
+        entry.delete()
+    return result
+
+
+class LoggedCostResult(LoggedCostOut):
+    id: int | None = Field(description="Null with dry_run.")
+    url: str | None = Field(description="Null with dry_run.")
+
+
+class LoggedCostFields(InputSchema):
+    rendered_on: dt.date | None = Field(default=None, description="Defaults to today.")
+    rendered_by: str | None = Field(
+        default=None, description="Short name of a user, defaults to you."
+    )
+    cost: Number | None = Field(default=None, description="Excl. tax.")
+    third_party_costs: Number | None = Field(
+        default=None,
+        description="Total incl. tax for third parties contained in the cost;"
+        " null removes them.",
+    )
+    are_expenses: bool | None = Field(
+        default=None,
+        description="Paid from your own pocket, needs third party costs.",
+    )
+    expense_currency: str | None = Field(
+        default=None,
+        description="Currency of expenses in foreign currencies, together with"
+        " expense_cost.",
+    )
+    expense_cost: Number | None = Field(
+        default=None, description="Expenses in the foreign currency."
+    )
+    description: str | None = Field(default=None, min_length=1)
+
+
+class LoggedCostCreate(LoggedCostFields):
+    service: int = Field(description="ID of a service which allows logging.")
+    cost: Number = Field(description="Excl. tax.")
+    description: str = Field(min_length=1)
+
+
+class LoggedCostPatch(LoggedCostFields):
+    """Fields which aren't given are left alone"""
+
+    service: int | None = Field(
+        default=None,
+        description="ID of another service of the same project which allows logging.",
+    )
+
+
+@router.post("/logbook/costs/", response=LoggedCostResult)
+def logged_cost_create(
+    request,
+    data: LoggedCostCreate,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Log costs, validated like in the web interface
+
+    Warnings of the web interface (e.g. ``third-party-costs-higher``) are
+    errors unless they are ignored by their code. The ID and the URL are
+    null with ``dry_run``."""
+    service = get_object_or_404(
+        Service.objects.select_related("project"), pk=data.service
+    )
+    request = without_query(request)
+    fields = data.model_dump(exclude_unset=True)
+    form = LoggedCostForm(project=service.project, request=request, prefix=None)
+    _check_fields(form, fields, _("These costs cannot be changed anymore."))
+    values = _values(
+        {
+            "rendered_by": request.user.pk,
+            "rendered_on": dt.date.today(),
+            "third_party_costs": "",
+            "are_expenses": False,
+            "expense_currency": "",
+            "expense_cost": "",
+        },
+        fields,
+    )
+    form = LoggedCostForm(values, project=service.project, request=request, prefix=None)
+    validate_form(form, ignore_warnings=ignore_warnings)
+    return _save(form, request, _cost_out, dry_run=dry_run)
+
+
+@router.patch("/logbook/costs/{int:cost_id}/", response=LoggedCostOut)
+def logged_cost_update(
+    request,
+    cost_id: int,
+    data: LoggedCostPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change logged costs, validated like in the web interface
+
+    Invoiced costs keep their service, date, person and amounts, costs of
+    expense reports their date, person and expenses. Warnings are errors
+    unless they are ignored by their code."""
+    entry = get_object_or_404(
+        LoggedCost.objects.select_related("service__project"), pk=cost_id
+    )
+    request = without_query(request)
+    form = LoggedCostForm(instance=entry, request=request, prefix=None)
+    fields = data.model_dump(exclude_unset=True)
+    _check_fields(form, fields, _("These costs cannot be changed anymore."))
+    form = LoggedCostForm(
+        _values(form_data(form), fields),
+        instance=entry,
+        request=request,
+        prefix=None,
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+    return _save(form, request, _cost_out, dry_run=dry_run)
+
+
+@router.delete("/logbook/costs/{int:cost_id}/", response=LoggedCostOut)
+def logged_cost_delete(request, cost_id: int, *, dry_run: DryRun = False):
+    """Delete logged costs like in the web interface: not when they have
+    been invoiced or are part of an expense report
+
+    Returns the deleted entry."""
+    entry = get_object_or_404(
+        LoggedCost.objects.select_related("service__project"), pk=cost_id
+    )
+    check_allow_delete(entry, request, ["path", "cost_id"])
+    result = _cost_out(entry, request)
     if not dry_run:
         entry.delete()
     return result
