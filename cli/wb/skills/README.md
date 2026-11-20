@@ -81,6 +81,14 @@ It changes only what the user told it, and never closes, declines or reopens
 deals on its own or invents values, probabilities, dates or reasons; values
 it derives from offers and invoices are proposals the user approves.
 
+## workbench-logbook
+
+Logs hours and costs from what the user points it to (notes, a calendar,
+commits, timestamps), after looking at what's logged already and proposing
+the entries with their services for approval. Warnings of the logbook form
+are shown to the user and only ignored after they confirmed the entry;
+corrections and deletions work like in the web interface.
+
 ## workbench-mailing-list
 
 Maintains a group of people for a mailing, e.g. Christmas cards, gifts or

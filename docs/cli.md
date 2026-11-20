@@ -24,8 +24,9 @@ When Workbench needs a newer `wb`, it says so and prints the upgrade
 command (`uv tool upgrade --python … workbench-cli`).
 
 `wb skills install` installs the skills for Claude Code which come with
-`wb` (writing offers, adding contacts, planning, controlling and more).
-Run it again after upgrades which bring new skills.
+`wb` (writing offers, logging hours, adding contacts, planning,
+controlling and more). Run it again after upgrades which bring new
+skills.
 
 ## Using wb
 
