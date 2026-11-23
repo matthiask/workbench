@@ -73,6 +73,29 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(t.user, user)
 
+    def test_timestamp_cross_origin(self):
+        """Controllers on other origins can read the response"""
+        user = factories.UserFactory.create()
+        response = self.client.post(
+            "/create-timestamp/",
+            {"type": "start", "token": user.token},
+            headers={"origin": "https://example.com"},
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
+
+        response = self.client.get(
+            f"/list-timestamps/?token={user.token}",
+            headers={"origin": "https://example.com"},
+        )
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
+
+        self.client.force_login(user)
+        response = self.client.get(
+            "/timestamps/", headers={"origin": "https://example.com"}
+        )
+        self.assertNotIn("Access-Control-Allow-Origin", response.headers)
+
     def test_timestamps_of_inactive_users(self):
         """Tokens of users who left don't work anymore"""
         user = factories.UserFactory.create(is_active=False)

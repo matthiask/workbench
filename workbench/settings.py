@@ -92,6 +92,7 @@ MIDDLEWARE = [
         "django.middleware.security.SecurityMiddleware" if LIVE else "",
         "debug_toolbar.middleware.DebugToolbarMiddleware" if DEBUG_TOOLBAR else "",
         "django.contrib.sessions.middleware.SessionMiddleware",
+        "corsheaders.middleware.CorsMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.locale.LocaleMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
@@ -488,8 +489,9 @@ if LIVE:  # pragma: no cover
 else:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-# Fine since it's only used for selected views
-CORS_ORIGIN_ALLOW_ALL = True
+# The timestamps controller may run on other origins, it authenticates with tokens
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_URLS_REGEX = r"^/(create-timestamp|list-timestamps)/$"
 
 if DEBUG:  # pragma: no cover
     globals().update(django_email_url(env("EMAIL_URL", default="console:")))

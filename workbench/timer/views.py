@@ -1,14 +1,12 @@
 import datetime as dt
 from decimal import Decimal
 
-from corsheaders.middleware import CorsMiddleware
 from django import forms
 from django.contrib import messages
 from django.db.models import Sum
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.decorators import decorator_from_middleware
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -87,7 +85,6 @@ class TimestampForm(TokenUserMixin, ModelForm):
 
 
 @csrf_exempt
-@decorator_from_middleware(CorsMiddleware)
 @require_POST
 def create_timestamp(request):
     form = TimestampForm(request.POST, request=request)
@@ -124,7 +121,6 @@ class SplitTimestampForm(Form):
         return [base] * (parts - 1) + [base + remainder]
 
 
-@decorator_from_middleware(CorsMiddleware)
 @require_GET
 def list_timestamps(request):
     form = TokenUserForm(request.GET, request=request)
