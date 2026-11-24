@@ -470,19 +470,23 @@ def _send(method, url, path, token, **kwargs):
 def logout(url):
     """Revoke the installation's token and forget the installation
 
-    Returns whether the token is gone on the server, invalid tokens (e.g.
-    expired ones) count as gone."""
+    Returns the URL (the installation may have moved) and whether the token
+    is gone on the server, invalid tokens (e.g. expired ones) count as gone."""
     revoked = True
     if token := read_config()["installations"].get(url, {}).get("token"):
+        path = "tokens/current/"
         try:
-            response = _send_unchecked("DELETE", url, "tokens/current/", token)
+            response = _send_unchecked("DELETE", url, path, token)
+            if new := _moved(url, path, response):
+                url = new
+                response = _send_unchecked("DELETE", url, path, token)
         except requests.RequestException as exc:
             click.echo(str(exc), err=True)
             revoked = False
         else:
             revoked = response.status_code in {200, 401}
     forget_installation(url)
-    return revoked
+    return url, revoked
 
 
 def _moved(url, path, response):

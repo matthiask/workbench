@@ -84,7 +84,8 @@ def logout():
         terminate("Not configured yet, nothing to log out from.")
     if url not in read_config()["installations"]:
         terminate(f"Not logged in to {url}.")
-    if revoke_and_forget(url):
+    url, revoked = revoke_and_forget(url)
+    if revoked:
         click.echo(f"Logged out from {url}.")
     else:
         terminate(
