@@ -445,7 +445,10 @@ def _offers_offer_cfg(user):
     }
     if user.features[FEATURES.CONTROLLING]:
         fields |= WITH_TOTAL
-    return {"fields": fields, "related": [(OfferHeading, "offer_id")]}
+    return {
+        "fields": fields,
+        "related": [(ProjectService, "offer_id"), (OfferHeading, "offer_id")],
+    }
 
 
 def _projects_campaign_cfg(user):

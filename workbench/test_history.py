@@ -100,6 +100,15 @@ class HistoryTest(TestCase):
             response, f'href="/history/planning_externalwork/project_id/{project.pk}/"'
         )
 
+    def test_offer_related_services(self):
+        """The offer's history links the history of its services"""
+        offer = factories.OfferFactory.create()
+        self.client.force_login(offer.owned_by)
+        response = self.client.get(f"/history/offers_offer/id/{offer.pk}/")
+        self.assertContains(
+            response, f'href="/history/projects_service/offer_id/{offer.pk}/"'
+        )
+
     def test_nothing(self):
         """History modal of a PK without any history entries"""
         self.client.force_login(factories.UserFactory.create())
