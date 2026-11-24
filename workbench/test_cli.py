@@ -55,7 +55,7 @@ class CLITest(TestCase):
         self.api_client = Client()
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
-        self.directory = Path(directory.name)
+        self.directory = Path(directory.name).resolve()
         for patcher in [
             patch.object(wb.core.requests, "request", self.request),
             patch.object(wb.core, "CONFIG", self.directory / "workbench.toml"),
