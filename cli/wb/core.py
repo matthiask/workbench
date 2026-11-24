@@ -226,6 +226,19 @@ def save_config(url, token, access=None):
     write_config(config)
 
 
+def move_installation(old, new):
+    """The installation moved to another URL, e.g. a new domain"""
+    global _selected_installation  # noqa: PLW0603
+    config = read_config()
+    if old in config["installations"]:
+        config["installations"].setdefault(new, config["installations"].pop(old))
+    if config["current"] == old:
+        config["current"] = new
+    write_config(config)
+    if _selected_installation == old:
+        _selected_installation = new
+
+
 def forget_installation(url):
     """Remove the installation and its token from the configuration"""
     config = read_config()
@@ -323,6 +336,22 @@ def _can_login_again(url):
 LOGIN_TIMEOUT = 300
 
 
+AUTHORIZED_PAGE = """<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wb is authorized</title>
+<style>
+  :root { color-scheme: light dark; font: 1.125rem/1.5 system-ui, sans-serif; }
+  body { display: grid; place-items: center; min-height: 100vh; margin: 0; }
+  main { padding: 2rem; text-align: center; }
+  h1 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+  h1::before { content: "\\2713"; margin-right: 0.5rem; color: #198754; }
+  p { margin: 0; opacity: 0.7; }
+</style>
+<main><h1>wb is authorized</h1><p>You can close this window.</p></main>
+"""
+
+
 def browser_login(url, access):
     """Authorize wb in the browser and store the token
 
@@ -339,9 +368,9 @@ def browser_login(url, access):
                 self.send_error(400)
                 return
             result["token"] = data["token"][0]
-            body = b"wb is authorized. You can close this window."
+            body = AUTHORIZED_PAGE.encode()
             self.send_response(200)
-            self.send_header("content-type", "text/plain; charset=utf-8")
+            self.send_header("content-type", "text/html; charset=utf-8")
             self.send_header("content-length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -420,11 +449,13 @@ def format_error(error):
 
 
 def _send_unchecked(method, url, path, token, **kwargs):
+    # Following redirects to other hosts drops the token, see _moved()
     return requests.request(
         method,
         urljoin(url, f"/api/{path}"),
         headers={"authorization": f"Bearer {token}", "x-workbench-cli": VERSION},
         timeout=30,
+        allow_redirects=False,
         **kwargs,
     )
 
@@ -454,14 +485,40 @@ def logout(url):
     return revoked
 
 
+def _moved(url, path, response):
+    """The new URL of an installation redirecting the API permanently to
+    another host over HTTPS (e.g. a new domain), if it does
+
+    The old host gets the token anyway, HTTPS makes sure that it's the one
+    redirecting; never to HTTP."""
+    if response.status_code not in {301, 308}:
+        return None
+    old = urljoin(url, f"/api/{path}")
+    location = urljoin(old, response.headers.get("location", ""))
+    new = installation_url(location)
+    if (
+        new == url
+        or not new.startswith("https://")
+        or urlsplit(location).path != urlsplit(old).path
+    ):
+        return None
+    move_installation(url, new)
+    click.secho(f"{url} moved to {new}, updated {CONFIG}.", fg="yellow", err=True)
+    return new
+
+
 def request(method, path, *, optional=False, raw=False, **kwargs):
     """Request the API, terminate on errors
 
     ``optional`` requests return ``None`` if access is denied, e.g. because
     a feature is missing. ``raw`` requests return the response instead of
-    its JSON. Expired tokens are replaced and the request is sent again."""
+    its JSON. Installations which moved are updated and expired tokens
+    replaced, the request is sent again."""
     url, token = _config()
     response = _send(method, url, path, token, **kwargs)
+    if new := _moved(url, path, response):
+        url = new
+        response = _send(method, url, path, token, **kwargs)
     if response.status_code == 401 and (access := _can_login_again(url)):
         click.secho("Your access has expired.", fg="yellow", err=True)
         token = browser_login(url, access)

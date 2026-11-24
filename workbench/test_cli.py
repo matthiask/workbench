@@ -14,6 +14,7 @@ import click
 import wb
 from click.shell_completion import get_completion_class
 from click.testing import CliRunner
+from django.http import HttpResponsePermanentRedirect
 from django.test import Client, TestCase
 from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
@@ -70,7 +71,9 @@ class CLITest(TestCase):
     def tearDown(self):
         deactivate_all()
 
-    def request(self, method, url, *, headers, timeout, params=None, json=None):
+    def request(
+        self, method, url, *, headers, timeout, params=None, json=None, **kwargs
+    ):
         url = urllib.parse.urlsplit(url)
         path = url.path
         if params and method != "GET":
@@ -105,6 +108,43 @@ class CLITest(TestCase):
         if result.exception and not isinstance(result.exception, SystemExit):
             raise result.exception
         return result
+
+    def test_moved_installation(self):
+        """Installations redirecting permanently to another host over HTTPS
+        move in the configuration: following the redirect would drop the
+        token (requests does for other hosts), each request a 401"""
+        _token, token = APIToken.create_for(
+            user=self.user, title="Tests", access="write"
+        )
+        wb.core.write_config({
+            "current": "https://old.example",
+            "installations": {"https://old.example": {"token": token}},
+        })
+        moved = {"https://old.example": "https://new.example"}
+
+        def request(method, url, **kwargs):
+            parts = urllib.parse.urlsplit(url)
+            if new := moved.get(f"{parts.scheme}://{parts.netloc}"):
+                response = HttpResponsePermanentRedirect(f"{new}{parts.path}")
+                return Response(response)
+            return self.request(method, url, **kwargs)
+
+        with patch.object(wb.core.requests, "request", request):
+            result = CliRunner().invoke(wb.cli, ["me"], env={"WB_DEBUG": "1"})
+            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertIn(self.user.get_full_name(), result.output)
+            self.assertIn("moved to https://new.example", result.output)
+            config = wb.core.read_config()
+            self.assertEqual(config["current"], "https://new.example")
+            self.assertEqual(
+                config["installations"], {"https://new.example": {"token": token}}
+            )
+
+            # Not to HTTP
+            moved["https://new.example"] = "http://insecure.example"
+            result = CliRunner().invoke(wb.cli, ["me"], env={"WB_DEBUG": "1"})
+            self.assertEqual(result.exit_code, 1)
+            self.assertEqual(wb.core.read_config()["current"], "https://new.example")
 
     def file(self, content):
         path = self.directory / "data.yaml"
