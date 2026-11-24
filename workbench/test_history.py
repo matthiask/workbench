@@ -85,6 +85,18 @@ class HistoryTest(TestCase):
         # print(response, response.content.decode("utf-8"))
         self.assertContains(response, f"INSERT contacts_postaladdress {pa.pk}")
 
+    def test_project_related_planning(self):
+        """The project's history links the history of its milestones"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        response = self.client.get(f"/history/projects_project/id/{project.pk}/")
+        self.assertContains(
+            response, f'href="/history/planning_plannedwork/project_id/{project.pk}/"'
+        )
+        self.assertContains(
+            response, f'href="/history/planning_milestone/project_id/{project.pk}/"'
+        )
+
     def test_nothing(self):
         """History modal of a PK without any history entries"""
         self.client.force_login(factories.UserFactory.create())

@@ -487,7 +487,7 @@ def _projects_project_cfg(user):
         fields |= {"cost_center"}
     if user.features[FEATURES.PLANNING]:
         fields |= {"suppress_planning_update_mails"}
-        related.append((PlannedWork, "project_id"))
+        related.extend([(PlannedWork, "project_id"), (Milestone, "project_id")])
     if user.features[FEATURES.PROJECTED_GROSS_MARGIN]:
         related.append((ProjectedInvoice, "project_id"))
     return {"fields": fields, "related": related}
