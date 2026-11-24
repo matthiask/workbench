@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-20 11:10+0100\n"
+"POT-Creation-Date: 2026-11-24 10:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2140,6 +2140,22 @@ msgid "<closing type missing>"
 msgstr "<Abschlusstyp fehlt>"
 
 #: workbench/deals/models.py
+msgid "link of a deal and an offer"
+msgstr "Verbindung von Geschäft und Offerte"
+
+#: workbench/deals/models.py
+msgid "links of deals and offers"
+msgstr "Verbindungen von Geschäften und Offerten"
+
+#: workbench/deals/models.py
+msgid "link of a deal and a project"
+msgstr "Verbindung von Geschäft und Projekt"
+
+#: workbench/deals/models.py
+msgid "links of deals and projects"
+msgstr "Verbindungen von Geschäften und Projekten"
+
+#: workbench/deals/models.py
 msgid "deal attribute"
 msgstr "Geschäftsattribut"
 
@@ -2777,6 +2793,7 @@ msgid "Services"
 msgstr "Leistungen"
 
 #: workbench/invoices/models.py
+#: workbench/templates/contacts/organization_detail.html
 msgid "recurring invoice"
 msgstr "Stapelrechnung"
 
@@ -3065,6 +3082,7 @@ msgstr "{code}, {total}, {due_on} und {service_period} werden durch die Werte de
 
 #: workbench/invoices/models.py workbench/invoices/tasks.py
 #: workbench/templates/base.html
+#: workbench/templates/contacts/organization_detail.html
 msgid "recurring invoices"
 msgstr "Stapelrechnungen"
 

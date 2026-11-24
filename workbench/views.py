@@ -221,7 +221,10 @@ def search(request):
     )
 
 
-DB_TABLE_TO_MODEL = {model._meta.db_table: model for model in apps.get_models()}
+# Including the tables of many-to-many relations, e.g. of deals and offers
+DB_TABLE_TO_MODEL = {
+    model._meta.db_table: model for model in apps.get_models(include_auto_created=True)
+}
 
 
 def history(request, db_table, attribute, id):

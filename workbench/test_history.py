@@ -127,6 +127,49 @@ class HistoryTest(TestCase):
         )
         self.assertContains(response, f"INSERT planning_externalwork {work.pk}")
 
+    def test_deal_links_history(self):
+        """Linking offers and projects to deals is logged, the history is
+        linked from both sides"""
+        offer = factories.OfferFactory.create()
+        deal = factories.DealFactory.create(customer=offer.project.customer)
+        self.client.force_login(deal.owned_by)
+        self.client.post(deal.urls["add_offer"], {"modal-offer": offer.pk})
+        self.client.post(deal.urls["add_project"], {"modal-project": offer.project.pk})
+        self.assertEqual(deal.related_offers.get(), offer)
+        self.assertEqual(deal.related_projects.get(), offer.project)
+
+        response = self.client.get(f"/history/deals_deal/id/{deal.pk}/")
+        self.assertContains(
+            response, f'href="/history/deals_deal_related_offers/deal_id/{deal.pk}/"'
+        )
+        self.assertContains(
+            response,
+            f'href="/history/deals_deal_related_projects/deal_id/{deal.pk}/"',
+        )
+        response = self.client.get(f"/history/offers_offer/id/{offer.pk}/")
+        self.assertContains(
+            response,
+            f'href="/history/deals_deal_related_offers/offer_id/{offer.pk}/"',
+        )
+        response = self.client.get(f"/history/projects_project/id/{offer.project.pk}/")
+        self.assertContains(
+            response,
+            f'/history/deals_deal_related_projects/project_id/{offer.project.pk}/"',
+        )
+
+        response = self.client.get(
+            f"/history/deals_deal_related_offers/offer_id/{offer.pk}/"
+        )
+        self.assertContains(response, "INSERT deals_deal_related_offers")
+        self.assertContains(response, f'href="/history/deals_deal/id/{deal.pk}/"')
+
+        self.client.post(deal.urls["remove_offer"], {"modal-offer": offer.pk})
+        self.assertEqual(deal.related_offers.count(), 0)
+        response = self.client.get(
+            f"/history/deals_deal_related_offers/deal_id/{deal.pk}/"
+        )
+        self.assertContains(response, "DELETE deals_deal_related_offers")
+
     def test_nothing(self):
         """History modal of a PK without any history entries"""
         self.client.force_login(factories.UserFactory.create())

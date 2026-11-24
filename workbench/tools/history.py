@@ -58,6 +58,10 @@ from workbench.tools.formats import local_date_format
 # This is an object which __contains__ everything
 EVERYTHING = type("c", (), {"__contains__": lambda *a: True})()
 
+# Linking offers and projects to deals
+DealOffer = Deal.related_offers.through
+DealProject = Deal.related_projects.through
+
 Change = namedtuple("Change", "changes created_at pretty_user_name values version")
 
 
@@ -343,8 +347,19 @@ def _deals_deal_cfg(user):
         raise Http404
     return {
         "fields": EVERYTHING,
-        "related": [(Value, "deal_id"), (Contribution, "deal_id")],
+        "related": [
+            (Value, "deal_id"),
+            (Contribution, "deal_id"),
+            (DealOffer, "deal_id"),
+            (DealProject, "deal_id"),
+        ],
     }
+
+
+def _deals_links_cfg(user):
+    if not user.features[FEATURES.DEALS]:
+        raise Http404
+    return {"fields": EVERYTHING}
 
 
 def _deals_value_cfg(user):
@@ -447,7 +462,11 @@ def _offers_offer_cfg(user):
         fields |= WITH_TOTAL
     return {
         "fields": fields,
-        "related": [(ProjectService, "offer_id"), (OfferHeading, "offer_id")],
+        "related": [
+            (ProjectService, "offer_id"),
+            (OfferHeading, "offer_id"),
+            *([(DealOffer, "offer_id")] if user.features[FEATURES.DEALS] else []),
+        ],
     }
 
 
@@ -497,6 +516,8 @@ def _projects_project_cfg(user):
         ])
     if user.features[FEATURES.PROJECTED_GROSS_MARGIN]:
         related.append((ProjectedInvoice, "project_id"))
+    if user.features[FEATURES.DEALS]:
+        related.append((DealProject, "project_id"))
     return {"fields": fields, "related": related}
 
 
@@ -589,6 +610,8 @@ HISTORY = {
     CreditEntry: _credit_control_creditentry_cfg,
     Contribution: _deals_contribution_cfg,
     Deal: _deals_deal_cfg,
+    DealOffer: _deals_links_cfg,
+    DealProject: _deals_links_cfg,
     Value: _deals_value_cfg,
     ValueType: _deals_valuetype_cfg,
     ExpenseReport: {

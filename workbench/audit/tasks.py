@@ -24,6 +24,8 @@ def prune_audit():
             "deals_value",
             "deals_deal",
             "deals_contribution",
+            "deals_deal_related_offers",
+            "deals_deal_related_projects",
             "awt_holiday",
             "planning_milestone",
             "planning_plannedwork",

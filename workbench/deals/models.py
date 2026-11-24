@@ -303,6 +303,15 @@ class Deal(Model):
         )
 
 
+# Names of the links in their history (workbench/tools/history.py)
+Deal.related_offers.through._meta.verbose_name = _("link of a deal and an offer")
+Deal.related_offers.through._meta.verbose_name_plural = _("links of deals and offers")
+Deal.related_projects.through._meta.verbose_name = _("link of a deal and a project")
+Deal.related_projects.through._meta.verbose_name_plural = _(
+    "links of deals and projects"
+)
+
+
 class DealAttribute(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name=_("deal"))
     attribute = models.ForeignKey(
