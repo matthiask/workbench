@@ -218,6 +218,9 @@ class Organization(Model):
     def recent_invoices(self):
         return self.invoice_set.select_related("owned_by")[:10]
 
+    def open_recurring_invoices(self):
+        return self.recurringinvoice_set.open().select_related("owned_by")
+
     def postal_addresses(self):
         return organization_postal_addresses(self)
 

@@ -1266,6 +1266,26 @@ class ContactsTest(TestCase):
             self.assertNotContains(response, "Recent invoices")
             self.assertNotContains(response, "Recent offers")
 
+    def test_organization_recurring_invoices(self):
+        """The organization detail page lists open recurring invoices"""
+        open_ri = factories.RecurringInvoiceFactory.create(title="Hosting")
+        organization = open_ri.customer
+        factories.RecurringInvoiceFactory.create(
+            customer=organization,
+            title="Old maintenance",
+            ends_on=dt.date.today() - dt.timedelta(days=1),
+        )
+        self.client.force_login(organization.primary_contact)
+
+        response = self.client.get(organization.urls["detail"])
+        self.assertContains(response, "Hosting")
+        self.assertNotContains(response, "Old maintenance")
+        self.assertContains(response, f"/recurring-invoices/?org={organization.pk}")
+
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
+            response = self.client.get(organization.urls["detail"])
+            self.assertNotContains(response, "Hosting")
+
     def test_organization_deals(self):
         """The organization detail page lists its deals with the DEALS
         feature"""

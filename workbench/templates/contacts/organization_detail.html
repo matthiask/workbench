@@ -232,6 +232,32 @@
           </div>
         </section>
       </div>
+      {% with recurring_invoices=organization.open_recurring_invoices %}
+        {% if recurring_invoices %}
+          <div class="col-lg-6 col-xl-3">
+            <section class="card">
+              <div class="card-header">
+                <a href="{% url 'invoices_recurringinvoice_list' %}?org={{ organization.pk }}" class="text-reset">
+                  {% translate 'recurring invoices'|capfirst %}
+                </a>
+              </div>
+              <div class="list-group list-group-flush">
+                {% for object in recurring_invoices %}
+                  <a class="list-group-item list-group-item-action wb-row" href="{{ object.get_absolute_url }}">
+                    <div class="wb-row-main">
+                      <div class="wb-row-title">{{ object|h }}</div>
+                      <div class="wb-row-meta"><span>{{ object.pretty_status }}</span></div>
+                    </div>
+                    <div class="wb-row-aside">
+                      <span class="wb-row-amount">{% total_incl_tax object %}</span>
+                    </div>
+                  </a>
+                {% endfor %}
+              </div>
+            </section>
+          </div>
+        {% endif %}
+      {% endwith %}
       <div class="col-lg-6 col-xl-3">
         <section class="card">
           <div class="card-header">
