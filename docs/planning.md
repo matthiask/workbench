@@ -40,7 +40,8 @@ Planning is available where your installation has enabled it.
 Workbench warns when work is planned after its milestone. Closed
 projects don't get new planned work. Closing a project, declining an
 offer or losing a deal asks whether to delete the planned work after the
-current week; past work stays. Winning a deal doesn't change the
+current week; past work stays. Milestones after the current week go
+with it when no planned or external work is left on them. Winning a deal doesn't change the
 planning: make provisional work definite yourself.
 
 ## Capacity

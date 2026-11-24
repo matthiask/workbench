@@ -143,6 +143,17 @@ class AbstractPlannedWork(Model):
         }
 
 
+def delete_emptied_milestones(milestone_ids):
+    """Deletes the milestones after the current week without planned or
+    external work, of those whose work has just been deleted"""
+    Milestone.objects.filter(
+        pk__in=milestone_ids - {None},
+        date__gt=monday() + dt.timedelta(days=6),
+        plannedwork__isnull=True,
+        externalwork__isnull=True,
+    ).delete()
+
+
 class ExternalWorkQuerySet(SearchQuerySet):
     def after_this_week(self):
         """External work in weeks after the current one"""
@@ -152,12 +163,15 @@ class ExternalWorkQuerySet(SearchQuerySet):
     def delete_after_this_week(self):
         """Removes the weeks after the current one, like planned work"""
         this_week = monday()
+        milestone_ids = set()
         for work in self.after_this_week():
             if past := [week for week in work.weeks if week <= this_week]:
                 work.weeks = past
                 work.save()
             else:
+                milestone_ids.add(work.milestone_id)
                 work.delete()
+        delete_emptied_milestones(milestone_ids)
 
 
 @model_urls
@@ -208,6 +222,7 @@ class PlannedWorkQuerySet(SearchQuerySet):
         weeks stay the same. Work which has been done (or not) stays for the
         comparison with the logbook."""
         this_week = monday()
+        milestone_ids = set()
         for work in self.after_this_week():
             if past := [week for week in work.weeks if week <= this_week]:
                 # At least the minimum of planned work
@@ -220,7 +235,9 @@ class PlannedWorkQuerySet(SearchQuerySet):
                 work.weeks = past
                 work.save()
             else:
+                milestone_ids.add(work.milestone_id)
                 work.delete()
+        delete_emptied_milestones(milestone_ids)
 
     def maybe_actionable(self, *, user):
         day = monday()

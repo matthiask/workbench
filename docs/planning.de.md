@@ -45,7 +45,9 @@ Workbench warnt, wenn Arbeit nach ihrem Meilenstein geplant ist.
 Geschlossene Projekte erhalten keine neue geplante Arbeit. Beim
 Schliessen eines Projekts, Ablehnen einer Offerte oder Verlieren eines
 Geschäfts fragt Workbench, ob die geplante Arbeit nach der laufenden
-Woche gelöscht werden soll; vergangene Arbeit bleibt. Ein gewonnenes
+Woche gelöscht werden soll; vergangene Arbeit bleibt. Meilensteine
+nach der laufenden Woche werden mitgelöscht, wenn ihnen keine geplante
+Arbeit und keine Kundenarbeit mehr bleibt. Ein gewonnenes
 Geschäft ändert die Planung nicht: Mache provisorische Arbeit selbst
 fest.
 

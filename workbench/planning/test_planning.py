@@ -82,6 +82,45 @@ class PlanningTest(TestCase):
         (c,) = report["per_customer"]
         self.assertEqual(len(c["per_week"]), 1)
 
+    def test_delete_after_this_week_milestones(self):
+        """Deleting planned work deletes its future milestones left empty"""
+        project = factories.ProjectFactory.create()
+        this_week = monday()
+        next_week = this_week + dt.timedelta(days=7)
+
+        def milestone(date):
+            return factories.MilestoneFactory.create(project=project, date=date)
+
+        emptied = milestone(next_week)
+        still_used = milestone(next_week)
+        current = milestone(this_week + dt.timedelta(days=6))
+        unused = milestone(next_week)
+        external = milestone(next_week)
+        ExternalWork.objects.create(
+            project=project,
+            milestone=external,
+            provided_by=factories.OrganizationFactory.create(),
+            created_by=project.owned_by,
+            title="Printing",
+            weeks=[next_week],
+        )
+        for m in [emptied, still_used, current, external]:
+            factories.PlannedWorkFactory.create(
+                project=project, milestone=m, weeks=[next_week]
+            )
+        kept = factories.PlannedWorkFactory.create(
+            project=project, milestone=still_used, weeks=[this_week]
+        )
+
+        project.planned_work.exclude(pk=kept.pk).delete_after_this_week()
+
+        self.assertEqual(
+            set(project.milestones.all()), {still_used, current, unused, external}
+        )
+
+        project.external_work.all().delete_after_this_week()
+        self.assertEqual(set(project.milestones.all()), {still_used, current, unused})
+
     def test_milestone_phase_after_date(self):
         """The phase of a milestone doesn't start after the milestone"""
         milestone = factories.MilestoneFactory.create(
