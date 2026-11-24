@@ -129,6 +129,8 @@ export function usePlanningDrag({
         index: weekAt(e.clientX),
       }
     } else {
+      // Milestones and other links lie on top of the zone, let them be clicked
+      if (e.target.closest("a[href]")) return
       const zone = document
         .elementsFromPoint(e.clientX, e.clientY)
         .find((el) => el.dataset.createUrl)
