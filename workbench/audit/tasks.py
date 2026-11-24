@@ -27,6 +27,7 @@ def prune_audit():
             "awt_holiday",
             "planning_milestone",
             "planning_plannedwork",
+            "planning_externalwork",
         ],
         created_at__lt=in_days(-3 * 366),
     ).delete()

@@ -10,8 +10,10 @@ from workbench.accounts.features import FEATURES, F
 from workbench.accounts.middleware import set_user_name
 from workbench.accounts.models import APIToken
 from workbench.audit.models import LoggedAction
+from workbench.planning.models import ExternalWork
 from workbench.projects.models import Project
 from workbench.tools.history import EVERYTHING, Prettifier
+from workbench.tools.validation import monday
 
 
 class HistoryTest(TestCase):
@@ -108,6 +110,22 @@ class HistoryTest(TestCase):
         self.assertContains(
             response, f'href="/history/projects_service/offer_id/{offer.pk}/"'
         )
+
+    def test_external_work_history(self):
+        """External work is audited"""
+        project = factories.ProjectFactory.create()
+        work = ExternalWork.objects.create(
+            project=project,
+            provided_by=factories.OrganizationFactory.create(),
+            created_by=project.owned_by,
+            title="Printing",
+            weeks=[monday()],
+        )
+        self.client.force_login(project.owned_by)
+        response = self.client.get(
+            f"/history/planning_externalwork/project_id/{project.pk}/"
+        )
+        self.assertContains(response, f"INSERT planning_externalwork {work.pk}")
 
     def test_nothing(self):
         """History modal of a PK without any history entries"""
