@@ -42,6 +42,11 @@
           <a href="{% url 'invoices_invoice_create' %}?customer={{ object.pk }}" class="dropdown-item">
             {% translate 'invoice'|capfirst %}
           </a>
+          {% if request.user.features.CONTROLLING %}
+            <a href="{% url 'invoices_recurringinvoice_create' %}?customer={{ object.pk }}" class="dropdown-item">
+              {% translate 'recurring invoice'|capfirst %}
+            </a>
+          {% endif %}
           {% if request.user.features.DEALS %}
             <a href="{% url 'deals_deal_create' %}?customer={{ object.pk }}" class="dropdown-item">
               {% translate 'deal'|capfirst %}

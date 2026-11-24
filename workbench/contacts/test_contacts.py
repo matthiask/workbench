@@ -1281,10 +1281,14 @@ class ContactsTest(TestCase):
         self.assertContains(response, "Hosting")
         self.assertNotContains(response, "Old maintenance")
         self.assertContains(response, f"/recurring-invoices/?org={organization.pk}")
+        self.assertContains(
+            response, f"/recurring-invoices/create/?customer={organization.pk}"
+        )
 
         with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
             response = self.client.get(organization.urls["detail"])
             self.assertNotContains(response, "Hosting")
+            self.assertNotContains(response, "/recurring-invoices/create/")
 
     def test_organization_deals(self):
         """The organization detail page lists its deals with the DEALS
