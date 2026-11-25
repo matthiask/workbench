@@ -11,6 +11,7 @@ import {
   arrange,
   position,
   prettyDuration,
+  startAutoScroll,
   timestamp,
 } from "./utils.js"
 
@@ -58,6 +59,7 @@ function useRectangleSelection(areaRef, setSelection) {
         if (moved) setRectangle(normalize(start, end))
       }
       const onPointerUp = (e) => {
+        stopScroll()
         window.removeEventListener("pointermove", onPointerMove)
         window.removeEventListener("pointerup", onPointerUp)
         document.body.classList.remove("is-selecting")
@@ -82,6 +84,9 @@ function useRectangleSelection(areaRef, setSelection) {
           e.shiftKey ? new Set([...selection, ...ids]) : new Set(ids),
         )
       }
+      const stopScroll = startAutoScroll((clientX, clientY) =>
+        onPointerMove({ clientX, clientY }),
+      )
       window.addEventListener("pointermove", onPointerMove)
       window.addEventListener("pointerup", onPointerUp)
     }

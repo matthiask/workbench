@@ -2,7 +2,7 @@ import { createContext, useContext, useRef, useState } from "react"
 import Draggable from "react-draggable"
 import { connect } from "react-redux"
 
-import { dragBounds, position } from "./utils.js"
+import { dragBounds, position, startAutoScroll } from "./utils.js"
 
 // The selected activities and the offset of those being dragged right now,
 // provided by the timer. Not persisted: a selection only lasts until reload.
@@ -30,6 +30,7 @@ export const Movable = connect(({ zoom }) => ({ zoom }))(
     // position passed to onStop can be off by a step of the grid.
     const dragRef = useRef({ ids: [], dx: 0, dy: 0 })
     const [bounds, setBounds] = useState()
+    const stopScrollRef = useRef(null)
     const { selection, setSelection, drag, setDrag } =
       useContext(SelectionContext)
 
@@ -71,6 +72,12 @@ export const Movable = connect(({ zoom }) => ({ zoom }))(
           }
           setBounds(dragBounds(ref.current, nodes))
           setDrag(dragRef.current)
+          // The drag follows mouse events, repeat the last one after scrolling
+          stopScrollRef.current = startAutoScroll((clientX, clientY) =>
+            document.dispatchEvent(
+              new MouseEvent("mousemove", { clientX, clientY, bubbles: true }),
+            ),
+          )
         }}
         onDrag={(_e, data) => {
           dragRef.current = {
@@ -81,6 +88,8 @@ export const Movable = connect(({ zoom }) => ({ zoom }))(
           setDrag(dragRef.current)
         }}
         onStop={() => {
+          stopScrollRef.current?.()
+          stopScrollRef.current = null
           const { ids, dx, dy } = dragRef.current
           if (dx || dy) dispatch({ type: "MOVE_ACTIVITIES", ids, dx, dy })
           setDrag(null)

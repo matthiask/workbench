@@ -120,6 +120,48 @@ export function arrange(items, { left, top, right, gap = 1, step = 10 }) {
   return positions
 }
 
+// Scrolls the page while the pointer is near an edge of the window during a
+// drag (at the top, below the sticky navbar), faster the closer it gets.
+// `onScroll` gets the pointer position after each step, so that what's
+// dragged keeps following the pointer. Returns a function which stops it.
+export function startAutoScroll(onScroll, { edge = 50, speed = 30 } = {}) {
+  let pointer = null
+  const track = (e) => {
+    pointer = { x: e.clientX, y: e.clientY }
+  }
+  const step = (position, start, end) => {
+    if (position < start + edge)
+      return -speed * Math.min(1, (start + edge - position) / edge)
+    if (position > end - edge)
+      return speed * Math.min(1, (position - end + edge) / edge)
+    return 0
+  }
+  let frame
+  const tick = () => {
+    frame = requestAnimationFrame(tick)
+    if (!pointer) return
+    const root = document.documentElement
+    const top =
+      document.querySelector(".wb-navbar")?.getBoundingClientRect().bottom || 0
+    const dx = Math.round(step(pointer.x, 0, root.clientWidth))
+    const dy = Math.round(step(pointer.y, top, root.clientHeight))
+    if (!dx && !dy) return
+    const before = [window.scrollX, window.scrollY]
+    // Instantly: Bootstrap makes scrolling smooth, which would restart its
+    // animation on every step and barely move
+    window.scrollBy({ left: dx, top: dy, behavior: "instant" })
+    if (window.scrollX !== before[0] || window.scrollY !== before[1]) {
+      onScroll(pointer.x, pointer.y)
+    }
+  }
+  window.addEventListener("pointermove", track)
+  frame = requestAnimationFrame(tick)
+  return () => {
+    cancelAnimationFrame(frame)
+    window.removeEventListener("pointermove", track)
+  }
+}
+
 // Activities can be dragged within the visible area or the area other
 // activities already use, whichever is larger, but never further out.
 // `nodes` are all activities moved together, `node` the one being dragged.
