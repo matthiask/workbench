@@ -46,6 +46,10 @@ export const Movable = connect(({ zoom }) => ({ zoom }))(
         scale={zoom}
         nodeRef={ref}
         onStart={(e) => {
+          // A text selection would be dragged by the browser itself, which
+          // swallows the mouseup and never ends this drag
+          e.preventDefault()
+          window.getSelection()?.removeAllRanges()
           if (e.shiftKey) {
             const next = new Set(selection)
             if (isSelected) next.delete(activity.id)
