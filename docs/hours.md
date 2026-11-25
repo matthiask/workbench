@@ -141,3 +141,7 @@ the recommended way to keep track of your work.
 Its activities stay where you put them. On a smaller screen the page
 scrolls, and the − and + buttons below "+ Break" make the activities
 smaller or larger in this browser.
+
+To move several activities at once, drag a rectangle over them on an empty
+spot (or Shift-click their titles) and drag one of them. A click on an
+empty spot or Escape clears the selection.

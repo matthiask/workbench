@@ -1,6 +1,6 @@
 import { combineReducers } from "redux"
 
-import { timestamp } from "./utils.js"
+import { position, timestamp } from "./utils.js"
 
 function activities(state, action) {
   if (typeof state === "undefined") {
@@ -21,6 +21,14 @@ function activities(state, action) {
           ...action.fields,
         },
       }
+    case "MOVE_ACTIVITIES":
+      return Object.fromEntries(
+        Object.entries(state).map(([id, activity]) => {
+          if (!action.ids.includes(id)) return [id, activity]
+          const { x, y } = position(activity)
+          return [id, { ...activity, left: x + action.dx, top: y + action.dy }]
+        }),
+      )
     case "START":
     case "STOP": {
       if (!action.current || !state[action.current.id]) return state

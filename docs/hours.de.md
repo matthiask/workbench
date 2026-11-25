@@ -153,3 +153,8 @@ Zeitmarken.
 Seine Aktivitäten bleiben, wo du sie hinschiebst. Auf einem kleineren
 Bildschirm scrollt die Seite, und die Knöpfe − und + unter «+ Pause»
 machen die Aktivitäten in diesem Browser kleiner oder grösser.
+
+Um mehrere Aktivitäten auf einmal zu verschieben, ziehst du auf einer
+leeren Stelle ein Rechteck über sie (oder klickst mit gedrückter
+Umschalttaste auf ihre Titel) und ziehst dann eine davon. Ein Klick auf
+eine leere Stelle oder Escape hebt die Auswahl auf.

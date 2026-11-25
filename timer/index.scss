@@ -102,6 +102,23 @@ div[role="main"] {
   color: #1d2127;
 }
 
+.activity.is-selected {
+  outline: 2px dashed var(--bs-primary);
+  outline-offset: 3px;
+}
+
+.activity-selection {
+  position: absolute;
+  z-index: 3;
+  border: 1px solid var(--bs-primary);
+  background: color-mix(in srgb, var(--bs-primary) 10%, transparent);
+  pointer-events: none;
+}
+
+body.is-selecting {
+  user-select: none;
+}
+
 .activity:hover,
 .activity:focus-within {
   z-index: 2;

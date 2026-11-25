@@ -1,19 +1,12 @@
 import { useEffect, useRef, useState } from "react"
-import Draggable from "react-draggable"
 import { connect } from "react-redux"
 
 import { openBreakForm, overwriteBreakElapsed, saveBreak } from "./actions.js"
 import { ActivitySettings } from "./activitySettings.js"
 import { gettext } from "./i18n.js"
 import * as icons from "./icons.js"
-import {
-  colorStyle,
-  dragBounds,
-  hasColor,
-  position,
-  prettyDuration,
-  timestamp,
-} from "./utils.js"
+import { Movable } from "./movable.js"
+import { colorStyle, hasColor, prettyDuration, timestamp } from "./utils.js"
 
 const createUpdater =
   ({ id, dispatch }) =>
@@ -22,13 +15,10 @@ const createUpdater =
 
 export const BreakActivity = connect((state) => ({
   current: state.current,
-  zoom: state.zoom,
-}))(({ activity, current, dispatch, usedColors, zoom }) => {
+}))(({ activity, current, dispatch, usedColors }) => {
   const dispatchUpdate = createUpdater({ id: activity.id, dispatch })
   const [showSettings, setShowSettings] = useState(false)
   const [, updateState] = useState()
-  const ref = useRef()
-  const [bounds, setBounds] = useState()
 
   const isRunning = !!activity.startedAt
 
@@ -64,113 +54,102 @@ export const BreakActivity = connect((state) => ({
   const title = activity.title || gettext("Break")
 
   return (
-    <Draggable
-      handle=".js-drag-handle"
-      bounds={bounds}
-      onStart={() => setBounds(dragBounds(ref.current))}
-      defaultPosition={position(activity)}
-      grid={[10, 10]}
-      scale={zoom}
-      onStop={(_e, data) => dispatchUpdate({ left: data.x, top: data.y })}
-      nodeRef={ref}
+    <Movable
+      activity={activity}
+      className={`activity is-break ${isRunning ? "is-active" : ""} ${
+        hasColor(activity.color) ? "has-color" : ""
+      } card`}
+      style={colorStyle(activity.color)}
     >
       <div
-        className={`activity is-break ${isRunning ? "is-active" : ""} ${
-          hasColor(activity.color) ? "has-color" : ""
-        } card`}
-        style={colorStyle(activity.color)}
-        ref={ref}
+        className="activity-title text-truncate js-drag-handle"
+        title={title}
       >
-        <div
-          className="activity-title text-truncate js-drag-handle"
-          title={title}
-        >
-          {title}
+        {title}
+      </div>
+      <div className="activity-body">
+        <div className="form-group">
+          <textarea
+            className="form-control"
+            rows="2"
+            value={activity.description}
+            onChange={(e) => dispatchUpdate({ description: e.target.value })}
+            placeholder={gettext("Description")}
+          />
         </div>
-        <div className="activity-body">
-          <div className="form-group">
-            <textarea
-              className="form-control"
-              rows="2"
-              value={activity.description}
-              onChange={(e) => dispatchUpdate({ description: e.target.value })}
-              placeholder={gettext("Description")}
-            />
-          </div>
-          <div className="d-flex align-items-center justify-content-between">
-            {isRunning ? (
-              <button
-                type="button"
-                className="activity-duration ps-2"
-                onClick={() => overwriteBreakElapsed(dispatch, activity)}
-                style={{ cursor: "cell" }}
-              >
-                {prettyDuration(elapsed)}
-              </button>
-            ) : (
-              <span className="activity-duration ps-2">—</span>
-            )}
-            <div>
-              <button
-                className={`btn btn-quiet btn-sm btn-icon ${showSettings ? "active" : ""}`}
-                type="button"
-                onClick={() => setShowSettings(!showSettings)}
-                title={gettext("Settings")}
-              >
-                {icons.cog}
-              </button>
-              {!isRunning && (
-                <button
-                  className="btn btn-sm btn-icon ms-1 btn-quiet"
-                  type="button"
-                  onClick={() => {
-                    dispatch({ type: "STOP", current })
-                    dispatchUpdate({ startedAt: timestamp() })
-                  }}
-                  title={gettext("Start break")}
-                >
-                  {icons.play}
-                </button>
-              )}
+        <div className="d-flex align-items-center justify-content-between">
+          {isRunning ? (
+            <button
+              type="button"
+              className="activity-duration ps-2"
+              onClick={() => overwriteBreakElapsed(dispatch, activity)}
+              style={{ cursor: "cell" }}
+            >
+              {prettyDuration(elapsed)}
+            </button>
+          ) : (
+            <span className="activity-duration ps-2">—</span>
+          )}
+          <div>
+            <button
+              className={`btn btn-quiet btn-sm btn-icon ${showSettings ? "active" : ""}`}
+              type="button"
+              onClick={() => setShowSettings(!showSettings)}
+              title={gettext("Settings")}
+            >
+              {icons.cog}
+            </button>
+            {!isRunning && (
               <button
                 className="btn btn-sm btn-icon ms-1 btn-quiet"
                 type="button"
-                onClick={() => openBreakForm(dispatch, activity)}
-                title={gettext("Open break form")}
+                onClick={() => {
+                  dispatch({ type: "STOP", current })
+                  dispatchUpdate({ startedAt: timestamp() })
+                }}
+                title={gettext("Start break")}
               >
-                {icons.pen}
+                {icons.play}
               </button>
-              <button
-                className={`btn btn-sm btn-icon ms-1 ${
-                  isRunning ? "btn-success" : "btn-quiet"
-                }`}
-                type="button"
-                disabled={!isRunning}
-                onClick={() => saveBreak(dispatch, activity)}
-                title={gettext("Save break")}
-              >
-                {icons.save}
-              </button>
-            </div>
+            )}
+            <button
+              className="btn btn-sm btn-icon ms-1 btn-quiet"
+              type="button"
+              onClick={() => openBreakForm(dispatch, activity)}
+              title={gettext("Open break form")}
+            >
+              {icons.pen}
+            </button>
+            <button
+              className={`btn btn-sm btn-icon ms-1 ${
+                isRunning ? "btn-success" : "btn-quiet"
+              }`}
+              type="button"
+              disabled={!isRunning}
+              onClick={() => saveBreak(dispatch, activity)}
+              title={gettext("Save break")}
+            >
+              {icons.save}
+            </button>
           </div>
         </div>
-        {showSettings ? (
-          <ActivitySettings
-            title={activity.title}
-            color={activity.color}
-            otherColors={usedColors || []}
-            dispatchUpdate={dispatchUpdate}
-            closeSettings={() => setShowSettings(false)}
-            removeActivity={() =>
-              dispatch({ type: "REMOVE_ACTIVITY", id: activity.id })
-            }
-            resetActivity={() => {
-              dispatchUpdate({ startedAt: null })
-              setShowSettings(false)
-            }}
-          />
-        ) : null}
       </div>
-    </Draggable>
+      {showSettings ? (
+        <ActivitySettings
+          title={activity.title}
+          color={activity.color}
+          otherColors={usedColors || []}
+          dispatchUpdate={dispatchUpdate}
+          closeSettings={() => setShowSettings(false)}
+          removeActivity={() =>
+            dispatch({ type: "REMOVE_ACTIVITY", id: activity.id })
+          }
+          resetActivity={() => {
+            dispatchUpdate({ startedAt: null })
+            setShowSettings(false)
+          }}
+        />
+      ) : null}
+    </Movable>
   )
 })
