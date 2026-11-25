@@ -192,8 +192,8 @@ at each with `wb people show` and propose a fix:
   code and city on separate lines): the name keeps only the organization's
   lines (`wb organizations update <organization_id> --name "..."
   --dry-run`), check that its people have the address. Names over several
-  lines for an organization's hierarchy (Kanton Zürich / Baudirektion /
-  Amt für ...) are fine.
+  lines for an organization's hierarchy (Canton / Department / Office)
+  are fine.
 - **An address suffix repeating the organization** loses the repetition.
 - **Swiss postal codes** have four digits (no `CH -` prefix, no stray
   characters); foreign addresses need their country.

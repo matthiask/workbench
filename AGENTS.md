@@ -91,6 +91,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 - Pre-commit hooks run through `prek` (not `pre-commit`) and auto-fix
   formatting; re-stage the fixed files and commit again.
 - Standalone scripts load `.env` with `speckenv.read_speckenv()`.
+- No real client data (names, organizations, street addresses) in code,
+  tests, docs or skills, also not in examples taken from a database copy;
+  use made-up ones (Beispiel AG, Hans Muster, Musterweg 1).
 
 ## Web interface
 
