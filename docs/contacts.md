@@ -31,7 +31,12 @@ organizations; for a private person create an organization and tick
 Groups collect contacts, e.g. for mailings. Groups which **apply to
 organizations** (e.g. industries) belong to the organization: ticking
 such a group on a person adds the whole organization. Pinned groups are
-listed first. The people list filtered by a group exports the people as
+listed first. "Missing or incomplete postal address" finds the people
+who can't get a letter yet, also those whose address doesn't print well
+(line breaks in fields, placeholders like "-" instead of a street, a
+whole address in the organization's name, an address suffix repeating
+the organization); check the group before a mailing. The people list
+filtered by a group exports the people as
 XLSX or vCards. The XLSX has the complete postal address in one cell,
 as printed on invoices, ready for letters and labels; the address
 fields follow for sorting and filtering.

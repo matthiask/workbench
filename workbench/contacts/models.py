@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 import phonenumbers
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, OuterRef, Q, Sum
+from django.db.models import Exists, F, OuterRef, Q, Sum
 from django.db.models.functions import Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
@@ -282,11 +282,12 @@ class PersonQuerySet(SearchQuerySet):
 
     def without_complete_postal_address(self):
         """People without a postal address with street (or post office box),
-        postal code and city (or one which is overridden completely), e.g. for
-        mailings"""
-        return self.exclude(
-            Exists(
-                PostalAddress.objects.filter(person=OuterRef("pk")).filter(
+        postal code and city (or one which is overridden completely), or with
+        an address which doesn't print well, e.g. for mailings"""
+        addresses = PostalAddress.objects.filter(person=OuterRef("pk"))
+        return self.filter(
+            ~Exists(
+                addresses.filter(
                     ~Q(postal_address_override="")
                     | (
                         (~Q(street="") | ~Q(post_office_box=""))
@@ -295,6 +296,9 @@ class PersonQuerySet(SearchQuerySet):
                     )
                 )
             )
+            | Exists(addresses.filter(postal_address_to_check_q()))
+            # A whole address in the name of the organization
+            | Q(organization__name__regex=r"\n\s*[0-9]{4,5}\s")
         )
 
     def without_groups(self):
@@ -304,6 +308,43 @@ class PersonQuerySet(SearchQuerySet):
                 groups__is_archived=False, groups__applies_to_organizations=True
             )
         )
+
+
+def postal_address_to_check_q():
+    """Postal addresses which don't print well: line breaks in fields,
+    placeholders instead of a street, Swiss postal codes without four digits,
+    an address suffix repeating the organization, overrides without postal
+    code"""
+    line_breaks = Q()
+    for field in [
+        "street",
+        "house_number",
+        "address_suffix",
+        "post_office_box",
+        "postal_code",
+        "city",
+    ]:
+        line_breaks |= Q(**{f"{field}__contains": "\n"})
+    placeholder = r"^([^[:alnum:]]+|x)$"
+    return (
+        line_breaks
+        | (
+            Q(postal_address_override="")
+            & (
+                Q(street__iregex=placeholder)
+                | Q(house_number__iregex=placeholder)
+                | (Q(country="CH") & ~Q(postal_code__regex=r"^[0-9]{4}$"))
+                | (
+                    ~Q(address_suffix="")
+                    & Q(address_suffix__icontains=F("person__organization__name"))
+                )
+            )
+        )
+        | (
+            ~Q(postal_address_override="")
+            & ~Q(postal_address_override__regex=r"[0-9]{4,5}\s+\S")
+        )
+    )
 
 
 def in_group_q(group):

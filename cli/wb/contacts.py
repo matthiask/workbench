@@ -544,7 +544,9 @@ def people():
 @click.option(
     "--missing-postal-address",
     is_flag=True,
-    help="Only people without a postal address with street, postal code and city.",
+    help="Only people without a complete postal address or with one which"
+    " doesn't print well (line breaks, placeholders, an address in the"
+    " organization's name, ...).",
 )
 @click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names

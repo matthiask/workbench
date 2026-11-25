@@ -1868,7 +1868,35 @@ class GroupsTest(TestCase):
         factories.PersonFactory.create(given_name="Missing")
         factories.PersonFactory.create(given_name="Gone", is_archived=True)
 
+        # Complete addresses which don't print well
+        def address(name, organization=None, **kwargs):
+            person = factories.PersonFactory.create(
+                given_name=name,
+                organization=factories.OrganizationFactory.create(name=organization)
+                if organization
+                else None,
+            )
+            person.postaladdresses.create(
+                **{"street": "Musterweg", "postal_code": "8000", "city": "Zürich"}
+                | kwargs
+            )
+
+        address("Box", street="", post_office_box="Postfach 12")
+        address("Abroad", postal_code="80331", city="München", country="DE")
+        address("Department", "Beispiel AG", address_suffix="Abteilung Kommunikation")
+        address("Linebreak", street="Musterweg 1\r\nPostfach")
+        address("Placeholder", street="-", post_office_box="Postfach")
+        address("Orgaddress", "Beispiel AG\r\nMusterweg 1\r\n8000 Zürich")
+        address("Repeated", "Beispiel AG", address_suffix="Beispiel AG, Kommunikation")
+        address("Nocode", postal_address_override="Beispiel AG\nMusterweg 1")
+        address("Shortcode", postal_code="800")
+
         response = self.client.get("/contacts/people/?s=missing-postal-address")
+        for name in ["Box", "Abroad", "Department"]:
+            self.assertNotContains(response, f"{name} Nachname")
+        for name in ["Linebreak", "Placeholder", "Orgaddress", "Repeated", "Nocode"]:
+            self.assertContains(response, f"{name} Nachname")
+        self.assertContains(response, "Shortcode Nachname")
         self.assertNotContains(response, "Complete Nachname")
         self.assertContains(response, "Incomplete Nachname")
         self.assertNotContains(response, "Override Nachname")
@@ -1879,7 +1907,17 @@ class GroupsTest(TestCase):
             "/api/contacts/people/", {"missing_postal_address": "true"}
         ).json()
         self.assertEqual(
-            {p["given_name"] for p in data["items"]}, {"Incomplete", "Missing"}
+            {p["given_name"] for p in data["items"]},
+            {
+                "Incomplete",
+                "Missing",
+                "Linebreak",
+                "Placeholder",
+                "Orgaddress",
+                "Repeated",
+                "Nocode",
+                "Shortcode",
+            },
         )
 
     def test_post_office_box(self):

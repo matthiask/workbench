@@ -32,8 +32,14 @@ weglässt. <kbd>Ctrl-Shift-C</kbd> springt zu einer Person.
 Gruppen fassen Kontakte zusammen, z.B. für Mailings. Gruppen, die **für
 Organisationen gelten** (z.B. Branchen), gehören zur Organisation: Diese
 Gruppe bei einer Person anzuhaken, fügt die ganze Organisation hinzu.
-Angepinnte Gruppen stehen zuoberst. Die nach einer Gruppe gefilterte
-Personenliste exportiert die Personen als XLSX oder vCards. Das XLSX
+Angepinnte Gruppen stehen zuoberst. «Fehlende oder unvollständige
+Postadresse» findet die Personen, die noch keinen Brief bekommen können,
+auch jene, deren Adresse nicht sauber gedruckt wird (Zeilenumbrüche in
+Feldern, Platzhalter wie «-» statt einer Strasse, eine ganze Adresse im
+Namen der Organisation, ein Adresszusatz, der die Organisation
+wiederholt); prüfe die Gruppe vor einem Versand. Die nach einer Gruppe
+gefilterte Personenliste exportiert die Personen als XLSX oder vCards.
+Das XLSX
 enthält die vollständige Postadresse in einer Zelle, wie sie auf
 Rechnungen steht, bereit für Briefe und Etiketten; die einzelnen
 Adressfelder folgen zum Sortieren und Filtern.

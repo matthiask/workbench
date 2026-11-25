@@ -229,8 +229,9 @@ class PersonFilter(OrganizationFilter):
     )
     missing_postal_address: bool = Field(
         default=False,
-        description="Only people without a postal address with street, postal"
-        " code and city, like the defined search",
+        description="Only people without a complete postal address or with one"
+        " which doesn't print well (line breaks, placeholders, an address in the"
+        " organization's name, ...), like the defined search",
     )
     primary_contact: str | None = Field(default=None, description="Short name")
     projects_or_deals_since: dt.date | None = Field(
