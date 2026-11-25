@@ -14,7 +14,7 @@ import { ActivitySettings } from "./activitySettings.js"
 import { gettext, OUTCOME } from "./i18n.js"
 import * as icons from "./icons.js"
 import { Movable } from "./movable.js"
-import { colorStyle, hasColor, prettyDuration } from "./utils.js"
+import { colorClass, colorStyle, prettyDuration } from "./utils.js"
 
 const createUpdater =
   ({ id, dispatch }) =>
@@ -57,9 +57,9 @@ export const Activity = connect((state, ownProps) => ({
     <Movable
       activity={activity}
       as="form"
-      className={`activity ${activity.isActive ? "is-active" : ""} ${
-        hasColor(activity.color) ? "has-color" : ""
-      } card`}
+      className={`activity ${activity.isActive ? "is-active" : ""} ${colorClass(
+        activity.color,
+      )} card`}
       style={colorStyle(activity.color)}
     >
       <div

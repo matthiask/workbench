@@ -6,7 +6,7 @@ import { ActivitySettings } from "./activitySettings.js"
 import { gettext } from "./i18n.js"
 import * as icons from "./icons.js"
 import { Movable } from "./movable.js"
-import { colorStyle, hasColor, prettyDuration, timestamp } from "./utils.js"
+import { colorClass, colorStyle, prettyDuration, timestamp } from "./utils.js"
 
 const createUpdater =
   ({ id, dispatch }) =>
@@ -56,9 +56,9 @@ export const BreakActivity = connect((state) => ({
   return (
     <Movable
       activity={activity}
-      className={`activity is-break ${isRunning ? "is-active" : ""} ${
-        hasColor(activity.color) ? "has-color" : ""
-      } card`}
+      className={`activity is-break ${isRunning ? "is-active" : ""} ${colorClass(
+        activity.color,
+      )} card`}
       style={colorStyle(activity.color)}
     >
       <div

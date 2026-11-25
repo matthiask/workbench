@@ -95,11 +95,32 @@ div[role="main"] {
   font-weight: 600;
 }
 
-// Colors are chosen for light text backgrounds, keep the text dark on them
-.activity.has-color,
-.activity.has-color .activity-duration,
-.activity.has-color .btn-quiet {
-  color: #1d2127;
+// Text on colored activities is dark, or white on dark colors (see
+// colorClass()). Their quiet buttons are transparent so that the color shows.
+.activity.has-color {
+  --wb-activity-text: #1d2127;
+  --wb-activity-hover: rgb(0 0 0 / 0.1);
+
+  &.has-dark-color {
+    --wb-activity-text: #fff;
+    --wb-activity-hover: rgb(255 255 255 / 0.2);
+  }
+
+  &,
+  .activity-duration {
+    color: var(--wb-activity-text);
+  }
+
+  .btn-quiet {
+    --bs-btn-color: var(--wb-activity-text);
+    --bs-btn-bg: transparent;
+    --bs-btn-hover-color: var(--wb-activity-text);
+    --bs-btn-hover-bg: var(--wb-activity-hover);
+    --bs-btn-active-color: var(--wb-activity-text);
+    --bs-btn-active-bg: var(--wb-activity-hover);
+    --bs-btn-disabled-color: var(--wb-activity-text);
+    --bs-btn-disabled-bg: transparent;
+  }
 }
 
 .activity.is-selected {

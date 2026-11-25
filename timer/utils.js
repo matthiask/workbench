@@ -92,6 +92,28 @@ export function hasColor(color) {
   return Boolean(color) && color.toLowerCase() !== "#ffffff"
 }
 
+// Relative luminance (WCAG) of a #rrggbb color
+function luminance(color) {
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = Number.parseInt(color.slice(i, i + 2), 16) / 255
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+// Text on colored activities is dark (#1d2127), or white on dark colors
+// where white contrasts more
+const DARK_TEXT = luminance("#1d2127")
+
+export function colorClass(color) {
+  if (!hasColor(color)) return ""
+  if (!/^#[0-9a-f]{6}$/i.test(color)) return "has-color"
+  const l = luminance(color)
+  return 1.05 / (l + 0.05) > (l + 0.05) / (DARK_TEXT + 0.05)
+    ? "has-color has-dark-color"
+    : "has-color"
+}
+
 export function colorStyle(color) {
   return hasColor(color) ? { backgroundColor: color } : {}
 }
