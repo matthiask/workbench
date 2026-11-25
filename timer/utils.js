@@ -6,8 +6,11 @@ export function timestamp() {
   return Date.now() / 1000
 }
 
-export function clamp(value, min, max) {
-  return Math.max(Math.min(value || 0, max), min)
+// Positions aren't limited to the window: activities arranged on a larger
+// screen stay where they are and the page scrolls on a smaller one.
+export function position(activity) {
+  const snap = (value) => 10 * Math.floor(Math.max(value || 0, 0) / 10)
+  return { x: snap(activity.left), y: snap(activity.top) }
 }
 
 export function prettyDuration(secondsArgument) {

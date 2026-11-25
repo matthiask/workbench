@@ -44,10 +44,10 @@ div[role="main"] {
   font-weight: 400;
 }
 
+// Activities outside the window extend the page instead of being clipped
 .activity-list {
   flex: 1 0 auto;
   position: relative;
-  overflow: hidden;
   margin: -15px -8px;
 }
 

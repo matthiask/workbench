@@ -14,7 +14,7 @@ import {
 import { ActivitySettings } from "./activitySettings.js"
 import { gettext, OUTCOME } from "./i18n.js"
 import * as icons from "./icons.js"
-import { clamp, colorStyle, hasColor, prettyDuration } from "./utils.js"
+import { colorStyle, hasColor, position, prettyDuration } from "./utils.js"
 
 const createUpdater =
   ({ id, dispatch }) =>
@@ -58,15 +58,8 @@ export const Activity = connect((state, ownProps) => ({
   return (
     <Draggable
       handle=".js-drag-handle"
-      bounds="parent"
-      defaultPosition={{
-        x:
-          10 *
-          Math.floor(clamp(activity.left, 0, window.innerWidth - 300) / 10),
-        y:
-          10 *
-          Math.floor(clamp(activity.top, 0, window.innerHeight - 300) / 10),
-      }}
+      bounds={{ left: 0, top: 0 }}
+      defaultPosition={position(activity)}
       grid={[10, 10]}
       onStop={(_e, data) =>
         dispatchUpdate({
