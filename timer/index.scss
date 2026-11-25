@@ -13,11 +13,18 @@ div[role="main"] {
   margin-bottom: 0.5rem;
 }
 
+// Fixed width, so that the buttons don't change size with their labels
+// (e.g. "Arrange" and "Undo")
 .create-activity {
   position: fixed;
   top: 58px;
   right: 10px;
   z-index: 1005;
+  width: 7.5rem;
+
+  > .btn {
+    justify-content: center;
+  }
 }
 
 .total-seconds {
