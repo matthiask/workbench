@@ -27,6 +27,80 @@ export function areaBox(area, el) {
   }
 }
 
+// Where a new activity of `size` goes within `visible`: the first spot in
+// reading order which doesn't touch the `occupied` rectangles, or the one
+// overlapping them least if there's no room.
+export function freeSpot(
+  visible,
+  occupied,
+  size,
+  { step = 10, gap = 10 } = {},
+) {
+  const up = (value) => step * Math.ceil(value / step)
+  const range = (from, to) => {
+    const values = []
+    for (let v = up(from); v <= Math.max(to, up(from)); v += step) {
+      values.push(v)
+    }
+    return values
+  }
+  const overlap = (left, top) =>
+    occupied.reduce((sum, r) => {
+      const w =
+        Math.min(left + size.width, r.right + gap) -
+        Math.max(left, r.left - gap)
+      const h =
+        Math.min(top + size.height, r.bottom + gap) - Math.max(top, r.top - gap)
+      return w > 0 && h > 0 ? sum + w * h : sum
+    }, 0)
+
+  let best = null
+  for (const top of range(visible.top, visible.bottom - size.height)) {
+    for (const left of range(visible.left, visible.right - size.width)) {
+      const value = overlap(left, top)
+      if (value === 0) return { left, top }
+      if (!best || value < best.value) best = { left, top, value }
+    }
+  }
+  return { left: best.left, top: best.top }
+}
+
+// A free spot in the visible part of the timer for a new activity
+export function newActivityPosition(size) {
+  const area = document.querySelector(".activity-list")
+  if (!area) {
+    // Not rendered yet
+    return {
+      left: 10 * Math.floor((Math.random() * (window.innerWidth - 300)) / 10),
+      top: 10 * Math.floor((Math.random() * (window.innerHeight - 300)) / 10),
+    }
+  }
+  const areaRect = area.getBoundingClientRect()
+  const k = areaRect.width / area.offsetWidth || 1
+  const toArea = (r) => ({
+    left: (r.left - areaRect.left) / k,
+    top: (r.top - areaRect.top) / k,
+    right: (r.right - areaRect.left) / k,
+    bottom: (r.bottom - areaRect.top) / k,
+  })
+  const visible = toArea({
+    left: 0,
+    top: 0,
+    right: document.documentElement.clientWidth,
+    bottom: document.documentElement.clientHeight,
+  })
+  visible.left = Math.max(visible.left, 0)
+  visible.top = Math.max(visible.top, 0)
+  const occupied = [
+    ...area.querySelectorAll("[data-activity]"),
+    // Fixed elements on top of the activities
+    ...document.querySelectorAll(
+      ".wb-navbar, .create-activity, .total-seconds",
+    ),
+  ].map((el) => toArea(el.getBoundingClientRect()))
+  return freeSpot(visible, occupied, size)
+}
+
 // Activities can be dragged within the visible area or the area other
 // activities already use, whichever is larger, but never further out.
 // `nodes` are all activities moved together, `node` the one being dragged.

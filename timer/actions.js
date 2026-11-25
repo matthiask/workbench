@@ -1,5 +1,14 @@
 import { gettext } from "./i18n.js"
-import { containsJSON, createIdentifier, timestamp } from "./utils.js"
+import {
+  containsJSON,
+  createIdentifier,
+  newActivityPosition,
+  timestamp,
+} from "./utils.js"
+
+// Approximate sizes of new activities, for finding a free spot
+const ACTIVITY_SIZE = { width: 286, height: 250 }
+const BREAK_SIZE = { width: 286, height: 170 }
 
 const BASE_URL = document.getElementById("projects-base-url").dataset.url
 const ACTIVE_PROJECTS = () => `${BASE_URL}projects/`
@@ -16,8 +25,7 @@ export function createBreak(dispatch) {
       description: "",
       startedAt: null,
       id: createIdentifier(),
-      left: 10 * Math.floor((Math.random() * (window.innerWidth - 300)) / 10),
-      top: 10 * Math.floor((Math.random() * (window.innerHeight - 300)) / 10),
+      ...newActivityPosition(BREAK_SIZE),
       color: "#ffffff",
     },
   })
@@ -126,8 +134,7 @@ export function createActivity(dispatch, fields = {}) {
       description: "",
       seconds: 0,
       id: createIdentifier(),
-      left: 10 * Math.floor((Math.random() * (window.innerWidth - 300)) / 10),
-      top: 10 * Math.floor((Math.random() * (window.innerHeight - 300)) / 10),
+      ...newActivityPosition(ACTIVITY_SIZE),
       color: "#ffffff",
       ...fields,
     },
