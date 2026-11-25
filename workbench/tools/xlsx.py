@@ -200,7 +200,8 @@ class WorkbenchXLSXDocument(XLSXDocument):
 
     def people(self, queryset):
         """The columns of a mailing list first (primary contact, organization,
-        name, postal address), then the other details"""
+        name, the complete postal address and its fields), then the other
+        details"""
         people = queryset.select_related(
             "organization", "primary_contact"
         ).prefetch_related(
@@ -216,6 +217,10 @@ class WorkbenchXLSXDocument(XLSXDocument):
             "postal_address_override",
         ]
 
+        def lines(text):
+            # Line breaks as LF, without the CR of the web forms' textareas
+            return "\n".join(filter(None, (line.strip() for line in text.splitlines())))
+
         def first(details):
             # Ordered by weight, like the people list and the vCard export
             return next(iter(details.all()), None)
@@ -226,14 +231,15 @@ class WorkbenchXLSXDocument(XLSXDocument):
             phone = first(person.phonenumbers)
             return [
                 person.primary_contact.get_full_name(),
-                person.organization.name if person.organization else "",
+                lines(person.organization.name) if person.organization else "",
                 person.given_name,
                 person.family_name,
+                lines(address.postal_address) if address else "",
                 *(
                     (
                         address.country.code
                         if field == "country"
-                        else getattr(address, field)
+                        else lines(getattr(address, field))
                     )
                     if address
                     else ""
@@ -264,6 +270,7 @@ class WorkbenchXLSXDocument(XLSXDocument):
                     "family_name",
                 ]
             ]
+            + [str(capfirst(PostalAddress._meta.verbose_name))]
             + [str(label(PostalAddress, field)) for field in address_fields]
             + [
                 str(label(Person, "address")),

@@ -26,7 +26,10 @@ Gruppen fassen Kontakte zusammen, z.B. für Mailings. Gruppen, die **für
 Organisationen gelten** (z.B. Branchen), gehören zur Organisation: Diese
 Gruppe bei einer Person anzuhaken, fügt die ganze Organisation hinzu.
 Angepinnte Gruppen stehen zuoberst. Die nach einer Gruppe gefilterte
-Personenliste exportiert die Personen als XLSX oder vCards.
+Personenliste exportiert die Personen als XLSX oder vCards. Das XLSX
+enthält die vollständige Postadresse in einer Zelle, wie sie auf
+Rechnungen steht, bereit für Briefe und Etiketten; die einzelnen
+Adressfelder folgen zum Sortieren und Filtern.
 
 ## Duplikate, Archivieren, Löschen
 

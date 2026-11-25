@@ -112,7 +112,10 @@ don't. Only archive people (`--archive`) when the user confirms they left.
 ## 6. Export
 
 The export for the mailing is the people list of the web interface filtered
-by the group (XLSX with postal addresses). For a check in the terminal:
+by the group (XLSX with postal addresses). Its column "Postal address" is
+the complete address as printed on invoices: letters and labels use it as
+is. Composing the address from the other columns again (organization,
+address suffix, override) repeats lines. For a check in the terminal:
 
     wb people search --group "<group>" --csv
 

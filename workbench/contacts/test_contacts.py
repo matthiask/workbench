@@ -204,7 +204,9 @@ class ContactsTest(TestCase):
         person = factories.PersonFactory.create(
             given_name="Hans",
             family_name="Muster",
-            organization=factories.OrganizationFactory.create(name="Beispiel AG"),
+            organization=factories.OrganizationFactory.create(
+                name="Beispiel AG\r\nAbteilung Kommunikation"
+            ),
         )
         # Archived groups are left out
         archived = Group.objects.create(title="Newsletter 2015", is_archived=True)
@@ -229,12 +231,13 @@ class ContactsTest(TestCase):
         header, row = ([cell.value for cell in r] for r in sheet.iter_rows(max_row=2))
         header = [title.lower() for title in header]
         self.assertEqual(
-            header[:11],
+            header[:12],
             [
                 "primary contact",
                 "organization",
                 "given name",
                 "family name",
+                "postal address",
                 "street",
                 "house number",
                 "address suffix",
@@ -248,7 +251,12 @@ class ContactsTest(TestCase):
         self.assertEqual(
             values["primary contact"], person.primary_contact.get_full_name()
         )
-        self.assertEqual(values["organization"], "Beispiel AG")
+        self.assertEqual(values["organization"], "Beispiel AG\nAbteilung Kommunikation")
+        # The complete address as printed on invoices, ready for printing
+        self.assertEqual(
+            values["postal address"],
+            "Beispiel AG\nAbteilung Kommunikation\nHans Muster\nHauptstrasse 1\n8000 Zürich",
+        )
         self.assertEqual(values["country"], "CH")
         self.assertEqual(values["email"], "hans@example.com")
         self.assertEqual(values["groups"], "Christmas Mailing")
