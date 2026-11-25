@@ -1369,6 +1369,7 @@ class ContactsTest(TestCase):
             organization=factories.OrganizationFactory.create(),
             date_of_birth=dt.date(2020, 3, 1),
             notes="Bla",
+            job_title="Head of Communications",
         )
 
         factories.PostalAddressFactory.create(person=person)
@@ -1381,6 +1382,7 @@ class ContactsTest(TestCase):
         serialized = person_to_vcard(person).serialize()
         self.assertIn("OVERRIDE", serialized)
         self.assertIn("2020-03-01", serialized)
+        self.assertIn("TITLE:Head of Communications", serialized)
 
     def test_year_of_birth_unknown(self):
         """Birthdays without year are shown, exported and merged without it"""

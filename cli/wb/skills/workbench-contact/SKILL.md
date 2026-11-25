@@ -51,6 +51,7 @@ family_name: Muster
 address: Herr
 salutation: Lieber Hans           # or: Sehr geehrter Herr Muster
 address_on_first_name_terms: true
+job_title: Leiter Kommunikation    # from the signature, never in the address
 organization: 345                  # or: new_organization: Beispiel AG
 email_addresses:
   - email: hans@example.com

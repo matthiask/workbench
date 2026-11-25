@@ -331,6 +331,12 @@ class Person(Model):
         max_length=100,
         help_text=_("Dear John/Dear Ms Smith"),
     )
+    job_title = models.CharField(
+        _("job title"),
+        max_length=100,
+        blank=True,
+        help_text=_("Not part of the postal address."),
+    )
     date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
     year_of_birth_unknown = models.BooleanField(
         _("year of birth unknown"),

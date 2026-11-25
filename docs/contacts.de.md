@@ -14,6 +14,8 @@ weglässt. <kbd>Ctrl-Shift-C</kbd> springt zu einer Person.
   hinzufügen, sobald die Person gespeichert ist. «Von Kolleg:in
   übernehmen» übernimmt die Adresse einer Kolleg:in. Eine Adresse vom Typ
   «Privat» lässt die Organisation weg.
+- Die **Funktion** (z.B. Leiterin Kommunikation) gehört zur Person, nicht
+  in die Adresse: Adressen werden ohne sie gedruckt.
 - Wenn eine Organisation umzieht, ändert «Ändern» bei einer ihrer
   Adressen sie für die ausgewählten Personen auf einmal.
 - Wenn jemand die Stelle wechselt und Projekte, Geschäfte oder Rechnungen

@@ -13,6 +13,7 @@
         {% endif %}
       </h1>
       <div class="wb-meta">
+        {% if person.job_title %}<span>{{ person.job_title }}</span>{% endif %}
         {% if person.organization %}
           <span>{% link_or_none person.organization %}</span>
         {% endif %}

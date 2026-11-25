@@ -669,6 +669,7 @@ class PersonForm(ModelForm):
             "family_name",
             "address_on_first_name_terms",
             "salutation",
+            "job_title",
             "date_of_birth",
             "year_of_birth_unknown",
             "notes",

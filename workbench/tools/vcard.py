@@ -16,6 +16,8 @@ def person_to_vcard(person):
 
     if person.organization and not person.organization.is_private_person:
         v.add("org").value = [person.organization.name]
+    if person.job_title:
+        v.add("title").value = person.job_title
     if person.year_of_birth_unknown and person.date_of_birth:
         # Apple's convention for birthdays without year (a leap year)
         bday = v.add("bday")

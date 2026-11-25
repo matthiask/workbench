@@ -900,6 +900,7 @@ class PersonDetailOut(PersonOut):
     address: str = Field(description="Mr./Ms./...")
     salutation: str
     address_on_first_name_terms: bool
+    job_title: str
     notes: str
     primary_contact: str
     groups: list[str]
@@ -924,6 +925,7 @@ def person_out(person, request):
         "address": person.address,
         "salutation": person.salutation,
         "address_on_first_name_terms": person.address_on_first_name_terms,
+        "job_title": person.job_title,
         "notes": person.notes,
         "primary_contact": person.primary_contact.get_short_name(),
         "groups": [group.title for group in person.all_groups()],
@@ -992,6 +994,11 @@ class PersonIn(DetailsIn):
         " e.g. Lieber Hans or Sehr geehrte Frau Muster.",
     )
     address_on_first_name_terms: bool = False
+    job_title: str = Field(
+        default="",
+        max_length=100,
+        description="E.g. Head of Communications; not part of the postal address.",
+    )
     notes: str = ""
     organization: int | None = Field(
         default=None,
@@ -1227,6 +1234,7 @@ def person_create(
                 "address": data.address,
                 "salutation": data.salutation,
                 "address_on_first_name_terms": data.address_on_first_name_terms,
+                "job_title": data.job_title,
                 "notes": data.notes,
                 "organization": organization or "",
                 "primary_contact": request.user.pk,
@@ -1307,6 +1315,9 @@ class PersonPatch(InputSchema):
         " e.g. Lieber Hans or Sehr geehrte Frau Muster.",
     )
     address_on_first_name_terms: bool | None = None
+    job_title: str | None = Field(
+        default=None, description="Replaces the job title, an empty string removes it"
+    )
     notes: str | None = Field(default=None, description="Replaces the notes")
     primary_contact: str | None = Field(
         default=None, description="Short name of an active user"
@@ -1485,6 +1496,7 @@ PERSON_FIELDS = [
     "address",
     "salutation",
     "address_on_first_name_terms",
+    "job_title",
     "notes",
 ]
 
@@ -1552,8 +1564,8 @@ def person_update(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Change the names, the salutation, the notes, the primary contact, the
-    organization and the groups of a person (short salutations are a
+    """Change the names, the salutation, the job title, the notes, the primary
+    contact, the organization and the groups of a person (short salutations are a
     warning, ``short-salutation``, so are names of other active people,
     ``duplicate-name``), remove email addresses, phone numbers
     and postal addresses, change their types (e.g. home for private ones)

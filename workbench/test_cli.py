@@ -1427,14 +1427,18 @@ planned_work:
             "--no-first-name-terms",
             "--notes",
             "Prefers phone calls",
+            "--job-title",
+            "Head of Communications",
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Sehr geehrter Herr Muster", result.output)
+        self.assertIn("Head of Communications", result.output)
         person.refresh_from_db()
         self.assertEqual(person.given_name, "Johann")
         self.assertEqual(person.address, "Herr")
         self.assertFalse(person.address_on_first_name_terms)
         self.assertEqual(person.notes, "Prefers phone calls")
+        self.assertEqual(person.job_title, "Head of Communications")
 
         result = self.wb("people", "update", person.pk, "--salutation", "Hallo")
         self.assertEqual(result.exit_code, 1)

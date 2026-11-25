@@ -635,6 +635,11 @@ def show_person(person_id, as_json):
     default=None,
     help="Whether to address the person on first-name terms.",
 )
+@click.option(
+    "--job-title",
+    help="E.g. `Head of Communications`, not part of the postal address; an"
+    " empty string removes it.",
+)
 @click.option("--notes", help="Replaces the notes; an empty string removes them.")
 @click.option(
     "--primary-contact", help="Short name.", shell_complete=complete_short_names
@@ -721,6 +726,7 @@ def update_person(
     address,
     salutation,
     address_on_first_name_terms,
+    job_title,
     notes,
     primary_contact,
     add_groups,
@@ -737,8 +743,8 @@ def update_person(
     ignore_warnings,
     as_json,
 ):
-    """Change the names, the salutation, the notes, the primary contact, the
-    organization and the groups of a person, remove email addresses, phone
+    """Change the names, the salutation, the job title, the notes, the primary
+    contact, the organization and the groups of a person, remove email addresses, phone
     numbers and postal addresses, change their types or archive them, like in the web interface. Projects, deals and invoices keep their customer and contact
     when moving a person to another organization."""
     data = {
@@ -749,6 +755,7 @@ def update_person(
             ("address", address),
             ("salutation", salutation),
             ("address_on_first_name_terms", address_on_first_name_terms),
+            ("job_title", job_title),
             ("notes", notes),
             ("primary_contact", primary_contact),
             ("add_groups", list(add_groups)),
@@ -1189,6 +1196,7 @@ def _echo_person(data):
                 link(organization.get("name", ""), organization.get("url")),
             ),
             ("Organization ID", organization.get("id")),
+            ("Job title", data.get("job_title")),
             ("Form of address", data["address"]),
             ("Salutation", data["salutation"]),
             (
