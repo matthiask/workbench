@@ -89,6 +89,7 @@ class PostalAddressOut(Schema):
     street: str
     house_number: str
     address_suffix: str
+    post_office_box: str
     postal_code: str
     city: str
     country: str = Field(description="ISO 3166-1 code, e.g. CH")
@@ -118,6 +119,7 @@ def _postal_address_out(person):
             "street",
             "house_number",
             "address_suffix",
+            "post_office_box",
             "postal_code",
             "city",
             "postal_address_override",
@@ -489,6 +491,7 @@ class OrganizationPostalAddressOut(Schema):
     street: str
     house_number: str
     address_suffix: str
+    post_office_box: str
     postal_code: str
     city: str
     country: str = Field(description="ISO 3166-1 code, e.g. CH")
@@ -848,6 +851,7 @@ class OrganizationPostalAddressIn(InputSchema):
     street: str | None = None
     house_number: str | None = None
     address_suffix: str | None = None
+    post_office_box: str | None = None
     postal_code: str | None = None
     city: str | None = None
     country: str | None = Field(default=None, description="ISO 3166-1 code, e.g. CH")
@@ -964,9 +968,17 @@ class PostalAddressIn(InputSchema):
     type: str | None = Field(
         default=None, max_length=40, description="E.g. Work or Home."
     )
-    street: str
+    street: str = Field(
+        default="", description="May be empty if there is a post office box."
+    )
     house_number: str = ""
-    address_suffix: str = Field(default="", description="E.g. a post office box.")
+    address_suffix: str = Field(
+        default="",
+        description="E.g. c/o, a department or a building; above the street.",
+    )
+    post_office_box: str = Field(
+        default="", description="E.g. Postfach or Postfach 686; below the street."
+    )
     postal_code: str
     city: str
     country: str = Field(default="CH", description="ISO 3166-1 alpha-2 code.")
@@ -1681,6 +1693,7 @@ class PostalAddressPatch(InputSchema):
     street: str | None = None
     house_number: str | None = None
     address_suffix: str | None = None
+    post_office_box: str | None = None
     postal_code: str | None = None
     city: str | None = None
     country: str | None = Field(default=None, description="ISO 3166-1 code, e.g. CH")

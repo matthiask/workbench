@@ -3,6 +3,7 @@ import re
 from urllib.parse import urlencode
 
 import phonenumbers
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, OuterRef, Q, Sum
 from django.db.models.functions import Lower
@@ -280,13 +281,18 @@ class PersonQuerySet(SearchQuerySet):
         return self.filter(in_group_q(group))
 
     def without_complete_postal_address(self):
-        """People without a postal address with street, postal code and city
-        (or one which is overridden completely), e.g. for mailings"""
+        """People without a postal address with street (or post office box),
+        postal code and city (or one which is overridden completely), e.g. for
+        mailings"""
         return self.exclude(
             Exists(
                 PostalAddress.objects.filter(person=OuterRef("pk")).filter(
                     ~Q(postal_address_override="")
-                    | (~Q(street="") & ~Q(postal_code="") & ~Q(city=""))
+                    | (
+                        (~Q(street="") | ~Q(post_office_box=""))
+                        & ~Q(postal_code="")
+                        & ~Q(city="")
+                    )
                 )
             )
         )
@@ -638,9 +644,20 @@ class PostalAddress(PersonDetail):
         verbose_name=_("person"),
         related_name="postaladdresses",
     )
-    street = models.CharField(_("street"), max_length=100)
+    street = models.CharField(_("street"), max_length=100, blank=True)
     house_number = models.CharField(_("house number"), max_length=20, blank=True)
-    address_suffix = models.CharField(_("address suffix"), max_length=100, blank=True)
+    address_suffix = models.CharField(
+        _("address suffix"),
+        max_length=100,
+        blank=True,
+        help_text=_("E.g. c/o, a department or a building; above the street."),
+    )
+    post_office_box = models.CharField(
+        _("post office box"),
+        max_length=100,
+        blank=True,
+        help_text=_("E.g. Postfach or Postfach 686; below the street."),
+    )
     postal_code = models.CharField(_("postal code"), max_length=20)
     city = models.CharField(_("city"), max_length=100)
     country = CountryField(_("country"), default="CH")
@@ -658,6 +675,28 @@ class PostalAddress(PersonDetail):
     def __str__(self):
         return self.postal_address
 
+    def clean(self):
+        super().clean()
+        if not self.street.strip() and not self.post_office_box.strip():
+            raise ValidationError({
+                "street": _("Enter a street or a post office box."),
+            })
+
+    def address_lines(self):
+        """The lines below the name, in the order of Swiss Post"""
+        return list(
+            filter(
+                None,
+                [
+                    self.address_suffix,
+                    " ".join(filter(None, (self.street, self.house_number))),
+                    self.post_office_box,
+                    " ".join(filter(None, (self.postal_code, self.city))),
+                    self.country.name if self.country.code != "CH" else "",
+                ],
+            )
+        )
+
     @property
     def postal_address(self):
         if self.postal_address_override:
@@ -669,10 +708,7 @@ class PostalAddress(PersonDetail):
             and not HOME_TYPE.search(self.type)
             else "",
             self.person.full_name,
-            " ".join(filter(None, (self.street, self.house_number))),
-            self.address_suffix,
-            " ".join(filter(None, (self.postal_code, self.city))),
-            self.country.name if self.country.code != "CH" else "",
+            *self.address_lines(),
         ]
         return "\n".join(filter(None, lines))
 
@@ -689,6 +725,7 @@ ADDRESS_FIELDS = (
     "street",
     "house_number",
     "address_suffix",
+    "post_office_box",
     "postal_code",
     "city",
     "country",
@@ -723,21 +760,7 @@ def organization_postal_addresses(organization, *, exclude_person=None):
                     for line in address.postal_address_override.splitlines()
                     if line.strip()
                 )
-                or ", ".join(
-                    filter(
-                        None,
-                        (
-                            " ".join(
-                                filter(None, (address.street, address.house_number))
-                            ),
-                            address.address_suffix,
-                            " ".join(filter(None, (address.postal_code, address.city))),
-                            address.country.name
-                            if address.country.code != "CH"
-                            else "",
-                        ),
-                    )
-                ),
+                or ", ".join(address.address_lines()),
                 "people": [],
                 "addresses": [],
             },

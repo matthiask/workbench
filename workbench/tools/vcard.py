@@ -42,7 +42,18 @@ def person_to_vcard(person):
             attr.value = vcard.Address(street=address.postal_address_override)
         else:
             attr.value = vcard.Address(
-                street=f"{address.street} {address.house_number}\n{address.address_suffix}",
+                street="\n".join(
+                    filter(
+                        None,
+                        [
+                            address.address_suffix,
+                            " ".join(
+                                filter(None, (address.street, address.house_number))
+                            ),
+                            address.post_office_box,
+                        ],
+                    )
+                ),
                 code=address.postal_code,
                 city=address.city,
                 country=address.country.name,

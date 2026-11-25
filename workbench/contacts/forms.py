@@ -838,6 +838,7 @@ class PostalAddressForm(forms.ModelForm):
             "street",
             "house_number",
             "address_suffix",
+            "post_office_box",
             "postal_code",
             "city",
             "country",

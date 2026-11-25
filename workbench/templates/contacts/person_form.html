@@ -67,17 +67,18 @@
           {{ form.id }}
           {% ff_errors form %}
           {% ff_field form.type %}
+          {% ff_field form.address_suffix %}
           <div class="row">
             <div class="col-8">{% ff_field form.street %}</div>
             <div class="col-4">{% ff_field form.house_number %}</div>
           </div>
-          {% ff_field form.address_suffix %}
+          {% ff_field form.post_office_box %}
           <div class="row">
             <div class="col-3">{% ff_field form.postal_code %}</div>
             <div class="col-6">{% ff_field form.city %}</div>
             <div class="col-3">{% ff_field form.country %}</div>
           </div>
-          {% ff_fields form exclude='type,street,house_number,address_suffix,postal_code,city,country' %}
+          {% ff_fields form exclude='type,street,house_number,address_suffix,post_office_box,postal_code,city,country' %}
         </div>
         {% endformset %}
         <a

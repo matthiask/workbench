@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 14:55+0100\n"
+"POT-Creation-Date: 2026-11-25 14:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1500,6 +1500,18 @@ msgid "address suffix"
 msgstr "Adresszusatz"
 
 #: workbench/contacts/models.py
+msgid "E.g. c/o, a department or a building; above the street."
+msgstr "Z.B. c/o, eine Abteilung oder ein Gebäude; über der Strasse."
+
+#: workbench/contacts/models.py
+msgid "post office box"
+msgstr "Postfach"
+
+#: workbench/contacts/models.py
+msgid "E.g. Postfach or Postfach 686; below the street."
+msgstr "Z.B. Postfach oder Postfach 686; unter der Strasse."
+
+#: workbench/contacts/models.py
 msgid "postal code"
 msgstr "PLZ"
 
@@ -1531,6 +1543,10 @@ msgstr "Postadresse"
 #: workbench/templates/contacts/person_form.html
 msgid "postal addresses"
 msgstr "Postadressen"
+
+#: workbench/contacts/models.py
+msgid "Enter a street or a post office box."
+msgstr "Gib eine Strasse oder ein Postfach an."
 
 #: workbench/contacts/urls.py
 #, python-format

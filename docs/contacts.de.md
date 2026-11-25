@@ -16,6 +16,11 @@ weglässt. <kbd>Ctrl-Shift-C</kbd> springt zu einer Person.
   «Privat» lässt die Organisation weg.
 - Die **Funktion** (z.B. Leiterin Kommunikation) gehört zur Person, nicht
   in die Adresse: Adressen werden ohne sie gedruckt.
+- Adressen werden in der Reihenfolge der Post gedruckt: der
+  **Adresszusatz** (c/o, eine Abteilung, ein Gebäude) über der Strasse,
+  das **Postfach** darunter. Eine Adresse mit Postfach braucht keine
+  Strasse. «Übersteuern» ersetzt die ganze Adresse, samt Organisation und
+  Name; verwende es nur, wenn die Felder die Adresse nicht abbilden.
 - Wenn eine Organisation umzieht, ändert «Ändern» bei einer ihrer
   Adressen sie für die ausgewählten Personen auf einmal.
 - Wenn jemand die Stelle wechselt und Projekte, Geschäfte oder Rechnungen

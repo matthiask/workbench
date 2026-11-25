@@ -231,7 +231,7 @@ class ContactsTest(TestCase):
         header, row = ([cell.value for cell in r] for r in sheet.iter_rows(max_row=2))
         header = [title.lower() for title in header]
         self.assertEqual(
-            header[:12],
+            header[:13],
             [
                 "primary contact",
                 "organization",
@@ -241,6 +241,7 @@ class ContactsTest(TestCase):
                 "street",
                 "house number",
                 "address suffix",
+                "post office box",
                 "postal code",
                 "city",
                 "country",
@@ -1782,6 +1783,47 @@ class GroupsTest(TestCase):
         self.assertEqual(
             {p["given_name"] for p in data["items"]}, {"Incomplete", "Missing"}
         )
+
+    def test_post_office_box(self):
+        """The address suffix (c/o, department) comes before the street, the
+        post office box after it, as Swiss Post wants it; a post office box
+        doesn't need a street"""
+        person = factories.PersonFactory.create(
+            given_name="Hans",
+            family_name="Muster",
+            organization=factories.OrganizationFactory.create(name="Beispiel AG"),
+        )
+        address = PostalAddress(
+            person=person,
+            street="Hauptstrasse",
+            house_number="1",
+            address_suffix="c/o Impact Hub",
+            post_office_box="Postfach 686",
+            postal_code="8000",
+            city="Zürich",
+        )
+        address.full_clean()
+        self.assertEqual(
+            address.postal_address,
+            "Beispiel AG\nHans Muster\nc/o Impact Hub\nHauptstrasse 1"
+            "\nPostfach 686\n8000 Zürich",
+        )
+
+        address.street = address.house_number = ""
+        address.full_clean()
+        address.save()
+        self.assertEqual(
+            address.postal_address,
+            "Beispiel AG\nHans Muster\nc/o Impact Hub\nPostfach 686\n8000 Zürich",
+        )
+        self.assertFalse(
+            Person.objects.filter(pk=person.pk).without_complete_postal_address()
+        )
+
+        address.post_office_box = ""
+        with self.assertRaises(ValidationError) as cm:
+            address.full_clean()
+        self.assertIn("street", cm.exception.message_dict)
 
     def test_member_counts(self):
         """People and organizations are counted independently of each other"""

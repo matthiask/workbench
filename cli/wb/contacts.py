@@ -394,7 +394,12 @@ def update_organization(
 )
 @click.option("--street")
 @click.option("--house-number")
-@click.option("--address-suffix")
+@click.option(
+    "--address-suffix", help="E.g. c/o, a department or a building; above the street."
+)
+@click.option(
+    "--post-office-box", help="E.g. Postfach or Postfach 686; below the street."
+)
 @click.option("--postal-code")
 @click.option("--city")
 @click.option("--country", help="ISO 3166-1 code, e.g. CH.")
@@ -415,6 +420,7 @@ def change_organization_address(
     street,
     house_number,
     address_suffix,
+    post_office_box,
     postal_code,
     city,
     country,
@@ -431,6 +437,7 @@ def change_organization_address(
             ("street", street),
             ("house_number", house_number),
             ("address_suffix", address_suffix),
+            ("post_office_box", post_office_box),
             ("postal_code", postal_code),
             ("city", city),
             ("country", country),
@@ -805,7 +812,12 @@ def update_person(
 @click.option("--type", "type_", help="E.g. Work or Home.")
 @click.option("--street")
 @click.option("--house-number")
-@click.option("--address-suffix")
+@click.option(
+    "--address-suffix", help="E.g. c/o, a department or a building; above the street."
+)
+@click.option(
+    "--post-office-box", help="E.g. Postfach or Postfach 686; below the street."
+)
 @click.option("--postal-code")
 @click.option("--city")
 @click.option("--country", help="ISO 3166-1 code, e.g. CH.")
@@ -822,6 +834,7 @@ def change_person_address(
     street,
     house_number,
     address_suffix,
+    post_office_box,
     postal_code,
     city,
     country,
@@ -839,6 +852,7 @@ def change_person_address(
             ("street", street),
             ("house_number", house_number),
             ("address_suffix", address_suffix),
+            ("post_office_box", post_office_box),
             ("postal_code", postal_code),
             ("city", city),
             ("country", country),

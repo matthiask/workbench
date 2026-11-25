@@ -1498,6 +1498,16 @@ planned_work:
         address.refresh_from_db()
         self.assertEqual((address.street, address.city), ("Neuweg", "Bern"))
 
+        # A post office box doesn't need a street
+        change = ("people", "change-address", person.pk, "--address", address.pk)
+        result = self.wb(*change, "--street", "")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Enter a street or a post office box.", result.output)
+        result = self.wb(*change, "--street", "", "--post-office-box", "Postfach 12")
+        self.assertEqual(result.exit_code, 0, result.output)
+        address.refresh_from_db()
+        self.assertEqual((address.street, address.post_office_box), ("", "Postfach 12"))
+
         result = self.wb(
             "organizations",
             "update",
