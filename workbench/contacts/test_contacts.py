@@ -454,6 +454,104 @@ class ContactsTest(TestCase):
             untouched.notes, "Rechnungen an: info@example.com\n\nDanke (Skype,bitte)"
         )
 
+    def test_address_suffix_migration(self):
+        """Post office boxes move out of the address suffix and the street,
+        job titles out of the address suffix; ambiguous values stay"""
+        migration = importlib.import_module(
+            "workbench.contacts.migrations.0030_move_job_titles_and_post_office_boxes"
+        )
+        person = factories.PersonFactory.create()
+        cases = [
+            # street, house number, suffix -> street, house number, suffix,
+            # post office box, job title
+            (
+                ("Musterweg", "110", "Postfach"),
+                ("Musterweg", "110", "", "Postfach", ""),
+            ),
+            (
+                ("Musterweg", "", "Postfach 686"),
+                ("Musterweg", "", "", "Postfach 686", ""),
+            ),
+            (
+                ("Musterweg", "1", "Leiterin Kommunikation"),
+                ("Musterweg", "1", "", "", "Leiterin Kommunikation"),
+            ),
+            # A second job title of the same person stays
+            (
+                ("Musterweg", "1", "PD Dr. med."),
+                ("Musterweg", "1", "PD Dr. med.", "", ""),
+            ),
+            (
+                ("Musterweg", "1", "c/o Beispiel GmbH"),
+                ("Musterweg", "1", "c/o Beispiel GmbH", "", ""),
+            ),
+            (
+                ("Musterweg", "1", "Kommunikation"),
+                ("Musterweg", "1", "Kommunikation", "", ""),
+            ),
+            (
+                ("Musterweg", "1", "Geschäftsführer\r\nPartner"),
+                ("Musterweg", "1", "Geschäftsführer\r\nPartner", "", ""),
+            ),
+            (("Postfach", "1335", ""), ("", "", "", "Postfach 1335", "")),
+            (("Postfach 573", "", ""), ("", "", "", "Postfach 573", "")),
+            (
+                ("Musterweg 20\r\nPostfach", "1118", ""),
+                ("Musterweg 20", "", "", "Postfach 1118", ""),
+            ),
+            (
+                ("Beispielgasse 1 / Postfach", "", ""),
+                ("Beispielgasse 1", "", "", "Postfach", ""),
+            ),
+            # Not the number of the box but the postal code again
+            (
+                ("Beispielplatz 61Postfach", "8000", ""),
+                ("Beispielplatz 61", "", "", "Postfach", ""),
+            ),
+            (
+                ("Beispielplatz 2Postfach", "", ""),
+                ("Beispielplatz 2", "", "", "Postfach", ""),
+            ),
+            (("-", "-", "Postfach"), ("", "", "", "Postfach", "")),
+        ]
+        addresses = [
+            person.postaladdresses.create(
+                street=street,
+                house_number=house_number,
+                address_suffix=suffix,
+                postal_code="8000",
+                city="Zürich",
+            )
+            for (street, house_number, suffix), _expected in cases
+        ]
+        # The job title of the first address with one wins
+        other = factories.PersonFactory.create(job_title="CEO")
+        kept = other.postaladdresses.create(
+            street="Musterweg",
+            address_suffix="Geschäftsführer",
+            postal_code="8000",
+            city="Zürich",
+        )
+        migration.forwards(apps, None)
+        for address, (_given, expected) in zip(addresses, cases, strict=True):
+            address.refresh_from_db()
+            self.assertEqual(
+                (
+                    address.street,
+                    address.house_number,
+                    address.address_suffix,
+                    address.post_office_box,
+                ),
+                expected[:4],
+            )
+        person.refresh_from_db()
+        self.assertEqual(person.job_title, "Leiterin Kommunikation")
+        kept.refresh_from_db()
+        other.refresh_from_db()
+        self.assertEqual(
+            (other.job_title, kept.address_suffix), ("CEO", "Geschäftsführer")
+        )
+
     def test_detail_types_migration(self):
         """Spellings and synonyms of the suggested types are cleaned up, the
         prefix of details copied from the organization stays"""
@@ -1797,7 +1895,7 @@ class GroupsTest(TestCase):
             person=person,
             street="Hauptstrasse",
             house_number="1",
-            address_suffix="c/o Impact Hub",
+            address_suffix="c/o Beispiel GmbH",
             post_office_box="Postfach 686",
             postal_code="8000",
             city="Zürich",
@@ -1805,7 +1903,7 @@ class GroupsTest(TestCase):
         address.full_clean()
         self.assertEqual(
             address.postal_address,
-            "Beispiel AG\nHans Muster\nc/o Impact Hub\nHauptstrasse 1"
+            "Beispiel AG\nHans Muster\nc/o Beispiel GmbH\nHauptstrasse 1"
             "\nPostfach 686\n8000 Zürich",
         )
 
@@ -1814,7 +1912,7 @@ class GroupsTest(TestCase):
         address.save()
         self.assertEqual(
             address.postal_address,
-            "Beispiel AG\nHans Muster\nc/o Impact Hub\nPostfach 686\n8000 Zürich",
+            "Beispiel AG\nHans Muster\nc/o Beispiel GmbH\nPostfach 686\n8000 Zürich",
         )
         self.assertFalse(
             Person.objects.filter(pk=person.pk).without_complete_postal_address()
