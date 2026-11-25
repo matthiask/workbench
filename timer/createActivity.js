@@ -25,7 +25,7 @@ export const CreateActivity = connect(({ zoom }) => ({ zoom }))(
         >
           + {gettext("Break")}
         </button>
-        <div className="activity-zoom btn-group btn-group-sm">
+        <div className="activity-zoom">
           <button
             className="btn btn-quiet"
             type="button"
@@ -36,6 +36,7 @@ export const CreateActivity = connect(({ zoom }) => ({ zoom }))(
           >
             −
           </button>
+          <span className="activity-zoom-level">{Math.round(zoom * 100)}%</span>
           <button
             className="btn btn-quiet"
             type="button"
