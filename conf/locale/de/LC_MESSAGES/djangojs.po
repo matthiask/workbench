@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 16:40+0100\n"
+"POT-Creation-Date: 2026-11-25 16:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,6 +106,18 @@ msgstr "Aktivität"
 #: conf/strings.js planning/index.js
 msgid "Add planned work"
 msgstr "Geplante Arbeit hinzufügen"
+
+#: conf/strings.js timer/createActivity.js
+msgid "Arrange all activities in rows"
+msgstr "Alle Aktivitäten in Reihen anordnen"
+
+#: conf/strings.js timer/createActivity.js
+msgid "Arrange the selected activities in rows"
+msgstr "Die ausgewählten Aktivitäten in Reihen anordnen"
+
+#: conf/strings.js timer/createActivity.js
+msgid "Arrange"
+msgstr "Anordnen"
 
 #: conf/strings.js timer/breakActivity.js timer/createActivity.js
 msgid "Break"
@@ -218,6 +230,10 @@ msgstr "Entfernen"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
+#: conf/strings.js timer/createActivity.js
+msgid "Restore the positions from before arranging"
+msgstr "Die Positionen von vor dem Anordnen wiederherstellen"
+
 #: conf/strings.js timer/breakActivity.js
 msgid "Save break"
 msgstr "Pause speichern"
@@ -294,6 +310,10 @@ msgstr "Konnte Logbucheintrag nicht abschicken"
 #: conf/strings.js timer/actions.js
 msgid "Unable to submit the logbook entry. Your session may have expired, please reload the page."
 msgstr "Konnte Logbucheintrag nicht abschicken. Möglicherweise ist deine Sitzung abgelaufen, bitte lade die Seite neu."
+
+#: conf/strings.js timer/createActivity.js
+msgid "Undo"
+msgstr "Rückgängig"
 
 #: conf/strings.js timer/i18n.js
 msgid "What outcome do you seek?"

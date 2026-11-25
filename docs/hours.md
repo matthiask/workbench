@@ -145,3 +145,7 @@ smaller or larger in this browser.
 To move several activities at once, drag a rectangle over them on an empty
 spot (or Shift-click their titles) and drag one of them. A click on an
 empty spot or Escape clears the selection.
+
+"Arrange" lays out the selected activities (or all of them) in rows which
+fit the window. "Undo" restores the previous positions until one of the
+activities moves.

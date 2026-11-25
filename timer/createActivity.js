@@ -5,7 +5,7 @@ import { gettext } from "./i18n.js"
 import { ZOOM_LEVELS } from "./reducers.js"
 
 export const CreateActivity = connect(({ zoom }) => ({ zoom }))(
-  ({ dispatch, zoom }) => {
+  ({ arrange, canUndo, hasSelection, dispatch, zoom }) => {
     const index = ZOOM_LEVELS.indexOf(zoom)
     const setZoom = (offset) =>
       dispatch({ type: "ZOOM", zoom: ZOOM_LEVELS[index + offset] })
@@ -24,6 +24,20 @@ export const CreateActivity = connect(({ zoom }) => ({ zoom }))(
           onClick={() => createBreak(dispatch)}
         >
           + {gettext("Break")}
+        </button>
+        <button
+          className="btn btn-quiet"
+          type="button"
+          onClick={arrange}
+          title={
+            canUndo
+              ? gettext("Restore the positions from before arranging")
+              : hasSelection
+                ? gettext("Arrange the selected activities in rows")
+                : gettext("Arrange all activities in rows")
+          }
+        >
+          {canUndo ? gettext("Undo") : gettext("Arrange")}
         </button>
         <div className="activity-zoom">
           <button

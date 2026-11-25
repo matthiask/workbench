@@ -29,6 +29,14 @@ function activities(state, action) {
           return [id, { ...activity, left: x + action.dx, top: y + action.dy }]
         }),
       )
+    case "PLACE_ACTIVITIES":
+      return Object.fromEntries(
+        Object.entries(state).map(([id, activity]) =>
+          action.positions[id]
+            ? [id, { ...activity, ...action.positions[id] }]
+            : [id, activity],
+        ),
+      )
     case "START":
     case "STOP": {
       if (!action.current || !state[action.current.id]) return state

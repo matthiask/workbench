@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { connect } from "react-redux"
 
 import { Activity } from "./activity.js"
@@ -6,7 +6,13 @@ import { BreakActivity } from "./breakActivity.js"
 import { CreateActivity } from "./createActivity.js"
 import { gettext } from "./i18n.js"
 import { SelectionContext } from "./movable.js"
-import { areaBox, prettyDuration, timestamp } from "./utils.js"
+import {
+  areaBox,
+  arrange,
+  position,
+  prettyDuration,
+  timestamp,
+} from "./utils.js"
 
 const hours = JSON.parse(document.getElementById("user-hours").textContent)
 
@@ -97,11 +103,77 @@ export const Timer = connect(({ activities, current, zoom }) => ({
   activities,
   current,
   zoom,
-}))(({ activities, current, zoom }) => {
+}))(({ activities, current, zoom, dispatch }) => {
   const areaRef = useRef()
   const [selection, setSelection] = useState(() => new Set())
   const [drag, setDrag] = useState(null)
   const rectangle = useRectangleSelection(areaRef, setSelection)
+
+  // Arrange the selected activities (or all) in rows. Undo is offered until
+  // one of them moves.
+  // Chrome keeps the page's scrollable size when only the transforms of the
+  // activities change (e.g. arranging them), so lay out the area again
+  const positions = Object.values(activities)
+    .map((a) => `${a.id}:${a.left}:${a.top}`)
+    .join()
+  useLayoutEffect(() => {
+    const area = areaRef.current
+    if (!area || !positions) return
+    area.style.minWidth = "0px"
+    void area.offsetWidth
+    area.style.minWidth = ""
+  }, [positions])
+
+  const [arranged, setArranged] = useState(null)
+  const byId = activities
+  const arrangeActivities = () => {
+    const area = areaRef.current
+    const nodes = [...area.querySelectorAll("[data-activity]")].filter(
+      (el) => !selection.size || selection.has(el.dataset.activity),
+    )
+    if (!nodes.length) return
+    const items = nodes.map((el) => {
+      const box = areaBox(area, el)
+      return {
+        id: el.dataset.activity,
+        left: box.left,
+        top: box.top,
+        width: box.right - box.left,
+        height: box.bottom - box.top,
+      }
+    })
+    const start = selection.size
+      ? {
+          left: Math.min(...items.map((i) => i.left)),
+          top: Math.min(...items.map((i) => i.top)),
+        }
+      : { left: 20, top: 20 }
+    // Left of the buttons, but with room for at least one activity
+    const buttons = document.querySelector(".create-activity")
+    const right = Math.max(
+      buttons ? areaBox(area, buttons).left - 10 : area.offsetWidth,
+      start.left + Math.max(...items.map((i) => i.width)),
+    )
+    const after = arrange(items, { ...start, right })
+    const before = Object.fromEntries(
+      items.map(({ id }) => {
+        const { x, y } = position(byId[id])
+        return [id, { left: x, top: y }]
+      }),
+    )
+    dispatch({ type: "PLACE_ACTIVITIES", positions: after })
+    setArranged({ before, after })
+  }
+  const canUndo =
+    arranged &&
+    Object.entries(arranged.after).every(([id, place]) => {
+      const p = byId[id] && position(byId[id])
+      return p && p.x === place.left && p.y === place.top
+    })
+  const undoArrange = () => {
+    dispatch({ type: "PLACE_ACTIVITIES", positions: arranged.before })
+    setArranged(null)
+  }
 
   // Update each second if any activity is current
   const [, updateState] = useState()
@@ -136,7 +208,11 @@ export const Timer = connect(({ activities, current, zoom }) => ({
 
   return (
     <>
-      <CreateActivity />
+      <CreateActivity
+        arrange={canUndo ? undoArrange : arrangeActivities}
+        canUndo={canUndo}
+        hasSelection={selection.size > 0}
+      />
       <div className="total-seconds">
         <span>
           <span className="total-seconds-label">{gettext("Today")}</span>

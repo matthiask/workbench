@@ -29,13 +29,9 @@ export function areaBox(area, el) {
 
 // Where a new activity of `size` goes within `visible`: the first spot in
 // reading order which doesn't touch the `occupied` rectangles, or the one
-// overlapping them least if there's no room.
-export function freeSpot(
-  visible,
-  occupied,
-  size,
-  { step = 10, gap = 10 } = {},
-) {
+// overlapping them least if there's no room. Spots are on the grid of
+// `step`, so the gap to others is at most one step.
+export function freeSpot(visible, occupied, size, { step = 10, gap = 1 } = {}) {
   const up = (value) => step * Math.ceil(value / step)
   const range = (from, to) => {
     const values = []
@@ -99,6 +95,29 @@ export function newActivityPosition(size) {
     ),
   ].map((el) => toArea(el.getBoundingClientRect()))
   return freeSpot(visible, occupied, size)
+}
+
+// Lays out activities in rows from `left` and `top`, wrapping before
+// `right`, in the reading order of their current positions. Each starts on
+// the first line of the grid of `step` after the previous one ends.
+export function arrange(items, { left, top, right, gap = 1, step = 10 }) {
+  const up = (value) => step * Math.ceil(value / step)
+  const sorted = [...items].sort((a, b) => a.top - b.top || a.left - b.left)
+  const positions = {}
+  let x = up(left)
+  let y = up(top)
+  let rowHeight = 0
+  for (const item of sorted) {
+    if (x > up(left) && x + item.width > right) {
+      x = up(left)
+      y = up(y + rowHeight + gap)
+      rowHeight = 0
+    }
+    positions[item.id] = { left: x, top: y }
+    x = up(x + item.width + gap)
+    rowHeight = Math.max(rowHeight, item.height)
+  }
+  return positions
 }
 
 // Activities can be dragged within the visible area or the area other

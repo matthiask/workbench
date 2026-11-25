@@ -158,3 +158,7 @@ Um mehrere Aktivitäten auf einmal zu verschieben, ziehst du auf einer
 leeren Stelle ein Rechteck über sie (oder klickst mit gedrückter
 Umschalttaste auf ihre Titel) und ziehst dann eine davon. Ein Klick auf
 eine leere Stelle oder Escape hebt die Auswahl auf.
+
+«Anordnen» legt die ausgewählten Aktivitäten (oder alle) in Reihen aus,
+die ins Fenster passen. «Rückgängig» stellt die vorherigen Positionen
+wieder her, bis eine der Aktivitäten verschoben wird.

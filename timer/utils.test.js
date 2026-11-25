@@ -1,7 +1,13 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 
-import { colorClass, freeSpot, position, prettyDuration } from "./utils.js"
+import {
+  arrange,
+  colorClass,
+  freeSpot,
+  position,
+  prettyDuration,
+} from "./utils.js"
 
 test("positions snap to the grid and aren't limited to the window", () => {
   assert.deepEqual(position({ left: 1704, top: 2399 }), { x: 1700, y: 2390 })
@@ -32,7 +38,7 @@ test("new activities go to the first free spot", () => {
   assert.deepEqual(freeSpot(visible, [], size), { left: 0, top: 0 })
   // Next to an activity in the top left corner, with a gap
   const first = { left: 20, top: 20, right: 306, bottom: 270 }
-  assert.deepEqual(freeSpot(visible, [first], size), { left: 320, top: 0 })
+  assert.deepEqual(freeSpot(visible, [first], size), { left: 310, top: 0 })
   // Below the first row if it's full
   const row = [0, 310, 620].map((left) => ({
     left,
@@ -55,5 +61,27 @@ test("a visible area smaller than an activity still has a spot", () => {
   assert.deepEqual(freeSpot(visible, [], { width: 286, height: 250 }), {
     left: 20,
     top: 10,
+  })
+})
+
+test("arranging lays out activities in rows in reading order", () => {
+  const items = [
+    { id: "c", left: 900, top: 500, width: 286, height: 170 },
+    { id: "a", left: 50, top: 30, width: 286, height: 250 },
+    { id: "b", left: 1700, top: 40, width: 286, height: 250 },
+  ]
+  assert.deepEqual(arrange(items, { left: 20, top: 20, right: 700 }), {
+    a: { left: 20, top: 20 },
+    b: { left: 310, top: 20 },
+    c: { left: 20, top: 280 },
+  })
+  // The next row starts on the first line of the grid after the tallest
+  const tall = items.map((i) => ({ ...i, height: 251 }))
+  assert.equal(arrange(tall, { left: 20, top: 20, right: 700 }).c.top, 280)
+  // At least one per row, even if the row is too narrow
+  assert.deepEqual(arrange(items, { left: 0, top: 0, right: 100 }), {
+    a: { left: 0, top: 0 },
+    b: { left: 0, top: 260 },
+    c: { left: 0, top: 520 },
   })
 })

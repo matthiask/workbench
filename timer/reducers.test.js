@@ -51,3 +51,18 @@ test("removing the running activity stops the timer", () => {
   assert.equal(after.current, null)
   assert.deepEqual(Object.keys(after.activities), ["b"])
 })
+
+test("placing activities sets the given positions", () => {
+  const before = state([
+    { id: "a", left: 23, top: 41 },
+    { id: "b", left: 300, top: 40 },
+  ])
+  const after = reducer(before, {
+    type: "PLACE_ACTIVITIES",
+    positions: { a: { left: 20, top: 20 }, removed: { left: 0, top: 0 } },
+  })
+  assert.deepEqual(after.activities, {
+    a: { id: "a", left: 20, top: 20 },
+    b: { id: "b", left: 300, top: 40 },
+  })
+})
