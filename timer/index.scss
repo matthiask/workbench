@@ -191,6 +191,13 @@ div[role="main"] {
   background-color: var(--bs-tertiary-bg) !important;
 }
 
+// react-select's selected option has white text on its primary color, keep
+// the text readable on our own background
+.select__option--is-selected {
+  background-color: var(--bs-primary-bg-subtle) !important;
+  color: var(--bs-body-color) !important;
+}
+
 .form-group textarea {
   height: 78px;
 }
