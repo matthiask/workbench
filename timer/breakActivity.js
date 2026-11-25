@@ -20,157 +20,157 @@ const createUpdater =
   (fields) =>
     dispatch({ type: "UPDATE_ACTIVITY", id, fields })
 
-export const BreakActivity = connect((state) => ({ current: state.current }))(
-  ({ activity, current, dispatch, usedColors }) => {
-    const dispatchUpdate = createUpdater({ id: activity.id, dispatch })
-    const [showSettings, setShowSettings] = useState(false)
-    const [, updateState] = useState()
-    const ref = useRef()
-    const [bounds, setBounds] = useState()
+export const BreakActivity = connect((state) => ({
+  current: state.current,
+  zoom: state.zoom,
+}))(({ activity, current, dispatch, usedColors, zoom }) => {
+  const dispatchUpdate = createUpdater({ id: activity.id, dispatch })
+  const [showSettings, setShowSettings] = useState(false)
+  const [, updateState] = useState()
+  const ref = useRef()
+  const [bounds, setBounds] = useState()
 
-    const isRunning = !!activity.startedAt
+  const isRunning = !!activity.startedAt
 
-    // Update clock each second while running
-    // Note that this is slightly inconsistent. If we could reuse the "current"
-    // logic in timer.js by marking the break as active it would look nicer,
-    // but the auto-save effect below needs both the *previous* current (to know
-    // whether this break was running before) and the *latest* startedAt (to
-    // reflect any elapsed-time overwrites). Satisfying both at once requires
-    // extra refs and makes the logic harder to follow than keeping it separate.
-    useEffect(() => {
-      if (!isRunning) return
-      const interval = setInterval(() => updateState({}), 1000)
-      return () => clearInterval(interval)
-    }, [isRunning])
+  // Update clock each second while running
+  // Note that this is slightly inconsistent. If we could reuse the "current"
+  // logic in timer.js by marking the break as active it would look nicer,
+  // but the auto-save effect below needs both the *previous* current (to know
+  // whether this break was running before) and the *latest* startedAt (to
+  // reflect any elapsed-time overwrites). Satisfying both at once requires
+  // extra refs and makes the logic harder to follow than keeping it separate.
+  useEffect(() => {
+    if (!isRunning) return
+    const interval = setInterval(() => updateState({}), 1000)
+    return () => clearInterval(interval)
+  }, [isRunning])
 
-    // Auto-save when another activity starts
-    const activityRef = useRef(activity)
-    activityRef.current = activity
-    const mountedRef = useRef(false)
-    useEffect(() => {
-      if (!mountedRef.current) {
-        mountedRef.current = true
-        return
-      }
-      const act = activityRef.current
-      if (current?.id && act.startedAt) {
-        saveBreak(dispatch, act, { reload: false })
-      }
-    }, [current?.id, dispatch])
+  // Auto-save when another activity starts
+  const activityRef = useRef(activity)
+  activityRef.current = activity
+  const mountedRef = useRef(false)
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      return
+    }
+    const act = activityRef.current
+    if (current?.id && act.startedAt) {
+      saveBreak(dispatch, act, { reload: false })
+    }
+  }, [current?.id, dispatch])
 
-    const elapsed = isRunning ? Math.ceil(timestamp() - activity.startedAt) : 0
-    const title = activity.title || gettext("Break")
+  const elapsed = isRunning ? Math.ceil(timestamp() - activity.startedAt) : 0
+  const title = activity.title || gettext("Break")
 
-    return (
-      <Draggable
-        handle=".js-drag-handle"
-        bounds={bounds}
-        onStart={() => setBounds(dragBounds(ref.current))}
-        defaultPosition={position(activity)}
-        grid={[10, 10]}
-        onStop={(_e, data) => dispatchUpdate({ left: data.x, top: data.y })}
-        nodeRef={ref}
+  return (
+    <Draggable
+      handle=".js-drag-handle"
+      bounds={bounds}
+      onStart={() => setBounds(dragBounds(ref.current))}
+      defaultPosition={position(activity)}
+      grid={[10, 10]}
+      scale={zoom}
+      onStop={(_e, data) => dispatchUpdate({ left: data.x, top: data.y })}
+      nodeRef={ref}
+    >
+      <div
+        className={`activity is-break ${isRunning ? "is-active" : ""} ${
+          hasColor(activity.color) ? "has-color" : ""
+        } card`}
+        style={colorStyle(activity.color)}
+        ref={ref}
       >
         <div
-          className={`activity is-break ${isRunning ? "is-active" : ""} ${
-            hasColor(activity.color) ? "has-color" : ""
-          } card`}
-          style={colorStyle(activity.color)}
-          ref={ref}
+          className="activity-title text-truncate js-drag-handle"
+          title={title}
         >
-          <div
-            className="activity-title text-truncate js-drag-handle"
-            title={title}
-          >
-            {title}
+          {title}
+        </div>
+        <div className="activity-body">
+          <div className="form-group">
+            <textarea
+              className="form-control"
+              rows="2"
+              value={activity.description}
+              onChange={(e) => dispatchUpdate({ description: e.target.value })}
+              placeholder={gettext("Description")}
+            />
           </div>
-          <div className="activity-body">
-            <div className="form-group">
-              <textarea
-                className="form-control"
-                rows="2"
-                value={activity.description}
-                onChange={(e) =>
-                  dispatchUpdate({ description: e.target.value })
-                }
-                placeholder={gettext("Description")}
-              />
-            </div>
-            <div className="d-flex align-items-center justify-content-between">
-              {isRunning ? (
-                <button
-                  type="button"
-                  className="activity-duration ps-2"
-                  onClick={() => overwriteBreakElapsed(dispatch, activity)}
-                  style={{ cursor: "cell" }}
-                >
-                  {prettyDuration(elapsed)}
-                </button>
-              ) : (
-                <span className="activity-duration ps-2">—</span>
-              )}
-              <div>
-                <button
-                  className={`btn btn-quiet btn-sm btn-icon ${showSettings ? "active" : ""}`}
-                  type="button"
-                  onClick={() => setShowSettings(!showSettings)}
-                  title={gettext("Settings")}
-                >
-                  {icons.cog}
-                </button>
-                {!isRunning && (
-                  <button
-                    className="btn btn-sm btn-icon ms-1 btn-quiet"
-                    type="button"
-                    onClick={() => {
-                      dispatch({ type: "STOP", current })
-                      dispatchUpdate({ startedAt: timestamp() })
-                    }}
-                    title={gettext("Start break")}
-                  >
-                    {icons.play}
-                  </button>
-                )}
+          <div className="d-flex align-items-center justify-content-between">
+            {isRunning ? (
+              <button
+                type="button"
+                className="activity-duration ps-2"
+                onClick={() => overwriteBreakElapsed(dispatch, activity)}
+                style={{ cursor: "cell" }}
+              >
+                {prettyDuration(elapsed)}
+              </button>
+            ) : (
+              <span className="activity-duration ps-2">—</span>
+            )}
+            <div>
+              <button
+                className={`btn btn-quiet btn-sm btn-icon ${showSettings ? "active" : ""}`}
+                type="button"
+                onClick={() => setShowSettings(!showSettings)}
+                title={gettext("Settings")}
+              >
+                {icons.cog}
+              </button>
+              {!isRunning && (
                 <button
                   className="btn btn-sm btn-icon ms-1 btn-quiet"
                   type="button"
-                  onClick={() => openBreakForm(dispatch, activity)}
-                  title={gettext("Open break form")}
+                  onClick={() => {
+                    dispatch({ type: "STOP", current })
+                    dispatchUpdate({ startedAt: timestamp() })
+                  }}
+                  title={gettext("Start break")}
                 >
-                  {icons.pen}
+                  {icons.play}
                 </button>
-                <button
-                  className={`btn btn-sm btn-icon ms-1 ${
-                    isRunning ? "btn-success" : "btn-quiet"
-                  }`}
-                  type="button"
-                  disabled={!isRunning}
-                  onClick={() => saveBreak(dispatch, activity)}
-                  title={gettext("Save break")}
-                >
-                  {icons.save}
-                </button>
-              </div>
+              )}
+              <button
+                className="btn btn-sm btn-icon ms-1 btn-quiet"
+                type="button"
+                onClick={() => openBreakForm(dispatch, activity)}
+                title={gettext("Open break form")}
+              >
+                {icons.pen}
+              </button>
+              <button
+                className={`btn btn-sm btn-icon ms-1 ${
+                  isRunning ? "btn-success" : "btn-quiet"
+                }`}
+                type="button"
+                disabled={!isRunning}
+                onClick={() => saveBreak(dispatch, activity)}
+                title={gettext("Save break")}
+              >
+                {icons.save}
+              </button>
             </div>
           </div>
-          {showSettings ? (
-            <ActivitySettings
-              title={activity.title}
-              color={activity.color}
-              otherColors={usedColors || []}
-              dispatchUpdate={dispatchUpdate}
-              closeSettings={() => setShowSettings(false)}
-              removeActivity={() =>
-                dispatch({ type: "REMOVE_ACTIVITY", id: activity.id })
-              }
-              resetActivity={() => {
-                dispatchUpdate({ startedAt: null })
-                setShowSettings(false)
-              }}
-            />
-          ) : null}
         </div>
-      </Draggable>
-    )
-  },
-)
+        {showSettings ? (
+          <ActivitySettings
+            title={activity.title}
+            color={activity.color}
+            otherColors={usedColors || []}
+            dispatchUpdate={dispatchUpdate}
+            closeSettings={() => setShowSettings(false)}
+            removeActivity={() =>
+              dispatch({ type: "REMOVE_ACTIVITY", id: activity.id })
+            }
+            resetActivity={() => {
+              dispatchUpdate({ startedAt: null })
+              setShowSettings(false)
+            }}
+          />
+        ) : null}
+      </div>
+    </Draggable>
+  )
+})

@@ -35,7 +35,8 @@ export const Activity = connect((state, ownProps) => ({
   activity: ownProps.activity,
   current: state.current,
   projects: state.projects,
-}))(({ activity, current, projects, dispatch, usedColors }) => {
+  zoom: state.zoom,
+}))(({ activity, current, projects, dispatch, usedColors, zoom }) => {
   const dispatchUpdate = createUpdater({ id: activity.id, dispatch })
 
   // State vars
@@ -69,6 +70,7 @@ export const Activity = connect((state, ownProps) => ({
       onStart={() => setBounds(dragBounds(ref.current))}
       defaultPosition={position(activity)}
       grid={[10, 10]}
+      scale={zoom}
       onStop={(_e, data) =>
         dispatchUpdate({
           left: data.x,

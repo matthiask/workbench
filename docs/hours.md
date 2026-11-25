@@ -137,3 +137,7 @@ Costs which have been invoiced keep their amounts.
 
 The timer (in the menu with your name) still exists, but timestamps are
 the recommended way to keep track of your work.
+
+Its activities stay where you put them. On a smaller screen the page
+scrolls, and the − and + buttons below "+ Break" make the activities
+smaller or larger in this browser.

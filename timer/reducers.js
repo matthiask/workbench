@@ -83,11 +83,27 @@ function projects(state, action) {
   }
 }
 
+// Size of the activities, chosen per browser (e.g. smaller on a laptop)
+export const ZOOM_LEVELS = [0.6, 0.7, 0.8, 0.9, 1]
+
+function zoom(state, action) {
+  if (typeof state === "undefined") {
+    state = 1
+  }
+  switch (action.type) {
+    case "ZOOM":
+      return ZOOM_LEVELS.includes(action.zoom) ? action.zoom : state
+    default:
+      return state
+  }
+}
+
 const reducer = combineReducers({
   activities,
   current,
   modalActivity,
   projects,
+  zoom,
 })
 
 export default reducer

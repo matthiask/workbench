@@ -9,10 +9,11 @@ import { prettyDuration, timestamp } from "./utils.js"
 
 const hours = JSON.parse(document.getElementById("user-hours").textContent)
 
-export const Timer = connect(({ activities, current }) => ({
+export const Timer = connect(({ activities, current, zoom }) => ({
   activities,
   current,
-}))(({ activities, current }) => {
+  zoom,
+}))(({ activities, current, zoom }) => {
   // Update each second if any activity is current
   const [, updateState] = useState()
   useEffect(() => {
@@ -61,7 +62,7 @@ export const Timer = connect(({ activities, current }) => ({
           {prettyDuration(totalSeconds)}
         </span>
       </div>
-      <div className="activity-list">
+      <div className="activity-list" style={{ zoom }}>
         {activities.map((activity) =>
           activity.type === "break" ? (
             <BreakActivity

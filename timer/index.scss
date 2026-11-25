@@ -228,3 +228,15 @@ div[role="main"] {
   backdrop-filter: blur(3px);
   z-index: 1010;
 }
+
+.activity-zoom {
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: var(--wb-surface);
+
+  .btn,
+  .btn:disabled {
+    flex: 1;
+    border-color: transparent;
+  }
+}

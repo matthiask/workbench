@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 08:46+0100\n"
+"POT-Creation-Date: 2026-11-25 16:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -146,6 +146,10 @@ msgstr "KW %s"
 msgid "KW %s–%s"
 msgstr "KW %s–%s"
 
+#: conf/strings.js timer/createActivity.js
+msgid "Larger"
+msgstr "Grösser"
+
 #: conf/strings.js planning/index.js
 msgid "Logged hours"
 msgstr "Erfasste Stunden"
@@ -241,6 +245,10 @@ msgstr "Sende ins Logbuch"
 #: conf/strings.js timer/activity.js timer/breakActivity.js
 msgid "Settings"
 msgstr "Einstellungen"
+
+#: conf/strings.js timer/createActivity.js
+msgid "Smaller"
+msgstr "Kleiner"
 
 #: conf/strings.js timer/breakActivity.js
 msgid "Start break"

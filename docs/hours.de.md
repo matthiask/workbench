@@ -149,3 +149,7 @@ Verrechnete Kosten behalten ihre Beträge.
 
 Der Timer (im Menü mit deinem Namen) gibt es noch, empfohlen sind aber
 Zeitmarken.
+
+Seine Aktivitäten bleiben, wo du sie hinschiebst. Auf einem kleineren
+Bildschirm scrollt die Seite, und die Knöpfe − und + unter «+ Pause»
+machen die Aktivitäten in diesem Browser kleiner oder grösser.
