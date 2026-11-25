@@ -53,6 +53,14 @@ company who knows them) and their postal address. Point out members without
 a postal address and members whose primary contact isn't active anymore
 (`wb users search --include-inactive`).
 
+Before exporting, check the addresses of the group:
+
+    wb people search --group "<group>" --missing-postal-address --csv
+
+lists members without a complete address and those whose address doesn't
+print well (line breaks, placeholders, an address in the organization's
+name, ...). Fix them with the workbench-address-book skill (step 4).
+
 ## 3. Find who is missing
 
 People who should probably be on the list:

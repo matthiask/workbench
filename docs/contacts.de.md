@@ -39,9 +39,8 @@ Feldern, Platzhalter wie «-» statt einer Strasse, eine ganze Adresse im
 Namen der Organisation, ein Adresszusatz, der die Organisation
 wiederholt); prüfe die Gruppe vor einem Versand. Die nach einer Gruppe
 gefilterte Personenliste exportiert die Personen als XLSX oder vCards.
-Das XLSX
-enthält die vollständige Postadresse in einer Zelle, wie sie auf
-Rechnungen steht, bereit für Briefe und Etiketten; die einzelnen
+Das XLSX enthält die vollständige Postadresse in einer Zelle, wie sie
+auf Rechnungen steht, bereit für Briefe und Etiketten; die einzelnen
 Adressfelder folgen zum Sortieren und Filtern.
 
 ## Duplikate, Archivieren, Löschen

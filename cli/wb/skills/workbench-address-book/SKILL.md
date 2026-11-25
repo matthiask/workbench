@@ -172,6 +172,36 @@ get their organization's current address after the user agrees, with `wb
 people add-details` (see the workbench-contact skill for the format). Never
 change addresses you only guessed.
 
+The same search also lists complete addresses which don't print well. An
+address prints as: organization, name, address suffix, street and number,
+post office box, postal code and city, country (outside Switzerland). Look
+at each with `wb people show` and propose a fix:
+
+- **Job titles in the address suffix** (Leiterin Kommunikation, CEO, Dr.
+  med.) belong to the person: `wb people update <person_id> --job-title
+  "..."`, then empty the suffix with `wb people change-address <person_id>
+  --address <address_id> --address-suffix "" --dry-run`. Departments, c/o
+  and buildings stay in the suffix.
+- **Post office boxes** in the suffix or the street (`Musterweg 1\nPostfach`,
+  a box number in the house number) go into `--post-office-box "Postfach
+  123"`; an address with a post office box needs no street.
+- **Placeholders** (`-`, `.`, `X`) instead of a street or house number are
+  emptied.
+- **Line breaks** in a field: split the value into the right fields.
+- **A whole address in the organization's name** (name, street, postal
+  code and city on separate lines): the name keeps only the organization's
+  lines (`wb organizations update <organization_id> --name "..."
+  --dry-run`), check that its people have the address. Names over several
+  lines for an organization's hierarchy (Kanton Zürich / Baudirektion /
+  Amt für ...) are fine.
+- **An address suffix repeating the organization** loses the repetition.
+- **Swiss postal codes** have four digits (no `CH -` prefix, no stray
+  characters); foreign addresses need their country.
+- **Overrides** replace the whole address including organization and name,
+  so they hide renamed organizations and new names. Replace them with the
+  fields where these can express the address (`--override ""` together
+  with the fields), keep them only for addresses which don't fit.
+
 ## 5. Archiving
 
     wb organizations search --without-active-people
