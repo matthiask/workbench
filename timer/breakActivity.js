@@ -8,6 +8,7 @@ import { gettext } from "./i18n.js"
 import * as icons from "./icons.js"
 import {
   colorStyle,
+  dragBounds,
   hasColor,
   position,
   prettyDuration,
@@ -25,6 +26,7 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
     const [showSettings, setShowSettings] = useState(false)
     const [, updateState] = useState()
     const ref = useRef()
+    const [bounds, setBounds] = useState()
 
     const isRunning = !!activity.startedAt
 
@@ -62,7 +64,8 @@ export const BreakActivity = connect((state) => ({ current: state.current }))(
     return (
       <Draggable
         handle=".js-drag-handle"
-        bounds={{ left: 0, top: 0 }}
+        bounds={bounds}
+        onStart={() => setBounds(dragBounds(ref.current))}
         defaultPosition={position(activity)}
         grid={[10, 10]}
         onStop={(_e, data) => dispatchUpdate({ left: data.x, top: data.y })}
