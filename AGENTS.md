@@ -9,6 +9,10 @@ Use `./runtests.sh` to run the full test suite. Accepts an optional module argum
 
 The tests need the local PostgreSQL container: `podman start local_postgres_1`.
 
+The timer's JavaScript (reducers, store, helpers) has its own tests,
+`timer/*.test.js` next to the code: `yarn test` (`node --test`, no build).
+Components aren't tested there; check them in a browser (see Screenshots).
+
 # Screenshots
 
 The dev server (`:8000`) needs a login. Sessions are signed cookies, so log in

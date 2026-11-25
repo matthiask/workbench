@@ -1,6 +1,6 @@
 import { compose, createStore } from "redux"
 import persistState from "redux-localstorage"
-import reducer from "./reducers"
+import reducer from "./reducers.js"
 
 const VERSION = 4
 
@@ -8,7 +8,7 @@ const serialize = (data) => {
   return JSON.stringify({ ...data, _v: VERSION })
 }
 
-const deserialize = (blob) => {
+export const deserialize = (blob) => {
   const deserializeRaw = () => {
     const parsed = JSON.parse(blob)
     if (!parsed?._v) return {}

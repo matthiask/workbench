@@ -27,5 +27,8 @@
   },
   "prettier": {
     "semi": false
+  },
+  "scripts": {
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test 'timer/**/*.test.js'"
   }
 }
