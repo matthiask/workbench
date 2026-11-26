@@ -1,7 +1,7 @@
 import datetime as dt
 import itertools
 import re
-from collections import UserDict
+from collections import UserDict, defaultdict
 from decimal import ROUND_UP, Decimal
 from urllib.parse import urlencode
 
@@ -185,22 +185,47 @@ class TimestampQuerySet(models.QuerySet):
            and/or detected.
         """
         day = day or dt.date.today()
-        entries = list(
-            self.filter(user=user, created_at__date=day).select_related(
-                "logged_hours__service__project__owned_by",
-                "logged_break",
-                "project__owned_by",
-                "project__customer",
-                "service",
+        return self.slices_by_day(user, start=day, end=day)[day]
+
+    def slices_by_day(self, user, *, start, end):
+        """``slices()`` of all days from start to end (inclusive), by day
+
+        Loads the timestamps, logged hours and breaks of all days at once."""
+        timestamps = defaultdict(list)
+        for entry in self.filter(
+            user=user, created_at__date__range=[start, end]
+        ).select_related(
+            "logged_hours__service__project__owned_by",
+            "logged_break",
+            "project__owned_by",
+            "project__customer",
+            "service",
+        ):
+            timestamps[timezone.localdate(entry.created_at)].append(entry)
+        logged_hours = defaultdict(list)
+        for entry in user.loggedhours.filter(
+            rendered_on__range=[start, end]
+        ).select_related("service__project__owned_by"):
+            logged_hours[entry.rendered_on].append(entry)
+        breaks = defaultdict(list)
+        for entry in user.breaks.filter(starts_at__date__range=[start, end]):
+            breaks[timezone.localdate(entry.starts_at)].append(entry)
+
+        days = (start + dt.timedelta(days=i) for i in range((end - start).days + 1))
+        return {
+            day: self._slices(
+                day,
+                entries=timestamps[day],
+                logged_hours=logged_hours[day],
+                breaks=breaks[day],
             )
-        )
+            for day in days
+        }
+
+    def _slices(self, day, *, entries, logged_hours, breaks):
         known_logged_hours = {entry.logged_hours for entry in entries}
         logged_hours = [
-            entry
-            for entry in user.loggedhours.filter(rendered_on=day).select_related(
-                "service__project__owned_by"
-            )
-            if entry not in known_logged_hours
+            entry for entry in logged_hours if entry not in known_logged_hours
         ]
         entries.extend(
             self.model(
@@ -226,7 +251,6 @@ class TimestampQuerySet(models.QuerySet):
             if timezone.localdate(entry.created_at) != day
         ]
         known_breaks = {entry.logged_break for entry in entries}
-        breaks = user.breaks.filter(starts_at__date=day)
         entries.extend(
             self.model(
                 created_at=entry.ends_at, type=self.model.BREAK, logged_break=entry

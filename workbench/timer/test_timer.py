@@ -724,6 +724,33 @@ class TimestampsTest(TestCase):
         self.assertEqual(len(slices), 1)
         self.assertEqual(slices[0]["timestamp_id"], t2.pk)
 
+    @travel("2020-02-20T12:00:00+01:00")  # A Thursday
+    def test_unlogged_timestamps_warning(self):
+        """STARTs of slices logged through their STOP aren't unlogged"""
+        user = factories.UserFactory.create()
+        monday = timezone.make_aware(dt.datetime(2020, 2, 17, 8))
+        for hour in range(9):
+            user.timestamp_set.create(
+                type=Timestamp.START, created_at=monday + dt.timedelta(hours=hour)
+            )
+            user.timestamp_set.create(
+                type=Timestamp.STOP,
+                created_at=monday + dt.timedelta(hours=hour, minutes=30),
+                logged_hours=factories.LoggedHoursFactory.create(
+                    rendered_by=user, rendered_on=monday.date(), hours=Decimal("0.5")
+                ),
+            )
+        with self.assertNumQueries(3):  # Not per day
+            self.assertIsNone(user.unlogged_timestamps_warning(request=None))
+
+        # Unlogged slices are still counted
+        for hour in range(9):
+            user.timestamp_set.create(
+                type=Timestamp.STOP,
+                created_at=monday + dt.timedelta(days=1, hours=hour),
+            )
+        self.assertIn("9 unlogged", user.unlogged_timestamps_warning(request=None))
+
     def test_elapsed_none_with_only_start(self):
         """A bare START makes one slice with no elapsed time at all"""
         user = factories.UserFactory.create()

@@ -421,25 +421,28 @@ select max(created_at) from sq
         m = monday()
         t = dt.date.today()
         if m == t:
-            return
+            return None
 
-        unlogged = self.timestamp_set.filter(
-            Q(
-                created_at__range=[
-                    timezone.make_aware(dt.datetime.combine(m, dt.time.min)),
-                    timezone.make_aware(dt.datetime.combine(t, dt.time.min)),
-                ]
-            )
-            & Q(logged_hours__isnull=True, logged_break__isnull=True)
-        ).count()
+        from workbench.timer.models import Timestamp
 
+        # A START is merged into the slice of the following STOP, which gets
+        # the logged hours: count the slices the timer shows unlogged
+        unlogged = sum(
+            1
+            for slices in Timestamp.objects.slices_by_day(
+                self, start=m, end=t - dt.timedelta(days=1)
+            ).values()
+            for slice in slices
+            if slice.get("timestamp_id") and not slice.has_associated_log
+        )
         if unlogged > 2 * (1 + (t - m).days):  # about two per day
-            messages.warning(
-                request,
-                _(
-                    "You have {} unlogged timestamps from this week only. You should probably go and check them."
-                ).format(unlogged),
-            )
+            msg = _(
+                "You have {} unlogged timestamps from this week only. You should probably go and check them."
+            ).format(unlogged)
+            if request:
+                messages.warning(request, msg)
+            return msg
+        return None
 
 
 @model_urls
