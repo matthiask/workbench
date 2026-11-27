@@ -975,6 +975,11 @@ class BreakForm(ModelForm):
             data["ends_at"] = timezone.make_aware(
                 dt.datetime.combine(data["day"], data["ends_at"])
             )
+            # The model's validation of the times, they aren't model fields
+            # of the form
+            Break(starts_at=data["starts_at"], ends_at=data["ends_at"]).clean_fields(
+                exclude=["user"]
+            )
 
         return data
 

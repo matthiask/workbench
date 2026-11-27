@@ -186,6 +186,24 @@ class BreaksTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
 
+    def test_ends_before_it_starts(self):
+        """Breaks have to end later than they begin, also in the form"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.post(
+            Break.urls["create"],
+            {
+                "modal-day": dt.date.today().isoformat(),
+                "modal-starts_at": "13:00",
+                "modal-ends_at": "12:00",
+                "modal-description": "",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "Breaks should end later than they begin.")
+        self.assertFalse(Break.objects.exists())
+
     def test_break_form_save_assigns_timestamp(self):
         """Creating a break from the timestamps button sets the logged_break attr"""
         user = factories.UserFactory.create()
