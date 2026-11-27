@@ -10,6 +10,7 @@ from django.utils.translation import gettext, gettext_lazy, ngettext
 
 from workbench import generic
 from workbench.contacts.models import Person
+from workbench.invoices import sending
 from workbench.invoices.forms import SendReminderForm
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import HOURS_FOR_INVOICING, LoggedCost, LoggedHours
@@ -130,10 +131,12 @@ class RecurringInvoiceDetailView(generic.DetailView):
                 % len(invoices),
             )
             for invoice in invoices:
-                if sending := getattr(invoice, "sending", None):
-                    messages.info(request, f"{invoice}: {sending}")
+                if outcome := getattr(invoice, "sending", None):
+                    messages.info(request, f"{invoice}: {outcome}")
             return redirect("invoices_invoice_list" if len(invoices) else self.object)
         context = self.get_context_data()
+        if self.object.new_invoices == self.object.SEND:
+            context["automatic_mail"] = sending.automatic_mail(self.object)
         return self.render_to_response(context)
 
 

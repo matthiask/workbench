@@ -588,6 +588,28 @@ class RecurringTest(TestCase):
             f" bis {local_date_format(invoice.due_on)}.",
         )
 
+    def test_send_automatically_detail(self):
+        """The detail page shows the mail which is sent automatically, the
+        proposal if nothing is configured"""
+        self.client.force_login(factories.UserFactory.create())
+        r = factories.RecurringInvoiceFactory.create(
+            subtotal=100, postal_address="Name\nStreet\nCity", new_invoices="send"
+        )
+        response = self.client.get(r.get_absolute_url())
+        self.assertContains(response, "No email address.")
+
+        r.contact.emailaddresses.create(email="contact@example.com")
+        response = self.client.get(r.get_absolute_url())
+        self.assertContains(response, "contact@example.com")
+        self.assertContains(response, "{due_on}")
+
+        r.mail_subject = "Rechnung {code}"
+        r.mail_body = "Zahlbar bis {due_on}.\nGruss"
+        r.save()
+        response = self.client.get(r.get_absolute_url())
+        self.assertContains(response, "Rechnung {code}")
+        self.assertContains(response, "Zahlbar bis {due_on}.<br>Gruss")
+
     def test_send_automatically_form(self):
         """The form proposes the recipient and the mail with placeholders"""
         r = factories.RecurringInvoiceFactory.create(

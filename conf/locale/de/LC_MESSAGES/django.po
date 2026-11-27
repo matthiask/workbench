@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-27 07:22+0100\n"
+"POT-Creation-Date: 2026-11-27 07:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -231,6 +231,7 @@ msgstr "Inaktiv"
 
 #: workbench/accounts/models.py workbench/contacts/models.py
 #: workbench/invoices/forms.py
+#: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "email"
 msgstr "Email"
 
@@ -2781,6 +2782,7 @@ msgid "All ways of sending"
 msgstr "Alle Versandarten"
 
 #: workbench/invoices/forms.py workbench/invoices/sending.py
+#: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "No email address."
 msgstr "Keine Emailadresse."
 
@@ -3096,6 +3098,7 @@ msgid "Proposed: the accounts payable address of the organization, the contact o
 msgstr "Vorgeschlagen: die Kreditorenadresse der Organisation, der Kontakt oder die zentrale Adresse. Die verantwortliche Person erhält eine Kopie und die Antworten."
 
 #: workbench/invoices/models.py
+#: workbench/templates/invoices/recurringinvoice_detail.html
 #, python-brace-format
 msgid "{code}, {total}, {due_on} and {service_period} are replaced with the values of each invoice."
 msgstr "{code}, {total}, {due_on} und {service_period} werden durch die Werte der jeweiligen Rechnung ersetzt."
@@ -5873,6 +5876,10 @@ msgstr "Rechnungen erstellen"
 #: workbench/templates/projects/project_detail.html
 msgid "Copy"
 msgstr "Kopieren"
+
+#: workbench/templates/invoices/recurringinvoice_detail.html
+msgid "Cc"
+msgstr "Cc"
 
 #: workbench/templates/invoices/reminders.html
 msgid "Last reminded on"

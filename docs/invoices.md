@@ -111,7 +111,8 @@ changed.
 periodically (yearly, quarterly, monthly or weekly), a number of days
 before each period begins. New invoices are created in preparation,
 marked as sent, or mailed automatically (the list filters by it); the
-owner gets a mail. With
+owner gets a mail. The recurring invoice shows the mail it sends, with
+placeholders for the values of each invoice. With
 "Create project?" each invoice gets its own maintenance project and is a
 down payment on it, deducted when the work logged there is invoiced.
 The invoices link to their recurring invoice, which lists them.

@@ -136,22 +136,32 @@ def send(invoice, *, to, subject, body, save=None):
         raise
 
 
+def automatic_mail(recurring_invoice, invoice=None):
+    """The recipient, subject and text of the mail for a new invoice of a
+    recurring invoice: those configured or the proposal, with placeholders
+    without ``invoice``; ``None`` without an email address"""
+    obj = invoice or recurring_invoice
+    emails = suggested_emails(obj)
+    if not (to := recurring_invoice.send_to or (emails[0] if emails else "")):
+        return None
+    subject, body = proposal(invoice, to) if invoice else recurring_proposal(obj, to)
+    return {
+        "to": to,
+        "subject": recurring_invoice.mail_subject or subject,
+        "body": recurring_invoice.mail_body or body,
+    }
+
+
 def send_automatically(invoice, recurring_invoice):
     """Sends a new invoice of a recurring invoice with its recipient, subject
     and text (or the proposal), see RecurringInvoice.create_single_invoice()
     for the invoice date; ``invoice.sending`` says what happened"""
-    emails = suggested_emails(invoice)
-    if not (to := recurring_invoice.send_to or (emails[0] if emails else "")):
+    if not (mail := automatic_mail(recurring_invoice, invoice)):
         invoice.sending = _("Not sent: %s") % _("No email address.")
         return
-    subject, body = proposal(invoice, to)
+    to = mail["to"]
     try:
-        send(
-            invoice,
-            to=to,
-            subject=recurring_invoice.mail_subject or subject,
-            body=recurring_invoice.mail_body or body,
-        )
+        send(invoice, **mail)
     except Exception as exc:  # noqa: BLE001
         invoice.sending = _("Not sent: %s") % exc
     else:

@@ -120,7 +120,8 @@ Nur noch ihr Status und wenige Felder lassen sich ändern.
 quartalsweise, monatlich oder wöchentlich) Fixbetragsrechnungen, einige
 Tage bevor die jeweilige Periode beginnt. Neue Rechnungen werden in
 Vorbereitung erstellt, als versendet markiert oder automatisch
-verschickt (die Liste filtert danach); die verantwortliche Person erhält eine Mail. Mit «Projekt
+verschickt (die Liste filtert danach); die verantwortliche Person erhält eine Mail. Die Stapelrechnung zeigt die
+Mail, die sie verschickt, mit Platzhaltern für die Werte jeder Rechnung. Mit «Projekt
 erstellen?» erhält jede Rechnung ihr eigenes Wartungsprojekt und ist eine
 Anzahlung darauf, die beim Verrechnen der dort erfassten Arbeit
 abgezogen wird. Die Rechnungen verlinken ihre Stapelrechnung, die sie
