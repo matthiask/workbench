@@ -334,3 +334,130 @@ class BudgetTransferTest(TestCase):
                 self.assertRedirects(
                     self.client.get(url), "/", fetch_redirect_response=False
                 )
+
+
+class BudgetTransferAPITest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
+    def test_crud(self):
+        """Budget transfers are listed, created, changed and deleted through
+        the web interface's form, its warnings are errors with a code"""
+        user = factories.UserFactory.create()
+        source = BudgetTransferTest.campaign_project(
+            self, user=user, invoiced=Decimal(12000), hours=40
+        )
+        target = BudgetTransferTest.reconception_project(self, user=user, hours=40)
+        self.client.force_login(user)
+        url = f"/api/projects/{source.code}/budget-transfers/"
+        data = {"title": "Re-Konzeption", "amount": 8000}
+
+        # The source has no accepted offers (invoiced with a fixed amount)
+        response = self.client.post(url, data, content_type="application/json")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["code"], "budget-transfer-beyond-offers"
+        )
+
+        url += "?ignore_warnings=budget-transfer-beyond-offers"
+        response = self.client.post(
+            url + "&dry_run=true", data, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertFalse(BudgetTransfer.objects.exists())
+
+        response = self.client.post(url, data, content_type="application/json")
+        self.assertEqual(response.status_code, 200, response.content)
+        transfer = BudgetTransfer.objects.get()
+        created = response.json()
+        self.assertEqual(created["id"], transfer.pk)
+        self.assertEqual(created["amount"], "8000.00")
+        self.assertEqual(created["from_project"]["id"], source.pk)
+        self.assertIsNone(created["to_project"])
+        self.assertTrue(created["is_reserved"])
+        self.assertEqual(created["created_by"], user.get_short_name())
+        self.assertEqual(transfer.created_by, user)
+
+        # Listed on the projects they touch, the project shows them too
+        for project, ids in [(source, [transfer.pk]), (target, [])]:
+            response = self.client.get(f"/api/projects/{project.pk}/budget-transfers/")
+            self.assertEqual(response.status_code, 200, response.content)
+            self.assertEqual([t["id"] for t in response.json()], ids)
+        detail = self.client.get(f"/api/projects/{source.pk}/").json()
+        self.assertEqual([t["id"] for t in detail["budget_transfers"]], [transfer.pk])
+        self.assertEqual(detail["budget_adjustment"], "-8000.00")
+
+        url = f"/api/budget-transfers/{transfer.pk}/"
+        self.assertEqual(self.client.get(url).json(), created)
+
+        # Pointing it at the project which does the work
+        response = self.client.patch(
+            url + "?ignore_warnings=budget-transfer-beyond-offers",
+            {"to_project": target.code, "notes": "Phase 2"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        transfer.refresh_from_db()
+        self.assertEqual((transfer.to_project, transfer.notes), (target, "Phase 2"))
+        self.assertFalse(response.json()["is_reserved"])
+        detail = self.client.get(f"/api/projects/{target.pk}/").json()
+        self.assertEqual([t["id"] for t in detail["budget_transfers"]], [transfer.pk])
+        self.assertEqual(detail["budget_adjustment"], "8000.00")
+
+        # The form's rules
+        for patch, loc, code in [
+            ({"amount": 20000}, ["body", "data"], "budget-transfer-too-large"),
+            ({"to_project": source.pk}, ["body", "data", "to_project"], None),
+            ({"to_project": 0}, ["body", "data", "to_project"], None),
+            ({"title": None}, ["body", "data", "title"], None),
+            ({"from_project": target.pk}, ["body", "data", "from_project"], None),
+        ]:
+            with self.subTest(patch=patch):
+                response = self.client.patch(
+                    url + "?ignore_warnings=budget-transfer-beyond-offers",
+                    patch,
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, 422)
+                error = response.json()["detail"][0]
+                self.assertEqual(error["loc"], loc)
+                self.assertEqual(error.get("code"), code)
+
+        response = self.client.delete(url + "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], transfer.pk)
+        self.assertTrue(BudgetTransfer.objects.exists())
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(BudgetTransfer.objects.exists())
+        self.assertEqual(self.client.delete(url).status_code, 404)
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER})
+    def test_requires_controlling(self):
+        """Like the web interface, budget transfers require the controlling
+        feature; the project leaves them out"""
+        project = factories.ProjectFactory.create()
+        transfer = BudgetTransfer.objects.create(
+            from_project=project,
+            title="Reserved",
+            amount=100,
+            created_by=project.owned_by,
+        )
+        self.client.force_login(project.owned_by)
+        url = f"/api/budget-transfers/{transfer.pk}/"
+        for method, path in [
+            ("get", f"/api/projects/{project.pk}/budget-transfers/"),
+            ("post", f"/api/projects/{project.pk}/budget-transfers/"),
+            ("get", url),
+            ("patch", url),
+            ("delete", url),
+        ]:
+            with self.subTest(method=method, path=path):
+                response = getattr(self.client, method)(
+                    path, {}, content_type="application/json"
+                )
+                self.assertEqual(response.status_code, 403)
+        detail = self.client.get(f"/api/projects/{project.pk}/").json()
+        self.assertIsNone(detail["budget_transfers"])
+        self.assertIsNone(detail["budget_adjustment"])

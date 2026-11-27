@@ -9,6 +9,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.notes.models import Note
 from workbench.offers.models import Offer
+from workbench.projects.models import BudgetTransfer
 from workbench.tools.validation import in_days, monday
 
 
@@ -210,7 +211,21 @@ class APIQueriesTest(TestCase):
             )
             factories.AbsenceFactory.create(starts_on=in_days(5))
 
+        def budget_transfers():
+            for kwargs in [
+                {"from_project": project, "to_project": factories.ProjectFactory()},
+                {"from_project": factories.ProjectFactory(), "to_project": project},
+            ]:
+                BudgetTransfer.objects.create(
+                    **kwargs,
+                    title="Transfer",
+                    amount=100,
+                    created_by=factories.UserFactory.create(),
+                )
+
         for url, create in [
+            (f"/api/projects/{project.pk}/", budget_transfers),
+            (f"/api/projects/{project.pk}/budget-transfers/", budget_transfers),
             (f"/api/projects/{project.pk}/", service),
             (f"/api/offers/{offer.pk}/", service),
             (f"/api/projects/{project.pk}/offers/context/", service),

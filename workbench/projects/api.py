@@ -49,6 +49,7 @@ from workbench.offers.models import (
 )
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import (
+    BudgetTransferForm,
     CampaignDeleteForm,
     CampaignForm,
     ProjectedInvoicesProjectForm,
@@ -58,7 +59,13 @@ from workbench.projects.forms import (
     ServiceMergeForm,
     ServiceMoveForm,
 )
-from workbench.projects.models import Campaign, InternalType, Project, Service
+from workbench.projects.models import (
+    BudgetTransfer,
+    Campaign,
+    InternalType,
+    Project,
+    Service,
+)
 from workbench.reporting.models import CostCenter
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
@@ -662,25 +669,240 @@ def project_stats(request, filters: Query[StatsFilter]):
     return [project_stats(project) for project in projects]
 
 
+# Budget transfers ############################################################
+
+
+class BudgetTransferOut(Schema):
+    id: int | None = Field(description="Null with dry_run when creating.")
+    url: str | None
+    from_project: ProjectSummary
+    to_project: ProjectSummary | None = Field(
+        description="Null while the budget is only reserved."
+    )
+    is_reserved: bool
+    title: str
+    amount: Amount
+    notes: str
+    created_at: dt.datetime
+    created_by: str
+
+
+def budget_transfer_out(transfer, request):
+    return {
+        "id": transfer.id,
+        "url": request.build_absolute_uri(transfer.get_absolute_url()),
+        "from_project": project_summary(transfer.from_project, request),
+        "to_project": project_summary(transfer.to_project, request)
+        if transfer.to_project
+        else None,
+        "is_reserved": transfer.is_reserved,
+        "title": transfer.title,
+        "amount": transfer.amount,
+        "notes": transfer.notes,
+        "created_at": transfer.created_at,
+        "created_by": transfer.created_by.get_short_name(),
+    }
+
+
+def _budget_transfers():
+    return BudgetTransfer.objects.select_related(
+        "from_project__customer", "to_project__customer", "created_by"
+    ).order_by("-created_at", "-pk")
+
+
+def _project_budget_transfers(project):
+    return _budget_transfers().filter(Q(from_project=project) | Q(to_project=project))
+
+
+def _budget_transfer_saved(transfer, request, *, dry_run):
+    """The saved transfer, without ID and URL if it's going to be rolled back"""
+    result = budget_transfer_out(_budget_transfers().get(pk=transfer.pk), request)
+    if dry_run:
+        result |= {"id": None, "url": None}
+    return result
+
+
+BUDGET_TRANSFER_FORM = BudgetTransferForm.__wrapped__
+
+
+class BudgetTransferFields(InputSchema):
+    to_project: int | str | None = Field(
+        default=None,
+        description="ID or code of the project which does the work, null"
+        " only reserves the budget (it leaves the source project anyway).",
+    )
+    notes: str | None = None
+
+
+class BudgetTransferCreate(BudgetTransferFields):
+    title: str = Field(min_length=1, max_length=200)
+    amount: Number = Field(
+        description="Part of the total invoiced on the project; more than its"
+        " gross margin warns (budget-transfer-too-large), more than its"
+        " accepted offers too (budget-transfer-beyond-offers)."
+    )
+
+
+class BudgetTransferPatch(BudgetTransferFields):
+    """Fields which aren't given are left alone; the source project can't
+    be changed"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    amount: Number | None = None
+
+
+BUDGET_TRANSFER_FIELDS = {"to_project": object_pk(Project.objects.all())}
+
+
+@router.get(
+    "/projects/{project_id}/budget-transfers/",
+    response=list[BudgetTransferOut],
+    auth=user_auth(feature=FEATURES.CONTROLLING),
+)
+def budget_transfer_list(request, project_id: str):
+    """The budget transfers from and to a project (by ID or code), newest
+    first; see ``budget_adjustment`` of the project for their net effect"""
+    project = by_id_or_code(Project.objects.all(), project_id)
+    return [
+        budget_transfer_out(transfer, request)
+        for transfer in _project_budget_transfers(project)
+    ]
+
+
+@router.post(
+    "/projects/{project_id}/budget-transfers/",
+    response=BudgetTransferOut,
+    auth=user_auth(feature=FEATURES.CONTROLLING),
+)
+def budget_transfer_create(
+    request,
+    project_id: str,
+    data: BudgetTransferCreate,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Move budget invoiced on this project (by ID or code) to the project
+    which does the work, or reserve it for later, validated like in the web
+    interface. Only money moves, the hours stay where they were logged."""
+    project = by_id_or_code(Project.objects.all(), project_id)
+    return patch_with_form(
+        BUDGET_TRANSFER_FORM,
+        BudgetTransfer(from_project=project),
+        data.model_dump(),
+        request,
+        out=lambda transfer: _budget_transfer_saved(transfer, request, dry_run=dry_run),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map=BUDGET_TRANSFER_FIELDS,
+    )
+
+
+@router.get(
+    "/budget-transfers/{int:transfer_id}/",
+    response=BudgetTransferOut,
+    auth=user_auth(feature=FEATURES.CONTROLLING),
+)
+def budget_transfer_detail(request, transfer_id: int):
+    return budget_transfer_out(
+        get_object_or_404(_budget_transfers(), pk=transfer_id), request
+    )
+
+
+@router.patch(
+    "/budget-transfers/{int:transfer_id}/",
+    response=BudgetTransferOut,
+    auth=user_auth(feature=FEATURES.CONTROLLING),
+)
+def budget_transfer_update(
+    request,
+    transfer_id: int,
+    data: BudgetTransferPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change a budget transfer, e.g. name the project which does the work
+    of a reserved one; validated like in the web interface"""
+    return patch_with_form(
+        BUDGET_TRANSFER_FORM,
+        get_object_or_404(BudgetTransfer, pk=transfer_id),
+        data,
+        request,
+        out=lambda transfer: _budget_transfer_saved(transfer, request, dry_run=False),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map=BUDGET_TRANSFER_FIELDS,
+    )
+
+
+@router.delete(
+    "/budget-transfers/{int:transfer_id}/",
+    response=BudgetTransferOut,
+    auth=user_auth(feature=FEATURES.CONTROLLING),
+)
+def budget_transfer_delete(request, transfer_id: int, *, dry_run: DryRun = False):
+    """Delete a budget transfer, the budget goes back to its source project.
+    Returns the deleted transfer."""
+    transfer = get_object_or_404(_budget_transfers(), pk=transfer_id)
+    result = budget_transfer_out(transfer, request)
+    delete_with_form(transfer, request, loc=["path", "transfer_id"], dry_run=dry_run)
+    return result
+
+
+def project_budget_transfers(project, request):
+    """The budget transfers of the project and their net effect on its
+    figures, ``None`` without the controlling feature"""
+    if not request.user.features[FEATURES.CONTROLLING]:
+        return {"budget_transfers": None, "budget_adjustment": None}
+    return {
+        "budget_transfers": [
+            budget_transfer_out(transfer, request)
+            for transfer in _project_budget_transfers(project)
+        ],
+        "budget_adjustment": BudgetTransfer.objects.adjustments(projects=[project])[
+            project.id
+        ],
+    }
+
+
+# End of budget transfers #####################################################
+
+
 class ProjectDetail(ProjectOut):
     cost_center: str | None = Field(description="Title of the cost center.")
     deals: list[DealRef] | None = Field(
         description="Deals linked to the project, directly or through one of"
         " its offers; null without the deals feature."
     )
+    budget_transfers: list[BudgetTransferOut] | None = Field(
+        description="Budget transfers from and to the project; null without"
+        " the controlling feature."
+    )
+    budget_adjustment: Amount | None = Field(
+        description="Net budget transfers (in minus out), included in the sold"
+        " amount and the gross margin of the project's statistics; null"
+        " without the controlling feature."
+    )
 
 
 def project_detail_out(project, request):
-    return project_out(project, request) | {
-        "cost_center": project.cost_center.title if project.cost_center else None,
-        "deals": deal_refs(
-            Deal.objects
-            .filter(Q(related_projects=project) | Q(related_offers__project=project))
-            .distinct()
-            .order_by("-pk"),
-            request,
-        ),
-    }
+    return (
+        project_out(project, request)
+        | {
+            "cost_center": project.cost_center.title if project.cost_center else None,
+            "deals": deal_refs(
+                Deal.objects
+                .filter(
+                    Q(related_projects=project) | Q(related_offers__project=project)
+                )
+                .distinct()
+                .order_by("-pk"),
+                request,
+            ),
+        }
+        | project_budget_transfers(project, request)
+    )
 
 
 @router.get("/projects/{project_id}/", response=ProjectDetail)
