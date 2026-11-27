@@ -39,7 +39,9 @@ deine Installation sie eingeschaltet hat.
   Projektseite füllt Titel, Bemerkungen und Stunden aus.
 - Im Formular wählst du mehrere Wochen mit Ctrl (Cmd auf Macs).
 - «Batch-Bearbeitung» im Menü des Projekts verschiebt, weist zu oder
-  löscht mehrere Einträge auf einmal, oder macht sie fest.
+  löscht mehrere Einträge auf einmal, oder macht sie fest. Über Projekte
+  hinweg, z.B. um die künftige Arbeit von jemandem zu übergeben, der
+  geht, mit `wb planning work batch`.
 
 Workbench warnt, wenn Arbeit nach ihrem Meilenstein geplant ist.
 Geschlossene Projekte erhalten keine neue geplante Arbeit. Beim

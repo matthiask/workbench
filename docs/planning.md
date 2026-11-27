@@ -35,7 +35,9 @@ Planning is available where your installation has enabled it.
   fills in the title, notes and hours.
 - In the form, select several weeks with Ctrl (Cmd on Macs).
 - "Batch update" in the project's menu moves, reassigns or deletes
-  several entries at once, or makes them definite.
+  several entries at once, or makes them definite. Across projects, e.g.
+  to hand over the future work of someone who leaves, use
+  `wb planning work batch`.
 
 Workbench warns when work is planned after its milestone. Closed
 projects don't get new planned work. Closing a project, declining an
