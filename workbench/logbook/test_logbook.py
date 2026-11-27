@@ -1072,7 +1072,9 @@ class LogbookTest(TestCase):
     def test_autofill_field(self):
         """The hours and services fields are automatically filled in"""
         hours = factories.LoggedHoursFactory.create(
-            created_at=timezone.now() - dt.timedelta(hours=2)
+            # 1.95 hours are rounded up to 2.0; exactly two hours would become
+            # 2.1 as soon as the test takes any time at all
+            created_at=timezone.now() - dt.timedelta(hours=2, minutes=-3)
         )
         self.client.force_login(hours.rendered_by)
 
