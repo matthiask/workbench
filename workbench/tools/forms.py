@@ -140,14 +140,24 @@ class WarningsForm:
             return False
 
         return not (
-            self.warnings and not (ignore_warnings or self.should_ignore_warnings())
+            self.warnings
+            and not (ignore_warnings or set(self.warnings) <= self._ignored_warnings())
         )
 
-    def should_ignore_warnings(self):
-        ignore = set(self.data.get(self.ignore_warnings_id, "").split())
-        current = set(self.warnings)
-        # print("IGNORE", ignore, "CURRENT", current)
-        return current <= ignore
+    def _ignored_warnings(self):
+        return set(self.data.get(self.ignore_warnings_id, "").split())
+
+    def should_ignore_warnings(self, code):
+        """Whether the user has seen the warning with this code and ignored
+        it: the web interface's checkbox posts the codes of the warnings it
+        has shown, the API those listed in ``ignore_warnings``
+
+        ``clean()`` asks this to decide whether an ignored warning should
+        have its effect (e.g. resetting the closing date) instead of adding
+        the warning again. It's about this code only, not about the warnings
+        collected so far: those may be none yet, and then the effect would
+        happen without the warning ever being shown."""
+        return code in self._ignored_warnings()
 
     @property
     def ignore_warnings_value(self):

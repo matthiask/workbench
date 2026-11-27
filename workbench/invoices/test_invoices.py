@@ -1767,6 +1767,30 @@ class InvoicesTest(TestCase):
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
         self.assertIsNone(invoice.closed_on)
 
+    def test_reopen_paid_invoice_warns_about_closed_on(self):
+        """The closing date is only reset after its own warning has been
+        shown and ignored, not because the other warnings have"""
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(-1),
+            due_on=in_days(14),
+            closed_on=in_days(-1),
+            status=Invoice.PAID,
+            postal_address="Test\nStreet\nCity",
+        )
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(
+                invoice,
+                status=Invoice.SENT,
+                **{WarningsForm.ignore_warnings_id: "status-unexpected"},
+            ),
+        )
+        self.assertContains(response, "but the invoice has already been closed on")
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.closed_on, in_days(-1))
+
     def test_hand_over_sent_invoice(self):
         """Changing the owner of a sent invoice doesn't warn, other changes
         in the same submit still do"""

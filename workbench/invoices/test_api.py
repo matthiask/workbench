@@ -610,6 +610,29 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(invoice.status, Invoice.SENT)
         self.assertEqual(mail.outbox, [])
 
+    def test_reopen_paid_invoice(self):
+        """Reopening a paid invoice warns about its closing date even when
+        the other warnings have been ignored"""
+        invoice = factories.InvoiceFactory.create(
+            status=Invoice.PAID,
+            due_on=in_days(14),
+            closed_on=in_days(-1),
+            postal_address=ADDRESS,
+        )
+        self.client.force_login(invoice.owned_by)
+        response = self.client.patch(
+            f"/api/invoices/{invoice.pk}/?ignore_warnings=status-unexpected",
+            {"status": "sent"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn(
+            "status-change-but-already-closed",
+            [error.get("code") for error in response.json()["detail"]],
+        )
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.closed_on, in_days(-1))
+
     def test_update_freeze_date(self):
         """The freeze date refuses invoice dates and changes like the form"""
         FreezeDate.objects.create(up_to=in_days(-10))

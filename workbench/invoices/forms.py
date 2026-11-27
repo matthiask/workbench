@@ -849,7 +849,7 @@ class InvoiceForm(PostalAddressSelectionForm):
             data["closed_on"] = dt.date.today()
 
         if has_status and self.instance.closed_on and data["status"] < Invoice.PAID:
-            if self.should_ignore_warnings():
+            if self.should_ignore_warnings("status-change-but-already-closed"):
                 data["closed_on"] = None
             else:
                 self.add_warning(
