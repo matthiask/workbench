@@ -89,8 +89,8 @@ sites to Workbench sites by host name, lowercased and ignoring a leading
    customer.
 2. **In Workbench, not running anymore**: propose archiving the site
    (`wb sites update SITE --archived`). Show its recurring invoices: ending
-   them is the user's decision in the web interface (or ask before using
-   `wb recurring-invoices update`).
+   them is the user's decision, ask before
+   `wb recurring-invoices update ID --ends-on DATE`.
 3. **Moved**: the host names run on another server than recorded; propose
    `wb sites update SITE --server OTHER`.
 4. **Host names changed**: propose the new domains (`--domain` replaces all
@@ -108,8 +108,10 @@ sites to Workbench sites by host name, lowercased and ignoring a leading
   none, ask: is hosting included elsewhere (maintenance contract, mandate,
   internal site)? Then record the reason with
   `wb sites update SITE --no-invoice-reason "…"`. Otherwise it's hosting
-  nobody invoices: list it for the user, creating recurring invoices is
-  theirs to do in the web interface.
+  nobody invoices: list it for the user; creating a recurring invoice
+  (amount, periodicity) is their decision. Once they've decided, propose
+  `wb recurring-invoices create --site SITE_ID --contact ID --periodicity
+  yearly --subtotal AMOUNT --dry-run`.
 - **No contact for outages**: propose people, e.g. the contact of the
   recurring invoice or of the customer's recent projects
   (`wb organizations show ID`, `wb people search --organization ID`), and
