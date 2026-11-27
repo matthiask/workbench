@@ -15,41 +15,41 @@ from workbench.hosting.views import SiteContactDeleteView
 
 urlpatterns = [
     path(
-        "",
+        "sites/",
         hosting_only(
             generic.ListView.as_view(model=Site, search_form_class=SiteSearchForm)
         ),
         name="hosting_site_list",
     ),
     path(
-        "autocomplete/",
+        "sites/autocomplete/",
         hosting_only(
             generic.AutocompleteView.as_view(model=Site, queryset=Site.objects.active())
         ),
         name="hosting_site_autocomplete",
     ),
     path(
-        "<int:pk>/",
+        "sites/<int:pk>/",
         hosting_only(generic.DetailView.as_view(model=Site)),
         name="hosting_site_detail",
     ),
     path(
-        "create/",
+        "sites/create/",
         hosting_only(generic.CreateView.as_view(model=Site, form_class=SiteForm)),
         name="hosting_site_create",
     ),
     path(
-        "<int:pk>/update/",
+        "sites/<int:pk>/update/",
         hosting_only(generic.UpdateView.as_view(model=Site, form_class=SiteForm)),
         name="hosting_site_update",
     ),
     path(
-        "<int:pk>/delete/",
+        "sites/<int:pk>/delete/",
         hosting_only(generic.DeleteView.as_view(model=Site)),
         name="hosting_site_delete",
     ),
     path(
-        "<int:pk>/add-contact/",
+        "sites/<int:pk>/add-contact/",
         hosting_only(
             generic.CreateRelatedView.as_view(
                 model=SiteContact,
@@ -60,7 +60,7 @@ urlpatterns = [
         name="hosting_site_add_contact",
     ),
     path(
-        "contacts/<int:pk>/update/",
+        "sites/contacts/<int:pk>/update/",
         hosting_only(
             generic.UpdateView.as_view(
                 model=SiteContact,
@@ -70,7 +70,7 @@ urlpatterns = [
         name="hosting_sitecontact_update",
     ),
     path(
-        "contacts/<int:pk>/delete/",
+        "sites/contacts/<int:pk>/delete/",
         hosting_only(
             SiteContactDeleteView.as_view(
                 model=SiteContact, template_name="modal_confirm_delete.html"

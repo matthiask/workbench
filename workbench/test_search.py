@@ -72,10 +72,10 @@ class SearchTest(TestCase):
 
             response = self.client.get(f"/search/?q={site.server.title}")
             self.assertContains(response, site.server.urls["detail"])
-            self.assertContains(response, f"/sites/servers/?q={site.server.title}")
+            self.assertContains(response, f"/contacts/servers/?q={site.server.title}")
 
             response = self.client.get(
-                f"/sites/servers/?q={site.server.title}", follow=True
+                f"/contacts/servers/?q={site.server.title}", follow=True
             )
             self.assertContains(response, site.server.urls["detail"])
 

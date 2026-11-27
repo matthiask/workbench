@@ -279,6 +279,18 @@ class ViewsTest(TestCase):
             form.errors["site"], ["The site belongs to a different organization."]
         )
 
+    def test_navigation(self):
+        """Sites and servers belong to the contacts, each marked on its own"""
+        for current, other in [
+            (Site.urls["list"], Server.urls["list"]),
+            (Server.urls["list"], Site.urls["list"]),
+        ]:
+            with self.subTest(url=current):
+                response = self.client.get(current)
+                self.assertContains(response, f'active" href="{current}"')
+                self.assertNotContains(response, f'active" href="{other}"')
+                self.assertContains(response, 'active" href="/contacts/"')
+
     @override_settings(FEATURES={FEATURES.HOSTING: F.NEVER})
     def test_without_feature(self):
         site = factories.SiteFactory.create()
