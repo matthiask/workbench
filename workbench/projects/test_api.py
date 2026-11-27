@@ -1225,3 +1225,28 @@ class ProjectsAPITest(TestCase):
             sorted(e["loc"][-1] for e in response.json()["detail"]),
             ["campaign", "cost_center", "suppress_planning_update_mails"],
         )
+
+    def test_delete(self):
+        """Projects are deleted like in the web interface, unless something
+        depends on them"""
+        project = factories.ProjectFactory.create(title="Mistake")
+        factories.ServiceFactory.create(project=project)
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/"
+
+        response = self.client.delete(f"{url}?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "Mistake")
+        self.assertTrue(Project.objects.filter(pk=project.pk).exists())
+
+        offer = factories.OfferFactory.create(project=project)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["path", "project_id"])
+        self.assertIn("Cannot delete", response.json()["detail"][0]["msg"])
+        offer.delete()
+
+        response = self.client.delete(f"/api/projects/{project.code}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], project.pk)
+        self.assertFalse(Project.objects.filter(pk=project.pk).exists())

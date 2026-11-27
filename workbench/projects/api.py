@@ -71,6 +71,7 @@ from workbench.tools.api import (
     Serialized,
     ShortName,
     active_user,
+    delete_with_form,
     form_data,
     object_pk,
     patch_with_form,
@@ -779,6 +780,28 @@ def project_update(
         # The form reads initial values from the web interface's parameters
         form_kwargs={"request": without_query(request)},
     )
+
+
+@router.delete("/projects/{project_id}/", response=ProjectDetail)
+def project_delete(request, project_id: str, *, dry_run: DryRun = False):
+    """Delete a project (by ID or code) like in the web interface, e.g. one
+    created by mistake; refused if offers, invoices or logged hours or costs
+    depend on it. Its services, planned work and projected invoices are
+    deleted too. Returns the deleted project."""
+    project = by_id_or_code(
+        Project.objects.select_related(
+            "customer",
+            "contact",
+            "owned_by",
+            "internal_type",
+            "campaign",
+            "cost_center",
+        ),
+        project_id,
+    )
+    result = project_detail_out(project, request)
+    delete_with_form(project, request, loc=["path", "project_id"], dry_run=dry_run)
+    return result
 
 
 class ServiceOut(Schema):

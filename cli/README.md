@@ -127,6 +127,13 @@ flat rate overwrites the rates of the services which haven't been invoiced
     wb projects update 1234 --budget-alert-at 8000 --suppress-planning-update-mails
     wb projects update 1234 --no-flat-rate --no-budget-alert --no-campaign
 
+A project created by mistake is deleted like in the web interface, with its
+services, planned work and projected invoices; projects with offers,
+invoices or logged hours or costs are closed instead:
+
+    wb projects delete 2026-0042 --dry-run
+    wb projects delete 2026-0042
+
 `wb organizations show 123` and `wb people show 345` show the details of the
 search results, e.g. the people of an organization or the email addresses of a
 person.

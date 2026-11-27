@@ -369,6 +369,25 @@ class CLITest(TestCase):
         )
         self.assertEqual(result.exit_code, 1)
 
+    def test_project_delete(self):
+        """Projects created by mistake are deleted, others are refused"""
+        project = factories.ProjectFactory.create(title="Mistake")
+        result = self.wb("projects", "delete", project.code, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        self.assertTrue(Project.objects.filter(pk=project.pk).exists())
+
+        offer = factories.OfferFactory.create(project=project)
+        result = self.wb("projects", "delete", project.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Cannot delete", result.output)
+
+        offer.delete()
+        result = self.wb("projects", "delete", project.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted {project.code}.", result.output)
+        self.assertFalse(Project.objects.filter(pk=project.pk).exists())
+
     @override_settings(FEATURES={FEATURES.INTERNAL_TYPES: F.ALWAYS})
     def test_internal_projects(self):
         """Internal projects get their internal type by name"""

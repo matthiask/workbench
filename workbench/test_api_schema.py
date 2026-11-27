@@ -145,6 +145,7 @@ API_ROUTES = {
         "POST /api/projects/{project_id}/planning/milestones/"
     ),
     "projects_project_creatework": "POST /api/projects/{project_id}/planning/work/",
+    "projects_project_delete": "DELETE /api/projects/{project_id}/",
     "projects_project_logbook_batch_update_costs": (
         "POST /api/projects/{project_id}/logbook/move/"
     ),
@@ -205,7 +206,6 @@ NOT_IN_API = {
     "projects_campaign_delete": "package 11",
     "projects_campaign_update": "package 11",
     "projects_project_createbudgettransfer": "package 10",
-    "projects_project_delete": "package 07",
     "projects_project_pin": "out of scope: own profile (pinned projects)",
     "projects_project_projected_invoices": "package 07",
     "projects_service_move": "package 08",

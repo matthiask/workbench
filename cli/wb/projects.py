@@ -5,12 +5,15 @@ import datetime as dt
 import click
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     complete_internal_types,
     complete_short_names,
     console,
     deal_links,
     echo_csv,
+    echo_deleted,
     echo_fields,
     echo_json,
     echo_more,
@@ -428,3 +431,22 @@ def update_project(
         json=data,
     )
     _echo_saved_project(data, dry_run=dry_run, as_json=as_json)
+
+
+@projects.command("delete")
+@click.argument("project_id")
+@change_options(warnings=False)
+def delete_project(project_id, dry_run, as_json):
+    """Delete a project, by ID or code, e.g. one created by mistake
+
+    Refused if offers, invoices or logged hours or costs depend on it (close
+    it instead). Its services, planned work and projected invoices are
+    deleted too."""
+    data = request("DELETE", f"projects/{project_id}/", params=change_params(dry_run))
+    echo_deleted(
+        data,
+        lambda data: _echo_saved_project(data, dry_run=False, as_json=False),
+        what=data["code"],
+        dry_run=dry_run,
+        as_json=as_json,
+    )
