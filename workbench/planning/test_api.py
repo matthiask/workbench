@@ -606,3 +606,124 @@ class PlanningAPITest(TestCase):
         self.assertTrue(project.planned_work.exists())
         self.client.delete(url)
         self.assertFalse(project.planned_work.exists())
+
+    def batch(self, data, query=""):
+        return self.client.post(
+            f"/api/planning/work/batch/{query}", data, content_type="application/json"
+        )
+
+    def test_batch_update(self):
+        """Planned work of several projects is changed at once, through the
+        web interface's batch form"""
+        leaving = factories.UserFactory.create(_short_name="ub")
+        taking_over = factories.UserFactory.create(_short_name="aha")
+        week = monday() + dt.timedelta(days=7)
+        first = factories.PlannedWorkFactory.create(
+            user=leaving, weeks=[week], is_provisional=True
+        )
+        second = factories.PlannedWorkFactory.create(
+            user=leaving, weeks=[week, week + dt.timedelta(days=7)]
+        )
+        other = factories.PlannedWorkFactory.create(user=leaving, weeks=[week])
+        self.assertNotEqual(first.project, second.project)
+        self.client.force_login(taking_over)
+
+        data = {
+            "work": [first.pk, second.pk],
+            "assign_to": "AHA",
+            "move_by_weeks": 1,
+            "provisional": False,
+        }
+        response = self.batch(data, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        result = response.json()
+        self.assertEqual(
+            [
+                (pw["id"], pw["user"], pw["is_provisional"])
+                for pw in result["planned_work"]
+            ],
+            [(first.pk, "aha", False), (second.pk, "aha", False)],
+        )
+        self.assertEqual(
+            result["planned_work"][1]["weeks"],
+            [
+                (week + dt.timedelta(days=7)).isoformat(),
+                (week + dt.timedelta(days=14)).isoformat(),
+            ],
+        )
+        first.refresh_from_db()
+        self.assertEqual(first.user, leaving)
+
+        response = self.batch(data)
+        self.assertEqual(response.status_code, 200, response.content)
+        for pw in [first, second, other]:
+            pw.refresh_from_db()
+        self.assertEqual(
+            [first.user, second.user, other.user], [taking_over, taking_over, leaving]
+        )
+        self.assertEqual(first.weeks, [week + dt.timedelta(days=7)])
+        self.assertFalse(first.is_provisional)
+        self.assertEqual(other.weeks, [week])
+
+    def test_batch_update_refused(self):
+        """The batch form's rules apply: active users, open projects, no new
+        weeks on closed projects"""
+        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
+        inactive = factories.UserFactory.create(_short_name="old", is_active=False)
+        closed = factories.ProjectFactory.create(closed_on=dt.date.today())
+        self.client.force_login(pw.user)
+
+        for data, loc in [
+            ({"work": []}, "work"),
+            ({"work": [pw.pk + 1]}, "work"),
+            ({"work": [pw.pk], "assign_to": inactive._short_name}, "assign_to"),
+            ({"work": [pw.pk], "project": closed.code}, "project"),
+            ({"work": [pw.pk], "project": "2099-9999"}, "project"),
+        ]:
+            with self.subTest(data=data):
+                response = self.batch(data)
+                self.assertEqual(response.status_code, 422, response.content)
+                (error,) = response.json()["detail"]
+                self.assertEqual(error["loc"], ["body", "data", loc])
+
+        pw.project.closed_on = dt.date.today()
+        pw.project.save()
+        response = self.batch({"work": [pw.pk], "move_by_weeks": 2})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data", "move_by_weeks"],
+                    "msg": "The project is closed.",
+                }
+            ],
+        )
+
+    def test_batch_update_project_and_delete(self):
+        """Work moved to another project (by code) loses its offer and
+        milestone; deleting returns the IDs"""
+        milestone = factories.MilestoneFactory.create(date=in_days(30))
+        pw = factories.PlannedWorkFactory.create(
+            project=milestone.project,
+            milestone=milestone,
+            offer=factories.OfferFactory.create(project=milestone.project),
+            weeks=[monday()],
+        )
+        target = factories.ProjectFactory.create()
+        self.client.force_login(pw.user)
+
+        response = self.batch({"work": [pw.pk], "project": target.code})
+        self.assertEqual(response.status_code, 200, response.content)
+        (moved,) = response.json()["planned_work"]
+        self.assertEqual((moved["offer"], moved["milestone"]), (None, None))
+        pw.refresh_from_db()
+        self.assertEqual(pw.project, target)
+
+        response = self.batch({"work": [pw.pk], "delete": True}, "?dry_run=true")
+        self.assertEqual(response.json()["deleted_planned_work"], [pw.pk])
+        self.assertEqual(response.json()["planned_work"], [])
+        self.assertTrue(target.planned_work.exists())
+        response = self.batch({"work": [pw.pk], "delete": True})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(target.planned_work.exists())

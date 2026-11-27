@@ -1,6 +1,7 @@
 import datetime as dt
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -13,6 +14,7 @@ from workbench.accounts.models import User
 from workbench.api_keys import OfferStatus, key
 from workbench.awt.models import Absence
 from workbench.offers.models import Offer
+from workbench.planning.forms import PlannedWorkBatchForm
 from workbench.planning.models import (
     ExternalWork,
     Milestone,
@@ -30,14 +32,19 @@ from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     DateRangeFilter,
     DryRun,
     Hours,
+    InputSchema,
     ProjectID,
     UsersFilter,
+    active_user,
     date_range,
     filter_users,
     full_clean,
+    object_pk,
+    validate_form,
 )
 from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
@@ -630,6 +637,87 @@ def planned_work_delete(request, work_id: int, *, dry_run: DryRun = False):
     if not dry_run:
         pw.delete()
     return _import_result(deleted_planned_work=[work_id])
+
+
+class PlannedWorkBatch(InputSchema):
+    work: list[int] = Field(description="IDs of the planned work to change.")
+    move_by_weeks: int = Field(
+        default=0, description="Move the weeks of the work by this many weeks."
+    )
+    assign_to: str | None = Field(
+        default=None, description="Short name of the active user to assign it to."
+    )
+    project: int | str | None = Field(
+        default=None,
+        description="ID or code of the open project to move the work to, its"
+        " offer and milestone are removed.",
+    )
+    provisional: bool | None = Field(
+        default=None,
+        description="Make the work provisional or definitive, unchanged if null.",
+    )
+    delete: bool = Field(
+        default=False, description="Delete the work, the other changes are ignored."
+    )
+
+
+@router.post("/planning/work/batch/", response=ImportResult)
+def planned_work_batch(
+    request,
+    data: PlannedWorkBatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change or delete planned work of any projects at once, e.g. assign
+    all future work of someone to someone else
+
+    Through the batch form of the web interface (which works per project):
+    no new weeks on closed projects, only open projects and active users.
+    Nothing is saved if anything is invalid or with ``dry_run``."""
+    values = {"assign_to": "", "project": ""}
+    errors = []
+    for field, convert in [
+        ("assign_to", active_user),
+        ("project", object_pk(Project.objects.all())),
+    ]:
+        if (value := getattr(data, field)) is not None:
+            try:
+                values[field] = convert(value)
+            except DjangoValidationError as exc:
+                errors.extend(
+                    {"loc": ["body", "data", field], "msg": message}
+                    for message in exc.messages
+                )
+    if errors:
+        raise ValidationError(errors)
+
+    form = PlannedWorkBatchForm(
+        values
+        | {
+            "work": data.work,
+            "move_by_weeks": data.move_by_weeks,
+            "provisional": data.provisional,
+            "delete": data.delete,
+        },
+        # Any planned work may be changed, like in the web interface
+        work=PlannedWork.objects.filter(pk__in=data.work).select_related(
+            "project", "user", "service_type", "offer__project", "milestone"
+        ),
+        request=request,
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+    work = form.cleaned_data["work"]
+    with transaction.atomic():
+        if data.delete:
+            result = _import_result(deleted_planned_work=[pw.pk for pw in work])
+            form.process()
+        else:
+            form.process()
+            result = _import_result(planned_work=work)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
 
 
 class PlanningExportFilter(DateRangeFilter, UsersFilter):
