@@ -115,11 +115,13 @@
             <dt>{{ object|label:'mail_subject' }}</dt>
             <dd>{{ automatic_mail.subject }}</dd>
             <dt>{{ object|label:'mail_body' }}</dt>
-            <dd>{{ automatic_mail.body|linebreaksbr }}</dd>
+            <dd>
+              {{ automatic_mail.body|linebreaksbr }}
+              <p class="form-text mt-2 mb-0">
+                {% translate '{code}, {total}, {due_on} and {service_period} are replaced with the values of each invoice.' %}
+              </p>
+            </dd>
           </dl>
-          <p class="form-text mb-0">
-            {% translate '{code}, {total}, {due_on} and {service_period} are replaced with the values of each invoice.' %}
-          </p>
         {% else %}
           <p class="text-danger mb-0">{% translate 'No email address.' %}</p>
         {% endif %}
