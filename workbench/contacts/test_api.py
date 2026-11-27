@@ -382,6 +382,119 @@ class ContactsAPITest(TestCase):
             {("body", "data", "postal_code"), ("body", "data", "country")},
         )
 
+    def test_change_email_address_and_phone_number(self):
+        """Email addresses and phone numbers are changed with the forms of
+        the person form's formsets: phone numbers are normalized, types keep
+        the suggested spelling"""
+        person = factories.PersonFactory.create()
+        email = person.emailaddresses.create(type="Work", email="hans@example.com")
+        phone = person.phonenumbers.create(type="Work", phone_number="+41441234567")
+        other = factories.PersonFactory.create().emailaddresses.create(
+            email="other@example.com"
+        )
+        self.client.force_login(factories.UserFactory.create())
+
+        def patch(path, data, *, dry_run=False):
+            return self.client.patch(
+                f"/api/contacts/people/{person.pk}/{path}/"
+                + ("?dry_run=true" if dry_run else ""),
+                data,
+                content_type="application/json",
+            )
+
+        response = patch(
+            f"email-addresses/{email.pk}", {"email": " hans.muster@example.com "}
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["email_addresses"],
+            [{"id": email.pk, "type": "Work", "value": "hans.muster@example.com"}],
+        )
+        self.assertEqual(
+            [p.pk for p in Person.objects.search("hans.muster@example.com")],
+            [person.pk],
+        )
+
+        response = patch(
+            f"phone-numbers/{phone.pk}",
+            {"type": "mobile", "phone_number": "079 123 45 67"},
+            dry_run=True,
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            response.json()["phone_numbers"],
+            [{"id": phone.pk, "type": "Mobile", "value": "+41791234567"}],
+        )
+        phone.refresh_from_db()
+        self.assertEqual((phone.type, phone.phone_number), ("Work", "+41441234567"))
+
+        response = patch(f"phone-numbers/{phone.pk}", {"phone_number": "079 123"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["body", "data", "phone_number"]],
+        )
+        response = patch(f"email-addresses/{email.pk}", {"email": "no", "type": ""})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            {tuple(e["loc"]) for e in response.json()["detail"]},
+            {("body", "data", "email"), ("body", "data", "type")},
+        )
+        response = patch(f"email-addresses/{email.pk}", {"person": 1})
+        self.assertEqual(response.status_code, 422)
+
+        self.assertEqual(
+            patch(f"email-addresses/{other.pk}", {"type": "Home"}).status_code, 404
+        )
+        self.assertEqual(
+            patch(f"phone-numbers/{email.pk}", {"type": "Home"}).status_code, 404
+        )
+
+    def test_remove_details(self):
+        """Email addresses, phone numbers and postal addresses are removed by
+        their ID, the person stays"""
+        person = factories.PersonFactory.create()
+        email = person.emailaddresses.create(email="hans@example.com")
+        phone = person.phonenumbers.create(phone_number="+41441234567")
+        address = person.postaladdresses.create(
+            street="Musterweg", house_number="1", postal_code="8000", city="Zürich"
+        )
+        other = factories.PersonFactory.create().phonenumbers.create(
+            phone_number="+41791234567"
+        )
+        person.save()
+        self.client.force_login(factories.UserFactory.create())
+
+        def delete(path, *, dry_run=False):
+            return self.client.delete(
+                f"/api/contacts/people/{person.pk}/{path}/"
+                + ("?dry_run=true" if dry_run else "")
+            )
+
+        response = delete(f"email-addresses/{email.pk}", dry_run=True)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["email_addresses"], [])
+        self.assertEqual(person.emailaddresses.count(), 1)
+
+        self.assertEqual(delete(f"phone-numbers/{other.pk}").status_code, 404)
+        self.assertEqual(delete(f"postal-addresses/{phone.pk}").status_code, 404)
+
+        for path in [
+            f"email-addresses/{email.pk}",
+            f"phone-numbers/{phone.pk}",
+            f"postal-addresses/{address.pk}",
+        ]:
+            response = delete(path)
+            self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(
+            (data["email_addresses"], data["phone_numbers"], data["postal_addresses"]),
+            ([], [], []),
+        )
+        self.assertTrue(Person.objects.filter(pk=person.pk).exists())
+        self.assertEqual(Person.objects.search("Musterweg").count(), 0)
+        self.assertEqual(other.person.phonenumbers.count(), 1)
+
     def test_rename_duplicates(self):
         """Renaming people and organizations to the name of someone else is a
         warning, like creating them"""

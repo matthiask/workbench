@@ -14,6 +14,7 @@ from ninja.pagination import paginate
 
 from workbench.accounts.models import User
 from workbench.contacts.forms import (
+    EmailAddressFormset,
     GroupForm,
     GroupSearchForm,
     OrganizationForm,
@@ -21,6 +22,8 @@ from workbench.contacts.forms import (
     OrganizationPostalAddressForm,
     PersonForm,
     PersonMergeForm,
+    PhoneNumberFormset,
+    PostalAddressForm,
     organization_update_warning,
     recent_projects_or_deals,
     short_salutation_warning,
@@ -1687,6 +1690,22 @@ def person_update(
     return result
 
 
+class EmailAddressPatch(InputSchema):
+    """Fields which aren't given keep their current value"""
+
+    type: str | None = Field(default=None, description="E.g. Work or Home")
+    email: str | None = None
+
+
+class PhoneNumberPatch(InputSchema):
+    """Fields which aren't given keep their current value"""
+
+    type: str | None = Field(default=None, description="E.g. Work, Mobile or Home")
+    phone_number: str | None = Field(
+        default=None, description="Numbers without a country code are Swiss numbers."
+    )
+
+
 class PostalAddressPatch(InputSchema):
     """Fields which aren't given keep their current value"""
 
@@ -1701,6 +1720,122 @@ class PostalAddressPatch(InputSchema):
     postal_address_override: str | None = Field(
         default=None, description="Completely overrides the postal address if set"
     )
+
+
+def _person_detail_out(person_id, request):
+    return person_out(
+        Person.objects.select_related("organization", "primary_contact").get(
+            pk=person_id
+        ),
+        request,
+    )
+
+
+def _change_detail(form_class, detail, data, request, *, dry_run):
+    """Change an email address, a phone number or a postal address with the
+    form of the person form's formset, so that the rules are the same as in
+    the web interface (e.g. phone numbers are normalized)"""
+    values = form_data(form_class(instance=detail)) | data.dict(exclude_none=True)
+    form = form_class(values, instance=detail)
+    if not form.is_valid():
+        raise ValidationError([
+            {
+                "loc": ["body", "data"] + ([] if field == "__all__" else [field]),
+                "msg": message,
+            }
+            for field, messages in form.errors.items()
+            for message in messages
+        ])
+    with transaction.atomic():
+        # Also updates the weight
+        form.save()
+        # Updates the full text search
+        detail.person.save()
+        result = _person_detail_out(detail.person_id, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+def _remove_detail(detail, request, *, dry_run):
+    with transaction.atomic():
+        detail.delete()
+        # Updates the full text search
+        detail.person.save()
+        result = _person_detail_out(detail.person_id, request)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+@router.patch(
+    "/contacts/people/{int:person_id}/email-addresses/{int:email_id}/",
+    response=PersonDetailOut,
+)
+def person_change_email_address(
+    request,
+    person_id: int,
+    email_id: int,
+    data: EmailAddressPatch,
+    *,
+    dry_run: DryRun = False,
+):
+    """Change an email address of a person, like in the web interface"""
+    email = get_object_or_404(
+        EmailAddress.objects.select_related("person"), pk=email_id, person=person_id
+    )
+    return _change_detail(
+        EmailAddressFormset.form, email, data, request, dry_run=dry_run
+    )
+
+
+@router.delete(
+    "/contacts/people/{int:person_id}/email-addresses/{int:email_id}/",
+    response=PersonDetailOut,
+)
+def person_remove_email_address(
+    request, person_id: int, email_id: int, *, dry_run: DryRun = False
+):
+    """Remove an email address of a person; returns the person"""
+    email = get_object_or_404(
+        EmailAddress.objects.select_related("person"), pk=email_id, person=person_id
+    )
+    return _remove_detail(email, request, dry_run=dry_run)
+
+
+@router.patch(
+    "/contacts/people/{int:person_id}/phone-numbers/{int:phone_id}/",
+    response=PersonDetailOut,
+)
+def person_change_phone_number(
+    request,
+    person_id: int,
+    phone_id: int,
+    data: PhoneNumberPatch,
+    *,
+    dry_run: DryRun = False,
+):
+    """Change a phone number of a person, like in the web interface"""
+    phone = get_object_or_404(
+        PhoneNumber.objects.select_related("person"), pk=phone_id, person=person_id
+    )
+    return _change_detail(
+        PhoneNumberFormset.form, phone, data, request, dry_run=dry_run
+    )
+
+
+@router.delete(
+    "/contacts/people/{int:person_id}/phone-numbers/{int:phone_id}/",
+    response=PersonDetailOut,
+)
+def person_remove_phone_number(
+    request, person_id: int, phone_id: int, *, dry_run: DryRun = False
+):
+    """Remove a phone number of a person; returns the person"""
+    phone = get_object_or_404(
+        PhoneNumber.objects.select_related("person"), pk=phone_id, person=person_id
+    )
+    return _remove_detail(phone, request, dry_run=dry_run)
 
 
 @router.patch(
@@ -1722,24 +1857,23 @@ def person_change_postal_address(
         pk=address_id,
         person=person_id,
     )
-    for field, value in data.dict(exclude_none=True).items():
-        setattr(address, field, value.strip())
-    errors = []
-    full_clean(address, ["body", "data"], errors, exclude=["person"])
-    if errors:
-        raise ValidationError(errors)
-    with transaction.atomic():
-        # Also updates the weight
-        address.save()
-        # Updates the full text search
-        address.person.save()
-        person = Person.objects.select_related("organization", "primary_contact").get(
-            pk=person_id
-        )
-        result = person_out(person, request)
-        if dry_run:
-            transaction.set_rollback(True)
-    return result
+    return _change_detail(PostalAddressForm, address, data, request, dry_run=dry_run)
+
+
+@router.delete(
+    "/contacts/people/{int:person_id}/postal-addresses/{int:address_id}/",
+    response=PersonDetailOut,
+)
+def person_remove_postal_address(
+    request, person_id: int, address_id: int, *, dry_run: DryRun = False
+):
+    """Remove a postal address of a person; returns the person"""
+    address = get_object_or_404(
+        PostalAddress.objects.select_related("person"),
+        pk=address_id,
+        person=person_id,
+    )
+    return _remove_detail(address, request, dry_run=dry_run)
 
 
 @router.post("/contacts/people/{int:person_id}/merge/", response=PersonDetailOut)
