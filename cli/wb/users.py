@@ -1,18 +1,26 @@
 """Users and teams"""
 
+from urllib.parse import quote
+
 import click
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
+    complete_short_names,
     console,
+    echo_deleted,
     echo_json,
     echo_more,
+    forget_completion_values,
     format_bool,
     link,
     make_table,
     page_options,
     page_params,
     request,
+    terminate,
 )
 
 
@@ -86,3 +94,103 @@ def search_teams(query, limit, offset, as_json):
         )
     console.print(table)
     echo_more(data, offset, "teams")
+
+
+def _echo_team(team):
+    console.print(f"[bold]{link(team['name'], team['url'])}[/bold] (ID {team['id']})")
+    console.print(f"Members: {', '.join(team['members'])}")
+
+
+def _team_path(team):
+    return f"teams/{quote(team, safe='')}/"
+
+
+def _echo_changed_team(data, *, dry_run, as_json):
+    if not dry_run:
+        # The names are cached for completing --team
+        forget_completion_values("teams")
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing saved:")
+    _echo_team(data)
+
+
+@teams.command("create")
+@click.argument("name")
+@click.option(
+    "--member",
+    "members",
+    multiple=True,
+    required=True,
+    help="Short name of an active user; repeat it for several.",
+    shell_complete=complete_short_names,
+)
+@change_options(warnings=False)
+def create_team(name, members, dry_run, as_json):
+    """Create a team, e.g. for the --team option of reports and the
+    planning"""
+    data = request(
+        "POST",
+        "teams/",
+        json={"name": name, "members": list(members)},
+        params=change_params(dry_run),
+    )
+    _echo_changed_team(data, dry_run=dry_run, as_json=as_json)
+
+
+@teams.command("update")
+@click.argument("team")
+@click.option("--name", help="Renames the team.")
+@click.option(
+    "--member",
+    "members",
+    multiple=True,
+    help="Replaces the members: short name of an active user; repeat it for several.",
+    shell_complete=complete_short_names,
+)
+@click.option(
+    "--add-member",
+    "add_members",
+    multiple=True,
+    help="Short name of an active user; repeat it for several.",
+    shell_complete=complete_short_names,
+)
+@click.option(
+    "--remove-member",
+    "remove_members",
+    multiple=True,
+    help="Short name; repeat it for several.",
+    shell_complete=complete_short_names,
+)
+@change_options(warnings=False)
+def update_team(team, name, members, add_members, remove_members, dry_run, as_json):
+    """Rename a team (ID or name) or change its members
+
+    Members who left are dropped, like in the web interface."""
+    data = {
+        key: list(value) if isinstance(value, tuple) else value
+        for key, value in [
+            ("name", name),
+            ("members", members or None),
+            ("add_members", add_members),
+            ("remove_members", remove_members),
+        ]
+        if value
+    }
+    if not data:
+        terminate("Nothing to change.")
+    data = request("PATCH", _team_path(team), json=data, params=change_params(dry_run))
+    _echo_changed_team(data, dry_run=dry_run, as_json=as_json)
+
+
+@teams.command("delete")
+@click.argument("team")
+@change_options(warnings=False)
+def delete_team(team, dry_run, as_json):
+    """Delete a team (ID or name); its members stay"""
+    data = request("DELETE", _team_path(team), params=change_params(dry_run))
+    if not dry_run:
+        forget_completion_values("teams")
+    echo_deleted(data, _echo_team, what=data["name"], dry_run=dry_run, as_json=as_json)

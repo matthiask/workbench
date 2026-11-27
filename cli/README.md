@@ -95,6 +95,17 @@ the `--team` option of reports:
     wb teams search
     wb teams search design
 
+Anyone can create, change and delete teams, like in the web interface. Teams
+are given by ID or name; names are unique (case-insensitive). `--member`
+replaces the members, `--add-member` and `--remove-member` change them. Members
+who left are dropped when saving, like in the web interface. Changing teams
+forgets the team names cached for completion.
+
+    wb teams create Design --member hm --member xy
+    wb teams update Design --add-member ab --remove-member xy
+    wb teams update Design --name "Design & UX" --dry-run
+    wb teams delete "Design & UX"
+
 ## Creating projects
 
 Find the customer and the contact, then create the project. Projects are

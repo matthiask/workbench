@@ -974,6 +974,15 @@ def _completion_values(name, path, key):
     return values
 
 
+def forget_completion_values(name):
+    """Fetch the values for completing options again next time, e.g. after
+    changing teams"""
+    if url := current_installation():
+        (CACHE / f"completion-{urlsplit(url).netloc}-{name}.json").unlink(
+            missing_ok=True
+        )
+
+
 def _complete(values, incomplete):
     return [
         CompletionItem(value)

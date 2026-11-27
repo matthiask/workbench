@@ -22,7 +22,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
-from workbench.accounts.models import APIToken
+from workbench.accounts.models import APIToken, Team
 from workbench.api_keys import KEYS
 from workbench.awt.models import Absence
 from workbench.contacts.models import Group, Organization, Person
@@ -3130,6 +3130,55 @@ planned_work:
         result = self.wb("teams", "search")
         self.assertIn("Design", result.output)
         self.assertIn("ab", result.output)
+
+    def test_teams_create_update_delete(self):
+        """Teams are managed like in the web interface, changing them
+        forgets the team names cached for completing --team"""
+        factories.UserFactory.create(_short_name="xy")
+        cache = self.directory / "cache" / "completion-testserver-teams.json"
+        cache.parent.mkdir(parents=True)
+        cache.write_text('["Old"]')
+
+        result = self.wb("teams", "create", "Web team", "--member", "ab", "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertFalse(Team.objects.exists())
+        self.assertTrue(cache.exists())
+
+        result = self.wb("teams", "create", "Web team", "--member", "ab")
+        self.assertEqual(result.exit_code, 0, result.output)
+        team = Team.objects.get()
+        self.assertEqual(team.name, "Web team")
+        self.assertFalse(cache.exists())
+
+        result = self.wb(
+            "teams",
+            "update",
+            "web team",
+            "--name",
+            "Web & Design",
+            "--add-member",
+            "xy",
+            "--remove-member",
+            "ab",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("xy", result.output)
+        team.refresh_from_db()
+        self.assertEqual(team.name, "Web & Design")
+        self.assertEqual([u.get_short_name() for u in team.members.all()], ["xy"])
+
+        result = self.wb("teams", "update", "Web & Design", "--member", "ab", "--json")
+        self.assertEqual(json.loads(result.output)["members"], ["ab"])
+
+        result = self.wb("teams", "update", team.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Nothing to change", result.output)
+
+        result = self.wb("teams", "delete", "Web & Design")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Deleted Web & Design.", result.output)
+        self.assertFalse(Team.objects.exists())
 
     def test_defaults(self):
         """Nouns without a command show what's most often wanted"""
