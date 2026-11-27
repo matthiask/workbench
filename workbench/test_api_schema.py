@@ -1,3 +1,4 @@
+import ast
 import importlib
 import inspect
 import re
@@ -332,6 +333,34 @@ class CoverageTest(SimpleTestCase):
             },
             {},
         )
+
+
+class WarningCodesTest(SimpleTestCase):
+    def test_warnings_have_codes(self):
+        """Every warning has a stable kebab-case code, the API's
+        ``ignore_warnings`` names them"""
+        root = Path(__file__).parent
+        calls = 0
+        for path in sorted(root.rglob("*.py")):
+            if path.name.startswith("test"):
+                continue
+            for node in ast.walk(ast.parse(path.read_text())):
+                if not (
+                    isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Attribute)
+                    and node.func.attr == "add_warning"
+                ):
+                    continue
+                calls += 1
+                code = next(
+                    (kw.value for kw in node.keywords if kw.arg == "code"), None
+                )
+                with self.subTest(path=str(path.relative_to(root)), line=node.lineno):
+                    self.assertIsNotNone(code, "add_warning() without code=")
+                    # Codes from variables (e.g. merge_warnings()) are fine
+                    if isinstance(code, ast.Constant):
+                        self.assertRegex(code.value, r"^[a-z0-9]+(-[a-z0-9]+)*$")
+        self.assertGreater(calls, 50)
 
 
 class UnknownShortNamesTest(TestCase):
