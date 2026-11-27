@@ -405,6 +405,12 @@ a few fields. `--status sent` only records the status, nothing is mailed:
     wb invoices update 5678 --status paid --closed-on 2026-11-20 --payment-notice "Bank transfer"
     wb invoices update 5678 --subtotal 4500 --down-payment 5677 --dry-run
 
+`wb invoices delete` deletes invoices in preparation, e.g. one created twice
+(sent invoices are canceled instead):
+
+    wb invoices delete 5678 --dry-run
+    wb invoices delete 5678 --ignore-warning release-logged-services
+
 Overdue invoices to remind customers of, per customer and contact, like the
 reminders in the web interface (without postponed reminders):
 

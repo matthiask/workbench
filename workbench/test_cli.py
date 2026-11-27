@@ -2155,6 +2155,22 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("Nothing to change.", result.output)
 
+    def test_invoices_delete(self):
+        invoice = factories.InvoiceFactory.create(title="Created twice")
+        sent = factories.InvoiceFactory.create(status=Invoice.SENT)
+        result = self.wb("invoices", "delete", sent.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Invoices in preparation may be deleted", result.output)
+        result = self.wb("invoices", "delete", invoice.code, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Created twice", result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        self.assertTrue(Invoice.objects.filter(pk=invoice.pk).exists())
+        result = self.wb("invoices", "delete", invoice.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted {invoice.code}.", result.output)
+        self.assertFalse(Invoice.objects.filter(pk=invoice.pk).exists())
+
     def test_show_deals(self):
         """Projects and offers show their deals"""
         offer = factories.OfferFactory.create(title="Phase 1")

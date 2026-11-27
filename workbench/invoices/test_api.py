@@ -751,3 +751,54 @@ class InvoicesAPITest(TestCase):
             response.json()["detail"][0]["msg"],
             "Invoices which haven't been sent are deleted, not cancelled.",
         )
+
+    def test_delete(self):
+        """Invoices in preparation are deleted like in the web interface,
+        the down payments and logged work they deducted are released"""
+        project = factories.ProjectFactory.create()
+        sent = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=1000,
+            status=Invoice.SENT,
+        )
+        draft = factories.InvoiceFactory.create(
+            project=project, customer=project.customer, subtotal=5000
+        )
+        sent.down_payment_applied_to = draft
+        sent.save()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.delete(f"/api/invoices/{sent.pk}/")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["path", "invoice_id"],
+                    "msg": "Invoices in preparation may be deleted, others not.",
+                }
+            ],
+        )
+
+        url = f"/api/invoices/{draft.code}/"
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error.get("code") for error in response.json()["detail"]],
+            ["release-down-payments"],
+        )
+        response = self.client.delete(
+            f"{url}?ignore_warnings=release-down-payments&dry_run=true"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], draft.pk)
+        self.assertTrue(Invoice.objects.filter(pk=draft.pk).exists())
+
+        response = self.client.delete(f"{url}?ignore_warnings=release-down-payments")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["code"], draft.code)
+        self.assertFalse(Invoice.objects.filter(pk=draft.pk).exists())
+        sent.refresh_from_db()
+        self.assertIsNone(sent.down_payment_applied_to)

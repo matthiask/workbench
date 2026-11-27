@@ -27,6 +27,7 @@ from workbench.contacts.models import Person, postal_address_choices
 from workbench.invoices.forms import (
     CreatePersonInvoiceForm,
     CreateProjectInvoiceForm,
+    InvoiceDeleteForm,
     InvoiceForm,
     RecurringInvoiceForm,
 )
@@ -46,6 +47,7 @@ from workbench.tools.api import (
     ShortName,
     active_user,
     api_key,
+    delete_with_form,
     filter_date_range,
     form_data,
     patch_with_form,
@@ -738,6 +740,33 @@ def invoice_update(
             "down_payments": "apply_down_payment",
         },
     )
+
+
+@router.delete("/invoices/{invoice_id}/", response=InvoiceOut)
+def invoice_delete(
+    request,
+    invoice_id: str,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Delete an invoice in preparation (by ID or code) like in the web
+    interface, e.g. one created twice; sent invoices are canceled instead
+
+    The logged hours and costs and the down payments it deducted are
+    released, which are warnings unless ignored by their code. Returns the
+    deleted invoice."""
+    invoice = by_id_or_code(Invoice.objects.all(), invoice_id)
+    result = invoice_out(invoice, request)
+    delete_with_form(
+        invoice,
+        request,
+        loc=["path", "invoice_id"],
+        delete_form_class=InvoiceDeleteForm,
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+    )
+    return result
 
 
 @router.get("/invoices/{invoice_id}/pdf/")

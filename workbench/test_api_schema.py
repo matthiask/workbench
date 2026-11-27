@@ -88,6 +88,7 @@ API_ROUTES = {
         "POST /api/hosting/sites/{site_id}/contacts/remove/"
     ),
     "invoices_invoice_create": "POST /api/invoices/",
+    "invoices_invoice_delete": "DELETE /api/invoices/{invoice_id}/",
     "invoices_invoice_postpone_reminders": (
         "POST /api/invoices/{invoice_id}/postpone-reminders/"
     ),
@@ -155,7 +156,6 @@ NOT_IN_API = {
     "hosting_site_delete": "package 22",
     "hosting_sitecontact_update": "package 22",
     "invoices_invoice_createservice": "package 05",
-    "invoices_invoice_delete": "package 03",
     "invoices_invoice_send": "out of scope: sending mail",
     "invoices_recurringinvoice_create": "package 06",
     "invoices_recurringinvoice_delete": "package 06",

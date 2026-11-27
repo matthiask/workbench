@@ -12,6 +12,7 @@ from wb.core import (
     download,
     echo_actionable,
     echo_csv,
+    echo_deleted,
     echo_fields,
     echo_invoice_list,
     echo_json,
@@ -503,6 +504,25 @@ def update_invoice(
     _echo_invoice(data)
     if dry_run:
         console.print("Dry run, nothing has been saved.")
+
+
+@invoices.command("delete")
+@click.argument("invoice_id")
+@change_options()
+def delete_invoice(invoice_id, ignore_warnings, dry_run, as_json):
+    """Delete an invoice in preparation, by ID or code, e.g. one created twice
+
+    Sent invoices are canceled instead (`wb invoices update ID --status
+    canceled`). Releasing the logged work or down payments it deducted are
+    warnings (release-logged-services, release-down-payments)."""
+    data = request(
+        "DELETE",
+        f"invoices/{invoice_id}/",
+        params=change_params(dry_run, ignore_warnings),
+    )
+    echo_deleted(
+        data, _echo_invoice, what=data["code"], dry_run=dry_run, as_json=as_json
+    )
 
 
 @invoices.command("reminders")
