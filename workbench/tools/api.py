@@ -191,7 +191,8 @@ def patch_with_form(
     converter (``active_user``, ``api_key("offer_status")``,
     ``object_pk(queryset)``, raising Django's ``ValidationError`` for
     invalid values) or both as ``(name, converter)``. Errors are located at
-    the API field, ``["body", "data", <api field>]``."""
+    the API field, ``["body", "data", <api field>]``. Fields which the form
+    disables or leaves out are refused unless their value is empty."""
     if isinstance(patch, Schema):
         patch = patch.model_dump(exclude_unset=True)
     names, convert = {}, {}
@@ -211,6 +212,18 @@ def patch_with_form(
     for api_field, value in converted.items():
         values[names.get(api_field, api_field)] = value
     form = form_class(values, **form_kwargs)
+    # The web interface doesn't offer fields which the form disables or
+    # leaves out, don't ignore them silently (empty values are fine)
+    if errors := [
+        {"loc": ["body", "data", api_field], "msg": _("This field cannot be changed.")}
+        for api_field, value in converted.items()
+        if (
+            (field := form.fields.get(names.get(api_field, api_field)))
+            and field.disabled
+        )
+        or (not field and value not in ("", [], ()))
+    ]:
+        raise NinjaValidationError(errors)
     validate_form(
         form,
         fields={form_field: [api_field] for api_field, form_field in names.items()},

@@ -6,11 +6,14 @@ from ninja.errors import ValidationError as NinjaValidationError
 
 from workbench import factories
 from workbench.deals.models import Deal
+from workbench.invoices.forms import InvoiceForm
+from workbench.invoices.models import Invoice
 from workbench.offers.forms import OfferDeleteForm
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import CampaignDeleteForm, ProjectForm
 from workbench.projects.models import Campaign, Project, Service
+from workbench.reporting.models import FreezeDate
 from workbench.tools.api import (
     active_user,
     api_key,
@@ -18,7 +21,7 @@ from workbench.tools.api import (
     object_pk,
     patch_with_form,
 )
-from workbench.tools.validation import monday
+from workbench.tools.validation import in_days, monday
 
 
 def _request(user):
@@ -158,6 +161,9 @@ class DeleteWithFormTest(TestCase):
 
 
 class PatchWithFormTest(TestCase):
+    def setUp(self):
+        deactivate_all()
+
     def test_patch(self):
         """Fields are renamed and converted, errors are located at the API
         field, dry runs return the result and change nothing"""
@@ -200,6 +206,51 @@ class PatchWithFormTest(TestCase):
         patch({"name": "After"})
         project.refresh_from_db()
         self.assertEqual((project.title, project.owned_by), ("After", request.user))
+
+    def test_disabled_and_missing_fields(self):
+        """Fields which the form disables or leaves out can't be changed,
+        they aren't ignored silently"""
+        FreezeDate.objects.create(up_to=in_days(-10))
+        invoice = factories.InvoiceFactory.create(
+            status=Invoice.PAID,
+            invoiced_on=in_days(-20),
+            due_on=in_days(-5),
+            closed_on=in_days(-15),
+            payment_notice="Paid",
+            postal_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+        )
+        request = _request(invoice.owned_by)
+
+        def patch(data):
+            return patch_with_form(
+                InvoiceForm,
+                invoice,
+                data,
+                request,
+                out=lambda invoice: invoice.title,
+                field_map={"down_payments": "apply_down_payment"},
+                ignore_warnings=["maybe-unintentional-invoice-change"],
+            )
+
+        # Disabled because the invoice is freezed; the status of freezed
+        # invoices which aren't sent anymore isn't in the form at all
+        with self.assertRaises(NinjaValidationError) as cm:
+            patch({"subtotal": 200, "status": Invoice.SENT, "title": "Ok"})
+        self.assertEqual(
+            _errors(cm),
+            [
+                {
+                    "loc": ["body", "data", "subtotal"],
+                    "msg": "This field cannot be changed.",
+                },
+                {
+                    "loc": ["body", "data", "status"],
+                    "msg": "This field cannot be changed.",
+                },
+            ],
+        )
+        # Empty values of fields which aren't in the form are fine
+        self.assertEqual(patch({"title": "Ok", "down_payments": []}), "Ok")
 
     def test_converters(self):
         self.assertEqual(api_key("deal_probability")("high"), Deal.HIGH)

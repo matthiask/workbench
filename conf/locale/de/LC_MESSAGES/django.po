@@ -1077,6 +1077,10 @@ msgid "Unknown or inactive user %r."
 msgstr "Unbekannte:r oder inaktive:r Mitarbeiter:in %r."
 
 #: workbench/tools/api.py
+msgid "This field cannot be changed."
+msgstr "Dieses Feld kann nicht geändert werden."
+
+#: workbench/tools/api.py
 #, python-format
 msgid "Expected one of %s."
 msgstr "Erlaubt sind: %s."
