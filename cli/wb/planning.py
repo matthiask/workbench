@@ -259,9 +259,27 @@ def _echo_import_result(data, *, dry_run, as_json):
         console.print(table)
     if data["planned_work"]:
         _echo_planned_work(data["planned_work"])
+    if data.get("external_work"):
+        table = make_table(
+            "ID>", "External work", "Provided by", "Service type", "Milestone", "Weeks"
+        )
+        for ew in data["external_work"]:
+            weeks = ew["weeks"]
+            table.add_row(
+                str(ew["id"] or "(new)"),
+                ew["title"],
+                ew["provided_by"],
+                ew["service_type"] or "",
+                f"{ew['milestone']} ({ew['milestone_id']})" if ew["milestone"] else "",
+                f"{weeks[0]} – {weeks[-1]} ({len(weeks)})"
+                if len(weeks) > 1
+                else weeks[0],
+            )
+        console.print(table)
     for key, what in [
         ("deleted_milestones", "milestones"),
         ("deleted_planned_work", "planned work"),
+        ("deleted_external_work", "external work"),
     ]:
         if ids := data.get(key):
             console.print(f"Deleted {what}: {', '.join(map(str, ids))}")
@@ -531,5 +549,217 @@ def batch_work(
         "planning/work/batch/",
         params=change_params(dry_run, ignore_warnings),
         json={"work": list(work_ids), "delete": delete} | changes,
+    )
+    _echo_import_result(data, dry_run=dry_run, as_json=as_json)
+
+
+def _changes(**values):
+    """The given options; - reads the notes from stdin, dates as strings"""
+    changes = {}
+    for key, value in values.items():
+        if value is None or value == ():
+            continue
+        if key == "notes":
+            changes[key] = text_or_stdin(value)
+        elif key == "weeks":
+            changes[key] = [week.date().isoformat() for week in value]
+        elif isinstance(value, dt.datetime):
+            changes[key] = value.date().isoformat()
+        else:
+            changes[key] = value
+    return changes
+
+
+def _clear(changes, flags):
+    """``--clear-FIELD`` flags set the field to null"""
+    for field, flag in flags.items():
+        option = field.replace("_", "-")
+        if flag and changes.get(field) is not None:
+            terminate(f"--clear-{option} and --{option} contradict each other.")
+        if flag:
+            changes[field] = None
+    if not changes:
+        terminate("Nothing to change.")
+    return changes
+
+
+DATE = click.DateTime(formats=["%Y-%m-%d"])
+
+
+@planning.group("milestones")
+def milestones():
+    """Add, change and delete milestones"""
+
+
+def _milestone_options(fn):
+    for option in reversed([
+        click.option("--date", type=DATE, help="The day of the milestone."),
+        click.option("--phase-starts-on", type=DATE),
+        click.option(
+            "--hours",
+            "estimated_total_hours",
+            type=float,
+            help="Planned hours, 0 by default.",
+        ),
+        click.option(
+            "--color",
+            help="Color of its planned work: #e03131 (red), #f76707 (orange),"
+            " #fcc419 (yellow), #37b24d (green), #1098ad (cyan), #3b5bdb (blue),"
+            " #7048e8 (violet) or #d6336c (pink).",
+        ),
+    ]):
+        fn = option(fn)
+    return fn
+
+
+@milestones.command("create")
+@click.argument("project_id", type=int)
+@click.argument("title")
+@_milestone_options
+@change_options()
+def create_milestone(project_id, title, dry_run, ignore_warnings, as_json, **values):
+    """Add a milestone to a project
+
+    E.g. `wb planning milestones create 1234 Launch --date 2027-03-01`."""
+    data = request(
+        "POST",
+        f"projects/{project_id}/planning/milestones/",
+        params=change_params(dry_run, ignore_warnings),
+        json={"title": title} | _changes(**values),
+    )
+    _echo_import_result(data, dry_run=dry_run, as_json=as_json)
+
+
+@milestones.command("update")
+@click.argument("milestone_id", type=int)
+@click.option("--title")
+@_milestone_options
+@click.option("--clear-phase-starts-on", is_flag=True)
+@click.option("--clear-color", is_flag=True, help="Use the service type's color.")
+@change_options()
+def update_milestone(
+    milestone_id,
+    clear_phase_starts_on,
+    clear_color,
+    dry_run,
+    ignore_warnings,
+    as_json,
+    **values,
+):
+    """Change a milestone, only the given fields"""
+    changes = _clear(
+        _changes(**values),
+        {"phase_starts_on": clear_phase_starts_on, "color": clear_color},
+    )
+    data = request(
+        "PATCH",
+        f"planning/milestones/{milestone_id}/",
+        params=change_params(dry_run, ignore_warnings),
+        json=changes,
+    )
+    _echo_import_result(data, dry_run=dry_run, as_json=as_json)
+
+
+@milestones.command("delete")
+@click.argument("milestone_id", type=int)
+@change_options(warnings=False)
+def delete_milestone(milestone_id, dry_run, as_json):
+    """Delete a milestone, its planned and external work stay without it"""
+    data = request(
+        "DELETE",
+        f"planning/milestones/{milestone_id}/",
+        params=change_params(dry_run),
+    )
+    _echo_import_result(data, dry_run=dry_run, as_json=as_json)
+
+
+@planning.group("external-work")
+def external_work():
+    """Add, change and delete external work"""
+
+
+def _external_work_options(fn):
+    for option in reversed([
+        click.option(
+            "--provided-by",
+            type=int,
+            help="Organization ID, new work defaults to the customer.",
+        ),
+        click.option(
+            "--service-type",
+            help="Title of the service type, see `wb services types`.",
+        ),
+        click.option("--milestone", type=int, help="Milestone ID."),
+        click.option(
+            "--week",
+            "weeks",
+            multiple=True,
+            type=DATE,
+            help="A day of a week of the work, can be repeated; new work"
+            " defaults to this week.",
+        ),
+        click.option("--notes", help="The text, or - to read it from stdin."),
+    ]):
+        fn = option(fn)
+    return fn
+
+
+@external_work.command("create")
+@click.argument("project_id", type=int)
+@click.argument("title")
+@_external_work_options
+@change_options()
+def create_external_work(
+    project_id, title, dry_run, ignore_warnings, as_json, **values
+):
+    """Add external work (e.g. by the customer or a freelancer) to a project"""
+    data = request(
+        "POST",
+        f"projects/{project_id}/planning/external-work/",
+        params=change_params(dry_run, ignore_warnings),
+        json={"title": title} | _changes(**values),
+    )
+    _echo_import_result(data, dry_run=dry_run, as_json=as_json)
+
+
+@external_work.command("update")
+@click.argument("work_id", type=int)
+@click.option("--title")
+@_external_work_options
+@click.option("--clear-service-type", is_flag=True)
+@click.option("--clear-milestone", is_flag=True)
+@change_options()
+def update_external_work(
+    work_id,
+    clear_service_type,
+    clear_milestone,
+    dry_run,
+    ignore_warnings,
+    as_json,
+    **values,
+):
+    """Change external work, only the given fields"""
+    changes = _clear(
+        _changes(**values),
+        {"service_type": clear_service_type, "milestone": clear_milestone},
+    )
+    data = request(
+        "PATCH",
+        f"planning/external-work/{work_id}/",
+        params=change_params(dry_run, ignore_warnings),
+        json=changes,
+    )
+    _echo_import_result(data, dry_run=dry_run, as_json=as_json)
+
+
+@external_work.command("delete")
+@click.argument("work_id", type=int)
+@change_options(warnings=False)
+def delete_external_work(work_id, dry_run, as_json):
+    """Delete external work"""
+    data = request(
+        "DELETE",
+        f"planning/external-work/{work_id}/",
+        params=change_params(dry_run),
     )
     _echo_import_result(data, dry_run=dry_run, as_json=as_json)

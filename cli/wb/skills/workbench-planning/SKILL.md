@@ -98,6 +98,23 @@ only after the user approves:
 `--week` takes any day of a week and can be repeated, giving `--week`
 replaces all weeks. New work is provisional unless `--definitive` is given.
 
+Milestones and external work (done by the customer or someone else, e.g.
+content or photos) are changed the same way, validated like in the web
+interface:
+
+    wb planning milestones create <project_id> "Launch" --date <day> --hours 40
+    wb planning milestones update <id> --date <day> --dry-run
+    wb planning milestones delete <id>       # Its work stays, without milestone
+    wb planning external-work create <project_id> "Content" --week <day> \
+        --milestone <id>                     # Provided by the customer by default
+    wb planning external-work update <id> --provided-by <organization_id>
+    wb planning external-work delete <id>
+
+Moving a milestone before its planned work warns (`work-after-milestone`),
+external work in or after the week of its milestone too
+(`weeks-after-milestone`); show the warning to the user before passing
+`--ignore-warning`.
+
 ## Changing a lot of planned work at once
 
 `wb planning work batch` selects work like `wb planning export` (`--user`,

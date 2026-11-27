@@ -114,6 +114,16 @@ API_ROUTES = {
     "notes_note_update": "PATCH /api/notes/{note_id}/",
     "offers_offer_create": "POST /api/projects/{project_id}/offers/",
     "offers_offer_update": "PATCH /api/offers/{offer_id}/",
+    "planning_externalwork_create": (
+        "POST /api/projects/{project_id}/planning/external-work/"
+    ),
+    "planning_externalwork_delete": "DELETE /api/planning/external-work/{work_id}/",
+    "planning_externalwork_update": "PATCH /api/planning/external-work/{work_id}/",
+    "planning_milestone_create": (
+        "POST /api/projects/{project_id}/planning/milestones/"
+    ),
+    "planning_milestone_delete": "DELETE /api/planning/milestones/{milestone_id}/",
+    "planning_milestone_update": "PATCH /api/planning/milestones/{milestone_id}/",
     "planning_plannedwork_create": "POST /api/projects/{project_id}/planning/work/",
     "planning_plannedwork_delete": "DELETE /api/planning/work/{work_id}/",
     "planning_plannedwork_update": "PATCH /api/planning/work/{work_id}/",
@@ -123,6 +133,12 @@ API_ROUTES = {
     "projects_project_createinvoice": "POST /api/invoices/",
     "projects_project_createoffer": "POST /api/projects/{project_id}/offers/",
     "projects_project_createservice": "POST /api/services/",
+    "projects_project_createexternalwork": (
+        "POST /api/projects/{project_id}/planning/external-work/"
+    ),
+    "projects_project_createmilestone": (
+        "POST /api/projects/{project_id}/planning/milestones/"
+    ),
     "projects_project_creatework": "POST /api/projects/{project_id}/planning/work/",
     "projects_project_logbook_batch_update_costs": (
         "POST /api/projects/{project_id}/logbook/move/"
@@ -180,20 +196,12 @@ NOT_IN_API = {
     "logbook_break_update": "package 12",
     "offers_offer_copy": "package 02",
     "offers_offer_delete": "package 02",
-    "planning_externalwork_create": "package 13",
-    "planning_externalwork_delete": "package 13",
-    "planning_externalwork_update": "package 13",
-    "planning_milestone_create": "package 13",
-    "planning_milestone_delete": "package 13",
-    "planning_milestone_update": "package 13",
     "projects_budgettransfer_delete": "package 10",
     "projects_budgettransfer_update": "package 10",
     "projects_campaign_create": "package 11",
     "projects_campaign_delete": "package 11",
     "projects_campaign_update": "package 11",
     "projects_project_createbudgettransfer": "package 10",
-    "projects_project_createexternalwork": "package 13",
-    "projects_project_createmilestone": "package 13",
     "projects_project_delete": "package 07",
     "projects_project_pin": "out of scope: own profile (pinned projects)",
     "projects_project_projected_invoices": "package 07",

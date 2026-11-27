@@ -828,6 +828,83 @@ planned_work:
                 result = self.wb("planning", "work", "batch", *args)
                 self.assertEqual(result.exit_code, 1, result.output)
 
+    def test_planning_milestones(self):
+        """Milestones are added, changed and deleted one by one"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        create = ["planning", "milestones", "create", project.pk, "Launch"]
+        create += ["--date", in_days(30).isoformat(), "--hours", 40]
+        result = self.wb(*create, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertFalse(project.milestones.exists())
+
+        result = self.wb(*create, "--color", "#37b24d")
+        self.assertEqual(result.exit_code, 0, result.output)
+        milestone = project.milestones.get()
+        self.assertEqual(
+            (milestone.color, milestone.estimated_total_hours), ("#37b24d", 40)
+        )
+
+        factories.PlannedWorkFactory.create(
+            project=project, milestone=milestone, weeks=[monday(in_days(21))]
+        )
+        update = ["planning", "milestones", "update", milestone.pk, "--clear-color"]
+        update += ["--date", in_days(14).isoformat()]
+        result = self.wb(*update)
+        self.assertEqual(result.exit_code, 1, result.output)
+        self.assertIn("work-after-milestone", result.output)
+        result = self.wb(*update, "--ignore-warning", "work-after-milestone")
+        self.assertEqual(result.exit_code, 0, result.output)
+        milestone.refresh_from_db()
+        self.assertEqual((milestone.color, milestone.date), ("", in_days(14)))
+        result = self.wb("planning", "milestones", "update", milestone.pk)
+        self.assertEqual(result.exit_code, 1, result.output)
+
+        result = self.wb("planning", "milestones", "delete", milestone.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted milestones: {milestone.pk}", result.output)
+        self.assertFalse(project.milestones.exists())
+
+    def test_planning_external_work(self):
+        """External work is added, changed and deleted one by one"""
+        factories.service_types()
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        result = self.wb(
+            "planning",
+            "external-work",
+            "create",
+            project.pk,
+            "Photos",
+            "--service-type",
+            "consulting",
+            "--week",
+            in_days(7).isoformat(),
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(project.customer.name, result.output)
+        ew = project.external_work.get()
+        self.assertEqual(ew.weeks, [monday(in_days(7))])
+
+        result = self.wb(
+            "planning",
+            "external-work",
+            "update",
+            ew.pk,
+            "--title",
+            "Pictures",
+            "--clear-service-type",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        ew.refresh_from_db()
+        self.assertEqual((ew.title, ew.service_type), ("Pictures", None))
+
+        result = self.wb("planning", "external-work", "delete", ew.pk, "--dry-run")
+        self.assertIn(f"Deleted external work: {ew.pk}", result.output)
+        self.assertTrue(project.external_work.exists())
+        result = self.wb("planning", "external-work", "delete", ew.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertFalse(project.external_work.exists())
+
     def test_logbook(self):
         """Services, logged hours and costs, absences and project statistics"""
         project = factories.ProjectFactory.create(owned_by=self.user)

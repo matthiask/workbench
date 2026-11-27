@@ -727,3 +727,224 @@ class PlanningAPITest(TestCase):
         response = self.batch({"work": [pw.pk], "delete": True})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertFalse(target.planned_work.exists())
+
+    def test_single_milestone(self):
+        """Milestones are added, changed and deleted one by one through the
+        web interface's form"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/planning/milestones/"
+
+        response = self.client.post(
+            url + "?dry_run=true",
+            {"title": "Launch", "date": in_days(30).isoformat()},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        (created,) = response.json()["milestones"]
+        self.assertIsNone(created["id"])
+        self.assertEqual(created["estimated_total_hours"], "0.0")
+        self.assertFalse(project.milestones.exists())
+
+        response = self.client.post(
+            url,
+            {
+                "title": "Launch",
+                "date": in_days(30).isoformat(),
+                "phase_starts_on": in_days(10).isoformat(),
+                "estimated_total_hours": 40,
+                "color": "#37b24d",
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        (created,) = response.json()["milestones"]
+        milestone = project.milestones.get()
+        self.assertEqual(created["id"], milestone.pk)
+        self.assertEqual(created["color"], "#37b24d")
+        self.assertEqual(milestone.estimated_total_hours, 40)
+
+        # The form's errors
+        response = self.client.post(
+            url,
+            {"title": "Launch", "date": in_days(30).isoformat(), "color": "pink"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "color"])
+
+        url = f"/api/planning/milestones/{milestone.pk}/"
+        response = self.client.patch(
+            url,
+            {"phase_starts_on": in_days(31).isoformat()},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "phase_starts_on"]
+        )
+
+        # Moving the milestone before its planned work warns
+        factories.PlannedWorkFactory.create(
+            project=project, milestone=milestone, weeks=[monday(in_days(21))]
+        )
+        response = self.client.patch(
+            url, {"date": in_days(14).isoformat()}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["code"], "work-after-milestone")
+        response = self.client.patch(
+            url + "?ignore_warnings=work-after-milestone",
+            {"date": in_days(14).isoformat(), "color": None},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        (updated,) = response.json()["milestones"]
+        self.assertEqual(updated["title"], "Launch")
+        self.assertEqual(updated["date"], in_days(14).isoformat())
+        self.assertEqual(updated["color"], "")
+
+        response = self.client.delete(url + "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["deleted_milestones"], [milestone.pk])
+        self.assertTrue(project.milestones.exists())
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(project.milestones.exists())
+        self.assertIsNone(project.planned_work.get().milestone)
+        self.assertEqual(self.client.delete(url).status_code, 404)
+
+        # Closed projects get no new milestones
+        project.closed_on = dt.date.today()
+        project.save()
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/milestones/",
+            {"title": "Launch", "date": in_days(30).isoformat()},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [{"loc": ["body", "data"], "msg": "The project is closed."}],
+        )
+
+    def test_single_external_work(self):
+        """External work is added, changed and deleted one by one through the
+        web interface's form"""
+        project = factories.ProjectFactory.create()
+        factories.service_types()
+        milestone = factories.MilestoneFactory.create(project=project, date=in_days(60))
+        other = factories.MilestoneFactory.create(date=in_days(60))
+        agency = factories.OrganizationFactory.create(name="Beispiel AG")
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/planning/external-work/"
+
+        # The customer and this week by default
+        response = self.client.post(
+            url + "?dry_run=true",
+            {"title": "Photos"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        (created,) = response.json()["external_work"]
+        self.assertIsNone(created["id"])
+        self.assertEqual(created["provided_by_id"], project.customer_id)
+        self.assertEqual(created["weeks"], [monday().isoformat()])
+        self.assertFalse(project.external_work.exists())
+
+        next_week = monday() + dt.timedelta(days=7)
+        data = {
+            "title": "Photos",
+            "provided_by": agency.pk,
+            "service_type": "consulting",
+            "milestone": milestone.pk,
+            # Any day of the week
+            "weeks": [(next_week + dt.timedelta(days=2)).isoformat()],
+            "notes": "Two days",
+        }
+        response = self.client.post(url, data, content_type="application/json")
+        self.assertEqual(response.status_code, 200, response.content)
+        (created,) = response.json()["external_work"]
+        ew = project.external_work.get()
+        self.assertEqual(created["id"], ew.pk)
+        self.assertEqual(
+            (created["provided_by"], created["service_type"], created["milestone"]),
+            ("Beispiel AG", "consulting", "Milestone"),
+        )
+        self.assertEqual(ew.weeks, [next_week])
+        self.assertEqual(ew.created_by, project.owned_by)
+
+        for patch, loc in [
+            ({"milestone": other.pk}, "milestone"),
+            ({"service_type": "nothing"}, "service_type"),
+            ({"provided_by": 0}, "provided_by"),
+            ({"weeks": []}, "weeks"),
+        ]:
+            with self.subTest(patch=patch):
+                response = self.client.post(
+                    url, data | patch, content_type="application/json"
+                )
+                self.assertEqual(response.status_code, 422, response.content)
+                self.assertEqual(
+                    response.json()["detail"][0]["loc"], ["body", "data", loc]
+                )
+
+        url = f"/api/planning/external-work/{ew.pk}/"
+        late = monday(in_days(70))
+        response = self.client.patch(
+            url, {"weeks": [late.isoformat()]}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["code"], "weeks-after-milestone")
+        response = self.client.patch(
+            url + "?ignore_warnings=weeks-after-milestone",
+            {"weeks": [late.isoformat()], "notes": None},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        (updated,) = response.json()["external_work"]
+        self.assertEqual(
+            (updated["title"], updated["weeks"], updated["notes"]),
+            ("Photos", [late.isoformat()], ""),
+        )
+        response = self.client.patch(
+            url, {"milestone": None}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        ew.refresh_from_db()
+        self.assertIsNone(ew.milestone)
+
+        # In the planning context
+        data = self.client.get(f"/api/projects/{project.pk}/planning/context/").json()
+        self.assertEqual(
+            data["external_work"],
+            [
+                {
+                    "id": ew.pk,
+                    "title": "Photos",
+                    "provided_by": "Beispiel AG",
+                    "service_type": "consulting",
+                    "milestone": None,
+                    "weeks": [late.isoformat()],
+                    "notes": "",
+                }
+            ],
+        )
+
+        # No new weeks on closed projects
+        project.closed_on = dt.date.today()
+        project.save()
+        response = self.client.patch(
+            url,
+            {"weeks": [late.isoformat(), next_week.isoformat()]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "weeks"])
+
+        response = self.client.delete(url + "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["deleted_external_work"], [ew.pk])
+        self.assertTrue(project.external_work.exists())
+        self.client.delete(url)
+        self.assertFalse(project.external_work.exists())

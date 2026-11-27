@@ -676,6 +676,16 @@ leaves:
     wb planning work batch --user ub --since 2026-12-07 --assign-to aha --dry-run
     wb planning work batch --user ub --since 2026-12-07 --assign-to aha
 
+Milestones and external work are changed one by one, through the web
+interface's forms (`--ignore-warning`, `--dry-run`, `--json`):
+
+    wb planning milestones create 1234 Launch --date 2027-03-01 --hours 40
+    wb planning milestones update 56 --date 2027-03-08 --clear-color
+    wb planning milestones delete 56
+    wb planning external-work create 1234 Content --week 2027-02-01 --milestone 56
+    wb planning external-work update 78 --provided-by 90 --clear-service-type
+    wb planning external-work delete 78
+
 ## Project statistics
 
 Hours (offered, logged, planned), amounts (sold, invoiced, logged work which

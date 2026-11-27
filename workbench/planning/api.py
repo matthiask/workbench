@@ -14,7 +14,11 @@ from workbench.accounts.models import User
 from workbench.api_keys import OfferStatus, key
 from workbench.awt.models import Absence
 from workbench.offers.models import Offer
-from workbench.planning.forms import PlannedWorkBatchForm
+from workbench.planning.forms import (
+    ExternalWorkForm,
+    MilestoneForm,
+    PlannedWorkBatchForm,
+)
 from workbench.planning.models import (
     ExternalWork,
     Milestone,
@@ -37,14 +41,18 @@ from workbench.tools.api import (
     DryRun,
     Hours,
     InputSchema,
+    Number,
     ProjectID,
     UsersFilter,
     active_user,
     date_range,
+    delete_with_form,
     filter_users,
     full_clean,
     object_pk,
+    patch_with_form,
     validate_form,
+    without_query,
 )
 from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
@@ -118,6 +126,16 @@ class PlannedWorkOut(Schema):
     notes: str
 
 
+class PlanningExternalWorkOut(Schema):
+    id: int
+    title: str
+    provided_by: str = Field(description="Name of the organization.")
+    service_type: str | None
+    milestone: int | None
+    weeks: list[dt.date]
+    notes: str
+
+
 class PlanningAbsenceOut(Schema):
     user: str
     starts_on: dt.date
@@ -132,6 +150,7 @@ class PlanningContext(Schema):
     service_types: list[str]
     milestones: list[MilestoneOut]
     planned_work: list[PlannedWorkOut]
+    external_work: list[PlanningExternalWorkOut]
     absences: list[PlanningAbsenceOut]
     import_schema: dict
 
@@ -220,6 +239,20 @@ def project_planning_context(project):
                 "service_type", "offer__project", "user"
             )
         ],
+        "external_work": [
+            {
+                "id": ew.id,
+                "title": ew.title,
+                "provided_by": ew.provided_by.name,
+                "service_type": ew.service_type.title if ew.service_type else None,
+                "milestone": ew.milestone_id,
+                "weeks": sorted(ew.weeks),
+                "notes": ew.notes,
+            }
+            for ew in project.external_work.select_related(
+                "provided_by", "service_type"
+            )
+        ],
         "absences": [
             {
                 "user": short_names[absence.user_id],
@@ -252,6 +285,9 @@ class ImportedMilestone(Schema):
     date: dt.date
     phase_starts_on: dt.date | None
     estimated_total_hours: Decimal
+    color: str = Field(
+        description="Color of its planned work, empty for the service type's."
+    )
 
 
 class ImportedPlannedWork(Schema):
@@ -267,6 +303,18 @@ class ImportedPlannedWork(Schema):
     is_provisional: bool
 
 
+class ImportedExternalWork(Schema):
+    id: int | None
+    title: str
+    provided_by: str = Field(description="Name of the organization.")
+    provided_by_id: int
+    service_type: str | None
+    milestone: str | None = Field(description="Title of the milestone.")
+    milestone_id: int | None
+    weeks: list[dt.date]
+    notes: str
+
+
 class ImportWarning(Schema):
     loc: list[str | int]
     msg: str
@@ -275,8 +323,10 @@ class ImportWarning(Schema):
 class ImportResult(Schema):
     milestones: list[ImportedMilestone]
     planned_work: list[ImportedPlannedWork]
+    external_work: list[ImportedExternalWork] = []
     deleted_milestones: list[int] = []
     deleted_planned_work: list[int] = []
+    deleted_external_work: list[int] = []
     warnings: list[ImportWarning]
 
 
@@ -418,9 +468,21 @@ def _apply_planned_work(  # noqa: C901
     )
 
 
-def _import_result(*, milestones=(), planned_work=(), warnings=(), **deleted):
+def _import_result(
+    *, milestones=(), planned_work=(), external_work=(), warnings=(), **deleted
+):
     return {
-        "milestones": list(milestones),
+        "milestones": [
+            {
+                "id": milestone.pk,
+                "title": milestone.title,
+                "date": milestone.date,
+                "phase_starts_on": milestone.phase_starts_on,
+                "estimated_total_hours": milestone.estimated_total_hours,
+                "color": milestone.color,
+            }
+            for milestone in milestones
+        ],
         "planned_work": [
             {
                 "id": pw.pk,
@@ -435,6 +497,20 @@ def _import_result(*, milestones=(), planned_work=(), warnings=(), **deleted):
                 "is_provisional": pw.is_provisional,
             }
             for pw in planned_work
+        ],
+        "external_work": [
+            {
+                "id": ew.pk,
+                "title": ew.title,
+                "provided_by": ew.provided_by.name,
+                "provided_by_id": ew.provided_by_id,
+                "service_type": ew.service_type.title if ew.service_type else None,
+                "milestone": ew.milestone.title if ew.milestone else None,
+                "milestone_id": ew.milestone_id,
+                "weeks": sorted(ew.weeks),
+                "notes": ew.notes,
+            }
+            for ew in external_work
         ],
         "warnings": list(warnings),
         **deleted,
@@ -718,6 +794,205 @@ def planned_work_batch(
         if dry_run:
             transaction.set_rollback(True)
     return result
+
+
+# The forms of the web interface's modals without their prefix
+MILESTONE_FORM = MilestoneForm.__wrapped__
+EXTERNAL_WORK_FORM = ExternalWorkForm.__wrapped__
+
+
+def _created(result, key, *, dry_run):
+    """New objects of dry runs have no ID, their save has been rolled back"""
+    if dry_run:
+        for obj in result[key]:
+            obj["id"] = None
+    return result
+
+
+class MilestoneFields(InputSchema):
+    phase_starts_on: dt.date | None = None
+    estimated_total_hours: Number | None = Field(
+        default=None, ge=0, description="Planned hours, defaults to 0."
+    )
+    color: str | None = Field(
+        default=None,
+        description="Color of its planned work, one of #e03131 (red), #f76707"
+        " (orange), #fcc419 (yellow), #37b24d (green), #1098ad (cyan), #3b5bdb"
+        " (blue), #7048e8 (violet) and #d6336c (pink); empty for the color of"
+        " the service type.",
+    )
+
+
+class MilestoneCreate(MilestoneFields):
+    title: str
+    date: dt.date
+
+
+class MilestonePatch(MilestoneFields):
+    title: str | None = None
+    date: dt.date | None = None
+
+
+@router.post("/projects/{project_id}/planning/milestones/", response=ImportResult)
+def milestone_create(
+    request,
+    project_id: int,
+    data: MilestoneCreate,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Add a milestone to the open project, validated like in the web
+    interface; the ID is null with ``dry_run``"""
+    project = get_object_or_404(Project, pk=project_id)
+    return _created(
+        patch_with_form(
+            MILESTONE_FORM,
+            Milestone(project=project),
+            data,
+            request,
+            out=lambda milestone: _import_result(milestones=[milestone]),
+            ignore_warnings=ignore_warnings,
+            dry_run=dry_run,
+            form_kwargs={"project": project},
+        ),
+        "milestones",
+        dry_run=dry_run,
+    )
+
+
+@router.patch("/planning/milestones/{int:milestone_id}/", response=ImportResult)
+def milestone_update(
+    request,
+    milestone_id: int,
+    data: MilestonePatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change single fields of a milestone, validated like in the web
+    interface; moving it before its planned work warns
+    (``work-after-milestone``)"""
+    return patch_with_form(
+        MILESTONE_FORM,
+        get_object_or_404(Milestone.objects.select_related("project"), pk=milestone_id),
+        data,
+        request,
+        out=lambda milestone: _import_result(milestones=[milestone]),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+    )
+
+
+@router.delete("/planning/milestones/{int:milestone_id}/", response=ImportResult)
+def milestone_delete(request, milestone_id: int, *, dry_run: DryRun = False):
+    """Delete a milestone, its planned and external work stay without
+    milestone"""
+    milestone = get_object_or_404(Milestone, pk=milestone_id)
+    delete_with_form(milestone, request, loc=["path", "milestone_id"], dry_run=dry_run)
+    return _import_result(deleted_milestones=[milestone_id])
+
+
+def _service_type_pk(title):
+    if service_type := ServiceType.objects.filter(title=title).first():
+        return service_type.pk
+    raise DjangoValidationError(_("Unknown service type %r.") % title)
+
+
+def _mondays_of(weeks):
+    return sorted({monday(week).isoformat() for week in weeks})
+
+
+EXTERNAL_WORK_FIELDS = {"service_type": _service_type_pk, "weeks": _mondays_of}
+
+
+class ExternalWorkFields(InputSchema):
+    provided_by: int | None = Field(
+        default=None,
+        description="ID of the organization, new work defaults to the customer.",
+    )
+    service_type: str | None = Field(
+        default=None, description="Title of the primary service type."
+    )
+    milestone: int | None = Field(
+        default=None, description="ID of a milestone of the project."
+    )
+    weeks: list[dt.date] | None = Field(
+        default=None,
+        min_length=1,
+        description="A day of each week of the work (stored as Mondays), new"
+        " work defaults to this week.",
+    )
+    notes: str | None = None
+
+
+class ExternalWorkCreate(ExternalWorkFields):
+    title: str
+
+
+class ExternalWorkPatch(ExternalWorkFields):
+    title: str | None = None
+
+
+@router.post("/projects/{project_id}/planning/external-work/", response=ImportResult)
+def external_work_create(
+    request,
+    project_id: int,
+    data: ExternalWorkCreate,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Add external work to the open project, validated like in the web
+    interface; the ID is null with ``dry_run``"""
+    project = get_object_or_404(Project, pk=project_id)
+    return _created(
+        patch_with_form(
+            EXTERNAL_WORK_FORM,
+            ExternalWork(project=project),
+            data,
+            without_query(request),
+            out=lambda ew: _import_result(external_work=[ew]),
+            ignore_warnings=ignore_warnings,
+            dry_run=dry_run,
+            field_map=EXTERNAL_WORK_FIELDS,
+            form_kwargs={"project": project},
+        ),
+        "external_work",
+        dry_run=dry_run,
+    )
+
+
+@router.patch("/planning/external-work/{int:work_id}/", response=ImportResult)
+def external_work_update(
+    request,
+    work_id: int,
+    data: ExternalWorkPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change single fields of external work, validated like in the web
+    interface; work in or after the week of its milestone warns
+    (``weeks-after-milestone``)"""
+    return patch_with_form(
+        EXTERNAL_WORK_FORM,
+        get_object_or_404(ExternalWork.objects.select_related("project"), pk=work_id),
+        data,
+        without_query(request),
+        out=lambda ew: _import_result(external_work=[ew]),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map=EXTERNAL_WORK_FIELDS,
+    )
+
+
+@router.delete("/planning/external-work/{int:work_id}/", response=ImportResult)
+def external_work_delete(request, work_id: int, *, dry_run: DryRun = False):
+    """Delete external work"""
+    ew = get_object_or_404(ExternalWork, pk=work_id)
+    delete_with_form(ew, request, loc=["path", "work_id"], dry_run=dry_run)
+    return _import_result(deleted_external_work=[work_id])
 
 
 class PlanningExportFilter(DateRangeFilter, UsersFilter):
