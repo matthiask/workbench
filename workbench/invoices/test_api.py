@@ -470,6 +470,28 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "site"])
 
+    def test_recurring_invoice_delete(self):
+        """Recurring invoices are deleted like in the web interface, the
+        invoices they created stay"""
+        recurring = factories.RecurringInvoiceFactory.create(title="Hosting")
+        invoice = factories.InvoiceFactory.create(recurring_invoice=recurring)
+        self.client.force_login(recurring.owned_by)
+        url = f"/api/recurring-invoices/{recurring.pk}/"
+
+        response = self.client.delete(f"{url}?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], recurring.pk)
+        self.assertTrue(RecurringInvoice.objects.filter(pk=recurring.pk).exists())
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "Hosting")
+        self.assertFalse(RecurringInvoice.objects.filter(pk=recurring.pk).exists())
+        invoice.refresh_from_db()
+        self.assertIsNone(invoice.recurring_invoice)
+
+        self.assertEqual(self.client.delete(url).status_code, 404)
+
     @override_settings(
         FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.HOSTING: F.NEVER}
     )

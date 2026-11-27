@@ -453,6 +453,11 @@ to the billing address, the responsible person to you, the start to today.
     wb recurring-invoices create --contact 456 --title Hosting \
         --periodicity yearly --subtotal 1200 --dry-run
 
+`delete` removes one created by mistake (the invoices it created stay); to
+stop creating invoices, cancel the auto-renewal with `--ends-on` instead:
+
+    wb recurring-invoices delete 123 --dry-run
+
 `update` changes every field of the web interface's form (`--subtotal`,
 `--discount`, `--periodicity`, `--starts-on`, `--ends-on`, `--no-vat`,
 `--owned-by`, ...); the next period is computed. `--ends-on ""` renews an

@@ -2253,6 +2253,14 @@ planned_work:
         self.assertEqual(recurring.subtotal, 1200)
         self.assertIn("Musterweg 1", recurring.postal_address)
 
+        result = self.wb("recurring-invoices", "delete", recurring.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        result = self.wb("recurring-invoices", "delete", recurring.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Deleted Hosting.", result.output)
+        self.assertFalse(RecurringInvoice.objects.exists())
+
     def test_invoice_reminders(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         overdue = factories.InvoiceFactory.create(

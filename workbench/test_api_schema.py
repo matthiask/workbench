@@ -100,6 +100,9 @@ API_ROUTES = {
     "invoices_invoice_settle": "PATCH /api/invoices/{invoice_id}/",
     "invoices_invoice_update": "PATCH /api/invoices/{invoice_id}/",
     "invoices_recurringinvoice_create": "POST /api/recurring-invoices/",
+    "invoices_recurringinvoice_delete": (
+        "DELETE /api/recurring-invoices/{invoice_id}/"
+    ),
     "invoices_recurringinvoice_update": "PATCH /api/recurring-invoices/{invoice_id}/",
     "logbook_loggedcost_create": "POST /api/logbook/costs/",
     "logbook_loggedcost_delete": "DELETE /api/logbook/costs/{cost_id}/",
@@ -185,7 +188,6 @@ NOT_IN_API = {
     "expenses_expensereport_update": "out of scope: bookkeeping",
     "invoices_invoice_createservice": "package 05",
     "invoices_invoice_send": "out of scope: sending mail",
-    "invoices_recurringinvoice_delete": "package 06",
     "invoices_reminders": "out of scope: sending mail",
     "invoices_send_reminder": "out of scope: sending mail",
     "invoices_service_delete": "package 05",

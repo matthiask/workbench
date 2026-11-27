@@ -917,6 +917,28 @@ def update_recurring_invoice(
         console.print("Dry run, nothing has been saved.")
 
 
+@recurring_invoices.command("delete")
+@click.argument("invoice_id", type=int)
+@change_options(warnings=False)
+def delete_recurring_invoice(invoice_id, dry_run, as_json):
+    """Delete a recurring invoice, e.g. one created by mistake
+
+    The invoices it created stay. To stop creating invoices, cancel the
+    auto-renewal instead (`wb recurring-invoices update ID --ends-on DATE`)."""
+    data = request(
+        "DELETE",
+        f"recurring-invoices/{invoice_id}/",
+        params=change_params(dry_run),
+    )
+    echo_deleted(
+        data,
+        _echo_recurring_invoice,
+        what=data["title"],
+        dry_run=dry_run,
+        as_json=as_json,
+    )
+
+
 @cli.group("projected-invoices", invoke_without_command=True)
 @click.pass_context
 def projected_invoices(ctx):

@@ -1139,3 +1139,15 @@ def recurring_invoice_update(
         field_map={"owned_by": active_user},
         form_kwargs={"request": without_query(request)},
     )
+
+
+@router.delete("/recurring-invoices/{int:invoice_id}/", response=RecurringInvoiceOut)
+def recurring_invoice_delete(request, invoice_id: int, *, dry_run: DryRun = False):
+    """Delete a recurring invoice like in the web interface, e.g. one created
+    by mistake; the invoices it created stay. To stop creating invoices,
+    cancel the auto-renewal (``ends_on``) instead. Returns the deleted
+    recurring invoice."""
+    invoice = get_object_or_404(RecurringInvoice, pk=invoice_id)
+    result = recurring_invoice_out(invoice, request)
+    delete_with_form(invoice, request, loc=["path", "invoice_id"], dry_run=dry_run)
+    return result
