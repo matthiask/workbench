@@ -463,6 +463,7 @@ a contact for outages have problems; `wb sites` lists them:
     wb sites update www.beispiel.ch --archived
     wb sites contacts add www.beispiel.ch 678                # outages and maintenance
     wb sites contacts add www.beispiel.ch 679 --role it      # DNS etc.
+    wb sites contacts update www.beispiel.ch 91 --role it    # contact ID, see show
     wb sites contacts remove www.beispiel.ch 678
     wb sites delete www.beispiel.ch     # created by mistake; archive the others
 

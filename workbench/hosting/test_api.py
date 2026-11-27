@@ -221,6 +221,61 @@ class HostingAPITest(TestCase):
         self.assertEqual(response.json()["title"], server.title)
         self.assertFalse(Server.objects.exists())
 
+    def test_site_contact_update(self):
+        """The role (and the person) of a site contact, through the form"""
+        site = factories.SiteFactory.create(title="www.example.com")
+        person = factories.PersonFactory.create()
+        contact = site.contacts.create(person=person, role="outage")
+        url = f"/api/hosting/sites/www.example.com/contacts/{contact.pk}/"
+
+        response = self.client.patch(
+            url + "?dry_run=1", {"role": "it"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["contacts"][0]["role"], "it")
+        contact.refresh_from_db()
+        self.assertEqual(contact.role, "outage")
+
+        response = self.client.patch(
+            url, {"role": "it"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        [data] = response.json()["contacts"]
+        self.assertEqual(data["contact_id"], contact.pk)
+        self.assertEqual(data["role"], "it")
+        self.assertIn("no_outage_contact", response.json()["problems"])
+        contact.refresh_from_db()
+        self.assertEqual(contact.role, "it")
+
+        # The form refuses duplicates
+        site.contacts.create(person=person, role="outage")
+        response = self.client.patch(
+            url, {"role": "outage"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+
+        response = self.client.patch(
+            url, {"role": "boss"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+
+        other = factories.PersonFactory.create()
+        response = self.client.patch(
+            url, {"person": other.pk}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        contact.refresh_from_db()
+        self.assertEqual(contact.person, other)
+
+        # Only contacts of this site
+        other_site = factories.SiteFactory.create(title="www.example.org")
+        response = self.client.patch(
+            f"/api/hosting/sites/{other_site.pk}/contacts/{contact.pk}/",
+            {"role": "outage"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 404)
+
     @override_settings(FEATURES={FEATURES.HOSTING: F.NEVER})
     def test_without_feature(self):
         self.assertEqual(self.client.get("/api/hosting/sites/").status_code, 403)

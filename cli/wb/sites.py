@@ -130,11 +130,18 @@ def _echo_site(data):
     if data["contacts"]:
         console.print()
         table = make_table(
-            "Person ID>", "Person", "Role", "Organization", "Email", "Phone"
+            "Contact ID>",
+            "Person ID>",
+            "Person",
+            "Role",
+            "Organization",
+            "Email",
+            "Phone",
         )
         for contact in data["contacts"]:
             organization = contact["organization"]
             table.add_row(
+                str(contact["contact_id"]),
                 str(contact["id"]),
                 link(contact["full_name"], contact["url"]),
                 contact["role_label"],
@@ -303,7 +310,7 @@ def delete_site(site, dry_run, as_json):
 
 @sites.group()
 def contacts():
-    """Add and remove the contacts of a site"""
+    """Add, change and remove the contacts of a site"""
 
 
 @contacts.command("add")
@@ -327,6 +334,40 @@ def add_contact(site, person, role, dry_run, as_json):
         params={"dry_run": format_bool(dry_run)},
     )
     echo_json(data) if as_json else _echo_site(data)
+
+
+@contacts.command("update")
+@click.argument("site")
+@click.argument("contact", type=int)
+@click.option(
+    "--role",
+    type=click.Choice(ROLES),
+    help="outage: outages and maintenance, it: IT matters like DNS records.",
+)
+@click.option("--person", type=int, help="Person ID.")
+@change_options(warnings=False)
+def update_contact(site, contact, role, person, dry_run, as_json):
+    """Change the role (or the person) of a contact (contact ID, see `wb sites
+    show`) of the site (ID or title)"""
+    data = {
+        key: value
+        for key, value in [("role", role), ("person", person)]
+        if value is not None
+    }
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"hosting/sites/{site}/contacts/{contact}/",
+        json=data,
+        params=change_params(dry_run),
+    )
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing saved:")
+    _echo_site(data)
 
 
 @contacts.command("remove")

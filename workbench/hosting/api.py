@@ -36,6 +36,7 @@ from workbench.tools.api import (
     Serialized,
     delete_with_form,
     form_data,
+    patch_with_form,
     raise_form_errors,
 )
 
@@ -526,6 +527,39 @@ def site_contact_remove(
         if dry_run:
             transaction.set_rollback(True)
     return result
+
+
+class SiteContactPatch(InputSchema):
+    """Fields which aren't given are left alone"""
+
+    person: int | None = Field(default=None, description="ID of the person.")
+    role: Role | None = Field(
+        default=None, description="outage (outages and maintenance) or it (DNS etc.)."
+    )
+
+
+@router.patch("/hosting/sites/{site_id}/contacts/{contact_id}/", response=SiteOut)
+def site_contact_update(
+    request,
+    site_id: str,
+    contact_id: int,
+    data: SiteContactPatch,
+    *,
+    dry_run: DryRun = False,
+):
+    """Change the role (or the person) of a site contact (`contact_id` in the
+    site's contacts) like in the web interface"""
+    site = _site(site_id)
+    contact = get_object_or_404(site.contacts.all(), pk=contact_id)
+    return patch_with_form(
+        # The class itself, without the prefix for modals
+        SiteContactForm.__wrapped__,
+        contact,
+        data,
+        request,
+        out=lambda contact: _site_out(_sites().get(pk=contact.site_id), request),
+        dry_run=dry_run,
+    )
 
 
 def site_summary(site):

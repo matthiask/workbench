@@ -2337,11 +2337,21 @@ planned_work:
         result = self.wb("servers")
         self.assertIn("cluster", result.output)
 
-    def test_sites_and_servers_delete(self):
-        """Deleting sites and servers"""
+    def test_sites_contact_roles_and_delete(self):
+        """Changing the role of a site contact, deleting sites and servers"""
         site = factories.SiteFactory.create(title="www.beispiel.ch")
         person = factories.PersonFactory.create(given_name="Hans", family_name="Muster")
-        site.contacts.create(person=person, role="outage")
+        contact = site.contacts.create(person=person, role="outage")
+
+        result = self.wb("sites", "show", "www.beispiel.ch")
+        self.assertIn(str(contact.pk), result.output)
+        result = self.wb(
+            "sites", "contacts", "update", "www.beispiel.ch", contact.pk, "--role", "it"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("IT", result.output)
+        contact.refresh_from_db()
+        self.assertEqual(contact.role, "it")
 
         server = site.server
         result = self.wb("servers", "delete", server.title)

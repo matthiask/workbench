@@ -89,6 +89,9 @@ API_ROUTES = {
     "hosting_sitecontact_delete": (
         "POST /api/hosting/sites/{site_id}/contacts/remove/"
     ),
+    "hosting_sitecontact_update": (
+        "PATCH /api/hosting/sites/{site_id}/contacts/{contact_id}/"
+    ),
     "invoices_invoice_create": "POST /api/invoices/",
     "invoices_invoice_delete": "DELETE /api/invoices/{invoice_id}/",
     "invoices_invoice_postpone_reminders": (
@@ -154,7 +157,6 @@ NOT_IN_API = {
     "expenses_expensereport_create": "out of scope: bookkeeping",
     "expenses_expensereport_delete": "out of scope: bookkeeping",
     "expenses_expensereport_update": "out of scope: bookkeeping",
-    "hosting_sitecontact_update": "package 22",
     "invoices_invoice_createservice": "package 05",
     "invoices_invoice_send": "out of scope: sending mail",
     "invoices_recurringinvoice_create": "package 06",
