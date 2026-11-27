@@ -145,6 +145,20 @@ invoices or logged hours or costs are closed instead:
     wb projects delete 2026-0042 --dry-run
     wb projects delete 2026-0042
 
+Budget invoiced on one project but worked off on another moves there with a
+budget transfer (controlling feature); without `--to-project` it's only
+reserved, it leaves the source project anyway. Only money moves: the sold
+amount and the gross margin follow, the hours stay. Moving more than the
+project's gross margin or its accepted offers warns
+(`budget-transfer-too-large`, `budget-transfer-beyond-offers`).
+`wb projects show` lists the transfers and their net effect:
+
+    wb projects budget-transfers list 2026-0042
+    wb projects budget-transfers create 2026-0042 --title "Re-Konzeption" --amount 8000 --dry-run
+    wb projects budget-transfers update 56 --to-project 2027-0007
+    wb projects budget-transfers update 56 --amount 6000 --reserve
+    wb projects budget-transfers delete 56
+
 `wb organizations show 123` and `wb people show 345` show the details of the
 search results, e.g. the people of an organization or the email addresses of a
 person.

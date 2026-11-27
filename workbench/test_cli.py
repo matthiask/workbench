@@ -33,7 +33,13 @@ from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.notes.models import Note
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
-from workbench.projects.models import Campaign, InternalType, Project, Service
+from workbench.projects.models import (
+    BudgetTransfer,
+    Campaign,
+    InternalType,
+    Project,
+    Service,
+)
 from workbench.reporting.models import FreezeDate
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days, monday
@@ -388,6 +394,54 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(f"Deleted {project.code}.", result.output)
         self.assertFalse(Project.objects.filter(pk=project.pk).exists())
+
+    def test_budget_transfers(self):
+        """Budget transfers are listed, created, changed and deleted; the
+        project shows them"""
+        source = factories.ProjectFactory.create(title="Kampagne")
+        offer = factories.OfferFactory.create(project=source, status=Offer.ACCEPTED)
+        factories.ServiceFactory.create(project=source, offer=offer, cost=10000)
+        offer.save()
+        target = factories.ProjectFactory.create(title="Re-Konzeption")
+
+        create = ["projects", "budget-transfers", "create", source.code]
+        create += ["--title", "Phase 2", "--amount", 3000]
+        result = self.wb(*create, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertFalse(BudgetTransfer.objects.exists())
+        result = self.wb(*create)
+        self.assertEqual(result.exit_code, 0, result.output)
+        transfer = BudgetTransfer.objects.get()
+        self.assertEqual((transfer.amount, transfer.to_project), (3000, None))
+
+        update = ["projects", "budget-transfers", "update", transfer.pk]
+        result = self.wb(*update, "--amount", 20000)
+        self.assertEqual(result.exit_code, 1, result.output)
+        self.assertIn("budget-transfer-too-large", result.output)
+        result = self.wb(*update, "--to-project", target.code, "--notes", "Later")
+        self.assertEqual(result.exit_code, 0, result.output)
+        transfer.refresh_from_db()
+        self.assertEqual((transfer.to_project, transfer.notes), (target, "Later"))
+
+        result = self.wb("projects", "budget-transfers", "list", target.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Phase 2", result.output)
+        self.assertIn("+3000.00", result.output)
+        result = self.wb("projects", "show", source.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Budget transfers", result.output)
+        self.assertIn("-3000.00", result.output)
+
+        result = self.wb(*update, "--reserve")
+        self.assertEqual(result.exit_code, 0, result.output)
+        transfer.refresh_from_db()
+        self.assertIsNone(transfer.to_project)
+
+        result = self.wb("projects", "budget-transfers", "delete", transfer.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted budget transfer {transfer.pk}.", result.output)
+        self.assertFalse(BudgetTransfer.objects.exists())
 
     def test_projected_invoices_set(self):
         """The projected invoices of a project are replaced from options or a

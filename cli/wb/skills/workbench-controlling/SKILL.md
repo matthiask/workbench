@@ -55,6 +55,10 @@ disputes change how an open invoice should be described.
   only available for the current week.
 - In the budget report, a positive `delta` is work which hasn't been invoiced
   yet, a negative one accruals. Offered amounts only count for open projects.
+- Budget transfers move budget invoiced on one project to the project doing
+  the work (or reserve it): "sold" and the gross margin include them, the
+  hours don't move. `wb projects show <project>` shows them and their net
+  effect (`budget_adjustment` in `--json`).
 - Profitability estimates should rather underestimate than overestimate.
 
 ## 3. Write the summary

@@ -131,6 +131,13 @@ def show_project(project_id, as_json):
             ),
             ("Closed on", project["closed_on"]),
             ("Deals", deal_links(project.get("deals"))),
+            # Net budget transfers, part of sold and gross margin
+            (
+                "Budget transfers",
+                project["budget_adjustment"]
+                if project.get("budget_transfers")
+                else None,
+            ),
             ("URL", project["url"]),
         ],
         url=project["url"],
@@ -138,6 +145,11 @@ def show_project(project_id, as_json):
     if project["description"]:
         console.print()
         console.print(project["description"])
+    if project.get("budget_transfers"):
+        console.print()
+        console.print(
+            _budget_transfer_table(project["budget_transfers"], project["id"])
+        )
     if offers is not None:
         console.print()
         echo_offer_list(offers)
@@ -449,6 +461,153 @@ def delete_project(project_id, dry_run, as_json):
         data,
         lambda data: _echo_saved_project(data, dry_run=False, as_json=False),
         what=data["code"],
+        dry_run=dry_run,
+        as_json=as_json,
+    )
+
+
+@projects.group("budget-transfers")
+def budget_transfers():
+    """List, create, change and delete budget transfers
+
+    Budget invoiced on one project but worked off on another (or reserved
+    for that) follows the hours: it counts as sold and as gross margin of
+    the project which does the work. Only money moves, the hours stay."""
+
+
+def _budget_transfer_table(transfers, project=None):
+    """Amounts from the point of view of ``project``: out negative, in
+    positive"""
+    table = make_table("ID>", "Amount>", "Title", "From", "To", "Notes")
+    for transfer in transfers:
+        sign = ""
+        if project is not None:
+            sign = "-" if transfer["from_project"]["id"] == project else "+"
+        to = transfer["to_project"]
+        table.add_row(
+            link(transfer["id"], transfer["url"]),
+            f"{sign}{transfer['amount']}",
+            transfer["title"],
+            _project_label(transfer["from_project"]),
+            _project_label(to) if to else "reserved",
+            transfer["notes"],
+        )
+    return table
+
+
+def _project_label(project):
+    return link(f"{project['code']} {project['title']}", project["url"])
+
+
+def _echo_budget_transfer(data, *, dry_run=False, as_json=False):
+    if as_json:
+        echo_json(data)
+        return
+    console.print(_budget_transfer_table([data]))
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
+
+
+@budget_transfers.command("list")
+@click.argument("project_id")
+@click.option("--json", "as_json", is_flag=True)
+def list_budget_transfers(project_id, as_json):
+    """The budget transfers from and to a project (by ID or code)"""
+    project = request("GET", f"projects/{project_id}/")
+    data = request("GET", f"projects/{project['id']}/budget-transfers/")
+    if as_json:
+        echo_json(data)
+        return
+    console.print(_budget_transfer_table(data, project["id"]))
+
+
+def _budget_transfer_options(fn):
+    for option in reversed([
+        click.option("--title"),
+        click.option(
+            "--amount",
+            type=float,
+            help="Part of the total invoiced on the source project.",
+        ),
+        click.option(
+            "--to-project",
+            help="ID or code of the project which does the work, without it"
+            " the budget is only reserved.",
+        ),
+        click.option("--notes", help="The text, or - to read it from stdin."),
+    ]):
+        fn = option(fn)
+    return fn
+
+
+def _budget_transfer_changes(**values):
+    if "notes" in values:
+        values["notes"] = text_or_stdin(values["notes"])
+    return {key: value for key, value in values.items() if value is not None}
+
+
+@budget_transfers.command("create")
+@click.argument("project_id")
+@_budget_transfer_options
+@change_options()
+def create_budget_transfer(project_id, dry_run, ignore_warnings, as_json, **values):
+    """Move budget away from a project (by ID or code)
+
+    Moving more than the project's gross margin or its accepted offers
+    warns (budget-transfer-too-large, budget-transfer-beyond-offers)."""
+    changes = _budget_transfer_changes(**values)
+    for option in ["title", "amount"]:
+        if option not in changes:
+            terminate(f"--{option} is required.")
+    data = request(
+        "POST",
+        f"projects/{project_id}/budget-transfers/",
+        params=change_params(dry_run, ignore_warnings),
+        json=changes,
+    )
+    _echo_budget_transfer(data, dry_run=dry_run, as_json=as_json)
+
+
+@budget_transfers.command("update")
+@click.argument("transfer_id", type=int)
+@_budget_transfer_options
+@click.option("--reserve", is_flag=True, help="Remove the target project.")
+@change_options()
+def update_budget_transfer(
+    transfer_id, reserve, dry_run, ignore_warnings, as_json, **values
+):
+    """Change a budget transfer, only the given fields
+
+    The source project can't be changed, delete the transfer and create a
+    new one."""
+    changes = _budget_transfer_changes(**values)
+    if reserve:
+        if "to_project" in changes:
+            terminate("Use either --to-project or --reserve.")
+        changes["to_project"] = None
+    if not changes:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"budget-transfers/{transfer_id}/",
+        params=change_params(dry_run, ignore_warnings),
+        json=changes,
+    )
+    _echo_budget_transfer(data, dry_run=dry_run, as_json=as_json)
+
+
+@budget_transfers.command("delete")
+@click.argument("transfer_id", type=int)
+@change_options(warnings=False)
+def delete_budget_transfer(transfer_id, dry_run, as_json):
+    """Delete a budget transfer, the budget goes back to its source project"""
+    data = request(
+        "DELETE", f"budget-transfers/{transfer_id}/", params=change_params(dry_run)
+    )
+    echo_deleted(
+        data,
+        _echo_budget_transfer,
+        what=f"budget transfer {transfer_id}",
         dry_run=dry_run,
         as_json=as_json,
     )
