@@ -1,0 +1,123 @@
+---
+name: workbench-hosting
+description: Keep the hosted sites in Workbench current with the `wb` CLI, compared with what actually runs on the servers (Kubernetes ingresses, vhosts), and find whom to contact about an outage or a maintenance window. Finds running sites missing in Workbench, sites which don't run anymore, sites without recurring invoice or without contact for outages. Use when the user wants to update, check or import the list of sites or hosting customers, asks which sites run on a server, which sites have no recurring invoice, or whom to inform about an outage or maintenance of a server.
+---
+
+# Hosted sites in Workbench
+
+The `wb` CLI talks to Workbench (see `wb --help`). If `wb` isn't installed or
+configured, tell the user to run
+`uv tool install "git+https://github.com/matthiask/workbench#subdirectory=cli"`
+and `wb login URL --write`. Writing needs `--write`; if `wb` answers that the
+token only allows reading, ask the user to log in with `--write` instead of
+working around it. Sites need the hosting feature; without it `wb` answers
+403, tell the user.
+
+Propose, people decide. Collect, compare, then show the user what you'd
+change as tables grouped by kind of finding. Validate every change with
+`--dry-run` and only write after the user explicitly approves. Never
+archive a site, end a recurring invoice or remove a contact on a guess.
+
+A site is one website on one server: its main domain is the title, further
+host names are its domains, it has a customer (organization), the person
+at our end who knows it best (`owned_by`), contacts with a role (`outage`:
+outages and maintenance, `it`: IT matters like DNS records, e.g. at the
+customer's IT provider) and optionally a link to its entry in the password
+manager (never the credentials themselves). Recurring invoices point to
+their site, a site may have several.
+
+    wb servers                          # the servers
+    wb sites                            # active sites with problems
+    wb sites search --server SERVER --csv
+    wb sites show SITE                  # ID or title
+
+## Whom to contact about a server
+
+For an outage or a maintenance window:
+
+    wb servers show SERVER              # outage contacts with their sites
+    wb servers show SERVER --emails     # comma separated, for BCC
+
+Mention contacts without email address and active sites without outage
+contact (`wb sites search --server SERVER --problems`): they won't get the
+mail. Draft the mail only if asked; don't send anything yourself.
+
+## Updating the list of sites
+
+Run it every few months (there may be a recurring to-do for it) or before a
+migration. Ask which servers to check, all by default (`wb servers`).
+
+### 1. Collect what runs
+
+Ask the user how to list the sites of each server if you don't know yet; it
+differs per server. Typical sources, run with the user's own access:
+
+- Kubernetes clusters: `kubectl get ingress --all-namespaces -o json`
+  (check the context with `kubectl config current-context` and ask if it
+  isn't obviously the server's cluster). Group the ingresses into sites,
+  e.g. by the label of the deployment tool or by their name; skip system
+  namespaces.
+- Servers with vhosts: ask the user for the command listing them (domains
+  and aliases per vhost) and for its output or a file. Leave out the
+  server's own technical host names.
+- Anything else: ask for a list of host names per site.
+
+Host names only in our own zones (staging and preview domains) usually
+aren't customer sites; list them separately and ask.
+
+### 2. Compare
+
+    wb sites search --server SERVER --include-archived --csv
+
+The CSV has the host names (title and domains) of each site. Match running
+sites to Workbench sites by host name, lowercased and ignoring a leading
+`www.`. Group the findings:
+
+1. **Running, not in Workbench**: propose a site per running site, with the
+   main domain as title and the other host names as domains. Find the
+   customer with `wb organizations search` and the recurring invoices with
+   `wb recurring-invoices search DOMAIN --include-closed` (the domain is
+   often in the title or description); their customer is the site's
+   customer.
+2. **In Workbench, not running anymore**: propose archiving the site
+   (`wb sites update SITE --archived`). Show its recurring invoices: ending
+   them is the user's decision in the web interface (or ask before using
+   `wb recurring-invoices update`).
+3. **Moved**: the host names run on another server than recorded; propose
+   `wb sites update SITE --server OTHER`.
+4. **Host names changed**: propose the new domains (`--domain` replaces all
+   further domains, `--no-domains` removes them).
+5. **Archived in Workbench, but running**: ask; maybe unarchive it
+   (`--not-archived`).
+
+### 3. Problems
+
+    wb sites search --problems
+
+- **No recurring invoice**: search for one (`wb recurring-invoices search
+  DOMAIN --include-closed`, `--customer ID`). If one exists, link it:
+  `wb recurring-invoices update ID --site SITE_ID --dry-run`. If there is
+  none, ask: is hosting included elsewhere (maintenance contract, mandate,
+  internal site)? Then record the reason with
+  `wb sites update SITE --no-invoice-reason "…"`. Otherwise it's hosting
+  nobody invoices: list it for the user, creating recurring invoices is
+  theirs to do in the web interface.
+- **No contact for outages**: propose people, e.g. the contact of the
+  recurring invoice or of the customer's recent projects
+  (`wb organizations show ID`, `wb people search --organization ID`), and
+  ask; the person receiving invoices isn't necessarily the right one.
+  `wb sites contacts add SITE PERSON_ID --dry-run`. Create missing people
+  with the workbench-contact skill.
+
+### 4. Write
+
+After the user approved, apply the changes one by one without `--dry-run`:
+
+    wb sites create --title www.beispiel.ch --domain beispiel.ch \
+        --server SERVER --customer 345 --dry-run
+    wb sites contacts add www.beispiel.ch 678 --role outage --dry-run
+    wb sites contacts add www.beispiel.ch 679 --role it --dry-run
+
+Finish with a short summary: what was created, changed and archived, and
+what's left for the user (sites nobody invoices, missing contacts, invoices
+to end).

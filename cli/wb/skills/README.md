@@ -81,6 +81,15 @@ It changes only what the user told it, and never closes, declines or reopens
 deals on its own or invents values, probabilities, dates or reasons; values
 it derives from offers and invoices are proposals the user approves.
 
+## workbench-hosting
+
+Keeps the hosted sites current (requires the hosting feature): compares
+what runs on the servers (Kubernetes ingresses, vhost lists, collected with
+the user's own access) with the sites in Workbench, proposes new sites,
+moved or archived ones, links recurring invoices and records why a site has
+none, and proposes contacts for outages. Also answers whom to inform about
+an outage or a maintenance window of a server.
+
 ## workbench-logbook
 
 Logs hours and costs from what the user points it to (notes, a calendar,
