@@ -117,6 +117,7 @@ API_ROUTES = {
     "notes_note_update": "PATCH /api/notes/{note_id}/",
     "offers_offer_copy": "POST /api/offers/{offer_id}/copy/",
     "offers_offer_create": "POST /api/projects/{project_id}/offers/",
+    "offers_offer_delete": "DELETE /api/offers/{offer_id}/",
     "offers_offer_update": "PATCH /api/offers/{offer_id}/",
     "planning_externalwork_create": (
         "POST /api/projects/{project_id}/planning/external-work/"
@@ -196,7 +197,6 @@ NOT_IN_API = {
     "logbook_break_create": "package 12",
     "logbook_break_delete": "package 12",
     "logbook_break_update": "package 12",
-    "offers_offer_delete": "package 02",
     "projects_budgettransfer_delete": "package 10",
     "projects_budgettransfer_update": "package 10",
     "projects_campaign_create": "package 11",

@@ -3805,6 +3805,13 @@ msgstr "Nur die Zwischentitel von Offerten in Vorbereitung können geändert wer
 msgid "The offer has no service with this ID."
 msgstr "Die Offerte hat keine Leistung mit dieser ID."
 
+#: workbench/offers/api.py
+msgid ""
+"The services of this offer cannot be deleted, they have logged hours or "
+"costs or have been invoiced."
+msgstr ""
+"Die Leistungen dieser Offerte können nicht gelöscht werden, sie haben "
+"erfasste Stunden oder Kosten oder wurden bereits verrechnet."
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
 #: workbench/templates/reporting/accepted_deals.html workbench/tools/pdf.py

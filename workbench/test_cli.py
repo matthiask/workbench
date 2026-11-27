@@ -1216,6 +1216,36 @@ planned_work:
         self.assertEqual(copy.owned_by, self.user)
         self.assertEqual(copy.services.count(), 1)
 
+    def test_offers_delete(self):
+        """Offers are deleted like in the web interface"""
+        offer = factories.OfferFactory.create()
+        project = offer.project
+        service = factories.ServiceFactory.create(project=project, offer=offer)
+        factories.PlannedWorkFactory.create(
+            project=project, offer=offer, weeks=[monday()]
+        )
+        result = self.wb("offers", "delete", offer.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("delete_planned_work: This field is required.", result.output)
+        result = self.wb(
+            "offers",
+            "delete",
+            offer.code,
+            "--delete-planned-work",
+            "--delete-services",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        self.assertTrue(Offer.objects.filter(pk=offer.pk).exists())
+        result = self.wb(
+            "offers", "delete", offer.pk, "--delete-planned-work", "--delete-services"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted {offer.code}.", result.output)
+        self.assertFalse(Offer.objects.filter(pk=offer.pk).exists())
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
+
     def test_milestones(self):
         """Milestones are linked with offers through their external references"""
         project = factories.ProjectFactory.create(title="Relaunch", owned_by=self.user)

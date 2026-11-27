@@ -231,6 +231,13 @@ another project), copy it and revise the copy, which is in preparation:
 
     wb offers copy <offer_id> --project <project_id_or_code> --dry-run
 
+Delete an offer only when the user asks for it (e.g. one created by
+mistake), first with `--dry-run`; sent offers can't be deleted, they're
+declined instead. Without `--delete-services` its services stay on the
+project without offer:
+
+    wb offers delete <offer_id> --dry-run
+
 Only for a completely new version of the offer, replace it entirely (as long
 as nothing has been logged on its services yet), again with the user's
 explicit approval:

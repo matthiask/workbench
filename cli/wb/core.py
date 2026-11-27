@@ -443,7 +443,12 @@ def format_error(error):
     message = error["msg"]
     if code := error.get("code"):
         message = f"{message} (warning, ignore with --ignore-warning {code})"
-    if loc := ".".join(str(part) for part in error["loc"][2:]):
+    # Located in the body ("body", "data", ...), or at a query parameter
+    # (also of filters: "query", "filters", ...)
+    parts = error["loc"][2:] or (
+        error["loc"][1:] if error["loc"][:1] == ["query"] else []
+    )
+    if loc := ".".join(str(part) for part in parts):
         return f"{loc}: {message}"
     return message
 

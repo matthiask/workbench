@@ -17,7 +17,7 @@ from workbench.accounts.features import FEATURES
 from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, OfferStatus, key
 from workbench.contacts.models import postal_address_choices
-from workbench.offers.forms import OfferCopyForm, OfferForm
+from workbench.offers.forms import OfferCopyForm, OfferDeleteForm, OfferForm
 from workbench.offers.models import (
     Offer,
     OfferHeading,
@@ -49,6 +49,7 @@ from workbench.tools.api import (
     ShortName,
     active_user,
     api_key,
+    delete_with_form,
     filter_date_range,
     full_clean,
     object_pk,
@@ -842,6 +843,68 @@ def offer_copy(
             result |= {"id": None, "code": None, "url": None}
             for item in [*result["services"], *result["headings"]]:
                 item.id = None
+    return result
+
+
+@router.delete("/offers/{offer_id}/", response=OfferOut)
+def offer_delete(
+    request,
+    offer_id: str,
+    *,
+    delete_services: Query[
+        bool,
+        P(
+            description="Delete the offer's services too, else they stay on the"
+            " project without offer. Not possible if they have logged hours or"
+            " costs or have been invoiced."
+        ),
+    ] = False,
+    delete_planned_work: Query[
+        bool,
+        P(
+            description="Required if the offer has planned work: it is deleted"
+            " with the offer."
+        ),
+    ] = False,
+    dry_run: DryRun = False,
+):
+    """Delete an offer in preparation or a service group (by ID or code) like
+    in the web interface, e.g. a wrong one; sent offers are declined or
+    discarded instead
+
+    Returns the deleted offer."""
+    offer = by_id_or_code(
+        Offer.objects.select_related("project__customer", "owned_by"), offer_id
+    )
+    result = offer_out(offer, list(offer.services.all()), request)
+    data = {"delete_services": delete_services}
+    if delete_planned_work:
+        data["delete_planned_work"] = True
+    # The form only asks if the services can be deleted
+    if delete_services and offer.status not in {Offer.OFFERED, Offer.ACCEPTED}:
+        form = OfferDeleteForm(instance=offer, request=request)
+        if "delete_services" not in form.fields:
+            raise ValidationError([
+                {
+                    "loc": ["query", "delete_services"],
+                    "msg": _(
+                        "The services of this offer cannot be deleted, they"
+                        " have logged hours or costs or have been invoiced."
+                    ),
+                }
+            ])
+    delete_with_form(
+        offer,
+        request,
+        loc=["path", "offer_id"],
+        delete_form_class=OfferDeleteForm,
+        data=data,
+        fields={
+            "delete_services": ["query", "delete_services"],
+            "delete_planned_work": ["query", "delete_planned_work"],
+        },
+        dry_run=dry_run,
+    )
     return result
 
 

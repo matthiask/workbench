@@ -988,3 +988,75 @@ class OfferCopyDeleteRenumberAPITest(TestCase):
 
         response = self.copy({"project": closed.pk, "title": "Copy"})
         self.assertEqual(response.status_code, 422)
+
+    def delete(self, offer=None, *, query=""):
+        return self.client.delete(f"/api/offers/{(offer or self.offer).pk}/?{query}")
+
+    def test_delete(self):
+        """Offers in preparation are deleted, their services stay on the
+        project unless they are deleted too"""
+        response = self.delete(query="dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["code"], self.offer.code)
+        self.assertTrue(Offer.objects.filter(pk=self.offer.pk).exists())
+
+        response = self.client.delete(f"/api/offers/{self.offer.code}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], self.offer.pk)
+        self.assertFalse(Offer.objects.filter(pk=self.offer.pk).exists())
+        self.service.refresh_from_db()
+        self.assertIsNone(self.service.offer)
+
+        offer = factories.OfferFactory.create(project=self.project)
+        service = factories.ServiceFactory.create(project=self.project, offer=offer)
+        response = self.delete(offer, query="delete_services=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
+
+    def test_delete_refused(self):
+        """Sent offers aren't deleted, services with logged hours aren't
+        deleted with their offer"""
+        self.offer.status = Offer.OFFERED
+        self.offer.offered_on = self.offer.valid_until = dt.date.today()
+        self.offer.save()
+        response = self.delete()
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["path", "offer_id"],
+                    "msg": "Offers which have been sent or accepted cannot be deleted.",
+                }
+            ],
+        )
+
+        offer = factories.OfferFactory.create(project=self.project)
+        service = factories.ServiceFactory.create(project=self.project, offer=offer)
+        factories.LoggedHoursFactory.create(service=service)
+        response = self.delete(offer, query="delete_services=true")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["query", "delete_services"]],
+        )
+        response = self.delete(offer, query="delete_services=false")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertTrue(Service.objects.filter(pk=service.pk, offer=None).exists())
+
+    def test_delete_planned_work(self):
+        """Planned work of the offer has to be deleted with it"""
+        work = factories.PlannedWorkFactory.create(
+            project=self.project, offer=self.offer, weeks=[monday()]
+        )
+        for query in ["", "delete_planned_work=false"]:
+            response = self.delete(query=query)
+            self.assertEqual(response.status_code, 422)
+            self.assertEqual(
+                [e["loc"] for e in response.json()["detail"]],
+                [["query", "delete_planned_work"]],
+            )
+        response = self.delete(query="delete_planned_work=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(Offer.objects.filter(pk=self.offer.pk).exists())
+        self.assertFalse(type(work).objects.filter(pk=work.pk).exists())

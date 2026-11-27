@@ -310,9 +310,17 @@ Changing an offer's status doesn't change its deals; closing a deal
 accepts or declines its offers (`wb deals close`).
 
 Offers are copied with their services and headings to an open project (the
-copy is in preparation and belongs to you):
+copy is in preparation and belongs to you) and deleted like in the web
+interface (only offers in preparation and service groups; sent offers are
+declined instead):
 
     wb offers copy 2026-0042-o01 --project 2026-0057
+    wb offers delete 5678 --dry-run
+    wb offers delete 5678 --delete-services --delete-planned-work
+
+Without `--delete-services` the services stay on the project without offer;
+services with logged hours or costs can't be deleted. Offers with planned
+work need `--delete-planned-work`.
 
 External references (URLs of issues or pull requests, for example) can be
 changed for any offer, also when it has been accepted already. They replace

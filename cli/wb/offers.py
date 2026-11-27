@@ -16,6 +16,7 @@ from wb.core import (
     download,
     echo_actionable,
     echo_csv,
+    echo_deleted,
     echo_json,
     echo_more,
     echo_offer,
@@ -391,6 +392,36 @@ def copy_offer(offer_id, project, ignore_warnings, dry_run, as_json):
         json={"project": project},
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
+
+
+@offers.command("delete")
+@click.argument("offer_id")
+@click.option(
+    "--delete-services",
+    is_flag=True,
+    help="Delete the services too, else they stay on the project without offer.",
+)
+@click.option(
+    "--delete-planned-work",
+    is_flag=True,
+    help="Required if the offer has planned work, it is deleted too.",
+)
+@change_options(warnings=False)
+def delete_offer(offer_id, delete_services, delete_planned_work, dry_run, as_json):
+    """Delete an offer in preparation or a service group, by ID or code
+
+    Sent offers are declined or discarded instead (`wb offers update ID
+    --status declined`)."""
+    data = request(
+        "DELETE",
+        f"offers/{offer_id}/",
+        params=change_params(dry_run)
+        | {
+            "delete_services": format_bool(delete_services),
+            "delete_planned_work": format_bool(delete_planned_work),
+        },
+    )
+    echo_deleted(data, echo_offer, what=data["code"], dry_run=dry_run, as_json=as_json)
 
 
 @offers.group("headings")
