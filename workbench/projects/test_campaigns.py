@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -8,6 +10,7 @@ from workbench.invoices.models import Invoice
 from workbench.projects.models import Campaign, Project
 from workbench.tools.forms import WarningsForm
 from workbench.tools.testing import check_code
+from workbench.tools.validation import monday
 
 
 class CampaignsTest(TestCase):
@@ -75,6 +78,27 @@ class CampaignsTest(TestCase):
         self.client.force_login(campaign.owned_by)
         response = self.client.get(campaign.urls["statistics"])
         self.assertEqual(response.status_code, 200)
+
+    def test_planning(self):
+        """The campaign planning works with and without projects"""
+        campaign = factories.CampaignFactory.create()
+        self.client.force_login(campaign.owned_by)
+        urls = [
+            reverse("projects_campaign_planning", args=[campaign.pk]),
+            reverse("projects_campaign_planning_external", args=[campaign.pk]),
+        ]
+        for url in urls:
+            self.assertEqual(self.client.get(url).status_code, 200)
+
+        project = factories.ProjectFactory.create(campaign=campaign)
+        for url in urls:
+            self.assertEqual(self.client.get(url).status_code, 200)
+
+        # The weeks start with the earliest planned work
+        week = monday() - dt.timedelta(days=70)
+        factories.PlannedWorkFactory.create(project=project, weeks=[week])
+        for url in urls:
+            self.assertContains(self.client.get(url), f'"monday": "{week}"')
 
     def test_gross_margin_per_hour(self):
         """Third party costs on invoices are deducted from the gross margin"""

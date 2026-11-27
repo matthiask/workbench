@@ -234,10 +234,3 @@ Decided:
   the offer and deducts them; additional work is offered as new services.
 - Credits aren't applied to services, the form's "invoiced" doesn't
   include them.
-
-## Open (2026-11-27)
-
-- The campaign planning views (`campaign_planning`,
-  `campaign_planning_external`) crash with a SQL syntax error (`syntax
-  error at or near "'({})'"`) for a campaign without projects, probably an
-  empty `IN` list in `campaign_planning` (`workbench/planning/reporting.py`).

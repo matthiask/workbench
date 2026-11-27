@@ -973,7 +973,7 @@ def campaign_planning_external(campaign):
 
 def campaign_planning(campaign, *, external_view=False):
     projects = Project.objects.filter(campaign=campaign)
-    projects_ids = ([project.id for project in projects],)
+    projects_ids = [project.id for project in projects]
 
     with connections["default"].cursor() as cursor:
         cursor.execute(
@@ -981,13 +981,13 @@ def campaign_planning(campaign, *, external_view=False):
 WITH sq AS (
     SELECT unnest(weeks) AS week
     FROM planning_plannedwork
-    WHERE project_id = ANY %s
+    WHERE project_id = ANY(%s)
 
     UNION ALL
 
     SELECT date_trunc('week', date)::date
     FROM planning_milestone
-    WHERE project_id = ANY %s
+    WHERE project_id = ANY(%s)
 )
 SELECT MIN(week), MAX(week) FROM sq
             """,
