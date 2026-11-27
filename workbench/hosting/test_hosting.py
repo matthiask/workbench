@@ -291,6 +291,19 @@ class ViewsTest(TestCase):
                 self.assertNotContains(response, f'active" href="{other}"')
                 self.assertContains(response, 'active" href="/contacts/"')
 
+    def test_contact_phone_number(self):
+        """Contacts of sites and servers show formatted phone numbers"""
+        site = factories.SiteFactory.create()
+        person = factories.PersonFactory.create()
+        person.phonenumbers.create(phone_number="+41791234567", type="work")
+        SiteContact.objects.create(site=site, person=person, role=SiteContact.OUTAGE)
+
+        for url in [site.urls["detail"], site.server.urls["detail"]]:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(response, "+41 79 123 45 67")
+                self.assertNotContains(response, ">+41791234567<")
+
     @override_settings(FEATURES={FEATURES.HOSTING: F.NEVER})
     def test_without_feature(self):
         site = factories.SiteFactory.create()
