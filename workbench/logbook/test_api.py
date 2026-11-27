@@ -9,7 +9,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import Invoice
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.projects.models import Project
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days
@@ -590,3 +590,204 @@ class LogbookMoveAPITest(TestCase):
         )
         hours.refresh_from_db()
         self.assertEqual(hours.service, target)
+
+
+def _at(day, time):
+    return timezone.make_aware(dt.datetime.combine(day, dt.time.fromisoformat(time)))
+
+
+class BreaksAPITest(TestCase):
+    def tearDown(self):
+        deactivate_all()
+
+    def _break(self, user, day=None, starts_at="12:00", ends_at="12:45", **kwargs):
+        day = day or dt.date.today()
+        return Break.objects.create(
+            user=user,
+            starts_at=_at(day, starts_at),
+            ends_at=_at(day, ends_at),
+            **kwargs,
+        )
+
+    def test_list(self):
+        """Breaks of everyone, filtered like logged hours; the total includes
+        all matches"""
+        user = factories.UserFactory.create(_short_name="ab")
+        other = factories.UserFactory.create(_short_name="cd")
+        mine = self._break(user, description="Lunch")
+        older = self._break(user, day=dt.date(2026, 9, 1), ends_at="12:15")
+        others = self._break(other, starts_at="15:00", ends_at="15:10")
+        self.client.force_login(user)
+
+        def get(query=""):
+            response = self.client.get(f"/api/logbook/breaks/{query}")
+            self.assertEqual(response.status_code, 200, response.content)
+            return response.json()
+
+        data = get()
+        self.assertEqual(
+            [row["id"] for row in data["items"]], [others.pk, mine.pk, older.pk]
+        )
+        self.assertEqual(data["count"], 3)
+        self.assertEqual(data["total_minutes"], 70)
+        row = data["items"][1]
+        self.assertEqual(row["user"], "ab")
+        self.assertEqual(row["day"], dt.date.today().isoformat())
+        self.assertEqual(row["minutes"], 45)
+        self.assertEqual(row["description"], "Lunch")
+        self.assertEqual(dt.datetime.fromisoformat(row["starts_at"]), mine.starts_at)
+        self.assertTrue(row["url"].endswith(mine.get_absolute_url()))
+
+        data = get("?user=AB")
+        self.assertEqual([row["id"] for row in data["items"]], [mine.pk, older.pk])
+        self.assertEqual(data["total_minutes"], 60)
+        data = get("?user=ab&period=2026-09")
+        self.assertEqual([row["id"] for row in data["items"]], [older.pk])
+        data = get("?q=lunch")
+        self.assertEqual([row["id"] for row in data["items"]], [mine.pk])
+
+        response = self.client.get("/api/logbook/breaks/?user=nobody")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["query", "filters", "user"]
+        )
+
+    def test_create(self):
+        """Breaks are created for yourself with the web interface's form"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+
+        def post(data, query=""):
+            return self.client.post(
+                f"/api/logbook/breaks/{query}", data, content_type="application/json"
+            )
+
+        data = {"starts_at": "12:00", "ends_at": "12:30", "description": "Lunch"}
+        response = post(data, "?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertIsNone(response.json()["url"])
+        self.assertEqual(response.json()["minutes"], 30)
+        self.assertFalse(Break.objects.exists())
+
+        response = post(data)
+        self.assertEqual(response.status_code, 200, response.content)
+        brk = Break.objects.get()
+        self.assertEqual(response.json()["id"], brk.pk)
+        self.assertEqual(brk.user, user)
+        self.assertEqual(brk.starts_at, _at(dt.date.today(), "12:00"))
+        self.assertEqual(brk.description, "Lunch")
+
+        # Query parameters of the timer are ignored, no timestamps
+        response = post(
+            {"day": in_days(-1).isoformat(), "starts_at": "15:00", "ends_at": "15:10"},
+            "?detected_ends_at=2026-11-20T12:00:00",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["day"], in_days(-1).isoformat())
+        self.assertEqual(Timestamp.objects.count(), 0)
+
+        response = post({"day": "2010-01-01", "starts_at": "12:00", "ends_at": "13:00"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data", "day"],
+                    "msg": "Breaks have to be logged promptly.",
+                }
+            ],
+        )
+        response = post({"starts_at": "13:00", "ends_at": "12:00"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "ends_at"]
+        )
+        response = post({"starts_at": "12:00"})
+        self.assertEqual(response.status_code, 422)
+        response = post({**data, "user": "ab"})
+        self.assertEqual(response.status_code, 422)
+
+    def test_update(self):
+        """Own breaks are changed with the web interface's form"""
+        user = factories.UserFactory.create()
+        brk = self._break(user, description="Before")
+        self.client.force_login(user)
+        url = f"/api/logbook/breaks/{brk.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch({"ends_at": "13:00", "description": "After"}, "?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["minutes"], 60)
+        brk.refresh_from_db()
+        self.assertEqual(brk.description, "Before")
+
+        response = patch({"ends_at": "13:00", "description": "After"})
+        self.assertEqual(response.status_code, 200, response.content)
+        brk.refresh_from_db()
+        self.assertEqual(brk.description, "After")
+        self.assertEqual(brk.starts_at, _at(dt.date.today(), "12:00"))
+        self.assertEqual(brk.ends_at, _at(dt.date.today(), "13:00"))
+
+        # Moving to another day keeps the times
+        response = patch({"day": in_days(-1).isoformat(), "description": None})
+        self.assertEqual(response.status_code, 200, response.content)
+        brk.refresh_from_db()
+        self.assertEqual(brk.starts_at, _at(in_days(-1), "12:00"))
+        self.assertEqual(brk.description, "")
+
+        response = patch({"starts_at": "14:00"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "ends_at"]
+        )
+
+        # Others' breaks are refused like in the web interface
+        other = self._break(factories.UserFactory.create())
+        response = self.client.patch(
+            f"/api/logbook/breaks/{other.pk}/",
+            {"description": "Mine"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["path", "break_id"],
+                    "msg": "Cannot modify breaks of other users.",
+                }
+            ],
+        )
+        other.refresh_from_db()
+        self.assertEqual(other.description, "")
+
+    def test_delete(self):
+        """Own breaks are deleted like in the web interface"""
+        user = factories.UserFactory.create()
+        brk = self._break(user, description="Twice")
+        other = self._break(factories.UserFactory.create())
+        self.client.force_login(user)
+
+        response = self.client.delete(f"/api/logbook/breaks/{other.pk}/")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["msg"], "Cannot modify breaks of other users."
+        )
+        self.assertTrue(Break.objects.filter(pk=other.pk).exists())
+
+        url = f"/api/logbook/breaks/{brk.pk}/"
+        response = self.client.delete(f"{url}?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], brk.pk)
+        self.assertTrue(Break.objects.filter(pk=brk.pk).exists())
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["description"], "Twice")
+        self.assertFalse(Break.objects.filter(pk=brk.pk).exists())
+        self.assertEqual(self.client.delete(url).status_code, 404)

@@ -97,6 +97,7 @@ class APIQueriesTest(TestCase):
                 lambda: factories.LoggedHoursFactory.create(rendered_by=self.user),
             ),
             ("/api/logbook/costs/", factories.LoggedCostFactory.create),
+            ("/api/logbook/breaks/", factories.BreakFactory.create),
             (
                 "/api/absences/?since=2000-01-01",
                 lambda: factories.AbsenceFactory.create(starts_on=in_days(5)),

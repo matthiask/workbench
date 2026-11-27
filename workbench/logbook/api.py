@@ -3,8 +3,9 @@ from decimal import Decimal
 from typing import Any, Literal
 
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.shortcuts import get_object_or_404
+from django.utils.timezone import localtime
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
@@ -13,13 +14,14 @@ from ninja.pagination import paginate
 from workbench.accounts.models import User
 from workbench.api_keys import InvoiceStatus, key
 from workbench.logbook.forms import (
+    BreakForm,
     LogbookBatchForm,
     LoggedCostForm,
     LoggedCostMoveForm,
     LoggedHoursForm,
     LoggedHoursMoveForm,
 )
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project, Service
 from workbench.tools.api import (
@@ -35,8 +37,10 @@ from workbench.tools.api import (
     ShortName,
     TotalsPagination,
     check_allow_delete,
+    delete_with_form,
     filter_date_range,
     form_data,
+    patch_with_form,
     user_by_short_name,
     validate_form,
     without_query,
@@ -662,4 +666,163 @@ def logbook_move(
         ]
         if dry_run:
             transaction.set_rollback(True)
+    return result
+
+
+# Breaks ######################################################################
+#
+# Breaks count for the working time. Everyone sees everyone's breaks like in
+# the web interface, but only changes and deletes their own
+# (``Break.allow_update``, which is also ``Break.allow_delete``).
+
+
+class BreakOut(Schema):
+    id: int
+    url: str
+    user: str = Field(description="Short name of the user taking the break.")
+    day: dt.date
+    starts_at: dt.datetime
+    ends_at: dt.datetime
+    minutes: int
+    description: str
+
+
+class BreakResult(BreakOut):
+    id: int | None = Field(description="Null with dry_run.")
+    url: str | None = Field(description="Null with dry_run.")
+
+
+class BreakPagination(TotalsPagination):
+    class Output(Schema):
+        items: list[Any]
+        count: int
+        total_minutes: int
+
+
+class BreakFilter(DateRangeFilter):
+    q: str = Field(default="", description="Search the description.")
+    user: ShortName = None
+
+
+def _minutes(timedelta):
+    return round(timedelta.total_seconds() / 60) if timedelta else 0
+
+
+def _break_out(brk, request, *, dry_run=False):
+    starts_at = localtime(brk.starts_at)
+    return {
+        "id": None if dry_run else brk.id,
+        "url": None if dry_run else request.build_absolute_uri(brk.get_absolute_url()),
+        "user": brk.user.get_short_name(),
+        "day": starts_at.date(),
+        "starts_at": starts_at,
+        "ends_at": localtime(brk.ends_at),
+        "minutes": _minutes(brk.timedelta),
+        "description": brk.description,
+    }
+
+
+@router.get("/logbook/breaks/", response=list[BreakOut])
+@paginate(BreakPagination)
+def break_list(request, filters: Query[BreakFilter]):
+    """Breaks of everyone (``user`` filters), newest first; the total
+    includes all matching breaks
+
+    The period filters the day of the break."""
+    breaks = Break.objects.all()
+    if filters.user:
+        breaks = breaks.filter(user=user_by_short_name(filters.user, param="user"))
+    if filters.q:
+        breaks = breaks.filter(description__icontains=filters.q)
+    breaks = filter_date_range(breaks, filters, "starts_at__date")
+    total = breaks.order_by().aggregate(total=Sum(F("ends_at") - F("starts_at")))
+    return Serialized(
+        breaks.select_related("user").order_by("-starts_at", "-pk"),
+        lambda row: _break_out(row, request),
+        totals={"total_minutes": _minutes(total["total"])},
+    )
+
+
+class BreakFields(InputSchema):
+    day: dt.date | None = Field(default=None, description="Defaults to today.")
+    starts_at: dt.time | None = Field(default=None, description="Time of the day.")
+    ends_at: dt.time | None = Field(
+        default=None, description="Time of the day, the same day as the start."
+    )
+    description: str | None = None
+
+
+class BreakCreate(BreakFields):
+    starts_at: dt.time = Field(description="Time of the day.")
+    ends_at: dt.time = Field(description="Time of the day.")
+
+
+class BreakPatch(BreakFields):
+    """Fields which aren't given are left alone; the times stay on the day
+    of the break unless ``day`` is given too"""
+
+
+@router.post("/logbook/breaks/", response=BreakResult)
+def break_create(
+    request,
+    data: BreakCreate,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Log a break of your own, validated like in the web interface
+
+    The ID and the URL are null with ``dry_run``."""
+    request = without_query(request)
+    values = {"day": dt.date.today(), "description": ""} | {
+        field: "" if value is None else value
+        for field, value in data.model_dump(exclude_unset=True).items()
+    }
+    form = BreakForm.__wrapped__(values, request=request)
+    validate_form(form, ignore_warnings=ignore_warnings)
+    with transaction.atomic():
+        result = _break_out(form.save(), request, dry_run=dry_run)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+def _own_break(request, break_id):
+    brk = get_object_or_404(Break.objects.select_related("user"), pk=break_id)
+    # Break.allow_delete is Break.allow_update: only own breaks
+    check_allow_delete(brk, request, ["path", "break_id"])
+    return brk
+
+
+@router.patch("/logbook/breaks/{int:break_id}/", response=BreakOut)
+def break_update(
+    request,
+    break_id: int,
+    data: BreakPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change a break of your own, validated like in the web interface"""
+    brk = _own_break(request, break_id)
+    request = without_query(request)
+    return patch_with_form(
+        BreakForm.__wrapped__,
+        brk,
+        data,
+        request,
+        out=lambda brk: _break_out(brk, request),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+    )
+
+
+@router.delete("/logbook/breaks/{int:break_id}/", response=BreakOut)
+def break_delete(request, break_id: int, *, dry_run: DryRun = False):
+    """Delete a break of your own like in the web interface
+
+    Returns the deleted break."""
+    brk = _own_break(request, break_id)
+    result = _break_out(brk, request)
+    delete_with_form(brk, request, loc=["path", "break_id"], dry_run=dry_run)
     return result
