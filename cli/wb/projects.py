@@ -111,7 +111,19 @@ def show_project(project_id, as_json):
             ("Owned by", project["owned_by"]),
             ("Type", project["type_label"]),
             ("Internal type", project["internal_type"]),
-            ("Flat rate", project["flat_rate"]),
+            (
+                "Campaign",
+                f"{project['campaign']['code']} {project['campaign']['title']}"
+                if project.get("campaign")
+                else None,
+            ),
+            ("Cost center", project.get("cost_center")),
+            ("Flat rate", project.get("flat_rate")),
+            ("Budget alert at", project.get("budget_alert_at")),
+            (
+                "Planning mails",
+                "suppressed" if project.get("suppress_planning_update_mails") else None,
+            ),
             ("Closed on", project["closed_on"]),
             ("Deals", deal_links(project.get("deals"))),
             ("URL", project["url"]),
@@ -250,6 +262,19 @@ def _echo_saved_project(data, *, dry_run, as_json):
             ("Owned by", data["owned_by"]),
             ("Type", data["type_label"]),
             ("Internal type", data.get("internal_type")),
+            (
+                "Campaign",
+                f"{data['campaign']['code']} {data['campaign']['title']}"
+                if data.get("campaign")
+                else None,
+            ),
+            ("Cost center", data.get("cost_center")),
+            ("Flat rate", data.get("flat_rate")),
+            ("Budget alert at", data.get("budget_alert_at")),
+            (
+                "Planning mails",
+                "suppressed" if data.get("suppress_planning_update_mails") else None,
+            ),
             ("Closed on", data["closed_on"]),
             ("URL", data["url"]),
         ],
@@ -275,6 +300,29 @@ def _echo_saved_project(data, *, dry_run, as_json):
     shell_complete=complete_internal_types,
 )
 @click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@click.option("--no-contact", is_flag=True, help="Remove the contact.")
+@click.option("--campaign", type=int, help="Campaign ID (see `wb campaigns`).")
+@click.option("--no-campaign", is_flag=True, help="Remove the campaign.")
+@click.option("--cost-center", help="Title or ID of the cost center.")
+@click.option("--no-cost-center", is_flag=True, help="Remove the cost center.")
+@click.option(
+    "--flat-rate",
+    type=float,
+    help="Hourly rate of all services, overwrites the rates of the services"
+    " which haven't been invoiced.",
+)
+@click.option("--no-flat-rate", is_flag=True, help="Remove the flat rate.")
+@click.option(
+    "--budget-alert-at",
+    type=float,
+    help="Send a mail when the logged cost reaches this amount.",
+)
+@click.option("--no-budget-alert", is_flag=True, help="Remove the budget alert.")
+@click.option(
+    "--suppress-planning-update-mails/--send-planning-update-mails",
+    default=None,
+    help="Planning update mails of this project for everyone.",
+)
 @click.option("--close", is_flag=True, help="Close the project today.")
 @click.option(
     "--closed-on",
@@ -300,6 +348,16 @@ def update_project(
     type_,
     internal_type,
     owned_by,
+    no_contact,
+    campaign,
+    no_campaign,
+    cost_center,
+    no_cost_center,
+    flat_rate,
+    no_flat_rate,
+    budget_alert_at,
+    no_budget_alert,
+    suppress_planning_update_mails,
     close,
     closed_on,
     reopen,
@@ -310,9 +368,19 @@ def update_project(
 ):
     """Change, close or reopen a project, only the given fields
 
-    Closing a project discards its offers in preparation."""
+    Closing a project discards its offers in preparation. Fields of features
+    you don't have (campaigns, cost centers, flat rates) can't be changed."""
     if sum(map(bool, [close, closed_on, reopen])) > 1:
         terminate("Use only one of --close, --closed-on and --reopen.")
+    for option, value, empty_option, empty in [
+        ("--contact", contact, "--no-contact", no_contact),
+        ("--campaign", campaign, "--no-campaign", no_campaign),
+        ("--cost-center", cost_center, "--no-cost-center", no_cost_center),
+        ("--flat-rate", flat_rate, "--no-flat-rate", no_flat_rate),
+        ("--budget-alert-at", budget_alert_at, "--no-budget-alert", no_budget_alert),
+    ]:
+        if value is not None and empty:
+            terminate(f"Use either {option} or {empty_option}.")
     data = {
         key: value
         for key, value in [
@@ -323,9 +391,23 @@ def update_project(
             ("type", type_),
             ("internal_type", internal_type),
             ("owned_by", owned_by),
+            ("campaign", campaign),
+            ("cost_center", cost_center),
+            ("flat_rate", flat_rate),
+            ("budget_alert_at", budget_alert_at),
+            ("suppress_planning_update_mails", suppress_planning_update_mails),
         ]
         if value is not None
     }
+    for key, empty in [
+        ("contact", no_contact),
+        ("campaign", no_campaign),
+        ("cost_center", no_cost_center),
+        ("flat_rate", no_flat_rate),
+        ("budget_alert_at", no_budget_alert),
+    ]:
+        if empty:
+            data[key] = None
     if close:
         data["closed_on"] = dt.date.today().isoformat()
     elif closed_on:

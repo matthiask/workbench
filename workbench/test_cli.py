@@ -297,6 +297,78 @@ class CLITest(TestCase):
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertFalse(offer.planned_work.exists())
 
+    @override_settings(
+        FEATURES={
+            FEATURES.CAMPAIGNS: F.ALWAYS,
+            FEATURES.CONTROLLING: F.ALWAYS,
+            FEATURES.LABOR_COSTS: F.ALWAYS,
+            FEATURES.PLANNING: F.ALWAYS,
+        }
+    )
+    def test_project_fields(self):
+        """All fields of the project form can be changed"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        campaign = factories.CampaignFactory.create(title="Spring campaign")
+        factories.CostCenterFactory.create(title="Development")
+        result = self.wb(
+            "projects",
+            "update",
+            project.pk,
+            "--campaign",
+            campaign.pk,
+            "--cost-center",
+            "Development",
+            "--flat-rate",
+            "160",
+            "--budget-alert-at",
+            "8000",
+            "--suppress-planning-update-mails",
+            "--no-contact",
+            "--ignore-warning",
+            "no-contact",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Spring campaign", result.output)
+        self.assertIn("Development", result.output)
+        project.refresh_from_db()
+        self.assertEqual(project.campaign, campaign)
+        self.assertEqual(project.flat_rate, 160)
+        self.assertEqual(project.budget_alert_at, 8000)
+        self.assertTrue(project.suppress_planning_update_mails)
+        self.assertIsNone(project.contact)
+
+        result = self.wb("projects", "show", project.pk)
+        self.assertIn("Budget alert at  8000.00", result.output)
+
+        result = self.wb(
+            "projects",
+            "update",
+            project.pk,
+            "--no-campaign",
+            "--no-cost-center",
+            "--no-flat-rate",
+            "--no-budget-alert",
+            "--send-planning-update-mails",
+            "--ignore-warning",
+            "no-contact",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        project.refresh_from_db()
+        self.assertEqual(
+            (
+                project.campaign,
+                project.cost_center,
+                project.flat_rate,
+                project.budget_alert_at,
+                project.suppress_planning_update_mails,
+            ),
+            (None, None, None, None, False),
+        )
+        result = self.wb(
+            "projects", "update", project.pk, "--flat-rate", "1", "--no-flat-rate"
+        )
+        self.assertEqual(result.exit_code, 1)
+
     @override_settings(FEATURES={FEATURES.INTERNAL_TYPES: F.ALWAYS})
     def test_internal_projects(self):
         """Internal projects get their internal type by name"""

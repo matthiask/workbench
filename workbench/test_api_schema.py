@@ -155,7 +155,6 @@ API_ROUTES = {
     "projects_project_renumber_offers": (
         "POST /api/projects/{project_id}/offers/renumber/"
     ),
-    # All fields: package 07
     "projects_project_update": "PATCH /api/projects/{project_id}/",
     "projects_service_assign_service_type": "PATCH /api/services/{service_id}/",
     "projects_service_delete": "DELETE /api/services/{service_id}/",

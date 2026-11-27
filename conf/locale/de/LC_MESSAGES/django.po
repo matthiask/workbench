@@ -4326,6 +4326,11 @@ msgid "Unknown internal type %(name)r, use one of %(types)s."
 msgstr "Unbekannter interner Typ %(name)r, verwende einen von %(types)s."
 
 #: workbench/projects/api.py
+#, python-format
+msgid "Unknown cost center %(name)r, use one of %(cost_centers)s."
+msgstr "Unbekannte Kostenstelle %(name)r, verwende eine von %(cost_centers)s."
+
+#: workbench/projects/api.py
 msgid "Either the project or the offer is required."
 msgstr "Das Projekt oder die Offerte wird benötigt."
 

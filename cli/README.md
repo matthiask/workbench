@@ -118,6 +118,15 @@ Projects are changed field by field, closed and reopened the same way:
 Closing a project discards its offers in preparation; if they have planned
 work, decide with `--delete-planned-work` or `--keep-planned-work`.
 
+All fields of the project form can be changed, `--no-...` empties them. A
+flat rate overwrites the rates of the services which haven't been invoiced
+(a warning if there are any):
+
+    wb projects update 1234 --campaign 12 --cost-center Development
+    wb projects update 1234 --flat-rate 160 --ignore-warning flat-rate-but-already-services
+    wb projects update 1234 --budget-alert-at 8000 --suppress-planning-update-mails
+    wb projects update 1234 --no-flat-rate --no-budget-alert --no-campaign
+
 `wb organizations show 123` and `wb people show 345` show the details of the
 search results, e.g. the people of an organization or the email addresses of a
 person.

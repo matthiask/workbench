@@ -4,6 +4,7 @@ from decimal import Decimal
 from itertools import islice
 from typing import Literal
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import (
     DecimalField,
@@ -54,11 +55,13 @@ from workbench.projects.forms import (
     ServiceMergeForm,
 )
 from workbench.projects.models import Campaign, InternalType, Project, Service
+from workbench.reporting.models import CostCenter
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
     IGNORE_WARNINGS,
+    Amount,
     DryRun,
     InputSchema,
     Number,
@@ -69,10 +72,12 @@ from workbench.tools.api import (
     ShortName,
     active_user,
     form_data,
+    object_pk,
     patch_with_form,
     raise_form_errors,
     user_by_short_name,
     validate_form,
+    without_query,
 )
 from workbench.tools.formats import Z1, Z2
 
@@ -149,7 +154,9 @@ class ProjectOut(Schema):
     type: ProjectType
     type_label: str
     campaign: CampaignSummary | None
-    flat_rate: Decimal | None
+    flat_rate: Amount | None
+    budget_alert_at: Amount | None
+    suppress_planning_update_mails: bool
     internal_type: str | None
     created_at: dt.datetime
     closed_on: dt.date | None
@@ -178,6 +185,8 @@ def project_out(project, request):
         else None,
         "internal_type": project.internal_type.name if project.internal_type else None,
         "flat_rate": project.flat_rate,
+        "budget_alert_at": project.budget_alert_at,
+        "suppress_planning_update_mails": project.suppress_planning_update_mails,
         "created_at": project.created_at,
         "closed_on": project.closed_on,
     }
@@ -520,10 +529,24 @@ def project_stats(request, filters: Query[StatsFilter]):
 
 
 class ProjectDetail(ProjectOut):
+    cost_center: str | None = Field(description="Title of the cost center.")
     deals: list[DealRef] | None = Field(
         description="Deals linked to the project, directly or through one of"
         " its offers; null without the deals feature."
     )
+
+
+def project_detail_out(project, request):
+    return project_out(project, request) | {
+        "cost_center": project.cost_center.title if project.cost_center else None,
+        "deals": deal_refs(
+            Deal.objects
+            .filter(Q(related_projects=project) | Q(related_offers__project=project))
+            .distinct()
+            .order_by("-pk"),
+            request,
+        ),
+    }
 
 
 @router.get("/projects/{project_id}/", response=ProjectDetail)
@@ -531,19 +554,16 @@ def project_detail(request, project_id: str):
     """A project by its ID or code (2026-0042)"""
     project = by_id_or_code(
         Project.objects.select_related(
-            "customer", "contact", "owned_by", "internal_type", "campaign"
+            "customer",
+            "contact",
+            "owned_by",
+            "internal_type",
+            "campaign",
+            "cost_center",
         ),
         project_id,
     )
-    return project_out(project, request) | {
-        "deals": deal_refs(
-            Deal.objects
-            .filter(Q(related_projects=project) | Q(related_offers__project=project))
-            .distinct()
-            .order_by("-pk"),
-            request,
-        )
-    }
+    return project_detail_out(project, request)
 
 
 class ProjectIn(InputSchema):
@@ -670,6 +690,29 @@ class ProjectPatch(InputSchema):
         " anymore lose it.",
     )
     owned_by: str | None = Field(default=None, description="Short name.")
+    campaign: int | None = Field(
+        default=None, description="ID of the campaign, null removes it."
+    )
+    cost_center: str | None = Field(
+        default=None,
+        description="Title or ID of the cost center, null removes it (labor"
+        " costs feature).",
+    )
+    flat_rate: Number | None = Field(
+        default=None,
+        description="Hourly rate of all services, null removes it. Overwrites"
+        " the rates of the services which haven't been invoiced (warning"
+        " flat-rate-but-already-services).",
+    )
+    budget_alert_at: Number | None = Field(
+        default=None,
+        description="Send a mail when the logged cost reaches this amount,"
+        " null removes it.",
+    )
+    suppress_planning_update_mails: bool | None = Field(
+        default=None,
+        description="Suppress the planning update mails of this project for everyone.",
+    )
     closed_on: dt.date | None = Field(
         default=None, description="Closes the project, null reopens it."
     )
@@ -681,7 +724,26 @@ class ProjectPatch(InputSchema):
     )
 
 
-@router.patch("/projects/{project_id}/", response=ProjectOut)
+def _cost_center(value):
+    """Converter for ``patch_with_form()``: the cost center by its title
+    (case-insensitive) or ID"""
+    cost_centers = list(CostCenter.objects.all())
+    for cost_center in cost_centers:
+        if cost_center.title.casefold() == value.casefold():
+            return cost_center.pk
+    for cost_center in cost_centers:
+        if value.isascii() and value.isdigit() and cost_center.pk == int(value):
+            return cost_center.pk
+    raise DjangoValidationError(
+        _("Unknown cost center %(name)r, use one of %(cost_centers)s.")
+        % {
+            "name": value,
+            "cost_centers": ", ".join(cc.title for cc in cost_centers) or "-",
+        }
+    )
+
+
+@router.patch("/projects/{project_id}/", response=ProjectDetail)
 def project_update(
     request,
     project_id: int,
@@ -704,14 +766,18 @@ def project_update(
         project,
         patch,
         request,
-        out=lambda project: project_out(project, request),
+        out=lambda project: project_detail_out(project, request),
         ignore_warnings=ignore_warnings,
         dry_run=dry_run,
         field_map={
             "owned_by": active_user,
             "internal_type": _internal_type,
+            "campaign": object_pk(Campaign.objects.all()),
+            "cost_center": _cost_center,
             "delete_planned_work": int,
         },
+        # The form reads initial values from the web interface's parameters
+        form_kwargs={"request": without_query(request)},
     )
 
 

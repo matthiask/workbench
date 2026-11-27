@@ -1109,3 +1109,119 @@ class ProjectsAPITest(TestCase):
 
         response = patch({"owned_by": "nobody"})
         self.assertEqual(response.status_code, 422)
+
+    @override_settings(
+        FEATURES={
+            FEATURES.CAMPAIGNS: F.ALWAYS,
+            FEATURES.CONTROLLING: F.ALWAYS,
+            FEATURES.LABOR_COSTS: F.ALWAYS,
+            FEATURES.PLANNING: F.ALWAYS,
+        }
+    )
+    def test_update_all_fields(self):
+        """Every field of the project form can be changed"""
+        project = factories.ProjectFactory.create()
+        campaign = factories.CampaignFactory.create(customer=project.customer)
+        cost_center = factories.CostCenterFactory.create(title="Development")
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch({
+            "campaign": campaign.pk,
+            "cost_center": "development",
+            "flat_rate": 160,
+            "budget_alert_at": 8000,
+            "suppress_planning_update_mails": True,
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(data["campaign"]["id"], campaign.pk)
+        self.assertEqual(data["cost_center"], "Development")
+        self.assertEqual(data["flat_rate"], "160.00")
+        self.assertEqual(data["budget_alert_at"], "8000.00")
+        self.assertTrue(data["suppress_planning_update_mails"])
+        project.refresh_from_db()
+        self.assertEqual(project.campaign, campaign)
+        self.assertEqual(project.cost_center, cost_center)
+        self.assertEqual(project.flat_rate, Decimal("160.00"))
+        self.assertEqual(project.budget_alert_at, Decimal("8000.00"))
+        self.assertTrue(project.suppress_planning_update_mails)
+
+        data = self.client.get(url).json()
+        self.assertEqual(data["cost_center"], "Development")
+        self.assertEqual(data["budget_alert_at"], "8000.00")
+
+        # IDs of cost centers work too, unknown ones and campaigns are errors
+        response = patch({"cost_center": str(cost_center.pk)})
+        self.assertEqual(response.status_code, 200, response.content)
+        response = patch({"cost_center": "Sales", "campaign": 0})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            sorted(e["loc"][-1] for e in response.json()["detail"]),
+            ["campaign", "cost_center"],
+        )
+
+        # The flat rate overwrites the rates of services, a warning
+        service = factories.ServiceFactory.create(
+            project=project, effort_type="Design", effort_rate=200, effort_hours=1
+        )
+        response = patch({"flat_rate": 180})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["code"], "flat-rate-but-already-services"
+        )
+        response = patch(
+            {"flat_rate": 180}, "?ignore_warnings=flat-rate-but-already-services"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
+        # null empties the fields
+        response = patch({
+            "campaign": None,
+            "cost_center": None,
+            "flat_rate": None,
+            "budget_alert_at": None,
+            "suppress_planning_update_mails": None,
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        project.refresh_from_db()
+        self.assertEqual(
+            (
+                project.campaign,
+                project.cost_center,
+                project.flat_rate,
+                project.budget_alert_at,
+                project.suppress_planning_update_mails,
+            ),
+            (None, None, None, None, False),
+        )
+        service.refresh_from_db()
+        self.assertEqual(service.effort_rate, Decimal("180.00"))
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.ALWAYS})
+    def test_update_fields_without_feature(self):
+        """Fields of features the user doesn't have can't be changed, like in
+        the web interface where they're missing"""
+        project = factories.ProjectFactory.create()
+        factories.CostCenterFactory.create(title="Anything")
+        self.client.force_login(project.owned_by)
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/",
+            {
+                "campaign": factories.CampaignFactory.create().pk,
+                "cost_center": "Anything",
+                "suppress_planning_update_mails": True,
+                "flat_rate": 100,
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            sorted(e["loc"][-1] for e in response.json()["detail"]),
+            ["campaign", "cost_center", "suppress_planning_update_mails"],
+        )
