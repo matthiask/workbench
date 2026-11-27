@@ -2218,6 +2218,41 @@ planned_work:
         recurring.refresh_from_db()
         self.assertIsNone(recurring.ends_on)
 
+    def test_recurring_invoice_create(self):
+        """Recurring invoices are created with the defaults of the web
+        interface, a missing contact warns"""
+        organization = factories.OrganizationFactory.create(
+            name="Beispiel AG",
+            default_billing_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+        )
+        args = [
+            "recurring-invoices",
+            "create",
+            "--customer",
+            organization.pk,
+            "--title",
+            "Hosting",
+            "--periodicity",
+            "yearly",
+            "--subtotal",
+            "1200",
+        ]
+        result = self.wb(*args)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("no-contact", result.output)
+
+        result = self.wb(*args, "--ignore-warning", "no-contact", "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertFalse(RecurringInvoice.objects.exists())
+
+        result = self.wb(*args, "--ignore-warning", "no-contact")
+        self.assertEqual(result.exit_code, 0, result.output)
+        recurring = RecurringInvoice.objects.get()
+        self.assertEqual(recurring.owned_by, self.user)
+        self.assertEqual(recurring.subtotal, 1200)
+        self.assertIn("Musterweg 1", recurring.postal_address)
+
     def test_invoice_reminders(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         overdue = factories.InvoiceFactory.create(

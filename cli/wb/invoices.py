@@ -621,7 +621,7 @@ def postpone_reminders(invoice_id, until, clear, confirm, as_json):
 @cli.group("recurring-invoices", invoke_without_command=True)
 @click.pass_context
 def recurring_invoices(ctx):
-    """Look at recurring invoices, requires the controlling feature
+    """Recurring invoices, requires the controlling feature
 
     Without a command, lists the open ones."""
     if ctx.invoked_subcommand is None:
@@ -857,6 +857,31 @@ def _recurring_invoice_data(fields):
         else:
             data[key] = value
     return data
+
+
+@recurring_invoices.command("create")
+@_recurring_invoice_options
+@change_options()
+def create_recurring_invoice(ignore_warnings, dry_run, as_json, **fields):
+    """Create a recurring invoice for a customer (or the organization of
+    --contact, or the customer of --site)
+
+    Like in the web interface, the postal address defaults to the billing
+    address of the contact or the customer, the responsible person to you
+    and the start to today; a missing contact warns (no-contact). Workbench
+    creates (and if wanted sends) the invoices itself, nothing is sent now."""
+    data = request(
+        "POST",
+        "recurring-invoices/",
+        params=change_params(dry_run, ignore_warnings),
+        json=_recurring_invoice_data(fields),
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_recurring_invoice(data)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")
 
 
 @recurring_invoices.command("update")

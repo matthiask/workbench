@@ -446,6 +446,13 @@ text are proposed unless given):
     wb recurring-invoices update 123 --send-to billing@example.com
     wb recurring-invoices update 123 --site 42    # the hosted site
 
+`create` takes the same options as `update`; the postal address defaults
+to the billing address, the responsible person to you, the start to today.
+`--contact` or `--site` determine the customer if `--customer` is missing:
+
+    wb recurring-invoices create --contact 456 --title Hosting \
+        --periodicity yearly --subtotal 1200 --dry-run
+
 `update` changes every field of the web interface's form (`--subtotal`,
 `--discount`, `--periodicity`, `--starts-on`, `--ends-on`, `--no-vat`,
 `--owned-by`, ...); the next period is computed. `--ends-on ""` renews an

@@ -10,7 +10,7 @@ from django.utils.translation import deactivate_all
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
-from workbench.invoices.models import Invoice
+from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.reporting.models import FreezeDate
 from workbench.tools.formats import local_date_format
 from workbench.tools.validation import in_days
@@ -367,6 +367,108 @@ class InvoicesAPITest(TestCase):
         self.assertIsNone(response.json()["ends_on"])
         recurring.refresh_from_db()
         self.assertEqual(recurring.ends_on, dt.date(2025, 6, 30))
+
+    def test_recurring_invoice_create(self):
+        """Recurring invoices are created through the web interface's form,
+        with its defaults"""
+        user = factories.UserFactory.create(_short_name="ab")
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create(
+                name="Beispiel AG",
+                default_billing_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+            ),
+        )
+        self.client.force_login(user)
+
+        def post(data, query=""):
+            return self.client.post(
+                f"/api/recurring-invoices/{query}",
+                data,
+                content_type="application/json",
+            )
+
+        data = {
+            "customer": person.organization_id,
+            "contact": person.pk,
+            "title": "Hosting",
+            "periodicity": "yearly",
+            "subtotal": "1200.00",
+        }
+        response = post(data, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["id"])
+        self.assertFalse(RecurringInvoice.objects.exists())
+
+        response = post(data)
+        self.assertEqual(response.status_code, 200, response.content)
+        created = response.json()
+        recurring = RecurringInvoice.objects.get()
+        self.assertEqual(created["id"], recurring.pk)
+        self.assertEqual(created["owned_by"], "ab")
+        self.assertEqual(created["starts_on"], dt.date.today().isoformat())
+        self.assertEqual(created["new_invoices"], "prepare")
+        self.assertIn("Musterweg 1", recurring.postal_address)
+        self.assertEqual(recurring.customer, person.organization)
+        self.assertEqual(recurring.contact, person)
+
+        # The form's validation
+        response = post(data | {"periodicity": None})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "periodicity"]
+        )
+        response = post(data | {"customer": None, "contact": None})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "customer"]
+        )
+        response = post(data | {"customer": 0})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "customer"]
+        )
+        response = post(data | {"next_period_starts_on": "2027-01-01"})
+        self.assertEqual(response.status_code, 422)
+        FreezeDate.objects.create(up_to=in_days(-1))
+        response = post(data | {"starts_on": in_days(-1).isoformat()})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "starts_on"]
+        )
+
+        # The customer of the contact or of the site
+        site = factories.SiteFactory.create(customer=person.organization)
+        response = post(
+            {
+                "site": site.pk,
+                "periodicity": "monthly",
+                "subtotal": "100.00",
+                "new_invoices": "send",
+                "send_to": "billing@example.com",
+            },
+            "?ignore_warnings=no-contact",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        created = response.json()
+        self.assertEqual(created["customer"]["id"], person.organization_id)
+        self.assertEqual(created["site"], {"id": site.pk, "title": site.title})
+        self.assertEqual(created["title"], site.title)
+        self.assertIn("{code}", created["mail_subject"])
+        self.assertEqual(len(mail.outbox), 0)
+
+        response = post({
+            "contact": person.pk,
+            "title": "Support",
+            "periodicity": "yearly",
+            "subtotal": "500.00",
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["customer"]["id"], person.organization_id)
+
+        # The site of a different organization
+        response = post(data | {"site": factories.SiteFactory.create().pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "site"])
 
     @override_settings(
         FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.HOSTING: F.NEVER}

@@ -3,6 +3,7 @@ import datetime as dt
 from decimal import Decimal
 from typing import Literal
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import F
 from django.http import QueryDict
@@ -23,7 +24,12 @@ from workbench.contacts.api import (
     organization_out,
     person_summary,
 )
-from workbench.contacts.models import Person, postal_address_choices
+from workbench.contacts.models import (
+    Organization,
+    Person,
+    postal_address_choices,
+)
+from workbench.hosting.models import Site
 from workbench.invoices.forms import (
     CreatePersonInvoiceForm,
     CreateProjectInvoiceForm,
@@ -1012,6 +1018,99 @@ class RecurringInvoicePatch(InputSchema):
         description="ID of the hosted site (of the same customer), null"
         " removes it. Requires the hosting feature.",
     )
+
+
+class RecurringInvoiceIn(RecurringInvoicePatch):
+    """The customer, or a contact or a site giving it; the web interface's
+    form validates the recurring invoice and proposes the rest"""
+
+
+class RecurringInvoiceCreated(RecurringInvoiceOut):
+    id: int | None
+    url: str | None
+
+
+def _recurring_invoice_request(request, data):
+    """The request with the query parameter of the web interface's creation:
+    the customer, else the contact or the site determining it"""
+    for field, model in [
+        ("customer", Organization),
+        ("contact", Person),
+        ("site", Site),
+    ]:
+        if (pk := data.get(field)) is not None and model.objects.filter(pk=pk).exists():
+            return _query(request, {field: str(pk)})
+    raise ValidationError([
+        {
+            "loc": ["body", "data", "customer"],
+            "msg": _("This field is required.")
+            if data.get("customer") is None
+            else _("Organization %r doesn't exist.") % data["customer"],
+        }
+    ])
+
+
+@router.post("/recurring-invoices/", response=RecurringInvoiceCreated)
+def recurring_invoice_create(
+    request,
+    data: RecurringInvoiceIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Create a recurring invoice, validated like in the web interface
+
+    The postal address defaults to the billing address of the contact or
+    the customer, the responsible person to you, the start to today and
+    third party costs to 0.
+    Workbench creates (and sends, if wanted) the invoices itself. Warnings of
+    the web interface are errors here unless ignored by their code; nothing
+    is saved if anything is invalid or with ``dry_run``."""
+    patch = data.model_dump(exclude_unset=True)
+    request = _recurring_invoice_request(request, patch)
+    values = form_data(form := RecurringInvoiceForm(request=request))
+    errors = []
+    for name, value in patch.items():
+        field = form.fields.get(name)
+        if not field or field.disabled:
+            if value not in ("", None):
+                errors.append({
+                    "loc": ["body", "data", name],
+                    "msg": _("This field cannot be changed."),
+                })
+            continue
+        values[name] = "" if value is None else value
+        if name == "owned_by" and value:
+            try:
+                values[name] = active_user(value)
+            except DjangoValidationError as exc:
+                errors.extend(
+                    {"loc": ["body", "data", name], "msg": message}
+                    for message in exc.messages
+                )
+    if errors:
+        raise ValidationError(errors)
+    if not values.get("postal_address"):
+        contact = Person.objects.filter(pk=values.get("contact") or None).first()
+        customer = Organization.objects.filter(
+            pk=values.get("customer") or None
+        ).first()
+        if choices := postal_address_choices(
+            person=contact, organization=customer, for_billing=True
+        ):
+            values["postal_address"] = choices[0][1]
+    if "third_party_costs" not in patch:
+        values["third_party_costs"] = Z2
+    values[RecurringInvoiceForm.ignore_warnings_id] = " ".join(ignore_warnings)
+    form = RecurringInvoiceForm(values, request=request)
+    validate_form(form, ignore_warnings=ignore_warnings)
+
+    with transaction.atomic():
+        result = recurring_invoice_out(form.save(), request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "url": None}
+    return result
 
 
 @router.patch("/recurring-invoices/{int:invoice_id}/", response=RecurringInvoiceOut)
