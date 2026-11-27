@@ -90,7 +90,7 @@ conflicts; the "Touches" column shows them.
 | 05 | [Invoices: services](05-invoice-services.md) | `invoices/api.py`, `cli/wb/invoices.py` | 00 | open |
 | 06 | [Recurring invoices](06-recurring-invoices.md) | `invoices/api.py` (recurring part), `cli/wb/invoices.py` | 00 | done |
 | 07 | [Projects: all fields, delete, projected invoices](07-projects.md) | `projects/api.py`, `cli/wb/projects.py` | 00 | done |
-| 08 | [Services: move](08-services-move.md) | `projects/api.py` (services), `cli/wb/services.py` | 00 | open |
+| 08 | [Services: move](08-services-move.md) | `projects/api.py` (services), `cli/wb/services.py` | 00 | done |
 | 09 | [Logbook: move entries](09-logbook-move.md) | `logbook/api.py`, `cli/wb/logbook.py` | 00 | done |
 | 10 | [Budget transfers](10-budget-transfers.md) | `projects/api.py`, `cli/wb/projects.py` | 00 | open |
 | 11 | [Campaigns](11-campaigns.md) | `projects/api.py`, `cli/wb/campaigns.py` | 00 | open |
