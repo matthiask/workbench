@@ -617,6 +617,18 @@ changed which deals:
     wb deals stats --period 2026 --user mk
     wb deals history --since 2026-10-01
 
+## Campaigns
+
+Campaigns group projects (requires the campaigns feature). Find them,
+create, change or delete them; projects join one with
+`wb projects update 1234 --campaign 12`. Deleting a campaign releases its
+projects, which is a warning:
+
+    wb campaigns search relaunch --include-closed
+    wb campaigns create --customer 42 --title Relaunch --owned-by mk
+    wb campaigns update 12 --title "Relaunch 2027" --description -
+    wb campaigns delete 12 --ignore-warning release-projects
+
 ## Notes
 
 Notes on deals, invoices, recurring invoices and projects, e.g. the results

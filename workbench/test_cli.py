@@ -33,7 +33,7 @@ from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.notes.models import Note
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
-from workbench.projects.models import InternalType, Project, Service
+from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.reporting.models import FreezeDate
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days, monday
@@ -2883,6 +2883,46 @@ planned_work:
         result = self.wb("campaigns", "search", "nothing", "--include-closed")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertNotIn("Relaunch", result.output)
+
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
+    def test_campaigns_create_update_delete(self):
+        organization = factories.OrganizationFactory.create(name="Beispiel AG")
+        result = self.wb(
+            "campaigns",
+            "create",
+            "--customer",
+            organization.pk,
+            "--title",
+            "Relaunch",
+            "--description",
+            "-",
+            input="All sites\n",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Relaunch", result.output)
+        campaign = Campaign.objects.get()
+        self.assertEqual(campaign.owned_by, self.user)
+        self.assertEqual(campaign.description, "All sites")
+
+        result = self.wb("campaigns", "update", campaign.pk, "--title", "Rebrand")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Rebrand", result.output)
+        campaign.refresh_from_db()
+        self.assertEqual(campaign.title, "Rebrand")
+        result = self.wb("campaigns", "update", campaign.pk)
+        self.assertEqual(result.exit_code, 1, result.output)
+        self.assertIn("Nothing to change", result.output)
+
+        factories.ProjectFactory.create(campaign=campaign)
+        result = self.wb("campaigns", "delete", campaign.pk)
+        self.assertEqual(result.exit_code, 1, result.output)
+        self.assertIn("release-projects", result.output)
+        result = self.wb(
+            "campaigns", "delete", campaign.pk, "--ignore-warning", "release-projects"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Deleted", result.output)
+        self.assertFalse(Campaign.objects.exists())
 
     def test_invoices_owned_by_and_type(self):
         factories.InvoiceFactory.create(
