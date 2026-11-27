@@ -148,6 +148,17 @@ the findings:
    Several contacts are joined with `-`. Don't leave out the threshold:
    without one, UptimeRobot mails on the first failed check, so every
    short network interruption causes a flood of mails.
+
+   Check what the URL answers first (`curl -s -o /dev/null -w
+   '%{http_code}'`): a monitor on a site that answers 401 or 403 is down
+   from the start. A 401 (password-protected, e.g. not live yet) gets a
+   monitor with the basic auth credentials (`-d http_auth_type=1
+   -d http_username=… -d http_password=…`), which the user takes from
+   the password manager and exports themselves, never pasted into the
+   chat; without them, skip the site. A 403 or another error: ask.
+   Watch out for host names served by the server's default vhost (wrong
+   certificate, e.g. `CN=feinheit06.nine.ch`): they answer 200, but
+   nothing runs there.
 2. **Monitor for an archived site or a host name nothing runs on**:
    propose deleting it (`deleteMonitor` with `-d id=ID`).
 3. **Monitor URL not on the site's host names anymore** (e.g. after the
