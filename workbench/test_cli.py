@@ -28,6 +28,7 @@ from workbench.deals.models import AttributeGroup, Deal
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
+from workbench.planning.models import PlannedWork
 from workbench.projects.models import InternalType, Project, Service
 from workbench.reporting.models import FreezeDate
 from workbench.timer.models import Timestamp
@@ -777,6 +778,52 @@ planned_work:
         result = self.wb("planning", "work", "delete", pw.pk)
         self.assertIn(f"Deleted planned work: {pw.pk}", result.output)
         self.assertFalse(project.planned_work.exists())
+
+    def test_planned_work_batch(self):
+        """The future planned work of someone who leaves goes to someone else,
+        selected like the export"""
+        leaving = factories.UserFactory.create(_short_name="ub")
+        next_week = monday() + dt.timedelta(days=7)
+        past = factories.PlannedWorkFactory.create(
+            user=leaving, weeks=[monday() - dt.timedelta(days=14)]
+        )
+        future = [
+            factories.PlannedWorkFactory.create(
+                user=leaving, title="Wireframes", weeks=[next_week]
+            ),
+            factories.PlannedWorkFactory.create(
+                user=leaving, weeks=[next_week + dt.timedelta(days=700)]
+            ),
+        ]
+        batch = ["planning", "work", "batch", "--user", "ub"]
+        batch += ["--since", next_week.isoformat(), "--assign-to", "ab"]
+
+        result = self.wb(*batch, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Wireframes", result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertFalse(PlannedWork.objects.filter(user=self.user).exists())
+
+        result = self.wb(*batch)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(set(PlannedWork.objects.filter(user=self.user)), set(future))
+        past.refresh_from_db()
+        self.assertEqual(past.user, leaving)
+
+        result = self.wb("planning", "work", "batch", "--work", past.pk, "--delete")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted planned work: {past.pk}", result.output)
+        self.assertFalse(PlannedWork.objects.filter(pk=past.pk).exists())
+
+        for args in [
+            ["--user", "ub"],  # Nothing to change
+            ["--assign-to", "ab"],  # Nothing selected
+            ["--work", 1, "--user", "ub", "--assign-to", "ab"],
+            ["--user", "ub", "--delete", "--definitive"],
+        ]:
+            with self.subTest(args=args):
+                result = self.wb("planning", "work", "batch", *args)
+                self.assertEqual(result.exit_code, 1, result.output)
 
     def test_logbook(self):
         """Services, logged hours and costs, absences and project statistics"""

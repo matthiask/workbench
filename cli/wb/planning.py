@@ -1,11 +1,14 @@
 """Planning"""
 
 import csv
+import datetime as dt
 import sys
 
 import click
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     complete_short_names,
     console,
@@ -395,5 +398,138 @@ def delete_work(work_id, dry_run, as_json):
         "DELETE",
         f"planning/work/{work_id}/",
         params={"dry_run": format_bool(dry_run)},
+    )
+    _echo_import_result(data, dry_run=dry_run, as_json=as_json)
+
+
+def _batch_selection(project, campaign, period, since, until, users, team):
+    """The planned work selected by the export's filters, from this week on
+    by default"""
+    if not (project or campaign or users or team):
+        terminate(
+            "Select planned work with --work, --user, --team, --project or --campaign."
+        )
+    if not period and not until:
+        since = since or dt.datetime.combine(dt.date.today(), dt.time())
+        until = since + dt.timedelta(days=3652)  # The export's maximum
+    params = period_params(period, since, until, users=users, team=team)
+    if project:
+        params["project"] = project
+    if campaign:
+        params["campaign"] = campaign
+    return request("GET", "planning/export/", params=params)
+
+
+def _echo_selection(data):
+    table = make_table(
+        "ID>",
+        "Project",
+        "Planned work",
+        "User",
+        "First week",
+        "Last week",
+        "Hours>",
+        title="Selected planned work",
+    )
+    for work in data["planned_work"]:
+        table.add_row(
+            str(work["id"]),
+            link(work["project"]["code"], work["project"]["url"]),
+            link(work["title"], work["url"]),
+            work["user"],
+            work["weeks"][0],
+            work["weeks"][-1],
+            format_hours(work["planned_hours"]),
+        )
+    console.print(table)
+    since = dt.date.fromisoformat(data["since"])
+    since -= dt.timedelta(days=since.weekday())
+    if earlier := [w for w in data["planned_work"] if w["weeks"][0] < str(since)]:
+        console.print(
+            f"{len(earlier)} of them also have weeks before {since}, the"
+            " changes apply to all of their weeks.",
+            style="yellow",
+        )
+
+
+@planned_work.command("batch")
+@click.option(
+    "--work",
+    "work_ids",
+    type=int,
+    multiple=True,
+    help="ID of planned work, can be repeated; instead of the filters.",
+)
+@click.option("--project", type=int, help="Select the work of this project (ID).")
+@click.option(
+    "--campaign", type=int, help="Select the work of this campaign's projects (ID)."
+)
+@period_options("defaults to the work from this week on")
+@users_options
+@click.option(
+    "--assign-to",
+    help="Short name of an active user.",
+    shell_complete=complete_short_names,
+)
+@click.option("--move-by-weeks", type=int, default=0, help="Can be negative.")
+@click.option(
+    "--move-to-project",
+    help="ID or code of an open project; removes the offer and the milestone.",
+)
+@click.option("--provisional/--definitive", default=None)
+@click.option("--delete", is_flag=True, help="Delete the selected work.")
+@change_options()
+def batch_work(
+    work_ids,
+    project,
+    campaign,
+    period,
+    since,
+    until,
+    users,
+    team,
+    assign_to,
+    move_by_weeks,
+    move_to_project,
+    provisional,
+    delete,
+    dry_run,
+    ignore_warnings,
+    as_json,
+):
+    """Change or delete planned work of any projects at once
+
+    Selects the work with the filters of `wb planning export` (the work
+    from this week on by default) or with --work, e.g. to hand over the
+    future work of someone who leaves:
+    `wb planning work batch --user ub --since 2026-12-07 --assign-to aha`.
+    Work overlapping the start of the period is changed as a whole."""
+    filters = (project, campaign, period, since, until, users, team)
+    if work_ids and any(filters):
+        terminate("Select planned work either with --work or with filters.")
+    changes = {
+        "assign_to": assign_to,
+        "move_by_weeks": move_by_weeks or None,
+        "project": move_to_project,
+        "provisional": provisional,
+    }
+    changes = {key: value for key, value in changes.items() if value is not None}
+    if delete and changes:
+        terminate("--delete and changes contradict each other.")
+    if not delete and not changes:
+        terminate("Nothing to change.")
+    if not work_ids:
+        selection = _batch_selection(*filters)
+        if not selection["planned_work"]:
+            console.print("No planned work selected.")
+            return
+        if not as_json:
+            _echo_selection(selection)
+        work_ids = [work["id"] for work in selection["planned_work"]]
+    data = request(
+        "POST",
+        "planning/work/batch/",
+        params=change_params(dry_run, ignore_warnings),
+        json={"work": list(work_ids), "delete": delete} | changes,
     )
     _echo_import_result(data, dry_run=dry_run, as_json=as_json)

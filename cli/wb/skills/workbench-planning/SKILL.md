@@ -1,6 +1,6 @@
 ---
 name: workbench-planning
-description: Plan a Workbench project (milestones and planned work per person and week) from its offers and a timeline using the `wb` CLI, change existing planned work (e.g. make provisional work definitive once a deal is won, move or remove it), or look at the planning and the capacity of people and teams. Use when the user wants to plan, schedule, reschedule or staff a project in Workbench, or asks who has time when.
+description: Plan a Workbench project (milestones and planned work per person and week) from its offers and a timeline using the `wb` CLI, change existing planned work (e.g. make provisional work definitive once a deal is won, move or remove it, hand over the planned work of someone who leaves), or look at the planning and the capacity of people and teams. Use when the user wants to plan, schedule, reschedule or staff a project in Workbench, or asks who has time when.
 ---
 
 # Planning Workbench projects
@@ -97,6 +97,24 @@ only after the user approves:
 
 `--week` takes any day of a week and can be repeated, giving `--week`
 replaces all weeks. New work is provisional unless `--definitive` is given.
+
+## Changing a lot of planned work at once
+
+`wb planning work batch` selects work like `wb planning export` (`--user`,
+`--team`, `--project`, `--campaign`, `--since`, `--until`; from this week on
+by default) or with `--work <id>` (repeatable), and assigns, moves, makes
+provisional or definitive, or deletes all of it. E.g. handing over the
+future work of someone who leaves, from next week on (dry run first, then
+again without `--dry-run` after the user approves):
+
+    wb planning work batch --user ub --since <next monday> --assign-to aha --dry-run
+    wb planning work batch --project <project_id> --move-by-weeks 2 --dry-run
+    wb planning work batch --work <id> --work <id> --move-to-project <project_id>
+
+Work overlapping the start of the period changes as a whole (the command
+says how many entries have earlier weeks); split it with `wb planning work
+update` first if its past weeks have to stay. Closed projects get no new
+weeks, `--move-to-project` removes the offer and the milestone.
 
 When a deal is won or lost (see the workbench-deals skill), look for
 provisional planned work on the offers related to the deal and offer to make

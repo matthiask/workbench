@@ -608,6 +608,16 @@ spreadsheets:
     wb planning export --team Design --period 2026-Q4
     wb planning export --user mk --since 2026-11-02 --until 2026-11-29
 
+Change planned work one by one (`wb planning work add|update|delete`) or a
+lot at once: `wb planning work batch` selects with the export's filters
+(from this week on by default) or `--work ID` and assigns it to someone
+else, moves it by weeks or to another project, makes it provisional or
+definitive, or deletes it. E.g. handing over the future work of someone who
+leaves:
+
+    wb planning work batch --user ub --since 2026-12-07 --assign-to aha --dry-run
+    wb planning work batch --user ub --since 2026-12-07 --assign-to aha
+
 ## Project statistics
 
 Hours (offered, logged, planned), amounts (sold, invoiced, logged work which
