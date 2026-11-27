@@ -72,8 +72,10 @@ What differs from the spec, and what later packages need to know:
 - Service groups lost their own 409 too: they take every field of the
   form, like in the web interface.
 - Changing only `external_reference` still skips the form, so it never
-  warns (e.g. `short-postal-address` on old offers). Any other change goes
-  through the form and may warn about the postal address.
+  warns. Any other change goes through the form; `short-postal-address`
+  only warns when the postal address is new or changed (decided
+  2026-11-27), so old offers with short addresses change without ignoring
+  it.
 - Linked deals: no signals; changing an offer's status doesn't touch its
   deals. Only closing a deal (`DealForm`) accepts or declines its offers.
   An accepted offer put back into preparation stays linked to its

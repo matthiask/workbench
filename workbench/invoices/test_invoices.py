@@ -1767,6 +1767,27 @@ class InvoicesTest(TestCase):
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
         self.assertIsNone(invoice.closed_on)
 
+    def test_short_postal_address_unchanged(self):
+        """Existing short postal addresses don't warn when they stay as they
+        are, changed ones do"""
+        invoice = factories.InvoiceFactory.create(
+            invoiced_on=in_days(0),
+            due_on=in_days(14),
+            postal_address="Street\nCity",
+        )
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"], invoice_to_dict(invoice, title="Changed")
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, postal_address="Other street\nCity"),
+        )
+        self.assertContains(response, 'value="short-postal-address"')
+
     def test_reopen_paid_invoice_warns_about_closed_on(self):
         """The closing date is only reset after its own warning has been
         shown and ignored, not because the other warnings have"""

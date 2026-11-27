@@ -885,8 +885,12 @@ class PostalAddressSelectionForm(ModelForm):
     def clean(self):
         data = super().clean()
 
+        # Only new or changed addresses, old ones may stay as they are when
+        # something else changes
         postal_address = data.get("postal_address", "")
-        if len(postal_address.strip().splitlines()) < 3:
+        if (not self.instance.pk or "postal_address" in self.changed_data) and len(
+            postal_address.strip().splitlines()
+        ) < 3:
             self.add_warning(
                 _("The postal address should probably be at least three lines long."),
                 code="short-postal-address",

@@ -850,6 +850,22 @@ class OfferServicesAPITest(TestCase):
         self.assertFalse(self.offer.planned_work.exists())
         self.assertEqual(self.offer.services.count(), 2)
 
+    def test_short_postal_address(self):
+        """Only new or changed postal addresses are checked, old offers with
+        short addresses still change without ignoring the warning"""
+        self.offer.postal_address = "Beispiel AG\nMusterweg 1"
+        self.offer.save()
+
+        response = self.patch({"title": "Website"})
+        self.assertEqual(response.status_code, 200, response.content)
+
+        response = self.patch({"postal_address": "Hans Muster\nMusterweg 1"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e.get("code") for e in response.json()["detail"]],
+            ["short-postal-address"],
+        )
+
     def test_update_all_fields(self):
         """Every field of the offer form can be changed"""
         response = self.patch({

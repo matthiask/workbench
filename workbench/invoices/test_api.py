@@ -610,6 +610,27 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(invoice.status, Invoice.SENT)
         self.assertEqual(mail.outbox, [])
 
+    def test_short_postal_address(self):
+        """Only new or changed postal addresses are checked"""
+        invoice = factories.InvoiceFactory.create(
+            due_on=in_days(15), postal_address="Beispiel AG\nMusterweg 1"
+        )
+        self.client.force_login(invoice.owned_by)
+
+        def patch(data):
+            return self.client.patch(
+                f"/api/invoices/{invoice.pk}/", data, content_type="application/json"
+            )
+
+        response = patch({"title": "Changed"})
+        self.assertEqual(response.status_code, 200, response.content)
+        response = patch({"postal_address": "Hans Muster\nMusterweg 1"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e.get("code") for e in response.json()["detail"]],
+            ["short-postal-address"],
+        )
+
     def test_reopen_paid_invoice(self):
         """Reopening a paid invoice warns about its closing date even when
         the other warnings have been ignored"""
