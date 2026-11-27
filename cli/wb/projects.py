@@ -23,6 +23,7 @@ from wb.core import (
     format_bool,
     ignore_warnings_option,
     link,
+    load,
     make_table,
     me,
     page_options,
@@ -31,12 +32,13 @@ from wb.core import (
     terminate,
     text_or_stdin,
 )
+from wb.invoices import projected_invoices
 
 
 @cli.group(invoke_without_command=True)
 @click.pass_context
 def projects(ctx):
-    """Find and create projects
+    """Find, create, change and delete projects
 
     Without a command, lists your open projects."""
     if ctx.invoked_subcommand is None:
@@ -450,3 +452,84 @@ def delete_project(project_id, dry_run, as_json):
         dry_run=dry_run,
         as_json=as_json,
     )
+
+
+def _projected_invoice(value):
+    """DATE=AMOUNT[:DESCRIPTION]"""
+    day, sep, rest = value.partition("=")
+    amount, _sep, description = rest.partition(":")
+    try:
+        dt.date.fromisoformat(day.strip())
+        amount = float(amount)
+    except ValueError:
+        sep = ""
+    if not sep:
+        raise click.BadParameter(
+            f"expected DATE=AMOUNT[:DESCRIPTION], e.g. 2027-01-31=5000:Phase 1,"
+            f" not {value!r}."
+        )
+    return {
+        "invoiced_on": day.strip(),
+        "gross_margin": amount,
+        "description": description.strip(),
+    }
+
+
+# The command group is in wb.invoices with the search
+@projected_invoices.command("set")
+@click.argument("project_id")
+@click.option(
+    "--invoice",
+    "invoices",
+    multiple=True,
+    metavar="DATE=AMOUNT[:DESCRIPTION]",
+    help="A projected invoice (gross margin), may be repeated.",
+)
+@click.option(
+    "--file",
+    type=click.File("r"),
+    help="YAML or JSON file with a list of invoiced_on, gross_margin and"
+    " description (optional).",
+)
+@click.option("--clear", is_flag=True, help="Delete all projected invoices.")
+@change_options(warnings=False)
+def set_projected_invoices(project_id, invoices, file, clear, dry_run, as_json):
+    """Replace the projected invoices of a project (by ID or code)
+
+    Like the form in the web interface: the ones not given are deleted,
+    existing ones with the same date are changed. Dates must be after the
+    freeze date, closed projects get no new ones."""
+    items = [_projected_invoice(value) for value in invoices]
+    if file:
+        loaded = load(file)
+        if isinstance(loaded, dict):
+            loaded = loaded.get("projected_invoices")
+        if not isinstance(loaded, list):
+            terminate("Expected a list of projected invoices in the file.")
+        items.extend(loaded)
+    if bool(items) == clear:
+        terminate("Pass --invoice or --file, or --clear to delete all of them.")
+    data = request(
+        "PUT",
+        f"projects/{project_id}/projected-invoices/",
+        params=change_params(dry_run),
+        json={"projected_invoices": items},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    console.print(
+        f"{data['project']['code']} {data['project']['title']}: projected gross"
+        f" margin {data['total']}"
+    )
+    table = make_table("ID>", "Invoiced on", "Gross margin>", "Description")
+    for row in data["projected_invoices"]:
+        table.add_row(
+            str(row["id"] or ""),
+            row["invoiced_on"],
+            row["gross_margin"],
+            row["description"],
+        )
+    console.print(table)
+    if dry_run:
+        console.print("Dry run, nothing has been saved.")

@@ -942,7 +942,7 @@ def delete_recurring_invoice(invoice_id, dry_run, as_json):
 @cli.group("projected-invoices", invoke_without_command=True)
 @click.pass_context
 def projected_invoices(ctx):
-    """Look at the planned invoicing
+    """Look at and set the planned invoicing
 
     Without a command, lists all of them."""
     if ctx.invoked_subcommand is None:

@@ -464,6 +464,23 @@ The planned invoicing (gross margin, without third party costs):
     wb projected-invoices search --project 1234
     wb projected-invoices search --since 2026-11-01 --until 2026-12-31
 
+`set` replaces the projected invoices of a project like the form in the web
+interface: the ones not given are deleted, existing ones with the same date
+(or the `id` given in a file) are changed. New dates must be after the
+freeze date, closed projects get no new ones:
+
+    wb projected-invoices set 2026-0042 --invoice 2027-01-31=5000:"Phase 1" --invoice 2027-03-31=2500
+    wb projected-invoices set 2026-0042 --file projected.yaml --dry-run
+    wb projected-invoices set 2026-0042 --clear
+
+```yaml
+- invoiced_on: 2027-01-31
+  gross_margin: 5000
+  description: Phase 1
+- invoiced_on: 2027-03-31
+  gross_margin: 2500
+```
+
 Recurring invoices, those which still renew by default (`--include-closed`
 for the others), and how their new invoices are created: in preparation,
 marked as sent, or sent by email automatically (the recipient, subject and

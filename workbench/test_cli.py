@@ -388,6 +388,46 @@ class CLITest(TestCase):
         self.assertIn(f"Deleted {project.code}.", result.output)
         self.assertFalse(Project.objects.filter(pk=project.pk).exists())
 
+    def test_projected_invoices_set(self):
+        """The projected invoices of a project are replaced from options or a
+        file"""
+        project = factories.ProjectFactory.create()
+        first, second = in_days(30).isoformat(), in_days(60).isoformat()
+        result = self.wb(
+            "projected-invoices",
+            "set",
+            project.code,
+            "--invoice",
+            f"{first}=5000:Phase 1",
+            "--invoice",
+            f"{second}=2500.50",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("projected gross margin 7500.50", result.output)
+        self.assertEqual(
+            list(project.projected_invoices.values_list("gross_margin", "description")),
+            [(5000, "Phase 1"), (2500.5, "")],
+        )
+
+        path = self.directory / "projected.yaml"
+        path.write_text(
+            f"- invoiced_on: {second}\n  gross_margin: 3000\n  description: Rest\n"
+        )
+        result = self.wb("projected-invoices", "set", project.pk, "--file", path)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(
+            list(project.projected_invoices.values_list("gross_margin", "description")),
+            [(3000, "Rest")],
+        )
+
+        result = self.wb("projected-invoices", "set", project.pk, "--invoice", "x")
+        self.assertEqual(result.exit_code, 2)
+        result = self.wb("projected-invoices", "set", project.pk)
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb("projected-invoices", "set", project.pk, "--clear")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertFalse(project.projected_invoices.exists())
+
     @override_settings(FEATURES={FEATURES.INTERNAL_TYPES: F.ALWAYS})
     def test_internal_projects(self):
         """Internal projects get their internal type by name"""

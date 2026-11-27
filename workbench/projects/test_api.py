@@ -1250,3 +1250,115 @@ class ProjectsAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["id"], project.pk)
         self.assertFalse(Project.objects.filter(pk=project.pk).exists())
+
+    def test_projected_invoices(self):
+        """The projected invoices of a project are replaced like in the web
+        interface's formset, with its freeze date rules"""
+        project = factories.ProjectFactory.create()
+        past = factories.ProjectedInvoiceFactory.create(
+            project=project, invoiced_on=in_days(-30), gross_margin=1000
+        )
+        removed = factories.ProjectedInvoiceFactory.create(
+            project=project, invoiced_on=in_days(10), gross_margin=500
+        )
+        FreezeDate.objects.create(up_to=in_days(-5))
+        self.client.force_login(project.owned_by)
+        url = f"/api/projects/{project.pk}/projected-invoices/"
+
+        def put(items, query=""):
+            return self.client.put(
+                f"{url}{query}",
+                {"projected_invoices": items},
+                content_type="application/json",
+            )
+
+        items = [
+            # Same date as an existing one: changed, not deleted and created
+            {"invoiced_on": in_days(-30).isoformat(), "gross_margin": 1200},
+            {
+                "invoiced_on": in_days(40).isoformat(),
+                "gross_margin": 3000,
+                "description": "Phase 2",
+            },
+        ]
+        response = put(items, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(
+            [(row["id"], row["gross_margin"]) for row in data["projected_invoices"]],
+            [(past.pk, "1200.00"), (None, "3000.00")],
+        )
+        self.assertEqual(data["total"], "4200.00")
+        self.assertEqual(data["project"]["id"], project.pk)
+        self.assertEqual(
+            set(project.projected_invoices.values_list("pk", flat=True)),
+            {past.pk, removed.pk},
+        )
+
+        response = put(items)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            list(
+                project.projected_invoices.values_list(
+                    "id", "gross_margin", "description"
+                )
+            ),
+            [
+                (past.pk, Decimal("1200.00"), ""),
+                (response.json()["projected_invoices"][1]["id"], 3000, "Phase 2"),
+            ],
+        )
+
+        # Not on or before the freeze date
+        response = put([
+            {"id": past.pk, "invoiced_on": in_days(-10).isoformat(), "gross_margin": 1},
+            {"invoiced_on": in_days(-6).isoformat(), "gross_margin": 1},
+        ])
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [
+                ["body", "data", "projected_invoices", 0, "invoiced_on"],
+                ["body", "data", "projected_invoices", 1, "invoiced_on"],
+            ],
+        )
+
+        # IDs of other projects' projections are refused, and IDs twice
+        other = factories.ProjectedInvoiceFactory.create(invoiced_on=in_days(20))
+        response = put([
+            {"id": other.pk, "invoiced_on": in_days(20).isoformat(), "gross_margin": 1},
+            {"id": past.pk, "invoiced_on": in_days(-30).isoformat(), "gross_margin": 1},
+            {"id": past.pk, "invoiced_on": in_days(-30).isoformat(), "gross_margin": 1},
+        ])
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [
+                ["body", "data", "projected_invoices", 0, "id"],
+                ["body", "data", "projected_invoices", 2, "id"],
+            ],
+        )
+
+        # Closed projects get no new projections, but can lose them
+        project.closed_on = in_days(0)
+        project.save()
+        response = put([{"invoiced_on": in_days(50).isoformat(), "gross_margin": 1}])
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("already closed", response.content.decode())
+        response = put([])
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["projected_invoices"], [])
+        self.assertEqual(response.json()["total"], "0.00")
+        self.assertFalse(project.projected_invoices.exists())
+
+    @override_settings(FEATURES={FEATURES.CONTROLLING: F.ALWAYS})
+    def test_projected_invoices_feature(self):
+        """Projected invoices require their feature, like in the web interface"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+        response = self.client.put(
+            f"/api/projects/{project.pk}/projected-invoices/",
+            {"projected_invoices": []},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)

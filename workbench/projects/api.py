@@ -49,6 +49,7 @@ from workbench.offers.models import (
 )
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import (
+    ProjectedInvoicesProjectForm,
     ProjectForm,
     ReassignLogbookForm,
     ServiceForm,
@@ -801,6 +802,173 @@ def project_delete(request, project_id: str, *, dry_run: DryRun = False):
     )
     result = project_detail_out(project, request)
     delete_with_form(project, request, loc=["path", "project_id"], dry_run=dry_run)
+    return result
+
+
+class ProjectedInvoiceIn(InputSchema):
+    id: int | None = Field(
+        default=None,
+        description="ID of a projected invoice of the project to change. Without"
+        " it, a projected invoice with the same date which isn't listed"
+        " otherwise is changed, else a new one is created.",
+    )
+    invoiced_on: dt.date
+    gross_margin: Number = Field(
+        description="Invoice total excl. tax minus third party costs incl. tax."
+    )
+    description: str = Field(default="", max_length=200)
+
+
+class ProjectedInvoicesIn(InputSchema):
+    projected_invoices: list[ProjectedInvoiceIn] = Field(
+        description="All projected invoices of the project, the ones not listed"
+        " are deleted."
+    )
+
+
+class ProjectedInvoiceItem(Schema):
+    id: int | None = Field(description="Null for new ones with dry_run.")
+    invoiced_on: dt.date
+    gross_margin: Amount
+    description: str
+
+
+class ProjectedInvoicesOut(Schema):
+    project: ProjectSummary
+    projected_invoices: list[ProjectedInvoiceItem]
+    total: Amount
+
+
+def _match_projected_invoices(items, existing):
+    """The existing projected invoice (by PK) each item changes: by its ID,
+    or the first one with the same date which isn't listed otherwise"""
+    loc = ["body", "data", "projected_invoices"]
+    matched, errors = {}, []
+    for index, item in enumerate(items):
+        if item.id is None:
+            continue
+        if item.id not in existing:
+            msg = _("Projected invoice %r doesn't belong to this project.") % item.id
+        elif item.id in matched.values():
+            msg = _("Projected invoice %r is listed twice.") % item.id
+        else:
+            matched[index] = item.id
+            continue
+        errors.append({"loc": [*loc, index, "id"], "msg": msg})
+    if errors:
+        raise ValidationError(errors)
+    for index, item in enumerate(items):
+        if item.id is None and (
+            pk := next(
+                (
+                    pk
+                    for pk, pi in existing.items()
+                    if pk not in matched.values() and pi.invoiced_on == item.invoiced_on
+                ),
+                None,
+            )
+        ):
+            matched[index] = pk
+    return matched
+
+
+@router.put(
+    "/projects/{project_id}/projected-invoices/",
+    response=ProjectedInvoicesOut,
+    auth=user_auth(feature=FEATURES.PROJECTED_GROSS_MARGIN),
+)
+def project_projected_invoices(
+    request, project_id: str, data: ProjectedInvoicesIn, *, dry_run: DryRun = False
+):
+    """Replace the projected invoices of a project (by ID or code) like the
+    web interface's form: projected gross margin, third party costs are not
+    included
+
+    Projected invoices which aren't listed are deleted. New ones and changed
+    dates must be after the freeze date, closed projects get no new ones."""
+    project = by_id_or_code(Project.objects.select_related("customer"), project_id)
+    form_kwargs = {"instance": project, "request": request}
+    formset = ProjectedInvoicesProjectForm(**form_kwargs).formsets["projected_invoices"]
+    forms = {form.instance.pk: form for form in formset.initial_forms}
+    matched = _match_projected_invoices(
+        data.projected_invoices, {pk: form.instance for pk, form in forms.items()}
+    )
+
+    # The formset's data: the existing projected invoices with their current
+    # values (deleted unless matched), the changes and the new ones on top
+    values = {
+        f"{formset.prefix}-TOTAL_FORMS": len(forms)
+        + len(data.projected_invoices)
+        - len(matched),
+        f"{formset.prefix}-INITIAL_FORMS": len(forms),
+        f"{formset.prefix}-MIN_NUM_FORMS": 0,
+        f"{formset.prefix}-MAX_NUM_FORMS": 1000,
+    }
+    for form in forms.values():
+        for name in form.fields:
+            value = form[name].value()
+            values[form.add_prefix(name)] = "" if value is None else value
+        values[form.add_prefix("DELETE")] = (
+            "" if form.instance.pk in matched.values() else "on"
+        )
+    indexes = {
+        form.instance.pk: index for index, form in enumerate(formset.initial_forms)
+    }
+    request_index = {}  # Index of the form -> index in the request
+    new = len(forms)
+    for index, item in enumerate(data.projected_invoices):
+        if index in matched:
+            form_index = indexes[matched[index]]
+        else:
+            form_index, new = new, new + 1
+        request_index[form_index] = index
+        for name, value in [
+            ("invoiced_on", item.invoiced_on.isoformat()),
+            ("gross_margin", item.gross_margin),
+            ("description", item.description),
+        ]:
+            values[f"{formset.prefix}-{form_index}-{name}"] = value
+
+    form = ProjectedInvoicesProjectForm(values, **form_kwargs)
+    if not form.is_valid():
+        formset = form.formsets["projected_invoices"]
+        loc = ["body", "data", "projected_invoices"]
+        raise ValidationError(
+            [{"loc": loc, "msg": message} for message in formset.non_form_errors()]
+            + [
+                {
+                    "loc": [*loc, request_index[index]]
+                    + ([] if field == "__all__" else [field]),
+                    "msg": message,
+                }
+                for index, subform in enumerate(formset.forms)
+                if index in request_index
+                for field, messages in subform.errors.items()
+                for message in messages
+            ]
+        )
+
+    with transaction.atomic():
+        form.save()
+        created = {obj.pk for obj in form.formsets["projected_invoices"].new_objects}
+        projected_invoices = list(
+            project.projected_invoices.order_by("invoiced_on", "pk")
+        )
+        result = {
+            "project": project_summary(project, request),
+            "projected_invoices": [
+                {
+                    "id": None if dry_run and pi.pk in created else pi.pk,
+                    "invoiced_on": pi.invoiced_on,
+                    "gross_margin": pi.gross_margin,
+                    "description": pi.description,
+                }
+                for pi in projected_invoices
+            ],
+            "total": sum((pi.gross_margin for pi in projected_invoices), Z2),
+        }
+        if dry_run:
+            transaction.set_rollback(True)
     return result
 
 
