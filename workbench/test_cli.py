@@ -1904,26 +1904,6 @@ planned_work:
         result = self.wb("invoices", "postpone-reminders", overdue.pk, "--clear")
         self.assertIn("aren't postponed anymore", result.output)
 
-    def test_send_reminder(self):
-        """Reminders are previewed without a recipient"""
-        invoice = factories.InvoiceFactory.create(
-            status=Invoice.SENT, invoiced_on=in_days(-60), due_on=in_days(-30)
-        )
-        invoice.contact.emailaddresses.create(email="billing@example.com")
-        result = self.wb("invoices", "send-reminder", invoice.contact.pk)
-        self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("billing@example.com", result.output)
-        self.assertIn("choose a recipient with --to", result.output)
-
-        result = self.wb(
-            "invoices",
-            "send-reminder",
-            invoice.contact.pk,
-            "--to",
-            "billing@example.com",
-        )
-        self.assertIn("The reminder has been sent.", result.output)
-
     def test_choices_match_the_server(self):
         """Choices the CLI offers are keys of the server, they don't drift
         apart unnoticed"""

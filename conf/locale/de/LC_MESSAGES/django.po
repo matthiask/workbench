@@ -2473,10 +2473,6 @@ msgstr "Site-Kontakte"
 msgid "These invoices aren't overdue: %s"
 msgstr "Diese Rechnungen sind nicht überfällig: %s"
 
-#: workbench/invoices/api.py
-msgid "This contact has no overdue invoices."
-msgstr "Diese Kontaktperson hat keine überfälligen Rechnungen."
-
 #: workbench/invoices/api.py workbench/invoices/forms.py
 msgid "Reminders can only be postponed for sent invoices."
 msgstr "Zahlungserinnerungen können nur für versendete Rechnungen aufgeschoben werden."
