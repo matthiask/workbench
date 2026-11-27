@@ -1,8 +1,11 @@
 import datetime as dt
+import html
 from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
@@ -30,9 +33,14 @@ from workbench.tools.api import (
     Percentage,
     Serialized,
     ShortName,
+    active_user,
+    check_allow_delete,
     date_range,
+    delete_with_form,
+    patch_with_form,
     user_by_short_name,
     validate_form,
+    without_query,
 )
 
 
@@ -45,7 +53,7 @@ class AbsenceOut(Schema):
     user: str
     starts_on: dt.date
     ends_on: dt.date | None
-    days: Decimal
+    days: Days
     reason: AbsenceReason
     reason_label: str
     description: str
@@ -151,6 +159,85 @@ def absence_create(
         if dry_run:
             transaction.set_rollback(True)
             result |= {"id": None, "url": None}
+    return result
+
+
+class AbsencePatch(InputSchema):
+    user: str | None = Field(
+        default=None,
+        description="Short name of an active user; only personnel administration"
+        " hands absences over to others.",
+    )
+    starts_on: dt.date | None = None
+    ends_on: dt.date | None = Field(
+        default=None, description="In the same year, null for a single day."
+    )
+    days: Decimal | None = Field(
+        default=None, description="Working days, only corrections are negative."
+    )
+    reason: AbsenceReason | None = None
+    description: str | None = None
+
+
+def _absence(request, absence_id):
+    """The absence if the user may change or delete it like in the web
+    interface (``Absence.allow_update``, which is ``allow_delete`` too)"""
+    absence = get_object_or_404(Absence.objects.select_related("user"), pk=absence_id)
+    check_allow_delete(absence, request, ["path", "absence_id"])
+    return absence
+
+
+@router.patch("/absences/{int:absence_id}/", response=AbsenceOut)
+def absence_update(
+    request,
+    absence_id: int,
+    data: AbsencePatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change an absence, validated like in the web interface
+
+    Only the absent person and personnel administration change absences
+    (whoever entered one for someone else may undo it on the same day),
+    absences of past years are locked. Descriptions of sickness stay hidden
+    from others, also here. A sickness absence with a description keeps its
+    reason: clear the description, or create a new absence and delete this
+    one. Warnings of the web interface are errors here unless they are
+    ignored by their code; nothing is saved if anything is invalid or with
+    ``dry_run``."""
+    absence = _absence(request, absence_id)
+    try:
+        return patch_with_form(
+            # The web interface shows the form in a modal
+            AbsenceForm.__wrapped__,
+            absence,
+            data,
+            # The form takes initial values from the query string
+            without_query(request),
+            out=lambda absence: _absence_out(absence, request),
+            ignore_warnings=ignore_warnings,
+            dry_run=dry_run,
+            field_map={"user": active_user},
+        )
+    except ValidationError as exc:
+        # The form links to replacing the absence in the web interface
+        for error in exc.errors:
+            error["msg"] = html.unescape(strip_tags(str(error["msg"])))
+        raise
+
+
+@router.delete("/absences/{int:absence_id}/", response=AbsenceOut)
+def absence_delete(request, absence_id: int, *, dry_run: DryRun = False):
+    """Delete an absence like in the web interface: allowed for the same
+    people as changing it
+
+    Deleting the absence of someone else is listed in the weekly mail to
+    personnel administration, like all their changes. Returns the deleted
+    absence."""
+    absence = _absence(request, absence_id)
+    result = _absence_out(absence, request)
+    delete_with_form(absence, request, loc=["path", "absence_id"], dry_run=dry_run)
     return result
 
 

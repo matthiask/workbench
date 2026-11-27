@@ -53,6 +53,8 @@ WRITING_FUNCTION_VIEWS = {
 # comments name the package which completes it)
 API_ROUTES = {
     "awt_absence_create": "POST /api/absences/",
+    "awt_absence_delete": "DELETE /api/absences/{absence_id}/",
+    "awt_absence_update": "PATCH /api/absences/{absence_id}/",
     "contacts_group_create": "POST /api/contacts/groups/",
     "contacts_group_update": "PATCH /api/contacts/groups/{group_id}/",
     "contacts_organization_create": "POST /api/contacts/organizations/",
@@ -187,8 +189,6 @@ NOT_IN_API = {
     "accounts_team_update": "package 19",
     "accounts_update": "out of scope: own profile",
     "awt_absence_confirm": "out of scope: personnel administration",
-    "awt_absence_delete": "package 18",
-    "awt_absence_update": "package 18",
     "contacts_group_delete": "out of scope: deleting contacts",
     "contacts_organization_delete": "out of scope: deleting contacts",
     "contacts_person_delete": "out of scope: deleting contacts",
