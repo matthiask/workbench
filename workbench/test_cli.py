@@ -2526,6 +2526,12 @@ planned_work:
             "--subtotal",
             "1200",
         ]
+        # Required like in the web interface, 0 if there are none
+        result = self.wb(*args, "--ignore-warning", "no-contact")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("third_party_costs", result.output)
+
+        args += ["--third-party-costs", "0"]
         result = self.wb(*args)
         self.assertEqual(result.exit_code, 1)
         self.assertIn("no-contact", result.output)

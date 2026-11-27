@@ -942,7 +942,12 @@ def _recurring_invoice_options(fn):
             " invoices 20 days before their period begins.",
         ),
         click.option("--subtotal", type=float, help="Amount excl. tax."),
-        click.option("--third-party-costs", type=float),
+        click.option(
+            "--third-party-costs",
+            type=float,
+            help="Required when creating, like in the web interface (0 if"
+            " there are none).",
+        ),
         click.option("--discount", type=float, help="Amount excl. tax."),
         click.option("--vat/--no-vat", "liable_to_vat", default=None),
         click.option(
@@ -1004,7 +1009,8 @@ def create_recurring_invoice(ignore_warnings, dry_run, as_json, **fields):
 
     Like in the web interface, the postal address defaults to the billing
     address of the contact or the customer, the responsible person to you
-    and the start to today; a missing contact warns (no-contact). Workbench
+    and the start to today; --third-party-costs is required (0 if there are
+    none), a missing contact warns (no-contact). Workbench
     creates (and if wanted sends) the invoices itself, nothing is sent now."""
     data = request(
         "POST",

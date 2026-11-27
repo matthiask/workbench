@@ -35,8 +35,10 @@ description, owner and the mail settings.
   from the customer, else from the contact's organization or the site's
   customer (the query parameter the form reads). Defaults beyond the form:
   the postal address is the first billing address (like
-  `POST /api/invoices/`) and third party costs are 0 (the web form leaves
-  them empty and required). A missing contact warns (`no-contact`).
+  `POST /api/invoices/`). Third party costs have no default (decided
+  2026-11-27, they defaulted to 0 at first): they're required like in the
+  web form, 0 has to be passed explicitly. A missing contact warns
+  (`no-contact`).
 - `DELETE /api/recurring-invoices/{id}/`: no delete form, no warnings
   (`delete_with_form()` with `allow_delete()`); the invoices created stay.
 - The output has the new fields `postal_address`, `create_invoice_on_day`,

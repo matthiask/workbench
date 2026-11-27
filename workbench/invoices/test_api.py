@@ -395,6 +395,15 @@ class InvoicesAPITest(TestCase):
             "periodicity": "yearly",
             "subtotal": "1200.00",
         }
+        # Third party costs are required like in the web form, no default
+        response = post(data)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["body", "data", "third_party_costs"]],
+        )
+        data["third_party_costs"] = "0.00"
+
         response = post(data, "?dry_run=true")
         self.assertEqual(response.status_code, 200, response.content)
         self.assertIsNone(response.json()["id"])
@@ -455,6 +464,7 @@ class InvoicesAPITest(TestCase):
                 "site": site.pk,
                 "periodicity": "monthly",
                 "subtotal": "100.00",
+                "third_party_costs": "0.00",
                 "new_invoices": "send",
                 "send_to": "billing@example.com",
             },
@@ -473,6 +483,7 @@ class InvoicesAPITest(TestCase):
             "title": "Support",
             "periodicity": "yearly",
             "subtotal": "500.00",
+            "third_party_costs": "0.00",
         })
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["customer"]["id"], person.organization_id)

@@ -1230,8 +1230,9 @@ def recurring_invoice_create(
     """Create a recurring invoice, validated like in the web interface
 
     The postal address defaults to the billing address of the contact or
-    the customer, the responsible person to you, the start to today and
-    third party costs to 0.
+    the customer, the responsible person to you and the start to today;
+    third party costs are required like in the web interface (0 if there
+    are none).
     Workbench creates (and sends, if wanted) the invoices itself. Warnings of
     the web interface are errors here unless ignored by their code; nothing
     is saved if anything is invalid or with ``dry_run``."""
@@ -1268,8 +1269,6 @@ def recurring_invoice_create(
             person=contact, organization=customer, for_billing=True
         ):
             values["postal_address"] = choices[0][1]
-    if "third_party_costs" not in patch:
-        values["third_party_costs"] = Z2
     values[RecurringInvoiceForm.ignore_warnings_id] = " ".join(ignore_warnings)
     form = RecurringInvoiceForm(values, request=request)
     validate_form(form, ignore_warnings=ignore_warnings)

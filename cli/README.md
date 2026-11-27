@@ -541,10 +541,12 @@ text are proposed unless given):
 
 `create` takes the same options as `update`; the postal address defaults
 to the billing address, the responsible person to you, the start to today.
-`--contact` or `--site` determine the customer if `--customer` is missing:
+`--third-party-costs` is required like in the web interface (0 if there are
+none). `--contact` or `--site` determine the customer if `--customer` is
+missing:
 
     wb recurring-invoices create --contact 456 --title Hosting \
-        --periodicity yearly --subtotal 1200 --dry-run
+        --periodicity yearly --subtotal 1200 --third-party-costs 0 --dry-run
 
 `delete` removes one created by mistake (the invoices it created stay); to
 stop creating invoices, cancel the auto-renewal with `--ends-on` instead:

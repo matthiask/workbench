@@ -111,7 +111,7 @@ sites to Workbench sites by host name, lowercased and ignoring a leading
   nobody invoices: list it for the user; creating a recurring invoice
   (amount, periodicity) is their decision. Once they've decided, propose
   `wb recurring-invoices create --site SITE_ID --contact ID --periodicity
-  yearly --subtotal AMOUNT --dry-run`.
+  yearly --subtotal AMOUNT --third-party-costs 0 --dry-run`.
 - **No contact for outages**: propose people, e.g. the contact of the
   recurring invoice or of the customer's recent projects
   (`wb organizations show ID`, `wb people search --organization ID`), and
