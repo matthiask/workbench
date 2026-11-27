@@ -3070,6 +3070,25 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertFalse(LoggedCost.objects.exists())
 
+    def test_move_logbook_entries(self):
+        """Hours and costs move to services of other projects one by one"""
+        hours = factories.LoggedHoursFactory.create(
+            rendered_by=self.user, created_by=self.user
+        )
+        cost = factories.LoggedCostFactory.create(created_by=self.user)
+        target = factories.ServiceFactory.create(title="Support")
+
+        result = self.wb("hours", "update", hours.pk, "--service", target.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"{target.project.code} Support ({target.pk})", result.output)
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, target)
+
+        result = self.wb("costs", "update", cost.pk, "--service", target.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        cost.refresh_from_db()
+        self.assertEqual(cost.service, target)
+
     def test_timestamps(self):
         """Tasks are started and stopped like with the old tst command"""
         result = self.wb("timestamps", "start")

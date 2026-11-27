@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
 from django.utils.translation import deactivate_all
 
 from workbench import factories
@@ -9,6 +10,7 @@ from workbench.accounts.features import FEATURES, F
 from workbench.expenses.models import ExpenseReport
 from workbench.invoices.models import Invoice
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.projects.models import Project
 from workbench.timer.models import Timestamp
 from workbench.tools.validation import in_days
 
@@ -444,3 +446,81 @@ class LogbookChangesAPITest(TestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertFalse(LoggedCost.objects.filter(pk=entry.pk).exists())
+
+
+class LogbookMoveAPITest(TestCase):
+    def tearDown(self):
+        deactivate_all()
+
+    def patch(self, url, data, query=""):
+        return self.client.patch(f"{url}{query}", data, content_type="application/json")
+
+    def test_move_hours_to_another_project(self):
+        """A service of another project moves the hours through the move form
+        of the web interface: archived entries and closed projects refused"""
+        entry = factories.LoggedHoursFactory.create(description="Before")
+        service = entry.service
+        target = factories.ServiceFactory.create()
+        self.client.force_login(entry.rendered_by)
+        url = f"/api/logbook/hours/{entry.pk}/"
+
+        response = self.patch(url, {"service": target.pk}, "?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["project"]["id"], target.project_id)
+        entry.refresh_from_db()
+        self.assertEqual(entry.service, service)
+
+        response = self.patch(url, {"service": target.pk, "description": "After"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["service_id"], target.pk)
+        self.assertEqual(response.json()["description"], "After")
+        entry.refresh_from_db()
+        self.assertEqual(entry.service, target)
+        self.assertEqual(entry.description, "After")
+
+        # Errors of the other fields leave the entry where it was
+        other = factories.ServiceFactory.create()
+        response = self.patch(url, {"service": other.pk, "hours": 0})
+        self.assertEqual(response.status_code, 422)
+        entry.refresh_from_db()
+        self.assertEqual(entry.service, target)
+
+        closed = factories.ServiceFactory.create()
+        Project.objects.filter(pk=closed.project_id).update(closed_on=in_days(0))
+        response = self.patch(url, {"service": closed.pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "service"]],
+        )
+
+        Project.objects.filter(pk=target.project_id).update(closed_on=in_days(0))
+        response = self.patch(url, {"service": other.pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["msg"] for error in response.json()["detail"]],
+            ["Cannot move logbook entries of closed projects."],
+        )
+
+        Project.objects.filter(pk=target.project_id).update(closed_on=None)
+        LoggedHours.objects.filter(pk=entry.pk).update(archived_at=timezone.now())
+        response = self.patch(url, {"service": other.pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["msg"] for error in response.json()["detail"]],
+            ["Cannot move archived logbook entries."],
+        )
+        entry.refresh_from_db()
+        self.assertEqual(entry.service, target)
+
+    def test_move_cost_to_another_project(self):
+        """Costs move to services of other projects too"""
+        entry = factories.LoggedCostFactory.create()
+        target = factories.ServiceFactory.create()
+        self.client.force_login(entry.rendered_by)
+
+        response = self.patch(f"/api/logbook/costs/{entry.pk}/", {"service": target.pk})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["project"]["id"], target.project_id)
+        entry.refresh_from_db()
+        self.assertEqual(entry.service, target)

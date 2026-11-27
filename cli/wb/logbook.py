@@ -239,7 +239,11 @@ def create_hours(
 
 @hours.command("update")
 @click.argument("hours_id", type=int)
-@click.option("--service", type=int, help="Another service of the same project.")
+@click.option(
+    "--service",
+    type=int,
+    help="Another service; one of another open project moves the entry there.",
+)
 @click.option("--hours", type=float)
 @click.option("--description", help="`-` reads it from stdin.")
 @_rendered_on_option
@@ -269,7 +273,9 @@ def update_hours(
     """Change logged hours, only the given fields
 
     Like in the web interface, hours of past weeks keep their date, person
-    and hours, invoiced hours only allow changing the description."""
+    and hours, invoiced hours only allow changing the description. A
+    `--service` of another open project moves the hours there, not when
+    they have been invoiced or their project has been closed."""
     data = _values(
         service=service,
         hours=hours,
@@ -450,7 +456,11 @@ def create_cost(
 
 @costs.command("update")
 @click.argument("cost_id", type=int)
-@click.option("--service", type=int, help="Another service of the same project.")
+@click.option(
+    "--service",
+    type=int,
+    help="Another service; one of another open project moves the entry there.",
+)
 @click.option("--cost", type=float, help="Excl. tax.")
 @click.option("--description", help="`-` reads it from stdin.")
 @_with_cost_options
@@ -476,7 +486,8 @@ def update_cost(
 
     Like in the web interface, invoiced costs keep their service, date,
     person and amounts, costs of expense reports their date, person and
-    expenses."""
+    expenses. A `--service` of another open project moves the costs there,
+    not when they have been invoiced or their project has been closed."""
     values["rendered_on"] = _date(values["rendered_on"])
     data = _values(**values, are_expenses=expenses)
     _clear(data, "third_party_costs", clear_third_party_costs)

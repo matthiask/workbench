@@ -12,7 +12,12 @@ from ninja.pagination import paginate
 
 from workbench.accounts.models import User
 from workbench.api_keys import InvoiceStatus, key
-from workbench.logbook.forms import LoggedCostForm, LoggedHoursForm
+from workbench.logbook.forms import (
+    LoggedCostForm,
+    LoggedCostMoveForm,
+    LoggedHoursForm,
+    LoggedHoursMoveForm,
+)
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Service
@@ -293,6 +298,57 @@ def _save(form, request, out, *, dry_run):
     return result
 
 
+def _update(
+    entry,
+    fields,
+    request,
+    *,
+    form_class,
+    move_form_class,
+    out,
+    message,
+    ignore_warnings,
+    dry_run,
+):
+    """Change the entry with the form of the web interface, which only
+    offers services of the same project; a service of another project moves
+    the entry with the move form first, like the web interface does in a
+    separate step. Errors of the other fields roll back the move too."""
+    request = without_query(request)
+    with transaction.atomic():
+        if (service := fields.get("service")) is not None and Service.objects.filter(
+            pk=service
+        ).exclude(project=entry.service.project_id).exists():
+            form = move_form_class(
+                {"service": service}, instance=entry, request=request, prefix=None
+            )
+            validate_form(form)
+            form.save()
+            entry = (
+                type(entry).objects.select_related("service__project").get(pk=entry.pk)
+            )
+            fields = {key: value for key, value in fields.items() if key != "service"}
+            if not fields:
+                result = out(entry, request)
+                if dry_run:
+                    transaction.set_rollback(True)
+                return result
+
+        form = form_class(instance=entry, request=request, prefix=None)
+        _check_fields(form, fields, message)
+        form = form_class(
+            _values(form_data(form), fields),
+            instance=entry,
+            request=request,
+            prefix=None,
+        )
+        validate_form(form, ignore_warnings=ignore_warnings)
+        result = _save(form, request, out, dry_run=False)
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
 class LoggedHoursResult(LoggedHoursOut):
     id: int | None = Field(description="Null with dry_run.")
     url: str | None = Field(description="Null with dry_run.")
@@ -324,7 +380,8 @@ class LoggedHoursPatch(LoggedHoursFields):
 
     service: int | None = Field(
         default=None,
-        description="ID of another service of the same project which allows logging.",
+        description="ID of another service which allows logging; services of"
+        " other open projects move the entry there.",
     )
 
 
@@ -373,22 +430,23 @@ def logged_hours_update(
 
     Hours of past weeks keep their date, person and hours (except for people
     who may log late), invoiced hours only allow changing the description.
-    Warnings are errors unless they are ignored by their code."""
+    A service of another open project moves the hours there, not when they
+    have been invoiced or their project has been closed. Warnings are errors
+    unless they are ignored by their code."""
     entry = get_object_or_404(
         LoggedHours.objects.select_related("service__project"), pk=hours_id
     )
-    request = without_query(request)
-    form = LoggedHoursForm(instance=entry, request=request, prefix=None)
-    fields = data.model_dump(exclude_unset=True)
-    _check_fields(form, fields, _("These hours cannot be changed anymore."))
-    form = LoggedHoursForm(
-        _values(form_data(form), fields),
-        instance=entry,
-        request=request,
-        prefix=None,
+    return _update(
+        entry,
+        data.model_dump(exclude_unset=True),
+        request,
+        form_class=LoggedHoursForm,
+        move_form_class=LoggedHoursMoveForm,
+        out=_hours_out,
+        message=_("These hours cannot be changed anymore."),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
     )
-    validate_form(form, ignore_warnings=ignore_warnings)
-    return _save(form, request, _hours_out, dry_run=dry_run)
 
 
 @router.delete("/logbook/hours/{int:hours_id}/", response=LoggedHoursOut)
@@ -450,7 +508,8 @@ class LoggedCostPatch(LoggedCostFields):
 
     service: int | None = Field(
         default=None,
-        description="ID of another service of the same project which allows logging.",
+        description="ID of another service which allows logging; services of"
+        " other open projects move the entry there.",
     )
 
 
@@ -502,23 +561,24 @@ def logged_cost_update(
     """Change logged costs, validated like in the web interface
 
     Invoiced costs keep their service, date, person and amounts, costs of
-    expense reports their date, person and expenses. Warnings are errors
-    unless they are ignored by their code."""
+    expense reports their date, person and expenses. A service of another
+    open project moves the costs there, not when they have been invoiced or
+    their project has been closed. Warnings are errors unless they are
+    ignored by their code."""
     entry = get_object_or_404(
         LoggedCost.objects.select_related("service__project"), pk=cost_id
     )
-    request = without_query(request)
-    form = LoggedCostForm(instance=entry, request=request, prefix=None)
-    fields = data.model_dump(exclude_unset=True)
-    _check_fields(form, fields, _("These costs cannot be changed anymore."))
-    form = LoggedCostForm(
-        _values(form_data(form), fields),
-        instance=entry,
-        request=request,
-        prefix=None,
+    return _update(
+        entry,
+        data.model_dump(exclude_unset=True),
+        request,
+        form_class=LoggedCostForm,
+        move_form_class=LoggedCostMoveForm,
+        out=_cost_out,
+        message=_("These costs cannot be changed anymore."),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
     )
-    validate_form(form, ignore_warnings=ignore_warnings)
-    return _save(form, request, _cost_out, dry_run=dry_run)
 
 
 @router.delete("/logbook/costs/{int:cost_id}/", response=LoggedCostOut)
