@@ -555,8 +555,12 @@ class TimestampsTest(TestCase):
         logbook entries if there is a gap in-between"""
         user = factories.UserFactory.create()
 
+        # The second entry ends now and spans one hour, which leaves a gap of
+        # 1.95 hours, rounded up to 2.0. A gap of exactly two hours would
+        # become 2.1 as soon as creating the second entry takes any time.
         factories.LoggedHoursFactory.create(
-            rendered_by=user, created_at=timezone.now() - dt.timedelta(seconds=10799)
+            rendered_by=user,
+            created_at=timezone.now() - dt.timedelta(hours=3, minutes=-3),
         )
         factories.LoggedHoursFactory.create(rendered_by=user)
 
@@ -620,14 +624,18 @@ class TimestampsTest(TestCase):
         t = Timestamp.objects.get()
         self.assertEqual(slices[1]["timestamp_id"], t.id)
 
-    @travel("2021-04-26 18:00")  # Make 10800 seconds stay within the same day
+    @travel("2021-04-26 18:00")  # Make three hours stay within the same day
     def test_break_autocreate_timestamp_from_detected(self):
         """The buttons for <detected> gaps lead to a form which fills the gap
         instead of appending new slices"""
         user = factories.UserFactory.create()
 
+        # The second entry ends now and spans one hour, which leaves a gap of
+        # 1.95 hours, rounded up to 2.0. A gap of exactly two hours would
+        # become 2.1 as soon as creating the second entry takes any time.
         factories.LoggedHoursFactory.create(
-            rendered_by=user, created_at=timezone.now() - dt.timedelta(seconds=10799)
+            rendered_by=user,
+            created_at=timezone.now() - dt.timedelta(hours=3, minutes=-3),
         )
         factories.LoggedHoursFactory.create(rendered_by=user)
 
