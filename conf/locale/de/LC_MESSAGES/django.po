@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-27 07:29+0100\n"
+"POT-Creation-Date: 2026-11-27 07:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -231,7 +231,6 @@ msgstr "Inaktiv"
 
 #: workbench/accounts/models.py workbench/contacts/models.py
 #: workbench/invoices/forms.py
-#: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "email"
 msgstr "Email"
 
@@ -5876,6 +5875,10 @@ msgstr "Rechnungen erstellen"
 #: workbench/templates/projects/project_detail.html
 msgid "Copy"
 msgstr "Kopieren"
+
+#: workbench/templates/invoices/recurringinvoice_detail.html
+msgid "Email sent automatically with each new invoice"
+msgstr "Email, die automatisch mit jeder neuen Rechnung verschickt wird"
 
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "Cc"
