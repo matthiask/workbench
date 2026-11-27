@@ -1,5 +1,6 @@
 """Offers and their services"""
 
+import datetime as dt
 from pathlib import Path
 
 import click
@@ -7,6 +8,8 @@ import click
 from wb import core
 from wb.core import (
     announce_installation,
+    change_options,
+    change_params,
     cli,
     complete_short_names,
     current_installation,
@@ -243,12 +246,57 @@ def _echo_changed_offer(data, *, dry_run, as_json):
         click.secho("Dry run, nothing has been saved.", fg="yellow", err=True)
 
 
+OFFER_STATUSES = [
+    "in_preparation",
+    "service_group",
+    "offered",
+    "accepted",
+    "declined",
+    "discarded",
+]
+
+
+def _date_or_empty(ctx, param, value):
+    """A date, "" empties the field"""
+    if not value:
+        return value
+    try:
+        return dt.date.fromisoformat(value).isoformat()
+    except ValueError:
+        raise click.BadParameter('expected YYYY-MM-DD, or "" to empty it.') from None
+
+
+def _date_option(name, help=None):
+    return click.option(name, callback=_date_or_empty, metavar="YYYY-MM-DD", help=help)
+
+
 @offers.command("update")
 @click.argument("offer_id", type=int)
 @click.option("--title")
 @click.option("--description", help="The text, or - to read it from stdin.")
 @click.option(
+    "--status",
+    type=click.Choice(OFFER_STATUSES),
+    help="in_preparation puts sent or accepted offers back into preparation"
+    " to revise them.",
+)
+@_date_option("--offered-on")
+@_date_option("--valid-until")
+@_date_option("--closed-on", help="Date of acceptance or decline.")
+@_date_option("--work-completed-on", help='Stops logging on the services, "" resumes.')
+@click.option("--postal-address", help="The text, or - to read it from stdin.")
+@click.option(
     "--discount", type=float, help="Amount excl. tax, 0 removes the discount."
+)
+@click.option("--liable-to-vat/--not-liable-to-vat", default=None)
+@click.option("--tax-rate", type=float, help="E.g. 8.1.")
+@click.option("--show-service-details/--hide-service-details", default=None)
+@click.option("--budget-retainer/--no-budget-retainer", default=None)
+@click.option(
+    "--delete-planned-work/--keep-planned-work",
+    default=None,
+    help="Required when declining or discarding an offer with planned work"
+    " after this week.",
 )
 @click.option("--owned-by", help="Short name of an active user.")
 @click.option(
@@ -257,27 +305,49 @@ def _echo_changed_offer(data, *, dry_run, as_json):
     help="URL, e.g. of an issue; repeat it for several. Replaces the existing"
     ' ones, "" removes them.',
 )
-@click.option("--dry-run", is_flag=True, help="Validate and show totals only.")
-@click.option("--json", "as_json", is_flag=True)
+@change_options()
 def update_offer(
     offer_id,
     title,
     description,
+    status,
+    offered_on,
+    valid_until,
+    closed_on,
+    work_completed_on,
+    postal_address,
     discount,
+    liable_to_vat,
+    tax_rate,
+    show_service_details,
+    budget_retainer,
+    delete_planned_work,
     owned_by,
     external_reference,
+    ignore_warnings,
     dry_run,
     as_json,
 ):
-    """Change the title, the description, the owner or the discount of an
-    offer in preparation, the title, the description or the owner of a
-    service group, or the external references of any offer"""
+    """Change an offer in any status, only the given fields
+
+    Services of offers which have been sent stay as they were sent. To
+    revise a sent or accepted offer, put it back into preparation with
+    `--status in_preparation` (accepted offers: `--ignore-warning
+    status-change-but-already-closed`), change it with `wb offers replace`
+    or `wb services`, then send it again with `--status offered`."""
     data = {
         key: value
         for key, value in [
             ("title", title),
             ("description", text_or_stdin(description)),
+            ("status", status),
+            ("postal_address", text_or_stdin(postal_address)),
             ("discount", discount),
+            ("liable_to_vat", liable_to_vat),
+            ("tax_rate", tax_rate),
+            ("show_service_details", show_service_details),
+            ("is_budget_retainer", budget_retainer),
+            ("delete_planned_work", delete_planned_work),
             ("owned_by", owned_by),
             (
                 "external_reference",
@@ -286,15 +356,20 @@ def update_offer(
         ]
         if value is not None
     }
+    for key, value in [
+        ("offered_on", offered_on),
+        ("valid_until", valid_until),
+        ("closed_on", closed_on),
+        ("work_completed_on", work_completed_on),
+    ]:
+        if value is not None:
+            data[key] = value or None
     if not data:
-        terminate(
-            "Nothing to change, pass --title, --description, --discount,"
-            " --owned-by or --external-reference."
-        )
+        terminate("Nothing to change, see --help.")
     data = request(
         "PATCH",
         f"offers/{offer_id}/",
-        params={"dry_run": format_bool(dry_run)},
+        params=change_params(dry_run, ignore_warnings),
         json=data,
     )
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)

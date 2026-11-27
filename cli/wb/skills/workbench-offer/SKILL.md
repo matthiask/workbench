@@ -1,6 +1,6 @@
 ---
 name: workbench-offer
-description: Turn a specification, briefing or email into a Workbench offer using the `wb` CLI. Use when the user wants to write, draft, estimate or create an offer (Offerte) for a Workbench project, or to revise an offer which is still in preparation.
+description: Turn a specification, briefing or email into a Workbench offer using the `wb` CLI. Use when the user wants to write, draft, estimate or create an offer (Offerte) for a Workbench project, or to revise an offer (also one which has been sent or accepted).
 ---
 
 # Creating Workbench offers from a specification
@@ -215,6 +215,16 @@ Change only what was asked, one command per change, each one first with
 - Services without hours or a cost are allowed (Workbench only warns), e.g.
   when several people estimate their own services one after the other. Only
   touch the services you were asked about, never fill in or delete others.
+
+Offers which have been sent or accepted keep their services as they were
+sent. To revise one, and only after the user's explicit approval, put it
+back into preparation first, change it as above, and ask the user to send it
+again in Workbench:
+
+    wb offers update <offer_id> --status in_preparation --dry-run
+    wb offers update <offer_id> --status in_preparation --ignore-warning status-change-but-already-closed
+
+The warning only comes for accepted offers (they lose their closing date).
 
 Only for a completely new version of the offer, replace it entirely (as long
 as nothing has been logged on its services yet), again with the user's

@@ -1020,6 +1020,106 @@ planned_work:
         offer.refresh_from_db()
         self.assertEqual(offer.external_reference, "")
 
+    def test_offer_status(self):
+        """Offers are sent, accepted, put back into preparation to revise
+        them and declined with `wb offers update`"""
+        project = factories.ProjectFactory.create(owned_by=self.user)
+        factories.PostalAddressFactory.create(person=project.contact)
+        offer = factories.OfferFactory.create(
+            project=project,
+            title="Relaunch",
+            postal_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+        )
+        service = factories.ServiceFactory.create(project=project, offer=offer)
+        today = dt.date.today().isoformat()
+
+        result = self.wb(
+            "offers",
+            "update",
+            offer.pk,
+            "--status",
+            "offered",
+            "--offered-on",
+            today,
+            "--valid-until",
+            today,
+            "--not-liable-to-vat",
+            "--hide-service-details",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.IN_PREPARATION)
+
+        result = self.wb(
+            "offers",
+            "update",
+            offer.pk,
+            "--status",
+            "accepted",
+            "--offered-on",
+            today,
+            "--valid-until",
+            today,
+            "--closed-on",
+            today,
+            "--not-liable-to-vat",
+            "--hide-service-details",
+            "--tax-rate",
+            "7.7",
+            "--budget-retainer",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.ACCEPTED)
+        self.assertFalse(offer.liable_to_vat)
+        self.assertFalse(offer.show_service_details)
+        self.assertTrue(offer.is_budget_retainer)
+        self.assertEqual(str(offer.tax_rate), "7.70")
+
+        # Back into preparation to revise it
+        result = self.wb("offers", "update", offer.pk, "--status", "in_preparation")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn(
+            "--ignore-warning status-change-but-already-closed", result.output
+        )
+        result = self.wb(
+            "offers",
+            "update",
+            offer.pk,
+            "--status",
+            "in_preparation",
+            "--ignore-warning",
+            "status-change-but-already-closed",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.IN_PREPARATION)
+        self.assertEqual(list(offer.services.all()), [service])
+
+        # Declining asks about planned work after this week
+        factories.PlannedWorkFactory.create(
+            project=project, offer=offer, weeks=[monday() + dt.timedelta(days=7)]
+        )
+        decline = [
+            "offers",
+            "update",
+            offer.pk,
+            "--status",
+            "declined",
+            "--ignore-warning",
+            "yes-please-decline",
+        ]
+        result = self.wb(*decline)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("delete_planned_work", result.output)
+        result = self.wb(*decline, "--keep-planned-work", "--work-completed-on", today)
+        self.assertEqual(result.exit_code, 0, result.output)
+        offer.refresh_from_db()
+        self.assertEqual(offer.status, Offer.DECLINED)
+        self.assertEqual(offer.planned_work.count(), 1)
+
     def test_milestones(self):
         """Milestones are linked with offers through their external references"""
         project = factories.ProjectFactory.create(title="Relaunch", owned_by=self.user)

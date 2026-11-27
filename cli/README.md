@@ -287,6 +287,19 @@ created in preparation; review and send them in Workbench.
     wb offers update 5678 --discount 500 --dry-run
     wb offers update 5678 --owned-by hm   # e.g. when someone leaves
 
+`wb offers update` changes every field of the offer form (`--help` lists
+them), with the form's rules and warnings, for offers in any status. Setting
+the status sends nothing. To revise an offer which has been sent or
+accepted, put it back into preparation, change it and set it to offered
+again; accepted offers warn that they had been closed already:
+
+    wb offers update 5678 --status in_preparation --ignore-warning status-change-but-already-closed
+    wb offers update 5678 --status offered --offered-on 2026-12-01 --valid-until 2026-12-31
+    wb offers update 5678 --status declined --ignore-warning yes-please-decline --keep-planned-work
+
+Changing an offer's status doesn't change its deals; closing a deal
+accepts or declines its offers (`wb deals close`).
+
 External references (URLs of issues or pull requests, for example) can be
 changed for any offer, also when it has been accepted already. They replace
 the existing ones; Workbench only stores them and doesn't talk to GitHub:
