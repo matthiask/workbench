@@ -49,18 +49,26 @@ migration. Ask which servers to check, all by default (`wb servers`).
 
 ### 1. Collect what runs
 
-Ask the user how to list the sites of each server if you don't know yet; it
-differs per server. Typical sources, run with the user's own access:
+Each server's notes say how to list its sites (`wb servers show SERVER`):
+the command, where to run it, the kube context, which host names to leave
+out. Follow them, with the user's own access; ask before running anything
+on a server and let the user run commands needing other credentials
+themselves. Typical sources:
 
-- Kubernetes clusters: `kubectl get ingress --all-namespaces -o json`
-  (check the context with `kubectl config current-context` and ask if it
-  isn't obviously the server's cluster). Group the ingresses into sites,
-  e.g. by the label of the deployment tool or by their name; skip system
-  namespaces.
-- Servers with vhosts: ask the user for the command listing them (domains
-  and aliases per vhost) and for its output or a file. Leave out the
-  server's own technical host names.
-- Anything else: ask for a list of host names per site.
+- Kubernetes clusters: `kubectl get ingress --all-namespaces -o json` in
+  the cluster's context. Group the ingresses into sites, e.g. by the label
+  of the deployment tool or by their name; skip system namespaces.
+- Servers with vhosts: a command listing the domains and aliases per vhost,
+  its output or a file from the user. Leave out the server's own technical
+  host names.
+
+If the notes don't say how, ask the user, and once it worked propose adding
+it to the notes so the next run (and everybody else) finds it there:
+
+    wb servers update SERVER --notes - < notes.md --dry-run
+
+`--notes` replaces the notes: start from the current ones. Notes are for
+how to get at the list, never credentials.
 
 Host names only in our own zones (staging and preview domains) usually
 aren't customer sites; list them separately and ask.

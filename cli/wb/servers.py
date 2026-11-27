@@ -15,6 +15,7 @@ from wb.core import (
     page_params,
     request,
     terminate,
+    text_or_stdin,
 )
 
 
@@ -104,7 +105,7 @@ def show_server(server, emails, as_json):
 
 @servers.command("create")
 @click.option("--title", required=True)
-@click.option("--notes", default="")
+@click.option("--notes", default="", help="- reads them from stdin.")
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
 def create_server(title, notes, dry_run, as_json):
@@ -112,7 +113,7 @@ def create_server(title, notes, dry_run, as_json):
     data = request(
         "POST",
         "hosting/servers/",
-        json={"title": title, "notes": notes},
+        json={"title": title, "notes": text_or_stdin(notes)},
         params={"dry_run": format_bool(dry_run)},
     )
     if as_json:
@@ -126,7 +127,11 @@ def create_server(title, notes, dry_run, as_json):
 @servers.command("update")
 @click.argument("server")
 @click.option("--title")
-@click.option("--notes", help="Replaces the notes.")
+@click.option(
+    "--notes",
+    help="Replaces the notes, - reads them from stdin; e.g. how to list the"
+    " server's sites.",
+)
 @click.option("--archived/--not-archived", "is_archived", default=None)
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
@@ -136,7 +141,7 @@ def update_server(server, title, notes, is_archived, dry_run, as_json):
         key: value
         for key, value in [
             ("title", title),
-            ("notes", notes),
+            ("notes", text_or_stdin(notes)),
             ("is_archived", is_archived),
         ]
         if value is not None

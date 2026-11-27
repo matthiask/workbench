@@ -2048,8 +2048,16 @@ planned_work:
         result = self.wb("sites", "search")
         self.assertNotIn("www.beispiel.ch", result.output)
 
-        result = self.wb("servers", "update", "cluster", "--notes", "Kubernetes")
-        self.assertIn("Kubernetes", result.output)
+        result = self.wb(
+            "servers",
+            "update",
+            "cluster",
+            "--notes",
+            "-",
+            input="List the sites with kubectl get ingress -A\n",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("kubectl get ingress -A", result.output)
         result = self.wb("servers")
         self.assertIn("cluster", result.output)
 

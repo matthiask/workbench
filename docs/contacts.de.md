@@ -82,6 +82,8 @@ Zugangsdaten selbst).
   stehen unter «Mit Problemen».
 - Ein **Server** listet die Kontakte für Störungen all seiner aktiven
   Sites mit ihren Emailadressen, zum Kopieren für eine Mail zu einem
-  Wartungsfenster. Zieht eine Site um, ändert sich nur ihr Server.
+  Wartungsfenster. Zieht eine Site um, ändert sich nur ihr Server. Seine
+  Notizen sagen, wie man die Sites auf ihm auflistet (Befehl, wo
+  ausführen), nie Zugangsdaten.
 - Sites, die nicht mehr laufen, archivieren statt löschen, und ihre
   Stapelrechnungen beenden.

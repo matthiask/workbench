@@ -103,7 +103,10 @@ server pages show them.
 Run every few months (Biwak to-do) or before a maintenance window:
 
 1. Collect what runs: the ingresses of the clusters (`kubectl`), the vhosts
-   of the classic servers (the user knows the command per server).
+   of the classic servers. The server's notes in Workbench say how (command,
+   kube context, host names to leave out), so this knowledge stays internal
+   and the public skill stays generic; the skill proposes adding it when
+   missing.
 2. Compare with `wb sites search --server …` by host name.
 3. Report and, after confirmation, fix: running sites missing in Workbench
    (create them, find the customer), sites in Workbench which don't run

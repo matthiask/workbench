@@ -76,6 +76,8 @@ credentials themselves).
   outages are listed under "With problems".
 - A **server** lists the outage contacts of all its active sites with
   their email addresses, to copy them for a mail about a maintenance
-  window. Moving a site to another server only changes its server.
+  window. Moving a site to another server only changes its server. Its
+  notes say how to list the sites running on it (command, where to run
+  it), never credentials.
 - Archive sites which don't run anymore instead of deleting them, and end
   their recurring invoices.
