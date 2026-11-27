@@ -26,7 +26,7 @@ rate for all its services and a [budget alert](reports.md#projects).
 Hours and costs are always logged on a service. Create services with
 "+ Service" on the project, in the [offer form](offers.md) or while
 [logging hours](hours.md). A service's menu reassigns its logbook
-entries, merges it into another service or moves it to another project
+entries to other services (except entries on an invoice), merges it into another service or moves it to another project
 (only services without offer and not invoiced). Services which have
 been invoiced can't be deleted.
 

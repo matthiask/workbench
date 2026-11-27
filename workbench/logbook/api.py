@@ -646,9 +646,9 @@ def logbook_move(
         {"entries": data.entries, "service": data.service},
         request=request,
         project=project,
-        entries=model.objects.filter(
-            service__project=project, archived_at__isnull=True
-        ).select_related("rendered_by", "service"),
+        entries=model.objects.filter(service__project=project).select_related(
+            "rendered_by", "service"
+        ),
     )
     validate_form(form, ignore_warnings=ignore_warnings)
     with transaction.atomic():

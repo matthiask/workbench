@@ -513,6 +513,53 @@ class LogbookMoveAPITest(TestCase):
         entry.refresh_from_db()
         self.assertEqual(entry.service, target)
 
+    def test_move_invoiced_entries(self):
+        """Entries on an invoice are refused when moving them to another
+        project or to another service of the project"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        target = factories.ServiceFactory.create(project=project)
+        invoice = factories.InvoiceFactory.create(
+            project=project, type=Invoice.SERVICES
+        )
+        invoice_service = invoice.services.create(title="Test", cost=50)
+        hours = factories.LoggedHoursFactory.create(
+            service=service, invoice_service=invoice_service
+        )
+        cost = factories.LoggedCostFactory.create(
+            service=service, invoice_service=invoice_service
+        )
+        self.client.force_login(hours.rendered_by)
+
+        other = factories.ServiceFactory.create()
+        for url in [
+            f"/api/logbook/hours/{hours.pk}/",
+            f"/api/logbook/costs/{cost.pk}/",
+        ]:
+            with self.subTest(url=url):
+                response = self.patch(url, {"service": other.pk})
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(
+                    [error["msg"] for error in response.json()["detail"]],
+                    ["Cannot move logbook entries which are on an invoice."],
+                )
+
+        response = self.client.post(
+            f"/api/projects/{project.pk}/logbook/move/",
+            {"kind": "hours", "entries": [hours.pk], "service": target.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "entries"]],
+        )
+
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, service)
+        cost.refresh_from_db()
+        self.assertEqual(cost.service, service)
+
     def test_move_cost_to_another_project(self):
         """Costs move to services of other projects too"""
         entry = factories.LoggedCostFactory.create()

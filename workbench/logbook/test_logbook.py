@@ -260,6 +260,41 @@ class LogbookTest(TestCase):
         hours.refresh_from_db()
         self.assertEqual(hours.service, other)
 
+    def test_move_invoiced_entries(self):
+        """Entries on an invoice are neither moved one by one nor in the
+        batch update, also when they haven't been archived"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        other = factories.ServiceFactory.create(project=project)
+        invoice = factories.InvoiceFactory.create(
+            project=project, type=Invoice.SERVICES
+        )
+        invoice_service = invoice.services.create(title="Test", cost=50)
+        hours = factories.LoggedHoursFactory.create(
+            service=service, invoice_service=invoice_service
+        )
+        self.client.force_login(hours.rendered_by)
+
+        response = self.client.post(
+            hours.urls["move"],
+            {"modal-service": factories.ServiceFactory.create().pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(
+            response, "Cannot move logbook entries which are on an invoice.", 2
+        )
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, service)
+
+        response = self.client.post(
+            project.urls["logbook_batch_update_hours"],
+            {"entries": [hours.pk], "service": other.pk},
+        )
+        self.assertEqual(response.status_code, 200)  # Not a choice
+        self.assertNotContains(response, f'name="entries" value="{hours.pk}"')
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, service)
+
     def test_batch_update_groups_by_offer(self):
         """The batch update groups entries and services by offer, services
         with the same title can't be told apart otherwise"""

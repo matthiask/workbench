@@ -28,7 +28,8 @@ Stunden und Kosten werden immer auf einer Leistung erfasst. Erstelle
 Leistungen mit «+ Leistung» auf dem Projekt, im
 [Offertenformular](offers.de.md) oder beim [Erfassen von
 Stunden](hours.de.md). Das Menü einer Leistung weist ihre
-Logbucheinträge neu zu, führt sie mit einer anderen Leistung zusammen
+Logbucheinträge anderen Leistungen zu (ausser Einträgen auf einer
+Rechnung), führt sie mit einer anderen Leistung zusammen
 oder verschiebt sie in ein anderes Projekt (nur Leistungen ohne Offerte
 und nicht verrechnet). Verrechnete Leistungen lassen sich nicht löschen.
 

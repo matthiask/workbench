@@ -423,9 +423,9 @@ def logbook_batch_update(request, pk, *, model):
     if project.closed_on:
         messages.error(request, _("Cannot move logbook entries of closed projects."))
         return redirect(project)
-    queryset = model.objects.filter(
-        service__project=project, archived_at__isnull=True
-    ).select_related("rendered_by", "service")
+    queryset = model.objects.filter(service__project=project).select_related(
+        "rendered_by", "service"
+    )
 
     if service := request.GET.get("service"):
         queryset = queryset.filter(service=service)

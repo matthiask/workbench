@@ -7,7 +7,8 @@ decisions first.
 
 - `logbook_loggedhours_move`, `logbook_loggedcost_move` →
   `LoggedHoursMoveForm` / `LoggedCostMoveForm`: any logging service of an
-  open project; archived entries and closed projects refused.
+  open project; entries on an invoice, archived entries and closed
+  projects refused.
 - Batch: `projects_project_logbook_batch_update_hours|costs` →
   `LogbookBatchForm` (`workbench/projects/views.py`
   `logbook_batch_update`).
@@ -28,18 +29,22 @@ decisions first.
 
 - `PATCH /api/logbook/hours|costs/{id}/` with a `service` of another
   project goes through `LoggedHoursMoveForm` / `LoggedCostMoveForm`
-  (any logging service of an open project; archived entries and closed
-  projects refused with the form's messages). The same-project path is
+  (any logging service of an open project; entries on an invoice,
+  archived entries and closed projects refused with the form's
+  messages). The same-project path is
   unchanged. Other fields given together with the move are changed
   afterwards with the logbook form on the new project, in the same
   transaction: their errors and warnings roll back the move too. A pure
   move runs only the move form, so it has no warnings (like the web
-  interface). Invoiced but not yet archived entries move like in the
-  web interface (the move form only checks `archived_at`).
+  interface). Decided (2026-11-27): entries on an invoice
+  (`invoice_service` set, also when not archived) aren't moved, neither
+  in the web interface nor in the API ("Cannot move logbook entries
+  which are on an invoice.").
 - `POST /api/projects/{project_id}/logbook/move/` `{kind, entries,
   service}` through `LogbookBatchForm` unchanged, with `dry_run` and
   `ignore_warnings` (the form has none). Like the web view: only entries
-  of the project which aren't archived are choices (others are the form's
+  of the project which aren't archived and not on an invoice are choices
+  (the form excludes them itself; others are the form's
   "Select a valid choice" at `entries`), only services of the same project
   (the batch form doesn't move across projects; loop over `PATCH` for
   that), closed projects refused at `["path", "project_id"]`. `service`

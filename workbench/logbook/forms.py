@@ -1022,7 +1022,11 @@ class LoggedMoveForm(ModelForm):
         kwargs.setdefault("initial", {}).setdefault("service", "")
         super().__init__(*args, **kwargs)
 
-        if self.instance.archived_at:
+        if self.instance.invoice_service_id:
+            self.move_forbidden = _(
+                "Cannot move logbook entries which are on an invoice."
+            )
+        elif self.instance.archived_at:
             self.move_forbidden = _("Cannot move archived logbook entries.")
         elif self.instance.service.project.closed_on:
             self.move_forbidden = _("Cannot move logbook entries of closed projects.")
@@ -1151,7 +1155,10 @@ def _grouped_entries(entries, *, amount_field):
 class LogbookBatchForm(Form):
     def __init__(self, *args, **kwargs):
         self._project = kwargs.pop("project")
-        self._entries = kwargs.pop("entries")
+        # Invoiced and archived entries aren't moved, they aren't choices
+        self._entries = kwargs.pop("entries").filter(
+            archived_at__isnull=True, invoice_service__isnull=True
+        )
         super().__init__(*args, **kwargs)
 
         self.amount_field = "hours" if self._entries.model is LoggedHours else "cost"

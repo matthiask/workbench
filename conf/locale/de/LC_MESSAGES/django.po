@@ -3535,6 +3535,10 @@ msgid "Breaks have to be logged promptly."
 msgstr "Pausen müssen zeitnah erfasst werden."
 
 #: workbench/logbook/forms.py
+msgid "Cannot move logbook entries which are on an invoice."
+msgstr "Kann Logbucheinträge auf einer Rechnung nicht verschieben."
+
+#: workbench/logbook/forms.py
 msgid "Cannot move archived logbook entries."
 msgstr "Kann archivierte Logbucheinträge nicht verschieben."
 
