@@ -459,6 +459,18 @@ a few fields. `--status sent` only records the status, nothing is mailed:
     wb invoices delete 5678 --dry-run
     wb invoices delete 5678 --ignore-warning release-logged-services
 
+The services of services invoices in preparation (their IDs are in `wb
+invoices show`, they aren't the services of projects) are created, changed
+and deleted with the web interface's form. The hours and costs logged on a
+deleted service can be invoiced again; when the remaining ones cover another
+service period than before, `delete` says so, like the web interface:
+
+    wb invoices services create 2026-0042-0001 --title Hosting --cost 120
+    wb invoices services create 5678 --title Support --service-type Consulting --effort-hours 2
+    wb invoices services update 901 --effort-hours 3 --description "Hotline"
+    wb invoices services update 901 --clear-effort --cost 450 --dry-run
+    wb invoices services delete 901
+
 Overdue invoices to remind customers of, per customer and contact, like the
 reminders in the web interface (without postponed reminders):
 

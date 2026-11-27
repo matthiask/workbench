@@ -166,6 +166,7 @@ def _echo_invoice(data):
         console.print(data["description"])
     if data.get("services"):
         table = make_table(
+            "ID>",
             "Service",
             "Project service>",
             "Offer",
@@ -176,6 +177,7 @@ def _echo_invoice(data):
         )
         for service in data["services"]:
             table.add_row(
+                str(service["id"]),
                 service["title"],
                 str(service["project_service_id"] or ""),
                 service["offer"] or "",
@@ -526,6 +528,140 @@ def delete_invoice(invoice_id, ignore_warnings, dry_run, as_json):
     echo_deleted(
         data, _echo_invoice, what=data["code"], dry_run=dry_run, as_json=as_json
     )
+
+
+@invoices.group("services")
+def invoice_services():
+    """Create, change and delete the services of services invoices
+
+    Only invoices in preparation, like in the web interface. `wb invoices
+    show` lists the services with their IDs. These aren't the services of
+    projects (`wb services`)."""
+
+
+def _invoice_service_options(fn):
+    for option in reversed([
+        click.option("--title"),
+        click.option(
+            "--description", help='The text, or - to read it from stdin, "" removes it.'
+        ),
+        click.option(
+            "--service-type",
+            help="Title of the service type (see `wb services types`), fills in"
+            " the effort type and the hourly rate unless they are given too.",
+        ),
+        click.option("--effort-type"),
+        click.option("--effort-hours", type=float, help="Hours."),
+        click.option("--effort-rate", type=float, help="Hourly rate."),
+        click.option("--cost", type=float, help="Fixed costs in addition to hours."),
+        click.option(
+            "--third-party-costs",
+            type=float,
+            help="Total incl. tax for third parties contained in the cost.",
+        ),
+    ]):
+        fn = option(fn)
+    return fn
+
+
+def _invoice_service_data(values):
+    if values.get("description") is not None:
+        values["description"] = text_or_stdin(values["description"])
+    return {key: value for key, value in values.items() if value is not None}
+
+
+def _echo_invoice_service(data, *, prefix="", dry_run=False, as_json=False):
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        prefix = "Dry run, nothing changed: " + prefix
+    effort = (
+        f" | {data['effort_hours']}h × {data['effort_rate']} ({data['effort_type']})"
+        if data["effort_hours"] is not None
+        else ""
+    )
+    invoice = data["invoice"]
+    console.print(
+        f"{prefix}{data['id'] or '(new)'} {data['title']}{effort}"
+        f" | {data['service_cost']}"
+        f" | invoice {link(invoice['code'], invoice['url'])} total excl. tax"
+        f" {invoice['total_excl_tax']}"
+    )
+
+
+@invoice_services.command("create")
+@click.argument("invoice_id")
+@_invoice_service_options
+@change_options(warnings=False)
+def create_invoice_service(invoice_id, dry_run, as_json, **values):
+    """Add a service to a services invoice in preparation, by ID or code"""
+    if not values["title"]:
+        terminate("Pass --title.")
+    data = request(
+        "POST",
+        f"invoices/{invoice_id}/services/",
+        params=change_params(dry_run),
+        json=_invoice_service_data(values),
+    )
+    _echo_invoice_service(data, prefix="Created ", dry_run=dry_run, as_json=as_json)
+
+
+@invoice_services.command("update")
+@click.argument("service_id", type=int)
+@_invoice_service_options
+@click.option(
+    "--clear-effort", is_flag=True, help="Remove the effort type, hours and rate."
+)
+@click.option("--clear-cost", is_flag=True, help="Remove the cost.")
+@change_options(warnings=False)
+def update_invoice_service(
+    service_id, clear_effort, clear_cost, dry_run, as_json, **values
+):
+    """Change a service of an invoice in preparation, only the given fields"""
+    data = _invoice_service_data(values)
+    if clear_effort:
+        if {"effort_type", "effort_hours", "effort_rate"} & set(data):
+            terminate("--clear-effort and the effort options contradict each other.")
+        data |= {"effort_type": None, "effort_hours": None, "effort_rate": None}
+    if clear_cost:
+        if "cost" in data:
+            terminate("--clear-cost and --cost contradict each other.")
+        data["cost"] = None
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"invoices/services/{service_id}/",
+        params=change_params(dry_run),
+        json=data,
+    )
+    _echo_invoice_service(data, dry_run=dry_run, as_json=as_json)
+
+
+@invoice_services.command("delete")
+@click.argument("service_id", type=int)
+@change_options(warnings=False)
+def delete_invoice_service(service_id, dry_run, as_json):
+    """Delete a service of an invoice in preparation
+
+    The hours and costs logged on it can be invoiced again. Prints what to
+    check by hand afterwards, e.g. the invoice's service period."""
+    data = request(
+        "DELETE",
+        f"invoices/services/{service_id}/",
+        params=change_params(dry_run),
+    )
+    echo_deleted(
+        data,
+        _echo_invoice_service,
+        what=data["id"],
+        dry_run=dry_run,
+        as_json=as_json,
+    )
+    if not as_json:
+        for warning in data["warnings"]:
+            console.print(Text(warning, style="yellow"))
 
 
 @invoices.command("reminders")

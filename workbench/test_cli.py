@@ -2596,6 +2596,71 @@ planned_work:
         self.assertIn(f"Deleted {invoice.code}.", result.output)
         self.assertFalse(Invoice.objects.filter(pk=invoice.pk).exists())
 
+    def test_invoices_services(self):
+        """Services of invoices in preparation are created, changed and
+        deleted, deleting shows the consequences to check"""
+        project = factories.ProjectFactory.create()
+        early, late = factories.ServiceFactory.create_batch(2, project=project)
+        factories.LoggedHoursFactory.create(service=early, rendered_on=in_days(-20))
+        factories.LoggedHoursFactory.create(service=late, rendered_on=in_days(-2))
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([early, late])
+
+        result = self.wb(
+            "invoices",
+            "services",
+            "create",
+            invoice.code,
+            "--title",
+            "Hosting",
+            "--cost",
+            "120",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertEqual(invoice.services.count(), 2)
+        result = self.wb(
+            "invoices",
+            "services",
+            "create",
+            invoice.pk,
+            "--title",
+            "Hosting",
+            "--cost",
+            "120",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        service = invoice.services.get(title="Hosting")
+        self.assertIn(f"Created {service.pk} Hosting", result.output)
+
+        result = self.wb("invoices", "services", "update", service.pk, "--cost", "150")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("150.00", result.output)
+        service.refresh_from_db()
+        self.assertEqual(service.cost, 150)
+        result = self.wb("invoices", "services", "update", service.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Nothing to change.", result.output)
+
+        line = invoice.services.get(project_service=late)
+        result = self.wb("invoices", "services", "delete", line.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted {line.pk}.", result.output)
+        self.assertIn("Update the invoice's service period", result.output)
+        self.assertFalse(invoice.services.filter(pk=line.pk).exists())
+
+        invoice.status = Invoice.SENT
+        invoice.save()
+        result = self.wb("invoices", "services", "delete", service.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("not in preparation anymore", result.output)
+
     def test_notes_update_delete(self):
         """Notes are shown, changed and deleted"""
         deal = factories.DealFactory.create(title="Noted deal")
