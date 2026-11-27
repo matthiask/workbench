@@ -211,6 +211,9 @@ def patch_with_form(
     values = form_data(form_class(**form_kwargs))
     for api_field, value in converted.items():
         values[names.get(api_field, api_field)] = value
+    # Forms may act on ignored warnings, like when the checkbox has been
+    # checked in the web interface
+    values[form_class.ignore_warnings_id] = " ".join(ignore_warnings)
     form = form_class(values, **form_kwargs)
     # The web interface doesn't offer fields which the form disables or
     # leaves out, don't ignore them silently (empty values are fine)

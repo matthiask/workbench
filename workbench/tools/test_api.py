@@ -252,6 +252,29 @@ class PatchWithFormTest(TestCase):
         # Empty values of fields which aren't in the form are fine
         self.assertEqual(patch({"title": "Ok", "down_payments": []}), "Ok")
 
+    def test_ignored_warnings_reach_the_form(self):
+        """Forms which act on ignored warnings get them like in the web
+        interface: reopening a paid invoice resets its closing date"""
+        invoice = factories.InvoiceFactory.create(
+            status=Invoice.PAID,
+            due_on=in_days(14),
+            closed_on=in_days(-1),
+            payment_notice="Paid",
+            postal_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+        )
+        request = _request(invoice.owned_by)
+        patch_with_form(
+            InvoiceForm,
+            invoice,
+            {"status": Invoice.SENT},
+            request,
+            out=lambda invoice: invoice,
+            ignore_warnings=["status-unexpected", "status-change-but-already-closed"],
+        )
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.SENT)
+        self.assertIsNone(invoice.closed_on)
+
     def test_converters(self):
         self.assertEqual(api_key("deal_probability")("high"), Deal.HIGH)
         with self.assertRaises(ValidationError):
