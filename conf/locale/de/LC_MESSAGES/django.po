@@ -3812,6 +3812,11 @@ msgid ""
 msgstr ""
 "Die Leistungen dieser Offerte können nicht gelöscht werden, sie haben "
 "erfasste Stunden oder Kosten oder wurden bereits verrechnet."
+
+#: workbench/offers/api.py
+msgid "The project has no offer with this ID or code."
+msgstr "Das Projekt hat keine Offerte mit dieser ID oder diesem Code."
+
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
 #: workbench/templates/reporting/accepted_deals.html workbench/tools/pdf.py

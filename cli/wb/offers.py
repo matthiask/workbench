@@ -424,6 +424,40 @@ def delete_offer(offer_id, delete_services, delete_planned_work, dry_run, as_jso
     echo_deleted(data, echo_offer, what=data["code"], dry_run=dry_run, as_json=as_json)
 
 
+def _offer_codes(ctx, param, value):
+    codes = {}
+    for item in value:
+        offer, sep, number = item.rpartition("=")
+        if not sep or not offer or not number.isdigit():
+            raise click.BadParameter(f"expected OFFER=NUMBER, got {item!r}.")
+        codes[offer] = int(number)
+    return codes
+
+
+@offers.command("renumber")
+@click.argument("project_id", type=int)
+@click.argument("codes", nargs=-1, required=True, callback=_offer_codes)
+@change_options(warnings=False)
+def renumber_offers(project_id, codes, dry_run, as_json):
+    """Renumber the offers of a project, e.g. to order them
+
+    CODES are OFFER=NUMBER with the offer's ID or code, e.g.
+    `wb offers renumber 42 2026-0042-o03=1 2026-0042-o01=3`; the other
+    offers keep their numbers, numbers are unique within the project."""
+    data = request(
+        "POST",
+        f"projects/{project_id}/offers/renumber/",
+        params=change_params(dry_run),
+        json={"codes": codes},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    echo_offer_list(data)
+    if dry_run:
+        click.secho("Dry run, nothing has been saved.", fg="yellow", err=True)
+
+
 @offers.group("headings")
 def headings():
     """Add, change and delete the headings between the services of an offer

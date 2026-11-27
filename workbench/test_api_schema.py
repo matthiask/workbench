@@ -152,6 +152,9 @@ API_ROUTES = {
         "POST /api/projects/{project_id}/logbook/move/"
     ),
     "projects_project_planning_batch_update": "POST /api/planning/work/batch/",
+    "projects_project_renumber_offers": (
+        "POST /api/projects/{project_id}/offers/renumber/"
+    ),
     # All fields: package 07
     "projects_project_update": "PATCH /api/projects/{project_id}/",
     "projects_service_assign_service_type": "PATCH /api/services/{service_id}/",
@@ -206,7 +209,6 @@ NOT_IN_API = {
     "projects_project_delete": "package 07",
     "projects_project_pin": "out of scope: own profile (pinned projects)",
     "projects_project_projected_invoices": "package 07",
-    "projects_project_renumber_offers": "package 02",
     "projects_service_move": "package 08",
     "projects_service_pin": "out of scope: own profile (pinned services)",
     "split_timestamp": "package 23",

@@ -1216,6 +1216,23 @@ planned_work:
         self.assertEqual(copy.owned_by, self.user)
         self.assertEqual(copy.services.count(), 1)
 
+    def test_offers_renumber(self):
+        project = factories.ProjectFactory.create()
+        offer = factories.OfferFactory.create(project=project, title="Relaunch")
+        second = factories.OfferFactory.create(project=project, title="Phase 2")
+        result = self.wb("offers", "renumber", project.pk, f"{second.code}=1")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Codes must be unique.", result.output)
+        result = self.wb("offers", "renumber", project.pk, "nonsense")
+        self.assertEqual(result.exit_code, 2)
+        result = self.wb(
+            "offers", "renumber", project.pk, f"{second.code}=1", f"{offer.pk}=2"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertLess(result.output.index("Phase 2"), result.output.index("Relaunch"))
+        offer.refresh_from_db()
+        self.assertEqual(offer._code, 2)
+
     def test_offers_delete(self):
         """Offers are deleted like in the web interface"""
         offer = factories.OfferFactory.create()

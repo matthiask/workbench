@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _, override
 from ninja import Field, P, Query, Router, Schema
@@ -34,6 +35,7 @@ from workbench.projects.api import (
     project_out,
     project_summary,
 )
+from workbench.projects.forms import OffersRenumberForm
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
@@ -51,6 +53,7 @@ from workbench.tools.api import (
     api_key,
     delete_with_form,
     filter_date_range,
+    form_data,
     full_clean,
     object_pk,
     patch_with_form,
@@ -268,12 +271,13 @@ def offer_out(offer, services, request):
     }
 
 
-def _project_offers(project, request):
+def _project_offers(project, request, *, order_by=("-pk",)):
     return [
         offer_out(offer, list(offer.services.all()), request)
-        for offer in project.offers.select_related(
-            "project__customer", "owned_by"
-        ).prefetch_related("services", "headings", "deals")
+        for offer in project.offers
+        .order_by(*order_by)
+        .select_related("project__customer", "owned_by")
+        .prefetch_related("services", "headings", "deals")
     ]
 
 
@@ -905,6 +909,46 @@ def offer_delete(
         },
         dry_run=dry_run,
     )
+    return result
+
+
+class OffersRenumberIn(InputSchema):
+    codes: dict[str, int] = Field(
+        description="The new numbers by offer ID or code, e.g."
+        ' {"2026-0042-o03": 1, "123": 2}; the other offers of the project keep'
+        " theirs. Numbers are unique within the project."
+    )
+
+
+@router.post("/projects/{project_id}/offers/renumber/", response=list[OfferOut])
+def offers_renumber(
+    request, project_id: int, data: OffersRenumberIn, *, dry_run: DryRun = False
+):
+    """Renumber the offers of a project like in the web interface, e.g. to
+    order them; returns the project's offers ordered by their number"""
+    project = get_object_or_404(Project, pk=project_id)
+    values = form_data(OffersRenumberForm(instance=project, request=request))
+    fields, errors = {}, []
+    for offer_id, code in data.codes.items():
+        try:
+            offer = by_id_or_code(project.offers.all(), offer_id)
+        except Http404:
+            errors.append({
+                "loc": ["body", "data", "codes", offer_id],
+                "msg": _("The project has no offer with this ID or code."),
+            })
+            continue
+        values[f"offer_{offer.pk}_code"] = code
+        fields[f"offer_{offer.pk}_code"] = ["codes", offer_id]
+    if errors:
+        raise ValidationError(errors)
+    form = OffersRenumberForm(values, instance=project, request=request)
+    validate_form(form, fields=fields)
+    with transaction.atomic():
+        form.save()
+        result = _project_offers(project, request, order_by=("_code", "pk"))
+        if dry_run:
+            transaction.set_rollback(True)
     return result
 
 

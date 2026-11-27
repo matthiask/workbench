@@ -1060,3 +1060,66 @@ class OfferCopyDeleteRenumberAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertFalse(Offer.objects.filter(pk=self.offer.pk).exists())
         self.assertFalse(type(work).objects.filter(pk=work.pk).exists())
+
+    def renumber(self, data, *, query=""):
+        return self.client.post(
+            f"/api/projects/{self.project.pk}/offers/renumber/?{query}",
+            data,
+            content_type="application/json",
+        )
+
+    def test_renumber(self):
+        """Offers are renumbered by ID or code, the others keep theirs"""
+        second = factories.OfferFactory.create(project=self.project)
+        third = factories.OfferFactory.create(project=self.project)
+        self.assertEqual([self.offer._code, second._code, third._code], [1, 2, 3])
+
+        response = self.renumber(
+            {"codes": {str(self.offer.pk): 2, second.code: 1}}, query="dry_run=true"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            [offer["id"] for offer in response.json()],
+            [second.pk, self.offer.pk, third.pk],
+        )
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer._code, 1)
+
+        response = self.renumber({"codes": {str(self.offer.pk): 2, second.code: 1}})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            [offer["code"] for offer in response.json()],
+            [f"{self.project.code}-o01", f"{self.project.code}-o02", third.code],
+        )
+        second.refresh_from_db()
+        self.assertEqual(second._code, 1)
+
+    def test_renumber_errors(self):
+        """Codes stay unique, offers of other projects are unknown"""
+        second = factories.OfferFactory.create(project=self.project)
+        other = factories.OfferFactory.create()
+
+        response = self.renumber({"codes": {str(self.offer.pk): 2}})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]], [["body", "data"]]
+        )
+        response = self.renumber({
+            "codes": {str(other.pk): 3, "nonsense": 4, str(second.pk): 0}
+        })
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [
+                ["body", "data", "codes", str(other.pk)],
+                ["body", "data", "codes", "nonsense"],
+            ],
+        )
+        response = self.renumber({"codes": {str(second.pk): 0}})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e["loc"] for e in response.json()["detail"]],
+            [["body", "data", "codes", str(second.pk)]],
+        )
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer._code, 1)
