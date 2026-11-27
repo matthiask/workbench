@@ -2426,9 +2426,11 @@ kbd {
   margin-bottom: 1.75rem !important;
 }
 
-// Search: the jump links shouldn't scroll the results below the navbar
+// Search: the jump links shouldn't scroll the results below the navbar;
+// all types are as far apart as those with the pill hanging below
 .wb-search-results {
   scroll-margin-top: 5rem;
+  margin-bottom: 1.75rem;
 }
 
 // Anchors (e.g. links to notes) shouldn't scroll below the sticky navbar

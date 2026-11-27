@@ -29,7 +29,7 @@
     {% endif %}
     {% for result in results %}
       {% if result.count %}
-        <section class="card mb-3 wb-search-results" id="search-{{ result.id }}">
+        <section class="card wb-search-results" id="search-{{ result.id }}">
           <div class="card-header">
             <a
               href="{{ result.url }}?q={{ query|urlencode }}"
