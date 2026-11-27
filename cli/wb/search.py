@@ -16,7 +16,7 @@ from wb.core import cli, console, echo_json, link, make_table, request
 )
 @click.option("--json", "as_json", is_flag=True)
 def search(query, limit, as_json):
-    """Search projects, contacts, invoices, offers and deals at once
+    """Search projects, contacts, invoices, offers, deals and sites at once
 
     Like the search field of the web interface. Show results with the
     `show` command of their noun, e.g. `wb projects show ID`."""

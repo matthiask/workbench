@@ -10,11 +10,26 @@ from workbench.tools.models import Model, SearchQuerySet
 from workbench.tools.urls import model_urls
 
 
+class ServerQuerySet(SearchQuerySet):
+    def search(self, terms):
+        queryset = self
+        for term in terms.split():
+            queryset = queryset.filter(
+                Q(title__icontains=term) | Q(notes__icontains=term)
+            )
+        return queryset
+
+    def active(self):
+        return self.filter(is_archived=False)
+
+
 @model_urls
 class Server(Model):
     title = models.CharField(_("title"), max_length=100, unique=True)
     notes = models.TextField(_("notes"), blank=True)
     is_archived = models.BooleanField(_("is archived"), default=False)
+
+    objects = ServerQuerySet.as_manager()
 
     class Meta:
         ordering = ["is_archived", "title"]

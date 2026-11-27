@@ -1,4 +1,5 @@
-"""The search across projects, contacts, invoices, offers and deals"""
+"""The search across projects, contacts, invoices, offers, deals and
+hosting"""
 
 from typing import Literal
 from urllib.parse import urlencode
@@ -10,6 +11,7 @@ from ninja import Field, Query, Router, Schema
 from workbench.accounts.features import FEATURES
 from workbench.contacts.models import Organization, Person
 from workbench.deals.models import Deal
+from workbench.hosting.models import Server, Site
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Campaign, Project
@@ -25,6 +27,8 @@ NOUNS = {
     RecurringInvoice: "recurring-invoices",
     Offer: "offers",
     Deal: "deals",
+    Site: "sites",
+    Server: "servers",
 }
 
 
@@ -45,6 +49,11 @@ def search_sources(user):
         ])
     if user.features[FEATURES.DEALS]:
         sources.append(Deal.objects.order_by("-pk"))
+    if user.features[FEATURES.HOSTING]:
+        sources.extend([
+            Site.objects.active().select_related("customer"),
+            Server.objects.active(),
+        ])
     return sources
 
 

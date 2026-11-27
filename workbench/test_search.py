@@ -57,6 +57,33 @@ class SearchTest(TestCase):
         with override_settings(FEATURES={"CONTROLLING": F.NEVER, "DEALS": F.ALWAYS}):
             self.assertContains(self.client.get("/search/?q=Test"), deals)
 
+    def test_hosting(self):
+        """Active sites and servers are searched with the hosting feature"""
+        site = factories.SiteFactory.create(title="www.example.com")
+        archived = factories.SiteFactory.create(
+            title="old.example.com", server=site.server, is_archived=True
+        )
+        self.client.force_login(factories.UserFactory.create())
+
+        with override_settings(FEATURES={"HOSTING": F.ALWAYS}):
+            response = self.client.get("/search/?q=example")
+            self.assertContains(response, site.urls["detail"])
+            self.assertNotContains(response, archived.urls["detail"])
+
+            response = self.client.get(f"/search/?q={site.server.title}")
+            self.assertContains(response, site.server.urls["detail"])
+            self.assertContains(response, f"/sites/servers/?q={site.server.title}")
+
+            response = self.client.get(
+                f"/sites/servers/?q={site.server.title}", follow=True
+            )
+            self.assertContains(response, site.server.urls["detail"])
+
+        with override_settings(FEATURES={"HOSTING": F.NEVER}):
+            response = self.client.get("/search/?q=example")
+            self.assertNotContains(response, site.urls["detail"])
+            self.assertNotContains(response, ">Sites<")
+
     def test_search_more(self):
         """Types show a few results right away, the others on request; the
         jump links lead to the types with results"""
