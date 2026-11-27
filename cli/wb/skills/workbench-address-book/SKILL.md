@@ -133,7 +133,8 @@ Phone numbers work the same way: the reception's number belongs to the
 organization (its central number, shown on every person), mobile numbers
 on several people are usually duplicates or mistakes; ask. A typo or an
 outdated value of a single person's email address or phone number is fixed
-in place (IDs from `wb people show`), not removed and added again:
+in place (IDs from `wb people show`), not removed and added again (an email
+address someone else uses already warns, `email-in-use`; ask):
 
     wb people change-email <person_id> <email_id> --email hans.muster@example.com --dry-run
     wb people change-phone <person_id> <phone_id> --phone-number "+41 44 123 45 68" --dry-run

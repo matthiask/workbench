@@ -105,6 +105,68 @@ class ContactsTest(TestCase):
         )
         self.assertRedirects(response, person.urls["detail"])
 
+    def test_update_email_address_in_use(self):
+        """Changing or adding an email address which another person or an
+        organization (centrally) uses already is a warning, like creating
+        people rejects them; addresses which don't change don't warn"""
+        organization = factories.OrganizationFactory.create(email="info@example.com")
+        person = factories.PersonFactory.create(salutation="Dear John")
+        email = person.emailaddresses.create(type="Work", email="hans@example.com")
+        other = factories.PersonFactory.create()
+        other.emailaddresses.create(type="Work", email="other@example.com")
+        self.client.force_login(person.primary_contact)
+
+        def data(*emails, **kwargs):
+            return person_to_dict(
+                person,
+                **{
+                    "emailaddresses-TOTAL_FORMS": len(emails),
+                    "emailaddresses-INITIAL_FORMS": 1,
+                },
+                **{
+                    f"emailaddresses-{index}-{field}": value
+                    for index, values in enumerate(emails)
+                    for field, value in values.items()
+                },
+                **kwargs,
+            )
+
+        existing = {"id": email.pk, "person": person.pk, "type": "Work"}
+        response = self.client.post(
+            person.urls["update"],
+            data(existing | {"email": "OTHER@example.com"}),
+        )
+        self.assertContains(response, 'value="email-in-use"')
+        self.assertContains(response, f"Already used by {other} (ID {other.pk}).")
+
+        response = self.client.post(
+            person.urls["update"],
+            data(
+                existing | {"email": "hans@example.com"},
+                {"person": person.pk, "type": "Work", "email": "info@example.com"},
+            ),
+        )
+        self.assertContains(response, 'value="email-in-use"')
+        self.assertContains(response, f"The central address of {organization}")
+
+        response = self.client.post(
+            person.urls["update"],
+            data(
+                existing | {"email": "other@example.com"},
+                **{WarningsForm.ignore_warnings_id: "email-in-use"},
+            ),
+        )
+        self.assertRedirects(response, person.urls["detail"])
+        email.refresh_from_db()
+        self.assertEqual(email.email, "other@example.com")
+
+        # Shared addresses which don't change don't warn
+        response = self.client.post(
+            person.urls["update"],
+            data(existing | {"email": "other@example.com", "type": "Home"}),
+        )
+        self.assertRedirects(response, person.urls["detail"])
+
     def test_update_primary_contact_takes_over_organization(self):
         """A new primary contact of a person also becomes the primary contact
         of the organization if the organization's isn't active anymore"""

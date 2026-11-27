@@ -127,5 +127,9 @@ details are removed. The IDs are in `wb people show`; validate with
     wb people remove-phone <person_id> <phone_id> --dry-run
     wb people remove-address <person_id> <address_id> --dry-run
 
+An email address which another person or an organization uses already is a
+warning (`email-in-use`): show who uses it and only pass `--ignore-warning
+email-in-use` if the user confirms that the address is really shared.
+
 `--type` changes the type (Work, Mobile, Home, ...) of email addresses and
 phone numbers too.

@@ -38,10 +38,16 @@ whichever fits the existing `add-details` / `change-address` better.
   `PATCH .../postal-addresses/{id}/` uses `PostalAddressForm` now too
   instead of the model's `full_clean()` (same rules, same error
   locations). No form changes, the web interface is unchanged.
-- Like the formsets, nothing else is checked: an email address used by
-  another person can be set (only creating and `details/` reject those),
-  removing has no rules. The forms have no warnings, so the endpoints and
-  commands take no `ignore_warnings`.
+- Like the formsets, nothing else is checked, removing has no rules.
+  Exception, decided 2026-11-27: changing an email address to one another
+  person or an organization (centrally) uses already is a warning
+  (`email-in-use`; the same rule as creating and `details/`: any other
+  person, archived or not, of any organization), in the person form
+  (changed and added addresses) and in `PATCH .../email-addresses/{id}/`,
+  which takes `ignore_warnings` for it (`wb people change-email
+  --ignore-warning email-in-use`). Creating and `details/` keep rejecting
+  them as errors. The other endpoints and commands take no
+  `ignore_warnings`.
 - `wb people change-email PERSON_ID EMAIL_ID [--email] [--type]`,
   `change-phone PERSON_ID PHONE_ID [--phone-number] [--type]`,
   `remove-email|remove-phone|remove-address PERSON_ID ID`, all with

@@ -2091,6 +2091,21 @@ planned_work:
         email.refresh_from_db()
         self.assertEqual((email.type, email.email), ("Home", "hans.muster@example.com"))
 
+        # Addresses of other people are a warning
+        factories.PersonFactory.create().emailaddresses.create(
+            email="other@example.com"
+        )
+        args = ["people", "change-email", person.pk, email.pk]
+        result = self.wb(*args, "--email", "other@example.com")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("email-in-use", result.output)
+        result = self.wb(
+            *args, "--email", "other@example.com", "--ignore-warning", "email-in-use"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        email.refresh_from_db()
+        self.assertEqual(email.email, "other@example.com")
+
         result = self.wb(
             "people",
             "change-phone",

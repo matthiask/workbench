@@ -450,6 +450,40 @@ class ContactsAPITest(TestCase):
             patch(f"phone-numbers/{email.pk}", {"type": "Home"}).status_code, 404
         )
 
+    def test_change_email_address_in_use(self):
+        """An email address another person or an organization (centrally)
+        uses already is a warning, also when changing an address"""
+        person = factories.PersonFactory.create()
+        email = person.emailaddresses.create(type="Work", email="hans@example.com")
+        other = factories.PersonFactory.create()
+        other.emailaddresses.create(type="Work", email="other@example.com")
+        factories.OrganizationFactory.create(email="info@example.com")
+        self.client.force_login(factories.UserFactory.create())
+        url = f"/api/contacts/people/{person.pk}/email-addresses/{email.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(url + query, data, content_type="application/json")
+
+        for value in ["Other@example.com", "info@example.com"]:
+            with self.subTest(value=value):
+                response = patch({"email": value})
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(
+                    [e.get("code") for e in response.json()["detail"]],
+                    ["email-in-use"],
+                )
+
+        response = patch(
+            {"email": "other@example.com"}, "?ignore_warnings=email-in-use"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        email.refresh_from_db()
+        self.assertEqual(email.email, "other@example.com")
+
+        # Shared addresses which don't change don't warn
+        response = patch({"type": "Home"})
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_remove_details(self):
         """Email addresses, phone numbers and postal addresses are removed by
         their ID, the person stays"""

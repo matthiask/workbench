@@ -24,6 +24,7 @@ from workbench.contacts.forms import (
     PersonMergeForm,
     PhoneNumberFormset,
     PostalAddressForm,
+    email_in_use_warning,
     organization_update_warning,
     recent_projects_or_deals,
     short_salutation_warning,
@@ -1731,10 +1732,11 @@ def _person_detail_out(person_id, request):
     )
 
 
-def _change_detail(form_class, detail, data, request, *, dry_run):
+def _change_detail(form_class, detail, data, request, *, dry_run, check=None):
     """Change an email address, a phone number or a postal address with the
     form of the person form's formset, so that the rules are the same as in
-    the web interface (e.g. phone numbers are normalized)"""
+    the web interface (e.g. phone numbers are normalized); ``check(form)``
+    raises the warnings of the person form about the valid form"""
     values = form_data(form_class(instance=detail)) | data.dict(exclude_none=True)
     form = form_class(values, instance=detail)
     if not form.is_valid():
@@ -1746,6 +1748,8 @@ def _change_detail(form_class, detail, data, request, *, dry_run):
             for field, messages in form.errors.items()
             for message in messages
         ])
+    if check:
+        check(form)
     with transaction.atomic():
         # Also updates the weight
         form.save()
@@ -1779,13 +1783,35 @@ def person_change_email_address(
     data: EmailAddressPatch,
     *,
     dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Change an email address of a person, like in the web interface"""
+    """Change an email address of a person, like in the web interface: an
+    address another person or an organization (centrally) uses already is a
+    warning (``email-in-use``)"""
     email = get_object_or_404(
         EmailAddress.objects.select_related("person"), pk=email_id, person=person_id
     )
+
+    def check(form):
+        if (
+            "email" in form.changed_data
+            and "email-in-use" not in ignore_warnings
+            and (
+                warning := email_in_use_warning(
+                    form.cleaned_data["email"], person=email.person
+                )
+            )
+        ):
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "email"],
+                    "msg": warning,
+                    "code": "email-in-use",
+                }
+            ])
+
     return _change_detail(
-        EmailAddressFormset.form, email, data, request, dry_run=dry_run
+        EmailAddressFormset.form, email, data, request, dry_run=dry_run, check=check
     )
 
 

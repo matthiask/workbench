@@ -880,11 +880,13 @@ def change_person_address(
     _echo_person(data)
 
 
-def _change_detail(path, data, *, dry_run, as_json):
+def _change_detail(path, data, *, dry_run, as_json, ignore_warnings=()):
     data = {key: value for key, value in data.items() if value is not None}
     if not data:
         terminate("Nothing to change, see --help for the options.")
-    data = request("PATCH", path, json=data, params=change_params(dry_run))
+    data = request(
+        "PATCH", path, json=data, params=change_params(dry_run, ignore_warnings)
+    )
     if as_json:
         echo_json(data)
         return
@@ -898,14 +900,20 @@ def _change_detail(path, data, *, dry_run, as_json):
 @click.argument("email_id", type=int)
 @click.option("--email", help="The new email address.")
 @click.option("--type", "type_", help="E.g. Work or Home.")
-@change_options(warnings=False)
-def change_person_email(person_id, email_id, email, type_, dry_run, as_json):
-    """Change an email address of a person (the ID from `wb people show`)"""
+@change_options()
+def change_person_email(
+    person_id, email_id, email, type_, ignore_warnings, dry_run, as_json
+):
+    """Change an email address of a person (the ID from `wb people show`)
+
+    An address another person or an organization (centrally) uses already
+    is a warning (email-in-use)."""
     _change_detail(
         f"contacts/people/{person_id}/email-addresses/{email_id}/",
         {"email": email, "type": type_},
         dry_run=dry_run,
         as_json=as_json,
+        ignore_warnings=ignore_warnings,
     )
 
 

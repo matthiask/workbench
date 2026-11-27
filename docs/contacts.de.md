@@ -13,7 +13,9 @@ weglässt. <kbd>Ctrl-Shift-C</kbd> springt zu einer Person.
 - Telefonnummern, Emailadressen und Postadressen einer Person lassen sich
   hinzufügen, sobald die Person gespeichert ist. «Von Kolleg:in
   übernehmen» übernimmt die Adresse einer Kolleg:in. Eine Adresse vom Typ
-  «Privat» lässt die Organisation weg.
+  «Privat» lässt die Organisation weg. Eine Emailadresse, die schon eine
+  andere Person oder eine Organisation (als zentrale Adresse) verwendet,
+  gibt eine Warnung.
 - Die **Funktion** (z.B. Leiterin Kommunikation) gehört zur Person, nicht
   in die Adresse: Adressen werden ohne sie gedruckt.
 - Adressen werden in der Reihenfolge der Post gedruckt: der

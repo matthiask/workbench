@@ -650,6 +650,31 @@ def organization_update_warning(person):
     ) % ", ".join(related)
 
 
+def email_in_use_warning(email, *, person):
+    """Warning (``email-in-use``) when another person or an organization
+    (as its central address) uses the email address already, or None
+
+    Creating people and adding details rejects those addresses; changing
+    them only warns since addresses shared by colleagues exist."""
+    email = email.strip()
+    messages = [
+        _("Already used by %(person)s (ID %(id)s).")
+        % {"person": existing.person, "id": existing.person_id}
+        for existing in EmailAddress.objects
+        .filter(email__iexact=email)
+        .exclude(person=person)
+        .select_related("person")
+    ] + [
+        _(
+            "The central address of %(organization)s (ID %(id)s), it's"
+            " shown on its people."
+        )
+        % {"organization": organization, "id": organization.pk}
+        for organization in Organization.objects.filter(email__iexact=email)
+    ]
+    return " ".join(str(message) for message in messages) or None
+
+
 def short_salutation_warning(salutation):
     if salutation and len(salutation.split()) < 2:
         return _("This does not look right. Please add a full salutation.")
@@ -724,6 +749,20 @@ class PersonForm(ModelForm):
             and (warning := organization_update_warning(self.instance))
         ):
             self.add_warning(warning, code="organization-update")
+        if (formset := self.formsets.get("emailaddresses")) and formset.is_valid():
+            warnings = [
+                warning
+                for form in formset.forms
+                if "email" in form.changed_data
+                and not form.cleaned_data.get("DELETE")
+                and (
+                    warning := email_in_use_warning(
+                        form.cleaned_data["email"], person=self.instance
+                    )
+                )
+            ]
+            if warnings:
+                self.add_warning(" ".join(warnings), code="email-in-use")
 
         return data
 
