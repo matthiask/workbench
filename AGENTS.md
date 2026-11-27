@@ -141,6 +141,11 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   reject unknown fields, so data under a wrong key isn't lost silently.
 - Web forms validate the API too (`validate_form()`): their warnings are
   errors carrying a code, ignored only when listed in `ignore_warnings`.
+  Changes go through the web form with `patch_with_form()`, deletions
+  through `allow_delete()` and the view's delete form with
+  `delete_with_form()` (`workbench/tools/api.py`). Every web view changing
+  data has an API route or an entry in `NOT_IN_API`
+  (`workbench/test_api_schema.py`).
 - Decimals are strings (`Amount`, `Hours`, `Days`, `Percentage`), except
   key data and cash data (`jsonable()`, used by integrations, also at their
   old URLs). Numeric statuses and probabilities are output and accepted as
@@ -160,9 +165,9 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
   `select_related("project__customer")` (`test_api_queries.py` checks).
 - Messages added during API requests are dropped
   (`api_messages_middleware`).
-- Deletions check `allow_delete()` with `check_allow_delete()` (its
-  messages become errors); forms reading the web interface's query
-  parameters get `without_query(request)`.
+- Deletions check `allow_delete()` (`check_allow_delete()`,
+  `delete_with_form()`; its messages become errors); forms reading the
+  web interface's query parameters get `without_query(request)`.
 - On purpose: dates of birth aren't in the API; creating people rejects
   duplicates (mostly fed by LLMs). Hours and costs are logged with the
   logbook forms, all of their warnings can be ignored by code (else
