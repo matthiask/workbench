@@ -44,7 +44,9 @@ eine Warnung zeigt, hält `wb` an und gibt den Code der Warnung aus;
 [erfassen Stunden und Kosten](hours.de.md) mit den Prüfungen und
 Warnungen des Logbuch-Formulars, `update` und `delete` ändern und
 entfernen sie wie in der Weboberfläche. `wb services search --project ID`
-findet die Leistung. `wb timestamps start` und `wb timestamps stop`
+findet die Leistung. `wb breaks create 12:00 12:45` erfasst eine
+[Pause](hours.de.md#pausen), `wb breaks` zeigt deine; nur deine eigenen
+kannst du ändern und löschen. `wb timestamps start` und `wb timestamps stop`
 setzen [Zeitmarken](hours.de.md#zeitmarken).
 
 ## API-Tokens

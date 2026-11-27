@@ -43,6 +43,8 @@ shows a warning, `wb` stops and prints the warning's code;
 [log hours and costs](hours.md) with the checks and warnings of the
 logbook form, `update` and `delete` change and remove them like in the
 web interface. `wb services search --project ID` finds the service.
+`wb breaks create 12:00 12:45` logs a [break](hours.md#breaks), `wb breaks`
+lists yours; only your own can be changed and deleted.
 `wb timestamps start` and `wb timestamps stop` set
 [timestamps](hours.md#timestamps).
 

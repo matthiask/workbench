@@ -1,6 +1,6 @@
 ---
 name: workbench-logbook
-description: Log hours and costs in Workbench with the `wb` CLI, e.g. from notes, a calendar, commits or timestamps, and correct or delete logged entries. Use when the user wants to log, book, record, fix, move or delete hours, time, expenses or costs in Workbench, or asks what they logged.
+description: Log hours, costs and breaks in Workbench with the `wb` CLI, e.g. from notes, a calendar, commits or timestamps, and correct or delete logged entries. Use when the user wants to log, book, record, fix, move or delete hours, time, expenses, costs or breaks in Workbench, or asks what they logged.
 ---
 
 # Logging hours and costs in Workbench
@@ -92,3 +92,18 @@ at once (all or none):
 Invoiced entries keep their service, entries of closed projects stay where
 they are; tell the user instead of logging them again. Show the entries and
 the target service to the user and wait for their approval before moving.
+
+## 7. Breaks
+
+Breaks count for the working time, and `take-a-break` warns when a day
+has too much work without them. If the user took a break that isn't
+logged (e.g. a gap between timestamps), log it instead of ignoring the
+warning:
+
+    wb breaks create 12:00 12:45 Lunch --dry-run
+    wb breaks create 15:00 15:10 --day 2026-11-26
+    wb breaks update <id> --ends-at 13:00
+    wb breaks delete <id>
+
+`wb breaks` lists the user's breaks of this week. Only their own breaks
+can be changed or deleted, and breaks have to be logged promptly.

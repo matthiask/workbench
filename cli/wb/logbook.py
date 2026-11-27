@@ -1,4 +1,4 @@
-"""Logged hours and costs"""
+"""Logged hours, costs and breaks"""
 
 import click
 
@@ -9,6 +9,7 @@ from wb.core import (
     complete_short_names,
     console,
     echo_csv,
+    echo_deleted,
     echo_json,
     echo_more,
     format_bool,
@@ -564,3 +565,178 @@ def delete_cost(cost_id, dry_run, as_json):
 
 
 move_costs = _move_command(costs, "costs", _echo_cost)
+
+
+# Breaks ######################################################################
+
+
+def _time(value):
+    return value.time().isoformat(timespec="minutes") if value else None
+
+
+def _clock(value):
+    """HH:MM of a datetime of the API"""
+    return value[11:16]
+
+
+def _echo_break(data, *, dry_run=False, prefix=""):
+    if dry_run:
+        prefix = "Dry run, nothing changed: " + prefix
+    console.print(
+        f"{prefix}{link(data['id'] or '(new)', data['url'])} {data['day']}"
+        f" {data['user']} {_clock(data['starts_at'])}–{_clock(data['ends_at'])}"
+        f" ({data['minutes']} min)"
+        + (f" | {data['description']}" if data["description"] else "")
+    )
+
+
+_times = click.DateTime(["%H:%M", "%H:%M:%S"])
+_day_option = click.option(
+    "--day", type=click.DateTime(["%Y-%m-%d"]), help="YYYY-MM-DD, defaults to today."
+)
+
+
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def breaks(ctx):
+    """Look at, log, change and delete breaks
+
+    Breaks count for the working time. Everyone's breaks can be searched,
+    only your own can be changed and deleted. Without a command, lists your
+    breaks of this week."""
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(search_breaks, user=me()["short_name"], period="this-week")
+
+
+@breaks.command("search")
+@click.argument("query", nargs=-1)
+@click.option("--user", help="Short name.", shell_complete=complete_short_names)
+@period_options("filters the day of the break")
+@page_options
+@click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
+@click.option("--json", "as_json", is_flag=True)
+def search_breaks(query, user, period, since, until, limit, offset, as_csv, as_json):
+    """Search breaks, newest first; QUERY searches the description"""
+    params = {"q": " ".join(query)}
+    if user:
+        params["user"] = user
+    params |= period_params(period, since, until)
+    data = request("GET", "logbook/breaks/", params=params | page_params(limit, offset))
+    if as_csv:
+        echo_csv(data["items"])
+        echo_more(data, offset)
+        return
+    if as_json:
+        echo_json(data)
+        return
+    table = make_table(
+        "ID>",
+        "Day",
+        "User",
+        "From",
+        "Until",
+        "Minutes>",
+        "Description",
+        show_footer=True,
+    )
+    for row in data["items"]:
+        table.add_row(
+            link(row["id"], row["url"]),
+            row["day"],
+            row["user"],
+            _clock(row["starts_at"]),
+            _clock(row["ends_at"]),
+            str(row["minutes"]),
+            row["description"],
+        )
+    table.columns[1].footer = "Total"
+    table.columns[5].footer = str(data["total_minutes"])
+    console.print(table)
+    echo_more(data, offset, "breaks", note="The total includes all of them.")
+
+
+@breaks.command("create")
+@click.argument("starts_at", type=_times)
+@click.argument("ends_at", type=_times)
+@click.argument("description", required=False)
+@_day_option
+@change_options()
+def create_break(
+    starts_at, ends_at, description, day, ignore_warnings, dry_run, as_json
+):
+    """Log a break of your own from STARTS_AT until ENDS_AT (HH:MM)
+
+    Checked like in the web interface, e.g. breaks have to be logged
+    promptly. A DESCRIPTION of `-` is read from stdin."""
+    data = request(
+        "POST",
+        "logbook/breaks/",
+        params=change_params(dry_run, ignore_warnings),
+        json=_values(
+            starts_at=_time(starts_at),
+            ends_at=_time(ends_at),
+            description=description,
+            day=_date(day),
+        ),
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_break(data, dry_run=dry_run, prefix="Logged ")
+
+
+@breaks.command("update")
+@click.argument("break_id", type=int)
+@_day_option
+@click.option("--starts-at", type=_times, help="HH:MM.")
+@click.option("--ends-at", type=_times, help="HH:MM.")
+@click.option("--description", help="`-` reads it from stdin.")
+@change_options()
+def update_break(
+    break_id,
+    day,
+    starts_at,
+    ends_at,
+    description,
+    ignore_warnings,
+    dry_run,
+    as_json,
+):
+    """Change a break of your own, only the given fields
+
+    The times stay on the break's day unless `--day` moves it."""
+    data = _values(
+        day=_date(day),
+        starts_at=_time(starts_at),
+        ends_at=_time(ends_at),
+        description=description,
+    )
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"logbook/breaks/{break_id}/",
+        params=change_params(dry_run, ignore_warnings),
+        json=data,
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_break(data, dry_run=dry_run, prefix="Changed ")
+
+
+@breaks.command("delete")
+@click.argument("break_id", type=int)
+@change_options(warnings=False)
+def delete_break(break_id, dry_run, as_json):
+    """Delete a break of your own, e.g. one logged twice"""
+    data = request(
+        "DELETE", f"logbook/breaks/{break_id}/", params=change_params(dry_run)
+    )
+    echo_deleted(
+        data,
+        _echo_break,
+        what=f"the break {data['id']}",
+        dry_run=dry_run,
+        as_json=as_json,
+    )

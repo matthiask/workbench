@@ -641,6 +641,21 @@ invoiced entries and entries of closed projects stay where they are:
     wb hours move --project 1234 --entry 5678 --entry 5679 --service 902
     wb costs move --project 1234 --entry 345 --service 902
 
+## Breaks
+
+Breaks count for the working time. `wb breaks` lists your breaks of this
+week, `wb breaks search` everyone's (`--user`, `--period`, `--since`,
+`--until`, terms search the description). Breaks are logged, changed and
+deleted like in the web interface, only your own:
+
+    wb breaks create 12:00 12:45 Lunch
+    wb breaks create 15:00 15:10 --day 2026-11-26
+    wb breaks update 4321 --ends-at 13:00
+    wb breaks delete 4321
+
+The times stay on the break's day unless `--day` moves it. All of them take
+`--dry-run` and `--json`.
+
 ## Timestamps
 
 `wb timestamps start` and `wb timestamps stop` replace the `tst` command of

@@ -28,7 +28,7 @@ from workbench.contacts.models import Group, Organization, Person
 from workbench.deals.models import AttributeGroup, Deal
 from workbench.hosting.models import Server, Site
 from workbench.invoices.models import Invoice, RecurringInvoice
-from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.notes.models import Note
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
@@ -3513,6 +3513,52 @@ planned_work:
         self.assertEqual(json.loads(result.output)[0]["service_id"], target.pk)
         cost.refresh_from_db()
         self.assertEqual(cost.service, target)
+
+    def test_breaks(self):
+        """Log, list, change and delete breaks; only your own"""
+        result = self.wb("breaks", "create", "12:00", "12:30", "Lunch", "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing changed: Logged (new)", result.output)
+        self.assertFalse(Break.objects.exists())
+
+        result = self.wb("breaks", "create", "12:00", "12:30", "Lunch")
+        self.assertEqual(result.exit_code, 0, result.output)
+        brk = Break.objects.get()
+        self.assertEqual(brk.user, self.user)
+        self.assertIn(f"Logged {brk.pk} ", result.output)
+        self.assertIn("ab 12:00–12:30 (30 min) | Lunch", result.output)
+
+        result = self.wb("breaks", "create", "13:00", "12:00")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Breaks should end later than they begin.", result.output)
+
+        other = factories.BreakFactory.create(description="Coffee")
+        result = self.wb("breaks")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Lunch", result.output)
+        self.assertNotIn("Coffee", result.output)
+        result = self.wb("breaks", "search", "--period", "this-week")
+        self.assertIn("Coffee", result.output)
+        self.assertIn("Lunch", result.output)
+
+        result = self.wb("breaks", "update", brk.pk, "--ends-at", "12:45")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("12:00–12:45 (45 min)", result.output)
+        result = self.wb("breaks", "update", brk.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Nothing to change.", result.output)
+        result = self.wb("breaks", "update", other.pk, "--description", "Mine")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Cannot modify breaks of other users.", result.output)
+
+        result = self.wb("breaks", "delete", brk.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        self.assertTrue(Break.objects.filter(pk=brk.pk).exists())
+        result = self.wb("breaks", "delete", brk.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"Deleted the break {brk.pk}.", result.output)
+        self.assertFalse(Break.objects.filter(pk=brk.pk).exists())
 
     def test_timestamps(self):
         """Tasks are started and stopped like with the old tst command"""
