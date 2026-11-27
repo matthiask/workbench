@@ -18,6 +18,7 @@ from workbench.contacts.models import (
     PostalAddress,
 )
 from workbench.deals.models import Deal
+from workbench.hosting.models import Site, SiteContact
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.planning.models import ExternalWork
 from workbench.projects.models import Campaign, Project
@@ -121,6 +122,8 @@ def _recent(cutoff):
         Invoice: Q(created_at__gte=cutoff),
         RecurringInvoice: Q(ends_on__isnull=True) | Q(ends_on__gte=cutoff),
         ExternalWork: Q(created_at__gte=cutoff),
+        Site: Q(is_archived=False),
+        SiteContact: Q(site__is_archived=False),
         User: Q(is_active=True),
         Person: Q(is_archived=False),
         PhoneNumber: NEVER,

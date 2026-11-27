@@ -53,6 +53,9 @@ def prune_audit():
             "projects_budgettransfer",
             "projects_campaign",
             "notes_note",
+            "hosting_server",
+            "hosting_site",
+            "hosting_sitecontact",
         ],
         # The offer history (workbench/offers/history.py) goes back as far
         created_at__lt=in_days(-5 * 366),

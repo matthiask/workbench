@@ -5,7 +5,7 @@ from collections import defaultdict
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q, Value
+from django.db.models import Count, Exists, OuterRef, Prefetch, Q, Value
 from django.db.models.functions import Concat, Lower, Trim
 from django.utils.translation import gettext as _, ngettext
 
@@ -124,7 +124,7 @@ DETAILS = [
 def merge_people(*, duplicate, keep):
     """Move everything of the duplicate to the person to keep and delete it
 
-    Projects, deals, invoices, the linked user and the contact details move
+    Projects, deals, invoices, site contacts, the linked user and the contact details move
     (details the person to keep has already are dropped), groups are added
     like in the person form, notes are appended and the date of birth is
     taken over if the person to keep has none or one without the year. The person kept is archived
@@ -145,6 +145,13 @@ def merge_people(*, duplicate, keep):
 
         for group in duplicate.groups.all():
             keep.add_to_group(group)
+
+        # Site contacts are unique per site, person and role
+        duplicate.site_contacts.filter(
+            Exists(
+                keep.site_contacts.filter(site=OuterRef("site"), role=OuterRef("role"))
+            )
+        ).delete()
 
         if duplicate.notes.strip() and duplicate.notes.strip() not in keep.notes:
             keep.notes = "\n\n".join(filter(None, (keep.notes, duplicate.notes)))

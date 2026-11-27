@@ -13,6 +13,7 @@ from workbench.awt.models import Absence, Employment, WorkingTimeModel, Year
 from workbench.contacts.models import Organization, Person, PostalAddress
 from workbench.credit_control.models import CreditEntry, Ledger
 from workbench.deals.models import AttributeGroup, ClosingType, Deal, ValueType
+from workbench.hosting.models import Server, Site
 from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -196,6 +197,23 @@ class RecurringInvoiceFactory(DjangoModelFactory):
 
     class Meta:
         model = RecurringInvoice
+
+
+class ServerFactory(DjangoModelFactory):
+    title = factory.Sequence(lambda n: "server%02d" % n)
+
+    class Meta:
+        model = Server
+
+
+class SiteFactory(DjangoModelFactory):
+    title = factory.Sequence(lambda n: "site-%d.example.com" % n)
+    server = factory.SubFactory(ServerFactory)
+    customer = factory.SubFactory(OrganizationFactory)
+    owned_by = factory.SubFactory(UserFactory)
+
+    class Meta:
+        model = Site
 
 
 class ProjectedInvoiceFactory(DjangoModelFactory):

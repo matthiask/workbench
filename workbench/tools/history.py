@@ -29,6 +29,7 @@ from workbench.contacts.models import (
 from workbench.credit_control.models import CreditEntry
 from workbench.deals.models import Contribution, Deal, Value, ValueType
 from workbench.expenses.models import ExpenseReport
+from workbench.hosting.models import Server, Site, SiteContact
 from workbench.invoices.models import (
     Invoice,
     ProjectedInvoice,
@@ -568,6 +569,15 @@ WITH_TOTAL = {
 }
 
 
+def _hosting_cfg(related=()):
+    def cfg(user):
+        if not user.features[FEATURES.HOSTING]:
+            raise Http404
+        return {"fields": EVERYTHING, "related": list(related)}
+
+    return cfg
+
+
 def _notes_note_cfg(user):
     # Only notes of objects the user may see, also of deleted notes
     visible = visible_content_types(user)
@@ -662,4 +672,7 @@ HISTORY = {
     InternalTypeUser: {"fields": EVERYTHING},
     CostCenter: _reporting_costcenter_cfg,
     Note: _notes_note_cfg,
+    Server: _hosting_cfg(),
+    Site: _hosting_cfg([(SiteContact, "site_id")]),
+    SiteContact: _hosting_cfg(),
 }

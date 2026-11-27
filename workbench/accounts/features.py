@@ -42,6 +42,7 @@ class FEATURES(StrEnum):
     DISABLE_AWT_MONITORING = "DISABLE_AWT_MONITORING"
     EXPENSES = "EXPENSES"
     FOREIGN_CURRENCIES = "FOREIGN_CURRENCIES"
+    HOSTING = "HOSTING"
     INTERNAL_TYPES = "INTERNAL_TYPES"
     LABOR_COSTS = "LABOR_COSTS"
     LATE_LOGGING = "LATE_LOGGING"
@@ -98,6 +99,10 @@ LABELS = {
     FEATURES.FOREIGN_CURRENCIES: {
         "label": _("Foreign currencies for expenses"),
     },
+    FEATURES.HOSTING: {
+        "label": capfirst(_("hosting")),
+        "help_text": _("Hosted sites, their servers and contacts."),
+    },
     FEATURES.INTERNAL_TYPES: {
         "label": capfirst(_("internal types")),
         "help_text": _(
@@ -148,5 +153,6 @@ class F(Enum):
 bookkeeping_only = feature_required(FEATURES.BOOKKEEPING)
 controlling_only = feature_required(FEATURES.CONTROLLING)
 deals_only = feature_required(FEATURES.DEALS)
+hosting_only = feature_required(FEATURES.HOSTING)
 labor_costs_only = feature_required(FEATURES.LABOR_COSTS)
 productivity_only = feature_required(FEATURES.PRODUCTIVITY)

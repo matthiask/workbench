@@ -872,6 +872,14 @@ class RecurringInvoice(ModelWithTotal):
         null=True,
         verbose_name=_("contact"),
     )
+    site = models.ForeignKey(
+        "hosting.Site",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("site"),
+        related_name="recurringinvoices",
+    )
 
     title = models.CharField(_("title"), max_length=200)
     description = models.TextField(_("description"), blank=True)
