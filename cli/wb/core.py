@@ -875,6 +875,37 @@ ignore_warnings_option = click.option(
 )
 
 
+def change_options(*, warnings=True):
+    """``--ignore-warning`` (unless ``warnings=False``), ``--dry-run`` and
+    ``--json`` for commands changing or deleting something; the command gets
+    ``ignore_warnings``, ``dry_run`` and ``as_json``, see ``change_params()``"""
+
+    def decorator(fn):
+        fn = click.option("--json", "as_json", is_flag=True)(fn)
+        fn = click.option("--dry-run", is_flag=True, help="Validate only.")(fn)
+        return ignore_warnings_option(fn) if warnings else fn
+
+    return decorator
+
+
+def change_params(dry_run, ignore_warnings=()):
+    """The query parameters of the options of ``change_options()``"""
+    return {"dry_run": format_bool(dry_run), "ignore_warnings": list(ignore_warnings)}
+
+
+def echo_deleted(data, echo, *, what, dry_run, as_json):
+    """The deleted object (shown with ``echo(data)``) and what happened,
+    there's no confirmation: ``--dry-run`` shows what would be deleted"""
+    if as_json:
+        echo_json(data)
+        return
+    echo(data)
+    console.print()
+    console.print(
+        "Dry run, nothing has been deleted." if dry_run else f"Deleted {what}."
+    )
+
+
 def page_options(fn):
     fn = click.option(
         "--offset",

@@ -3,6 +3,7 @@
 import click
 
 from wb.core import (
+    change_params,
     cli,
     complete_short_names,
     console,
@@ -22,10 +23,6 @@ from wb.core import (
     terminate,
     text_or_stdin,
 )
-
-
-def _change_params(dry_run, ignore_warnings=()):
-    return {"dry_run": format_bool(dry_run), "ignore_warnings": list(ignore_warnings)}
 
 
 def _echo_entry(data, amount, *, dry_run, as_json, prefix):
@@ -227,7 +224,7 @@ def create_hours(
     data = request(
         "POST",
         "logbook/hours/",
-        params=_change_params(dry_run, ignore_warnings),
+        params=change_params(dry_run, ignore_warnings),
         json=_values(
             service=service_id,
             hours=hours,
@@ -287,7 +284,7 @@ def update_hours(
     data = request(
         "PATCH",
         f"logbook/hours/{hours_id}/",
-        params=_change_params(dry_run, ignore_warnings),
+        params=change_params(dry_run, ignore_warnings),
         json=data,
     )
     _echo_hours(data, dry_run=dry_run, as_json=as_json, prefix="Changed ")
@@ -303,7 +300,7 @@ def delete_hours(hours_id, dry_run, as_json):
     Like in the web interface, not when they have been invoiced or are from
     past weeks."""
     data = request(
-        "DELETE", f"logbook/hours/{hours_id}/", params=_change_params(dry_run)
+        "DELETE", f"logbook/hours/{hours_id}/", params=change_params(dry_run)
     )
     _echo_hours(data, dry_run=dry_run, as_json=as_json, prefix="Deleted ")
 
@@ -439,7 +436,7 @@ def create_cost(
     data = request(
         "POST",
         "logbook/costs/",
-        params=_change_params(dry_run, ignore_warnings),
+        params=change_params(dry_run, ignore_warnings),
         json=_values(
             service=service_id,
             cost=cost,
@@ -488,7 +485,7 @@ def update_cost(
     data = request(
         "PATCH",
         f"logbook/costs/{cost_id}/",
-        params=_change_params(dry_run, ignore_warnings),
+        params=change_params(dry_run, ignore_warnings),
         json=data,
     )
     _echo_cost(data, dry_run=dry_run, as_json=as_json, prefix="Changed ")
@@ -503,7 +500,5 @@ def delete_cost(cost_id, dry_run, as_json):
 
     Like in the web interface, not when they have been invoiced or are part
     of an expense report."""
-    data = request(
-        "DELETE", f"logbook/costs/{cost_id}/", params=_change_params(dry_run)
-    )
+    data = request("DELETE", f"logbook/costs/{cost_id}/", params=change_params(dry_run))
     _echo_cost(data, dry_run=dry_run, as_json=as_json, prefix="Deleted ")

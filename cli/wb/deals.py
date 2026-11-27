@@ -3,11 +3,14 @@
 import click
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     complete_short_names,
     console,
     echo_actionable,
     echo_csv,
+    echo_deleted,
     echo_fields,
     echo_json,
     echo_more,
@@ -119,24 +122,14 @@ def show_deal(deal_id, as_json):
 
 @deals.command("delete")
 @click.argument("deal_id")
-@click.option("--dry-run", is_flag=True, help="Validate only.")
-@click.option("--json", "as_json", is_flag=True)
+@change_options(warnings=False)
 def delete_deal(deal_id, dry_run, as_json):
     """Delete a deal, by ID or code, e.g. a duplicate
 
     Deals which have been lost are declined instead (`wb deals close`), so
     that the reports keep them. Linked offers and projects stay."""
-    data = request(
-        "DELETE", f"deals/{deal_id}/", params={"dry_run": format_bool(dry_run)}
-    )
-    if as_json:
-        echo_json(data)
-        return
-    _echo_deal(data)
-    console.print()
-    console.print(
-        "Dry run, nothing has been deleted." if dry_run else f"Deleted {data['code']}."
-    )
+    data = request("DELETE", f"deals/{deal_id}/", params=change_params(dry_run))
+    echo_deleted(data, _echo_deal, what=data["code"], dry_run=dry_run, as_json=as_json)
 
 
 def _key_values(values, option):
@@ -197,9 +190,7 @@ def _echo_saved_deal(data, *, dry_run, as_json):
     help="SHORT_NAME=WEIGHT: 100 main driving force, 50 contributing force,"
     " 0 removes the contribution.",
 )
-@ignore_warnings_option
-@click.option("--dry-run", is_flag=True, help="Validate only.")
-@click.option("--json", "as_json", is_flag=True)
+@change_options()
 def update_deal(
     deal_id,
     title,
@@ -252,10 +243,7 @@ def update_deal(
     data = request(
         "PATCH",
         f"deals/{deal_id}/",
-        params={
-            "dry_run": format_bool(dry_run),
-            "ignore_warnings": list(ignore_warnings),
-        },
+        params=change_params(dry_run, ignore_warnings),
         json=data,
     )
     _echo_saved_deal(data, dry_run=dry_run, as_json=as_json)

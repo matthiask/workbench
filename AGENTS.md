@@ -172,6 +172,10 @@ Edit `conf/locale/de/LC_MESSAGES/django.po` manually. Remove the `#, fuzzy` flag
 
 - Lives in `cli/` (own package, one module per noun, shared helpers in
   `wb/core.py`). A thin client: keep the logic on the server.
+- Commands changing or deleting something take `--ignore-warning`,
+  `--dry-run` and `--json` (`change_options()`, `change_params()`);
+  deletions ask for no confirmation and print what they deleted
+  (`echo_deleted()`).
 - `wb <noun> <verb>`: `search` (terms and filters, `--include-closed` etc.,
   `include_*` in the API), `show ID` (ID or code, `by_id_or_code()`),
   `create`, `update`. Nouns without a verb show the most common list.
