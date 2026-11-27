@@ -45,6 +45,7 @@ dependencies = [
 [dependency-groups]
 # The CLI tests run the CLI, the deployment doesn't need it (UV_NO_DEV)
 dev = [
+  "tblib>=3.2.2",
   "workbench-cli",
 ]
 
@@ -167,6 +168,10 @@ run.omit = [
   "*venv*",
 ]
 run.branch = true
+# Parallel test runs (./runtests.sh): a file per process, combined after
+run.concurrency = [ "multiprocessing", "thread" ]
+run.parallel = true
+run.sigterm = true
 report.skip_covered = true
 report.show_missing = true
 

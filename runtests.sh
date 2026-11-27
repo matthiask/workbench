@@ -1,7 +1,8 @@
 #!/bin/sh
 set -ex
 uv run coverage erase
-PYTHONWARNINGS=all uv run coverage run ./manage.py test -v 2 --keepdb $*
+PYTHONWARNINGS=all uv run coverage run ./manage.py test -v 2 --keepdb --parallel auto $*
+uv run coverage combine -q
 
 if [ $# -eq 0 ]; then
   uv run coverage report

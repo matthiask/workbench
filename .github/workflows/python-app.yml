@@ -48,7 +48,9 @@ jobs:
 
         run: |
           mkdir -p tmp
-          uv run coverage run ./manage.py test -v2
+          uv run manage.py makemigrations --check --dry-run
+          PYTHONWARNINGS=all uv run coverage run ./manage.py test -v2 --parallel auto
+          uv run coverage combine -q
           uv run coverage report -m
 
   timer:
