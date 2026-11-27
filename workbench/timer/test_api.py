@@ -249,3 +249,87 @@ class TimestampsAPITest(TestCase):
         response = self.client.delete("/api/timestamps/latest/")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(list(Timestamp.objects.all()), [other])
+
+    @travel("2026-10-30T12:00:00+01:00", tick=False)
+    def test_split(self):
+        """Slices are split into parts of whole tenths of an hour like in the
+        web interface, the parts keep the slice's project"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        service = factories.ServiceFactory.create()
+        Timestamp.objects.create(
+            user=user,
+            type=Timestamp.START,
+            created_at=dt.datetime.fromisoformat("2026-10-30T09:00:00+01:00"),
+            project=service.project,
+            service=service,
+        )
+        stop = Timestamp.objects.create(
+            user=user,
+            type=Timestamp.STOP,
+            created_at=dt.datetime.fromisoformat("2026-10-30T09:40:00+01:00"),
+            notes="Work",
+        )
+
+        def split(timestamp, query="", **data):
+            return self.client.post(
+                f"/api/timestamps/{timestamp}/split/{query}",
+                data,
+                content_type="application/json",
+            )
+
+        response = split("T2", "?dry_run=true", parts=3)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [part["slice"]["hours"] for part in response.json()], ["0.2", "0.2", "0.3"]
+        )
+        self.assertEqual(Timestamp.objects.count(), 2)
+
+        data = split(stop.pk, parts=3).json()
+        self.assertEqual([part["code"] for part in data], ["T2", "T3", "T4"])
+        self.assertEqual(data[-1]["id"], stop.pk)
+        self.assertEqual(
+            [part["created_at"][11:16] for part in data], ["09:12", "09:24", "09:40"]
+        )
+        self.assertEqual(
+            {
+                (part["notes"], part["project"]["id"], part["service_id"])
+                for part in data
+            },
+            {("Work", service.project_id, service.pk)},
+        )
+        self.assertEqual(
+            [s["hours"] for s in self.client.get("/api/timestamps/").json()["slices"]],
+            ["0.2", "0.2", "0.3"],
+        )
+
+        response = split("T2", parts=3)
+        self.assertContains(
+            response, "can be split into at most 2 parts", status_code=422
+        )
+        self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "parts"])
+        self.assertEqual(split("T2", parts=1).status_code, 422)
+
+        # The start of the day has no slice of its own
+        response = split("T1", parts=2)
+        self.assertContains(response, "cannot be split", status_code=422)
+
+        other = Timestamp.objects.create(
+            user=factories.UserFactory.create(), type=Timestamp.STOP
+        )
+        self.assertEqual(split(other.pk, parts=2).status_code, 404)
+        self.assertEqual(split("T2", "?day=2020-01-01", parts=2).status_code, 404)
+
+    def test_split_logged(self):
+        """Timestamps linked to logged hours cannot be split"""
+        hours = factories.LoggedHoursFactory.create()
+        self.client.force_login(hours.rendered_by)
+        timestamp = Timestamp.objects.create(
+            user=hours.rendered_by, type=Timestamp.STOP, logged_hours=hours
+        )
+        response = self.client.post(
+            f"/api/timestamps/{timestamp.pk}/split/",
+            {"parts": 2},
+            content_type="application/json",
+        )
+        self.assertContains(response, "cannot be split", status_code=422)

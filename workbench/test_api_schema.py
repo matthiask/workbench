@@ -188,6 +188,7 @@ API_ROUTES = {
     ),
     "projects_service_set_order": "POST /api/services/reorder/",
     "projects_service_update": "PATCH /api/services/{service_id}/",
+    "split_timestamp": "POST /api/timestamps/{timestamp}/split/",
 }
 
 # Web views without API route: either out of scope (see specs/complete-api)
@@ -214,7 +215,6 @@ NOT_IN_API = {
     "invoices_send_reminder": "out of scope: sending mail",
     "projects_project_pin": "out of scope: own profile (pinned projects)",
     "projects_service_pin": "out of scope: own profile (pinned services)",
-    "split_timestamp": "package 23",
 }
 
 

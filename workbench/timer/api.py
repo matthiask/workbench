@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Literal
 
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
@@ -17,7 +18,8 @@ from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Service
 from workbench.reporting.utils import sum_of
 from workbench.timer.models import Slice, Timestamp, timestamp_project
-from workbench.tools.api import InputSchema
+from workbench.timer.views import SplitTimestampForm, splittable_slice
+from workbench.tools.api import DryRun, InputSchema, validate_form
 from workbench.tools.formats import Z1
 from workbench.tools.validation import monday
 
@@ -111,9 +113,13 @@ class TimestampOut(Schema):
     slice: SliceOut | None
 
 
-def _timestamp_out(timestamp, request, *, with_slice=True):
-    codes = _codes(timestamp.user, localdate(timestamp.created_at))
-    slice = timestamp.slice() if with_slice else None
+def _timestamp_out(timestamp, request, *, with_slice=True, codes=None, slice=None):
+    """``codes`` and ``slice`` are computed unless given, e.g. for several
+    timestamps of the same day"""
+    if codes is None:
+        codes = _codes(timestamp.user, localdate(timestamp.created_at))
+    if slice is None and with_slice:
+        slice = timestamp.slice()
     return {
         "id": timestamp.id,
         "code": codes[timestamp.id],
@@ -205,28 +211,81 @@ def timestamp_delete_latest(request):
     return result
 
 
-@router.delete("/timestamps/{timestamp}/", response=TimestampOut)
-def timestamp_delete(
-    request,
-    timestamp: str,
-    day: Query[
-        dt.date | None, P(description="The day of the timestamp, today by default.")
-    ] = None,
-):
-    """Delete a timestamp by its code (T1, T2, ... of the day, today by
-    default) or its ID, both are in the list of slices"""
+TimestampDay = Query[
+    dt.date | None, P(description="The day of the timestamp's code, today by default.")
+]
+
+
+def _timestamp(request, timestamp, day):
+    """The user's timestamp with this code (T1, T2, ... of the day) or ID"""
     timestamps = Timestamp.objects.filter(user=request.user)
     if match := re.fullmatch(r"[tT]([0-9]+)", timestamp):
         codes = {
             code: pk for pk, code in _codes(request.user, day or localdate()).items()
         }
-        timestamp = get_object_or_404(timestamps, pk=codes.get(f"T{int(match[1])}", 0))
-    elif re.fullmatch(r"[0-9]+", timestamp):
-        timestamp = get_object_or_404(timestamps, pk=timestamp)
-    else:
-        raise HttpError(404, _("Use a code like T1 or an ID."))
+        return get_object_or_404(timestamps, pk=codes.get(f"T{int(match[1])}", 0))
+    if re.fullmatch(r"[0-9]+", timestamp):
+        return get_object_or_404(timestamps, pk=timestamp)
+    raise HttpError(404, _("Use a code like T1 or an ID."))
+
+
+@router.delete("/timestamps/{timestamp}/", response=TimestampOut)
+def timestamp_delete(request, timestamp: str, day: TimestampDay = None):
+    """Delete a timestamp by its code (T1, T2, ... of the day, today by
+    default) or its ID, both are in the list of slices"""
+    timestamp = _timestamp(request, timestamp, day)
     result = _timestamp_out(timestamp, request, with_slice=False)
     timestamp.delete()
+    return result
+
+
+class TimestampSplitIn(InputSchema):
+    parts: int = Field(
+        description="Number of parts of whole tenths of an hour, the last one"
+        " gets the remainder."
+    )
+
+
+@router.post("/timestamps/{timestamp}/split/", response=list[TimestampOut])
+def timestamp_split(
+    request,
+    timestamp: str,
+    data: TimestampSplitIn,
+    *,
+    day: TimestampDay = None,
+    dry_run: DryRun = False,
+):
+    """Split the slice of a timestamp (code or ID like for deleting) into
+    parts like the web interface, e.g. to log them on different services
+
+    New timestamps end all parts but the last one, which the timestamp
+    itself ends; all of them get the timestamp's notes and the slice's
+    project and service. Slices whose hours have been logged can't be
+    split. Returns the parts' timestamps."""
+    timestamp = _timestamp(request, timestamp, day)
+    if not (slice := splittable_slice(timestamp)):
+        raise ValidationError([
+            {
+                "loc": ["path", "timestamp"],
+                "msg": _("This timestamp cannot be split."),
+            }
+        ])
+    form = SplitTimestampForm({"parts": data.parts}, request=request, slice=slice)
+    validate_form(form)
+    with transaction.atomic():
+        parts = [*form.save(timestamp), timestamp]
+        day = localdate(timestamp.created_at)
+        codes = _codes(timestamp.user, day)
+        slices = {
+            slice.get("timestamp_id"): slice
+            for slice in Timestamp.objects.slices(timestamp.user, day=day)
+        }
+        result = [
+            _timestamp_out(part, request, codes=codes, slice=slices.get(part.id))
+            for part in parts
+        ]
+        if dry_run:
+            transaction.set_rollback(True)
     return result
 
 

@@ -120,6 +120,40 @@ class SplitTimestampForm(Form):
         base, remainder = divmod(total_tenths, parts)
         return [base] * (parts - 1) + [base + remainder]
 
+    def save(self, timestamp):
+        """Split the slice of the timestamp, which ends the last part;
+        returns the new timestamps ending the other parts"""
+        accumulated_tenths = 0
+        new_timestamps = []
+        for part_tenths in self.split_hours()[:-1]:
+            accumulated_tenths += part_tenths
+            new_timestamps.append(
+                Timestamp(
+                    user=timestamp.user,
+                    type=Timestamp.STOP,
+                    notes=timestamp.notes,
+                    created_at=self.slice["starts_at"]
+                    + dt.timedelta(seconds=accumulated_tenths * 360),
+                    project=self.slice["project"],
+                    service=self.slice["service"],
+                )
+            )
+        new_timestamps = Timestamp.objects.bulk_create(new_timestamps)
+        # The last part is the timestamp itself, keep the slice's project too
+        if not timestamp.project and self.slice["project"]:
+            timestamp.project = self.slice["project"]
+            timestamp.service = self.slice["service"]
+            timestamp.save()
+        return new_timestamps
+
+
+def splittable_slice(timestamp):
+    """The slice of the timestamp if it can be split, else ``None``"""
+    if timestamp.logged_hours_id or timestamp.logged_break_id:
+        return None
+    slice = timestamp.slice()
+    return slice if slice and slice.split_url else None
+
 
 @require_GET
 def list_timestamps(request):
@@ -194,27 +228,7 @@ def split_timestamp(request, pk):
         slice=slice,
     )
     if request.method == "POST" and form.is_valid():
-        accumulated_tenths = 0
-        new_timestamps = []
-        for part_tenths in form.split_hours()[:-1]:
-            accumulated_tenths += part_tenths
-            new_timestamps.append(
-                Timestamp(
-                    user=request.user,
-                    type=Timestamp.STOP,
-                    notes=timestamp.notes,
-                    created_at=slice["starts_at"]
-                    + dt.timedelta(seconds=accumulated_tenths * 360),
-                    project=slice["project"],
-                    service=slice["service"],
-                )
-            )
-        Timestamp.objects.bulk_create(new_timestamps)
-        # The last part is the timestamp itself, keep the slice's project too
-        if not timestamp.project and slice["project"]:
-            timestamp.project = slice["project"]
-            timestamp.service = slice["service"]
-            timestamp.save()
+        form.save(timestamp)
         messages.success(request, _("The timestamp has been split successfully."))
         if request.is_ajax():
             return HttpResponse("Thanks", status=201)
