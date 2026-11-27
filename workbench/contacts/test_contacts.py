@@ -1956,10 +1956,12 @@ class GroupsTest(TestCase):
             Person.objects.filter(pk=person.pk).without_complete_postal_address()
         )
 
-        address.post_office_box = ""
-        with self.assertRaises(ValidationError) as cm:
-            address.full_clean()
-        self.assertIn("street", cm.exception.message_dict)
+        # Small organizations sometimes have neither (Verein, 8000 Zürich)
+        address.post_office_box = address.address_suffix = ""
+        address.full_clean()
+        self.assertEqual(
+            address.postal_address, "Beispiel AG\nHans Muster\n8000 Zürich"
+        )
 
     def test_member_counts(self):
         """People and organizations are counted independently of each other"""

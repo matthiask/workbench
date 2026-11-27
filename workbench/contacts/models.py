@@ -3,7 +3,6 @@ import re
 from urllib.parse import urlencode
 
 import phonenumbers
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, F, OuterRef, Q, Sum
 from django.db.models.functions import Lower
@@ -715,13 +714,6 @@ class PostalAddress(PersonDetail):
 
     def __str__(self):
         return self.postal_address
-
-    def clean(self):
-        super().clean()
-        if not self.street.strip() and not self.post_office_box.strip():
-            raise ValidationError({
-                "street": _("Enter a street or a post office box."),
-            })
 
     def address_lines(self):
         """The lines below the name, in the order of Swiss Post"""

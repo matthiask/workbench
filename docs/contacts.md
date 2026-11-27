@@ -17,8 +17,8 @@ organizations; for a private person create an organization and tick
   not into the address: addresses print without it.
 - Addresses print in the order of Swiss Post: the **address suffix**
   (c/o, a department, a building) above the street, the **post office
-  box** below it. An address with a post office box doesn't need a
-  street. The override replaces the whole address, organization and name
+  box** below it. Street and post office box are optional,
+  some small organizations only have a postal code and a city. The override replaces the whole address, organization and name
   included; only use it when the fields can't express the address.
 - When an organization moves, "Change" on one of its addresses changes
   it for the selected people at once.
