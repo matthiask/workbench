@@ -94,7 +94,7 @@ conflicts; the "Touches" column shows them.
 | 09 | [Logbook: move entries](09-logbook-move.md) | `logbook/api.py`, `cli/wb/logbook.py` | 00 | done |
 | 10 | [Budget transfers](10-budget-transfers.md) | `projects/api.py`, `cli/wb/projects.py` | 00 | open |
 | 11 | [Campaigns](11-campaigns.md) | `projects/api.py`, `cli/wb/campaigns.py` | 00 | open |
-| 12 | [Breaks](12-breaks.md) | `logbook/api.py`, `cli/wb/logbook.py` | 00 | open |
+| 12 | [Breaks](12-breaks.md) | `logbook/api.py`, `cli/wb/logbook.py` | 00 | done |
 | 13 | [Planning: milestones and external work](13-planning-milestones.md) | `planning/api.py`, `cli/wb/planning.py` | 00 | done |
 | 14 | [Planning: batch update](14-planning-batch.md) | `planning/api.py`, `cli/wb/planning.py` | 00 | done |
 | 16 | [Contacts: change and remove details](16-contact-details.md) | `contacts/api.py`, `cli/wb/contacts.py` | 00 | done |
