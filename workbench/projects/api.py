@@ -49,6 +49,8 @@ from workbench.offers.models import (
 )
 from workbench.planning.models import PlannedWork
 from workbench.projects.forms import (
+    CampaignDeleteForm,
+    CampaignForm,
     ProjectedInvoicesProjectForm,
     ProjectForm,
     ReassignLogbookForm,
@@ -242,17 +244,146 @@ def campaign_list(request, filters: Query[CampaignFilter]):
     if filters.q:
         campaigns = campaigns.search(filters.q)
     return Serialized(
-        campaigns.order_by("-pk"),
-        lambda campaign: {
-            "id": campaign.id,
-            "code": campaign.code,
-            "url": request.build_absolute_uri(campaign.get_absolute_url()),
-            "title": campaign.title,
-            "description": campaign.description,
-            "customer": organization_out(campaign.customer, request),
-            "owned_by": campaign.owned_by.get_short_name(),
-        },
+        campaigns.order_by("-pk"), lambda campaign: campaign_out(campaign, request)
     )
+
+
+def campaign_out(campaign, request):
+    return {
+        "id": campaign.id,
+        "code": campaign.code,
+        "url": request.build_absolute_uri(campaign.get_absolute_url()),
+        "title": campaign.title,
+        "description": campaign.description,
+        "customer": organization_out(campaign.customer, request),
+        "owned_by": campaign.owned_by.get_short_name(),
+    }
+
+
+class CampaignIn(InputSchema):
+    title: str = Field(min_length=1, max_length=200)
+    description: str = ""
+    customer: int = Field(description="Organization ID.")
+    owned_by: str | None = Field(
+        default=None, description="Short name, defaults to the current user."
+    )
+
+
+class CampaignCreated(CampaignOut):
+    id: int | None
+    code: str | None
+    url: str | None
+
+
+@router.post(
+    "/campaigns/",
+    response=CampaignCreated,
+    auth=user_auth(feature=FEATURES.CAMPAIGNS),
+)
+def campaign_create(
+    request,
+    data: CampaignIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Create a campaign, validated like in the web interface; nothing is
+    saved if anything is invalid or with ``dry_run``"""
+    owned_by = request.user
+    if data.owned_by is not None:
+        owned_by = (
+            User.objects.by_short_name(data.owned_by).filter(is_active=True).first()
+        )
+        if not owned_by:
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "owned_by"],
+                    "msg": _("Unknown or inactive user %r.") % data.owned_by,
+                }
+            ])
+    form = CampaignForm(
+        {
+            "title": data.title,
+            "description": data.description,
+            "customer": data.customer,
+            "owned_by": owned_by.pk,
+        },
+        request=without_query(request),
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+
+    with transaction.atomic():
+        campaign = form.save()
+        result = campaign_out(campaign, request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "code": None, "url": None}
+    return result
+
+
+class CampaignPatch(InputSchema):
+    """Fields which aren't given are left alone"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    customer: int | None = Field(default=None, description="Organization ID.")
+    owned_by: str | None = Field(default=None, description="Short name.")
+
+
+@router.patch(
+    "/campaigns/{campaign_id}/",
+    response=CampaignOut,
+    auth=user_auth(feature=FEATURES.CAMPAIGNS),
+)
+def campaign_update(
+    request,
+    campaign_id: int,
+    data: CampaignPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change a campaign, validated like in the web interface; nothing is
+    saved if anything is invalid or with ``dry_run``"""
+    campaign = get_object_or_404(Campaign, pk=campaign_id)
+    return patch_with_form(
+        CampaignForm,
+        campaign,
+        data,
+        without_query(request),
+        out=lambda campaign: campaign_out(campaign, request),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map={"owned_by": active_user},
+    )
+
+
+@router.delete(
+    "/campaigns/{campaign_id}/",
+    response=CampaignOut,
+    auth=user_auth(feature=FEATURES.CAMPAIGNS),
+)
+def campaign_delete(
+    request,
+    campaign_id: int,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Delete a campaign like in the web interface; its projects stay and
+    are released (warning ``release-projects`` unless ignored). Returns the
+    deleted campaign."""
+    campaign = get_object_or_404(Campaign, pk=campaign_id)
+    result = campaign_out(campaign, request)
+    delete_with_form(
+        campaign,
+        without_query(request),
+        loc=["path", "campaign_id"],
+        delete_form_class=CampaignDeleteForm,
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+    )
+    return result
 
 
 class InternalTypeOut(Schema):

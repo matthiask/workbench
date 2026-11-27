@@ -9,7 +9,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer, OfferHeading
-from workbench.projects.models import InternalType, Project, Service
+from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.reporting.models import FreezeDate
 from workbench.tools.testing import messages
 from workbench.tools.validation import in_days, monday
@@ -332,6 +332,186 @@ class ProjectsAPITest(TestCase):
 
         data = self.client.get(f"/api/projects/{project.pk}/").json()
         self.assertEqual(data["campaign"]["id"], campaign.pk)
+
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
+    def test_campaign_create(self):
+        """Campaigns are created through the web form, owned by the current
+        user by default"""
+        user = factories.UserFactory.create(_short_name="ab")
+        other = factories.UserFactory.create(_short_name="cd")
+        inactive = factories.UserFactory.create(_short_name="ef", is_active=False)
+        organization = factories.OrganizationFactory.create()
+        self.client.force_login(user)
+
+        response = self.client.post(
+            "/api/campaigns/?dry_run=1",
+            {"title": "Relaunch", "customer": organization.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(data["id"], None)
+        self.assertEqual(data["title"], "Relaunch")
+        self.assertEqual(data["owned_by"], "ab")
+        self.assertEqual(Campaign.objects.count(), 0)
+
+        response = self.client.post(
+            "/api/campaigns/",
+            {
+                "title": "Relaunch",
+                "description": "All sites",
+                "customer": organization.pk,
+                "owned_by": "CD",
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        campaign = Campaign.objects.get()
+        self.assertEqual(response.json()["id"], campaign.pk)
+        self.assertEqual(campaign.owned_by, other)
+        self.assertEqual(campaign.description, "All sites")
+
+        response = self.client.post(
+            "/api/campaigns/",
+            {
+                "title": "Relaunch",
+                "customer": organization.pk,
+                "owned_by": inactive.get_short_name(),
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "owned_by"]],
+        )
+
+        response = self.client.post(
+            "/api/campaigns/",
+            {"title": "Relaunch", "customer": 0},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "customer"]],
+        )
+
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
+    def test_campaign_update(self):
+        """Campaigns are changed through the web form, only the given
+        fields"""
+        user = factories.UserFactory.create(_short_name="ab")
+        campaign = factories.CampaignFactory.create(
+            title="Relaunch", description="All sites"
+        )
+        organization = factories.OrganizationFactory.create()
+        self.client.force_login(user)
+        url = f"/api/campaigns/{campaign.pk}/"
+
+        response = self.client.patch(
+            f"{url}?dry_run=1", {"title": "Rebrand"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "Rebrand")
+        campaign.refresh_from_db()
+        self.assertEqual(campaign.title, "Relaunch")
+
+        response = self.client.patch(
+            url,
+            {"owned_by": "ab", "customer": organization.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(data["owned_by"], "ab")
+        self.assertEqual(data["customer"]["id"], organization.pk)
+        campaign.refresh_from_db()
+        self.assertEqual(campaign.title, "Relaunch")
+        self.assertEqual(campaign.description, "All sites")
+        self.assertEqual(campaign.owned_by, user)
+
+        response = self.client.patch(
+            url, {"title": None}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "title"]],
+        )
+
+        response = self.client.patch(
+            url, {"owned_by": "nobody"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+
+        response = self.client.patch(
+            url, {"code": "x"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+
+        self.assertEqual(
+            self.client.patch(
+                "/api/campaigns/0/", {"title": "x"}, content_type="application/json"
+            ).status_code,
+            404,
+        )
+
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
+    def test_campaign_delete(self):
+        """Deleting a campaign releases its projects, which is a warning"""
+        user = factories.UserFactory.create()
+        campaign = factories.CampaignFactory.create(title="Relaunch")
+        project = factories.ProjectFactory.create(campaign=campaign)
+        self.client.force_login(user)
+        url = f"/api/campaigns/{campaign.pk}/"
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["code"] for error in response.json()["detail"]],
+            ["release-projects"],
+        )
+
+        response = self.client.delete(
+            f"{url}?ignore_warnings=release-projects&dry_run=1"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], campaign.pk)
+        self.assertTrue(Campaign.objects.filter(pk=campaign.pk).exists())
+
+        response = self.client.delete(f"{url}?ignore_warnings=release-projects")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "Relaunch")
+        self.assertFalse(Campaign.objects.filter(pk=campaign.pk).exists())
+        project.refresh_from_db()
+        self.assertIsNone(project.campaign)
+
+        # Without projects there is nothing to confirm
+        empty = factories.CampaignFactory.create()
+        response = self.client.delete(f"/api/campaigns/{empty.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(Campaign.objects.filter(pk=empty.pk).exists())
+        self.assertEqual(self.client.delete(url).status_code, 404)
+
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.NEVER})
+    def test_campaign_writes_require_the_feature(self):
+        """Without the campaigns feature, campaigns can't be changed"""
+        campaign = factories.CampaignFactory.create()
+        self.client.force_login(campaign.owned_by)
+        url = f"/api/campaigns/{campaign.pk}/"
+        response = self.client.post(
+            "/api/campaigns/",
+            {"title": "x", "customer": campaign.customer_id},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+        response = self.client.patch(
+            url, {"title": "x"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(self.client.delete(url).status_code, 403)
+        self.assertTrue(Campaign.objects.filter(pk=campaign.pk).exists())
 
     def test_service_types(self):
         """Service types are listed with the titles services take"""
