@@ -427,6 +427,17 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(
             response.json()["detail"][0]["loc"], ["body", "data", "customer"]
         )
+        response = post(data | {"customer": 0, "contact": None})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data", "customer"],
+                    "msg": "Organization 0 doesn't exist.",
+                }
+            ],
+        )
         response = post(data | {"next_period_starts_on": "2027-01-01"})
         self.assertEqual(response.status_code, 422)
         FreezeDate.objects.create(up_to=in_days(-1))

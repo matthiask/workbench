@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import F
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import HttpError, ValidationError
@@ -1045,7 +1046,11 @@ def _recurring_invoice_request(request, data):
             "loc": ["body", "data", "customer"],
             "msg": _("This field is required.")
             if data.get("customer") is None
-            else _("Organization %r doesn't exist.") % data["customer"],
+            else _("%(model)s %(value)r doesn't exist.")
+            % {
+                "model": capfirst(Organization._meta.verbose_name),
+                "value": data["customer"],
+            },
         }
     ])
 
