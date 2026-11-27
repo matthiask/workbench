@@ -300,9 +300,10 @@ class LogbookTest(TestCase):
             response,
             "&middot; 2.0h not invoiced · 5.0h logged of 10.0h offered · 3.0h invoiced",
         )
-        self.assertContains(response, f'value="{hours.pk}"', 1)
+        # The checkboxes of the entries, not other inputs with the same ID
+        self.assertContains(response, f'name="entries" value="{hours.pk}"', 1)
         self.assertContains(response, 'data-amount="2.0"')
-        self.assertNotContains(response, f'value="{archived.pk}"')
+        self.assertNotContains(response, f'name="entries" value="{archived.pk}"')
         self.assertContains(response, "data-selection-total")
 
     def test_batch_update_invoiced_amounts(self):
