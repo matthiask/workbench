@@ -749,7 +749,11 @@ class OffersTest(TestCase):
         response = self.client.get(offer.urls["update"])
         self.assertContains(response, 'data-add-service="services-1"')
         self.assertContains(response, "Unoffered")
-        self.assertNotContains(response, f'value="{other.pk}"')
+        # Match the hidden ID inputs of the services formset, other inputs
+        # and options may have the same value
+        content = response.content.decode()
+        self.assertRegex(content, rf'name="services-\d+-id" value="{unoffered.pk}"')
+        self.assertNotRegex(content, rf'name="services-\d+-id" value="{other.pk}"')
 
         new = {
             "title": "New",
