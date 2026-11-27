@@ -708,6 +708,23 @@ Create absences like in Workbench, your own by default:
     wb absences create --starts-on 2026-12-21 --ends-on 2026-12-31 --days 5 \
         --reason vacation --description "Christmas holidays" --dry-run
 
+Change only the given fields, or delete an absence (e.g. one entered twice):
+
+    wb absences update 123 --days 4.5 --ends-on 2026-12-30 --dry-run
+    wb absences update 123 --single-day --days 1
+    wb absences delete 123 --dry-run
+
+Like in Workbench, only the absent person and personnel administration
+change and delete absences (whoever entered one for someone else may undo
+it on the same day); absences of past years are locked and only personnel
+administration hands absences over to someone else (`--user`). Changes of
+others' absences are a warning (`absence-of-others`): personnel
+administration gets them in a weekly mail, deletions too. Descriptions of
+sickness stay hidden from others. A sickness absence with a description
+keeps its reason: empty the description (`--description ''`) or create a
+new absence and delete the old one. Confirming paid leave stays in the web
+interface.
+
 ## Reports
 
 The reports require the same features as in the web interface, most of them

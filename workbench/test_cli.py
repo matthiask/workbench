@@ -24,6 +24,7 @@ from workbench import cli_version, factories
 from workbench.accounts.features import FEATURES, F
 from workbench.accounts.models import APIToken
 from workbench.api_keys import KEYS
+from workbench.awt.models import Absence
 from workbench.contacts.models import Group, Organization, Person
 from workbench.deals.models import AttributeGroup, Deal
 from workbench.hosting.models import Server, Site
@@ -1505,6 +1506,46 @@ planned_work:
         result = self.wb("absences", "search")
         self.assertIn("Holidays", result.output)
         self.assertNotIn("Past", result.output)
+
+    def test_absences_update_delete(self):
+        absence = factories.AbsenceFactory.create(
+            user=self.user, starts_on=in_days(7), ends_on=in_days(8), days=2
+        )
+        result = self.wb("absences", "update", absence.pk, "--days", "1.5", "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("1.50", result.output)
+        self.assertIn("Dry run", result.output)
+        absence.refresh_from_db()
+        self.assertEqual(absence.days, 2)
+
+        result = self.wb(
+            "absences",
+            "update",
+            absence.pk,
+            "--single-day",
+            "--days",
+            1,
+            "--description",
+            "Dentist",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        absence.refresh_from_db()
+        self.assertEqual(
+            (absence.ends_on, absence.days, absence.description), (None, 1, "Dentist")
+        )
+
+        result = self.wb("absences", "update", absence.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Nothing to change", result.output)
+
+        result = self.wb("absences", "delete", absence.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        self.assertTrue(Absence.objects.filter(pk=absence.pk).exists())
+        result = self.wb("absences", "delete", absence.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Deleted", result.output)
+        self.assertFalse(Absence.objects.filter(pk=absence.pk).exists())
 
     def test_ignore_warnings(self):
         """Absences, closing deals and new people ignore warnings by code"""
