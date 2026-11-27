@@ -3,10 +3,13 @@
 import click
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     complete_short_names,
     console,
     echo_csv,
+    echo_deleted,
     echo_json,
     echo_more,
     link,
@@ -15,27 +18,32 @@ from wb.core import (
     period_options,
     period_params,
     request,
+    terminate,
     text_or_stdin,
 )
 
 
 @cli.group()
 def notes():
-    """Search and add notes on deals, invoices and projects"""
+    """Search, add, change and delete notes on deals, invoices and projects"""
+
+
+def _echo_note(note):
+    obj = note["object"]
+    console.print(
+        link(f"{obj['name']} ({obj['type']} {obj['id']})", obj["url"]),
+        style="bold",
+    )
+    console.print(
+        f"{note['title']} – {note['created_by']}, {note['created_at'][:10]}",
+        style="dim",
+    )
+    console.print(note["description"])
 
 
 def _echo_notes(notes):
     for note in notes:
-        obj = note["object"]
-        console.print(
-            link(f"{obj['name']} ({obj['type']} {obj['id']})", obj["url"]),
-            style="bold",
-        )
-        console.print(
-            f"{note['title']} – {note['created_by']}, {note['created_at'][:10]}",
-            style="dim",
-        )
-        console.print(note["description"])
+        _echo_note(note)
         console.print()
 
 
@@ -117,3 +125,60 @@ def create_note(deal, invoice, recurring_invoice, project, title, description, a
         },
     )
     echo_json(data) if as_json else _echo_notes([data])
+
+
+@notes.command("show")
+@click.argument("note_id", type=int)
+@click.option("--json", "as_json", is_flag=True)
+def show_note(note_id, as_json):
+    """Show a note with its object"""
+    data = request("GET", f"notes/{note_id}/")
+    echo_json(data) if as_json else _echo_note(data)
+
+
+@notes.command("update")
+@click.argument("note_id", type=int)
+@click.option("--title")
+@click.option("--description", help="- reads it from stdin.")
+@change_options(warnings=False)
+def update_note(note_id, title, description, dry_run, as_json):
+    """Change the title or the description of a note, also of notes others
+    wrote, like in Workbench
+
+    Notes stay on their object. The owner of the object finds the change in
+    the daily notes digest mail."""
+    data = {
+        key: value
+        for key, value in [
+            ("title", title),
+            ("description", text_or_stdin(description)),
+        ]
+        if value is not None
+    }
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH", f"notes/{note_id}/", params=change_params(dry_run), json=data
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_note(data)
+    if dry_run:
+        console.print()
+        console.print("Dry run, nothing has been saved.")
+
+
+@notes.command("delete")
+@click.argument("note_id", type=int)
+@change_options(warnings=False)
+def delete_note(note_id, dry_run, as_json):
+    """Delete a note, also notes others wrote, like in Workbench"""
+    data = request("DELETE", f"notes/{note_id}/", params=change_params(dry_run))
+    echo_deleted(
+        data,
+        _echo_note,
+        what=f"note {data['title']}",
+        dry_run=dry_run,
+        as_json=as_json,
+    )

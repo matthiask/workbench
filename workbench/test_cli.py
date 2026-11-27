@@ -29,6 +29,7 @@ from workbench.deals.models import AttributeGroup, Deal
 from workbench.hosting.models import Server, Site
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
+from workbench.notes.models import Note
 from workbench.offers.models import Offer
 from workbench.planning.models import PlannedWork
 from workbench.projects.models import InternalType, Project, Service
@@ -2246,6 +2247,53 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(f"Deleted {invoice.code}.", result.output)
         self.assertFalse(Invoice.objects.filter(pk=invoice.pk).exists())
+
+    def test_notes_update_delete(self):
+        """Notes are shown, changed and deleted"""
+        deal = factories.DealFactory.create(title="Noted deal")
+        note = Note.objects.create(
+            content_object=deal,
+            created_by=deal.owned_by,
+            title="Call",
+            description="Budget approved",
+        )
+        result = self.wb("notes", "show", note.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Noted deal", result.output)
+        self.assertIn("Budget approved", result.output)
+
+        result = self.wb("notes", "update", note.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Nothing to change.", result.output)
+        result = self.wb(
+            "notes", "update", note.pk, "--title", "Phone call", "--dry-run"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Phone call", result.output)
+        self.assertIn("Dry run, nothing has been saved.", result.output)
+        note.refresh_from_db()
+        self.assertEqual(note.title, "Call")
+        result = self.wb(
+            "notes",
+            "update",
+            note.pk,
+            "--description",
+            "-",
+            input="Budget approved by the board\n",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        note.refresh_from_db()
+        self.assertEqual(note.title, "Call")
+        self.assertEqual(note.description, "Budget approved by the board")
+
+        result = self.wb("notes", "delete", note.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+        result = self.wb("notes", "delete", note.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Deleted note Call.", result.output)
+        self.assertFalse(Note.objects.filter(pk=note.pk).exists())
 
     def test_show_deals(self):
         """Projects and offers show their deals"""

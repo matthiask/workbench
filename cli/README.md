@@ -526,7 +526,16 @@ of a project's debriefing. Search all of them or those of some objects:
     wb notes create --deal 1234 --title "Call" --description "Budget approved."
     wb notes create --project 4321 --title "Debriefing" --description - < debriefing.md
 
-Like in Workbench, adding a note notifies the owner of the object.
+Like in Workbench, everyone who may see the notes of an object may change
+or delete them, also notes others wrote; notes stay on their object:
+
+    wb notes show 567
+    wb notes update 567 --title "Call with the board" --dry-run
+    wb notes update 567 --description - < call.md
+    wb notes delete 567
+
+Like in Workbench, adding or changing a note notifies the owner of the
+object in the daily notes digest mail.
 
 ## Services
 
