@@ -220,6 +220,15 @@ removed:
 
     wb people add-details 345 details.yaml --dry-run
 
+Existing details are changed or removed by their ID from `wb people show`,
+like in the person form (phone numbers are normalized):
+
+    wb people change-email 345 680 --email hans.muster@example.com
+    wb people change-phone 345 681 --phone-number "079 123 45 67" --type Mobile
+    wb people remove-email 345 680
+    wb people remove-phone 345 681
+    wb people remove-address 345 679 --dry-run
+
 The customer is the contact's organization unless you pass `--customer`.
 `--type` is `order` (default), `maintenance` or `internal`, `--owned-by` takes a
 short name and defaults to you.

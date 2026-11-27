@@ -4,6 +4,8 @@ import click
 from rich.text import Text
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     complete_short_names,
     console,
@@ -876,6 +878,108 @@ def change_person_address(
     if dry_run:
         console.print("Dry run, nothing changed:")
     _echo_person(data)
+
+
+def _change_detail(path, data, *, dry_run, as_json):
+    data = {key: value for key, value in data.items() if value is not None}
+    if not data:
+        terminate("Nothing to change, see --help for the options.")
+    data = request("PATCH", path, json=data, params=change_params(dry_run))
+    if as_json:
+        echo_json(data)
+        return
+    if dry_run:
+        console.print("Dry run, nothing changed:")
+    _echo_person(data)
+
+
+@people.command("change-email")
+@click.argument("person_id", type=int)
+@click.argument("email_id", type=int)
+@click.option("--email", help="The new email address.")
+@click.option("--type", "type_", help="E.g. Work or Home.")
+@change_options(warnings=False)
+def change_person_email(person_id, email_id, email, type_, dry_run, as_json):
+    """Change an email address of a person (the ID from `wb people show`)"""
+    _change_detail(
+        f"contacts/people/{person_id}/email-addresses/{email_id}/",
+        {"email": email, "type": type_},
+        dry_run=dry_run,
+        as_json=as_json,
+    )
+
+
+@people.command("change-phone")
+@click.argument("person_id", type=int)
+@click.argument("phone_id", type=int)
+@click.option(
+    "--phone-number",
+    help="The new phone number; numbers without a country code are Swiss numbers.",
+)
+@click.option("--type", "type_", help="E.g. Work, Mobile or Home.")
+@change_options(warnings=False)
+def change_person_phone(person_id, phone_id, phone_number, type_, dry_run, as_json):
+    """Change a phone number of a person (the ID from `wb people show`)"""
+    _change_detail(
+        f"contacts/people/{person_id}/phone-numbers/{phone_id}/",
+        {"phone_number": phone_number, "type": type_},
+        dry_run=dry_run,
+        as_json=as_json,
+    )
+
+
+def _remove_detail(path, *, what, dry_run, as_json):
+    data = request("DELETE", path, params=change_params(dry_run))
+    if as_json:
+        echo_json(data)
+        return
+    _echo_person(data)
+    console.print()
+    console.print(
+        "Dry run, nothing has been removed." if dry_run else f"Removed {what}."
+    )
+
+
+@people.command("remove-email")
+@click.argument("person_id", type=int)
+@click.argument("email_id", type=int)
+@change_options(warnings=False)
+def remove_person_email(person_id, email_id, dry_run, as_json):
+    """Remove an email address of a person (the ID from `wb people show`)"""
+    _remove_detail(
+        f"contacts/people/{person_id}/email-addresses/{email_id}/",
+        what=f"the email address {email_id}",
+        dry_run=dry_run,
+        as_json=as_json,
+    )
+
+
+@people.command("remove-phone")
+@click.argument("person_id", type=int)
+@click.argument("phone_id", type=int)
+@change_options(warnings=False)
+def remove_person_phone(person_id, phone_id, dry_run, as_json):
+    """Remove a phone number of a person (the ID from `wb people show`)"""
+    _remove_detail(
+        f"contacts/people/{person_id}/phone-numbers/{phone_id}/",
+        what=f"the phone number {phone_id}",
+        dry_run=dry_run,
+        as_json=as_json,
+    )
+
+
+@people.command("remove-address")
+@click.argument("person_id", type=int)
+@click.argument("address_id", type=int)
+@change_options(warnings=False)
+def remove_person_address(person_id, address_id, dry_run, as_json):
+    """Remove a postal address of a person (the ID from `wb people show`)"""
+    _remove_detail(
+        f"contacts/people/{person_id}/postal-addresses/{address_id}/",
+        what=f"the postal address {address_id}",
+        dry_run=dry_run,
+        as_json=as_json,
+    )
 
 
 @people.command("duplicates")

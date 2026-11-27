@@ -1683,6 +1683,88 @@ planned_work:
             [group.title for group in organization.groups.all()], ["Agenturen"]
         )
 
+    def test_people_change_and_remove_details(self):
+        """Email addresses and phone numbers are changed, details removed
+        by their ID"""
+        person = factories.PersonFactory.create()
+        email = person.emailaddresses.create(type="Work", email="hans@example.com")
+        phone = person.phonenumbers.create(type="Work", phone_number="+41441234567")
+        address = person.postaladdresses.create(
+            street="Musterweg", house_number="1", postal_code="8000", city="Zürich"
+        )
+
+        result = self.wb(
+            "people",
+            "change-email",
+            person.pk,
+            email.pk,
+            "--email",
+            "hans.muster@example.com",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("hans.muster@example.com", result.output)
+        self.assertIn("Dry run", result.output)
+        email.refresh_from_db()
+        self.assertEqual(email.email, "hans@example.com")
+        result = self.wb("people", "change-email", person.pk, email.pk)
+        self.assertEqual(result.exit_code, 1)
+        result = self.wb(
+            "people",
+            "change-email",
+            person.pk,
+            email.pk,
+            "--email",
+            "hans.muster@example.com",
+            "--type",
+            "home",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        email.refresh_from_db()
+        self.assertEqual((email.type, email.email), ("Home", "hans.muster@example.com"))
+
+        result = self.wb(
+            "people",
+            "change-phone",
+            person.pk,
+            phone.pk,
+            "--phone-number",
+            "079 123 45 67",
+            "--type",
+            "Mobile",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        phone.refresh_from_db()
+        self.assertEqual((phone.type, phone.phone_number), ("Mobile", "+41791234567"))
+        result = self.wb(
+            "people", "change-phone", person.pk, phone.pk, "--phone-number", "123"
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("phone_number", result.output)
+
+        result = self.wb("people", "remove-address", person.pk, address.pk, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run", result.output)
+        self.assertEqual(person.postaladdresses.count(), 1)
+        for command, pk in [
+            ("remove-email", email.pk),
+            ("remove-phone", phone.pk),
+            ("remove-address", address.pk),
+        ]:
+            result = self.wb("people", command, person.pk, pk)
+            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertIn("Removed", result.output)
+        self.assertEqual(
+            (
+                person.emailaddresses.count(),
+                person.phonenumbers.count(),
+                person.postaladdresses.count(),
+            ),
+            (0, 0, 0),
+        )
+        result = self.wb("people", "remove-email", person.pk, email.pk)
+        self.assertEqual(result.exit_code, 1)
+
     def test_create_organization(self):
         """Organizations are created, duplicate names are rejected"""
         result = self.wb(
