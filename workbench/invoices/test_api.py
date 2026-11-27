@@ -522,8 +522,8 @@ class InvoicesAPITest(TestCase):
 
     def test_update_sent_invoice(self):
         """Sent invoices change through the invoice form: changing anything
-        but the status, closing date, payment notice and third party costs
-        is a warning, like in the web interface"""
+        but the owner, status, closing date, payment notice and third party
+        costs is a warning, like in the web interface"""
         project = factories.ProjectFactory.create()
         invoice = factories.InvoiceFactory.create(
             project=project,
@@ -549,9 +549,13 @@ class InvoicesAPITest(TestCase):
             ["maybe-unintentional-invoice-change"],
         )
         response = patch(
-            {"owned_by": "zz", "title": "Handed over"},
+            {"title": "Handed over"},
             "?ignore_warnings=maybe-unintentional-invoice-change",
         )
+        self.assertEqual(response.status_code, 200, response.content)
+
+        # Handing it over to someone else doesn't warn
+        response = patch({"owned_by": "zz"})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response.json()["owned_by"], "zz")
         invoice.refresh_from_db()

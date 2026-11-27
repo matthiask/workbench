@@ -1767,6 +1767,33 @@ class InvoicesTest(TestCase):
         self.assertEqual(invoice.status, Invoice.IN_PREPARATION)
         self.assertIsNone(invoice.closed_on)
 
+    def test_hand_over_sent_invoice(self):
+        """Changing the owner of a sent invoice doesn't warn, other changes
+        in the same submit still do"""
+        invoice = factories.InvoiceFactory.create(
+            title="Test",
+            subtotal=20,
+            invoiced_on=in_days(-1),
+            due_on=in_days(14),
+            status=Invoice.SENT,
+            postal_address="Test\nStreet\nCity",
+        )
+        other = factories.UserFactory.create()
+        self.client.force_login(invoice.owned_by)
+
+        response = self.client.post(
+            invoice.urls["update"],
+            invoice_to_dict(invoice, owned_by=other.pk, title="Changed"),
+        )
+        self.assertContains(response, 'value="maybe-unintentional-invoice-change"')
+
+        response = self.client.post(
+            invoice.urls["update"], invoice_to_dict(invoice, owned_by=other.pk)
+        )
+        self.assertRedirects(response, invoice.urls["detail"])
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.owned_by, other)
+
     def test_down_payments_larger_than_invoice(self):
         """Down payments larger than the invoice they are applied to (with a
         negative total) are a warning"""

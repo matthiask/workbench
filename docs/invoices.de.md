@@ -111,6 +111,9 @@ Workbench lässt dich versandte Rechnungen ändern, warnt aber. Die
 Warnungen sind als Hilfe gemeint: Wenn die geänderte Rechnung von Anfang
 an richtig gewesen wäre, wähle «Warnungen ignorieren». Vorsicht, wenn die
 Rechnung schon bezahlt wurde oder bei der Buchhaltung angekommen ist.
+Nur die Ansprechperson (z.B. beim Übergeben von Rechnungen, wenn jemand
+geht), den Status, «Geschlossen am», die Zahlungsnotiz oder die
+Fremdkosten zu ändern, warnt nicht.
 Rechnungen am oder vor dem Einfrierdatum sind eingefroren:
 Nur noch ihr Status und wenige Felder lassen sich ändern.
 

@@ -101,9 +101,11 @@ can't be changed anymore; cancel that invoice first.
 Workbench lets you change sent invoices, but warns. The warnings are
 meant as help: if the changed invoice is what it should have been from
 the beginning, choose "Ignore warnings". Be careful when the invoice has
-been paid already or has reached the bookkeeping. Invoices on or before
-the freeze date are frozen: only their status and a few fields can be
-changed.
+been paid already or has reached the bookkeeping. Changing only the
+contact person (e.g. handing invoices over when someone leaves), the
+status, "closed on", the payment notice or the third party costs
+doesn't warn. Invoices on or before the freeze date are frozen: only
+their status and a few fields can be changed.
 
 ## Recurring invoices
 

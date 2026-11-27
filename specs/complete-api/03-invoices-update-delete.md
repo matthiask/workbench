@@ -57,8 +57,10 @@ the web interface.
 - Different from the spec: the field restrictions only apply to
   **freezed** invoices (on or before the freeze date, or archived). Sent
   invoices after the freeze date keep all fields, changing anything but
-  status, closed on, payment notice and third party costs warns
-  (`maybe-unintentional-invoice-change`), amounts too.
+  owner, status, closed on, payment notice and third party costs warns
+  (`maybe-unintentional-invoice-change`), amounts too. Handing invoices
+  over (`--owned-by`) doesn't need to ignore it anymore (decided
+  2026-11-27).
 - Two changes to `patch_with_form()` for every package: fields which the
   form disables or leaves out (e.g. amounts of freezed invoices, the
   discount of credits) are refused ("This field cannot be changed.")

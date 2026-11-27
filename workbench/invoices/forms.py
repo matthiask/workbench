@@ -764,9 +764,12 @@ class InvoiceForm(PostalAddressSelectionForm):
                 ).format(local_date_format(freeze)),
             )
 
+        # Handing invoices over to someone else (e.g. when people leave) is
+        # uncontroversial
         if self.instance.status > self.instance.IN_PREPARATION and set(
             self.changed_data
         ) - {
+            "owned_by",
             "status",
             "closed_on",
             "payment_notice",

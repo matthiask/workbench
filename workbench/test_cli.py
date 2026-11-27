@@ -2113,18 +2113,11 @@ planned_work:
             postal_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
         )
         factories.UserFactory.create(_short_name="zz")
-        result = self.wb("invoices", "update", invoice.code, "--owned-by", "zz")
+        result = self.wb("invoices", "update", invoice.code, "--title", "Other")
         self.assertEqual(result.exit_code, 1)
         self.assertIn("maybe-unintentional-invoice-change", result.output)
         result = self.wb(
-            "invoices",
-            "update",
-            invoice.code,
-            "--owned-by",
-            "zz",
-            "--ignore-warning",
-            "maybe-unintentional-invoice-change",
-            "--dry-run",
+            "invoices", "update", invoice.code, "--owned-by", "zz", "--dry-run"
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("Dry run, nothing has been saved.", result.output)

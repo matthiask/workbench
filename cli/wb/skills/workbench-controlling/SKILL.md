@@ -89,7 +89,7 @@ else; try with `--dry-run` first. Warnings are errors with a code, ignore
 one with `--ignore-warning CODE` only after telling the user what it says.
 
     wb invoices update <id> --status paid --closed-on 2026-11-20 --payment-notice "Bank transfer"
-    wb invoices update <id> --owned-by <short name> --ignore-warning maybe-unintentional-invoice-change
+    wb invoices update <id> --owned-by <short name>
     wb invoices delete <id>    # Only invoices in preparation, sent ones are canceled
 
 `--status sent` only records the status; invoices are sent from the web
