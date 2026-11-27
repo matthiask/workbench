@@ -766,15 +766,20 @@ class InvoiceForm(PostalAddressSelectionForm):
 
         # Handing invoices over to someone else (e.g. when people leave) is
         # uncontroversial
-        if self.instance.status > self.instance.IN_PREPARATION and set(
-            self.changed_data
-        ) - {
-            "owned_by",
-            "status",
-            "closed_on",
-            "payment_notice",
-            "third_party_costs",
-        }:
+        if self.instance.status > self.instance.IN_PREPARATION and (
+            changed := [
+                field
+                for field in self.changed_data
+                if field
+                not in {
+                    "owned_by",
+                    "status",
+                    "closed_on",
+                    "payment_notice",
+                    "third_party_costs",
+                }
+            ]
+        ):
             self.add_warning(
                 _(
                     "You are attempting to change %(fields)s."
@@ -783,7 +788,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                 )
                 % {
                     "fields": ", ".join(
-                        "'%s'" % self.fields[field].label for field in self.changed_data
+                        "'%s'" % self.fields[field].label for field in changed
                     )
                 },
                 code="maybe-unintentional-invoice-change",

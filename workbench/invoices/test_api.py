@@ -790,6 +790,12 @@ class InvoicesAPITest(TestCase):
             [error.get("code") for error in response.json()["detail"]],
             ["maybe-unintentional-invoice-change"],
         )
+        # Only the fields which trigger the warning are listed
+        self.assertEqual(
+            response.json()["detail"][0]["msg"],
+            "You are attempting to change 'Title'."
+            " I am trying to prevent unintentional changes. Are you sure?",
+        )
         response = patch(
             {"title": "Handed over"},
             "?ignore_warnings=maybe-unintentional-invoice-change",
