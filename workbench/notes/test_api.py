@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -6,6 +8,7 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.notes.models import Note
+from workbench.notes.tasks import send_notes_digest
 
 
 class NotesAPITest(TestCase):
@@ -140,3 +143,92 @@ class NotesAPITest(TestCase):
             )
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Note.objects.count(), 1)
+
+    def test_show(self):
+        """Single notes, only those the user may see"""
+        deal = factories.DealFactory.create(title="Relaunch")
+        note = Note.objects.create(
+            content_object=deal, created_by=deal.owned_by, title="Call"
+        )
+        self.client.force_login(factories.UserFactory.create())
+
+        data = self.client.get(f"/api/notes/{note.pk}/").json()
+        self.assertEqual(data["id"], note.pk)
+        self.assertEqual(data["title"], "Call")
+        self.assertEqual(data["object"]["type"], "deal")
+
+        with override_settings(FEATURES={FEATURES.DEALS: F.NEVER}):
+            response = self.client.get(f"/api/notes/{note.pk}/")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(self.client.get("/api/notes/0/").status_code, 404)
+
+    def test_update(self):
+        """Notes of others can be changed like in the web interface, without
+        an immediate mail; dry runs save nothing"""
+        deal = factories.DealFactory.create()
+        note = Note.objects.create(
+            content_object=deal,
+            created_by=deal.owned_by,
+            title="Call",
+            description="Budget approved",
+        )
+        self.client.force_login(factories.UserFactory.create())
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"/api/notes/{note.pk}/{query}", data, content_type="application/json"
+            )
+
+        response = patch({"title": "Phone call"}, "?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "Phone call")
+        note.refresh_from_db()
+        self.assertEqual(note.title, "Call")
+
+        response = patch({"description": "Budget approved by the board"})
+        self.assertEqual(response.status_code, 200, response.content)
+        note.refresh_from_db()
+        self.assertEqual(note.title, "Call")
+        self.assertEqual(note.description, "Budget approved by the board")
+        self.assertEqual(note.created_by, deal.owned_by)
+        self.assertEqual(len(mail.outbox), 0)
+        # The owner finds the change in the daily digest
+        send_notes_digest(day=dt.date.today())
+        [message] = mail.outbox
+        self.assertEqual(message.to, [deal.owned_by.email])
+        self.assertIn("Budget approved by the board", message.body)
+
+        response = patch({"title": None})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "title"])
+        # Notes aren't moved to other objects
+        self.assertEqual(patch({"deal": deal.pk}).status_code, 422)
+
+        with override_settings(FEATURES={FEATURES.DEALS: F.NEVER}):
+            self.assertEqual(patch({"title": "Nope"}).status_code, 404)
+        note.refresh_from_db()
+        self.assertEqual(note.title, "Call")
+
+    def test_delete(self):
+        """Notes of others can be deleted like in the web interface"""
+        invoice = factories.InvoiceFactory.create()
+        note = Note.objects.create(
+            content_object=invoice, created_by=invoice.owned_by, title="Reminder"
+        )
+        self.client.force_login(factories.UserFactory.create())
+
+        response = self.client.delete(f"/api/notes/{note.pk}/?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "Reminder")
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.NEVER}):
+            response = self.client.delete(f"/api/notes/{note.pk}/")
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+
+        response = self.client.delete(f"/api/notes/{note.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], note.pk)
+        self.assertFalse(Note.objects.filter(pk=note.pk).exists())
+        self.assertEqual(len(mail.outbox), 0)

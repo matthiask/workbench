@@ -3,6 +3,7 @@ from typing import Literal
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
 from ninja.errors import ValidationError
@@ -13,13 +14,16 @@ from workbench.notes.forms import NoteForm
 from workbench.notes.models import TARGETS, Note, visible_content_types
 from workbench.tools.api import (
     DateRangeFilter,
+    DryRun,
     InputSchema,
     ProjectID,
     SearchQuery,
     Serialized,
     ShortName,
+    delete_with_form,
     filter_date_range,
     form_errors,
+    patch_with_form,
     user_by_short_name,
 )
 
@@ -142,3 +146,66 @@ def note_create(request, data: NoteIn):
     if not form.is_valid():
         raise ValidationError(form_errors(form))
     return note_out(form.save(), request, types=visible_content_types(request.user))
+
+
+def _visible_note(request, note_id):
+    """The note, if the user may see its object's notes (``allow_update()``
+    and ``allow_delete()`` check the same), and the visible content types"""
+    types = visible_content_types(request.user)
+    note = get_object_or_404(
+        Note.objects
+        .visible(types)
+        .select_related("created_by", "content_type")
+        .with_content_objects(),
+        pk=note_id,
+    )
+    return note, types
+
+
+@router.get("/notes/{int:note_id}/", response=NoteOut)
+def note_detail(request, note_id: int):
+    """A note; notes on objects which require features the user hasn't got
+    and notes of deleted objects aren't found"""
+    note, types = _visible_note(request, note_id)
+    return note_out(note, request, types=types)
+
+
+class NotePatch(InputSchema):
+    """Fields which aren't given are left alone"""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, min_length=1)
+
+
+@router.patch("/notes/{int:note_id}/", response=NoteOut)
+def note_update(
+    request,
+    note_id: int,
+    data: NotePatch,
+    *,
+    dry_run: DryRun = False,
+):
+    """Change the title or the description of a note, also of notes others
+    wrote, like in the web interface
+
+    Notes stay on their object. Nothing is mailed, the owner of the object
+    finds the change in the daily notes digest mail."""
+    note, types = _visible_note(request, note_id)
+    return patch_with_form(
+        NoteForm,
+        note,
+        data,
+        request,
+        out=lambda note: note_out(note, request, types=types),
+        dry_run=dry_run,
+    )
+
+
+@router.delete("/notes/{int:note_id}/", response=NoteOut)
+def note_delete(request, note_id: int, *, dry_run: DryRun = False):
+    """Delete a note, also notes others wrote, like in the web interface;
+    returns the deleted note"""
+    note, types = _visible_note(request, note_id)
+    result = note_out(note, request, types=types)
+    delete_with_form(note, request, loc=["path", "note_id"], dry_run=dry_run)
+    return result
