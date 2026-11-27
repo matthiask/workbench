@@ -497,8 +497,10 @@ class ContactsAPITest(TestCase):
         address = person.postaladdresses.create(
             street="Musterweg", house_number="1", postal_code="8000", city="Zürich"
         )
-        other = factories.PersonFactory.create().phonenumbers.create(
-            phone_number="+41791234567"
+        other_person = factories.PersonFactory.create()
+        other = other_person.phonenumbers.create(phone_number="+41791234567")
+        other_address = other_person.postaladdresses.create(
+            street="Beispielstrasse", house_number="2", postal_code="3000", city="Bern"
         )
         person.save()
         self.client.force_login(factories.UserFactory.create())
@@ -515,7 +517,9 @@ class ContactsAPITest(TestCase):
         self.assertEqual(person.emailaddresses.count(), 1)
 
         self.assertEqual(delete(f"phone-numbers/{other.pk}").status_code, 404)
-        self.assertEqual(delete(f"postal-addresses/{phone.pk}").status_code, 404)
+        self.assertEqual(
+            delete(f"postal-addresses/{other_address.pk}").status_code, 404
+        )
 
         for path in [
             f"email-addresses/{email.pk}",
