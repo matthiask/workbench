@@ -96,7 +96,7 @@ conflicts; the "Touches" column shows them.
 | 11 | [Campaigns](11-campaigns.md) | `projects/api.py`, `cli/wb/campaigns.py` | 00 | open |
 | 12 | [Breaks](12-breaks.md) | `logbook/api.py`, `cli/wb/logbook.py` | 00 | open |
 | 13 | [Planning: milestones and external work](13-planning-milestones.md) | `planning/api.py`, `cli/wb/planning.py` | 00 | open |
-| 14 | [Planning: batch update](14-planning-batch.md) | `planning/api.py`, `cli/wb/planning.py` | 00 | open |
+| 14 | [Planning: batch update](14-planning-batch.md) | `planning/api.py`, `cli/wb/planning.py` | 00 | done |
 | 16 | [Contacts: change and remove details](16-contact-details.md) | `contacts/api.py`, `cli/wb/contacts.py` | 00 | open |
 | 17 | [Notes](17-notes.md) | `notes/api.py`, `cli/wb/notes.py` | 00 | open |
 | 18 | [Absences](18-absences.md) | `awt/api.py`, `cli/wb/absences.py` | 00 | open |
