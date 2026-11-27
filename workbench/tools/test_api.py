@@ -91,7 +91,7 @@ class DeleteWithFormTest(TestCase):
             delete()
         self.assertEqual(
             [error["loc"] for error in _errors(cm)],
-            [["body", "data", "query", "delete_planned_work"]],
+            [["query", "delete_planned_work"]],
         )
 
         delete({"delete_planned_work": True}, dry_run=True)

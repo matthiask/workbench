@@ -43,14 +43,19 @@ def form_errors(form, *, fields=None, ignore_warnings=()):
     """Errors of the invalid form; warnings of the web interface are errors
     too unless their code is in ``ignore_warnings``, they carry their code
 
-    ``fields`` maps form fields to their location in the request body."""
+    ``fields`` maps form fields to their location in the request body, or
+    to query parameters (locations starting with ``"query"``, e.g. the
+    questions of delete forms)."""
     fields = fields or {}
+
+    def loc(field):
+        if field == "__all__":
+            return ["body", "data"]
+        loc = fields.get(field, [field])
+        return loc if loc[0] == "query" else ["body", "data", *loc]
+
     return [
-        {
-            "loc": ["body", "data"]
-            + ([] if field == "__all__" else fields.get(field, [field])),
-            "msg": message,
-        }
+        {"loc": loc(field), "msg": message}
         for field, messages in form.errors.items()
         for message in messages
     ] + [
