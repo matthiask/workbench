@@ -2539,6 +2539,10 @@ msgstr "Leistung %s ist keine der Leistungen, die verrechnet werden."
 msgid "Select the services to invoice, or invoice an offer."
 msgstr "Wähle die zu verrechnenden Leistungen aus oder verrechne eine Offerte."
 
+#: workbench/invoices/api.py
+msgid "Only services invoices have services."
+msgstr "Nur Leistungsrechnungen haben Leistungen."
+
 #: workbench/invoices/api.py workbench/invoices/views.py
 #: workbench/offers/api.py workbench/offers/views.py
 #, python-brace-format

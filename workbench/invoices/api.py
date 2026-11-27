@@ -37,16 +37,24 @@ from workbench.invoices.forms import (
     InvoiceDeleteForm,
     InvoiceForm,
     RecurringInvoiceForm,
+    ServiceForm,
 )
-from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
+from workbench.invoices.models import (
+    Invoice,
+    ProjectedInvoice,
+    RecurringInvoice,
+    Service,
+)
 from workbench.offers.models import Offer
 from workbench.projects.api import ProjectSummary, project_summary
 from workbench.projects.models import Project
+from workbench.services.models import ServiceType
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     DateRangeFilter,
     DryRun,
     InputSchema,
+    Number,
     OrganizationID,
     ProjectID,
     SearchQuery,
@@ -775,6 +783,162 @@ def invoice_delete(
         dry_run=dry_run,
     )
     return result
+
+
+class InvoiceServiceFields(InputSchema):
+    """Fields which aren't given are left alone, ``null`` clears values"""
+
+    title: str | None = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, description="Null removes it.")
+    service_type: str | None = Field(
+        default=None,
+        description="Title of a service type. Fills in the effort type and the"
+        " hourly rate unless they are given too.",
+    )
+    effort_type: str | None = Field(default=None, max_length=50)
+    effort_hours: Number | None = Field(default=None, description="Hours.")
+    effort_rate: Number | None = Field(default=None, description="Hourly rate.")
+    cost: Number | None = Field(
+        default=None, description="Fixed costs in addition to hours."
+    )
+    third_party_costs: Number | None = Field(
+        default=None,
+        description="Total incl. tax for third parties contained in the cost.",
+    )
+
+
+class InvoiceServiceCreate(InvoiceServiceFields):
+    title: str = Field(min_length=1, max_length=200)
+
+
+class InvoiceServiceDetail(InvoiceServiceOut):
+    invoice: InvoiceOut = Field(description="The invoice with its new total.")
+
+
+class InvoiceServiceCreated(InvoiceServiceDetail):
+    id: int | None
+    position: int | None
+
+
+class InvoiceServiceDeleted(InvoiceServiceDetail):
+    warnings: list[str] = Field(
+        description="Consequences to check by hand, e.g. a service period"
+        " which doesn't match the remaining logged hours and costs anymore."
+    )
+
+
+def _invoice_service_patch(data):
+    """The fields for ``patch_with_form()``, the service type fills in the
+    effort type and the hourly rate like in the web interface"""
+    patch = data.model_dump(exclude_unset=True)
+    if (title := patch.pop("service_type", None)) is not None:
+        if not (service_type := ServiceType.objects.filter(title=title).first()):
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "service_type"],
+                    "msg": _("Unknown service type %r.") % title,
+                }
+            ])
+        patch.setdefault("effort_type", service_type.title)
+        patch.setdefault("effort_rate", service_type.hourly_rate)
+    return patch
+
+
+def _invoice_service_detail(service, request):
+    """The saved service and its invoice as stored (the invoice's total is
+    recalculated when saving the service)"""
+    service = Service.objects.select_related(
+        "project_service__offer",
+        "invoice__project__customer",
+        "invoice__recurring_invoice",
+        "invoice__customer",
+        "invoice__owned_by",
+    ).get(pk=service.pk)
+    return _invoice_service_out(service) | {
+        "invoice": invoice_out(service.invoice, request)
+    }
+
+
+@router.post("/invoices/{invoice_id}/services/", response=InvoiceServiceCreated)
+def invoice_service_create(
+    request,
+    invoice_id: str,
+    data: InvoiceServiceCreate,
+    *,
+    dry_run: DryRun = False,
+):
+    """Add a service to a services invoice in preparation (by ID or code),
+    validated with the form of the web interface
+
+    Returns the service and the invoice with its new total; the ID is null
+    with ``dry_run``."""
+    invoice = by_id_or_code(Invoice.objects.all(), invoice_id)
+    if invoice.type != Invoice.SERVICES:
+        raise ValidationError([
+            {
+                "loc": ["path", "invoice_id"],
+                "msg": _("Only services invoices have services."),
+            }
+        ])
+    result = patch_with_form(
+        ServiceForm,
+        Service(invoice=invoice),
+        _invoice_service_patch(data),
+        request,
+        out=lambda service: _invoice_service_detail(service, request),
+        dry_run=dry_run,
+    )
+    if dry_run:
+        result |= {"id": None, "position": None}
+    return result
+
+
+@router.patch("/invoices/services/{int:service_id}/", response=InvoiceServiceDetail)
+def invoice_service_update(
+    request,
+    service_id: int,
+    data: InvoiceServiceFields,
+    *,
+    dry_run: DryRun = False,
+):
+    """Change a service of an invoice in preparation, validated with the
+    form of the web interface
+
+    Returns the service and the invoice with its new total."""
+    service = get_object_or_404(
+        Service.objects.select_related("invoice", "project_service__offer"),
+        pk=service_id,
+    )
+    return patch_with_form(
+        ServiceForm,
+        service,
+        _invoice_service_patch(data),
+        request,
+        out=lambda service: _invoice_service_detail(service, request),
+        dry_run=dry_run,
+    )
+
+
+@router.delete("/invoices/services/{int:service_id}/", response=InvoiceServiceDeleted)
+def invoice_service_delete(request, service_id: int, *, dry_run: DryRun = False):
+    """Delete a service of an invoice in preparation like in the web
+    interface; the hours and costs logged on it can be invoiced again
+
+    Returns the deleted service, the invoice with its new total and the
+    consequences to check by hand (``warnings``, the web interface shows
+    them as messages)."""
+    service = get_object_or_404(
+        Service.objects.select_related("invoice", "project_service__offer"),
+        pk=service_id,
+    )
+    result = _invoice_service_out(service)
+    delete_with_form(service, request, loc=["path", "service_id"], dry_run=dry_run)
+    return result | {
+        "invoice": invoice_out(service.invoice, request),
+        "warnings": [
+            str(warning) for warning in getattr(service, "delete_warnings", ())
+        ],
+    }
 
 
 @router.get("/invoices/{invoice_id}/pdf/")

@@ -93,6 +93,7 @@ API_ROUTES = {
         "PATCH /api/hosting/sites/{site_id}/contacts/{contact_id}/"
     ),
     "invoices_invoice_create": "POST /api/invoices/",
+    "invoices_invoice_createservice": "POST /api/invoices/{invoice_id}/services/",
     "invoices_invoice_delete": "DELETE /api/invoices/{invoice_id}/",
     "invoices_invoice_postpone_reminders": (
         "POST /api/invoices/{invoice_id}/postpone-reminders/"
@@ -104,6 +105,8 @@ API_ROUTES = {
         "DELETE /api/recurring-invoices/{invoice_id}/"
     ),
     "invoices_recurringinvoice_update": "PATCH /api/recurring-invoices/{invoice_id}/",
+    "invoices_service_delete": "DELETE /api/invoices/services/{service_id}/",
+    "invoices_service_update": "PATCH /api/invoices/services/{service_id}/",
     "logbook_break_create": "POST /api/logbook/breaks/",
     "logbook_break_delete": "DELETE /api/logbook/breaks/{break_id}/",
     "logbook_break_update": "PATCH /api/logbook/breaks/{break_id}/",
@@ -198,12 +201,9 @@ NOT_IN_API = {
     "expenses_expensereport_create": "out of scope: bookkeeping",
     "expenses_expensereport_delete": "out of scope: bookkeeping",
     "expenses_expensereport_update": "out of scope: bookkeeping",
-    "invoices_invoice_createservice": "package 05",
     "invoices_invoice_send": "out of scope: sending mail",
     "invoices_reminders": "out of scope: sending mail",
     "invoices_send_reminder": "out of scope: sending mail",
-    "invoices_service_delete": "package 05",
-    "invoices_service_update": "package 05",
     "projects_budgettransfer_delete": "package 10",
     "projects_budgettransfer_update": "package 10",
     "projects_campaign_create": "package 11",

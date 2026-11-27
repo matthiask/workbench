@@ -12,6 +12,7 @@ from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.reporting.models import FreezeDate
+from workbench.services.models import ServiceType
 from workbench.tools.formats import local_date_format
 from workbench.tools.validation import in_days
 
@@ -1091,3 +1092,175 @@ class InvoicesAPITest(TestCase):
         self.assertFalse(Invoice.objects.filter(pk=draft.pk).exists())
         sent.refresh_from_db()
         self.assertIsNone(sent.down_payment_applied_to)
+
+    def test_services_create_update_delete(self):
+        """Services of services invoices in preparation are created, changed
+        and deleted with the form of the web interface"""
+        ServiceType.objects.create(title="Consulting", hourly_rate=250)
+        invoice = factories.InvoiceFactory.create(type=Invoice.SERVICES)
+        self.client.force_login(invoice.owned_by)
+        url = f"/api/invoices/{invoice.code}/services/"
+
+        response = self.client.post(
+            f"{url}?dry_run=true",
+            {"title": "Support", "service_type": "Consulting", "effort_hours": 2},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(
+            (data["id"], data["effort_type"], data["effort_rate"]),
+            (None, "Consulting", "250.00"),
+        )
+        self.assertEqual(data["invoice"]["total_excl_tax"], "500.00")
+        self.assertFalse(invoice.services.exists())
+
+        response = self.client.post(
+            url,
+            {
+                "title": "Support",
+                "effort_type": "Support",
+                "effort_hours": 3,
+                "effort_rate": 200,
+                "x": 1,
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        response = self.client.post(
+            url,
+            {
+                "title": "Support",
+                "effort_type": "Support",
+                "effort_hours": 3,
+                "effort_rate": 200,
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        service = invoice.services.get()
+        self.assertEqual(response.json()["id"], service.pk)
+        self.assertEqual(response.json()["invoice"]["total_excl_tax"], "600.00")
+
+        url = f"/api/invoices/services/{service.pk}/"
+        response = self.client.patch(
+            url,
+            {"effort_hours": 4, "cost": 50, "description": "Hotline"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["service_cost"], "850.00")
+        self.assertEqual(response.json()["invoice"]["total_excl_tax"], "850.00")
+        service.refresh_from_db()
+        self.assertEqual(
+            (service.title, service.description, service.effort_hours),
+            ("Support", "Hotline", 4),
+        )
+
+        response = self.client.patch(
+            url, {"title": None}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "title"])
+
+        response = self.client.delete(f"{url}?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], service.pk)
+        self.assertTrue(invoice.services.exists())
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            (response.json()["invoice"]["total_excl_tax"], response.json()["warnings"]),
+            ("0.00", []),
+        )
+        self.assertFalse(invoice.services.exists())
+
+    def test_services_only_in_preparation(self):
+        """Sent invoices keep their services, fixed amount invoices have none"""
+        invoice = factories.InvoiceFactory.create(
+            type=Invoice.SERVICES, status=Invoice.SENT
+        )
+        service = invoice.services.create(title="Support", cost=100)
+        self.client.force_login(invoice.owned_by)
+        message = (
+            "Cannot modify a service bound to an invoice which is not in"
+            " preparation anymore."
+        )
+
+        response = self.client.post(
+            f"/api/invoices/{invoice.pk}/services/",
+            {"title": "More"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"], [{"loc": ["body", "data"], "msg": message}]
+        )
+        response = self.client.patch(
+            f"/api/invoices/services/{service.pk}/",
+            {"cost": 50},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"], [{"loc": ["body", "data"], "msg": message}]
+        )
+        response = self.client.delete(f"/api/invoices/services/{service.pk}/")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [{"loc": ["path", "service_id"], "msg": message}],
+        )
+        self.assertTrue(invoice.services.exists())
+
+        fixed = factories.InvoiceFactory.create(subtotal=100)
+        response = self.client.post(
+            f"/api/invoices/{fixed.pk}/services/",
+            {"title": "More"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["path", "invoice_id"],
+                    "msg": "Only services invoices have services.",
+                }
+            ],
+        )
+
+    def test_services_delete_service_period(self):
+        """Deleting a service returns the consequences which the web
+        interface shows as messages"""
+        project = factories.ProjectFactory.create()
+        early, late = factories.ServiceFactory.create_batch(2, project=project)
+        factories.LoggedHoursFactory.create(service=early, rendered_on=in_days(-20))
+        factories.LoggedHoursFactory.create(service=late, rendered_on=in_days(-2))
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([early, late])
+        self.client.force_login(invoice.owned_by)
+
+        service = invoice.services.get(project_service=late)
+        response = self.client.delete(f"/api/invoices/services/{service.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["project_service_id"], late.pk)
+        self.assertEqual(
+            response.json()["warnings"],
+            [
+                (
+                    "The logged hours and costs of this invoice now cover the service"
+                    f" period {local_date_format(in_days(-20))} - "
+                    f"{local_date_format(in_days(-20))}. Update the invoice's service"
+                    " period if necessary."
+                )
+            ],
+        )
+        self.assertFalse(
+            late.loggedhours.filter(invoice_service__isnull=False).exists()
+        )
