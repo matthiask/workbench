@@ -56,3 +56,21 @@ whichever fits the existing `add-details` / `change-address` better.
   `--phone-number` are the new values (options named like the API fields).
 - `wb people update --remove-email/--remove-phone/--remove-postal-address`
   and the `--*-type` options stay (removing by value, several at once).
+- Open: email-in-use on create/details. Decided 2026-11-27: in
+  `POST /api/contacts/people/` and `POST .../people/{id}/details/`, an
+  address the same person has already stays a hard error without code (on
+  create only "Listed twice."); one another person or an organization uses
+  becomes the ignorable warning `email-in-use` (reuse
+  `email_in_use_warning()`, located at the address's field). Nothing is
+  implemented yet. Left: replace `_email_errors()` in
+  `workbench/contacts/api.py` accordingly, add `ignore_warnings`
+  (`IGNORE_WARNINGS`) to `person_add_details`, fix the `allow_duplicates`
+  description (it mentions email addresses but never applied to them) and
+  the docstrings of `email_in_use_warning()`, `person_create` and
+  `person_add_details`; `--ignore-warning` for `wb people add-details`
+  (`wb people create` has it already), docstring of `wb people create`,
+  version bump; `cli/README.md` ("email addresses which are in use are
+  always rejected"), the `workbench-contact` skill (step 4: still ask the
+  user before ignoring the warning); API tests for both endpoints (same
+  person, another person, an organization, `ignore_warnings`, dry run) and
+  a round trip in `workbench/test_cli.py`.
