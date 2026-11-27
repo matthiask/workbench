@@ -446,8 +446,12 @@ class ContactsAPITest(TestCase):
         self.assertEqual(
             patch(f"email-addresses/{other.pk}", {"type": "Home"}).status_code, 404
         )
+        # The ID of an email address may be the ID of a phone number too, use
+        # the phone number of another person
+        other_phone = other.person.phonenumbers.create(phone_number="+41441234568")
         self.assertEqual(
-            patch(f"phone-numbers/{email.pk}", {"type": "Home"}).status_code, 404
+            patch(f"phone-numbers/{other_phone.pk}", {"type": "Home"}).status_code,
+            404,
         )
 
     def test_change_email_address_in_use(self):
