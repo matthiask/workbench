@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-27 07:39+0100\n"
+"POT-Creation-Date: 2026-11-27 08:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,6 +127,14 @@ msgstr "Spesenerfassung und -rückerstattung."
 msgid "Foreign currencies for expenses"
 msgstr "Fremdwährungen für Spesen."
 
+#: workbench/accounts/features.py workbench/hosting/apps.py
+msgid "hosting"
+msgstr "Hosting"
+
+#: workbench/accounts/features.py
+msgid "Hosted sites, their servers and contacts."
+msgstr "Gehostete Sites, ihre Server und Kontakte."
+
 #: workbench/accounts/features.py
 #: workbench/management/commands/internal_types.py workbench/projects/models.py
 msgid "internal types"
@@ -222,6 +230,7 @@ msgid "Inactive users"
 msgstr "Inaktive Mitarbeiter:innen"
 
 #: workbench/accounts/models.py workbench/contacts/forms.py
+#: workbench/hosting/forms.py
 msgid "Active"
 msgstr "Aktiv"
 
@@ -267,6 +276,7 @@ msgid "How many hours are available for freely planning projects?"
 msgstr "Wie viele Stunden sind frei verfügbar für die Projektplanung?"
 
 #: workbench/accounts/models.py workbench/contacts/models.py
+#: workbench/hosting/models.py
 #: workbench/templates/contacts/organization_detail.html
 msgid "person"
 msgstr "Person"
@@ -390,11 +400,11 @@ msgstr "lesen und schreiben"
 
 #: workbench/accounts/models.py workbench/contacts/models.py
 #: workbench/credit_control/reporting.py workbench/deals/models.py
-#: workbench/invoices/models.py workbench/logbook/forms.py
-#: workbench/notes/models.py workbench/offers/models.py
-#: workbench/planning/models.py workbench/projects/models.py
-#: workbench/reporting/models.py workbench/services/models.py
-#: workbench/templates/accounts/api_tokens.html
+#: workbench/hosting/models.py workbench/invoices/models.py
+#: workbench/logbook/forms.py workbench/notes/models.py
+#: workbench/offers/models.py workbench/planning/models.py
+#: workbench/projects/models.py workbench/reporting/models.py
+#: workbench/services/models.py workbench/templates/accounts/api_tokens.html
 #: workbench/templates/invoices/invoice_form.html
 #: workbench/templates/offers/offer_form.html
 #: workbench/templates/planning/planning_import.html
@@ -756,8 +766,9 @@ msgstr "Ferienwochen für ein volles Anstellungsjahr."
 
 #: workbench/awt/models.py workbench/awt/pdf.py workbench/contacts/models.py
 #: workbench/credit_control/forms.py workbench/credit_control/models.py
-#: workbench/credit_control/reporting.py workbench/planning/models.py
-#: workbench/projects/models.py workbench/templates/awt/year_detail.html
+#: workbench/credit_control/reporting.py workbench/hosting/models.py
+#: workbench/planning/models.py workbench/projects/models.py
+#: workbench/templates/awt/year_detail.html
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/timer/models.py
 msgid "notes"
@@ -1169,6 +1180,7 @@ msgstr "Dieses Feld ist zwingend erforderlich."
 
 #: workbench/contacts/apps.py workbench/templates/base.html
 #: workbench/templates/contacts/object_list.html
+#: workbench/templates/hosting/site_detail.html
 msgid "contacts"
 msgstr "Kontakte"
 
@@ -1176,20 +1188,22 @@ msgstr "Kontakte"
 msgid "All groups"
 msgstr "Alle Gruppen"
 
-#: workbench/contacts/forms.py
+#: workbench/contacts/forms.py workbench/hosting/forms.py
 msgid "Archived"
 msgstr "Archiviert"
 
 #: workbench/contacts/forms.py workbench/credit_control/forms.py
-#: workbench/deals/forms.py workbench/invoices/forms.py
-#: workbench/logbook/forms.py workbench/notes/forms.py
-#: workbench/offers/forms.py workbench/projects/forms.py
-#: workbench/templates/base.html workbench/templates/search.html
+#: workbench/deals/forms.py workbench/hosting/forms.py
+#: workbench/invoices/forms.py workbench/logbook/forms.py
+#: workbench/notes/forms.py workbench/offers/forms.py
+#: workbench/projects/forms.py workbench/templates/base.html
+#: workbench/templates/search.html
 msgid "Search"
 msgstr "Suche"
 
 #: workbench/contacts/forms.py workbench/expenses/forms.py
-#: workbench/projects/forms.py workbench/reporting/views.py
+#: workbench/hosting/forms.py workbench/projects/forms.py
+#: workbench/reporting/views.py
 msgid "All"
 msgstr "Alle"
 
@@ -1324,6 +1338,7 @@ msgid "An organization cannot be merged with itself."
 msgstr "Eine Organisation kann nicht mit sich selbst zusammengeführt werden."
 
 #: workbench/contacts/models.py workbench/deals/models.py
+#: workbench/hosting/models.py
 msgid "is archived"
 msgstr "ist archiviert"
 
@@ -1483,6 +1498,7 @@ msgid "phone numbers"
 msgstr "Telefonnummern"
 
 #: workbench/contacts/models.py workbench/templates/contacts/person_form.html
+#: workbench/templates/hosting/server_detail.html
 #: workbench/templates/invoices/send_reminder.html
 msgid "email addresses"
 msgstr "Emailadressen"
@@ -2079,8 +2095,8 @@ msgstr "tief"
 msgid "high"
 msgstr "hoch"
 
-#: workbench/deals/models.py workbench/invoices/models.py
-#: workbench/projects/models.py
+#: workbench/deals/models.py workbench/hosting/models.py
+#: workbench/invoices/models.py workbench/projects/models.py
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/projects/campaign_detail.html
@@ -2358,6 +2374,99 @@ msgstr "%(object)s löschen"
 #, python-format
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
+
+#: workbench/hosting/forms.py
+msgid "With problems"
+msgstr "Mit Problemen"
+
+#: workbench/hosting/forms.py
+msgid "All servers"
+msgstr "Alle Server"
+
+#: workbench/hosting/forms.py
+msgid "This person is already a contact of the site with this role."
+msgstr "Diese Person ist bereits Kontakt der Site mit dieser Rolle."
+
+#: workbench/hosting/models.py
+msgid "server"
+msgstr "Server"
+
+#: workbench/hosting/models.py workbench/templates/contacts/object_list.html
+#: workbench/templates/hosting/server_detail.html
+msgid "servers"
+msgstr "Server"
+
+#: workbench/hosting/models.py
+msgid "The main domain of the site."
+msgstr "Die Hauptdomain der Site."
+
+#: workbench/hosting/models.py
+msgid "further domains"
+msgstr "weitere Domains"
+
+#: workbench/hosting/models.py
+msgid "One host name per line."
+msgstr "Ein Hostname pro Zeile."
+
+#: workbench/hosting/models.py
+msgid "responsible"
+msgstr "verantwortlich"
+
+#: workbench/hosting/models.py
+msgid "password manager"
+msgstr "Passwortmanager"
+
+#: workbench/hosting/models.py
+msgid "Link to the credentials, never the credentials themselves."
+msgstr "Link zu den Zugangsdaten, nie die Zugangsdaten selbst."
+
+#: workbench/hosting/models.py
+msgid "reason without recurring invoice"
+msgstr "Grund ohne Stapelrechnung"
+
+#: workbench/hosting/models.py
+msgid "For example a maintenance contract or an internal site."
+msgstr "Zum Beispiel ein Wartungsvertrag oder eine interne Site."
+
+#: workbench/hosting/models.py workbench/invoices/models.py
+#: workbench/templates/hosting/server_detail.html
+msgid "site"
+msgstr "Site"
+
+#: workbench/hosting/models.py workbench/templates/contacts/object_list.html
+#: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/contacts/person_detail.html
+#: workbench/templates/hosting/server_detail.html
+msgid "sites"
+msgstr "Sites"
+
+#: workbench/hosting/models.py
+msgid "No recurring invoice"
+msgstr "Keine Stapelrechnung"
+
+#: workbench/hosting/models.py
+msgid "No contact for outages"
+msgstr "Kein Kontakt für Störungen"
+
+#: workbench/hosting/models.py
+msgid "outages and maintenance"
+msgstr "Störungen und Wartungen"
+
+#: workbench/hosting/models.py
+msgid "IT (DNS etc.)"
+msgstr "IT (DNS usw.)"
+
+#: workbench/hosting/models.py
+msgid "role"
+msgstr "Rolle"
+
+#: workbench/hosting/models.py
+msgid "site contact"
+msgstr "Site-Kontakt"
+
+#: workbench/hosting/models.py
+msgid "site contacts"
+msgstr "Site-Kontakte"
 
 #: workbench/invoices/api.py
 #, python-format
@@ -2781,9 +2890,14 @@ msgid "All ways of sending"
 msgstr "Alle Versandarten"
 
 #: workbench/invoices/forms.py workbench/invoices/sending.py
+#: workbench/templates/hosting/server_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 msgid "No email address."
 msgstr "Keine Emailadresse."
+
+#: workbench/invoices/forms.py
+msgid "The site belongs to a different organization."
+msgstr "Die Site gehört zu einer anderen Organisation."
 
 #: workbench/invoices/forms.py
 #, python-brace-format
@@ -2815,6 +2929,7 @@ msgstr "Leistungen"
 
 #: workbench/invoices/models.py
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/hosting/site_detail.html
 msgid "recurring invoice"
 msgstr "Stapelrechnung"
 
@@ -3105,6 +3220,7 @@ msgstr "{code}, {total}, {due_on} und {service_period} werden durch die Werte de
 #: workbench/invoices/models.py workbench/invoices/tasks.py
 #: workbench/templates/base.html
 #: workbench/templates/contacts/organization_detail.html
+#: workbench/templates/hosting/site_detail.html
 msgid "recurring invoices"
 msgstr "Stapelrechnungen"
 
@@ -5024,6 +5140,9 @@ msgstr "Kopiere das Token jetzt, es wird nicht noch einmal angezeigt:"
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/generic/object_detail.html
+#: workbench/templates/hosting/server_form.html
+#: workbench/templates/hosting/site_detail.html
+#: workbench/templates/hosting/sitecontact_form.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/break_detail.html
@@ -5145,6 +5264,8 @@ msgstr "Abwesenheitskalender"
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/generic/object_detail.html
+#: workbench/templates/hosting/server_detail.html
+#: workbench/templates/hosting/site_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/logbook/break_detail.html
@@ -5350,6 +5471,7 @@ msgstr "Keine Abwesenheiten."
 #: workbench/templates/contacts/organization_detail.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/deals/deal_detail.html
+#: workbench/templates/hosting/site_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/reporting/labor_costs.html
@@ -5505,6 +5627,11 @@ msgstr "Personen mit demselben Namen oder derselben E-Mail-Adresse."
 #: workbench/templates/contacts/organization_duplicates.html
 #: workbench/templates/contacts/person_detail.html
 #: workbench/templates/contacts/person_list.html
+#: workbench/templates/hosting/_contact.html
+#: workbench/templates/hosting/server_detail.html
+#: workbench/templates/hosting/server_list.html
+#: workbench/templates/hosting/site_detail.html
+#: workbench/templates/hosting/site_list.html
 msgid "archived"
 msgstr "archiviert"
 
@@ -5564,6 +5691,7 @@ msgstr "Neu"
 #: workbench/templates/deals/deal_detail.html
 #: workbench/templates/expenses/expensereport_detail.html
 #: workbench/templates/generic/object_detail.html
+#: workbench/templates/hosting/site_detail.html
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/recurringinvoice_detail.html
 #: workbench/templates/planning/project_planning.html
@@ -5648,6 +5776,8 @@ msgstr "Rechnungstotal"
 #: workbench/templates/credit_control/creditentry_list.html
 #: workbench/templates/deals/deal_list.html
 #: workbench/templates/generic/object_list.html
+#: workbench/templates/hosting/server_detail.html
+#: workbench/templates/hosting/site_detail.html
 #: workbench/templates/invoices/reminders.html
 #: workbench/templates/reporting/_budget_statistics_table.html
 #: workbench/templates/reporting/open_items_list.html
@@ -5741,6 +5871,27 @@ msgstr "Kapitel der Hilfe"
 #: workbench/templates/history_modal.html workbench/templatetags/workbench.py
 msgid "History"
 msgstr "Geschichte"
+
+#: workbench/templates/hosting/server_detail.html
+msgid "Contacts for outages and maintenance"
+msgstr "Kontakte für Störungen und Wartungen"
+
+#: workbench/templates/hosting/server_detail.html
+#: workbench/templates/invoices/send_reminder.html
+msgid "copy"
+msgstr "kopieren"
+
+#: workbench/templates/hosting/site_detail.html
+msgid "Add contact"
+msgstr "Kontakt hinzufügen"
+
+#: workbench/templates/hosting/site_detail.html
+msgid "No contacts yet."
+msgstr "Noch keine Kontakte."
+
+#: workbench/templates/hosting/site_detail.html
+msgid "Open in the password manager"
+msgstr "Im Passwortmanager öffnen"
 
 #: workbench/templates/invoices/invoice_detail.html
 #: workbench/templates/invoices/send_invoice.html
@@ -5903,10 +6054,6 @@ msgstr "Empfänger:in auswählen"
 #: workbench/templates/invoices/reminders.html
 msgid "Contact missing"
 msgstr "Ansprechperson fehlt"
-
-#: workbench/templates/invoices/send_reminder.html
-msgid "copy"
-msgstr "kopieren"
 
 #: workbench/templates/invoices/service_form.html
 #: workbench/templates/offers/offer_form.html

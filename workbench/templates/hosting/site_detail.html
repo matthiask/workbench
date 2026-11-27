@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load i18n workbench %}
+{% block title %}{{ object }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">
+        <a href="https://{{ object.title }}" target="_blank" rel="noopener">{{ object }}</a>
+        {% history_link object %}
+        {% if object.is_archived %}<span class="wb-title-badge"><span
+              class="badge text-bg-secondary"
+            >{% translate 'archived' %}</span></span>{% endif %}
+      </h1>
+      <div class="wb-meta">
+        <span><span class="wb-meta-label">{{ object|label:'server' }}</span>
+          {% link_or_none object.server %}</span>
+        <span><span class="wb-meta-label">{{ object|label:'customer' }}</span>
+          {% link_or_none object.customer %}</span>
+        <span><span class="wb-meta-label">{{ object|label:'owned_by' }}</span>
+          {% link_or_none object.owned_by %}</span>
+      </div>
+    </div>
+    <div class="wb-page-actions">
+      <a href="{{ object.urls.update }}" class="btn btn-primary">{% translate 'Update' %}</a>
+      <a href="{{ object.urls.add_contact }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Add contact' %}</a>
+      <span class="dropdown">
+        <button
+          type="button"
+          class="btn btn-quiet btn-icon"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="{% translate 'More actions' %}"
+        >
+          {% include 'svg/kebab-horizontal.svg' %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <a href="{{ object.urls.delete }}" class="dropdown-item text-danger">{% translate 'Delete' %}</a>
+        </div>
+      </span>
+    </div>
+  </div>
+
+  {% for problem in object.problems %}
+    <div class="alert alert-warning py-2">{{ problem }}</div>
+  {% endfor %}
+
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'contacts'|capfirst %}</div>
+        <div class="list-group list-group-flush">
+          {% for contact in object.contacts.all %}
+            <div class="list-group-item wb-row">
+              {% include "hosting/_contact.html" with person=contact.person %}
+              <div class="wb-row-aside">
+                <span class="badge text-bg-light">{{ contact.get_role_display }}</span>
+                <a
+                  href="{{ contact.urls.update }}"
+                  class="btn btn-quiet btn-sm"
+                  data-ajaxmodal
+                >{% translate 'Update' %}</a>
+              </div>
+            </div>
+          {% empty %}
+            <div class="list-group-item text-secondary">{% translate 'No contacts yet.' %}</div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-5">
+      <section class="card h-100">
+        <div class="card-header">{% translate 'Details' %}</div>
+        <div class="card-body">
+          <dl class="wb-fields">
+            <dt>{{ object|label:'domains' }}</dt>
+            <dd>{{ object.domains|linebreaksbr|default:"&ndash;" }}</dd>
+            <dt>{{ object|label:'password_manager_url' }}</dt>
+            <dd>
+              {% if object.password_manager_url %}
+                <a
+                  href="{{ object.password_manager_url }}"
+                  target="_blank"
+                  rel="noopener"
+                >{% translate 'Open in the password manager' %}</a>
+              {% else %}
+                &ndash;
+              {% endif %}
+            </dd>
+            {% if object.no_invoice_reason %}
+              <dt>{{ object|label:'no_invoice_reason' }}</dt>
+              <dd>{{ object.no_invoice_reason }}</dd>
+            {% endif %}
+            {% if object.notes %}
+              <dt>{{ object|label:'notes' }}</dt>
+              <dd>{{ object.notes|linebreaksbr }}</dd>
+            {% endif %}
+          </dl>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  {% if request.user.features.CONTROLLING %}
+    <section class="card my-3">
+      <div class="card-header d-flex align-items-center">
+        {% translate 'recurring invoices'|capfirst %}
+        <a
+          href="{% url 'invoices_recurringinvoice_create' %}?site={{ object.pk }}"
+          class="btn btn-quiet btn-sm ms-auto"
+        >{% include "svg/plus.svg" %} {% translate 'recurring invoice'|capfirst %}</a>
+      </div>
+      <div class="list-group list-group-flush">
+        {% for invoice in object.recurringinvoices.all %}
+          <a href="{{ invoice.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+            <div class="wb-row-main">
+              <div class="wb-row-title">{{ invoice }}</div>
+              <div class="wb-row-meta">
+                <span>{{ invoice.get_periodicity_display }}</span>
+                <span>{{ invoice.pretty_next_period }}</span>
+              </div>
+            </div>
+            <div class="wb-row-aside">{{ invoice.status_badge }} {% total_incl_tax invoice %}</div>
+          </a>
+        {% empty %}
+          <div class="list-group-item text-secondary">{% translate 'No results found.' %}</div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock content %}

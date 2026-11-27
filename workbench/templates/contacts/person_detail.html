@@ -239,5 +239,32 @@
         </div>
       {% endwith %}
     {% endif %}
+    {% if request.user.features.HOSTING %}
+      {% with site_contacts=person.site_contacts.all %}
+        {% if site_contacts %}
+          <div class="col-lg-4">
+            <section class="card">
+              <div class="card-header">{% translate 'sites'|capfirst %}</div>
+              <div class="list-group list-group-flush">
+                {% for contact in site_contacts %}
+                  <a class="list-group-item list-group-item-action wb-row" href="{{ contact.site.get_absolute_url }}">
+                    <div class="wb-row-main">
+                      <div class="wb-row-title">{{ contact.site }}</div>
+                      <div class="wb-row-meta">
+                        <span>{{ contact.get_role_display }}</span>
+                        <span>{{ contact.site.server }}</span>
+                        {% if contact.site.is_archived %}<span
+                            class="badge text-bg-secondary"
+                          >{% translate 'archived' %}</span>{% endif %}
+                      </div>
+                    </div>
+                  </a>
+                {% endfor %}
+              </div>
+            </section>
+          </div>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
   </div>
 {% endblock content %}

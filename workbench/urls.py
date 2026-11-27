@@ -37,6 +37,7 @@ urlpatterns = [
     path("api/", api.urls),
     path("", include("workbench.timer.urls")),
     path("notes/", include("workbench.notes.urls")),
+    path("sites/", include("workbench.hosting.urls")),
     # Legacy URL redirects
     path("shortcuts/", lambda request: redirect("help", "shortcuts")),
     re_path(

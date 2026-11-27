@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load i18n workbench %}
+{% block title %}{{ object }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+  <div class="wb-page-header">
+    <div class="min-w-0">
+      <h1 class="mb-1">
+        {{ object }}
+        {% history_link object %}
+        {% if object.is_archived %}<span class="wb-title-badge"><span
+              class="badge text-bg-secondary"
+            >{% translate 'archived' %}</span></span>{% endif %}
+      </h1>
+      <div class="wb-meta">
+        <a href="{% url 'hosting_server_list' %}">{% translate 'servers'|capfirst %}</a>
+      </div>
+    </div>
+    <div class="wb-page-actions">
+      <a
+        href="{% url 'hosting_site_create' %}?server={{ object.pk }}"
+        class="btn btn-primary"
+      >{% translate 'site'|capfirst %}</a>
+      <a href="{{ object.urls.update }}" class="btn btn-quiet" data-ajaxmodal>{% translate 'Update' %}</a>
+    </div>
+  </div>
+
+  {% if object.notes %}
+    <p class="wb-description">{{ object.notes|linebreaksbr }}</p>
+  {% endif %}
+
+  {% with contacts=object.outage_contacts %}
+    <section class="card mb-3">
+      <div class="card-header">{% translate 'Contacts for outages and maintenance' %}</div>
+      {% if contacts %}
+        <div class="card-body">
+          <label class="form-label" for="outage-emails">{% translate 'email addresses'|capfirst %}</label>
+          <textarea id="outage-emails" class="form-control wb-no-autogrow" rows="3" readonly
+          >{% for person in contacts %}{% if person.email %}{{ person.email }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}</textarea>
+          <div class="mt-2">
+            <button
+              type="button"
+              class="btn btn-quiet btn-sm"
+              onclick="navigator.clipboard.writeText(document.getElementById('outage-emails').value)"
+            >
+              {% translate 'copy' %}
+            </button>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for person in contacts %}
+            <div class="list-group-item wb-row">
+              {% include "hosting/_contact.html" %}
+              <div class="wb-row-aside small text-secondary">
+                {% for site in person.site_titles %}<a
+                    href="{{ site.get_absolute_url }}"
+                  >{{ site }}</a>{% if not forloop.last %},
+                  {% endif %}{% endfor %}
+                {% if not person.email %}<span
+                    class="badge text-bg-warning"
+                  >{% translate 'No email address.' %}</span>{% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="card-body text-secondary">{% translate 'No results found.' %}</div>
+      {% endif %}
+    </section>
+  {% endwith %}
+
+  <section class="card mb-3">
+    <div class="card-header">{% translate 'sites'|capfirst %}</div>
+    <div class="list-group list-group-flush">
+      {% for site in object.active_sites %}
+        <a href="{{ site.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+          <div class="wb-row-main">
+            <div class="wb-row-title">{{ site }}</div>
+            <div class="wb-row-meta"><span>{{ site.customer }}</span></div>
+          </div>
+          <div class="wb-row-aside">
+            {% for problem in site.problems %}<span class="badge text-bg-warning">{{ problem }}</span>{% endfor %}
+          </div>
+        </a>
+      {% empty %}
+        <div class="list-group-item text-secondary">{% translate 'No results found.' %}</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock content %}

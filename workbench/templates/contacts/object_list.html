@@ -7,6 +7,10 @@
     <a class="nav-link" href="{% url 'contacts_person_list' %}">{% translate 'people'|capfirst %}</a>
     <a class="nav-link" href="{% url 'contacts_organization_list' %}">{% translate 'organizations'|capfirst %}</a>
     <a class="nav-link" href="{% url 'contacts_group_list' %}">{% translate 'groups'|capfirst %}</a>
+    {% if request.user.features.HOSTING %}
+      <a class="nav-link" href="{% url 'hosting_site_list' %}">{% translate 'sites'|capfirst %}</a>
+      <a class="nav-link" href="{% url 'hosting_server_list' %}">{% translate 'servers'|capfirst %}</a>
+    {% endif %}
     {% endmark_current %}
   </nav>
 {% endblock content-title %}

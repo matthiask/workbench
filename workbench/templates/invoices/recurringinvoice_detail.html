@@ -15,6 +15,10 @@
           {% link_or_none object.customer %}</span>
         <span><span class="wb-meta-label">{% translate 'contact'|capfirst %}</span>
           {% link_or_none object.contact %}</span>
+        {% if request.user.features.HOSTING and object.site %}
+          <span><span class="wb-meta-label">{{ object|label:'site' }}</span>
+            {% link_or_none object.site %}</span>
+        {% endif %}
       </div>
     </div>
     <div class="wb-page-actions">

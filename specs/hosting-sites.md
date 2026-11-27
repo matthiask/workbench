@@ -72,8 +72,7 @@ An active site (not archived) has a problem when:
 
 - it has no running recurring invoice (not ended: `ends_on` empty or in
   the future) and no `no_invoice_reason`,
-- it has no outage contact,
-- an outage contact is archived.
+- it has no active outage contact (archived people don't count).
 
 The site list filters by server and by "with problems"; the site and
 server pages show them.

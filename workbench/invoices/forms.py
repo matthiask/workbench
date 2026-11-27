@@ -15,9 +15,11 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _, pgettext_lazy
 from django_fast_export.csv import StreamingCSVResponse, all_values, all_verbose_names
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.forms import PostalAddressSelectionForm
 from workbench.contacts.models import Organization, Person
+from workbench.hosting.models import Site
 from workbench.invoices import sending
 from workbench.invoices.models import (
     Invoice,
@@ -1768,6 +1770,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "contact",
             "customer",
             "title",
+            "site",
             "description",
             "owned_by",
             "postal_address",
@@ -1796,7 +1799,7 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             "mail_body": Textarea({"rows": 12}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: C901
         instance = kwargs.get("instance")
         contact = None
         customer = None
@@ -1824,6 +1827,10 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
                     "third_party_costs": invoice.third_party_costs,
                     "liable_to_vat": invoice.liable_to_vat,
                 })
+
+        elif pk := request.GET.get("site"):
+            customer = self.initial_from_site(pk, initial)
+            self.pre_form = customer is None
 
         elif pk := request.GET.get("contact"):
             try:
@@ -1864,6 +1871,35 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
                 for_billing=True,
             )
             self.propose_mail()
+
+        self.limit_sites(customer=customer, contact=contact)
+
+    def initial_from_site(self, pk, initial):
+        """Customer, site and title for a new recurring invoice of a site,
+        returns the customer"""
+        try:
+            site = Site.objects.select_related("customer").get(pk=pk)
+        except Site.DoesNotExist, TypeError, ValueError:
+            return None
+        initial.update({"customer": site.customer, "site": site, "title": site.title})
+        return site.customer
+
+    def limit_sites(self, *, customer, contact):
+        """Only the active sites of the customer (and the current site), and
+        only with the hosting feature (not in the pre-form)"""
+        if "site" not in self.fields:
+            return
+        if not self.request.user.features[FEATURES.HOSTING]:
+            self.fields.pop("site")
+            return
+        customer_id = (
+            self.instance.customer_id
+            or (customer and customer.pk)
+            or (contact and contact.organization_id)
+        )
+        self.fields["site"].queryset = Site.objects.filter(
+            Q(is_archived=False, customer=customer_id) | Q(pk=self.instance.site_id)
+        ).select_related("server")
 
     def propose_mail(self):
         """Suggests recipients and proposes the mail for sending by email
@@ -1913,6 +1949,8 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
     def clean(self):
         data = super().clean()
         self.clean_mail(data)
+        if (site := data.get("site")) and site.customer != data.get("customer"):
+            self.add_error("site", _("The site belongs to a different organization."))
         if (
             "starts_on" in self.changed_data
             and (starts_on := data.get("starts_on"))

@@ -61,3 +61,27 @@ Adressfelder folgen zum Sortieren und Filtern.
 - Organisationen mit verknüpften Einträgen (Personen, Projekte, Rechnungen
   usw.) lassen sich nicht löschen: Führe sie zusammen oder archiviere
   sie.
+
+## Sites
+
+Installationen, die Websites hosten, führen sie unter «Sites» (nur mit
+dem Feature Hosting). Eine Site ist eine Website auf einem Server, mit
+ihrer Kundschaft, weiteren Domains, der Person bei uns, die sie am besten
+kennt, und einem Link zu den Zugangsdaten im Passwortmanager (nie die
+Zugangsdaten selbst).
+
+- **Kontakte** einer Site: wen wir über **Störungen und Wartungen**
+  informieren und wen wir bei **IT**-Fragen wie DNS-Einträgen fragen,
+  z.B. beim IT-Dienstleister der Kundschaft. Beim Zusammenführen von
+  Personen wandern ihre Site-Kontakte mit.
+- **Stapelrechnungen** nennen ihre Site; eine Site kann mehrere
+  haben (z.B. mit anderer Periodizität). «Stapelrechnung» auf der
+  Site erstellt eine für sie.
+- Aktive Sites ohne laufende Stapelrechnung (und ohne Grund
+  dafür, z.B. einen Wartungsvertrag) oder ohne Kontakt für Störungen
+  stehen unter «Mit Problemen».
+- Ein **Server** listet die Kontakte für Störungen all seiner aktiven
+  Sites mit ihren Emailadressen, zum Kopieren für eine Mail zu einem
+  Wartungsfenster. Zieht eine Site um, ändert sich nur ihr Server.
+- Sites, die nicht mehr laufen, archivieren statt löschen, und ihre
+  Stapelrechnungen beenden.

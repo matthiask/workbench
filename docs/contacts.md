@@ -55,3 +55,27 @@ fields follow for sorting and filtering.
 - Contacts unused for five years are archived automatically.
 - Organizations with related records (people, projects, invoices and
   so on) can't be deleted: merge or archive them.
+
+## Sites
+
+Installations which host websites list them under "Sites" (only if the
+hosting feature is enabled). A site is one website on one server, with
+its customer, further domains, the person at our end who knows it best
+and a link to its credentials in the password manager (never the
+credentials themselves).
+
+- **Contacts** of a site: whom to inform about **outages and
+  maintenance**, and whom to ask about **IT** matters like DNS records,
+  e.g. at the customer's IT provider. Merging people moves their site
+  contacts.
+- **Recurring invoices** name their site; a site may have several (e.g.
+  another periodicity). "Recurring invoice" on the site creates one for
+  it.
+- Active sites without a running recurring invoice (and without a reason
+  why there's none, e.g. a maintenance contract) or without a contact for
+  outages are listed under "With problems".
+- A **server** lists the outage contacts of all its active sites with
+  their email addresses, to copy them for a mail about a maintenance
+  window. Moving a site to another server only changes its server.
+- Archive sites which don't run anymore instead of deleting them, and end
+  their recurring invoices.

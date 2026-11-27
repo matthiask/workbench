@@ -304,5 +304,30 @@
         </section>
       </div>
     {% endif %}
+    {% if request.user.features.HOSTING %}
+      {% with sites=organization.sites.active %}
+        {% if sites %}
+          <div class="col-lg-6 col-xl-3">
+            <section class="card">
+              <div class="card-header">
+                <a href="{% url 'hosting_site_list' %}?org={{ organization.pk }}" class="text-reset">
+                  {% translate 'sites'|capfirst %}
+                </a>
+              </div>
+              <div class="list-group list-group-flush">
+                {% for site in sites %}
+                  <a class="list-group-item list-group-item-action wb-row" href="{{ site.get_absolute_url }}">
+                    <div class="wb-row-main">
+                      <div class="wb-row-title">{{ site }}</div>
+                      <div class="wb-row-meta"><span>{{ site.server }}</span></div>
+                    </div>
+                  </a>
+                {% endfor %}
+              </div>
+            </section>
+          </div>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
   </div>
 {% endblock content %}

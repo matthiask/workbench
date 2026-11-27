@@ -1,0 +1,25 @@
+{% extends "contacts/object_list.html" %}
+{% load i18n %}
+
+{% block rows %}
+  {% for site in object_list %}
+    <a href="{{ site.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+      <div class="wb-row-main">
+        <div class="wb-row-title">{{ site }}</div>
+        <div class="wb-row-meta">
+          <span>{{ site.server }}</span>
+          <span>{{ site.customer }}</span>
+          {% for contact in site.contacts.all %}
+            {% if contact.role == "outage" %}<span>{{ contact.person }}</span>{% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="wb-row-aside">
+        {% for problem in site.problems %}
+          <span class="badge text-bg-warning">{{ problem }}</span>
+        {% endfor %}
+        {% if site.is_archived %}<span class="badge text-bg-secondary">{% translate 'archived' %}</span>{% endif %}
+      </div>
+    </a>
+  {% endfor %}
+{% endblock rows %}

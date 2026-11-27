@@ -24,6 +24,9 @@ class Server(Model):
     def __str__(self):
         return self.title
 
+    def active_sites(self):
+        return self.sites.active().with_problem_flags().select_related("customer")
+
     def outage_contacts(self):
         """The active people to contact about outages and maintenance of the
         server's active sites, with the titles of their sites"""
@@ -43,6 +46,9 @@ class Server(Model):
         for contact in contacts:
             person = people.setdefault(contact.person.pk, contact.person)
             person.site_titles = [*getattr(person, "site_titles", []), contact.site]
+            person.email = next(
+                (email.email for email in person.emailaddresses.all()), ""
+            )
         return list(people.values())
 
 
@@ -181,7 +187,8 @@ class Site(Model):
         return problems
 
 
-class SiteContact(models.Model):
+@model_urls
+class SiteContact(Model):
     OUTAGE = "outage"
     IT = "it"
     ROLE_CHOICES = [
@@ -212,3 +219,6 @@ class SiteContact(models.Model):
 
     def __str__(self):
         return f"{self.person} ({self.get_role_display()})"
+
+    def get_absolute_url(self):
+        return self.site.get_absolute_url()

@@ -1,0 +1,23 @@
+{% extends "contacts/object_list.html" %}
+{% load i18n %}
+
+{% block search-form-buttons %}
+  <a href="{{ view.model.urls.create }}" class="btn btn-primary" data-ajaxmodal>
+    {% include "svg/plus.svg" %}
+    {{ view.meta.verbose_name|capfirst }}
+  </a>
+{% endblock search-form-buttons %}
+
+{% block rows %}
+  {% for server in object_list %}
+    <a href="{{ server.get_absolute_url }}" class="list-group-item list-group-item-action wb-row">
+      <div class="wb-row-main">
+        <div class="wb-row-title">{{ server }}</div>
+        {% if server.notes %}<div class="wb-row-meta"><span>{{ server.notes|truncatechars:120 }}</span></div>{% endif %}
+      </div>
+      <div class="wb-row-aside">
+        {% if server.is_archived %}<span class="badge text-bg-secondary">{% translate 'archived' %}</span>{% endif %}
+      </div>
+    </a>
+  {% endfor %}
+{% endblock rows %}
