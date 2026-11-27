@@ -67,7 +67,9 @@ from workbench.tools.api import (
     SearchQuery,
     Serialized,
     ShortName,
+    active_user,
     form_data,
+    patch_with_form,
     raise_form_errors,
     user_by_short_name,
     validate_form,
@@ -693,39 +695,24 @@ def project_update(
     Warnings of the web interface are errors here unless ignored by their
     code; nothing is saved if anything is invalid or with ``dry_run``."""
     project = get_object_or_404(Project, pk=project_id)
-    values = form_data(ProjectForm(instance=project, request=request))
     patch = data.model_dump(exclude_unset=True)
-    for field in ["title", "description", "customer", "contact", "type", "closed_on"]:
-        if field in patch:
-            values[field] = "" if patch[field] is None else patch[field]
-    if patch.get("owned_by"):
-        owned_by = (
-            User.objects.by_short_name(patch["owned_by"]).filter(is_active=True).first()
-        )
-        if not owned_by:
-            raise ValidationError([
-                {
-                    "loc": ["body", "data", "owned_by"],
-                    "msg": _("Unknown or inactive user %r.") % patch["owned_by"],
-                }
-            ])
-        values["owned_by"] = owned_by.pk
-    if "internal_type" in patch:
-        values["internal_type"] = _internal_type(patch["internal_type"])
-    elif patch.get("type") and patch["type"] != Project.INTERNAL:
-        values["internal_type"] = ""
-    if data.delete_planned_work is not None:
-        values["delete_planned_work"] = int(data.delete_planned_work)
-
-    form = ProjectForm(values, instance=project, request=request)
-    validate_form(form, ignore_warnings=ignore_warnings)
-
-    with transaction.atomic():
-        project = form.save()
-        result = project_out(project, request)
-        if dry_run:
-            transaction.set_rollback(True)
-    return result
+    # Projects which aren't internal anymore lose their internal type
+    if patch.get("type") not in {None, Project.INTERNAL}:
+        patch.setdefault("internal_type", None)
+    return patch_with_form(
+        ProjectForm,
+        project,
+        patch,
+        request,
+        out=lambda project: project_out(project, request),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map={
+            "owned_by": active_user,
+            "internal_type": _internal_type,
+            "delete_planned_work": int,
+        },
+    )
 
 
 class ServiceOut(Schema):

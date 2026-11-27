@@ -5,8 +5,10 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Annotated
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Q
-from django.http import QueryDict
+from django.http import Http404, QueryDict
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from ninja import P, Query, Schema
 from ninja.errors import ValidationError as NinjaValidationError
@@ -14,6 +16,8 @@ from ninja.pagination import LimitOffsetPagination
 from pydantic import ConfigDict, Field, PlainSerializer
 
 from workbench.accounts.models import Team, User
+from workbench.api_codes import by_id_or_code
+from workbench.api_keys import KEYS
 from workbench.tools.validation import monday
 
 
@@ -90,15 +94,172 @@ def form_data(form):
 
 def check_allow_delete(instance, request, loc):
     """Raise the reasons why ``allow_delete()`` refuses deleting the
-    instance like in the web interface, where they're messages"""
+    instance like in the web interface, where they're messages
+
+    Returns ``True``, or ``None`` if the view's delete form decides."""
     storage = request._messages
     before = len(storage._queued_messages)
-    if not instance.allow_delete(instance, request):
+    allow = instance.allow_delete(instance, request)
+    if allow is False:
         raise NinjaValidationError([
             {"loc": loc, "msg": str(message)}
             for message in storage._queued_messages[before:]
         ])
     del storage._queued_messages[before:]
+    return allow
+
+
+def delete_with_form(
+    instance,
+    request,
+    *,
+    loc,
+    delete_form_class=None,
+    data=None,
+    fields=None,
+    ignore_warnings=(),
+    dry_run,
+):
+    """Delete the instance like ``generic.DeleteView`` does: refused if
+    ``allow_delete()`` refuses, through the view's delete form if it has one
+
+    ``data`` are the values of the delete form's fields (its questions,
+    e.g. whether to delete the planned work too), ``fields`` maps them to
+    their location in the request like in ``form_errors()``. ``loc`` locates
+    the refusals of ``allow_delete()``, e.g. ``["path", "offer_id"]``.
+    Serialize the instance before, it's gone afterwards; consequences to
+    check by hand are in its ``delete_warnings`` (if any) like in the web
+    interface. Rolled back with ``dry_run``."""
+    allow = check_allow_delete(instance, request, loc)
+    assert allow or delete_form_class, (
+        "delete_form_class must be set if allow_delete returns None"
+    )
+    with transaction.atomic():
+        if delete_form_class:
+            form = delete_form_class(data or {}, instance=instance, request=request)
+            validate_form(form, fields=fields, ignore_warnings=ignore_warnings)
+            form.delete()
+        else:
+            instance.delete()
+        if dry_run:
+            transaction.set_rollback(True)
+
+
+def _converted(patch, convert):
+    """The patched values for the form, converted with
+    ``convert[name](value)``; converters raise Django's ``ValidationError``
+    for invalid values, null empties the field"""
+    values, errors = {}, []
+    for name, value in patch.items():
+        if value is None:
+            values[name] = ""
+        elif name not in convert:
+            values[name] = value
+        else:
+            try:
+                values[name] = convert[name](value)
+            except ValidationError as exc:
+                errors.extend(
+                    {"loc": ["body", "data", name], "msg": message}
+                    for message in exc.messages
+                )
+    return values, errors
+
+
+def patch_with_form(
+    form_class,
+    instance,
+    patch,
+    request,
+    *,
+    out,
+    ignore_warnings=(),
+    dry_run=False,
+    field_map=None,
+    form_kwargs=None,
+):
+    """Change the instance through the web interface's form: the patched
+    fields on top of the instance's current values (``form_data()``),
+    validated with ``validate_form()``, saved in a transaction; rolled back
+    with ``dry_run``. Returns ``out(saved_instance)`` (computed before the
+    rollback).
+
+    ``patch`` is the request body (fields which haven't been set are left
+    alone) or a dict of the fields to change. ``null`` empties a field, the
+    form decides whether that's allowed. ``field_map`` maps API fields to
+    form fields: a name (the field is called differently in the form), a
+    converter (``active_user``, ``api_key("offer_status")``,
+    ``object_pk(queryset)``, raising Django's ``ValidationError`` for
+    invalid values) or both as ``(name, converter)``. Errors are located at
+    the API field, ``["body", "data", <api field>]``."""
+    if isinstance(patch, Schema):
+        patch = patch.model_dump(exclude_unset=True)
+    names, convert = {}, {}
+    for api_field, mapping in (field_map or {}).items():
+        if isinstance(mapping, tuple):
+            names[api_field], convert[api_field] = mapping
+        elif isinstance(mapping, str):
+            names[api_field] = mapping
+        else:
+            convert[api_field] = mapping
+    converted, errors = _converted(patch, convert)
+    if errors:
+        raise NinjaValidationError(errors)
+
+    form_kwargs = {"instance": instance, "request": request} | (form_kwargs or {})
+    values = form_data(form_class(**form_kwargs))
+    for api_field, value in converted.items():
+        values[names.get(api_field, api_field)] = value
+    form = form_class(values, **form_kwargs)
+    validate_form(
+        form,
+        fields={form_field: [api_field] for api_field, form_field in names.items()},
+        ignore_warnings=ignore_warnings,
+    )
+    with transaction.atomic():
+        result = out(form.save())
+        if dry_run:
+            transaction.set_rollback(True)
+    return result
+
+
+def active_user(short_name):
+    """Converter for ``patch_with_form()``: the PK of the active user with
+    this short name, like the forms' choices of users"""
+    if user := User.objects.by_short_name(short_name).filter(is_active=True).first():
+        return user.pk
+    raise ValidationError(_("Unknown or inactive user %r.") % short_name)
+
+
+def api_key(name):
+    """Converter for ``patch_with_form()``: the stored value of a key of
+    ``workbench.api_keys.KEYS[name]``, e.g. ``api_key("offer_status")``"""
+
+    def convert(key):
+        try:
+            return KEYS[name][key]
+        except KeyError:
+            raise ValidationError(
+                _("Expected one of %s.") % ", ".join(KEYS[name])
+            ) from None
+
+    return convert
+
+
+def object_pk(queryset):
+    """Converter for ``patch_with_form()``: the PK of the object with this ID
+    or code (``by_id_or_code()``) in the queryset"""
+
+    def convert(value):
+        try:
+            return by_id_or_code(queryset, str(value)).pk
+        except Http404:
+            raise ValidationError(
+                _("%(model)s %(value)r doesn't exist.")
+                % {"model": capfirst(queryset.model._meta.verbose_name), "value": value}
+            ) from None
+
+    return convert
 
 
 def without_query(request):

@@ -1076,6 +1076,16 @@ msgstr "%(name)s (ID %(id)s) hat denselben Namen. Falls es dieselben sind, zusam
 msgid "Unknown or inactive user %r."
 msgstr "Unbekannte:r oder inaktive:r Mitarbeiter:in %r."
 
+#: workbench/tools/api.py
+#, python-format
+msgid "Expected one of %s."
+msgstr "Erlaubt sind: %s."
+
+#: workbench/tools/api.py
+#, python-format
+msgid "%(model)s %(value)r doesn't exist."
+msgstr "%(model)s %(value)r existiert nicht."
+
 #: workbench/contacts/api.py
 #, python-format
 msgid "%(organization)s (ID %(id)s) has been archived. Unarchive it instead, or allow duplicates."
