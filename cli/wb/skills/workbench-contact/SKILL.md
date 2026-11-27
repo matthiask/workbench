@@ -25,9 +25,9 @@ address and their organization:
 - If the person exists already, compare their details with the data. New
   email addresses, phone numbers or postal addresses can be added (see
   below). Names, the salutation, the organization and the notes are changed
-  with `wb people update <person_id> ... --dry-run` (see `--help`), outdated
-  details removed with its `--remove-*` options and postal addresses changed
-  with `wb people change-address`; confirm changes with the user first.
+  with `wb people update <person_id> ... --dry-run` (see `--help`). Existing
+  details are changed in place instead of being removed and added again
+  (see below); confirm changes with the user first.
 - If the organization exists, use its ID (`organization`). If several match,
   ask which one. Only use `new_organization` when there's none. If the data
   has a central email address (info@, kontakt@, ...) or a reception number,
@@ -112,3 +112,20 @@ them to the user and validate them:
 Existing details are never changed or removed. After the user's approval:
 
     wb people add-details <person_id> <scratchpad>/details.yaml
+
+## Changing or removing existing details
+
+A new email address or phone number of someone (e.g. a new mobile number,
+a changed domain) replaces the old one, it isn't added next to it; outdated
+details are removed. The IDs are in `wb people show`; validate with
+`--dry-run`, run without after the user's approval:
+
+    wb people change-email <person_id> <email_id> --email hans.muster@example.com --dry-run
+    wb people change-phone <person_id> <phone_id> --phone-number "079 123 45 67" --dry-run
+    wb people change-address <person_id> --address <address_id> --street Neuweg --dry-run
+    wb people remove-email <person_id> <email_id> --dry-run
+    wb people remove-phone <person_id> <phone_id> --dry-run
+    wb people remove-address <person_id> <address_id> --dry-run
+
+`--type` changes the type (Work, Mobile, Home, ...) of email addresses and
+phone numbers too.

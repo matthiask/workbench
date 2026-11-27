@@ -131,7 +131,12 @@ and central addresses of organizations which are still on people. Sort them:
 
 Phone numbers work the same way: the reception's number belongs to the
 organization (its central number, shown on every person), mobile numbers
-on several people are usually duplicates or mistakes; ask.
+on several people are usually duplicates or mistakes; ask. A typo or an
+outdated value of a single person's email address or phone number is fixed
+in place (IDs from `wb people show`), not removed and added again:
+
+    wb people change-email <person_id> <email_id> --email hans.muster@example.com --dry-run
+    wb people change-phone <person_id> <phone_id> --phone-number "+41 44 123 45 68" --dry-run
 
     wb people shared-phones
     wb organizations update <organization_id> --phone-number "+41 44 123 45 67" --dry-run
@@ -222,7 +227,7 @@ organization-update` after the user confirms. Membership in an active group
 
     wb people update <person_id> --organization <organization_id> --dry-run
     wb people update <person_id> --organization "" --dry-run
-    wb people update <person_id> --remove-postal-address <address_id> --dry-run
+    wb people remove-address <person_id> <address_id> --dry-run
 
 `wb people show` lists the IDs of the postal addresses.
 
