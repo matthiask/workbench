@@ -116,6 +116,8 @@ sites to Workbench sites by host name, lowercased and ignoring a leading
   ask; the person receiving invoices isn't necessarily the right one.
   `wb sites contacts add SITE PERSON_ID --dry-run`. Create missing people
   with the workbench-contact skill.
+- **Duplicates**: a site created twice by mistake is deleted (`wb sites
+  delete SITE --dry-run`); sites which ran once are archived instead.
 
 ### 4. Uptime monitors
 

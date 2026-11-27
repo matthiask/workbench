@@ -3,10 +3,13 @@
 import click
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     complete_short_names,
     console,
     echo_csv,
+    echo_deleted,
     echo_fields,
     echo_json,
     echo_more,
@@ -283,6 +286,19 @@ def update_site(
     if dry_run:
         console.print("Dry run, nothing saved:")
     _echo_site(data)
+
+
+@sites.command("delete")
+@click.argument("site")
+@change_options(warnings=False)
+def delete_site(site, dry_run, as_json):
+    """Delete a site (ID or title), e.g. one created by mistake
+
+    Sites which don't run anymore are archived instead (`wb sites update
+    SITE --archived`). Its contacts are deleted too, its recurring invoices
+    only lose their site."""
+    data = request("DELETE", f"hosting/sites/{site}/", params=change_params(dry_run))
+    echo_deleted(data, _echo_site, what=data["title"], dry_run=dry_run, as_json=as_json)
 
 
 @sites.group()

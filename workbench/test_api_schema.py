@@ -80,9 +80,11 @@ API_ROUTES = {
     "deals_deal_update": "PATCH /api/deals/{deal_id}/",
     "delete_timestamp": "DELETE /api/timestamps/{timestamp}/",
     "hosting_server_create": "POST /api/hosting/servers/",
+    "hosting_server_delete": "DELETE /api/hosting/servers/{server_id}/",
     "hosting_server_update": "PATCH /api/hosting/servers/{server_id}/",
     "hosting_site_add_contact": "POST /api/hosting/sites/{site_id}/contacts/",
     "hosting_site_create": "POST /api/hosting/sites/",
+    "hosting_site_delete": "DELETE /api/hosting/sites/{site_id}/",
     "hosting_site_update": "PATCH /api/hosting/sites/{site_id}/",
     "hosting_sitecontact_delete": (
         "POST /api/hosting/sites/{site_id}/contacts/remove/"
@@ -152,8 +154,6 @@ NOT_IN_API = {
     "expenses_expensereport_create": "out of scope: bookkeeping",
     "expenses_expensereport_delete": "out of scope: bookkeeping",
     "expenses_expensereport_update": "out of scope: bookkeeping",
-    "hosting_server_delete": "package 22",
-    "hosting_site_delete": "package 22",
     "hosting_sitecontact_update": "package 22",
     "invoices_invoice_createservice": "package 05",
     "invoices_invoice_send": "out of scope: sending mail",

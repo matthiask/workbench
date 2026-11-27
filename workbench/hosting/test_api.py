@@ -3,7 +3,7 @@ from django.test.utils import override_settings
 
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
-from workbench.hosting.models import Site
+from workbench.hosting.models import Server, Site, SiteContact
 
 
 class HostingAPITest(TestCase):
@@ -170,9 +170,65 @@ class HostingAPITest(TestCase):
         )
         self.assertIsNone(response.json()["site"])
 
+    def test_site_delete(self):
+        """Deleting a site like in the web interface: its contacts go with it,
+        recurring invoices only lose their site"""
+        site = factories.SiteFactory.create(title="www.example.com")
+        site.contacts.create(person=factories.PersonFactory.create(), role="outage")
+        invoice = factories.RecurringInvoiceFactory.create(
+            customer=site.customer,
+            postal_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+            site=site,
+        )
+
+        response = self.client.delete("/api/hosting/sites/www.example.com/?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], site.pk)
+        self.assertEqual(response.json()["recurring_invoices"][0]["id"], invoice.pk)
+        self.assertTrue(Site.objects.filter(pk=site.pk).exists())
+
+        response = self.client.delete(f"/api/hosting/sites/{site.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], "www.example.com")
+        self.assertFalse(Site.objects.filter(pk=site.pk).exists())
+        self.assertFalse(SiteContact.objects.exists())
+        invoice.refresh_from_db()
+        self.assertIsNone(invoice.site)
+
+        response = self.client.delete(f"/api/hosting/sites/{site.pk}/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_server_delete(self):
+        """Servers with sites (also archived ones) can't be deleted, like in
+        the web interface"""
+        site = factories.SiteFactory.create(title="www.example.com", is_archived=True)
+        server = site.server
+
+        response = self.client.delete(f"/api/hosting/servers/{server.pk}/")
+        self.assertEqual(response.status_code, 422)
+        [error] = response.json()["detail"]
+        self.assertEqual(error["loc"], ["path", "server_id"])
+        self.assertIn("www.example.com", error["msg"])
+
+        site.delete()
+        response = self.client.delete(f"/api/hosting/servers/{server.title}/?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["id"], server.pk)
+        self.assertTrue(Server.objects.filter(pk=server.pk).exists())
+
+        response = self.client.delete(f"/api/hosting/servers/{server.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["title"], server.title)
+        self.assertFalse(Server.objects.exists())
+
     @override_settings(FEATURES={FEATURES.HOSTING: F.NEVER})
     def test_without_feature(self):
         self.assertEqual(self.client.get("/api/hosting/sites/").status_code, 403)
+        site = factories.SiteFactory.create()
+        self.assertEqual(
+            self.client.delete(f"/api/hosting/sites/{site.pk}/").status_code, 403
+        )
+        self.assertTrue(Site.objects.exists())
 
     def test_without_controlling(self):
         site = factories.SiteFactory.create()

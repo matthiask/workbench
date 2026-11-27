@@ -464,12 +464,14 @@ a contact for outages have problems; `wb sites` lists them:
     wb sites contacts add www.beispiel.ch 678                # outages and maintenance
     wb sites contacts add www.beispiel.ch 679 --role it      # DNS etc.
     wb sites contacts remove www.beispiel.ch 678
+    wb sites delete www.beispiel.ch     # created by mistake; archive the others
 
 Whom to write to about an outage or a maintenance window of a server:
 
     wb servers
     wb servers show server01
     wb servers show server01 --emails    # comma separated, for BCC
+    wb servers delete server01          # only without sites, archive the others
 
 ## Deals
 

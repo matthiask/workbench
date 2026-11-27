@@ -34,6 +34,7 @@ from workbench.tools.api import (
     OrganizationID,
     SearchQuery,
     Serialized,
+    delete_with_form,
     form_data,
     raise_form_errors,
 )
@@ -220,6 +221,17 @@ def server_update(
     server = _server(server_id)
     values = _server_values(server, request) | data.dict(exclude_unset=True)
     return _save_server(request, server, values, dry_run=dry_run)
+
+
+@router.delete("/hosting/servers/{server_id}/", response=ServerOut)
+def server_delete(request, server_id: str, *, dry_run: DryRun = False):
+    """Delete a server (by ID or title) like in the web interface, e.g. one
+    created by mistake; refused while it has sites, also archived ones
+    (archive the server instead). Returns the deleted server."""
+    server = _server(server_id)
+    result = _server_out(server, request)
+    delete_with_form(server, request, loc=["path", "server_id"], dry_run=dry_run)
+    return result
 
 
 # Sites
@@ -441,6 +453,20 @@ def site_update(request, site_id: str, data: SitePatch, *, dry_run: DryRun = Fal
     """Change a site, e.g. move it to another server or archive it"""
     site = _site(site_id)
     return _save_site(request, site, data.dict(exclude_unset=True), dry_run=dry_run)
+
+
+@router.delete("/hosting/sites/{site_id}/", response=SiteOut)
+def site_delete(request, site_id: str, *, dry_run: DryRun = False):
+    """Delete a site (by ID or title) like in the web interface, e.g. one
+    created by mistake; sites which don't run anymore are archived instead
+
+    Its contacts are deleted too, its recurring invoices stay and only lose
+    their site (they're in the returned site, with the controlling
+    feature). Returns the deleted site."""
+    site = _site(site_id)
+    result = _site_out(site, request)
+    delete_with_form(site, request, loc=["path", "site_id"], dry_run=dry_run)
+    return result
 
 
 class SiteContactIn(InputSchema):

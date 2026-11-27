@@ -26,6 +26,7 @@ from workbench.accounts.models import APIToken
 from workbench.api_keys import KEYS
 from workbench.contacts.models import Group, Organization, Person
 from workbench.deals.models import AttributeGroup, Deal
+from workbench.hosting.models import Server, Site
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.offers.models import Offer
@@ -2335,6 +2336,30 @@ planned_work:
         self.assertIn("kubectl get ingress -A", result.output)
         result = self.wb("servers")
         self.assertIn("cluster", result.output)
+
+    def test_sites_and_servers_delete(self):
+        """Deleting sites and servers"""
+        site = factories.SiteFactory.create(title="www.beispiel.ch")
+        person = factories.PersonFactory.create(given_name="Hans", family_name="Muster")
+        site.contacts.create(person=person, role="outage")
+
+        server = site.server
+        result = self.wb("servers", "delete", server.title)
+        self.assertEqual(result.exit_code, 1, result.output)
+        self.assertIn("www.beispiel.ch", result.output)
+
+        result = self.wb("sites", "delete", "www.beispiel.ch", "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been deleted.", result.output)
+        result = self.wb("sites", "delete", site.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Deleted www.beispiel.ch.", result.output)
+        self.assertFalse(Site.objects.exists())
+
+        result = self.wb("servers", "delete", server.title, "--json")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(json.loads(result.output)["id"], server.pk)
+        self.assertFalse(Server.objects.exists())
 
     @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
     def test_campaigns(self):

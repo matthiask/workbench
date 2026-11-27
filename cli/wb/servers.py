@@ -3,8 +3,11 @@
 import click
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     console,
+    echo_deleted,
     echo_fields,
     echo_json,
     echo_more,
@@ -160,3 +163,19 @@ def update_server(server, title, notes, is_archived, dry_run, as_json):
     if dry_run:
         console.print("Dry run, nothing saved:")
     _echo_server(data)
+
+
+@servers.command("delete")
+@click.argument("server")
+@change_options(warnings=False)
+def delete_server(server, dry_run, as_json):
+    """Delete a server (ID or title), e.g. one created by mistake
+
+    Refused while it has sites, also archived ones; servers which aren't used
+    anymore are archived instead (`wb servers update SERVER --archived`)."""
+    data = request(
+        "DELETE", f"hosting/servers/{server}/", params=change_params(dry_run)
+    )
+    echo_deleted(
+        data, _echo_server, what=data["title"], dry_run=dry_run, as_json=as_json
+    )
