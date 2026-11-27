@@ -1200,6 +1200,22 @@ planned_work:
         self.assertEqual(offer.status, Offer.DECLINED)
         self.assertEqual(offer.planned_work.count(), 1)
 
+    def test_offers_copy(self):
+        """Offers are copied like in the web interface"""
+        offer = factories.OfferFactory.create(title="Relaunch")
+        factories.ServiceFactory.create(project=offer.project, offer=offer)
+        other = factories.ProjectFactory.create()
+
+        result = self.wb("offers", "copy", offer.code, "--project", offer.project.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning same-project", result.output)
+        result = self.wb("offers", "copy", offer.pk, "--project", other.code)
+        self.assertEqual(result.exit_code, 0, result.output)
+        copy = other.offers.get()
+        self.assertIn(f"{copy.code} Relaunch", result.output)
+        self.assertEqual(copy.owned_by, self.user)
+        self.assertEqual(copy.services.count(), 1)
+
     def test_milestones(self):
         """Milestones are linked with offers through their external references"""
         project = factories.ProjectFactory.create(title="Relaunch", owned_by=self.user)

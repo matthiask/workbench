@@ -309,6 +309,11 @@ again; accepted offers warn that they had been closed already:
 Changing an offer's status doesn't change its deals; closing a deal
 accepts or declines its offers (`wb deals close`).
 
+Offers are copied with their services and headings to an open project (the
+copy is in preparation and belongs to you):
+
+    wb offers copy 2026-0042-o01 --project 2026-0057
+
 External references (URLs of issues or pull requests, for example) can be
 changed for any offer, also when it has been accepted already. They replace
 the existing ones; Workbench only stores them and doesn't talk to GitHub:

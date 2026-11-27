@@ -17,7 +17,7 @@ from workbench.accounts.features import FEATURES
 from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, OfferStatus, key
 from workbench.contacts.models import postal_address_choices
-from workbench.offers.forms import OfferForm
+from workbench.offers.forms import OfferCopyForm, OfferForm
 from workbench.offers.models import (
     Offer,
     OfferHeading,
@@ -51,8 +51,10 @@ from workbench.tools.api import (
     api_key,
     filter_date_range,
     full_clean,
+    object_pk,
     patch_with_form,
     user_by_short_name,
+    validate_form,
 )
 from workbench.tools.pdf import offer_filename, pdf_response
 
@@ -796,6 +798,50 @@ def _update_external_reference(request, offer_id, value, *, dry_run):
         result = offer_out(offer, list(offer.services.all()), request)
         if dry_run:
             transaction.set_rollback(True)
+    return result
+
+
+class OfferCopyIn(InputSchema):
+    project: int | str = Field(description="ID or code of an open project.")
+
+
+@router.post("/offers/{offer_id}/copy/", response=OfferOut)
+def offer_copy(
+    request,
+    offer_id: str,
+    data: OfferCopyIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Copy an offer (by ID or code) with its services and headings to a
+    project, like in the web interface: the copy is in preparation and
+    belongs to you
+
+    Copying to the offer's own project is the warning same-project."""
+    offer = by_id_or_code(Offer.objects.select_related("project"), offer_id)
+    try:
+        project = object_pk(Project.objects.all())(data.project)
+    except DjangoValidationError as exc:
+        raise ValidationError([
+            {"loc": ["body", "data", "project"], "msg": message}
+            for message in exc.messages
+        ]) from None
+    form = OfferCopyForm(
+        {"project": project},
+        project=offer.project,
+        request=request,
+        prefix=None,  # The web interface's is "modal"
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+    with transaction.atomic():
+        new = offer.copy_to(project=form.cleaned_data["project"], owned_by=request.user)
+        result = offer_out(new, list(new.services.all()), request)
+        if dry_run:
+            transaction.set_rollback(True)
+            result |= {"id": None, "code": None, "url": None}
+            for item in [*result["services"], *result["headings"]]:
+                item.id = None
     return result
 
 

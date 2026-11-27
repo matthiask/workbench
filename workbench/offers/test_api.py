@@ -909,3 +909,82 @@ class OfferServicesAPITest(TestCase):
             f"/api/offers/{self.offer.pk}/pdf/?signature_line=true"
         )
         self.assertEqual(response.status_code, 200)
+
+
+class OfferCopyDeleteRenumberAPITest(TestCase):
+    """Copying, deleting and renumbering offers like in the web interface"""
+
+    def tearDown(self):
+        deactivate_all()
+
+    def setUp(self):
+        self.project = factories.ProjectFactory.create()
+        self.offer = factories.OfferFactory.create(
+            project=self.project, title="Relaunch"
+        )
+        self.service = factories.ServiceFactory.create(
+            project=self.project, offer=self.offer, title="Concept", effort_hours=10
+        )
+        self.client.force_login(self.project.owned_by)
+
+    def copy(self, data, *, query=""):
+        return self.client.post(
+            f"/api/offers/{self.offer.pk}/copy/?{query}",
+            data,
+            content_type="application/json",
+        )
+
+    def test_copy(self):
+        """Offers are copied with their services to another project, the
+        copy belongs to the user copying it like in the web interface"""
+        other = factories.ProjectFactory.create()
+
+        response = self.copy({"project": other.code}, query="dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(
+            (data["id"], data["code"], data["url"], data["project"]["id"]),
+            (None, None, None, other.pk),
+        )
+        self.assertEqual([s["id"] for s in data["services"]], [None])
+        self.assertFalse(other.offers.exists())
+
+        response = self.copy({"project": other.pk})
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        offer = other.offers.get()
+        self.assertEqual(data["id"], offer.pk)
+        self.assertEqual(data["title"], "Relaunch")
+        self.assertEqual(data["status"], "in_preparation")
+        self.assertEqual(data["owned_by"], self.project.owned_by.get_short_name())
+        self.assertEqual(
+            [(s["title"], s["effort_hours"]) for s in data["services"]],
+            [("Concept", "10.0")],
+        )
+
+    def test_copy_errors(self):
+        """Copying to the same project warns, closed projects are refused"""
+        response = self.copy({"project": self.project.pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [(e["loc"], e.get("code")) for e in response.json()["detail"]],
+            [(["body", "data"], "same-project")],
+        )
+        response = self.copy(
+            {"project": self.project.pk}, query="ignore_warnings=same-project"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(self.project.offers.count(), 2)
+
+        closed = factories.ProjectFactory.create(closed_on=dt.date.today())
+        for project in [closed.pk, "nonsense", 0]:
+            response = self.copy({"project": project})
+            self.assertEqual(response.status_code, 422)
+            self.assertEqual(
+                [e["loc"] for e in response.json()["detail"]],
+                [["body", "data", "project"]],
+            )
+        self.assertFalse(closed.offers.exists())
+
+        response = self.copy({"project": closed.pk, "title": "Copy"})
+        self.assertEqual(response.status_code, 422)

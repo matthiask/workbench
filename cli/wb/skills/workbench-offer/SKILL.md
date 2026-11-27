@@ -226,6 +226,11 @@ again in Workbench:
 
 The warning only comes for accepted offers (they lose their closing date).
 
+To start from an existing offer (e.g. the next phase, or the same offer for
+another project), copy it and revise the copy, which is in preparation:
+
+    wb offers copy <offer_id> --project <project_id_or_code> --dry-run
+
 Only for a completely new version of the offer, replace it entirely (as long
 as nothing has been logged on its services yet), again with the user's
 explicit approval:

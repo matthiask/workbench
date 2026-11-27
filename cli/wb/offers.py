@@ -375,6 +375,24 @@ def update_offer(
     _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
 
 
+@offers.command("copy")
+@click.argument("offer_id")
+@click.option("--project", required=True, help="ID or code of an open project.")
+@change_options()
+def copy_offer(offer_id, project, ignore_warnings, dry_run, as_json):
+    """Copy an offer (by ID or code) with its services to a project
+
+    The copy is in preparation and belongs to you. Copying it to its own
+    project is a warning (same-project)."""
+    data = request(
+        "POST",
+        f"offers/{offer_id}/copy/",
+        params=change_params(dry_run, ignore_warnings),
+        json={"project": project},
+    )
+    _echo_changed_offer(data, dry_run=dry_run, as_json=as_json)
+
+
 @offers.group("headings")
 def headings():
     """Add, change and delete the headings between the services of an offer
