@@ -55,3 +55,28 @@ sent and accepted offers; the form's warning
 the workflow in `wb offers update --help`, `cli/README.md` and the
 `workbench-offer` skill (revising an offer that isn't in preparation
 anymore).
+
+## Done (2026-11-27)
+
+What differs from the spec, and what later packages need to know:
+
+- `OfferForm(with_items=False)` leaves services and headings alone: the
+  formsets stay unbound, aren't validated and aren't saved. The API changes
+  them through `wb services` and `wb offers headings` only.
+- `OfferForm.is_valid()` takes `ignore_warnings` like the base form, and
+  the planned work question also appears when the status is posted as a
+  number (the API posts numbers, the web interface strings).
+- `discount: null` still removes the discount (sent as 0). `tax_rate` is a
+  number like 8.1, quantized to the form's choices. Booleans set to null
+  are false.
+- Service groups lost their own 409 too: they take every field of the
+  form, like in the web interface.
+- Changing only `external_reference` still skips the form, so it never
+  warns (e.g. `short-postal-address` on old offers). Any other change goes
+  through the form and may warn about the postal address.
+- Linked deals: no signals; changing an offer's status doesn't touch its
+  deals. Only closing a deal (`DealForm`) accepts or declines its offers.
+  An accepted offer put back into preparation stays linked to its
+  (possibly closed) deal.
+- Dates of `wb offers update` take `""` to empty them (`--work-completed-on
+  ""` resumes logging).

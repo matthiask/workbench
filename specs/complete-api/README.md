@@ -84,7 +84,7 @@ conflicts; the "Touches" column shows them.
 | # | Package | Touches | Depends on | Status |
 |---|---|---|---|---|
 | 00 | [Groundwork](00-groundwork.md) | `tools/api.py`, forms (warning codes), `test_api_schema.py` | — | done |
-| 01 | [Offers: update and status](01-offers-update.md) | `offers/api.py`, `cli/wb/offers.py` | 00 | open |
+| 01 | [Offers: update and status](01-offers-update.md) | `offers/api.py`, `cli/wb/offers.py` | 00 | done |
 | 02 | [Offers: copy, delete, renumber](02-offers-copy-delete.md) | `offers/api.py`, `projects/api.py`, `cli/wb/offers.py` | 00 | open |
 | 03 | [Invoices: update and delete](03-invoices-update-delete.md) | `invoices/api.py`, `cli/wb/invoices.py` | 00 | open |
 | 05 | [Invoices: services](05-invoice-services.md) | `invoices/api.py`, `cli/wb/invoices.py` | 00 | open |
