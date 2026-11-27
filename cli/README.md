@@ -285,6 +285,7 @@ created in preparation; review and send them in Workbench.
     wb offers pdf 5678 --signature-line -o ~/Downloads
     wb offers update 5678 --title "Relaunch 2027" --description - < text.txt
     wb offers update 5678 --discount 500 --dry-run
+    wb offers update 5678 --owned-by hm   # e.g. when someone leaves
 
 External references (URLs of issues or pull requests, for example) can be
 changed for any offer, also when it has been accepted already. They replace

@@ -655,6 +655,12 @@ headings:
         self.assertIn("Website", result.output)
         self.assertIn(str(concept.pk), result.output)
 
+        other = factories.UserFactory.create(_short_name="hm")
+        result = self.wb("offers", "update", created.pk, "--owned-by", "hm")
+        self.assertEqual(result.exit_code, 0, result.output)
+        created.refresh_from_db()
+        self.assertEqual(created.owned_by, other)
+
         result = self.wb(
             "services",
             "create",

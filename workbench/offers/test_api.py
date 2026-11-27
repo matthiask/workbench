@@ -211,8 +211,8 @@ class OffersAPITest(TestCase):
         )
         self.assertContains(
             response,
-            "Only the title, the description and the external reference"
-            " of service groups can be changed.",
+            "Only the title, the description, the owner and the external"
+            " reference of service groups can be changed.",
             status_code=409,
         )
 
@@ -592,6 +592,44 @@ class OfferServicesAPITest(TestCase):
         self.assertEqual(response.json()["total_excl_tax"], "2500.00")
         response = self.send("patch", data={"discount": None})
         self.assertEqual(response.json()["total_excl_tax"], "3000.00")
+
+    def test_owned_by(self):
+        """Offers in preparation and service groups are handed over to another
+        active user, e.g. when someone leaves; sent offers stay as they are"""
+        user = factories.UserFactory.create(_short_name="Hm")
+        factories.UserFactory.create(_short_name="xy", is_active=False)
+
+        response = self.send("patch", data={"owned_by": "hm"}, dry_run=True)
+        self.assertEqual(response.json()["owned_by"], "Hm")
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.owned_by, self.project.owned_by)
+
+        response = self.send("patch", data={"owned_by": "hm"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.owned_by, user)
+
+        for short_name in ["xy", "nobody"]:
+            with self.subTest(short_name=short_name):
+                response = self.send("patch", data={"owned_by": short_name})
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(
+                    response.json()["detail"][0]["loc"],
+                    ["body", "data", "owned_by"],
+                )
+
+        self.offer.status = Offer.SERVICE_GROUP
+        self.offer.save()
+        owner = self.project.owned_by.get_short_name()
+        response = self.send("patch", data={"owned_by": owner})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.owned_by, self.project.owned_by)
+
+        self.offer.status = Offer.OFFERED
+        self.offer.save()
+        response = self.send("patch", data={"owned_by": "hm"})
+        self.assertEqual(response.status_code, 409)
 
     def test_external_reference(self):
         """External references are changed for offers in any state and

@@ -14,6 +14,7 @@ from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
+from workbench.accounts.models import User
 from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, OfferStatus, key
 from workbench.contacts.models import postal_address_choices
@@ -698,14 +699,17 @@ class OfferPatch(InputSchema):
         description="URLs separated by whitespace; replaces the existing ones. Can also"
         " be changed when the offer isn't in preparation anymore.",
     )
+    owned_by: str | None = Field(
+        default=None, description="Short name of an active user."
+    )
 
 
 @router.patch("/offers/{offer_id}/", response=OfferOut)
 def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: DryRun = False):
-    """Change the title, the description, the postal address or the discount
-    of an offer in preparation, the title and the description of a service
-    group, or the external references of any offer; fields which aren't
-    given are left alone"""
+    """Change the title, the description, the owner, the postal address or
+    the discount of an offer in preparation, the title, the description and
+    the owner of a service group, or the external references of any offer;
+    fields which aren't given are left alone"""
     fields = data.model_dump(exclude_unset=True)
     if fields.keys() == {"external_reference"}:
         return _update_external_reference(
@@ -714,12 +718,12 @@ def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: DryRun = 
     offer = get_object_or_404(Offer, pk=offer_id)
     if offer.status == Offer.SERVICE_GROUP:
         # Service groups only have a title and a description
-        if fields.keys() - {"title", "description", "external_reference"}:
+        if fields.keys() - {"title", "description", "owned_by", "external_reference"}:
             raise HttpError(
                 409,
                 _(
-                    "Only the title, the description and the external reference"
-                    " of service groups can be changed."
+                    "Only the title, the description, the owner and the external"
+                    " reference of service groups can be changed."
                 ),
             )
         if "external_reference" in fields:
@@ -737,6 +741,8 @@ def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: DryRun = 
     for field, value in fields.items():
         if field == "discount":
             offer.discount = _decimal(value or 0, "0.00")
+        elif field == "owned_by":
+            offer.owned_by = _active_user(value)
         else:
             setattr(offer, field, value or "")
     errors = []
@@ -744,6 +750,19 @@ def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: DryRun = 
     if errors:
         raise ValidationError(errors)
     return _save(offer, [], request, dry_run=dry_run)
+
+
+def _active_user(short_name):
+    if short_name and (
+        user := User.objects.by_short_name(short_name).filter(is_active=True).first()
+    ):
+        return user
+    raise ValidationError([
+        {
+            "loc": ["body", "data", "owned_by"],
+            "msg": _("Unknown or inactive user %r.") % short_name,
+        }
+    ])
 
 
 def _update_external_reference(request, offer_id, value, *, dry_run):
