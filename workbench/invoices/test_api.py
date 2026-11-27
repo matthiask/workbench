@@ -3,6 +3,7 @@ from unittest import mock
 from unittest.mock import ANY
 
 from django.conf import settings
+from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import deactivate_all
@@ -10,7 +11,12 @@ from django.utils.translation import deactivate_all
 from workbench import factories
 from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
+from workbench.reporting.models import FreezeDate
+from workbench.tools.formats import local_date_format
 from workbench.tools.validation import in_days
+
+
+ADDRESS = "Beispiel AG\nHans Muster\nMusterweg 1\n8000 Zürich"
 
 
 class InvoicesAPITest(TestCase):
@@ -513,3 +519,235 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(response.json()["total_excl_tax"], "4000.00")
         down_payment.refresh_from_db()
         self.assertEqual(down_payment.down_payment_applied_to_id, response.json()["id"])
+
+    def test_update_sent_invoice(self):
+        """Sent invoices change through the invoice form: changing anything
+        but the status, closing date, payment notice and third party costs
+        is a warning, like in the web interface"""
+        project = factories.ProjectFactory.create()
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            status=Invoice.SENT,
+            invoiced_on=in_days(-10),
+            due_on=in_days(5),
+            subtotal=1000,
+            postal_address=ADDRESS,
+        )
+        other = factories.UserFactory.create(_short_name="zz")
+        self.client.force_login(project.owned_by)
+        url = f"/api/invoices/{invoice.code}/"
+
+        def patch(data, query=""):
+            return self.client.patch(url + query, data, content_type="application/json")
+
+        response = patch({"owned_by": "zz", "title": "Handed over"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error.get("code") for error in response.json()["detail"]],
+            ["maybe-unintentional-invoice-change"],
+        )
+        response = patch(
+            {"owned_by": "zz", "title": "Handed over"},
+            "?ignore_warnings=maybe-unintentional-invoice-change",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["owned_by"], "zz")
+        invoice.refresh_from_db()
+        self.assertEqual((invoice.owned_by, invoice.title), (other, "Handed over"))
+
+        # Amounts warn too
+        response = patch({"subtotal": "500.00"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["code"], "maybe-unintentional-invoice-change"
+        )
+
+        response = patch({"owned_by": "nobody"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "owned_by"]
+        )
+
+        # Settling it
+        settle = {
+            "status": "paid",
+            "closed_on": in_days(-1).isoformat(),
+            "payment_notice": "Bank transfer",
+        }
+        response = patch(settle, "?dry_run=true")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["status"], "paid")
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.SENT)
+
+        response = patch(settle)
+        self.assertEqual(response.status_code, 200, response.content)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.PAID)
+        self.assertEqual(invoice.closed_on, in_days(-1))
+        self.assertEqual(invoice.payment_notice, "Bank transfer")
+        self.assertEqual(invoice.total_excl_tax, 1000)
+
+    def test_update_status_sends_nothing(self):
+        """Setting the status to sent records it, nothing is mailed"""
+        invoice = factories.InvoiceFactory.create(
+            due_on=in_days(15), postal_address=ADDRESS
+        )
+        self.client.force_login(invoice.owned_by)
+        response = self.client.patch(
+            f"/api/invoices/{invoice.pk}/",
+            {"status": "sent"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.SENT)
+        self.assertEqual(mail.outbox, [])
+
+    def test_update_freeze_date(self):
+        """The freeze date refuses invoice dates and changes like the form"""
+        FreezeDate.objects.create(up_to=in_days(-10))
+        draft = factories.InvoiceFactory.create(
+            invoiced_on=in_days(-20), due_on=in_days(-5), postal_address=ADDRESS
+        )
+        self.client.force_login(draft.owned_by)
+
+        def patch(invoice, data, query=""):
+            return self.client.patch(
+                f"/api/invoices/{invoice.pk}/{query}",
+                data,
+                content_type="application/json",
+            )
+
+        response = patch(draft, {"status": "sent"}, "?ignore_warnings=invoiced-in-past")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data", "invoiced_on"],
+                    "msg": "Cannot create an invoice with a date of"
+                    f" {local_date_format(in_days(-10))} or earlier anymore.",
+                }
+            ],
+        )
+        response = patch(
+            draft,
+            {
+                "status": "sent",
+                "invoiced_on": in_days(0).isoformat(),
+                "due_on": in_days(15).isoformat(),
+            },
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
+        # Freezed invoices change only some fields
+        freezed = factories.InvoiceFactory.create(
+            status=Invoice.SENT,
+            invoiced_on=in_days(-20),
+            due_on=in_days(-5),
+            subtotal=100,
+            postal_address=ADDRESS,
+        )
+        response = patch(freezed, {"subtotal": "200.00", "due_on": None})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "due_on"], ["body", "data", "subtotal"]],
+        )
+        response = patch(freezed, {"status": "canceled", "payment_notice": "Twice"})
+        self.assertEqual(response.status_code, 200, response.content)
+        freezed.refresh_from_db()
+        self.assertEqual(freezed.status, Invoice.CANCELED)
+
+    def test_update_fields(self):
+        """Invoices in preparation change most fields, those which don't
+        apply to the type are refused"""
+        project = factories.ProjectFactory.create()
+        down_payment = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=1000,
+            status=Invoice.SENT,
+            postal_address=ADDRESS,
+        )
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            subtotal=5000,
+            postal_address=ADDRESS,
+        )
+        credit = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            type=Invoice.CREDIT,
+            subtotal=-100,
+            postal_address=ADDRESS,
+        )
+        self.client.force_login(project.owned_by)
+
+        def patch(invoice, data):
+            return self.client.patch(
+                f"/api/invoices/{invoice.pk}/", data, content_type="application/json"
+            )
+
+        response = patch(
+            invoice,
+            {
+                "subtotal": "4000.00",
+                "discount": "100.00",
+                "liable_to_vat": False,
+                "description": "Phase 1",
+                "service_period_from": "2026-10-01",
+                "service_period_until": "2026-10-31",
+                "down_payments": [down_payment.pk],
+            },
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["total"], "2900.00")
+        invoice.refresh_from_db()
+        self.assertFalse(invoice.liable_to_vat)
+        self.assertEqual(invoice.down_payment_total, 1000)
+
+        response = patch(invoice, {"down_payments": []})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["total"], "3900.00")
+
+        response = patch(invoice, {"tax_rate": 8.1, "liable_to_vat": True})
+        self.assertEqual(response.status_code, 200, response.content)
+
+        for data, field in [
+            ({"customer": factories.OrganizationFactory.create().pk}, "customer"),
+            ({"status": "maybe"}, "status"),
+            ({"type": "credit"}, "type"),
+        ]:
+            with self.subTest(data=data):
+                response = patch(invoice, data)
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.json()["detail"][0]["loc"][-1], field)
+
+        response = patch(credit, {"discount": "10.00"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data", "discount"],
+                    "msg": "This field cannot be changed.",
+                }
+            ],
+        )
+        response = patch(credit, {"subtotal": "150.00"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["total_excl_tax"], "-150.00")
+
+        response = patch(invoice, {"status": "canceled"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["msg"],
+            "Invoices which haven't been sent are deleted, not cancelled.",
+        )

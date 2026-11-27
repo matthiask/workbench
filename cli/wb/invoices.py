@@ -4,6 +4,8 @@ import click
 from rich.text import Text
 
 from wb.core import (
+    change_options,
+    change_params,
     cli,
     complete_short_names,
     console,
@@ -368,6 +370,138 @@ def create_invoice(
             f"{data['title']}: {data['total_excl_tax']} excl. tax"
             f" ({len(data['services'])} services)"
         )
+        console.print("Dry run, nothing has been saved.")
+
+
+DATE = click.DateTime(formats=["%Y-%m-%d"])
+
+
+@invoices.command("update")
+@click.argument("invoice_id")
+@click.option("--title")
+@click.option("--description", help="The text, or - to read it from stdin.")
+@click.option("--owned-by", help="Short name.", shell_complete=complete_short_names)
+@click.option(
+    "--status",
+    type=click.Choice(["in_preparation", "sent", "paid", "canceled"]),
+    help="Only records the status, nothing is sent.",
+)
+@click.option(
+    "--closed-on", type=DATE, help="Defaults to today for paid or canceled invoices."
+)
+@click.option("--payment-notice", help="E.g. when and how it has been paid.")
+@click.option("--contact", type=int, help="Person ID.")
+@click.option("--customer", type=int, help="Organization ID, invoices without project.")
+@click.option("--invoiced-on", type=DATE)
+@click.option("--due-on", type=DATE)
+@click.option("--service-period-from", type=DATE)
+@click.option("--service-period-until", type=DATE)
+@click.option("--postal-address")
+@click.option(
+    "--subtotal",
+    type=float,
+    help="Fixed amount, down payment and credit invoices, excl. tax.",
+)
+@click.option("--third-party-costs", type=float)
+@click.option("--discount", type=float, help="Amount excl. tax.")
+@click.option("--vat/--no-vat", "liable_to_vat", default=None)
+@click.option("--tax-rate", type=float)
+@click.option(
+    "--show-service-details/--hide-service-details",
+    default=None,
+    help="Services invoices.",
+)
+@click.option(
+    "--down-payment",
+    "down_payments",
+    type=int,
+    multiple=True,
+    help="ID of a sent or paid down payment invoice of the project to deduct,"
+    " replaces the current ones.",
+)
+@click.option(
+    "--no-down-payments", is_flag=True, help="Don't deduct down payments anymore."
+)
+@change_options()
+def update_invoice(
+    invoice_id,
+    title,
+    description,
+    owned_by,
+    status,
+    closed_on,
+    payment_notice,
+    contact,
+    customer,
+    invoiced_on,
+    due_on,
+    service_period_from,
+    service_period_until,
+    postal_address,
+    subtotal,
+    third_party_costs,
+    discount,
+    liable_to_vat,
+    tax_rate,
+    show_service_details,
+    down_payments,
+    no_down_payments,
+    ignore_warnings,
+    dry_run,
+    as_json,
+):
+    """Change an invoice, by ID or code, only the given fields
+
+    Hand it over (--owned-by) or settle it (--status paid or canceled,
+    --closed-on, --payment-notice). Like in the web interface, sent invoices
+    warn about other changes and freezed invoices only change a few fields.
+    Invoices are sent in the web interface, --status sent sends nothing."""
+    if down_payments and no_down_payments:
+        terminate("Pass either --down-payment or --no-down-payments.")
+    data = {
+        key: value
+        for key, value in [
+            ("title", title),
+            ("description", text_or_stdin(description)),
+            ("owned_by", owned_by),
+            ("status", status),
+            ("payment_notice", text_or_stdin(payment_notice)),
+            ("contact", contact),
+            ("customer", customer),
+            ("postal_address", postal_address),
+            ("subtotal", subtotal),
+            ("third_party_costs", third_party_costs),
+            ("discount", discount),
+            ("liable_to_vat", liable_to_vat),
+            ("tax_rate", tax_rate),
+            ("show_service_details", show_service_details),
+        ]
+        if value is not None
+    }
+    for key, value in [
+        ("closed_on", closed_on),
+        ("invoiced_on", invoiced_on),
+        ("due_on", due_on),
+        ("service_period_from", service_period_from),
+        ("service_period_until", service_period_until),
+    ]:
+        if value:
+            data[key] = value.date().isoformat()
+    if down_payments or no_down_payments:
+        data["down_payments"] = list(down_payments)
+    if not data:
+        terminate("Nothing to change.")
+    data = request(
+        "PATCH",
+        f"invoices/{invoice_id}/",
+        params=change_params(dry_run, ignore_warnings),
+        json=data,
+    )
+    if as_json:
+        echo_json(data)
+        return
+    _echo_invoice(data)
+    if dry_run:
         console.print("Dry run, nothing has been saved.")
 
 

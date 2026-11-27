@@ -396,6 +396,15 @@ the web interface:
     wb invoices create --project 1234 --service 11 --service 12:logbook --disable-logging 11
     wb invoices create --contact 345 --title Workshop --subtotal 1200
 
+`wb invoices update` changes the given fields through the web interface's
+invoice form: sent invoices warn about anything but the status, the closing
+date, the payment notice and third party costs, freezed invoices only change
+a few fields. `--status sent` only records the status, nothing is mailed:
+
+    wb invoices update 2026-0042-0001 --owned-by mk --ignore-warning maybe-unintentional-invoice-change
+    wb invoices update 5678 --status paid --closed-on 2026-11-20 --payment-notice "Bank transfer"
+    wb invoices update 5678 --subtotal 4500 --down-payment 5677 --dry-run
+
 Overdue invoices to remind customers of, per customer and contact, like the
 reminders in the web interface (without postponed reminders):
 

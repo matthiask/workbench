@@ -14,6 +14,7 @@ import click
 import wb
 from click.shell_completion import get_completion_class
 from click.testing import CliRunner
+from django.core import mail
 from django.http import HttpResponsePermanentRedirect
 from django.test import Client, TestCase
 from django.test.utils import override_settings
@@ -2099,6 +2100,60 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn(f"Deleted {deal.code}.", result.output)
         self.assertFalse(Deal.objects.filter(pk=deal.pk).exists())
+
+    def test_invoices_update(self):
+        """Invoices are handed over and settled through the invoice form,
+        nothing is mailed"""
+        invoice = factories.InvoiceFactory.create(
+            title="Relaunch",
+            owned_by=self.user,
+            status=Invoice.SENT,
+            due_on=in_days(15),
+            subtotal=1000,
+            postal_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+        )
+        factories.UserFactory.create(_short_name="zz")
+        result = self.wb("invoices", "update", invoice.code, "--owned-by", "zz")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("maybe-unintentional-invoice-change", result.output)
+        result = self.wb(
+            "invoices",
+            "update",
+            invoice.code,
+            "--owned-by",
+            "zz",
+            "--ignore-warning",
+            "maybe-unintentional-invoice-change",
+            "--dry-run",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing has been saved.", result.output)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.owned_by, self.user)
+
+        result = self.wb(
+            "invoices",
+            "update",
+            invoice.pk,
+            "--status",
+            "paid",
+            "--closed-on",
+            in_days(-1).isoformat(),
+            "--payment-notice",
+            "Bank transfer",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Paid", result.output)
+        invoice.refresh_from_db()
+        self.assertEqual(
+            (invoice.status, invoice.closed_on, invoice.payment_notice),
+            (Invoice.PAID, in_days(-1), "Bank transfer"),
+        )
+        self.assertEqual(mail.outbox, [])
+
+        result = self.wb("invoices", "update", invoice.pk)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Nothing to change.", result.output)
 
     def test_show_deals(self):
         """Projects and offers show their deals"""

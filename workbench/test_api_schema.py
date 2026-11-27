@@ -91,6 +91,8 @@ API_ROUTES = {
     "invoices_invoice_postpone_reminders": (
         "POST /api/invoices/{invoice_id}/postpone-reminders/"
     ),
+    "invoices_invoice_settle": "PATCH /api/invoices/{invoice_id}/",
+    "invoices_invoice_update": "PATCH /api/invoices/{invoice_id}/",
     # All fields: package 06
     "invoices_recurringinvoice_update": "PATCH /api/recurring-invoices/{invoice_id}/",
     "logbook_loggedcost_create": "POST /api/logbook/costs/",
@@ -155,8 +157,6 @@ NOT_IN_API = {
     "invoices_invoice_createservice": "package 05",
     "invoices_invoice_delete": "package 03",
     "invoices_invoice_send": "out of scope: sending mail",
-    "invoices_invoice_settle": "package 03",
-    "invoices_invoice_update": "package 03",
     "invoices_recurringinvoice_create": "package 06",
     "invoices_recurringinvoice_delete": "package 06",
     "invoices_reminders": "out of scope: sending mail",

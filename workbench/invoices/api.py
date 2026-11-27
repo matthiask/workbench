@@ -27,6 +27,7 @@ from workbench.contacts.models import Person, postal_address_choices
 from workbench.invoices.forms import (
     CreatePersonInvoiceForm,
     CreateProjectInvoiceForm,
+    InvoiceForm,
     RecurringInvoiceForm,
 )
 from workbench.invoices.models import Invoice, ProjectedInvoice, RecurringInvoice
@@ -43,8 +44,11 @@ from workbench.tools.api import (
     SearchQuery,
     Serialized,
     ShortName,
+    active_user,
+    api_key,
     filter_date_range,
     form_data,
+    patch_with_form,
     user_by_short_name,
     validate_form,
 )
@@ -651,6 +655,89 @@ def invoice_detail(request, invoice_id: str):
         invoice_id,
     )
     return invoice_out(invoice, request) | {"services": _invoice_services(invoice)}
+
+
+class InvoicePatch(InputSchema):
+    """Fields which aren't given are left alone; the web interface's invoice
+    form decides which fields an invoice can change (freezed invoices only a
+    few, sent ones warn about changes)"""
+
+    contact: int | None = Field(default=None, description="Person ID.")
+    customer: int | None = Field(
+        default=None,
+        description="Organization ID, determined by the project for project invoices.",
+    )
+    invoiced_on: dt.date | None = None
+    due_on: dt.date | None = None
+    title: str | None = Field(default=None, max_length=200)
+    description: str | None = None
+    service_period_from: dt.date | None = None
+    service_period_until: dt.date | None = None
+    owned_by: str | None = Field(default=None, description="Short name.")
+    status: InvoiceStatus | None = Field(
+        default=None,
+        description="Only records the status, nothing is sent. Sent invoices"
+        " can become paid or canceled.",
+    )
+    closed_on: dt.date | None = Field(
+        default=None, description="Defaults to today for paid or canceled invoices."
+    )
+    payment_notice: str | None = None
+    postal_address: str | None = None
+    subtotal: Decimal | None = Field(
+        default=None,
+        description="Fixed amount, down payment and credit invoices (credits as"
+        " a positive amount), calculated from the services otherwise.",
+    )
+    third_party_costs: Decimal | None = Field(
+        default=None, description="Fixed amount and down payment invoices."
+    )
+    discount: Decimal | None = None
+    liable_to_vat: bool | None = None
+    tax_rate: Decimal | None = None
+    show_service_details: bool | None = Field(
+        default=None, description="Services invoices."
+    )
+    down_payments: list[int] | None = Field(
+        default=None,
+        description="IDs of the project's sent or paid down payment invoices"
+        " to deduct (fixed amount and services invoices), replaces the"
+        " current ones.",
+    )
+
+
+@router.patch("/invoices/{invoice_id}/", response=InvoiceOut)
+def invoice_update(
+    request,
+    invoice_id: str,
+    data: InvoicePatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change an invoice (by ID or code), validated like in the web interface,
+    e.g. hand it over to another owner or settle it (status paid or canceled
+    with closed_on and payment_notice)
+
+    Setting the status to sent only records it, nothing is mailed. Warnings
+    of the web interface are errors here unless ignored by their code;
+    nothing is saved if anything is invalid or with ``dry_run``."""
+    invoice = by_id_or_code(Invoice.objects.all(), invoice_id)
+    return patch_with_form(
+        InvoiceForm,
+        invoice,
+        data,
+        request,
+        out=lambda invoice: invoice_out(invoice, request),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map={
+            "owned_by": active_user,
+            "status": api_key("invoice_status"),
+            "tax_rate": lambda value: Decimal(value).quantize(Z2),
+            "down_payments": "apply_down_payment",
+        },
+    )
 
 
 @router.get("/invoices/{invoice_id}/pdf/")
