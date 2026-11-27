@@ -1,15 +1,201 @@
 import importlib
 import inspect
+import re
 from pathlib import Path
 from unittest.mock import ANY
 
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import override_settings
+from django.urls import URLResolver, get_resolver
 from ninja import Schema
 
-from workbench import factories
+from workbench import factories, generic
 from workbench.accounts.features import FEATURES, F
 from workbench.api import api
+
+
+# Function views changing data; create, update and delete views are found
+# by their class
+WRITING_FUNCTION_VIEWS = {
+    "accounts_api_tokens",
+    "accounts_cli_login",
+    "awt_absence_confirm",
+    "contacts_organization_merge",
+    "contacts_person_merge",
+    "create_timestamp",
+    "credit_control_export_debtors",
+    "deals_deal_add_offer",
+    "deals_deal_add_project",
+    "deals_deal_remove_offer",
+    "deals_deal_remove_project",
+    "delete_timestamp",
+    "invoices_reminders",
+    "invoices_send_reminder",
+    "logbook_loggedcost_create",
+    "logbook_loggedhours_create",
+    "notes_note_add",
+    "offers_offer_copy",
+    "planning_externalwork_create",
+    "planning_milestone_create",
+    "planning_plannedwork_create",
+    "projects_project_logbook_batch_update_costs",
+    "projects_project_logbook_batch_update_hours",
+    "projects_project_pin",
+    "projects_project_planning_batch_update",
+    "projects_service_assign_service_type",
+    "projects_service_pin",
+    "projects_service_set_order",
+    "split_timestamp",
+}
+
+# The API route doing what the web view does (maybe not all of it yet, the
+# comments name the package which completes it)
+API_ROUTES = {
+    "awt_absence_create": "POST /api/absences/",
+    "contacts_group_create": "POST /api/contacts/groups/",
+    "contacts_group_update": "PATCH /api/contacts/groups/{group_id}/",
+    "contacts_organization_create": "POST /api/contacts/organizations/",
+    "contacts_organization_merge": (
+        "POST /api/contacts/organizations/{organization_id}/merge/"
+    ),
+    "contacts_organization_postal_address": (
+        "POST /api/contacts/organizations/{organization_id}/postal-address/"
+    ),
+    "contacts_organization_update": (
+        "PATCH /api/contacts/organizations/{organization_id}/"
+    ),
+    "contacts_person_create": "POST /api/contacts/people/",
+    "contacts_person_merge": "POST /api/contacts/people/{person_id}/merge/",
+    # Changing and removing email addresses and phone numbers: package 16
+    "contacts_person_update": "PATCH /api/contacts/people/{person_id}/",
+    "create_timestamp": "POST /api/timestamps/",
+    "deals_deal_add_offer": "POST /api/deals/{deal_id}/offers/",
+    "deals_deal_add_project": "POST /api/deals/{deal_id}/projects/",
+    "deals_deal_create": "POST /api/deals/",
+    "deals_deal_delete": "DELETE /api/deals/{deal_id}/",
+    "deals_deal_remove_offer": "POST /api/deals/{deal_id}/offers/remove/",
+    "deals_deal_remove_project": "POST /api/deals/{deal_id}/projects/remove/",
+    "deals_deal_set_status": "POST /api/deals/{deal_id}/status/",
+    "deals_deal_update": "PATCH /api/deals/{deal_id}/",
+    "delete_timestamp": "DELETE /api/timestamps/{timestamp}/",
+    "hosting_server_create": "POST /api/hosting/servers/",
+    "hosting_server_update": "PATCH /api/hosting/servers/{server_id}/",
+    "hosting_site_add_contact": "POST /api/hosting/sites/{site_id}/contacts/",
+    "hosting_site_create": "POST /api/hosting/sites/",
+    "hosting_site_update": "PATCH /api/hosting/sites/{site_id}/",
+    "hosting_sitecontact_delete": (
+        "POST /api/hosting/sites/{site_id}/contacts/remove/"
+    ),
+    "invoices_invoice_create": "POST /api/invoices/",
+    "invoices_invoice_postpone_reminders": (
+        "POST /api/invoices/{invoice_id}/postpone-reminders/"
+    ),
+    # All fields: package 06
+    "invoices_recurringinvoice_update": "PATCH /api/recurring-invoices/{invoice_id}/",
+    "invoices_reminders": "POST /api/invoices/reminders/",
+    "logbook_loggedcost_create": "POST /api/logbook/costs/",
+    "logbook_loggedcost_delete": "DELETE /api/logbook/costs/{cost_id}/",
+    "logbook_loggedcost_update": "PATCH /api/logbook/costs/{cost_id}/",
+    "logbook_loggedhours_create": "POST /api/logbook/hours/",
+    "logbook_loggedhours_delete": "DELETE /api/logbook/hours/{hours_id}/",
+    "logbook_loggedhours_update": "PATCH /api/logbook/hours/{hours_id}/",
+    "notes_note_add": "POST /api/notes/",
+    "offers_offer_create": "POST /api/projects/{project_id}/offers/",
+    # All fields and statuses: package 01
+    "offers_offer_update": "PATCH /api/offers/{offer_id}/",
+    "planning_plannedwork_create": "POST /api/projects/{project_id}/planning/work/",
+    "planning_plannedwork_delete": "DELETE /api/planning/work/{work_id}/",
+    "planning_plannedwork_update": "PATCH /api/planning/work/{work_id}/",
+    "projects_project_create": "POST /api/projects/",
+    "projects_project_createcost": "POST /api/logbook/costs/",
+    "projects_project_createhours": "POST /api/logbook/hours/",
+    "projects_project_createinvoice": "POST /api/invoices/",
+    "projects_project_createoffer": "POST /api/projects/{project_id}/offers/",
+    "projects_project_createservice": "POST /api/services/",
+    "projects_project_creatework": "POST /api/projects/{project_id}/planning/work/",
+    # All fields: package 07
+    "projects_project_update": "PATCH /api/projects/{project_id}/",
+    "projects_service_assign_service_type": "PATCH /api/services/{service_id}/",
+    "projects_service_delete": "DELETE /api/services/{service_id}/",
+    "projects_service_merge": "POST /api/services/{service_id}/merge/",
+    "projects_service_reassign_logbook": (
+        "POST /api/services/{service_id}/reassign-logbook/"
+    ),
+    "projects_service_set_order": "POST /api/services/reorder/",
+    "projects_service_update": "PATCH /api/services/{service_id}/",
+}
+
+# Web views without API route: either out of scope (see specs/complete-api)
+# or the package which adds the route
+NOT_IN_API = {
+    "accounts_api_tokens": "out of scope: own profile (the API deletes tokens)",
+    "accounts_cli_login": "out of scope: own profile (logs wb in)",
+    "accounts_team_create": "package 19",
+    "accounts_team_delete": "package 19",
+    "accounts_team_update": "package 19",
+    "accounts_update": "out of scope: own profile",
+    "awt_absence_confirm": "out of scope: personnel administration",
+    "awt_absence_delete": "package 18",
+    "awt_absence_update": "package 18",
+    "contacts_group_delete": "out of scope: deleting contacts",
+    "contacts_organization_delete": "out of scope: deleting contacts",
+    "contacts_person_delete": "out of scope: deleting contacts",
+    "credit_control_creditentry_assign": "out of scope: bookkeeping",
+    "credit_control_creditentry_create": "out of scope: bookkeeping",
+    "credit_control_creditentry_delete": "out of scope: bookkeeping",
+    "credit_control_creditentry_update": "out of scope: bookkeeping",
+    "credit_control_creditentry_upload": "out of scope: bookkeeping",
+    "credit_control_export_debtors": "out of scope: bookkeeping",
+    "expenses_expensereport_create": "out of scope: bookkeeping",
+    "expenses_expensereport_delete": "out of scope: bookkeeping",
+    "expenses_expensereport_update": "out of scope: bookkeeping",
+    "hosting_server_delete": "package 22",
+    "hosting_site_delete": "package 22",
+    "hosting_sitecontact_update": "package 22",
+    "invoices_invoice_createservice": "package 05",
+    "invoices_invoice_delete": "package 03",
+    "invoices_invoice_send": "out of scope: sending mail",
+    "invoices_invoice_settle": "package 03",
+    "invoices_invoice_update": "package 03",
+    "invoices_recurringinvoice_create": "package 06",
+    "invoices_recurringinvoice_delete": "package 06",
+    "invoices_send_reminder": "out of scope: sending mail",
+    "invoices_service_delete": "package 05",
+    "invoices_service_update": "package 05",
+    "logbook_break_create": "package 12",
+    "logbook_break_delete": "package 12",
+    "logbook_break_update": "package 12",
+    "logbook_loggedcost_move": "package 09",
+    "logbook_loggedhours_move": "package 09",
+    "notes_note_delete": "package 17",
+    "notes_note_update": "package 17",
+    "offers_offer_copy": "package 02",
+    "offers_offer_delete": "package 02",
+    "planning_externalwork_create": "package 13",
+    "planning_externalwork_delete": "package 13",
+    "planning_externalwork_update": "package 13",
+    "planning_milestone_create": "package 13",
+    "planning_milestone_delete": "package 13",
+    "planning_milestone_update": "package 13",
+    "projects_budgettransfer_delete": "package 10",
+    "projects_budgettransfer_update": "package 10",
+    "projects_campaign_create": "package 11",
+    "projects_campaign_delete": "package 11",
+    "projects_campaign_update": "package 11",
+    "projects_project_createbudgettransfer": "package 10",
+    "projects_project_createexternalwork": "package 13",
+    "projects_project_createmilestone": "package 13",
+    "projects_project_delete": "package 07",
+    "projects_project_logbook_batch_update_costs": "package 09",
+    "projects_project_logbook_batch_update_hours": "package 09",
+    "projects_project_pin": "out of scope: own profile (pinned projects)",
+    "projects_project_planning_batch_update": "package 14",
+    "projects_project_projected_invoices": "package 07",
+    "projects_project_renumber_offers": "package 02",
+    "projects_service_move": "package 08",
+    "projects_service_pin": "out of scope: own profile (pinned services)",
+    "split_timestamp": "package 23",
+}
 
 
 class APISchemaTest(SimpleTestCase):
@@ -96,6 +282,56 @@ class APISchemaTest(SimpleTestCase):
         for name in ["q", "owned_by", "customer", "project", "period", "since"]:
             with self.subTest(name=name):
                 self.assertTrue(parameters[name].get("description"), parameters[name])
+
+
+class CoverageTest(SimpleTestCase):
+    def test_web_views_writing_data_are_in_the_api(self):
+        """Everything a user can change in the web interface can be changed
+        through the API, or ``NOT_IN_API`` says why not (yet)"""
+
+        skip = ("api/", "^admin/", "__debug__/")
+
+        def walk(patterns):
+            for pattern in patterns:
+                if isinstance(pattern, URLResolver):
+                    if not str(pattern.pattern).startswith(skip):
+                        yield from walk(pattern.url_patterns)
+                elif pattern.name:
+                    yield pattern.name, getattr(pattern.callback, "view_class", None)
+
+        views = dict(walk(get_resolver().url_patterns))
+        self.assertEqual(WRITING_FUNCTION_VIEWS - views.keys(), set())
+        writing = WRITING_FUNCTION_VIEWS | {
+            name
+            for name, view_class in views.items()
+            if view_class
+            and issubclass(
+                view_class, (generic.CreateView, generic.UpdateView, generic.DeleteView)
+            )
+        }
+        self.assertEqual(sorted(writing - API_ROUTES.keys() - NOT_IN_API.keys()), [])
+        # Shrink NOT_IN_API when adding routes
+        self.assertEqual(sorted(API_ROUTES.keys() & NOT_IN_API.keys()), [])
+        self.assertEqual(sorted((API_ROUTES.keys() | NOT_IN_API.keys()) - writing), [])
+
+        schema = api.get_openapi_schema(path_prefix="/api/")
+        routes = {
+            f"{method.upper()} {path}"
+            for path, operations in schema["paths"].items()
+            for method in operations
+        }
+        self.assertEqual(
+            {name: route for name, route in API_ROUTES.items() if route not in routes},
+            {},
+        )
+        self.assertEqual(
+            {
+                name: reason
+                for name, reason in NOT_IN_API.items()
+                if not re.fullmatch(r"out of scope: .+|package \d\d", reason)
+            },
+            {},
+        )
 
 
 class UnknownShortNamesTest(TestCase):
