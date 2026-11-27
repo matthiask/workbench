@@ -235,6 +235,44 @@ class AbsenceCreateAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 422)
 
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
+    def test_create_negative_days(self):
+        """Like in the web form, only corrections by personnel
+        administration have negative days"""
+        user = factories.UserFactory.create(_short_name="ab")
+        self.client.force_login(user)
+        absence = {
+            "starts_on": dt.date.today().isoformat(),
+            "days": "-2",
+            "reason": "vacation",
+        }
+
+        response = self.client.post(
+            "/api/absences/", absence, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("only corrections may be negative", response.content.decode())
+
+        response = self.client.post(
+            "/api/absences/",
+            absence | {"reason": "correction"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertFalse(Absence.objects.exists())
+
+        hr = factories.UserFactory.create(_features=[FEATURES.PERSONNEL_ADMINISTRATION])
+        self.client.force_login(hr)
+        response = self.client.post(
+            "/api/absences/",
+            absence | {"reason": "correction", "user": "ab"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["days"], "-2.00")
+        correction = Absence.objects.get()
+        self.assertEqual((correction.user, correction.days), (user, -2))
+
 
 @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
 class AbsenceChangeAPITest(TestCase):

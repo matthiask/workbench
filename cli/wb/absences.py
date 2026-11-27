@@ -96,7 +96,12 @@ def search_absences(user, reason, period, since, until, limit, offset, as_csv, a
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="In the same year, leave out for a single day.",
 )
-@click.option("--days", type=float, required=True, help="Working days, e.g. 0.5.")
+@click.option(
+    "--days",
+    type=float,
+    required=True,
+    help="Working days, e.g. 0.5, only corrections are negative.",
+)
 @click.option(
     "--reason",
     type=click.Choice([
@@ -174,7 +179,9 @@ def _echo_absence(data):
     "--ends-on", type=click.DateTime(formats=["%Y-%m-%d"]), help="In the same year."
 )
 @click.option("--single-day", is_flag=True, help="Remove the end date.")
-@click.option("--days", type=float, help="Working days, e.g. 0.5.")
+@click.option(
+    "--days", type=float, help="Working days, e.g. 0.5, only corrections are negative."
+)
 @click.option(
     "--reason",
     type=click.Choice([

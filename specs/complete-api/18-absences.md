@@ -52,10 +52,6 @@ interface.
   `--days`, `--reason`, `--description`, `--user`) and
   `wb absences delete ID`.
 - Confirming paid leave stays in the web interface (`NOT_IN_API`).
-- Open, decided (2026-11-27): `POST /api/absences/` should accept negative
-  days like the web form. The restriction is only `AbsenceIn.days`
-  (`Field(gt=0)`) in `workbench/awt/api.py`; `AbsenceForm.clean()` already
-  allows negative days only for corrections. `AbsencePatch` and the CLI
-  options have no such restriction. To do: drop `gt=0` (describe the field
-  like `AbsencePatch.days`), API tests for a correction by personnel
-  administration and for a normal absence with negative days.
+- Decided (2026-11-27): `POST /api/absences/` accepts negative days like
+  the web form, `AbsenceForm.clean()` allows them only for corrections
+  (which only personnel administration may enter).

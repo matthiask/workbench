@@ -115,7 +115,9 @@ class AbsenceIn(InputSchema):
     ends_on: dt.date | None = Field(
         default=None, description="In the same year, empty for a single day."
     )
-    days: Decimal = Field(gt=0, description="Working days, e.g. 0.5.")
+    days: Decimal = Field(
+        description="Working days, e.g. 0.5, only corrections are negative."
+    )
     reason: AbsenceReason
     description: str = ""
 
