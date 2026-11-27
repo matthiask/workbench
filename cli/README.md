@@ -730,7 +730,10 @@ running; the unlogged slices link to the form for logging their hours in
 Workbench. `wb timestamps undo` deletes today's latest timestamp,
 `wb timestamps delete T3` any other one by the code from the list (or by its
 ID, add `--day` for codes of other days). The following timestamps are
-renumbered, so the new list is shown afterwards. If you miss `tst`, add
+renumbered, so the new list is shown afterwards. `wb timestamps split T3 2`
+splits the slice ending with T3 into two parts of whole tenths of an hour
+(like in the web interface; `--dry-run` shows the parts only), e.g. to log
+them on different services. If you miss `tst`, add
 `alias tst="wb timestamps"` to your shell's configuration.
 
 ## Absences

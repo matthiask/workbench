@@ -6,7 +6,16 @@ from urllib.parse import quote
 
 import click
 
-from wb.core import cli, console, echo_json, link, make_table, request
+from wb.core import (
+    change_options,
+    change_params,
+    cli,
+    console,
+    echo_json,
+    link,
+    make_table,
+    request,
+)
 
 
 @cli.group(invoke_without_command=True)
@@ -188,3 +197,47 @@ def delete_timestamp(timestamp, day, as_json):
 def undo(as_json):
     """Delete the latest timestamp of today"""
     _echo_deleted(request("DELETE", "timestamps/latest/"), as_json)
+
+
+@timestamps.command("split")
+@click.argument("timestamp")
+@click.argument("parts", type=click.IntRange(min=2))
+@click.option(
+    "--day",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Day of the code, defaults to today.",
+)
+@change_options(warnings=False)
+def split_timestamp(timestamp, parts, day, dry_run, as_json):
+    r"""Split the slice of a timestamp into parts, e.g. to log them on
+    different services
+
+    \b
+    wb timestamps split T3 2            # Two parts
+    wb timestamps split T3 3 --dry-run  # Show the parts only
+
+    TIMESTAMP is the code (T1, T2, ...) or the ID from `wb timestamps list`.
+    The parts are whole tenths of an hour, the last one gets the remainder.
+    They keep the notes and the project; the following timestamps are
+    renumbered, the new codes are shown afterwards."""
+    params = change_params(dry_run)
+    if day:
+        params["day"] = day.date().isoformat()
+    data = request(
+        "POST",
+        f"timestamps/{quote(timestamp, safe='')}/split/",
+        params=params,
+        json={"parts": parts},
+    )
+    if as_json:
+        echo_json(data)
+        return
+    for part in data:
+        _echo_timestamp(part)
+    if dry_run:
+        console.print()
+        console.print("Dry run, nothing has been split.")
+        return
+    day = dt.datetime.fromisoformat(data[-1]["created_at"]).date().isoformat()
+    console.print()
+    _echo_timestamps(request("GET", "timestamps/", params={"day": day}))

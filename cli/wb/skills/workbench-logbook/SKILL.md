@@ -18,6 +18,8 @@ the web interface in a browser: `wb` shows each warning with its code.
 - The user's notes, calendar, commits or whatever they point you to.
 - `wb timestamps list` shows today's timestamps, logged hours and breaks
   (the notes of timestamps are what the user said they were doing).
+  If one slice covers work on several services, `wb timestamps split T3 2`
+  splits it into parts (whole tenths of an hour) to log each one.
 - `wb hours` lists the user's hours of this week, `wb hours search
   --period this-month --rendered-by <short name>` more. Don't log work twice.
 

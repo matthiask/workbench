@@ -3863,6 +3863,42 @@ planned_work:
         self.assertEqual(result.exit_code, 1)
         self.assertIn("There are no timestamps today", result.output)
 
+    def test_timestamps_split(self):
+        """Slices are split into parts, a dry run shows them only"""
+        nine = dt.datetime.combine(dt.date.today(), dt.time(9), tzinfo=dt.UTC)
+        Timestamp.objects.create(user=self.user, type=Timestamp.START, created_at=nine)
+        Timestamp.objects.create(
+            user=self.user,
+            type=Timestamp.STOP,
+            created_at=nine + dt.timedelta(hours=1),
+            notes="Work",
+        )
+
+        result = self.wb("ts", "split", "T2", "4", "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("T3: stop at", result.output)
+        self.assertIn("(0.2h since", result.output)
+        self.assertIn("Dry run, nothing has been split.", result.output)
+        self.assertEqual(Timestamp.objects.count(), 2)
+
+        result = self.wb("timestamps", "split", "t2", "3", "--json")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(
+            [part["slice"]["hours"] for part in json.loads(result.output)],
+            ["0.3", "0.3", "0.4"],
+        )
+        self.assertEqual(Timestamp.objects.count(), 4)
+
+        result = self.wb("timestamps", "split", "T4", "20")
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("at most 4 parts", result.output)
+
+        result = self.wb("timestamps", "split", "T4", "2")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("T5: stop at", result.output)
+        self.assertIn("Timestamps ", result.output)  # The renumbered list
+        self.assertEqual(Timestamp.objects.count(), 5)
+
     def test_timestamps_alias(self):
         """wb ts is an alias for wb timestamps, which lists today's
         timestamps without a command"""
