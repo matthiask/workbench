@@ -22,3 +22,31 @@ detail IDs in `GET /api/contacts/people/{id}/` if they're missing.
 `wb people change-email|remove-email|change-phone|remove-phone|
 remove-address` or one `wb people details update|remove` command,
 whichever fits the existing `add-details` / `change-address` better.
+
+## Done (2026-11-27)
+
+- `PATCH`/`DELETE /api/contacts/people/{id}/email-addresses/{id}/` and
+  `.../phone-numbers/{id}/` (`type`, `email` / `phone_number`),
+  `DELETE .../postal-addresses/{id}/`, all with `dry_run`; they return the
+  person like `GET /api/contacts/people/{id}/`, which listed the detail
+  IDs already. A detail of another person is a 404.
+- Changes go through the forms of the person form's formsets
+  (`EmailAddressFormset.form`, `PhoneNumberFormset.form`,
+  `PostalAddressForm`) with the detail's current values (`form_data()`)
+  and the given fields on top, so phone numbers are normalized and types
+  keep the suggested spelling like in the web interface. The existing
+  `PATCH .../postal-addresses/{id}/` uses `PostalAddressForm` now too
+  instead of the model's `full_clean()` (same rules, same error
+  locations). No form changes, the web interface is unchanged.
+- Like the formsets, nothing else is checked: an email address used by
+  another person can be set (only creating and `details/` reject those),
+  removing has no rules. The forms have no warnings, so the endpoints and
+  commands take no `ignore_warnings`.
+- `wb people change-email PERSON_ID EMAIL_ID [--email] [--type]`,
+  `change-phone PERSON_ID PHONE_ID [--phone-number] [--type]`,
+  `remove-email|remove-phone|remove-address PERSON_ID ID`, all with
+  `--dry-run` and `--json`. The detail ID is an argument, not an option
+  like `change-address --address ID`, because `--email` and
+  `--phone-number` are the new values (options named like the API fields).
+- `wb people update --remove-email/--remove-phone/--remove-postal-address`
+  and the `--*-type` options stay (removing by value, several at once).
