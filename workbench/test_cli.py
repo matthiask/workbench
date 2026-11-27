@@ -2184,6 +2184,40 @@ planned_work:
         recurring.refresh_from_db()
         self.assertEqual(recurring.title, "new.example.com")
 
+    def test_recurring_invoice_update_fields(self):
+        """Amounts, periodicity and the end of recurring invoices change
+        through the web interface's form"""
+        recurring = factories.RecurringInvoiceFactory.create(
+            title="Hosting",
+            subtotal=1200,
+            starts_on=dt.date(2024, 1, 1),
+            postal_address="Org\nStreet\nCity",
+        )
+        result = self.wb(
+            "recurring-invoices",
+            "update",
+            recurring.pk,
+            "--subtotal",
+            "300",
+            "--periodicity",
+            "quarterly",
+            "--no-vat",
+            "--ends-on",
+            "2030-12-31",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("quarterly", result.output)
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.subtotal, 300)
+        self.assertEqual(recurring.periodicity, "quarterly")
+        self.assertFalse(recurring.liable_to_vat)
+        self.assertEqual(recurring.ends_on, dt.date(2030, 12, 31))
+
+        result = self.wb("recurring-invoices", "update", recurring.pk, "--ends-on", "")
+        self.assertEqual(result.exit_code, 0, result.output)
+        recurring.refresh_from_db()
+        self.assertIsNone(recurring.ends_on)
+
     def test_invoice_reminders(self):
         project = factories.ProjectFactory.create(owned_by=self.user)
         overdue = factories.InvoiceFactory.create(

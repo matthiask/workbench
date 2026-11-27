@@ -446,6 +446,16 @@ text are proposed unless given):
     wb recurring-invoices update 123 --send-to billing@example.com
     wb recurring-invoices update 123 --site 42    # the hosted site
 
+`update` changes every field of the web interface's form (`--subtotal`,
+`--discount`, `--periodicity`, `--starts-on`, `--ends-on`, `--no-vat`,
+`--owned-by`, ...); the next period is computed. `--ends-on ""` renews an
+ended recurring invoice again, which warns
+(`recurring-invoice-backlog`) if that creates the invoices of the periods
+in between:
+
+    wb recurring-invoices update 123 --subtotal 1500 --discount 100
+    wb recurring-invoices update 123 --ends-on 2026-12-31    # cancel renewal
+
 ## Sites and servers
 
 Hosted sites, their servers and contacts require the hosting feature. Active

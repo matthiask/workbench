@@ -287,6 +287,112 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(data["periodicity"], "yearly")
         self.assertEqual(data["owned_by"], "ab")
 
+    def test_recurring_invoice_update_fields(self):
+        """Recurring invoices change all fields of the web interface's form,
+        with its rules"""
+        recurring = factories.RecurringInvoiceFactory.create(
+            title="Hosting",
+            subtotal=1200,
+            postal_address=ADDRESS,
+            starts_on=dt.date(2024, 1, 1),
+        )
+        self.client.force_login(recurring.owned_by)
+        url = f"/api/recurring-invoices/{recurring.pk}/"
+
+        def patch(data, query=""):
+            return self.client.patch(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        response = patch({
+            "subtotal": "600.00",
+            "discount": "50.00",
+            "third_party_costs": "100.00",
+            "periodicity": "quarterly",
+            "create_invoice_on_day": -10,
+            "liable_to_vat": False,
+            "create_project": True,
+            "postal_address": ADDRESS.replace("Hans", "Fritz"),
+            "description": "Servers",
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(data["subtotal"], "600.00")
+        self.assertEqual(data["discount"], "50.00")
+        self.assertEqual(data["third_party_costs"], "100.00")
+        self.assertEqual(data["total_excl_tax"], "550.00")
+        self.assertEqual(data["total"], "550.00")
+        self.assertEqual(data["periodicity"], "quarterly")
+        self.assertEqual(data["create_invoice_on_day"], -10)
+        self.assertFalse(data["liable_to_vat"])
+        self.assertTrue(data["create_project"])
+        self.assertIn("Fritz", data["postal_address"])
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.periodicity, "quarterly")
+        self.assertEqual(recurring.description, "Servers")
+
+        # The next period is computed, not entered
+        response = patch({"next_period_starts_on": "2027-01-01"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"],
+            ["body", "data", "next_period_starts_on"],
+        )
+
+        # The form's validation
+        response = patch({"periodicity": "daily"})
+        self.assertEqual(response.status_code, 422)
+        FreezeDate.objects.create(up_to=in_days(-1))
+        response = patch({"starts_on": in_days(-1).isoformat()})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "starts_on"]
+        )
+
+        # Ending a recurring invoice in the past creates the invoices for the
+        # periods in between, which warns
+        recurring.next_period_starts_on = dt.date(2025, 1, 1)
+        recurring.ends_on = dt.date(2025, 6, 30)
+        recurring.save()
+        response = patch({"ends_on": None})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error.get("code") for error in response.json()["detail"]],
+            ["recurring-invoice-backlog"],
+        )
+        response = patch(
+            {"ends_on": None}, "?ignore_warnings=recurring-invoice-backlog&dry_run=1"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["ends_on"])
+        recurring.refresh_from_db()
+        self.assertEqual(recurring.ends_on, dt.date(2025, 6, 30))
+
+    @override_settings(
+        FEATURES={FEATURES.CONTROLLING: F.ALWAYS, FEATURES.HOSTING: F.NEVER}
+    )
+    def test_recurring_invoice_site_needs_hosting(self):
+        """The site of recurring invoices needs the hosting feature like in
+        the web interface"""
+        site = factories.SiteFactory.create()
+        recurring = factories.RecurringInvoiceFactory.create(
+            customer=site.customer, postal_address=ADDRESS
+        )
+        self.client.force_login(recurring.owned_by)
+        response = self.client.patch(
+            f"/api/recurring-invoices/{recurring.pk}/",
+            {"site": site.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["body", "data", "site"])
+        response = self.client.patch(
+            f"/api/recurring-invoices/{recurring.pk}/",
+            {"title": "Hosting"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_postpone_reminders(self):
         """Reminders of sent invoices are postponed for up to 60 days, more
         than 30 days have to be confirmed"""

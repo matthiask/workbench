@@ -1,5 +1,7 @@
 """Invoices, recurring invoices and projected invoices"""
 
+import datetime as dt
+
 import click
 from rich.text import Text
 
@@ -32,6 +34,7 @@ from wb.core import (
 
 
 NEW_INVOICES = ["prepare", "mark_as_sent", "send"]
+PERIODICITIES = ["yearly", "quarterly", "monthly", "weekly"]
 
 
 @cli.group(invoke_without_command=True)
@@ -734,8 +737,13 @@ def _echo_recurring_invoice(data):
             ("Starts on", data["starts_on"]),
             ("Ends on", data["ends_on"]),
             ("Next period", data["next_period_starts_on"]),
+            ("Create invoice on day", data.get("create_invoice_on_day")),
+            ("Subtotal", data.get("subtotal")),
+            ("Discount", data.get("discount")),
             ("Total excl. tax", data["total_excl_tax"]),
+            ("Liable to VAT", "no" if data.get("liable_to_vat") is False else None),
             ("Third party costs", data["third_party_costs"]),
+            ("Create project", "yes" if data.get("create_project") else None),
             ("New invoices", data["new_invoices_label"]),
             ("Recipient", data["send_to"] if sending else None),
             ("Subject", data["mail_subject"] if sending else None),
@@ -751,82 +759,129 @@ def _echo_recurring_invoice(data):
         console.print(Text(data["mail_body"]))
 
 
+def _date_or_empty(_ctx, _param, value):
+    """A date, "" empties the field"""
+    if not value:
+        return value
+    try:
+        return dt.date.fromisoformat(value).isoformat()
+    except ValueError:
+        raise click.BadParameter('expected YYYY-MM-DD, or "" to empty it.') from None
+
+
+def _recurring_invoice_options(fn):
+    """The fields of recurring invoices"""
+    options = [
+        click.option("--customer", type=int, help="Organization ID."),
+        click.option("--contact", type=int, help="Person ID."),
+        click.option("--title", help="Also the title of the invoices created."),
+        click.option(
+            "--description",
+            help="Also the description of the invoices created, or - to read"
+            " it from stdin.",
+        ),
+        click.option(
+            "--owned-by",
+            help="Short name, also responsible for the invoices created.",
+            shell_complete=complete_short_names,
+        ),
+        click.option("--postal-address", help="The text, or - to read it from stdin."),
+        click.option(
+            "--starts-on",
+            callback=_date_or_empty,
+            metavar="YYYY-MM-DD",
+            help="Not on or before the freeze date.",
+        ),
+        click.option(
+            "--ends-on",
+            callback=_date_or_empty,
+            metavar="YYYY-MM-DD",
+            help='Cancel the auto-renewal on this date, "" renews it again.',
+        ),
+        click.option("--periodicity", type=click.Choice(PERIODICITIES)),
+        click.option(
+            "--create-invoice-on-day",
+            type=int,
+            help="Days relative to the start of the period, -20 creates"
+            " invoices 20 days before their period begins.",
+        ),
+        click.option("--subtotal", type=float, help="Amount excl. tax."),
+        click.option("--third-party-costs", type=float),
+        click.option("--discount", type=float, help="Amount excl. tax."),
+        click.option("--vat/--no-vat", "liable_to_vat", default=None),
+        click.option(
+            "--create-project/--no-create-project",
+            default=None,
+            help="Create a project for each invoice.",
+        ),
+        click.option(
+            "--new-invoices",
+            type=click.Choice(NEW_INVOICES),
+            help="Create them in preparation, mark them as sent or send them"
+            " by email automatically.",
+        ),
+        click.option(
+            "--send-to",
+            help="The recipient when sending by email, an empty value proposes"
+            " one (like the subject and the text).",
+        ),
+        click.option("--mail-subject"),
+        click.option(
+            "--mail-body",
+            help="The text, or - to read it from stdin; {code}, {total},"
+            " {due_on} and {service_period} are replaced with the values of"
+            " each invoice.",
+        ),
+        click.option(
+            "--site",
+            type=int,
+            help="ID of the hosted site (of the same customer), requires the"
+            " hosting feature.",
+        ),
+    ]
+    for option in reversed(options):
+        fn = option(fn)
+    return fn
+
+
+def _recurring_invoice_data(fields):
+    """The request body of the given options, empty dates are sent as null"""
+    data = {}
+    for key, value in fields.items():
+        if value is None:
+            continue
+        if key in {"description", "postal_address", "mail_body"}:
+            data[key] = text_or_stdin(value)
+        elif key in {"starts_on", "ends_on"}:
+            data[key] = value or None
+        else:
+            data[key] = value
+    return data
+
+
 @recurring_invoices.command("update")
 @click.argument("invoice_id", type=int)
-@click.option("--title", help="Also the title of the invoices created.")
-@click.option(
-    "--description",
-    help="Also the description of the invoices created, or - to read it from stdin.",
-)
-@click.option(
-    "--owned-by",
-    help="Short name, also responsible for the invoices created.",
-    shell_complete=complete_short_names,
-)
-@click.option(
-    "--new-invoices",
-    type=click.Choice(NEW_INVOICES),
-    help="Create them in preparation, mark them as sent or send them by email"
-    " automatically.",
-)
-@click.option(
-    "--send-to",
-    help="The recipient when sending by email, an empty value proposes one"
-    " (like the subject and the text).",
-)
-@click.option("--mail-subject")
-@click.option(
-    "--mail-body",
-    help="The text, or - to read it from stdin; {code}, {total}, {due_on} and"
-    " {service_period} are replaced with the values of each invoice.",
-)
-@click.option("--site", type=int, help="ID of the hosted site (of the same customer).")
+@_recurring_invoice_options
 @click.option("--no-site", is_flag=True, help="Remove the site.")
-@ignore_warnings_option
-@click.option("--dry-run", is_flag=True, help="Validate only.")
-@click.option("--json", "as_json", is_flag=True)
+@change_options()
 def update_recurring_invoice(
-    invoice_id,
-    title,
-    description,
-    owned_by,
-    new_invoices,
-    send_to,
-    mail_subject,
-    mail_body,
-    site,
-    no_site,
-    ignore_warnings,
-    dry_run,
-    as_json,
+    invoice_id, no_site, ignore_warnings, dry_run, as_json, **fields
 ):
-    """Change the title, description, site and responsible person of new
-    invoices and how they are created and sent, only the given fields"""
-    data = {
-        key: value
-        for key, value in [
-            ("title", title),
-            ("description", text_or_stdin(description)),
-            ("owned_by", owned_by),
-            ("new_invoices", new_invoices),
-            ("send_to", send_to),
-            ("mail_subject", mail_subject),
-            ("mail_body", text_or_stdin(mail_body)),
-            ("site", site),
-        ]
-        if value is not None
-    }
+    """Change a recurring invoice, only the given fields
+
+    E.g. hand it over (--owned-by), change the amount or cancel the
+    auto-renewal (--ends-on). The next period is computed and cannot be
+    changed; renewing an ended recurring invoice warns if it would create
+    the invoices of the periods in between (recurring-invoice-backlog)."""
+    data = _recurring_invoice_data(fields)
     if no_site:
         data["site"] = None
     if not data:
-        terminate("Nothing to change.")
+        terminate("Nothing to change, see --help.")
     data = request(
         "PATCH",
         f"recurring-invoices/{invoice_id}/",
-        params={
-            "dry_run": format_bool(dry_run),
-            "ignore_warnings": list(ignore_warnings),
-        },
+        params=change_params(dry_run, ignore_warnings),
         json=data,
     )
     if as_json:
