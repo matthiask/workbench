@@ -3485,6 +3485,29 @@ planned_work:
         cost.refresh_from_db()
         self.assertEqual(cost.service, target)
 
+    def test_move_service(self):
+        """Services move to other projects, a flat rate is a warning"""
+        service = factories.ServiceFactory.create(title="Support")
+        other = factories.ProjectFactory.create(flat_rate=100)
+
+        move = ["services", "move", service.pk, "--project", other.code]
+        result = self.wb(*move)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning new-project-has-flat-rate", result.output)
+
+        ignore = ["--ignore-warning", "new-project-has-flat-rate"]
+        result = self.wb(*move, *ignore, "--dry-run")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("Dry run, nothing changed", result.output)
+        service.refresh_from_db()
+        self.assertNotEqual(service.project, other)
+
+        result = self.wb(*move, *ignore)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(other.code, result.output)
+        service.refresh_from_db()
+        self.assertEqual(service.project, other)
+
     def test_move_logbook_entries_at_once(self):
         """Entries of a project move to another service of the project"""
         service = factories.ServiceFactory.create()
@@ -3814,6 +3837,7 @@ planned_work:
                 "create",
                 "delete",
                 "merge",
+                "move",
                 "reassign-logbook",
                 "reorder",
                 "search",

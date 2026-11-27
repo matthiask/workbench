@@ -383,6 +383,14 @@ included:
     wb services reassign-logbook 902 --to 905 --dry-run
     wb services reassign-logbook 902 --to 905 --include-invoiced
 
+Services move to another open project with their logged hours and costs;
+invoiced services, services with invoiced entries and services bound to an
+offer stay where they are. A flat rate of the new project is a warning and
+applied to the service:
+
+    wb services move 902 --project 2026-0123 --dry-run
+    wb services move 902 --project 2026-0123 --ignore-warning new-project-has-flat-rate
+
 Services are given with options or as YAML (or JSON) files like a service of
 `wb offers create`; options override the file. `update` only changes the given
 fields. Services with logged hours or costs can be changed but not deleted.

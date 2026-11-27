@@ -23,7 +23,7 @@ from wb.core import (
 
 @cli.group()
 def services():
-    """Look at, create, change, delete and reorder services"""
+    """Look at, create, change, move, delete and reorder services"""
 
 
 def _service_options(fn):
@@ -384,4 +384,37 @@ def merge_service(service_id, into, dry_run, ignore_warnings, as_json):
             f"Dry run, nothing changed: {service_id} would be merged into {into}."
             if dry_run
             else f"{service_id} has been merged into {into}."
+        )
+
+
+@services.command("move")
+@click.argument("service_id", type=int)
+@click.option(
+    "--project", required=True, help="ID or code of an open project to move to."
+)
+@click.option("--dry-run", is_flag=True, help="Validate and show the result only.")
+@ignore_warnings_option
+@click.option("--json", "as_json", is_flag=True)
+def move_service(service_id, project, dry_run, ignore_warnings, as_json):
+    """Move a service with its logged hours and costs to another project
+
+    Like in the web interface, invoiced services, services with invoiced
+    hours or costs and services bound to an offer stay where they are. A
+    flat rate of the new project is a warning (new-project-has-flat-rate)
+    and applied to the service."""
+    data = request(
+        "POST",
+        f"services/{service_id}/move/",
+        json={"project": project},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
+    )
+    _echo_service(data, dry_run=dry_run, as_json=as_json, prefix="Moved ")
+    if not as_json:
+        target = data["project"]
+        console.print(
+            f"to {link(target['code'], target['url'])} {target['title']}"
+            f" ({target['customer']['name']})"
         )
