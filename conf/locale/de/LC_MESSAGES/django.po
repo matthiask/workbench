@@ -213,6 +213,10 @@ msgstr "Sieht die Beschreibungen von Krankheitsabsenzen und die Details der Jahr
 msgid "Contact your administrator to change this value."
 msgstr "Kontaktiere die Administrator:innen, falls Du diesen Wert ändern willst."
 
+#: workbench/accounts/forms.py
+msgid "A team with this name exists already."
+msgstr "Ein Team mit diesem Namen gibt es schon."
+
 #: workbench/accounts/middleware.py
 msgid "Please authenticate."
 msgstr "Bitte anmelden."

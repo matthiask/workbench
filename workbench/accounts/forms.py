@@ -90,3 +90,10 @@ class TeamForm(ModelForm):
         if self.instance.pk:
             candidates |= self.instance.members.active()
         self.fields["members"].queryset = candidates.distinct()
+
+    def clean_name(self):
+        """The APIs find teams by their name, e.g. the ``team`` filter"""
+        name = self.cleaned_data["name"]
+        if Team.objects.filter(name__iexact=name).exclude(pk=self.instance.pk):
+            raise forms.ValidationError(_("A team with this name exists already."))
+        return name

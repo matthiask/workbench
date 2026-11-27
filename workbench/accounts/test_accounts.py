@@ -236,6 +236,21 @@ class AccountsTest(TestCase):
         form = TeamForm(instance=team, request=req)
         self.assertEqual(set(form.fields["members"].queryset), {user})
 
+    def test_team_names_unique(self):
+        """The APIs find teams by their name (case-insensitive)"""
+        req = RequestFactory().get("/")
+        user = factories.UserFactory.create()
+        team = factories.TeamFactory.create(name="Design")
+
+        form = TeamForm({"name": "design", "members": [user.id]}, request=req)
+        self.assertEqual(
+            form.errors, {"name": ["A team with this name exists already."]}
+        )
+        form = TeamForm(
+            {"name": "DESIGN", "members": [user.id]}, instance=team, request=req
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
     @override_settings(
         FEATURES={
             FEATURES.BOOKKEEPING: F.ALWAYS,
