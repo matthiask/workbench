@@ -7,11 +7,12 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from ninja import Field, Query, Router, Schema
-from ninja.errors import HttpError
+from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
+from workbench.accounts.forms import TeamForm
 from workbench.accounts.models import APIToken, Team, User
 from workbench.deals.api import DealOut, deal_out, with_related
 from workbench.deals.models import Deal
@@ -23,8 +24,12 @@ from workbench.planning.models import PlannedWork
 from workbench.projects.api import ProjectOut, project_out
 from workbench.projects.models import Project
 from workbench.tools.api import (
+    DryRun,
+    InputSchema,
     SearchQuery,
     Serialized,
+    delete_with_form,
+    patch_with_form,
 )
 from workbench.tools.validation import monday
 
@@ -221,19 +226,120 @@ def team_list(request, filters: Query[TeamFilter]):
     teams = Team.objects.prefetch_related("members").order_by("name", "pk")
     if filters.q:
         teams = teams.filter(name__icontains=filters.q)
-    return Serialized(
-        teams,
-        lambda team: {
-            "id": team.id,
-            "url": request.build_absolute_uri(team.get_absolute_url()),
-            "name": team.name,
-            "members": sorted(
-                member.get_short_name()
-                for member in team.members.all()
-                if member.is_active
-            ),
-        },
+    return Serialized(teams, lambda team: team_out(team, request))
+
+
+def team_out(team, request):
+    return {
+        "id": team.id,
+        "url": request.build_absolute_uri(team.get_absolute_url()),
+        "name": team.name,
+        "members": sorted(
+            member.get_short_name() for member in team.members.all() if member.is_active
+        ),
+    }
+
+
+def _team(value):
+    """The team with this ID or name (case-insensitive)"""
+    value = value.strip()
+    teams = Team.objects.all()
+    if value.isascii() and value.isdigit():
+        return get_object_or_404(teams, pk=int(value))
+    return get_object_or_404(teams, name__iexact=value)
+
+
+class TeamIn(InputSchema):
+    name: str
+    members: list[str] = Field(description="Short names of active users.")
+
+
+class TeamPatch(InputSchema):
+    """Fields which aren't given are left alone"""
+
+    name: str | None = None
+    members: list[str] | None = Field(
+        default=None,
+        description="Replaces the members; short names of active users.",
     )
+    add_members: list[str] = Field(
+        default=[], description="Short names of active users."
+    )
+    remove_members: list[str] = Field(default=[], description="Short names.")
+
+
+def _user_pks(short_names, field, errors, *, active_only=True):
+    """The PKs of the users with these short names; like the form's choices
+    only active ones (unless ``active_only=False``)"""
+    pks = []
+    for index, short_name in enumerate(short_names):
+        users = User.objects.by_short_name(short_name)
+        if user := (users.filter(is_active=True) if active_only else users).first():
+            pks.append(user.pk)
+        else:
+            errors.append({
+                "loc": ["body", "data", field, index],
+                "msg": _("Unknown or inactive user %r.") % short_name,
+            })
+    return pks
+
+
+def _save_team(request, team, values, *, dry_run):
+    return patch_with_form(
+        TeamForm,
+        team,
+        values,
+        request,
+        out=lambda team: team_out(team, request),
+        dry_run=dry_run,
+    )
+
+
+@router.post("/teams/", response=TeamOut)
+def team_create(request, data: TeamIn, *, dry_run: DryRun = False):
+    """Create a team, e.g. for the ``team`` filter of reports and the
+    planning; anyone may, like in the web interface"""
+    errors = []
+    members = _user_pks(data.members, "members", errors)
+    if errors:
+        raise ValidationError(errors)
+    return _save_team(
+        request, Team(), {"name": data.name, "members": members}, dry_run=dry_run
+    )
+
+
+@router.patch("/teams/{team_id}/", response=TeamOut)
+def team_update(request, team_id: str, data: TeamPatch, *, dry_run: DryRun = False):
+    """Rename a team (by ID or name) or change its members
+
+    Like the web interface, which only shows active members, saving drops
+    members who left."""
+    team = _team(team_id)
+    errors = []
+    if data.members is not None:
+        members = set(_user_pks(data.members, "members", errors))
+    else:
+        members = set(team.members.active().values_list("pk", flat=True))
+    members |= set(_user_pks(data.add_members, "add_members", errors))
+    members -= set(
+        _user_pks(data.remove_members, "remove_members", errors, active_only=False)
+    )
+    if errors:
+        raise ValidationError(errors)
+    values = {"members": sorted(members)}
+    if "name" in data.model_fields_set:
+        values["name"] = data.name
+    return _save_team(request, team, values, dry_run=dry_run)
+
+
+@router.delete("/teams/{team_id}/", response=TeamOut)
+def team_delete(request, team_id: str, *, dry_run: DryRun = False):
+    """Delete a team (by ID or name) like in the web interface, its members
+    stay; returns the deleted team"""
+    team = _team(team_id)
+    result = team_out(team, request)
+    delete_with_form(team, request, loc=["path", "team_id"], dry_run=dry_run)
+    return result
 
 
 class APITokenOut(Schema):

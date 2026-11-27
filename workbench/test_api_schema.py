@@ -52,6 +52,9 @@ WRITING_FUNCTION_VIEWS = {
 # The API route doing what the web view does (maybe not all of it yet, the
 # comments name the package which completes it)
 API_ROUTES = {
+    "accounts_team_create": "POST /api/teams/",
+    "accounts_team_delete": "DELETE /api/teams/{team_id}/",
+    "accounts_team_update": "PATCH /api/teams/{team_id}/",
     "awt_absence_create": "POST /api/absences/",
     "awt_absence_delete": "DELETE /api/absences/{absence_id}/",
     "awt_absence_update": "PATCH /api/absences/{absence_id}/",
@@ -184,9 +187,6 @@ API_ROUTES = {
 NOT_IN_API = {
     "accounts_api_tokens": "out of scope: own profile (the API deletes tokens)",
     "accounts_cli_login": "out of scope: own profile (logs wb in)",
-    "accounts_team_create": "package 19",
-    "accounts_team_delete": "package 19",
-    "accounts_team_update": "package 19",
     "accounts_update": "out of scope: own profile",
     "awt_absence_confirm": "out of scope: personnel administration",
     "contacts_group_delete": "out of scope: deleting contacts",
