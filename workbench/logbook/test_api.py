@@ -524,3 +524,69 @@ class LogbookMoveAPITest(TestCase):
         self.assertEqual(response.json()["project"]["id"], target.project_id)
         entry.refresh_from_db()
         self.assertEqual(entry.service, target)
+
+    def test_batch_move(self):
+        """Entries of a project move to another service of the same project
+        through the batch form of the web interface"""
+        service = factories.ServiceFactory.create()
+        project = service.project
+        target = factories.ServiceFactory.create(project=project)
+        hours = factories.LoggedHoursFactory.create(service=service)
+        archived = factories.LoggedHoursFactory.create(service=service)
+        LoggedHours.objects.filter(pk=archived.pk).update(archived_at=timezone.now())
+        cost = factories.LoggedCostFactory.create(service=service)
+        self.client.force_login(hours.rendered_by)
+        url = f"/api/projects/{project.pk}/logbook/move/"
+
+        def post(data, query=""):
+            return self.client.post(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        data = {"kind": "hours", "entries": [hours.pk], "service": target.pk}
+        response = post(data, "?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            [(row["id"], row["service_id"]) for row in response.json()],
+            [(hours.pk, target.pk)],
+        )
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, service)
+
+        response = post(data)
+        self.assertEqual(response.status_code, 200, response.content)
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, target)
+
+        # Archived entries and costs aren't hours of this project to move
+        response = post(data | {"entries": [archived.pk, cost.pk]})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            {tuple(error["loc"]) for error in response.json()["detail"]},
+            {("body", "data", "entries")},
+        )
+
+        response = post({"kind": "costs", "entries": [cost.pk], "service": target.pk})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()[0]["cost"], "10.00")
+        cost.refresh_from_db()
+        self.assertEqual(cost.service, target)
+
+        # Services of other projects are refused
+        other = factories.ServiceFactory.create()
+        response = post(data | {"service": other.pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["loc"] for error in response.json()["detail"]],
+            [["body", "data", "service"]],
+        )
+
+        Project.objects.filter(pk=project.pk).update(closed_on=in_days(0))
+        response = post(data | {"service": service.pk})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["msg"] for error in response.json()["detail"]],
+            ["Cannot move logbook entries of closed projects."],
+        )
+        hours.refresh_from_db()
+        self.assertEqual(hours.service, target)

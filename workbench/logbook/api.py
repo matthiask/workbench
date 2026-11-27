@@ -1,6 +1,6 @@
 import datetime as dt
 from decimal import Decimal
-from typing import Any
+from typing import Any, Literal
 
 from django.db import transaction
 from django.db.models import Sum
@@ -13,6 +13,7 @@ from ninja.pagination import paginate
 from workbench.accounts.models import User
 from workbench.api_keys import InvoiceStatus, key
 from workbench.logbook.forms import (
+    LogbookBatchForm,
     LoggedCostForm,
     LoggedCostMoveForm,
     LoggedHoursForm,
@@ -20,7 +21,7 @@ from workbench.logbook.forms import (
 )
 from workbench.logbook.models import LoggedCost, LoggedHours
 from workbench.projects.api import ProjectSummary, project_summary
-from workbench.projects.models import Service
+from workbench.projects.models import Project, Service
 from workbench.tools.api import (
     IGNORE_WARNINGS,
     DateRangeFilter,
@@ -594,4 +595,71 @@ def logged_cost_delete(request, cost_id: int, *, dry_run: DryRun = False):
     result = _cost_out(entry, request)
     if not dry_run:
         entry.delete()
+    return result
+
+
+class LogbookMove(InputSchema):
+    kind: Literal["hours", "costs"]
+    entries: list[int] = Field(
+        min_length=1,
+        description="IDs of hours or costs of the project which haven't been invoiced.",
+    )
+    service: int = Field(
+        description="ID of a service of the same project which allows logging."
+    )
+
+
+@router.post(
+    "/projects/{project_id}/logbook/move/",
+    response=list[LoggedHoursOut] | list[LoggedCostOut],
+)
+def logbook_move(
+    request,
+    project_id: int,
+    data: LogbookMove,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Move hours or costs of a project to another service of the same
+    project at once, like the logbook batch update of the web interface
+
+    Not for invoiced entries or closed projects; ``PATCH`` moves single
+    entries to other projects. Nothing is saved if anything is invalid or
+    with ``dry_run``. Returns the moved entries."""
+    project = get_object_or_404(Project, pk=project_id)
+    if project.closed_on:
+        raise ValidationError([
+            {
+                "loc": ["path", "project_id"],
+                "msg": _("Cannot move logbook entries of closed projects."),
+            }
+        ])
+    model, out = (
+        (LoggedHours, _hours_out) if data.kind == "hours" else (LoggedCost, _cost_out)
+    )
+    form = LogbookBatchForm(
+        {"entries": data.entries, "service": data.service},
+        request=request,
+        project=project,
+        entries=model.objects.filter(
+            service__project=project, archived_at__isnull=True
+        ).select_related("rendered_by", "service"),
+    )
+    validate_form(form, ignore_warnings=ignore_warnings)
+    with transaction.atomic():
+        form.process()
+        result = [
+            out(entry, request)
+            for entry in model.objects
+            .filter(pk__in=data.entries)
+            .select_related(
+                "rendered_by",
+                "service__project__customer",
+                "invoice_service__invoice__project",
+            )
+            .order_by("-rendered_on", "-created_at", "-pk")
+        ]
+        if dry_run:
+            transaction.set_rollback(True)
     return result

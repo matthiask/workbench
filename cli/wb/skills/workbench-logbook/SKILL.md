@@ -74,3 +74,21 @@ anymore) can't be ignored: tell the user, don't work around them.
 The IDs are in `wb hours search` and `wb costs search`. Hours of past weeks
 and invoiced entries can't be changed or deleted anymore (except for their
 description); confirm deletions with the user first.
+
+## 6. Moving entries to another service
+
+Entries logged on the wrong service move with `--service`, also to a service
+of another open project:
+
+    wb hours update <id> --service <service_id> --dry-run
+    wb costs update <id> --service <service_id>
+
+Several entries of one project move to another service of the same project
+at once (all or none):
+
+    wb hours move --project <project_id> --entry <id> --entry <id> --service <service_id> --dry-run
+    wb costs move --project <project_id> --entry <id> --service <service_id>
+
+Invoiced entries keep their service, entries of closed projects stay where
+they are; tell the user instead of logging them again. Show the entries and
+the target service to the user and wait for their approval before moving.

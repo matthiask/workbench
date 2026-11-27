@@ -3089,6 +3089,35 @@ planned_work:
         cost.refresh_from_db()
         self.assertEqual(cost.service, target)
 
+    def test_move_logbook_entries_at_once(self):
+        """Entries of a project move to another service of the project"""
+        service = factories.ServiceFactory.create()
+        target = factories.ServiceFactory.create(project=service.project, title="QA")
+        first, second = factories.LoggedHoursFactory.create_batch(2, service=service)
+        cost = factories.LoggedCostFactory.create(service=service)
+        move = ["move", "--project", service.project_id, "--service", target.pk]
+
+        result = self.wb(
+            "hours", *move, "--entry", first.pk, "--entry", second.pk, "--dry-run"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(result.output.count("Dry run, nothing changed: Moved "), 2)
+        first.refresh_from_db()
+        self.assertEqual(first.service, service)
+
+        result = self.wb("hours", *move, "--entry", first.pk, "--entry", second.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn(f"QA ({target.pk})", result.output)
+        self.assertEqual(
+            set(LoggedHours.objects.values_list("service", flat=True)), {target.pk}
+        )
+
+        result = self.wb("costs", *move, "--entry", cost.pk, "--json")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(json.loads(result.output)[0]["service_id"], target.pk)
+        cost.refresh_from_db()
+        self.assertEqual(cost.service, target)
+
     def test_timestamps(self):
         """Tasks are started and stopped like with the old tst command"""
         result = self.wb("timestamps", "start")

@@ -3,6 +3,7 @@
 import click
 
 from wb.core import (
+    change_options,
     change_params,
     cli,
     complete_short_names,
@@ -91,7 +92,7 @@ def _date(value):
 @cli.group(invoke_without_command=True)
 @click.pass_context
 def hours(ctx):
-    """Look at, log, change and delete hours
+    """Look at, log, change, move and delete hours
 
     Without a command, lists your hours of this week."""
     if ctx.invoked_subcommand is None:
@@ -311,9 +312,56 @@ def delete_hours(hours_id, dry_run, as_json):
     _echo_hours(data, dry_run=dry_run, as_json=as_json, prefix="Deleted ")
 
 
+def _move_command(group, kind, echo):
+    """``wb hours|costs move``: entries of a project to another service of
+    the same project at once"""
+
+    @group.command(
+        "move",
+        help=f"""Move {kind} of a project to another service of the project
+
+    All or none, like the logbook batch update of the web interface: not
+    for invoiced entries or closed projects. `wb {kind} update ID --service`
+    moves single entries to other projects.""",
+    )
+    @click.option("--project", type=int, required=True, help="Project ID.")
+    @click.option(
+        "--entry",
+        "entries",
+        type=int,
+        multiple=True,
+        required=True,
+        help=f"ID of {kind} which haven't been invoiced (repeatable).",
+    )
+    @click.option(
+        "--service",
+        type=int,
+        required=True,
+        help="ID of another service of the same project.",
+    )
+    @change_options()
+    def move(project, entries, service, ignore_warnings, dry_run, as_json):
+        data = request(
+            "POST",
+            f"projects/{project}/logbook/move/",
+            params=change_params(dry_run, ignore_warnings),
+            json={"kind": kind, "entries": list(entries), "service": service},
+        )
+        if as_json:
+            echo_json(data)
+            return
+        for row in data:
+            echo(row, dry_run=dry_run, as_json=False, prefix="Moved ")
+
+    return move
+
+
+move_hours = _move_command(hours, "hours", _echo_hours)
+
+
 @cli.group()
 def costs():
-    """Look at, log, change and delete costs"""
+    """Look at, log, change, move and delete costs"""
 
 
 @costs.command("search")
@@ -513,3 +561,6 @@ def delete_cost(cost_id, dry_run, as_json):
     of an expense report."""
     data = request("DELETE", f"logbook/costs/{cost_id}/", params=change_params(dry_run))
     _echo_cost(data, dry_run=dry_run, as_json=as_json, prefix="Deleted ")
+
+
+move_costs = _move_command(costs, "costs", _echo_cost)

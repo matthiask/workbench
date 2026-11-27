@@ -553,6 +553,15 @@ Searching them works in the CLI:
     wb costs search --project 1234
     wb costs search --expenses --rendered-by mk
 
+Entries logged on the wrong service move with `--service`, also to a service
+of another open project; several entries of a project move to another
+service of the same project at once with `move`. Like in the web interface,
+invoiced entries and entries of closed projects stay where they are:
+
+    wb hours update 5678 --service 902 --dry-run
+    wb hours move --project 1234 --entry 5678 --entry 5679 --service 902
+    wb costs move --project 1234 --entry 345 --service 902
+
 ## Timestamps
 
 `wb timestamps start` and `wb timestamps stop` replace the `tst` command of

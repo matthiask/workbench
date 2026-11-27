@@ -122,6 +122,12 @@ API_ROUTES = {
     "projects_project_createoffer": "POST /api/projects/{project_id}/offers/",
     "projects_project_createservice": "POST /api/services/",
     "projects_project_creatework": "POST /api/projects/{project_id}/planning/work/",
+    "projects_project_logbook_batch_update_costs": (
+        "POST /api/projects/{project_id}/logbook/move/"
+    ),
+    "projects_project_logbook_batch_update_hours": (
+        "POST /api/projects/{project_id}/logbook/move/"
+    ),
     "projects_project_planning_batch_update": "POST /api/planning/work/batch/",
     # All fields: package 07
     "projects_project_update": "PATCH /api/projects/{project_id}/",
@@ -189,8 +195,6 @@ NOT_IN_API = {
     "projects_project_createexternalwork": "package 13",
     "projects_project_createmilestone": "package 13",
     "projects_project_delete": "package 07",
-    "projects_project_logbook_batch_update_costs": "package 09",
-    "projects_project_logbook_batch_update_hours": "package 09",
     "projects_project_pin": "out of scope: own profile (pinned projects)",
     "projects_project_projected_invoices": "package 07",
     "projects_project_renumber_offers": "package 02",
