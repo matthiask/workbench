@@ -88,61 +88,82 @@ def service_autocomplete_details(service):
     return str(service.project)
 
 
+campaigns_only = feature_required(FEATURES.CAMPAIGNS)
+
+
 urlpatterns = [
     path("offers/", include("workbench.offers.urls")),
     # Campaigns
     path(
         "campaigns/",
-        generic.ListView.as_view(model=Campaign, search_form_class=CampaignSearchForm),
+        campaigns_only(
+            generic.ListView.as_view(
+                model=Campaign, search_form_class=CampaignSearchForm
+            )
+        ),
         name="projects_campaign_list",
     ),
     path(
         "campaigns/autocomplete/",
-        generic.AutocompleteView.as_view(
-            model=Campaign,
-            queryset=Campaign.objects.select_related("owned_by"),
-            filter=autocomplete_filter,
+        campaigns_only(
+            generic.AutocompleteView.as_view(
+                model=Campaign,
+                queryset=Campaign.objects.select_related("owned_by"),
+                filter=autocomplete_filter,
+            )
         ),
         name="projects_campaign_autocomplete",
     ),
     path(
         "campaigns/<int:pk>/",
-        generic.DetailView.as_view(
-            model=Campaign,
-            queryset=Campaign.objects.select_related("owned_by", "customer"),
+        campaigns_only(
+            generic.DetailView.as_view(
+                model=Campaign,
+                queryset=Campaign.objects.select_related("owned_by", "customer"),
+            )
         ),
         name="projects_campaign_detail",
     ),
     path(
         "campaigns/<int:pk>/statistics/",
-        generic.DetailView.as_view(model=Campaign, template_name_suffix="_statistics"),
+        campaigns_only(
+            generic.DetailView.as_view(
+                model=Campaign, template_name_suffix="_statistics"
+            )
+        ),
         name="projects_campaign_statistics",
     ),
     path(
         "campaigns/create/",
-        generic.CreateView.as_view(form_class=CampaignForm, model=Campaign),
+        campaigns_only(
+            generic.CreateView.as_view(form_class=CampaignForm, model=Campaign)
+        ),
         name="projects_campaign_create",
     ),
     path(
         "campaigns/<int:pk>/update/",
-        generic.UpdateView.as_view(form_class=CampaignForm, model=Campaign),
+        campaigns_only(
+            generic.UpdateView.as_view(form_class=CampaignForm, model=Campaign)
+        ),
         name="projects_campaign_update",
     ),
     path(
         "campaigns/<int:pk>/delete/",
-        generic.DeleteView.as_view(
-            model=Campaign, delete_form_class=CampaignDeleteForm
+        campaigns_only(
+            generic.DeleteView.as_view(
+                model=Campaign, delete_form_class=CampaignDeleteForm
+            )
         ),
         name="projects_campaign_delete",
     ),
     path(
         "campaigns/<int:pk>/planning/",
-        campaign_planning,
+        campaigns_only(campaign_planning),
         name="projects_campaign_planning",
     ),
     path(
         "campaigns/<int:pk>/external/",
-        campaign_planning_external,
+        campaigns_only(campaign_planning_external),
         name="projects_campaign_planning_external",
     ),
     # Projects

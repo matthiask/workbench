@@ -1,6 +1,9 @@
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.urls import reverse
 
 from workbench import factories
+from workbench.accounts.features import FEATURES, F
 from workbench.invoices.models import Invoice
 from workbench.projects.models import Campaign, Project
 from workbench.tools.forms import WarningsForm
@@ -133,3 +136,31 @@ class CampaignsTest(TestCase):
 
         response = self.client.get(campaign.urls["create"] + "?copy=blub")
         self.assertEqual(response.status_code, 200)  # No crash
+
+    @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.NEVER})
+    def test_feature_required(self):
+        """Campaign views require the CAMPAIGNS feature, like the API"""
+        campaign = factories.CampaignFactory.create()
+        self.client.force_login(campaign.owned_by)
+
+        for name in ["list", "autocomplete", "create"]:
+            with self.subTest(name=name):
+                response = self.client.get(Campaign.urls[name])
+                self.assertRedirects(response, "/", fetch_redirect_response=False)
+
+        for name in [
+            "detail",
+            "statistics",
+            "update",
+            "delete",
+            "planning",
+            "planning_external",
+        ]:
+            with self.subTest(name=name):
+                url = reverse(f"projects_campaign_{name}", kwargs={"pk": campaign.pk})
+                response = self.client.get(url)
+                self.assertRedirects(response, "/", fetch_redirect_response=False)
+
+        response = self.client.post(campaign.urls["delete"])
+        self.assertRedirects(response, "/", fetch_redirect_response=False)
+        self.assertTrue(Campaign.objects.filter(pk=campaign.pk).exists())
