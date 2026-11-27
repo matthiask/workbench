@@ -654,8 +654,9 @@ def email_in_use_warning(email, *, person):
     """Warning (``email-in-use``) when another person or an organization
     (as its central address) uses the email address already, or None
 
-    Creating people and adding details rejects those addresses; changing
-    them only warns since addresses shared by colleagues exist."""
+    Used when adding, changing and creating addresses (the person form,
+    the API): a warning rather than an error since addresses shared by
+    colleagues exist. ``person`` is None for people being created."""
     email = email.strip()
     messages = [
         _("Already used by %(person)s (ID %(id)s).")

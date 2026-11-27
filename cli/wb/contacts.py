@@ -1269,7 +1269,8 @@ def create_person(file, dry_run, allow_duplicates, ignore_warnings, as_json):
     """Create a person with their contact details from a YAML or JSON file
 
     Search for the person and their organization with `wb contacts search`
-    first. Email addresses which are already in use are always rejected."""
+    first. An email address another person or an organization (centrally)
+    uses already is a warning (email-in-use)."""
     data = request(
         "POST",
         "contacts/people/",
@@ -1292,17 +1293,22 @@ def create_person(file, dry_run, allow_duplicates, ignore_warnings, as_json):
 @click.argument("person_id", type=int)
 @click.argument("file", type=click.File("r"))
 @click.option("--dry-run", is_flag=True, help="Validate only.")
+@ignore_warnings_option
 @click.option("--json", "as_json", is_flag=True)
-def add_person_details(person_id, file, dry_run, as_json):
+def add_person_details(person_id, file, dry_run, ignore_warnings, as_json):
     """Add email addresses, phone numbers and postal addresses to a person
 
     The YAML or JSON file contains email_addresses, phone_numbers and
     postal_addresses like for `wb people create`. Existing details are never
-    changed or removed."""
+    changed or removed. An email address another person or an organization
+    (centrally) uses already is a warning (email-in-use)."""
     data = request(
         "POST",
         f"contacts/people/{person_id}/details/",
-        params={"dry_run": format_bool(dry_run)},
+        params={
+            "dry_run": format_bool(dry_run),
+            "ignore_warnings": list(ignore_warnings),
+        },
         json=load(file),
     )
     if as_json:

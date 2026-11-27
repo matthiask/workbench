@@ -252,12 +252,13 @@ Groups are listed, created and archived with `wb groups`:
     wb groups update 56 --archive
 
 People and organizations whose names exist already are rejected unless you
-pass `--allow-duplicates`; email addresses which are in use are always
-rejected.
+pass `--allow-duplicates`. An email address which another person or an
+organization (centrally) uses already is a warning, pass `--ignore-warning
+email-in-use` if it's really shared.
 
 Add email addresses, phone numbers and postal addresses to existing people
 with a file of the same structure; existing details are never changed or
-removed:
+removed (addresses in use are a warning here too):
 
     wb people add-details 345 details.yaml --dry-run
 

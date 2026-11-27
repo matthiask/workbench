@@ -707,6 +707,34 @@ email_addresses:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("+41441234567", result.output)
 
+        # Addresses of other people are a warning
+        other = self.file(
+            "given_name: Anna\nfamily_name: Beispiel\nsalutation: Liebe Anna\n"
+            "email_addresses:\n  - email: hans@example.com\n"
+        )
+        result = self.wb("people", "create", other)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("email-in-use", result.output)
+        result = self.wb(
+            "people", "create", other, "--ignore-warning", "email-in-use", "--json"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        anna = json.loads(result.output)["id"]
+        details = self.file("email_addresses:\n  - email: hans@example.com\n")
+        result = self.wb("people", "add-details", created.pk, details)
+        self.assertEqual(result.exit_code, 1)
+        self.assertNotIn("email-in-use", result.output)
+        factories.OrganizationFactory.create(email="info@example.com")
+        details = self.file("email_addresses:\n  - email: info@example.com\n")
+        result = self.wb("people", "add-details", anna, details)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("email-in-use", result.output)
+        result = self.wb(
+            "people", "add-details", anna, details, "--ignore-warning", "email-in-use"
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("info@example.com", result.output)
+
         group = Group.objects.create(title="Mailing")
         created.groups.add(group)
         result = self.wb("people", "search", "--group", "Mailing")

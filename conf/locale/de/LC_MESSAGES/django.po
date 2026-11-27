@@ -1144,6 +1144,11 @@ msgstr "Verwende entweder eine existierende Organisation oder erstelle eine neue
 
 #: workbench/contacts/api.py
 #, python-format
+msgid "%(person)s has this email address already."
+msgstr "%(person)s hat diese Emailadresse bereits."
+
+#: workbench/contacts/api.py
+#, python-format
 msgid "%(person)s has this phone number already."
 msgstr "%(person)s hat diese Telefonnummer bereits."
 

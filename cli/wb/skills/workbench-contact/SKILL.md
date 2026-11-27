@@ -87,10 +87,14 @@ Validate it on the server and show the result to the user:
 
     wb people create <scratchpad>/person.yaml --dry-run
 
-Workbench rejects people and organizations whose names exist already, and email
-addresses which are in use. Show these to the user instead of working around
+Workbench rejects people and organizations whose names exist already, and
+warns about email addresses which another person or an organization uses
+already (`email-in-use`). Show these to the user instead of working around
 them. Only pass `--allow-duplicates` when the user confirms that it's really
-someone (or something) else with the same name. If the person exists twice
+someone (or something) else with the same name, and `--ignore-warning
+email-in-use` when the user confirms that the address is really shared (e.g.
+a team address); a generic address (info@) rather belongs to the
+organization. If the person exists twice
 already (e.g. under an old name), propose merging them with
 `wb people merge <duplicate_id> --into <keep_id> --dry-run` and only run it
 without `--dry-run` once the user confirms.
@@ -109,7 +113,9 @@ them to the user and validate them:
 
     wb people add-details <person_id> <scratchpad>/details.yaml --dry-run
 
-Existing details are never changed or removed. After the user's approval:
+Existing details are never changed or removed. Email addresses in use are a
+warning like when creating people (`email-in-use`, ask the user first).
+After the user's approval:
 
     wb people add-details <person_id> <scratchpad>/details.yaml
 

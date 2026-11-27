@@ -1236,3 +1236,75 @@ class ContactsAPITest(TestCase):
         self.assertEqual(person.postaladdresses.count(), 1)
         person.refresh_from_db()
         self.assertIn("+41441234567", person._fts)
+
+    def test_email_in_use_on_create_and_details(self):
+        """Creating people and adding details warns about email addresses
+        another person (archived or not, of any organization) or an
+        organization (centrally) uses already; an address the person has
+        already stays an error"""
+        person = factories.PersonFactory.create()
+        person.emailaddresses.create(email="hans@example.com")
+        factories.PersonFactory.create(is_archived=True).emailaddresses.create(
+            email="other@example.com"
+        )
+        factories.OrganizationFactory.create(email="info@example.com")
+        self.client.force_login(factories.UserFactory.create())
+        create_url = "/api/contacts/people/"
+        details_url = f"/api/contacts/people/{person.pk}/details/"
+        new_person = {
+            "given_name": "Anna",
+            "family_name": "Beispiel",
+            "salutation": "Liebe Anna",
+        }
+
+        def post(url, emails, query=""):
+            data = {"email_addresses": [{"email": email} for email in emails]}
+            if url == create_url:
+                data |= new_person
+            return self.client.post(url + query, data, content_type="application/json")
+
+        def errors(response):
+            self.assertEqual(response.status_code, 422)
+            return [(e["loc"][2:], e.get("code")) for e in response.json()["detail"]]
+
+        emails = ["Other@example.com", "info@example.com", "new@example.com"]
+        for url in [create_url, details_url]:
+            with self.subTest(url=url):
+                self.assertEqual(
+                    errors(post(url, emails)),
+                    [
+                        (["email_addresses", 0, "email"], "email-in-use"),
+                        (["email_addresses", 1, "email"], "email-in-use"),
+                    ],
+                )
+                response = post(url, emails, "?ignore_warnings=email-in-use&dry_run=1")
+                self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(Person.objects.filter(given_name="Anna").exists())
+        self.assertEqual(person.emailaddresses.count(), 1)
+
+        # The person's own address is an error which can't be ignored
+        self.assertEqual(
+            errors(
+                post(
+                    details_url,
+                    ["HANS@example.com", "info@example.com"],
+                    "?ignore_warnings=email-in-use",
+                )
+            ),
+            [(["email_addresses", 0, "email"], None)],
+        )
+        self.assertEqual(person.emailaddresses.count(), 1)
+
+        response = post(create_url, emails, "?ignore_warnings=email-in-use")
+        self.assertEqual(response.status_code, 200, response.content)
+        created = Person.objects.get(given_name="Anna")
+        self.assertEqual(created.emailaddresses.count(), 3)
+
+        response = post(
+            details_url, ["info@example.com"], "?ignore_warnings=email-in-use"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            sorted(person.emailaddresses.values_list("email", flat=True)),
+            ["hans@example.com", "info@example.com"],
+        )

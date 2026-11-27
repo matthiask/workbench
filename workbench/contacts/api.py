@@ -1049,37 +1049,36 @@ def person_context(request):
     return {"import_schema": PersonIn.model_json_schema()}
 
 
-def _email_errors(data):
-    """Email addresses are never used twice, central addresses of
-    organizations are shown on their people already"""
-    return [
+def _email_errors(data, *, ignore_warnings, person=None):
+    """An address the person has already is an error; one another person
+    or an organization (centrally) uses already is a warning
+    (``email-in-use``) like when changing addresses"""
+    own = (
         {
-            "loc": ["body", "data", "email_addresses", index, "email"],
-            "msg": _("Already used by %(person)s (ID %(id)s).")
-            % {"person": existing.person, "id": existing.person_id},
+            email.strip().casefold()
+            for email in person.emailaddresses.values_list("email", flat=True)
         }
-        for index, item in enumerate(data.email_addresses)
-        for existing in EmailAddress.objects.filter(
-            email__iexact=item.email.strip()
-        ).select_related("person")
-    ] + [
-        {
-            "loc": ["body", "data", "email_addresses", index, "email"],
-            "msg": _(
-                "The central address of %(organization)s (ID %(id)s), it's"
-                " shown on its people."
-            )
-            % {"organization": organization, "id": organization.pk},
-        }
-        for index, item in enumerate(data.email_addresses)
-        for organization in Organization.objects.filter(
-            email__iexact=item.email.strip()
-        )
-    ]
+        if person
+        else set()
+    )
+    errors = []
+    for index, item in enumerate(data.email_addresses):
+        loc = ["body", "data", "email_addresses", index, "email"]
+        if item.email.strip().casefold() in own:
+            errors.append({
+                "loc": loc,
+                "msg": _("%(person)s has this email address already.")
+                % {"person": person},
+            })
+        elif "email-in-use" not in ignore_warnings and (
+            warning := email_in_use_warning(item.email, person=person)
+        ):
+            errors.append({"loc": loc, "msg": warning, "code": "email-in-use"})
+    return errors
 
 
 def _duplicates(data, *, allow_duplicates):
-    errors = _email_errors(data)
+    errors = []
 
     def error(loc, msg):
         errors.append({"loc": ["body", "data", *loc], "msg": msg})
@@ -1201,7 +1200,8 @@ def person_create(
     allow_duplicates: Query[
         bool,
         P(
-            description="Create the person although someone with the same name or email address exists."
+            description="Create the person (and the new organization) although"
+            " someone (something) with the same name exists."
         ),
     ] = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
@@ -1210,15 +1210,18 @@ def person_create(
     if it doesn't exist yet
 
     Validated like in the web interface, warnings are errors here unless
-    they are ignored. People with the same name, organizations with the same
-    name and email addresses which are already in use are rejected; nothing
-    is saved if anything is invalid or with ``dry_run``."""
+    they are ignored. People and organizations with the same name are
+    rejected unless duplicates are allowed; email addresses another person
+    or an organization (centrally) uses already are a warning
+    (``email-in-use``). Nothing is saved if anything is invalid or with
+    ``dry_run``."""
     errors = []
     if data.organization and data.new_organization:
         errors.append({
             "loc": ["body", "data", "new_organization"],
             "msg": _("Either use an existing organization or create a new one."),
         })
+    errors.extend(_email_errors(data, ignore_warnings=ignore_warnings))
     errors.extend(_duplicates(data, allow_duplicates=allow_duplicates))
     primary_contact = request.user
     if data.primary_contact:
@@ -1283,16 +1286,23 @@ def person_create(
 
 @router.post("/contacts/people/{int:person_id}/details/", response=PersonCreated)
 def person_add_details(
-    request, person_id: int, data: DetailsIn, *, dry_run: DryRun = False
+    request,
+    person_id: int,
+    data: DetailsIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Add email addresses, phone numbers and postal addresses to a person
 
-    Never changes or removes existing details. Email addresses which are
-    already in use and phone numbers the person has already are rejected."""
+    Never changes or removes existing details. Email addresses and phone
+    numbers the person has already are rejected; email addresses another
+    person or an organization (centrally) uses already are a warning
+    (``email-in-use``)."""
     person = get_object_or_404(
         Person.objects.select_related("organization", "primary_contact"), pk=person_id
     )
-    errors = _email_errors(data)
+    errors = _email_errors(data, ignore_warnings=ignore_warnings, person=person)
     details = _details(data, errors)
     errors.extend(_central_phone_errors(details, person.organization_id))
     numbers = set(person.phonenumbers.values_list("phone_number", flat=True))
