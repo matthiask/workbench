@@ -281,42 +281,6 @@ class InvoicesAPITest(TestCase):
         self.assertEqual(data["periodicity"], "yearly")
         self.assertEqual(data["owned_by"], "ab")
 
-    def test_mark_reminded(self):
-        """Overdue invoices are marked as reminded today"""
-        invoice = factories.InvoiceFactory.create(
-            status=Invoice.SENT, invoiced_on=in_days(-60), due_on=in_days(-30)
-        )
-        other = factories.InvoiceFactory.create(
-            status=Invoice.SENT, invoiced_on=in_days(-5), due_on=in_days(25)
-        )
-        self.client.force_login(invoice.owned_by)
-        url = "/api/invoices/reminders/"
-
-        response = self.client.post(
-            f"{url}?dry_run=true",
-            {"invoices": [invoice.pk]},
-            content_type="application/json",
-        )
-        [group] = response.json()
-        self.assertEqual(
-            group["invoices"][0]["last_reminded_on"], dt.date.today().isoformat()
-        )
-        invoice.refresh_from_db()
-        self.assertIsNone(invoice.last_reminded_on)
-
-        response = self.client.post(
-            url, {"invoices": [invoice.pk, other.pk]}, content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 422)
-        self.assertIn(str(other.pk), response.content.decode())
-
-        response = self.client.post(
-            url, {"invoices": [invoice.pk]}, content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 200, response.content)
-        invoice.refresh_from_db()
-        self.assertEqual(invoice.last_reminded_on, dt.date.today())
-
     def test_postpone_reminders(self):
         """Reminders of sent invoices are postponed for up to 60 days, more
         than 30 days have to be confirmed"""

@@ -461,27 +461,6 @@ def postpone_reminders(invoice_id, until, clear, confirm, as_json):
         console.print(f"Reminders of {data['code']} aren't postponed anymore.")
 
 
-@invoices.command("mark-reminded")
-@click.argument("invoice_ids", type=int, nargs=-1, required=True)
-@click.option("--dry-run", is_flag=True, help="Validate only.")
-@click.option("--json", "as_json", is_flag=True)
-def mark_reminded(invoice_ids, dry_run, as_json):
-    """Mark overdue invoices as reminded today, e.g. after sending a dunning
-    letter"""
-    data = request(
-        "POST",
-        "invoices/reminders/",
-        params={"dry_run": format_bool(dry_run)},
-        json={"invoices": list(invoice_ids)},
-    )
-    if as_json:
-        echo_json(data)
-        return
-    _echo_reminders(data)
-    if dry_run:
-        console.print("Dry run, nothing has been saved.")
-
-
 @cli.group("recurring-invoices", invoke_without_command=True)
 @click.pass_context
 def recurring_invoices(ctx):

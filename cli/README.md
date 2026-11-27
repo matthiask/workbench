@@ -387,7 +387,6 @@ Overdue invoices to remind customers of, per customer and contact, like the
 reminders in the web interface (without postponed reminders):
 
     wb invoices reminders
-    wb invoices mark-reminded 5678 5679    # e.g. after sending a dunning letter
     wb invoices postpone-reminders 5678 2026-11-30
     wb invoices postpone-reminders 5678 2026-12-20 --confirm   # more than 30 days
     wb invoices postpone-reminders 5678 --clear

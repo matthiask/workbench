@@ -2478,11 +2478,6 @@ msgstr "Site-Kontakt"
 msgid "site contacts"
 msgstr "Site-Kontakte"
 
-#: workbench/invoices/api.py
-#, python-format
-msgid "These invoices aren't overdue: %s"
-msgstr "Diese Rechnungen sind nicht überfällig: %s"
-
 #: workbench/invoices/api.py workbench/invoices/forms.py
 msgid "Reminders can only be postponed for sent invoices."
 msgstr "Zahlungserinnerungen können nur für versendete Rechnungen aufgeschoben werden."

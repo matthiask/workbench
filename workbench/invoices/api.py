@@ -293,33 +293,6 @@ def _reminders(invoices, request):
     return list(nested.values())
 
 
-class Reminded(InputSchema):
-    invoices: list[int] = Field(
-        min_length=1, description="IDs of overdue invoices from the reminders."
-    )
-
-
-@router.post("/invoices/reminders/", response=list[Reminders], auth=user_auth())
-def mark_reminded(request, data: Reminded, *, dry_run: DryRun = False):
-    """Mark invoices as reminded today like in the web interface, e.g. after
-    sending a dunning letter; returns these invoices with their reminders"""
-    invoices = _overdue().filter(id__in=data.invoices)
-    if unknown := sorted(set(data.invoices) - {invoice.id for invoice in invoices}):
-        raise ValidationError([
-            {
-                "loc": ["body", "data", "invoices"],
-                "msg": _("These invoices aren't overdue: %s")
-                % ", ".join(map(str, unknown)),
-            }
-        ])
-    with transaction.atomic():
-        invoices.update(last_reminded_on=dt.date.today())
-        result = _reminders(_overdue().filter(id__in=data.invoices), request)
-        if dry_run:
-            transaction.set_rollback(True)
-    return result
-
-
 class PostponeReminders(InputSchema):
     until: dt.date | None = Field(
         description="No reminders before this date, null postpones nothing."

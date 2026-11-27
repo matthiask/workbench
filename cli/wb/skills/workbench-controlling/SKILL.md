@@ -78,6 +78,6 @@ anything in Workbench while preparing a summary.
 `wb` doesn't send anything to customers. List the overdue invoices with
 `wb invoices reminders`, check their notes (`wb notes search --invoice
 <invoice_id>`) and mention payment promises or disputes. The dunning
-letters are sent from the web interface; `wb invoices mark-reminded`
-records reminders sent some other way, `wb invoices postpone-reminders`
-leaves an invoice out while a question is being clarified.
+letters are sent and recorded in the web interface; `wb invoices
+postpone-reminders` leaves an invoice out while a question is being
+clarified.

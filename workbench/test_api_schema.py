@@ -93,7 +93,6 @@ API_ROUTES = {
     ),
     # All fields: package 06
     "invoices_recurringinvoice_update": "PATCH /api/recurring-invoices/{invoice_id}/",
-    "invoices_reminders": "POST /api/invoices/reminders/",
     "logbook_loggedcost_create": "POST /api/logbook/costs/",
     "logbook_loggedcost_delete": "DELETE /api/logbook/costs/{cost_id}/",
     "logbook_loggedcost_update": "PATCH /api/logbook/costs/{cost_id}/",
@@ -160,6 +159,7 @@ NOT_IN_API = {
     "invoices_invoice_update": "package 03",
     "invoices_recurringinvoice_create": "package 06",
     "invoices_recurringinvoice_delete": "package 06",
+    "invoices_reminders": "out of scope: sending mail",
     "invoices_send_reminder": "out of scope: sending mail",
     "invoices_service_delete": "package 05",
     "invoices_service_update": "package 05",

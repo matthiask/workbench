@@ -44,8 +44,8 @@ the same warnings. No restrictions that exist only in the API.
 - **The API sends nothing, for now.** Invoices and dunning letters are
   sent from the web interface, recurring invoices by Workbench itself.
   Changing a status (e.g. to sent) never sends anything. Asking for
-  overdue invoices (`wb invoices reminders`) is fine; the endpoint which
-  sent dunning letters has been removed.
+  overdue invoices (`wb invoices reminders`) is fine; the endpoints which
+  sent dunning letters and marked invoices as reminded have been removed.
 - **The CLI stays thin**: `wb <noun> update|delete|<verb>`, options named
   like the API fields, `--ignore-warning CODE` (repeatable) and `--dry-run`.
 - **Out of scope**: sending mail, bookkeeping (credit entries, bank
@@ -113,6 +113,7 @@ conflicts; the "Touches" column shows them.
   API; packages for credit entries and expense reports dropped. Teams yes.
 - Putting accepted offers back into preparation through the API: yes, it's
   the defined workflow for changing an offer (package 01).
-- Dunning letters: the endpoint sending them is removed (wb 0.56.0).
+- Dunning letters: the endpoints sending them and marking invoices as
+  reminded are removed (wb 0.56.0).
 - Order: 00 first, then 03, 01 and 14 in parallel (today's handover gaps,
   three different apps), then the rest in waves of different apps.
