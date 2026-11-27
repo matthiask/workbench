@@ -56,6 +56,9 @@ What the later packages need to know:
   `object_pk(queryset)`, or any callable raising Django's
   `ValidationError`) or `(name, converter)`. Cross-field rules go into the
   patch dict before the call (see `project_update`).
+  Since package 03 it refuses patched fields which the bound form disables
+  or doesn't have (unless empty), and passes `ignore_warnings` to the form
+  like the web interface's checkbox (`should_ignore_warnings()`).
 - `delete_with_form(instance, request, *, loc, delete_form_class=None,
   data=None, fields=None, ignore_warnings=(), dry_run)`: delete forms have
   warnings too (`release-logged-services`, `release-down-payments`,

@@ -42,3 +42,27 @@ Sent invoice: owner, title, status paid with closed on; amounts refused.
 Invoice dated before the freeze date: the form's error. Changing the
 status to sent sends no mail. Deleting a sent invoice: refused like in
 the web interface.
+
+## Done (2026-11-27)
+
+- `PATCH /api/invoices/{id}/` and `DELETE /api/invoices/{id}/` take an ID
+  or a code like `GET`. `down_payments` maps to the form's
+  `apply_down_payment` (replaces the current ones), `tax_rate` is rounded
+  to the choices' two places. `type` can't be patched (always disabled).
+- `wb invoices update ID` (all form fields, `--down-payment` /
+  `--no-down-payments`, `--vat/--no-vat`, `--show-/--hide-service-details`)
+  and `wb invoices delete ID`. No `wb invoices settle`:
+  `update --status paid --closed-on --payment-notice` does it, and the
+  settle URL counts as covered by the PATCH route.
+- Different from the spec: the field restrictions only apply to
+  **freezed** invoices (on or before the freeze date, or archived). Sent
+  invoices after the freeze date keep all fields, changing anything but
+  status, closed on, payment notice and third party costs warns
+  (`maybe-unintentional-invoice-change`), amounts too.
+- Two changes to `patch_with_form()` for every package: fields which the
+  form disables or leaves out (e.g. amounts of freezed invoices, the
+  discount of credits) are refused ("This field cannot be changed.")
+  unless the value is empty, instead of being ignored silently; and the
+  ignored warnings are passed to the form like the web interface's
+  checkbox, because forms act on them (`should_ignore_warnings()`:
+  reopening a paid invoice clears its closing date).
