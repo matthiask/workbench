@@ -101,7 +101,6 @@ API_ROUTES = {
     "logbook_loggedhours_update": "PATCH /api/logbook/hours/{hours_id}/",
     "notes_note_add": "POST /api/notes/",
     "offers_offer_create": "POST /api/projects/{project_id}/offers/",
-    # All fields and statuses: package 01
     "offers_offer_update": "PATCH /api/offers/{offer_id}/",
     "planning_plannedwork_create": "POST /api/projects/{project_id}/planning/work/",
     "planning_plannedwork_delete": "DELETE /api/planning/work/{work_id}/",

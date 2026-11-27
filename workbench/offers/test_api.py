@@ -9,6 +9,7 @@ from workbench import factories
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer, OfferHeading
 from workbench.projects.models import Service
+from workbench.tools.validation import monday
 
 
 class OffersAPITest(TestCase):
@@ -204,17 +205,6 @@ class OffersAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         offer.refresh_from_db()
         self.assertEqual((offer.title, offer.description), ("Tranche 3", "Later"))
-        response = self.client.patch(
-            f"/api/offers/{offer.pk}/",
-            {"discount": 100},
-            content_type="application/json",
-        )
-        self.assertContains(
-            response,
-            "Only the title, the description, the owner and the external"
-            " reference of service groups can be changed.",
-            status_code=409,
-        )
 
     def test_effort_type(self):
         """Service types only suggest the effort type and the hourly rate"""
@@ -594,8 +584,8 @@ class OfferServicesAPITest(TestCase):
         self.assertEqual(response.json()["total_excl_tax"], "3000.00")
 
     def test_owned_by(self):
-        """Offers in preparation and service groups are handed over to another
-        active user, e.g. when someone leaves; sent offers stay as they are"""
+        """Offers are handed over to another active user, e.g. when someone
+        leaves"""
         user = factories.UserFactory.create(_short_name="Hm")
         factories.UserFactory.create(_short_name="xy", is_active=False)
 
@@ -627,9 +617,12 @@ class OfferServicesAPITest(TestCase):
         self.assertEqual(self.offer.owned_by, self.project.owned_by)
 
         self.offer.status = Offer.OFFERED
+        self.offer.offered_on = self.offer.valid_until = dt.date.today()
         self.offer.save()
         response = self.send("patch", data={"owned_by": "hm"})
-        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.owned_by, user)
 
     def test_external_reference(self):
         """External references are changed for offers in any state and
@@ -711,16 +704,184 @@ class OfferServicesAPITest(TestCase):
         self.assertIn("invoiced", response.content.decode())
         self.assertEqual(self.offer.services.count(), 2)
 
-    def test_not_in_preparation(self):
-        """Only offers in preparation are changed"""
+    def patch(self, data, *, ignore_warnings=()):
+        query = "&".join(f"ignore_warnings={code}" for code in ignore_warnings)
+        return self.client.patch(
+            f"{self.url}?{query}", data, content_type="application/json"
+        )
+
+    def items(self):
+        """The services and headings of the offer, to check they stay"""
+        return [
+            *Service.objects
+            .filter(project=self.project)
+            .order_by("pk")
+            .values_list("pk", "offer", "position", "title", "effort_hours"),
+            *OfferHeading.objects.order_by("pk").values_list(
+                "pk", "offer", "position", "title"
+            ),
+        ]
+
+    def test_update_keeps_services_and_headings(self):
+        """Changing an offer through its form leaves its services and
+        headings alone, also when the offer has been sent"""
+        self.send("post", "headings/", {"title": "Phase 1", "before": self.concept.pk})
+        # A service without offer, which the web form could add
+        factories.ServiceFactory.create(project=self.project, title="Without")
+        items = self.items()
+        self.assertEqual(len(items), 4)
+
+        response = self.patch({"title": "Website", "discount": 100})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["total_excl_tax"], "2900.00")
+        self.assertEqual(len(response.json()["services"]), 2)
+        self.assertEqual(self.items(), items)
+
+        today = dt.date.today().isoformat()
+        response = self.patch({
+            "status": "offered",
+            "offered_on": today,
+            "valid_until": today,
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["status"], "offered")
+        self.assertEqual(self.items(), items)
+
+        response = self.patch({"title": "Website 2", "description": "Sent"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(self.items(), items)
+        self.assertEqual(response.json()["total_excl_tax"], "2900.00")
+
+    def test_sent_offer(self):
+        """Sent offers change their owner and status, not their services"""
+        today = dt.date.today()
         self.offer.status = Offer.OFFERED
+        self.offer.offered_on = self.offer.valid_until = today
         self.offer.save()
-        for method, path, data in [
-            ("patch", "", {"title": "X", "external_reference": ""}),
-            ("patch", "", {"title": "X"}),
-        ]:
-            with self.subTest(method=method, path=path):
-                self.assertEqual(self.send(method, path, data).status_code, 409)
+        user = factories.UserFactory.create(_short_name="hm")
+
+        response = self.patch({"owned_by": "hm", "status": "accepted"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.owned_by, user)
+        self.assertEqual(self.offer.status, Offer.ACCEPTED)
+        self.assertEqual(self.offer.closed_on, today)
+
+        response = self.client.patch(
+            f"/api/services/{self.concept.pk}/",
+            {"title": "Changed"},
+            content_type="application/json",
+        )
+        self.assertNotEqual(response.status_code, 200)
+        self.concept.refresh_from_db()
+        self.assertEqual(self.concept.title, "Concept")
+
+        response = self.patch({"status": "nonsense"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "status"]
+        )
+
+    def test_back_into_preparation(self):
+        """Accepted offers are put back into preparation to revise them,
+        the warning about the closing date is ignored explicitly"""
+        today = dt.date.today()
+        self.send("post", "headings/", {"title": "Phase 1"})
+        items = self.items()
+        self.offer.status = Offer.ACCEPTED
+        self.offer.offered_on = self.offer.valid_until = self.offer.closed_on = today
+        self.offer.save()
+
+        response = self.patch({"status": "in_preparation"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [e.get("code") for e in response.json()["detail"]],
+            ["status-change-but-already-closed"],
+        )
+
+        response = self.patch(
+            {"status": "in_preparation"},
+            ignore_warnings=["status-change-but-already-closed"],
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.status, Offer.IN_PREPARATION)
+        self.assertIsNone(self.offer.closed_on)
+        self.assertEqual(self.items(), items)
+
+        # Services are changeable again
+        response = self.client.patch(
+            f"/api/services/{self.concept.pk}/",
+            {"title": "Changed"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
+    def test_decline_with_planned_work(self):
+        """Declining an offer with planned work after this week asks whether
+        to delete it"""
+        today = dt.date.today()
+        self.offer.status = Offer.OFFERED
+        self.offer.offered_on = self.offer.valid_until = today
+        self.offer.save()
+        factories.PlannedWorkFactory.create(
+            project=self.project,
+            offer=self.offer,
+            weeks=[monday() + dt.timedelta(days=7)],
+        )
+
+        response = self.patch({"status": "declined"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [(e["loc"], e.get("code")) for e in response.json()["detail"]],
+            [
+                (["body", "data", "delete_planned_work"], None),
+                (["body", "data"], "yes-please-decline"),
+            ],
+        )
+
+        response = self.patch(
+            {"status": "declined", "delete_planned_work": True},
+            ignore_warnings=["yes-please-decline"],
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.status, Offer.DECLINED)
+        self.assertFalse(self.offer.planned_work.exists())
+        self.assertEqual(self.offer.services.count(), 2)
+
+    def test_update_all_fields(self):
+        """Every field of the offer form can be changed"""
+        response = self.patch({
+            "liable_to_vat": False,
+            "tax_rate": 7.7,
+            "show_service_details": False,
+            "is_budget_retainer": True,
+            "work_completed_on": dt.date.today().isoformat(),
+            "postal_address": "Beispiel AG\nMusterweg 1\n8000 Zürich",
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        data = response.json()
+        self.assertEqual(
+            (data["liable_to_vat"], data["tax_rate"], data["total"]),
+            (False, "7.70", data["total_excl_tax"]),
+        )
+        self.offer.refresh_from_db()
+        self.assertFalse(self.offer.show_service_details)
+        self.assertTrue(self.offer.is_budget_retainer)
+        self.assertEqual(self.offer.work_completed_on, dt.date.today())
+
+        response = self.patch({"work_completed_on": None, "tax_rate": 5})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "tax_rate"]
+        )
+        response = self.patch({
+            "work_completed_on": None,
+            "valid_until": dt.date.today().isoformat(),
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNone(response.json()["work_completed_on"])
 
     def test_pdf(self):
         """Offers are downloaded as PDF like in the web interface"""

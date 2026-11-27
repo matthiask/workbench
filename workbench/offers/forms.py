@@ -132,8 +132,12 @@ class OfferForm(PostalAddressSelectionForm):
             "tax_rate": forms.RadioSelect,
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, with_items=True, **kwargs):
+        """``with_items=False`` leaves the services and headings alone: the
+        formsets stay unbound and aren't validated or saved (the API changes
+        them through their own endpoints)"""
         self.project = kwargs.pop("project", None)
+        self.with_items = with_items
         if self.project:  # Creating a new offer
             kwargs.setdefault("initial", {}).update({"title": self.project.title})
         else:
@@ -162,9 +166,10 @@ class OfferForm(PostalAddressSelectionForm):
                 closed_on.isoformat(),
                 _("Use this date"),
             )
+        items_data = (self.data or None) if with_items else None
         self.formsets = {
             "services": ServiceFormset(
-                self.data or None,
+                items_data,
                 instance=self.instance,
                 form_kwargs={
                     "offer": self.instance,
@@ -172,7 +177,7 @@ class OfferForm(PostalAddressSelectionForm):
                 },
             ),
             "headings": HeadingFormset(
-                self.data or None,
+                items_data,
                 instance=self.instance,
                 form_kwargs={"editable": self.services_changeable},
             ),
@@ -203,7 +208,8 @@ class OfferForm(PostalAddressSelectionForm):
             posted_status = (
                 self.data.get(self.add_prefix("status")) if self.is_bound else None
             )
-            status = posted_status or str(self.instance.status)
+            # The API passes numbers, the web interface strings
+            status = str(posted_status or self.instance.status)
             if status == str(Offer.DECLINED):
                 self.fields["delete_planned_work"] = delete_planned_work_field(
                     _(
@@ -366,13 +372,13 @@ class OfferForm(PostalAddressSelectionForm):
             key=lambda row: (position(row[1]), row[0] == "service"),
         )
 
-    def is_valid(self):
+    def is_valid(self, *, ignore_warnings=False):
         return all([
-            super().is_valid(),
+            super().is_valid(ignore_warnings=ignore_warnings),
             *(
                 formset.is_valid()
                 for formset in self.formsets.values()
-                if self.services_changeable
+                if self.services_changeable and self.with_items
             ),
         ])
 
@@ -380,7 +386,7 @@ class OfferForm(PostalAddressSelectionForm):
         instance = super().save(commit=False)
         if not instance.pk:
             instance.save()
-        if self.services_changeable:
+        if self.services_changeable and self.with_items:
             for formset in self.formsets.values():
                 formset.save()
         # Totals of the services

@@ -14,10 +14,10 @@ from ninja.pagination import paginate
 
 from workbench.accounts.api_auth import user_auth
 from workbench.accounts.features import FEATURES
-from workbench.accounts.models import User
 from workbench.api_codes import by_id_or_code
 from workbench.api_keys import KEYS, OfferStatus, key
 from workbench.contacts.models import postal_address_choices
+from workbench.offers.forms import OfferForm
 from workbench.offers.models import (
     Offer,
     OfferHeading,
@@ -37,6 +37,7 @@ from workbench.projects.api import (
 from workbench.projects.models import Project, Service
 from workbench.services.models import ServiceType
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     DateRangeFilter,
     DryRun,
     InputSchema,
@@ -46,8 +47,11 @@ from workbench.tools.api import (
     SearchQuery,
     Serialized,
     ShortName,
+    active_user,
+    api_key,
     filter_date_range,
     full_clean,
+    patch_with_form,
     user_by_short_name,
 )
 from workbench.tools.pdf import offer_filename, pdf_response
@@ -681,88 +685,93 @@ def offer_replace(request, offer_id: int, data: OfferIn, *, dry_run: DryRun = Fa
     )
 
 
-def _changeable_offer(offer_id):
-    return _offer_in_preparation(
-        offer_id, _("Only offers in preparation can be changed.")
-    )
-
-
 class OfferPatch(InputSchema):
+    """Fields which aren't given are left alone, null empties a field"""
+
     title: str | None = Field(default=None, min_length=1, max_length=200)
     description: str | None = None
+    owned_by: str | None = Field(
+        default=None, description="Short name of an active user."
+    )
+    status: OfferStatus | None = Field(
+        default=None,
+        description="Offers which have been sent or accepted are put back into"
+        " preparation to revise them (ignore the warning"
+        " status-change-but-already-closed of accepted offers).",
+    )
+    offered_on: dt.date | None = None
+    valid_until: dt.date | None = None
+    closed_on: dt.date | None = Field(
+        default=None,
+        description="Date of acceptance or decline, defaults to today.",
+    )
+    work_completed_on: dt.date | None = Field(
+        default=None, description="Stops logging on the offer's services."
+    )
     postal_address: str | None = None
     discount: Number | None = Field(
         default=None, ge=0, description="Amount excl. tax, null removes it."
     )
+    liable_to_vat: bool | None = None
+    tax_rate: Number | None = Field(default=None, description="E.g. 8.1.")
+    show_service_details: bool | None = None
+    is_budget_retainer: bool | None = None
     external_reference: str | None = Field(
         default=None,
-        description="URLs separated by whitespace; replaces the existing ones. Can also"
-        " be changed when the offer isn't in preparation anymore.",
+        description="URLs separated by whitespace; replaces the existing ones."
+        " Changing only the external reference never warns.",
     )
-    owned_by: str | None = Field(
-        default=None, description="Short name of an active user."
+    delete_planned_work: bool | None = Field(
+        default=None,
+        description="Required when declining or discarding an offer with"
+        " planned work after this week: delete it or keep it.",
     )
 
 
 @router.patch("/offers/{offer_id}/", response=OfferOut)
-def offer_update(request, offer_id: int, data: OfferPatch, *, dry_run: DryRun = False):
-    """Change the title, the description, the owner, the postal address or
-    the discount of an offer in preparation, the title, the description and
-    the owner of a service group, or the external references of any offer;
-    fields which aren't given are left alone"""
-    fields = data.model_dump(exclude_unset=True)
-    if fields.keys() == {"external_reference"}:
+def offer_update(
+    request,
+    offer_id: int,
+    data: OfferPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change an offer in any status, validated like in the web interface;
+    its services and headings stay as they are
+
+    Warnings of the web interface are errors here unless ignored by their
+    code; nothing is saved if anything is invalid or with ``dry_run``."""
+    patch = data.model_dump(exclude_unset=True)
+    if patch.keys() == {"external_reference"}:
         return _update_external_reference(
-            request, offer_id, fields["external_reference"], dry_run=dry_run
+            request, offer_id, patch["external_reference"], dry_run=dry_run
         )
-    offer = get_object_or_404(Offer, pk=offer_id)
-    if offer.status == Offer.SERVICE_GROUP:
-        # Service groups only have a title and a description
-        if fields.keys() - {"title", "description", "owned_by", "external_reference"}:
-            raise HttpError(
-                409,
-                _(
-                    "Only the title, the description, the owner and the external"
-                    " reference of service groups can be changed."
-                ),
-            )
-        if "external_reference" in fields:
-            value = fields.pop("external_reference") or ""
-            try:
-                validate_external_reference(value)
-            except DjangoValidationError as exc:
-                raise ValidationError([
-                    {"loc": ["body", "data", "external_reference"], "msg": message}
-                    for message in exc.messages
-                ]) from None
-            offer.external_reference = normalize_external_reference(value)
-    else:
-        offer = _changeable_offer(offer_id)
-    for field, value in fields.items():
-        if field == "discount":
-            offer.discount = _decimal(value or 0, "0.00")
-        elif field == "owned_by":
-            offer.owned_by = _active_user(value)
-        else:
-            setattr(offer, field, value or "")
-    errors = []
-    full_clean(offer, ["body", "data"], errors, exclude=["project", "_code"])
-    if errors:
-        raise ValidationError(errors)
-    return _save(offer, [], request, dry_run=dry_run)
-
-
-def _active_user(short_name):
-    if short_name and (
-        user := User.objects.by_short_name(short_name).filter(is_active=True).first()
-    ):
-        return user
-    raise ValidationError([
-        {
-            "loc": ["body", "data", "owned_by"],
-            "msg": _("Unknown or inactive user %r.") % short_name,
-        }
-    ])
+    offer = get_object_or_404(
+        Offer.objects.select_related(
+            "project__customer", "project__contact", "owned_by"
+        ),
+        pk=offer_id,
+    )
+    if "discount" in patch and patch["discount"] is None:
+        patch["discount"] = 0
+    return patch_with_form(
+        OfferForm,
+        offer,
+        patch,
+        request,
+        out=lambda offer: offer_out(offer, list(offer.services.all()), request),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map={
+            "owned_by": active_user,
+            "status": api_key("offer_status"),
+            "discount": lambda value: _decimal(value, "0.00"),
+            "tax_rate": lambda value: _decimal(value, "0.00"),
+            "delete_planned_work": int,
+        },
+        form_kwargs={"with_items": False},
+    )
 
 
 def _update_external_reference(request, offer_id, value, *, dry_run):
