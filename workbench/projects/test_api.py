@@ -750,6 +750,114 @@ class ProjectsAPITest(TestCase):
         self.assertFalse(Service.objects.filter(pk=service.pk).exists())
         self.assertTrue(keep.is_invoiced)
 
+    def test_service_move(self):
+        """Services are moved to other open projects like in the web
+        interface: a flat rate of the new project is a warning and applied,
+        invoiced services and services bound to an offer stay"""
+        service = factories.ServiceFactory.create(
+            effort_type="Programming", effort_rate=150
+        )
+        project = service.project
+        other = factories.ProjectFactory.create()
+        closed = factories.ProjectFactory.create(closed_on=dt.date.today())
+        flat_rate = factories.ProjectFactory.create(flat_rate=100)
+        self.client.force_login(project.owned_by)
+        url = f"/api/services/{service.pk}/move/"
+
+        def post(data, query=""):
+            return self.client.post(
+                f"{url}{query}", data, content_type="application/json"
+            )
+
+        def errors(response):
+            self.assertEqual(response.status_code, 422, response.content)
+            return [(e["loc"], e.get("code")) for e in response.json()["detail"]]
+
+        response = post({"project": other.code}, "?dry_run=1")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["project"]["id"], other.pk)
+        service.refresh_from_db()
+        self.assertEqual(service.project, project)
+
+        response = post({"project": other.pk})
+        self.assertEqual(response.status_code, 200, response.content)
+        service.refresh_from_db()
+        self.assertEqual(service.project, other)
+
+        self.assertEqual(
+            errors(post({"project": closed.pk})), [(["body", "data", "project"], None)]
+        )
+        self.assertEqual(
+            errors(post({"project": 0})), [(["body", "data", "project"], None)]
+        )
+        self.assertEqual(
+            errors(post({"project": flat_rate.pk})),
+            [(["body", "data"], "new-project-has-flat-rate")],
+        )
+        response = post(
+            {"project": flat_rate.pk}, "?ignore_warnings=new-project-has-flat-rate"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        service.refresh_from_db()
+        self.assertEqual(service.project, flat_rate)
+        self.assertEqual(service.effort_rate, 100)
+
+        # Services bound to an offer stay with the offer's project
+        offer = factories.OfferFactory.create(project=project)
+        bound = factories.ServiceFactory.create(project=project, offer=offer)
+        response = self.client.post(
+            f"/api/services/{bound.pk}/move/",
+            {"project": other.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data"],
+                    "msg": "The offer must belong to the same project as the service.",
+                }
+            ],
+        )
+
+        # Invoiced services stay with the project of the invoice
+        invoiced = factories.ServiceFactory.create(project=project)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_offer([invoiced])
+        response = self.client.post(
+            f"/api/services/{invoiced.pk}/move/",
+            {"project": other.pk},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(
+            response.json()["detail"],
+            [
+                {
+                    "loc": ["body", "data", "project"],
+                    "msg": "This service has been invoiced already,"
+                    " it cannot be moved to another project.",
+                }
+            ],
+        )
+        invoiced.refresh_from_db()
+        self.assertEqual(invoiced.project, project)
+
+        self.assertEqual(
+            self.client.post(
+                "/api/services/0/move/",
+                {"project": other.pk},
+                content_type="application/json",
+            ).status_code,
+            404,
+        )
+
     def test_service_description(self):
         """Descriptions of services which aren't bound to sent offers can be
         changed, e.g. to move URLs into the external reference"""

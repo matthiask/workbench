@@ -54,6 +54,7 @@ from workbench.projects.forms import (
     ReassignLogbookForm,
     ServiceForm,
     ServiceMergeForm,
+    ServiceMoveForm,
 )
 from workbench.projects.models import Campaign, InternalType, Project, Service
 from workbench.reporting.models import CostCenter
@@ -1507,6 +1508,38 @@ def service_reassign_logbook(
         if dry_run:
             transaction.set_rollback(True)
     return result
+
+
+class ServiceMoveIn(InputSchema):
+    project: int | str = Field(description="ID or code of an open project.")
+
+
+@router.post("/services/{int:service_id}/move/", response=ServiceOut)
+def service_move(
+    request,
+    service_id: int,
+    data: ServiceMoveIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Move a service with its logged hours and costs to another open
+    project, validated with the form of the web interface
+
+    Invoiced services, services with invoiced hours or costs and services
+    bound to an offer stay where they are. A flat rate of the new project is
+    a warning (``new-project-has-flat-rate``) and applied to the service."""
+    service = get_object_or_404(Service, pk=service_id)
+    return patch_with_form(
+        ServiceMoveForm.__wrapped__,  # Without the "modal" prefix
+        service,
+        data,
+        request,
+        out=lambda service: _service_result(service, request),
+        ignore_warnings=ignore_warnings,
+        dry_run=dry_run,
+        field_map={"project": object_pk(Project.objects.all())},
+    )
 
 
 class ServiceMergeIn(InputSchema):

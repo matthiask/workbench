@@ -166,6 +166,7 @@ API_ROUTES = {
     "projects_service_assign_service_type": "PATCH /api/services/{service_id}/",
     "projects_service_delete": "DELETE /api/services/{service_id}/",
     "projects_service_merge": "POST /api/services/{service_id}/merge/",
+    "projects_service_move": "POST /api/services/{service_id}/move/",
     "projects_service_reassign_logbook": (
         "POST /api/services/{service_id}/reassign-logbook/"
     ),
@@ -210,7 +211,6 @@ NOT_IN_API = {
     "projects_campaign_update": "package 11",
     "projects_project_createbudgettransfer": "package 10",
     "projects_project_pin": "out of scope: own profile (pinned projects)",
-    "projects_service_move": "package 08",
     "projects_service_pin": "out of scope: own profile (pinned services)",
     "split_timestamp": "package 23",
 }
