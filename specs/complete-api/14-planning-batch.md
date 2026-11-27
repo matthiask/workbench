@@ -54,3 +54,15 @@ per project and let the CLI loop.
   changes as a whole (also its past weeks); the CLI says how many
   selected entries have earlier weeks. Splitting them is up to the user.
 - The help pages (`docs/planning*.md`) mention the command.
+
+## Decided (2026-11-27)
+
+- Splitting planned work which starts before the selected period at the
+  cut-off week (instead of changing the whole entry, past weeks
+  included, like the web form) is postponed. It would be more correct,
+  but plans should be made with a leaving person in mind already.
+  Revisit if it causes trouble.
+- A selection which matches nothing prints "No planned work selected."
+  and exits with 0, like `kubectl` with a selector matching nothing: an
+  error is for invalid parameters, not for an empty result. The current
+  behaviour stays.
