@@ -88,7 +88,7 @@ conflicts; the "Touches" column shows them.
 | 02 | [Offers: copy, delete, renumber](02-offers-copy-delete.md) | `offers/api.py`, `projects/api.py`, `cli/wb/offers.py` | 00 | open |
 | 03 | [Invoices: update and delete](03-invoices-update-delete.md) | `invoices/api.py`, `cli/wb/invoices.py` | 00 | done |
 | 05 | [Invoices: services](05-invoice-services.md) | `invoices/api.py`, `cli/wb/invoices.py` | 00 | open |
-| 06 | [Recurring invoices](06-recurring-invoices.md) | `invoices/api.py` (recurring part), `cli/wb/invoices.py` | 00 | open |
+| 06 | [Recurring invoices](06-recurring-invoices.md) | `invoices/api.py` (recurring part), `cli/wb/invoices.py` | 00 | done |
 | 07 | [Projects: all fields, delete, projected invoices](07-projects.md) | `projects/api.py`, `cli/wb/projects.py` | 00 | open |
 | 08 | [Services: move](08-services-move.md) | `projects/api.py` (services), `cli/wb/services.py` | 00 | open |
 | 09 | [Logbook: move entries](09-logbook-move.md) | `logbook/api.py`, `cli/wb/logbook.py` | 00 | done |
