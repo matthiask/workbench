@@ -806,6 +806,11 @@ NewInvoices = Literal[
 ]
 
 
+class RecurringInvoiceSiteOut(Schema):
+    id: int
+    title: str
+
+
 class RecurringInvoiceOut(Schema):
     id: int
     url: str
@@ -813,6 +818,7 @@ class RecurringInvoiceOut(Schema):
     description: str
     customer: OrganizationOut
     contact: PersonSummary | None
+    site: RecurringInvoiceSiteOut | None = Field(description="The hosted site.")
     owned_by: str
     periodicity: Periodicity
     periodicity_label: str
@@ -839,6 +845,7 @@ def recurring_invoice_out(invoice, request):
         "description": invoice.description,
         "customer": organization_out(invoice.customer, request),
         "contact": invoice.contact and person_summary(invoice.contact, request),
+        "site": invoice.site and {"id": invoice.site.id, "title": invoice.site.title},
         "owned_by": invoice.owned_by.get_short_name(),
         "periodicity": invoice.periodicity,
         "periodicity_label": invoice.get_periodicity_display(),
@@ -866,6 +873,7 @@ class RecurringInvoiceFilter(Schema):
     include_closed: bool = Field(
         default=False, description="Also those which don't renew anymore."
     )
+    site: int | None = Field(default=None, description="ID of the hosted site.")
 
 
 @router.get("/recurring-invoices/", response=list[RecurringInvoiceOut])
@@ -874,7 +882,7 @@ def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
     """Recurring invoices by customer, open ones by default (those whose
     auto-renewal hasn't been canceled before today)"""
     invoices = RecurringInvoice.objects.select_related(
-        "customer", "contact", "owned_by"
+        "customer", "contact", "owned_by", "site"
     )
     if not filters.include_closed:
         invoices = invoices.open()
@@ -886,6 +894,8 @@ def recurring_invoice_list(request, filters: Query[RecurringInvoiceFilter]):
         )
     if filters.new_invoices:
         invoices = invoices.filter(new_invoices=filters.new_invoices)
+    if filters.site:
+        invoices = invoices.filter(site=filters.site)
     if filters.q:
         invoices = invoices.search(filters.q)
     return Serialized(
@@ -929,6 +939,10 @@ class RecurringInvoicePatch(InputSchema):
         description="{code}, {total}, {due_on} and {service_period} are replaced"
         " with the values of each invoice.",
     )
+    site: int | None = Field(
+        default=None,
+        description="ID of the hosted site (of the same customer), null removes it.",
+    )
 
 
 @router.patch("/recurring-invoices/{int:invoice_id}/", response=RecurringInvoiceOut)
@@ -940,7 +954,7 @@ def recurring_invoice_update(
     dry_run: DryRun = False,
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
-    """Change the title, description and responsible person of new invoices
+    """Change the title, description, site and responsible person of new invoices
     and how they are created and sent, validated like in the web interface
 
     Warnings of the web interface are errors here unless ignored by their

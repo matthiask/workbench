@@ -2,7 +2,7 @@ import datetime as dt
 
 from django.db import models
 from django.db.models import Exists, OuterRef, Q
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from workbench.accounts.models import User
 from workbench.contacts.models import Organization, Person
@@ -166,7 +166,12 @@ class Site(Model):
             if not invoice.ends_on or invoice.ends_on >= dt.date.today()
         ]
 
-    def problems(self):
+    PROBLEMS = {
+        "no_recurring_invoice": _("No recurring invoice"),
+        "no_outage_contact": _("No contact for outages"),
+    }
+
+    def problem_keys(self):
         """What's missing on an active site; uses the flags of
         ``with_problem_flags()`` when annotated"""
         if self.is_archived:
@@ -179,12 +184,15 @@ class Site(Model):
             has_contact = self.contacts.filter(
                 role=SiteContact.OUTAGE, person__is_archived=False
             ).exists()
-        problems = []
+        keys = []
         if not has_invoice and not self.no_invoice_reason:
-            problems.append(gettext("No recurring invoice"))
+            keys.append("no_recurring_invoice")
         if not has_contact:
-            problems.append(gettext("No contact for outages"))
-        return problems
+            keys.append("no_outage_contact")
+        return keys
+
+    def problems(self):
+        return [str(self.PROBLEMS[key]) for key in self.problem_keys()]
 
 
 @model_urls

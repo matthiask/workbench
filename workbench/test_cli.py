@@ -1984,6 +1984,75 @@ planned_work:
             self.assertEqual(result.exit_code, 0, result.output)
             self.assertIn(f"{deal.code} Website relaunch (Open)", result.output)
 
+    def test_sites_and_servers(self):
+        """Servers, sites, their contacts and recurring invoices round trip
+        through the API"""
+        organization = factories.OrganizationFactory.create(name="Beispiel AG")
+        person = factories.PersonFactory.create(
+            organization=organization, given_name="Hans", family_name="Muster"
+        )
+        person.emailaddresses.create(email="hans@example.com")
+
+        result = self.wb("servers", "create", "--title", "cluster")
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb(
+            "sites",
+            "create",
+            "--title",
+            "www.beispiel.ch",
+            "--domain",
+            "beispiel.ch",
+            "--server",
+            "cluster",
+            "--customer",
+            organization.pk,
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("No recurring invoice", result.output)
+
+        # Without a command: the sites with problems
+        result = self.wb("sites")
+        self.assertIn("www.beispiel.ch", result.output)
+
+        result = self.wb("sites", "contacts", "add", "www.beispiel.ch", person.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("hans@example.com", result.output)
+
+        result = self.wb("servers", "show", "cluster", "--emails")
+        self.assertEqual(result.output.strip(), "hans@example.com")
+        result = self.wb("servers", "show", "cluster")
+        self.assertIn("Hans Muster", result.output)
+        self.assertIn("www.beispiel.ch", result.output)
+
+        invoice = factories.RecurringInvoiceFactory.create(
+            customer=organization,
+            postal_address="Beispiel AG\nMusterweg 1\n8000 Zürich",
+        )
+        site_id = json.loads(
+            self.wb("sites", "show", "www.beispiel.ch", "--json").output
+        )["id"]
+        result = self.wb("recurring-invoices", "update", invoice.pk, "--site", site_id)
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("www.beispiel.ch", result.output)
+
+        result = self.wb("sites", "search", "--problems")
+        self.assertNotIn("www.beispiel.ch", result.output)
+
+        result = self.wb("sites", "search", "--server", "cluster", "--csv")
+        self.assertIn("www.beispiel.ch beispiel.ch", result.output)
+
+        result = self.wb("sites", "contacts", "remove", "www.beispiel.ch", person.pk)
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb("sites", "update", "www.beispiel.ch", "--archived")
+        self.assertEqual(result.exit_code, 0, result.output)
+        result = self.wb("sites", "search")
+        self.assertNotIn("www.beispiel.ch", result.output)
+
+        result = self.wb("servers", "update", "cluster", "--notes", "Kubernetes")
+        self.assertIn("Kubernetes", result.output)
+        result = self.wb("servers")
+        self.assertIn("cluster", result.output)
+
     @override_settings(FEATURES={FEATURES.CAMPAIGNS: F.ALWAYS})
     def test_campaigns(self):
         campaign = factories.CampaignFactory.create(title="Relaunch")

@@ -12,6 +12,7 @@ from ninja import Router, Schema
 
 from workbench.awt.models import Absence
 from workbench.deals.models import Deal
+from workbench.hosting.models import SiteContact
 from workbench.invoices.models import Invoice, RecurringInvoice
 from workbench.offers.models import Offer
 from workbench.projects.models import Project
@@ -28,6 +29,7 @@ FIELDS = {
     "recurring_invoice_periodicity": (RecurringInvoice, "periodicity"),
     "absence_reason": (Absence, "reason"),
     "project_type": (Project, "type"),
+    "site_contact_role": (SiteContact, "role"),
 }
 
 KEYS = {

@@ -407,6 +407,32 @@ text are proposed unless given):
     wb recurring-invoices show 123
     wb recurring-invoices update 123 --new-invoices send --dry-run
     wb recurring-invoices update 123 --send-to billing@example.com
+    wb recurring-invoices update 123 --site 42    # the hosted site
+
+## Sites and servers
+
+Hosted sites, their servers and contacts require the hosting feature. Active
+sites without a running recurring invoice (and without a reason) or without
+a contact for outages have problems; `wb sites` lists them:
+
+    wb sites
+    wb sites search --server cluster
+    wb sites search beispiel --include-archived
+    wb sites search --csv > sites.csv     # host names, server, problems
+    wb sites show www.beispiel.ch
+    wb sites create --title www.beispiel.ch --domain beispiel.ch --server cluster --customer 345
+    wb sites update www.beispiel.ch --server server02
+    wb sites update www.beispiel.ch --no-invoice-reason "Maintenance contract"
+    wb sites update www.beispiel.ch --archived
+    wb sites contacts add www.beispiel.ch 678                # outages and maintenance
+    wb sites contacts add www.beispiel.ch 679 --role it      # DNS etc.
+    wb sites contacts remove www.beispiel.ch 678
+
+Whom to write to about an outage or a maintenance window of a server:
+
+    wb servers
+    wb servers show server01
+    wb servers show server01 --emails    # comma separated, for BCC
 
 ## Deals
 

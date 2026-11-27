@@ -547,6 +547,7 @@ def recurring_invoices(ctx):
     is_flag=True,
     help="Also those which don't renew anymore.",
 )
+@click.option("--site", type=int, help="ID of the hosted site.")
 @page_options
 @click.option("--csv", "as_csv", is_flag=True, help="One row per result.")
 @click.option("--json", "as_json", is_flag=True)
@@ -556,6 +557,7 @@ def search_recurring_invoices(
     owned_by,
     new_invoices,
     include_closed,
+    site,
     limit,
     offset,
     as_csv,
@@ -569,6 +571,8 @@ def search_recurring_invoices(
         params["owned_by"] = owned_by
     if new_invoices:
         params["new_invoices"] = new_invoices
+    if site:
+        params["site"] = site
     data = request(
         "GET", "recurring-invoices/", params=params | page_params(limit, offset)
     )
@@ -629,6 +633,10 @@ def _echo_recurring_invoice(data):
             ("ID", data["id"]),
             ("Customer", link(data["customer"]["name"], data["customer"]["url"])),
             ("Contact", contact and link(contact["full_name"], contact["url"])),
+            (
+                "Site",
+                data["site"] and f"{data['site']['title']} ({data['site']['id']})",
+            ),
             ("Owned by", data["owned_by"]),
             ("Periodicity", data["periodicity_label"]),
             ("Starts on", data["starts_on"]),
@@ -680,6 +688,8 @@ def _echo_recurring_invoice(data):
     help="The text, or - to read it from stdin; {code}, {total}, {due_on} and"
     " {service_period} are replaced with the values of each invoice.",
 )
+@click.option("--site", type=int, help="ID of the hosted site (of the same customer).")
+@click.option("--no-site", is_flag=True, help="Remove the site.")
 @ignore_warnings_option
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @click.option("--json", "as_json", is_flag=True)
@@ -692,12 +702,14 @@ def update_recurring_invoice(
     send_to,
     mail_subject,
     mail_body,
+    site,
+    no_site,
     ignore_warnings,
     dry_run,
     as_json,
 ):
-    """Change the title, description and responsible person of new invoices
-    and how they are created and sent, only the given fields"""
+    """Change the title, description, site and responsible person of new
+    invoices and how they are created and sent, only the given fields"""
     data = {
         key: value
         for key, value in [
@@ -708,9 +720,12 @@ def update_recurring_invoice(
             ("send_to", send_to),
             ("mail_subject", mail_subject),
             ("mail_body", text_or_stdin(mail_body)),
+            ("site", site),
         ]
         if value is not None
     }
+    if no_site:
+        data["site"] = None
     if not data:
         terminate("Nothing to change.")
     data = request(

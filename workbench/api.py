@@ -10,6 +10,7 @@ from workbench.api_keys import router as choices_router
 from workbench.awt.api import router as awt_router
 from workbench.contacts.api import router as contacts_router
 from workbench.deals.api import router as deals_router
+from workbench.hosting.api import router as hosting_router
 from workbench.invoices.api import router as invoices_router
 from workbench.logbook.api import router as logbook_router
 from workbench.notes.api import router as notes_router
@@ -101,6 +102,7 @@ api.add_router("/", awt_router)
 api.add_router("/", choices_router)
 api.add_router("/", contacts_router)
 api.add_router("/", deals_router)
+api.add_router("/", hosting_router)
 api.add_router("/", invoices_router)
 api.add_router("/", logbook_router)
 api.add_router("/", notes_router)
