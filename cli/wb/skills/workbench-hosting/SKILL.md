@@ -1,6 +1,6 @@
 ---
 name: workbench-hosting
-description: Keep the hosted sites in Workbench current with the `wb` CLI, compared with what actually runs on the servers (Kubernetes ingresses, vhosts), and find whom to contact about an outage or a maintenance window. Finds running sites missing in Workbench, sites which don't run anymore, sites without recurring invoice or without contact for outages. Use when the user wants to update, check or import the list of sites or hosting customers, asks which sites run on a server, which sites have no recurring invoice, or whom to inform about an outage or maintenance of a server.
+description: Keep the hosted sites in Workbench current with the `wb` CLI, compared with what actually runs on the servers (Kubernetes ingresses, vhosts), and find whom to contact about an outage or a maintenance window. Finds running sites missing in Workbench, sites which don't run anymore, sites without recurring invoice or without contact for outages, and UptimeRobot monitors missing or left over. Use when the user wants to update, check or import the list of sites or hosting customers, asks which sites run on a server, which sites have no recurring invoice, whom to inform about an outage or maintenance of a server, or wants to update the uptime monitors.
 ---
 
 # Hosted sites in Workbench
@@ -117,7 +117,52 @@ sites to Workbench sites by host name, lowercased and ignoring a leading
   `wb sites contacts add SITE PERSON_ID --dry-run`. Create missing people
   with the workbench-contact skill.
 
-### 4. Write
+### 4. Uptime monitors
+
+If the sites are monitored with UptimeRobot (ask if unsure), every active
+site should have a monitor and archived or removed sites shouldn't. This
+needs the account's main API key in `UPTIMEROBOT_API_KEY`; if it isn't
+set, ask the user to export it. Never ask them to paste it into the chat,
+never print it. Use the v2 API with form-encoded POSTs:
+
+    curl -s https://api.uptimerobot.com/v2/getMonitors \
+        -d api_key="$UPTIMEROBOT_API_KEY" -d format=json \
+        -d alert_contacts=1 -d limit=50 -d offset=0
+
+`limit` is at most 50; page with `offset` until `pagination.total`. Match
+monitors to sites by the host name in the monitor's `url`, lowercased and
+ignoring a leading `www.`, against the title and domains of each site, as
+in step 2 and taking the changes from steps 2 and 3 into account. Group
+the findings:
+
+1. **Active site without monitor**: propose a monitor on `https://TITLE/`
+   with the site title as friendly name, and the alert contacts and
+   threshold (alert delay) most other monitors use:
+
+       curl -s https://api.uptimerobot.com/v2/newMonitor \
+           -d api_key="$UPTIMEROBOT_API_KEY" -d format=json \
+           -d type=1 -d url=https://www.beispiel.ch/ \
+           -d friendly_name=www.beispiel.ch \
+           -d alert_contacts=ID_THRESHOLD_RECURRENCE
+
+   Several contacts are joined with `-`. Don't leave out the threshold:
+   without one, UptimeRobot mails on the first failed check, so every
+   short network interruption causes a flood of mails.
+2. **Monitor for an archived site or a host name nothing runs on**:
+   propose deleting it (`deleteMonitor` with `-d id=ID`).
+3. **Monitor URL not on the site's host names anymore** (e.g. after the
+   host names changed): propose updating it (`editMonitor` with
+   `-d id=ID -d url=...`).
+4. **Monitors without alert contacts or without threshold**: list them;
+   the first never alert, the second alert on every blip.
+
+Monitors for things that aren't sites (the servers themselves, mail,
+status endpoints) don't match any site: list them separately and leave
+them alone. Changing monitors needs the user's approval like the
+Workbench changes; the API has no dry run, so show the exact parameters
+instead.
+
+### 5. Write
 
 After the user approved, apply the changes one by one without `--dry-run`:
 
@@ -126,6 +171,9 @@ After the user approved, apply the changes one by one without `--dry-run`:
     wb sites contacts add www.beispiel.ch 678 --role outage --dry-run
     wb sites contacts add www.beispiel.ch 679 --role it --dry-run
 
-Finish with a short summary: what was created, changed and archived, and
-what's left for the user (sites nobody invoices, missing contacts, invoices
-to end).
+then the approved monitor changes, checking each API answer for
+`"stat": "ok"`.
+
+Finish with a short summary: what was created, changed and archived, which
+monitors were added, changed or removed, and what's left for the user
+(sites nobody invoices, missing contacts, invoices to end).

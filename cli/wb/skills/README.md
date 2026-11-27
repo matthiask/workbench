@@ -87,7 +87,8 @@ Keeps the hosted sites current (requires the hosting feature): compares
 what runs on the servers (Kubernetes ingresses, vhost lists, collected with
 the user's own access) with the sites in Workbench, proposes new sites,
 moved or archived ones, links recurring invoices and records why a site has
-none, and proposes contacts for outages. Also answers whom to inform about
+none, proposes contacts for outages and keeps the UptimeRobot monitors in
+line with the active sites. Also answers whom to inform about
 an outage or a maintenance window of a server.
 
 ## workbench-logbook
