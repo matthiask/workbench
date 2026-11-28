@@ -33,7 +33,7 @@ from workbench.tools.api import (
     Percentage,
     Serialized,
     ShortName,
-    active_user,
+    any_user,
     check_allow_delete,
     date_range,
     delete_with_form,
@@ -109,7 +109,9 @@ def _absence_out(absence, request):
 
 class AbsenceIn(InputSchema):
     user: str | None = Field(
-        default=None, description="Short name, defaults to the authenticated user."
+        default=None,
+        description="Short name (also of people who left), defaults to the"
+        " authenticated user.",
     )
     starts_on: dt.date
     ends_on: dt.date | None = Field(
@@ -136,11 +138,8 @@ def absence_create(
     nothing is saved if anything is invalid or with ``dry_run``."""
     user = request.user
     if data.user is not None:
-        user = User.objects.by_short_name(data.user).first()
-        if not user:
-            raise ValidationError([
-                {"loc": ["body", "data", "user"], "msg": _("Unknown user.")}
-            ])
+        # Also people who left, like the web form
+        user = user_by_short_name(data.user, loc=["body", "data", "user"])
     form = AbsenceForm(
         {
             "user": user.pk,
@@ -167,8 +166,8 @@ def absence_create(
 class AbsencePatch(InputSchema):
     user: str | None = Field(
         default=None,
-        description="Short name of an active user; only personnel administration"
-        " hands absences over to others.",
+        description="Short name, also of people who left; only personnel"
+        " administration hands absences over to others.",
     )
     starts_on: dt.date | None = None
     ends_on: dt.date | None = Field(
@@ -223,7 +222,7 @@ def absence_update(
             out=lambda absence: _absence_out(absence, request),
             ignore_warnings=ignore_warnings,
             dry_run=dry_run,
-            field_map={"user": active_user},
+            field_map={"user": any_user},
         )
     except ValidationError as exc:
         # The form links to replacing the absence in the web interface

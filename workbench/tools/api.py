@@ -267,6 +267,15 @@ def active_user(short_name):
     raise ValidationError(_("Unknown or inactive user %r.") % short_name)
 
 
+def any_user(short_name):
+    """Converter for ``patch_with_form()``: the PK of the user with this
+    short name, also of people who left, like the choices of forms with
+    ``collapse_inactive=False``"""
+    if user := User.objects.by_short_name(short_name).first():
+        return user.pk
+    raise ValidationError(_("Unknown user %r.") % short_name)
+
+
 def api_key(name):
     """Converter for ``patch_with_form()``: the stored value of a key of
     ``workbench.api_keys.KEYS[name]``, e.g. ``api_key("offer_status")``"""
@@ -469,14 +478,14 @@ class UsersFilter(Schema):
     )
 
 
-def user_by_short_name(short_name, *, param):
-    """The user with this short name (case-insensitive) for a filter, unknown
-    ones are errors instead of finding nothing"""
+def user_by_short_name(short_name, *, param=None, loc=None):
+    """The user with this short name (case-insensitive) for a filter (or the
+    field at ``loc``), unknown ones are errors instead of finding nothing"""
     if user := User.objects.by_short_name(short_name).first():
         return user
     raise NinjaValidationError([
         {
-            "loc": ["query", "filters", param],
+            "loc": loc or ["query", "filters", param],
             "msg": _("Unknown user %r.") % short_name,
         }
     ])

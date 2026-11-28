@@ -246,6 +246,53 @@ class AbsenceCreateAPITest(TestCase):
         )
         self.assertEqual(response.status_code, 422)
 
+    def test_users_who_left(self):
+        """Creating and changing absences accepts the same users as the web
+        form: also people who left, case-insensitively, unknown ones are
+        rejected"""
+        hr = factories.UserFactory.create(
+            _short_name="hr", _features=[FEATURES.PERSONNEL_ADMINISTRATION]
+        )
+        left = factories.UserFactory.create(_short_name="ab", is_active=False)
+        other = factories.UserFactory.create(_short_name="cd", is_active=False)
+        self.client.force_login(hr)
+        data = {
+            "user": "AB",
+            "starts_on": weekday().isoformat(),
+            "days": 1,
+            "reason": "vacation",
+        }
+        response = self.client.post(
+            "/api/absences/?ignore_warnings=absence-of-others",
+            data,
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        absence = Absence.objects.get()
+        self.assertEqual(absence.user, left)
+
+        response = self.client.patch(
+            f"/api/absences/{absence.pk}/?ignore_warnings=absence-of-others",
+            {"user": "Cd"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        absence.refresh_from_db()
+        self.assertEqual(absence.user, other)
+
+        for method, url in [
+            (self.client.post, "/api/absences/"),
+            (self.client.patch, f"/api/absences/{absence.pk}/"),
+        ]:
+            with self.subTest(url=url):
+                response = method(
+                    url, data | {"user": "nobody"}, content_type="application/json"
+                )
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(
+                    response.json()["detail"][0]["loc"], ["body", "data", "user"]
+                )
+
     @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
     def test_create_negative_days(self):
         """Like in the web form, only corrections by personnel
