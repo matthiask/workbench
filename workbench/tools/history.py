@@ -318,6 +318,24 @@ def _awt_absence_cfg(user):
     return {"fields": {"user", "starts_on", "ends_on", "days", "reason"}}
 
 
+def _contacts_organization_cfg(user):
+    related = [(Person, "organization_id")]
+    if user.features[FEATURES.HOSTING]:
+        related.append((Site, "customer_id"))
+    return {"fields": EVERYTHING, "related": related}
+
+
+def _contacts_person_cfg(user):
+    related = [
+        (PhoneNumber, "person_id"),
+        (EmailAddress, "person_id"),
+        (PostalAddress, "person_id"),
+    ]
+    if user.features[FEATURES.HOSTING]:
+        related.append((SiteContact, "person_id"))
+    return {"fields": EVERYTHING, "related": related}
+
+
 def _credit_control_creditentry_cfg(user):
     if not user.features[FEATURES.CONTROLLING]:
         raise Http404
@@ -642,15 +660,8 @@ HISTORY = {
     EmailAddress: {"fields": EVERYTHING},
     PhoneNumber: {"fields": EVERYTHING},
     PostalAddress: {"fields": EVERYTHING},
-    Organization: {"fields": EVERYTHING, "related": [(Person, "organization_id")]},
-    Person: {
-        "fields": EVERYTHING,
-        "related": [
-            (PhoneNumber, "person_id"),
-            (EmailAddress, "person_id"),
-            (PostalAddress, "person_id"),
-        ],
-    },
+    Organization: _contacts_organization_cfg,
+    Person: _contacts_person_cfg,
     Invoice: _invoices_invoice_cfg,
     InvoiceService: _invoices_service_cfg,
     RecurringInvoice: _invoices_recurringinvoice_cfg,
@@ -672,7 +683,7 @@ HISTORY = {
     InternalTypeUser: {"fields": EVERYTHING},
     CostCenter: _reporting_costcenter_cfg,
     Note: _notes_note_cfg,
-    Server: _hosting_cfg(),
+    Server: _hosting_cfg([(Site, "server_id")]),
     Site: _hosting_cfg([(SiteContact, "site_id")]),
     SiteContact: _hosting_cfg(),
 }

@@ -111,6 +111,49 @@ class HistoryTest(TestCase):
             response, f'href="/history/projects_service/offer_id/{offer.pk}/"'
         )
 
+    def test_hosting_related_history(self):
+        """People link the history of their site contacts, organizations of
+        their sites and servers of the sites moving to and from them"""
+        from workbench.hosting.models import SiteContact
+
+        site = factories.SiteFactory.create()
+        person = factories.PersonFactory.create()
+        contact = SiteContact.objects.create(
+            site=site, person=person, role=SiteContact.OUTAGE
+        )
+        server = site.server
+        site.server = factories.ServerFactory.create(title="other")
+        site.save()
+        self.client.force_login(person.primary_contact)
+
+        for url, related in [
+            (
+                f"/history/contacts_person/id/{person.pk}/",
+                f"/history/hosting_sitecontact/person_id/{person.pk}/",
+            ),
+            (
+                f"/history/contacts_organization/id/{site.customer_id}/",
+                f"/history/hosting_site/customer_id/{site.customer_id}/",
+            ),
+            (
+                f"/history/hosting_server/id/{server.pk}/",
+                f"/history/hosting_site/server_id/{server.pk}/",
+            ),
+        ]:
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), f'href="{related}"')
+                with override_settings(FEATURES={FEATURES.HOSTING: F.NEVER}):
+                    # Servers have no history without the feature
+                    self.assertNotIn(related, self.client.get(url).content.decode())
+
+        response = self.client.get(
+            f"/history/hosting_sitecontact/person_id/{person.pk}/"
+        )
+        self.assertContains(response, f"INSERT hosting_sitecontact {contact.pk}")
+        # The site moved away from the server
+        response = self.client.get(f"/history/hosting_site/server_id/{server.pk}/")
+        self.assertContains(response, f"UPDATE hosting_site {site.pk}")
+
     def test_external_work_history(self):
         """External work is audited"""
         project = factories.ProjectFactory.create()
