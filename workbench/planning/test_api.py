@@ -679,6 +679,8 @@ class PlanningAPITest(TestCase):
             ({"work": [pw.pk], "assign_to": inactive._short_name}, "assign_to"),
             ({"work": [pw.pk], "project": closed.code}, "project"),
             ({"work": [pw.pk], "project": "2099-9999"}, "project"),
+            ({"work": [pw.pk], "move_by_weeks": 10**9}, "move_by_weeks"),
+            ({"work": [pw.pk], "move_by_weeks": -(10**9)}, "move_by_weeks"),
         ]:
             with self.subTest(data=data):
                 response = self.batch(data)

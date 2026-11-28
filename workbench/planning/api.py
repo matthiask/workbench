@@ -718,7 +718,9 @@ def planned_work_delete(request, work_id: int, *, dry_run: DryRun = False):
 class PlannedWorkBatch(InputSchema):
     work: list[int] = Field(description="IDs of the planned work to change.")
     move_by_weeks: int = Field(
-        default=0, description="Move the weeks of the work by this many weeks."
+        default=0,
+        description="Move the weeks of the work by this many weeks (at most"
+        " 520 in either direction).",
     )
     assign_to: str | None = Field(
         default=None, description="Short name of the active user to assign it to."

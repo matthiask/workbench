@@ -504,8 +504,9 @@ class PlannedWorkBatchForm(Form):
             # widget=forms.CheckboxSelectMultiple,
             widget=forms.SelectMultiple(attrs={"size": 10}),
         )
+        # At most ten years, like the planning shows
         self.fields["move_by_weeks"] = forms.IntegerField(
-            label=_("Move by weeks"), initial=0
+            label=_("Move by weeks"), initial=0, min_value=-520, max_value=520
         )
         self.fields["assign_to"] = forms.ModelChoiceField(
             User.objects.active(),
