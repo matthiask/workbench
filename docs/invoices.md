@@ -116,7 +116,9 @@ before each period begins. The periods recur from the start date: one
 starting on January 31st covers January 31st to February 28th, March 1st
 to 30th, March 31st to April 30th and so on. Once invoices have been
 created, the start date and the periodicity are fixed; end the recurring
-invoice and create a new one to change them. New invoices are created in
+invoice and create a new one to change them. Reactivating an ended
+recurring invoice or creating invoices more days before their period
+warns when it creates the invoices of several periods at once. New invoices are created in
 preparation, marked as sent, or mailed automatically (the list filters by it); the
 owner gets a mail. The recurring invoice shows the mail it sends, with
 placeholders for the values of each invoice. With
