@@ -75,10 +75,19 @@ class InvoiceQuerySet(SearchQuerySet):
                     )
                     & ~Q(type=Invoice.CREDIT)
                 ),
+                # Invoices of people who left go to the owner of the open
+                # project and to those who worked on it recently
                 Q(owned_by=user)
-                | Q(owned_by__is_active=False, project__isnull=True)
-                | Q(owned_by__is_active=False, project__owned_by__is_active=False)
-                | Q(owned_by__is_active=False, project__owned_by=user),
+                | Q(
+                    Q(project__owned_by=user)
+                    | Q(
+                        project__in=LoggedHours.objects.filter(
+                            rendered_by=user, rendered_on__gte=in_days(-30)
+                        ).values("service__project")
+                    ),
+                    owned_by__is_active=False,
+                    project__closed_on__isnull=True,
+                ),
             )
             .select_related("project", "owned_by")
             .order_by(

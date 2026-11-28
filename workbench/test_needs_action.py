@@ -104,3 +104,30 @@ class NeedsActionTest(TestCase):
         deal.owned_by = factories.UserFactory.create()
         deal.save()
         self.assertEqual(list(Offer.objects.maybe_actionable(user=user)), [offer])
+
+    def test_invoices_of_inactive_users(self):
+        """Invoices of people who left are listed for those who worked on
+        the open project during the last 30 days, not for everyone"""
+        user = factories.UserFactory.create()
+        inactive = factories.UserFactory.create(is_active=False)
+        project = factories.ProjectFactory.create(owned_by=inactive)
+        invoice = factories.InvoiceFactory.create(
+            owned_by=inactive, project=project, customer=project.customer
+        )
+        factories.InvoiceFactory.create(owned_by=inactive)
+        self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [])
+
+        hours = factories.LoggedHoursFactory.create(
+            service=factories.ServiceFactory.create(project=project),
+            rendered_by=user,
+            rendered_on=in_days(-31),
+        )
+        self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [])
+
+        hours.rendered_on = in_days(-30)
+        hours.save()
+        self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [invoice])
+
+        project.closed_on = dt.date.today()
+        project.save()
+        self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [])
