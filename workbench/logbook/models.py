@@ -83,6 +83,9 @@ class LoggedHours(Model):
         if instance.invoice_service_id or instance.archived_at:
             messages.error(request, _("Cannot delete archived logged hours."))
             return False
+        if instance.service.project.is_logbook_locked:
+            messages.error(request, _("This project has been closed too long ago."))
+            return False
         # Like changing them: The hours of people with LATE_LOGGING may be
         # corrected late
         if (
@@ -182,6 +185,9 @@ class LoggedCost(Model):
     def allow_delete(cls, instance, request):
         if instance.invoice_service_id or instance.archived_at:
             messages.error(request, _("Cannot delete archived logged cost entries."))
+            return False
+        if instance.service.project.is_logbook_locked:
+            messages.error(request, _("This project has been closed too long ago."))
             return False
         if instance.expense_report:
             messages.error(

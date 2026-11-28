@@ -933,6 +933,30 @@ class LogbookTest(TestCase):
         self.assertEqual(response.status_code, 204)
         self.assertFalse(LoggedHours.objects.filter(pk=hours.pk).exists())
 
+    def test_deletion_closed_project(self):
+        """Entries of projects closed too long ago can't be deleted, like they
+        can't be changed"""
+        user = factories.UserFactory.create()
+        user._features.append(FEATURES.LATE_LOGGING)
+        user.save()
+        service = factories.ServiceFactory.create()
+        hours = factories.LoggedHoursFactory.create(
+            service=service, rendered_by=user, rendered_on=in_days(-60)
+        )
+        cost = factories.LoggedCostFactory.create(service=service, cost=100)
+        service.project.closed_on = in_days(-30)
+        service.project.save()
+        self.client.force_login(user)
+
+        for entry in [hours, cost]:
+            response = self.client.post(
+                entry.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                messages(response), ["This project has been closed too long ago."]
+            )
+
     def test_logged_cost_deletion(self):
         """Deleting archived logged costs is not allowed"""
         costs = factories.LoggedCostFactory.create(archived_at=timezone.now())

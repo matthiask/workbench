@@ -43,7 +43,8 @@ dem 1. Januar); mehr als einen Tag im Voraus fragt Workbench nach, ob das
 stimmt, mehr als eine Woche geht nicht. Die Stunden von Personen, die
 nachträglich erfassen dürfen (wo aktiviert), können auch in vergangenen
 Wochen erfasst werden, die Grenzen im Voraus gelten auch für sie. Auf
-geschlossenen Projekten kann noch 14 Tage lang erfasst werden.
+geschlossenen Projekten kann noch 14 Tage lang erfasst werden; danach
+lassen sich ihre Einträge weder ändern noch löschen.
 
 Das Formular warnt vor Einträgen, die falsch aussehen: ein Duplikat
 deines vorherigen Eintrags, ein kürzlich geschlossenes Projekt, ein schon

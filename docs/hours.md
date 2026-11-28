@@ -39,7 +39,8 @@ of January); logging more than a day in advance asks whether that's
 right, more than a week isn't possible. The hours of people allowed to log
 late (where enabled) can also be logged in past weeks, the limits in
 advance apply to them too. Projects stay open for logging for 14 days
-after they have been closed.
+after they have been closed; after that, their entries can't be changed
+or deleted anymore.
 
 The form warns about entries which look wrong: a duplicate of your
 previous entry, a project closed recently, an entry already invoiced,
