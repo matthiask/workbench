@@ -28,11 +28,14 @@ def accepted_deals(date_range, *, users=None):
         .order_by("closed_on")
     )
 
-    # Accepted offers without deal, e.g. follow-up orders, count as won too
+    # Accepted offers without deal, e.g. follow-up orders, count as won too,
+    # so do those whose deals have all been declined (else they'd count
+    # nowhere)
     offers = (
         Offer.objects
         .accepted()
-        .filter(closed_on__range=date_range, deals__isnull=True)
+        .filter(closed_on__range=date_range)
+        .exclude(deals__status__in=[Deal.OPEN, Deal.ACCEPTED])
         .exclude(project__type=Project.INTERNAL)
         .select_related("owned_by", "project__customer")
         .prefetch_related("services")

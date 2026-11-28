@@ -781,6 +781,25 @@ class DealsTest(TestCase):
         self.assertEqual([o["code"] for o in data["offers_without_deal"]], [offer.code])
         self.assertEqual(data["by_month"][0]["offers_without_deal"], "100.00")
 
+    def test_accepted_offers_of_declined_deals(self):
+        """Accepted offers whose deals have all been declined count like offers
+        without deal"""
+        offer = factories.OfferFactory.create()
+        factories.ServiceFactory.create(project=offer.project, offer=offer, cost=100)
+        offer.status = Offer.ACCEPTED
+        offer.closed_on = dt.date.today()
+        offer.save()
+        declined = factories.DealFactory.create(status=Deal.DECLINED)
+        declined.related_offers.add(offer)
+
+        stats = accepted_deals([dt.date.today(), dt.date.today()])
+        self.assertEqual(list(stats["offers"]), [offer])
+
+        # Another deal which isn't declined covers it
+        factories.DealFactory.create().related_offers.add(offer)
+        stats = accepted_deals([dt.date.today(), dt.date.today()])
+        self.assertEqual(list(stats["offers"]), [])
+
     def test_without_third_party_costs(self):
         """Offers and maintenance without deal count their in-house work:
         after the discount, without third party costs"""

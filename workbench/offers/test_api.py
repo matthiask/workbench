@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.utils.translation import deactivate_all
 
 from workbench import factories
+from workbench.deals.models import Deal
 from workbench.invoices.models import Invoice
 from workbench.offers.models import Offer, OfferHeading
 from workbench.projects.models import Service
@@ -751,6 +752,23 @@ class OfferServicesAPITest(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(self.items(), items)
         self.assertEqual(response.json()["total_excl_tax"], "2900.00")
+
+    def test_accept_offer_of_declined_deal(self):
+        """Accepting an offer whose deals have been declined warns"""
+        today = dt.date.today()
+        self.offer.status = Offer.OFFERED
+        self.offer.offered_on = self.offer.valid_until = today
+        self.offer.save()
+        deal = factories.DealFactory.create(status=Deal.DECLINED)
+        deal.related_offers.add(self.offer)
+
+        response = self.patch({"status": "accepted"})
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(
+            [e["code"] for e in response.json()["detail"]], ["declined-deal"]
+        )
+        response = self.patch({"status": "accepted"}, ignore_warnings=["declined-deal"])
+        self.assertEqual(response.status_code, 200, response.content)
 
     def test_sent_offer(self):
         """Sent offers change their owner and status, not their services"""

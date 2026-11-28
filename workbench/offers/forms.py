@@ -270,6 +270,23 @@ class OfferForm(PostalAddressSelectionForm):
                 code="yes-please-decline",
             )
 
+        if (
+            data["status"] == Offer.ACCEPTED
+            and "status" in self.changed_data
+            and self.instance.pk
+            and (deals := list(self.instance.deals.all()))
+            and all(deal.status == deal.DECLINED for deal in deals)
+        ):
+            self.add_warning(
+                _(
+                    "The deals of this offer have been declined: %(deals)s."
+                    " Reopen and accept the deal if it has been won after all,"
+                    " otherwise the offer counts as accepted offer without deal."
+                )
+                % {"deals": ", ".join(str(deal) for deal in deals)},
+                code="declined-deal",
+            )
+
         # Services without offer which are added to an offer whose work has
         # been completed can't be logged on anymore
         if data.get("work_completed_on") and self.services_changeable:

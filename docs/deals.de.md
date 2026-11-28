@@ -44,7 +44,10 @@ verbinden, ausser sie wurden abgelehnt, etwa die detaillierte Offerte zu
 einem Auftrag, den das Geschäft zusammenfasst; dabei ändert sich nichts,
 die Offerte behält ihren Status. Die gewonnenen Geschäfte zählen
 akzeptierte Offerten ohne Geschäft separat dazu, eine fehlende Verbindung
-zählt die Arbeit also doppelt.
+zählt die Arbeit also doppelt. Akzeptierte Offerten, deren Geschäfte alle
+abgelehnt wurden, zählen wie Offerten ohne Geschäft; Workbench warnt beim
+Akzeptieren einer solchen Offerte. Wurde das Geschäft doch gewonnen,
+öffne und akzeptiere stattdessen das Geschäft.
 
 «Projekt verbinden» verbindet Projekte mit offenen oder akzeptierten
 Geschäften, für Arbeit, die ohne Offerte verkauft wird, etwa ein
