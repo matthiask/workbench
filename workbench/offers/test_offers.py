@@ -1334,14 +1334,14 @@ class OffersTest(TestCase):
         )
         self.assertEqual(offer.planned_work.count(), 1)
 
-        # Deciding to delete the planning entries removes them.
-        response = self.client.post(
-            offer.urls["update"], {**data, "delete_planned_work": "1"}
-        )
+        # Later changes of the declined offer don't ask again
+        response = self.client.get(offer.urls["update"])
+        self.assertNotContains(response, "delete_planned_work")
+        response = self.client.post(offer.urls["update"], {**data, "title": "Other"})
         self.assertRedirects(
             response, offer.get_absolute_url(), fetch_redirect_response=False
         )
-        self.assertEqual(offer.planned_work.count(), 0)
+        self.assertEqual(offer.planned_work.count(), 1)
 
     def test_decline_offer_keeps_past_planned_work(self):
         """Declining an offer only deletes its planned work after the current

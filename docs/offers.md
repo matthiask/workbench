@@ -66,7 +66,8 @@ hours change, so that budgets and reports stay right. Offered and
 accepted offers can't be deleted.
 
 Declining or discarding an offer asks whether to delete its planned work
-after the current week. Closing a project discards its offers in
+after the current week; kept planned work stays, later changes don't ask
+again. Closing a project discards its offers in
 preparation and declines those sent before.
 
 **Work completed on** ends logging on the offer's services.

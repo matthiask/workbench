@@ -74,7 +74,8 @@ sich die Stunden ändern, damit Budgets und Auswertungen stimmen.
 Offerierte und akzeptierte Offerten lassen sich nicht löschen.
 
 Beim Ablehnen oder Verwerfen einer Offerte fragt Workbench, ob ihre
-geplante Arbeit nach der laufenden Woche gelöscht werden soll. Beim
+geplante Arbeit nach der laufenden Woche gelöscht werden soll; behaltene
+geplante Arbeit bleibt, spätere Änderungen fragen nicht mehr. Beim
 Schliessen eines Projekts werden Offerten in Vorbereitung verworfen und
 schon versandte abgelehnt.
 

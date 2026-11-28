@@ -210,6 +210,10 @@ class OfferForm(PostalAddressSelectionForm):
             )
             # The API passes numbers, the web interface strings
             status = str(posted_status or self.instance.status)
+            # Only asked when declining or discarding, later changes keep
+            # the planned work which has been kept
+            if status == str(self.instance.status):
+                status = None
             if status == str(Offer.DECLINED):
                 self.fields["delete_planned_work"] = delete_planned_work_field(
                     _(

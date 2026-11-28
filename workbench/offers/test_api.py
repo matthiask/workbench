@@ -850,6 +850,29 @@ class OfferServicesAPITest(TestCase):
         self.assertFalse(self.offer.planned_work.exists())
         self.assertEqual(self.offer.services.count(), 2)
 
+    def test_declined_with_kept_planned_work(self):
+        """The planned work of declined offers is only asked about when
+        declining, not on later changes"""
+        self.offer.status = Offer.OFFERED
+        self.offer.offered_on = self.offer.valid_until = dt.date.today()
+        self.offer.save()
+        factories.PlannedWorkFactory.create(
+            project=self.project,
+            offer=self.offer,
+            weeks=[monday() + dt.timedelta(days=7)],
+        )
+        response = self.patch(
+            {"status": "declined", "delete_planned_work": False},
+            ignore_warnings=["yes-please-decline"],
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
+        response = self.patch(
+            {"title": "Declined"}, ignore_warnings=["yes-please-decline"]
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(self.offer.planned_work.count(), 1)
+
     def test_decline_without_planned_work(self):
         """Answering the planned work question which isn't asked is fine"""
         self.offer.status = Offer.OFFERED
