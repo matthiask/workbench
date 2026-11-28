@@ -280,55 +280,36 @@ round", up to wb 0.58.0).
 
 ## Round 7 (2026-11-28)
 
-Four agents (offers to invoices, reports, time, contacts/deals/API). Fixed
-so far: hours in past weeks moved to people without `LATE_LOGGING`,
-negative projections in "thereof planned".
-
-### Open, to fix
-
-- Deleting logbook entries follows changing them: refused once the
-  project's logbook is locked (closed > 14 days), hours and costs,
-  regardless of `LATE_LOGGING` (`allow_delete()`, also the API).
-- Planning capacity outside an employment (after it ends, or none) is minus
-  the planned hours; the planned work form, the batch update and the
-  import warn about weeks outside an employment.
-- Bulk moves (reassigning the logbook, merging services) stay possible for
-  clean ups, but warn about projects whose logbook is locked and invoiced
-  entries changing their rate.
-- `Project.objects.open(on=)` drops the `created_at` condition: invoices
-  dated before their project was created are missing from that month's
-  accruals (budget statistics, cash data, snapshots).
-- Accepted offers whose deals are all declined count like offers without
-  deal; accepting an offer linked to a declined deal warns.
-- Using an archived organization (or person) as customer or contact
-  unarchives it (deals, projects, sites, recurring invoices, API too).
-- `PATCH /api/contacts/people/` carries the industry groups over to the new
-  organization like the web form.
-- The projected vs. invoiced chart deducts the down payments' third party
-  costs twice (`projects/charts.py`); use the invoiced gross margin of the
-  reports.
-- Copying an offer copies `allow_logging=False` (set by invoicing) and drops
-  `is_budget_retainer`.
-- Budget statistics drop third party costs on invoices in preparation
-  (only sent and paid invoices take them off).
-- The 50 % helper for down payments isn't rounded to 5 cents; "not applied
-  yet" counts down payments in preparation.
-- Merging an organization into an archived one with active people leaves
-  it archived.
-- The history of a deal contribution links to the values of the deal with
-  the contribution's ID (`_deals_contribution_cfg`).
-- "Projected invoices exceed the budgeted work and costs" ignores invoiced
-  surplus (`projects/views.py`).
-- Archiving a person who is the only outage contact of an active site
-  doesn't warn (deleting and merging do).
-- `suggested_days` accepts any period (millions of iterations).
-- The key data API accepts future months.
+Four agents (offers to invoices, reports, time, contacts/deals/API). The
+verified bugs and the decisions below have been implemented (the commits
+after "Verification: Findings of the seventh round", up to wb 0.59.0).
 
 ### Decided
 
+- Deleting logbook entries follows changing them: refused once the
+  project's logbook is locked (closed > 14 days), regardless of
+  `LATE_LOGGING`.
+- Planning capacity outside an employment is minus the planned work; the
+  planned work form, the batch update and the API warn
+  (`weeks-outside-employment`), only for people who have employments.
+- Bulk moves (reassigning the logbook, merging services) stay possible for
+  clean ups, but warn about projects whose logbook is locked
+  (`logbook-locked`) and invoiced hours valued at another rate
+  (`different-rate`).
+- The creation date of projects doesn't matter for cutoff dates
+  (`Project.objects.open(on=)`): invoices and logbook entries may be dated
+  before their project was created.
+- Accepted offers whose deals are all declined count like offers without
+  deal; accepting an offer linked to declined deals warns
+  (`declined-deal`).
+- Using an archived organization or person as customer or contact
+  unarchives them (`ModelForm.save()`).
+- `PATCH /api/contacts/people/` carries the groups of organizations over to
+  the new organization like the web form.
 - Recurring invoices with `create_project`: the project a deal links counts
   with the deal, the projects of later periods count as maintenance without
   deal.
+- Copied offers allow logging and stay budget retainers.
 
 ### Smaller risks and questions, not decided
 
