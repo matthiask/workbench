@@ -292,9 +292,8 @@ def _echo_import_result(data, *, dry_run, as_json):
 @planning.command("import")
 @click.argument("project_id", type=int)
 @click.argument("file", type=click.File("r"))
-@click.option("--dry-run", is_flag=True, help="Validate only.")
-@click.option("--json", "as_json", is_flag=True)
-def planning_import(project_id, file, dry_run, as_json):
+@change_options()
+def planning_import(project_id, file, dry_run, ignore_warnings, as_json):
     """Add, update and delete milestones and planned work from a YAML or JSON
     file
 
@@ -304,7 +303,7 @@ def planning_import(project_id, file, dry_run, as_json):
     data = request(
         "POST",
         f"projects/{project_id}/planning/import/",
-        params={"dry_run": format_bool(dry_run)},
+        params=change_params(dry_run, ignore_warnings),
         json=load(file),
     )
     _echo_import_result(data, dry_run=dry_run, as_json=as_json)
@@ -358,9 +357,8 @@ def _work_data(file, **values):
 @click.argument("project_id", type=int)
 @click.argument("file", type=click.File("r"), required=False)
 @_work_options
-@click.option("--dry-run", is_flag=True, help="Validate only.")
-@click.option("--json", "as_json", is_flag=True)
-def add_work(project_id, file, dry_run, as_json, **values):
+@change_options()
+def add_work(project_id, file, dry_run, ignore_warnings, as_json, **values):
     """Add planned work to a project, provisional by default
 
     Read from a YAML or JSON file (like an entry of `wb planning import`) or
@@ -368,7 +366,7 @@ def add_work(project_id, file, dry_run, as_json, **values):
     data = request(
         "POST",
         f"projects/{project_id}/planning/work/",
-        params={"dry_run": format_bool(dry_run)},
+        params=change_params(dry_run, ignore_warnings),
         json=_work_data(file, **values),
     )
     _echo_import_result(data, dry_run=dry_run, as_json=as_json)
@@ -380,10 +378,16 @@ def add_work(project_id, file, dry_run, as_json, **values):
 @_work_options
 @click.option("--clear-offer", is_flag=True, help="Remove the offer.")
 @click.option("--clear-milestone", is_flag=True, help="Remove the milestone.")
-@click.option("--dry-run", is_flag=True, help="Validate only.")
-@click.option("--json", "as_json", is_flag=True)
+@change_options()
 def update_work(
-    work_id, file, clear_offer, clear_milestone, dry_run, as_json, **values
+    work_id,
+    file,
+    clear_offer,
+    clear_milestone,
+    dry_run,
+    ignore_warnings,
+    as_json,
+    **values,
 ):
     """Change planned work, only the given fields
 
@@ -400,7 +404,7 @@ def update_work(
     data = request(
         "PATCH",
         f"planning/work/{work_id}/",
-        params={"dry_run": format_bool(dry_run)},
+        params=change_params(dry_run, ignore_warnings),
         json=data,
     )
     _echo_import_result(data, dry_run=dry_run, as_json=as_json)

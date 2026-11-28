@@ -992,6 +992,16 @@ planned_work:
         self.assertFalse(pw.is_provisional)
         self.assertEqual(self.wb("planning", "work", "update", pw.pk).exit_code, 1)
 
+        declined = factories.OfferFactory.create(project=project, status=Offer.DECLINED)
+        update = ["planning", "work", "update", pw.pk, "--offer", declined.code]
+        result = self.wb(*update)
+        self.assertEqual(result.exit_code, 1, result.output)
+        self.assertIn("offer-is-declined", result.output)
+        result = self.wb(*update, "--ignore-warning", "offer-is-declined")
+        self.assertEqual(result.exit_code, 0, result.output)
+        pw.refresh_from_db()
+        self.assertEqual(pw.offer, declined)
+
         result = self.wb("planning", "work", "delete", pw.pk)
         self.assertIn(f"Deleted planned work: {pw.pk}", result.output)
         self.assertFalse(project.planned_work.exists())

@@ -342,11 +342,9 @@ def _lookups(project):
             for short_name, user in plannable_users().items()
         },
         "service_types": {st.title: st for st in ServiceType.objects.all()},
+        # Declined offers are a warning, like in the form
         "offers": {
-            offer.code: offer
-            for offer in project.offers.exclude(
-                status__in=Offer.NOT_PURSUED
-            ).select_related("project")
+            offer.code: offer for offer in project.offers.select_related("project")
         },
         "milestones": {m.pk: m for m in project.milestones.all()},
     }
@@ -357,10 +355,14 @@ NOT_NULL = {"title", "user", "weeks", "planned_hours", "is_provisional"}
 
 
 def _apply_planned_work(  # noqa: C901
-    pw, values, lookups, *, new_milestones, loc, errors, warnings
+    pw, values, lookups, *, new_milestones, loc, errors, warnings, ignore_warnings
 ):
     """Set the given fields of planned work, shared by the import and the
-    endpoints changing single planned work"""
+    endpoints changing single planned work
+
+    Like ``PlannedWorkForm``: a service type is required (only work which
+    never had one may keep none, e.g. when sending back the context), and
+    declined offers are a warning which is an error unless ignored."""
     if "notes" in values and values["notes"] is None:
         values = {**values, "notes": ""}
     if (
@@ -408,7 +410,11 @@ def _apply_planned_work(  # noqa: C901
 
     if "service_type" in values:
         if values["service_type"] is None:
-            pw.service_type = None
+            if not pw.pk or pw.service_type:
+                errors.append({
+                    "loc": [*loc, "service_type"],
+                    "msg": _("This field is required."),
+                })
         elif service_type := lookups["service_types"].get(values["service_type"]):
             pw.service_type = service_type
         else:
@@ -424,10 +430,16 @@ def _apply_planned_work(  # noqa: C901
             pass  # Unchanged, also offers which have been declined since
         elif offer := lookups["offers"].get(values["offer"]):
             pw.offer = offer
+            if offer.is_declined and "offer-is-declined" not in ignore_warnings:
+                errors.append({
+                    "loc": [*loc, "offer"],
+                    "msg": _("The selected offer is declined."),
+                    "code": "offer-is-declined",
+                })
         else:
             errors.append({
                 "loc": [*loc, "offer"],
-                "msg": _("Unknown or declined offer %r.") % values["offer"],
+                "msg": _("Unknown offer %r.") % values["offer"],
             })
 
     if "milestone" in values:
@@ -534,7 +546,12 @@ def _existing(objects, ids, loc, errors, what):
 
 @router.post("/projects/{project_id}/planning/import/", response=ImportResult)
 def planning_import(  # noqa: C901
-    request, project_id: int, data: PlanningImport, *, dry_run: DryRun = False
+    request,
+    project_id: int,
+    data: PlanningImport,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Add, update and delete milestones and planned work of the project
 
@@ -608,6 +625,7 @@ def planning_import(  # noqa: C901
             loc=loc,
             errors=errors,
             warnings=warnings,
+            ignore_warnings=ignore_warnings,
         )
         planned_work.append(pw)
         if "milestone" in item.model_fields_set:
@@ -661,7 +679,12 @@ def planning_import(  # noqa: C901
 
 @router.post("/projects/{project_id}/planning/work/", response=ImportResult)
 def planned_work_create(
-    request, project_id: int, data: PlannedWorkIn, *, dry_run: DryRun = False
+    request,
+    project_id: int,
+    data: PlannedWorkIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Add planned work to the project"""
     if data.id is not None:
@@ -674,6 +697,7 @@ def planned_work_create(
         project.pk,
         PlanningImport(planned_work=[data]),
         dry_run=dry_run,
+        ignore_warnings=ignore_warnings,
     )
 
 
@@ -683,7 +707,12 @@ def _planned_work(work_id):
 
 @router.patch("/planning/work/{int:work_id}/", response=ImportResult)
 def planned_work_update(
-    request, work_id: int, data: PlannedWorkPatch, *, dry_run: DryRun = False
+    request,
+    work_id: int,
+    data: PlannedWorkPatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change single fields of planned work"""
     pw = _planned_work(work_id)
@@ -698,6 +727,7 @@ def planned_work_update(
         loc=["body", "data"],
         errors=errors,
         warnings=warnings,
+        ignore_warnings=ignore_warnings,
     )
     if errors:
         raise ValidationError(errors)

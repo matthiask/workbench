@@ -97,6 +97,8 @@ only after the user approves:
 
 `--week` takes any day of a week and can be repeated, giving `--week`
 replaces all weeks. New work is provisional unless `--definitive` is given.
+Planned work needs a service type. Planning work for a declined offer is a
+warning (`offer-is-declined`): ask the user before passing `--ignore-warning`.
 
 Milestones and external work (done by the customer or someone else, e.g.
 content or photos) are changed the same way, validated like in the web

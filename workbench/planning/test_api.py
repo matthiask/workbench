@@ -638,6 +638,58 @@ class PlanningAPITest(TestCase):
         self.client.delete(url)
         self.assertFalse(project.planned_work.exists())
 
+    def test_planned_work_service_type_and_declined_offer(self):
+        """Like the form, planned work needs a service type and declined
+        offers are a warning which can be ignored"""
+        service_types = factories.service_types()
+        pw = factories.PlannedWorkFactory.create(
+            weeks=[monday()], service_type=service_types.consulting
+        )
+        declined = factories.OfferFactory.create(
+            project=pw.project, status=Offer.DECLINED
+        )
+        self.client.force_login(pw.user)
+        url = f"/api/planning/work/{pw.pk}/"
+
+        response = self.client.patch(
+            url, {"service_type": None}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        (error,) = response.json()["detail"]
+        self.assertEqual(error["loc"], ["body", "data", "service_type"])
+
+        response = self.client.patch(
+            url, {"offer": declined.code}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        (error,) = response.json()["detail"]
+        self.assertEqual(error["code"], "offer-is-declined")
+        self.assertEqual(error["loc"], ["body", "data", "offer"])
+
+        response = self.client.patch(
+            url + "?ignore_warnings=offer-is-declined",
+            {"offer": declined.code},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        pw.refresh_from_db()
+        self.assertEqual(pw.offer, declined)
+
+        response = self.client.post(
+            f"/api/projects/{pw.project.pk}/planning/work/"
+            "?ignore_warnings=offer-is-declined&dry_run=true",
+            {
+                "title": "Concept",
+                "user": pw.user._short_name,
+                "service_type": "consulting",
+                "offer": declined.code,
+                "weeks": [monday().isoformat()],
+                "planned_hours": 8,
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def batch(self, data, query=""):
         return self.client.post(
             f"/api/planning/work/batch/{query}", data, content_type="application/json"
