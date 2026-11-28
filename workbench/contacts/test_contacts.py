@@ -2058,6 +2058,10 @@ class GroupsTest(TestCase):
         self.assertEqual(
             address.postal_address, "Beispiel AG\nHans Muster\n8000 Zürich"
         )
+        address.save()
+        self.assertFalse(
+            Person.objects.filter(pk=person.pk).without_complete_postal_address()
+        )
 
     def test_member_counts(self):
         """People and organizations are counted independently of each other"""

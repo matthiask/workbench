@@ -291,19 +291,15 @@ class PersonQuerySet(SearchQuerySet):
         return self.filter(in_group_q(group))
 
     def without_complete_postal_address(self):
-        """People without a postal address with street (or post office box),
-        postal code and city (or one which is overridden completely), or with
-        an address which doesn't print well, e.g. for mailings"""
+        """People without a postal address with postal code and city (street
+        and post office box are optional; or one which is overridden
+        completely), or with an address which doesn't print well, e.g. for
+        mailings"""
         addresses = PostalAddress.objects.filter(person=OuterRef("pk"))
         return self.filter(
             ~Exists(
                 addresses.filter(
-                    ~Q(postal_address_override="")
-                    | (
-                        (~Q(street="") | ~Q(post_office_box=""))
-                        & ~Q(postal_code="")
-                        & ~Q(city="")
-                    )
+                    ~Q(postal_address_override="") | (~Q(postal_code="") & ~Q(city=""))
                 )
             )
             | Exists(addresses.filter(postal_address_to_check_q()))
