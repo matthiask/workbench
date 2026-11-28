@@ -245,6 +245,40 @@ class RecurringTest(TestCase):
         self.assertRedirects(response, ri.urls["detail"])
         self.assertEqual(messages(response), ["Created 0 invoices."])
 
+    def test_periods_keep_the_start_day(self):
+        """Periods stay on the day of the month the recurring invoice starts
+        on, also after a shorter month and however often invoices are
+        created"""
+        expected = [
+            (dt.date(2026, 1, 30), dt.date(2026, 2, 28)),
+            (dt.date(2026, 3, 1), dt.date(2026, 3, 29)),
+            (dt.date(2026, 3, 30), dt.date(2026, 4, 29)),
+            (dt.date(2026, 4, 30), dt.date(2026, 5, 29)),
+        ]
+
+        def periods(ri):
+            return [
+                (invoice.service_period_from, invoice.service_period_until)
+                for invoice in ri.invoices.order_by("service_period_from")
+            ]
+
+        at_once, monthly = factories.RecurringInvoiceFactory.create_batch(
+            2,
+            starts_on=dt.date(2026, 1, 30),
+            periodicity="monthly",
+            create_invoice_on_day=0,
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+        )
+        with travel("2026-05-15 12:00"):
+            at_once.create_invoices()
+        for day in ["2026-01-30", "2026-03-01", "2026-03-30", "2026-04-30"]:
+            with travel(f"{day} 12:00"):
+                monthly.create_invoices()
+
+        self.assertEqual(periods(at_once), expected)
+        self.assertEqual(periods(monthly), expected)
+
     def test_reactivation_backlog(self):
         """Reactivating a recurring invoice which has ended warns about the
         invoices of the past periods it would create"""

@@ -1064,18 +1064,20 @@ class RecurringInvoice(ModelWithTotal):
         """The periods ``(starts_on, ends_on)`` whose invoices are due to be
         created now"""
         periods = []
-        days = recurring(
-            max(filter(None, (self.next_period_starts_on, self.starts_on))),
-            self.periodicity,
-        )
+        # The periods start on the days recurring from ``starts_on``;
+        # recurring from ``next_period_starts_on`` would move them to the
+        # 1st after a shorter month (January 31st, March 1st, April 1st)
+        days = recurring(self.starts_on, self.periodicity)
+        this_period = max(filter(None, (self.next_period_starts_on, self.starts_on)))
+        next_period = next(days)
+        while next_period <= this_period:
+            next_period = next(days)
         generate_until = min(
             filter(None, (in_days(-self.create_invoice_on_day), self.ends_on))
         )
-        this_period = next(days)
         while this_period <= generate_until:
-            next_period = next(days)
             periods.append((this_period, next_period - dt.timedelta(days=1)))
-            this_period = next_period
+            this_period, next_period = next_period, next(days)
         return periods
 
     def create_invoices(self):
