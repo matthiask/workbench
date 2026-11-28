@@ -1099,7 +1099,34 @@ def _cost_center(value):
     )
 
 
-@router.patch("/projects/{project_id}/", response=ProjectDetail)
+class SettledOfferOut(Schema):
+    id: int
+    code: str
+    url: str
+    title: str
+    status: OfferStatus
+    status_label: str
+
+
+class ProjectUpdateOut(ProjectDetail):
+    settled_offers: list[SettledOfferOut] = Field(
+        description="Offers in preparation which closing the project just"
+        " discarded, or declined if they have been sent before."
+    )
+
+
+def settled_offer_out(offer, request):
+    return {
+        "id": offer.id,
+        "code": offer.code,
+        "url": request.build_absolute_uri(offer.get_absolute_url()),
+        "title": offer.title,
+        "status": key("offer_status", offer.status),
+        "status_label": offer.get_status_display(),
+    }
+
+
+@router.patch("/projects/{project_id}/", response=ProjectUpdateOut)
 def project_update(
     request,
     project_id: int,
@@ -1110,9 +1137,27 @@ def project_update(
 ):
     """Change or close a project, validated like in the web interface
 
-    Warnings of the web interface are errors here unless ignored by their
-    code; nothing is saved if anything is invalid or with ``dry_run``."""
+    Closing a project discards its offers in preparation (or declines them
+    if they have been sent before), ``settled_offers`` lists them. Warnings
+    of the web interface are errors here unless ignored by their code;
+    nothing is saved if anything is invalid or with ``dry_run``."""
     project = get_object_or_404(Project, pk=project_id)
+    in_preparation = list(
+        project.offers.filter(status=Offer.IN_PREPARATION).values_list("pk", flat=True)
+    )
+
+    def out(project):
+        settled = (
+            project.offers
+            .filter(pk__in=in_preparation)
+            .exclude(status=Offer.IN_PREPARATION)
+            .select_related("project", "owned_by")
+            .order_by("pk")
+        )
+        return project_detail_out(project, request) | {
+            "settled_offers": [settled_offer_out(offer, request) for offer in settled]
+        }
+
     patch = data.model_dump(exclude_unset=True)
     # Projects which aren't internal anymore lose their internal type
     if patch.get("type") not in {None, Project.INTERNAL}:
@@ -1122,7 +1167,7 @@ def project_update(
         project,
         patch,
         request,
-        out=lambda project: project_detail_out(project, request),
+        out=out,
         ignore_warnings=ignore_warnings,
         dry_run=dry_run,
         field_map={

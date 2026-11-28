@@ -297,6 +297,9 @@ def _echo_saved_project(data, *, dry_run, as_json):
         ],
         url=data["url"],
     )
+    # Offers in preparation discarded or declined by closing the project
+    for offer in data.get("settled_offers", ()):
+        click.echo(f"{offer['status_label']}: {offer['code']} {offer['title']}")
     if dry_run:
         console.print("Dry run, nothing has been saved.")
 

@@ -1349,6 +1349,40 @@ class ProjectsAPITest(TestCase):
         project.refresh_from_db()
         self.assertEqual(project.closed_on, dt.date.today())
 
+    def test_close_settles_offers(self):
+        """Closing reports the offers in preparation it discarded or declined
+        (the web interface shows messages)"""
+        project = factories.ProjectFactory.create()
+        draft = factories.OfferFactory.create(project=project, title="Draft")
+        sent = factories.OfferFactory.create(
+            project=project, title="Sent", offered_on=dt.date.today()
+        )
+        factories.OfferFactory.create(
+            project=project, title="Accepted", status=Offer.ACCEPTED
+        )
+        self.client.force_login(project.owned_by)
+
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/?dry_run=true",
+            {"closed_on": dt.date.today().isoformat()},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            [
+                (offer["id"], offer["status"])
+                for offer in response.json()["settled_offers"]
+            ],
+            [(draft.pk, "discarded"), (sent.pk, "declined")],
+        )
+
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/",
+            {"title": "Changed"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.json()["settled_offers"], [])
+
     def test_update(self):
         """Projects are changed field by field and closed like in the web
         interface"""

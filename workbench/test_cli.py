@@ -291,7 +291,7 @@ class CLITest(TestCase):
 
         # Closing discards offers in preparation, their planned work needs a
         # decision
-        offer = factories.OfferFactory.create(project=project)
+        offer = factories.OfferFactory.create(project=project, title="Website")
         factories.PlannedWorkFactory.create(
             project=project, offer=offer, weeks=[monday() + dt.timedelta(days=7)]
         )
@@ -303,6 +303,7 @@ class CLITest(TestCase):
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertFalse(offer.planned_work.exists())
+        self.assertIn(f"Discarded: {offer.code} Website\n", result.output)
 
     @override_settings(
         FEATURES={
