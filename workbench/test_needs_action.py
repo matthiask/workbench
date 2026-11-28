@@ -148,3 +148,41 @@ class NeedsActionTest(TestCase):
         project.closed_on = dt.date.today()
         project.save()
         self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [])
+
+    def test_overdue_invoices_of_inactive_users_without_open_project(self):
+        """Overdue invoices of people who left without open project go to
+        the active owner of the closed project, else to controlling"""
+        inactive = factories.UserFactory.create(is_active=False)
+        owner = factories.UserFactory.create()
+        user = factories.UserFactory.create()
+        controlling = factories.UserFactory.create(_features=[FEATURES.CONTROLLING])
+        project = factories.ProjectFactory.create(
+            owned_by=owner, closed_on=dt.date.today()
+        )
+        overdue = {
+            "owned_by": inactive,
+            "status": Invoice.SENT,
+            "invoiced_on": in_days(-60),
+            "due_on": in_days(-30),
+        }
+        on_project = factories.InvoiceFactory.create(
+            **overdue, project=project, customer=project.customer
+        )
+        without_project = factories.InvoiceFactory.create(**overdue)
+
+        with override_settings(FEATURES={FEATURES.CONTROLLING: F.USER}):
+            self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [])
+            self.assertEqual(
+                list(Invoice.objects.maybe_actionable(user=owner)), [on_project]
+            )
+            self.assertEqual(
+                list(Invoice.objects.maybe_actionable(user=controlling)),
+                [without_project],
+            )
+
+            project.owned_by = inactive
+            project.save()
+            self.assertEqual(
+                set(Invoice.objects.maybe_actionable(user=controlling)),
+                {on_project, without_project},
+            )

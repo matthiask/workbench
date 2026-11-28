@@ -11,6 +11,7 @@ from django.utils.html import format_html
 from django.utils.timesince import timesince
 from django.utils.translation import gettext, gettext_lazy as _
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.audit.models import LoggedAction
 from workbench.contacts.models import Organization, Person
@@ -85,6 +86,27 @@ class InvoiceQuerySet(SearchQuerySet):
                     ),
                     owned_by__is_active=False,
                     project__closed_on__isnull=True,
+                )
+                # Without open project, overdue invoices go to the active
+                # owner of the closed project, else to controlling
+                | Q(
+                    overdue_q(),
+                    owned_by__is_active=False,
+                    project__closed_on__isnull=False,
+                    project__owned_by=user,
+                )
+                | (
+                    Q(
+                        Q(project__isnull=True)
+                        | Q(
+                            project__closed_on__isnull=False,
+                            project__owned_by__is_active=False,
+                        ),
+                        overdue_q(),
+                        owned_by__is_active=False,
+                    )
+                    if user.is_active and user.features[FEATURES.CONTROLLING]
+                    else Q(pk__in=[])
                 ),
             )
             .select_related("project", "owned_by")
