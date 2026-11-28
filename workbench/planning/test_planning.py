@@ -122,6 +122,63 @@ class PlanningTest(TestCase):
         project.external_work.all().delete_after_this_week()
         self.assertEqual(set(project.milestones.all()), {still_used, current, unused})
 
+    def test_deleting_work_deletes_emptied_milestones(self):
+        """Deleting planned work (also by moving it to another project) or
+        external work deletes its future milestones left without work"""
+        project = factories.ProjectFactory.create()
+        next_week = monday() + dt.timedelta(days=7)
+        self.client.force_login(project.owned_by)
+
+        def work(*, past=False):
+            milestone = factories.MilestoneFactory.create(
+                project=project, date=monday() if past else next_week
+            )
+            return factories.PlannedWorkFactory.create(
+                project=project, milestone=milestone, weeks=[monday()]
+            )
+
+        deleted = work()
+        response = self.client.post(
+            deleted.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(project.milestones.filter(pk=deleted.milestone_id).exists())
+
+        past = work(past=True)
+        past.delete()
+        self.assertTrue(project.milestones.filter(pk=past.milestone_id).exists())
+
+        batch = work()
+        moved = work()
+        url = project.urls["planning_batch_update"]
+        response = self.client.post(
+            url, {"work": [batch.pk], "move_by_weeks": 0, "delete": "on"}
+        )
+        self.assertEqual(response.status_code, 202)
+        response = self.client.post(
+            url,
+            {
+                "work": [moved.pk],
+                "move_by_weeks": 0,
+                "project": factories.ProjectFactory.create().pk,
+            },
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(list(project.milestones.all()), [past.milestone])
+
+        ew = ExternalWork.objects.create(
+            project=project,
+            milestone=factories.MilestoneFactory.create(
+                project=project, date=next_week
+            ),
+            provided_by=factories.OrganizationFactory.create(),
+            created_by=project.owned_by,
+            title="Printing",
+            weeks=[next_week],
+        )
+        ew.delete()
+        self.assertEqual(list(project.milestones.all()), [past.milestone])
+
     def test_milestone_phase_after_date(self):
         """The phase of a milestone doesn't start after the milestone"""
         milestone = factories.MilestoneFactory.create(

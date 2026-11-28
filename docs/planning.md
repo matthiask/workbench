@@ -43,9 +43,11 @@ Workbench warns when work is planned after its milestone or belongs to
 a declined offer, also in the batch update. Closed projects don't get
 new planned work. Closing a project, declining an
 offer or losing a deal asks whether to delete the planned work after the
-current week; past work stays. Milestones after the current week go
-with it when no planned or external work is left on them. Winning a deal doesn't change the
-planning: make provisional work definite yourself.
+current week; past work stays. Winning a deal doesn't change the
+planning: make provisional work definite yourself. Whenever planned or
+external work is deleted, or planned work is moved to another project,
+milestones after the current week go with it when no work is left on
+them.
 
 ## Capacity
 

@@ -267,6 +267,37 @@ class PlanningAPITest(TestCase):
         )
         self.assertTrue(project.milestones.exists())
 
+    def test_deletions_delete_emptied_milestones(self):
+        """Deleting planned work through the API deletes its future
+        milestones left without work, also those deleted explicitly"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        def work():
+            milestone = factories.MilestoneFactory.create(
+                project=project, date=in_days(60)
+            )
+            return factories.PlannedWorkFactory.create(
+                project=project, milestone=milestone, weeks=[monday()]
+            )
+
+        deleted = work()
+        response = self.client.delete(f"/api/planning/work/{deleted.pk}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(project.milestones.exists())
+
+        imported, both = work(), work()
+        response = self.client.post(
+            f"/api/projects/{project.pk}/planning/import/",
+            {
+                "delete_planned_work": [imported.pk, both.pk],
+                "delete_milestones": [both.milestone_id],
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(project.milestones.exists())
+
     def test_import_unchanged_context(self):
         """Planned work sent back unchanged is accepted, also with users who
         left and offers which have been declined since"""

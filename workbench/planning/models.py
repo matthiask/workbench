@@ -109,6 +109,12 @@ class AbstractPlannedWork(Model):
 
         raise_if_errors(errors, exclude)
 
+    def delete(self, *args, **kwargs):
+        milestone_id = self.milestone_id
+        ret = super().delete(*args, **kwargs)
+        delete_emptied_milestones({milestone_id})
+        return ret
+
     @property
     def pretty_from_until(self):
         return f"{local_date_format(min(self.weeks))} – {local_date_format(max(self.weeks) + dt.timedelta(days=6))}"

@@ -48,11 +48,12 @@ einer abgelehnten Offerte gehört, auch in der Batch-Bearbeitung.
 Geschlossene Projekte erhalten keine neue geplante Arbeit. Beim
 Schliessen eines Projekts, Ablehnen einer Offerte oder Verlieren eines
 Geschäfts fragt Workbench, ob die geplante Arbeit nach der laufenden
-Woche gelöscht werden soll; vergangene Arbeit bleibt. Meilensteine
-nach der laufenden Woche werden mitgelöscht, wenn ihnen keine geplante
-Arbeit und keine Kundenarbeit mehr bleibt. Ein gewonnenes
+Woche gelöscht werden soll; vergangene Arbeit bleibt. Ein gewonnenes
 Geschäft ändert die Planung nicht: Mache provisorische Arbeit selbst
-fest.
+fest. Wann immer geplante Arbeit oder Kundenarbeit gelöscht oder
+geplante Arbeit in ein anderes Projekt verschoben wird, werden
+Meilensteine nach der laufenden Woche mitgelöscht, wenn ihnen keine
+Arbeit mehr bleibt.
 
 ## Kapazität
 

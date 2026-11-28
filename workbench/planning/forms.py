@@ -14,6 +14,7 @@ from workbench.planning.models import (
     ExternalWork,
     Milestone,
     PlannedWork,
+    delete_emptied_milestones,
     future_weeks_on_closed_project,
 )
 from workbench.projects.models import Project
@@ -571,9 +572,11 @@ class PlannedWorkBatchForm(Form):
     def process(self):
         data = self.cleaned_data
         work = data["work"]
+        milestone_ids = {unit.milestone_id for unit in work}
 
         if data.get("delete"):
             work.delete()
+            delete_emptied_milestones(milestone_ids)
             return
 
         if move_by_weeks := data.get("move_by_weeks"):
@@ -594,3 +597,5 @@ class PlannedWorkBatchForm(Form):
 
         for unit in work:
             unit.save()
+        if project:
+            delete_emptied_milestones(milestone_ids)
