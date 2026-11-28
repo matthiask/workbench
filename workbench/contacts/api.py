@@ -1627,7 +1627,8 @@ def person_update(
     contact also replaces the organization's if it isn't active anymore.
     Moving the contact of projects, deals or invoices is a warning
     (``organization-update``), they keep their customer and contact. Groups
-    which apply to organizations stay with the previous organization."""
+    which apply to organizations are carried over to the new organization
+    (the previous one keeps them too), like in the person form."""
     person = get_object_or_404(
         Person.objects.select_related("organization"), pk=person_id
     )
@@ -1637,9 +1638,8 @@ def person_update(
         errors.append({"loc": ["body", "data", *loc], "msg": msg})
 
     name = (person.given_name, person.family_name)
-    add, remove = _groups_to_change(
-        {group.pk for group in person.all_groups()}, data, error
-    )
+    groups = person.all_groups()
+    add, remove = _groups_to_change({group.pk for group in groups}, data, error)
     _change_person_fields(person, data, error)
     if data.primary_contact is not None:
         user = (
@@ -1686,6 +1686,17 @@ def person_update(
         ),
     ]
     moving = _move_to_organization(person, data, error)
+    if moving:
+        # Like the person form, the groups which apply to organizations go
+        # along to the new organization (the previous one keeps them)
+        add = [
+            *add,
+            *(
+                group
+                for group in groups
+                if group.applies_to_organizations and group not in remove
+            ),
+        ]
     if errors:
         raise ValidationError(errors)
     _person_update_warnings(

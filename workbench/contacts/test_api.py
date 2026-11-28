@@ -191,6 +191,30 @@ class ContactsAPITest(TestCase):
             {project.contact_id, deal.contact_id, old.contact_id},
         )
 
+    def test_move_person_groups(self):
+        """Moving a person carries the groups which apply to organizations over
+        to the new organization, like the person form"""
+        industry = Group.objects.create(title="Industry", applies_to_organizations=True)
+        removed = Group.objects.create(title="Removed", applies_to_organizations=True)
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        old = person.organization
+        old.groups.add(industry, removed)
+        new = factories.OrganizationFactory.create()
+        self.client.force_login(person.primary_contact)
+
+        response = self.client.patch(
+            f"/api/contacts/people/{person.pk}/",
+            {"organization": new.pk, "remove_groups": ["Removed"]},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["groups"], ["Industry"])
+        self.assertEqual(list(new.groups.all()), [industry])
+        # The previous organization keeps its groups
+        self.assertEqual(set(old.groups.all()), {industry, removed})
+
     def test_archive_outage_contact(self):
         """Archiving the last outage contact of an active site warns"""
         from workbench.hosting.models import SiteContact

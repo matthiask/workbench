@@ -2249,9 +2249,10 @@ planned_work:
         self.assertEqual(person.organization, new)
         # Moving into an archived organization unarchives it
         self.assertFalse(new.is_archived)
-        # Groups which apply to organizations stay with the old one
+        # Groups which apply to organizations are carried over, like in the
+        # person form
         self.assertEqual(list(old.groups.all()), [industry])
-        self.assertNotIn(industry, person.all_groups())
+        self.assertEqual(list(new.groups.all()), [industry])
         project.refresh_from_db()
         self.assertEqual((project.customer, project.contact), (old, person))
 

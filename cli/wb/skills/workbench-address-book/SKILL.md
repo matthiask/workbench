@@ -227,8 +227,11 @@ employees) aren't archived: move them to their new organization, or to none
 if it isn't known, and remove the old organization's email and postal
 addresses. Projects, deals and invoices keep them as their contact; moving
 the contact of any warns (`organization-update`), pass `--ignore-warning
-organization-update` after the user confirms. Membership in an active group
-(e.g. the former team) keeps them from being archived automatically:
+organization-update` after the user confirms. Groups which apply to
+organizations (e.g. industries) are carried over to the new organization;
+remove those which don't fit it with `--remove-group`. Membership in an
+active group (e.g. the former team) keeps them from being archived
+automatically:
 
     wb people update <person_id> --organization <organization_id> --dry-run
     wb people update <person_id> --organization "" --dry-run
