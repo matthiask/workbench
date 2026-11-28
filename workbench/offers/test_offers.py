@@ -1294,6 +1294,35 @@ class OffersTest(TestCase):
         offer.project.closed_on = dt.date.today()
         self.assertIsNone(offer.project.solely_declined_offers_warning(request=None))
 
+    def test_change_declined_offer(self):
+        """Changing a declined offer doesn't ask to confirm declining again"""
+        offer = factories.OfferFactory.create(
+            status=Offer.DECLINED,
+            offered_on=in_days(-10),
+            closed_on=in_days(-1),
+            postal_address="Anything\nStreet\nCity",
+        )
+        self.client.force_login(offer.owned_by)
+        response = self.client.post(
+            offer.urls["update"],
+            {
+                "title": "Renamed",
+                "owned_by": offer.owned_by_id,
+                **services_formset(),
+                "discount": "0",
+                "liable_to_vat": "1",
+                "tax_rate": "8.10",
+                "postal_address": "Anything\nStreet\nCity",
+                "offered_on": in_days(-10).isoformat(),
+                "valid_until": in_days(60).isoformat(),
+                "closed_on": in_days(-1).isoformat(),
+                "status": Offer.DECLINED,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        offer.refresh_from_db()
+        self.assertEqual(offer.title, "Renamed")
+
     def test_decline_offer_with_planned_work(self):
         """Declining an offer with linked planning entries forces a decision"""
         offer = factories.OfferFactory.create()
