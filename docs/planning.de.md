@@ -43,7 +43,8 @@ deine Installation sie eingeschaltet hat.
   hinweg, z.B. um die künftige Arbeit von jemandem zu übergeben, der
   geht, mit `wb planning work batch`.
 
-Workbench warnt, wenn Arbeit nach ihrem Meilenstein geplant ist.
+Workbench warnt, wenn Arbeit nach ihrem Meilenstein geplant ist oder zu
+einer abgelehnten Offerte gehört, auch in der Batch-Bearbeitung.
 Geschlossene Projekte erhalten keine neue geplante Arbeit. Beim
 Schliessen eines Projekts, Ablehnen einer Offerte oder Verlieren eines
 Geschäfts fragt Workbench, ob die geplante Arbeit nach der laufenden

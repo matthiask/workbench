@@ -529,22 +529,43 @@ class PlannedWorkBatchForm(Form):
 
     def clean(self):
         data = super().clean()
-        if (
-            (move_by_weeks := data.get("move_by_weeks"))
-            and not data.get("project")
-            and any(
-                future_weeks_on_closed_project(
-                    unit.project,
-                    unit.weeks,
-                    [
-                        week + dt.timedelta(days=7 * move_by_weeks)
-                        for week in unit.weeks
-                    ],
+        if data.get("delete"):
+            return data
+
+        work = data.get("work", ())
+        # Moving to another project removes the offer and the milestone
+        if data.get("project"):
+            return data
+
+        if move_by_weeks := data.get("move_by_weeks"):
+            delta = dt.timedelta(days=7 * move_by_weeks)
+            moved = {unit: [week + delta for week in unit.weeks] for unit in work}
+            if any(
+                future_weeks_on_closed_project(unit.project, unit.weeks, weeks)
+                for unit, weeks in moved.items()
+            ):
+                self.add_error("move_by_weeks", _("The project is closed."))
+            if after := [
+                unit
+                for unit, weeks in moved.items()
+                if unit.milestone
+                and any(week >= monday(unit.milestone.date) for week in weeks)
+            ]:
+                self.add_warning(
+                    _(
+                        "The following work would be planned in or after the"
+                        " week of its milestone: %(work)s"
+                    )
+                    % {"work": ", ".join(str(unit) for unit in after)},
+                    code="weeks-after-milestone",
                 )
-                for unit in data.get("work", ())
+
+        if declined := [unit for unit in work if unit.offer and unit.offer.is_declined]:
+            self.add_warning(
+                _("The following work belongs to declined offers: %(work)s")
+                % {"work": ", ".join(str(unit) for unit in declined)},
+                code="offer-is-declined",
             )
-        ):
-            self.add_error("move_by_weeks", _("The project is closed."))
         return data
 
     def process(self):

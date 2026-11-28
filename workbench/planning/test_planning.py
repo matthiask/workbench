@@ -14,6 +14,7 @@ from workbench.awt.models import Absence, Holiday
 from workbench.planning import reporting
 from workbench.planning.forms import MilestoneForm, PlannedWorkSearchForm
 from workbench.planning.models import ExternalWork, PlannedWork
+from workbench.tools.forms import WarningsForm
 from workbench.tools.validation import in_days, monday
 
 
@@ -760,6 +761,53 @@ class PlanningTest(TestCase):
         deal.closed_on = dt.date.today()
         deal.save()
         self.assertIsNone(decision())
+
+    def test_batch_update_warnings(self):
+        """The batch update warns about work moved into or after the week of
+        its milestone and about work of declined offers, like the form;
+        deleting the work of closed projects is fine"""
+        milestone = factories.MilestoneFactory.create(
+            date=monday() + dt.timedelta(days=16)
+        )
+        offer = factories.OfferFactory.create(
+            project=milestone.project, status=factories.Offer.DECLINED
+        )
+        pw = factories.PlannedWorkFactory.create(
+            project=milestone.project, milestone=milestone, weeks=[monday()]
+        )
+        declined = factories.PlannedWorkFactory.create(
+            project=milestone.project, offer=offer, weeks=[monday()]
+        )
+        url = pw.project.urls["planning_batch_update"]
+        self.client.force_login(pw.user)
+
+        response = self.client.post(url, {"work": [pw.pk], "move_by_weeks": 1})
+        self.assertEqual(response.status_code, 202)
+
+        response = self.client.post(url, {"work": [pw.pk], "move_by_weeks": 2})
+        self.assertContains(response, 'value="weeks-after-milestone"')
+
+        response = self.client.post(url, {"work": [declined.pk], "move_by_weeks": 0})
+        self.assertContains(response, 'value="offer-is-declined"')
+
+        response = self.client.post(
+            url,
+            {
+                "work": [declined.pk],
+                "move_by_weeks": 0,
+                WarningsForm.ignore_warnings_id: "offer-is-declined",
+            },
+        )
+        self.assertEqual(response.status_code, 202)
+
+        # Deleting doesn't care
+        pw.project.closed_on = dt.date.today()
+        pw.project.save()
+        response = self.client.post(
+            url, {"work": [pw.pk, declined.pk], "move_by_weeks": 3, "delete": "on"}
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertFalse(PlannedWork.objects.exists())
 
     def test_batch_update_move_to_other_project(self):
         """Moving planned work to another project resets its offer and its

@@ -702,6 +702,25 @@ class PlanningAPITest(TestCase):
             ],
         )
 
+    def test_batch_update_declined_offer(self):
+        """Changing work of declined offers is a warning which can be ignored"""
+        pw = factories.PlannedWorkFactory.create(
+            offer=factories.OfferFactory.create(status=factories.Offer.DECLINED),
+            weeks=[monday()],
+        )
+        self.client.force_login(pw.user)
+
+        response = self.batch({"work": [pw.pk], "provisional": True})
+        self.assertEqual(response.status_code, 422, response.content)
+        (error,) = response.json()["detail"]
+        self.assertEqual(error["code"], "offer-is-declined")
+
+        response = self.batch(
+            {"work": [pw.pk], "provisional": True},
+            "?ignore_warnings=offer-is-declined",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_batch_update_project_and_delete(self):
         """Work moved to another project (by code) loses its offer and
         milestone; deleting returns the IDs"""
