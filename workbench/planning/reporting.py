@@ -758,49 +758,49 @@ def team_planning(team, date_range):
     return planning.report()
 
 
-def project_planning(project, *, external_view=False):
+def _project_weeks(project_ids):
+    """The weeks of the planned work, milestones and external work of the
+    projects, starting two weeks ago at the latest and at most ten years
+    in each direction"""
     with connections["default"].cursor() as cursor:
         cursor.execute(
             """\
 WITH sq AS (
     SELECT unnest(weeks) AS week
     FROM planning_plannedwork
-    WHERE project_id=%s
+    WHERE project_id = ANY(%s)
 
     UNION ALL
 
     SELECT date_trunc('week', date)::date
     FROM planning_milestone
-    WHERE project_id=%s
+    WHERE project_id = ANY(%s)
 
     UNION ALL
 
     SELECT unnest(weeks)
     FROM planning_externalwork
-    WHERE project_id=%s
+    WHERE project_id = ANY(%s)
 )
 SELECT MIN(week), MAX(week) FROM sq
             """,
-            [project.id, project.id, project.id],
+            [project_ids, project_ids, project_ids],
         )
-        result = next(iter(cursor))
+        first, last = next(iter(cursor))
 
-    if result[0]:
-        result = (
-            max(
-                monday(in_days(-365 * 10)),
-                min(result[0], monday() - dt.timedelta(days=14)),
-            ),
-            min(monday(in_days(365 * 10)), result[1]),
-        )
-        weeks = list(
-            islice(
-                recurring(result[0], "weekly"),
-                2 + (result[1] - result[0]).days // 7,
-            )
-        )
-    else:
-        weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
+    if not first:
+        return list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
+
+    first = max(
+        monday(in_days(-365 * 10)),
+        min(first, monday() - dt.timedelta(days=14)),
+    )
+    last = max(first, min(monday(in_days(365 * 10)), last))
+    return list(islice(recurring(first, "weekly"), 2 + (last - first).days // 7))
+
+
+def project_planning(project, *, external_view=False):
+    weeks = _project_weeks([project.id])
 
     planning = Planning(external_view=external_view, weeks=weeks)
     planning.add_planned_work_and_milestones(
@@ -979,44 +979,7 @@ def campaign_planning_external(campaign):
 
 def campaign_planning(campaign, *, external_view=False):
     projects = Project.objects.filter(campaign=campaign)
-    projects_ids = [project.id for project in projects]
-
-    with connections["default"].cursor() as cursor:
-        cursor.execute(
-            """\
-WITH sq AS (
-    SELECT unnest(weeks) AS week
-    FROM planning_plannedwork
-    WHERE project_id = ANY(%s)
-
-    UNION ALL
-
-    SELECT date_trunc('week', date)::date
-    FROM planning_milestone
-    WHERE project_id = ANY(%s)
-
-    UNION ALL
-
-    SELECT unnest(weeks)
-    FROM planning_externalwork
-    WHERE project_id = ANY(%s)
-)
-SELECT MIN(week), MAX(week) FROM sq
-            """,
-            [projects_ids, projects_ids, projects_ids],
-        )
-        result = next(iter(cursor))
-
-    if result[0]:
-        result = (min(result[0], monday() - dt.timedelta(days=14)), result[1])
-        weeks = list(
-            islice(
-                recurring(result[0], "weekly"),
-                2 + (result[1] - result[0]).days // 7,
-            )
-        )
-    else:
-        weeks = list(islice(recurring(monday() - dt.timedelta(days=14), "weekly"), 80))
+    weeks = _project_weeks([project.id for project in projects])
 
     planning = Planning(weeks=weeks, projects=projects, external_view=external_view)
 

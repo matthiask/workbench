@@ -256,6 +256,33 @@ class PlanningTest(TestCase):
             (record,) = report["projects_offers"]
             self.assertEqual([e["id"] for e in record["external_work"]], [ew.id])
 
+    def test_range_clamped_to_ten_years(self):
+        """Project and campaign planning show at most ten years in each
+        direction"""
+        pw = factories.PlannedWorkFactory.create(
+            weeks=[monday() + dt.timedelta(days=7 * 52 * 50)]
+        )
+        project = pw.project
+        project.campaign = factories.CampaignFactory.create()
+        project.save()
+        factories.MilestoneFactory.create(project=project, date=dt.date(1950, 1, 1))
+
+        for report in [
+            reporting.project_planning(project),
+            reporting.campaign_planning(project.campaign),
+        ]:
+            self.assertGreaterEqual(
+                report["weeks"][0]["monday"], monday(in_days(-365 * 10))
+            )
+            self.assertLessEqual(
+                report["weeks"][-1]["monday"], monday(in_days(365 * 10 + 7))
+            )
+
+        # Only work more than ten years ago
+        pw.weeks = [monday(dt.date(1950, 1, 1))]
+        pw.save()
+        self.assertTrue(reporting.project_planning(project)["weeks"])
+
     def test_only_milestones(self):
         """Milestones without any work show their project in the user's
         planning"""
