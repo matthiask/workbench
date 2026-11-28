@@ -25,6 +25,7 @@ from workbench.contacts.forms import (
     PhoneNumberFormset,
     PostalAddressForm,
     email_in_use_warning,
+    last_outage_contact_warning,
     organization_update_warning,
     recent_projects_or_deals,
     short_salutation_warning,
@@ -1587,6 +1588,19 @@ def _person_update_warnings(person, data, *, name, moving, ignore_warnings):
         raise ValidationError([
             {"loc": ["body", "data"], "msg": warning, "code": "organization-update"}
         ])
+    if (
+        data.is_archived
+        and not person.is_archived
+        and "last-outage-contact" not in ignore_warnings
+        and (warning := last_outage_contact_warning(person))
+    ):
+        raise ValidationError([
+            {
+                "loc": ["body", "data", "is_archived"],
+                "msg": warning,
+                "code": "last-outage-contact",
+            }
+        ])
 
 
 @router.patch("/contacts/people/{int:person_id}/", response=PersonDetailOut)
@@ -1606,7 +1620,9 @@ def person_update(
     or archive them, with the rules of the person form; contact details are
     added with ``details/``. Archiving the
     last active person of an organization without open projects or deals,
-    active sites or running recurring invoices archives the organization too, unarchiving a person unarchives their
+    active sites or running recurring invoices archives the organization too;
+    archiving the last active contact for outages of active sites is a
+    warning (``last-outage-contact``). Unarchiving a person unarchives their
     organization, so does moving an active person into it. A new primary
     contact also replaces the organization's if it isn't active anymore.
     Moving the contact of projects, deals or invoices is a warning

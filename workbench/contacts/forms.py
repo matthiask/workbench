@@ -6,7 +6,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Count, Func, OuterRef, Prefetch, Q, Subquery
+from django.db.models import Count, Exists, Func, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import Coalesce
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.http import Http404
@@ -634,6 +634,35 @@ class PersonMergeForm(Form):
         return keep
 
 
+def last_outage_contact_warning(person):
+    """Warning (``last-outage-contact``) when archiving the only active contact
+    for outages of active sites, or None"""
+    from workbench.hosting.models import Site, SiteContact
+
+    sites = list(
+        Site.objects
+        .active()
+        .filter(contacts__person=person, contacts__role=SiteContact.OUTAGE)
+        .exclude(
+            Exists(
+                SiteContact.objects.filter(
+                    site=OuterRef("pk"),
+                    role=SiteContact.OUTAGE,
+                    person__is_archived=False,
+                ).exclude(person=person)
+            )
+        )
+        .distinct()
+        .values_list("title", flat=True)
+    )
+    if not sites:
+        return None
+    return _("%(person)s is the last active contact for outages of %(sites)s.") % {
+        "person": person,
+        "sites": ", ".join(sites),
+    }
+
+
 def organization_update_warning(person):
     """Warning (``organization-update``) when moving a person who is the
     contact of related objects to another organization, or None"""
@@ -755,6 +784,13 @@ class PersonForm(ModelForm):
             and (warning := organization_update_warning(self.instance))
         ):
             self.add_warning(warning, code="organization-update")
+        if (
+            self.instance.pk
+            and data.get("is_archived")
+            and "is_archived" in self.changed_data
+            and (warning := last_outage_contact_warning(self.instance))
+        ):
+            self.add_warning(warning, code="last-outage-contact")
         if (formset := self.formsets.get("emailaddresses")) and formset.is_valid():
             warnings = [
                 warning

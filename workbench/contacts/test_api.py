@@ -191,6 +191,32 @@ class ContactsAPITest(TestCase):
             {project.contact_id, deal.contact_id, old.contact_id},
         )
 
+    def test_archive_outage_contact(self):
+        """Archiving the last outage contact of an active site warns"""
+        from workbench.hosting.models import SiteContact
+
+        person = factories.PersonFactory.create()
+        site = factories.SiteFactory.create()
+        SiteContact.objects.create(site=site, person=person, role=SiteContact.OUTAGE)
+        self.client.force_login(person.primary_contact)
+        url = f"/api/contacts/people/{person.pk}/"
+
+        response = self.client.patch(
+            url, {"is_archived": True}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(
+            [e["code"] for e in response.json()["detail"]], ["last-outage-contact"]
+        )
+
+        # Another active outage contact takes over
+        other = factories.PersonFactory.create()
+        SiteContact.objects.create(site=site, person=other, role=SiteContact.OUTAGE)
+        response = self.client.patch(
+            url, {"is_archived": True}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_update_person(self):
         """People get a primary contact, are added to and removed from groups
         with the rules of the person form (groups which apply to organizations

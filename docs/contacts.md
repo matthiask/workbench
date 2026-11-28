@@ -55,7 +55,8 @@ fields follow for sorting and filtering.
   Archiving an organization offers to archive its people and warns about
   its active sites and running recurring invoices; archiving its
   last person archives the organization too, unless it has open projects
-  or deals, active sites or running recurring invoices.
+  or deals, active sites or running recurring invoices. Archiving the last
+  contact for outages of an active site warns.
 - Contacts unused for five years are archived automatically.
 - Organizations with related records (people, projects, invoices and
   so on) can't be deleted: merge or archive them.

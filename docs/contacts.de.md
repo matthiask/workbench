@@ -59,7 +59,8 @@ Adressfelder folgen zum Sortieren und Filtern.
   warnt vor ihren aktiven Sites und laufenden Stapelrechnungen; wird
   ihre letzte Person archiviert, wird auch die Organisation archiviert,
   ausser sie hat offene Projekte oder Geschäfte, aktive Sites oder laufende
-  Stapelrechnungen.
+  Stapelrechnungen. Workbench warnt, wenn die letzte Kontaktperson für
+  Störungen einer aktiven Site archiviert wird.
 - Kontakte, die fünf Jahre nicht verwendet wurden, werden automatisch
   archiviert.
 - Organisationen mit verknüpften Einträgen (Personen, Projekte, Rechnungen
