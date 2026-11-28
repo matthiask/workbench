@@ -772,10 +772,16 @@ WITH sq AS (
     SELECT date_trunc('week', date)::date
     FROM planning_milestone
     WHERE project_id=%s
+
+    UNION ALL
+
+    SELECT unnest(weeks)
+    FROM planning_externalwork
+    WHERE project_id=%s
 )
 SELECT MIN(week), MAX(week) FROM sq
             """,
-            [project.id, project.id],
+            [project.id, project.id, project.id],
         )
         result = next(iter(cursor))
 
@@ -988,10 +994,16 @@ WITH sq AS (
     SELECT date_trunc('week', date)::date
     FROM planning_milestone
     WHERE project_id = ANY(%s)
+
+    UNION ALL
+
+    SELECT unnest(weeks)
+    FROM planning_externalwork
+    WHERE project_id = ANY(%s)
 )
 SELECT MIN(week), MAX(week) FROM sq
             """,
-            [projects_ids, projects_ids],
+            [projects_ids, projects_ids, projects_ids],
         )
         result = next(iter(cursor))
 

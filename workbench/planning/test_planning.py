@@ -232,6 +232,30 @@ class PlanningTest(TestCase):
         (record,) = reporting.project_planning(project)["projects_offers"]
         self.assertEqual([e["id"] for e in record["external_work"]], [ew.id])
 
+    def test_external_work_outside_planned_weeks(self):
+        """External work later than the planned work and milestones widens
+        the range of weeks of project and campaign planning"""
+        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
+        project = pw.project
+        project.campaign = factories.CampaignFactory.create()
+        project.save()
+        later = monday() + dt.timedelta(days=7 * 120)
+        ew = ExternalWork.objects.create(
+            project=project,
+            provided_by=factories.OrganizationFactory.create(),
+            created_by=pw.user,
+            title="Printing",
+            weeks=[later],
+        )
+
+        for report in [
+            reporting.project_planning(project),
+            reporting.campaign_planning(project.campaign),
+        ]:
+            self.assertIn(later, [week["monday"] for week in report["weeks"]])
+            (record,) = report["projects_offers"]
+            self.assertEqual([e["id"] for e in record["external_work"]], [ew.id])
+
     def test_only_milestones(self):
         """Milestones without any work show their project in the user's
         planning"""
