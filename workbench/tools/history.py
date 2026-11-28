@@ -3,6 +3,7 @@ from collections import namedtuple
 from decimal import Decimal
 
 from django.db import models
+from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
 from django.utils import dateparse
@@ -315,7 +316,26 @@ def _awt_absence_cfg(user):
     # The description may be health data
     if user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
         return {"fields": EVERYTHING}
-    return {"fields": {"user", "starts_on", "ends_on", "days", "reason"}}
+
+    # Working time corrections of others are hidden completely, also
+    # versions before or after changing the reason
+    # (``Absence.objects.visible_to()``)
+    def actions(actions):
+        return actions.exclude(
+            (
+                Q(row_data__reason=Absence.CORRECTION)
+                | Q(changed_fields__reason=Absence.CORRECTION)
+            )
+            & ~Q(row_data__user_id=str(user.pk))
+        )
+
+    return {
+        "allow": lambda absence: (
+            absence.reason != Absence.CORRECTION or absence.user_id == user.pk
+        ),
+        "fields": {"user", "starts_on", "ends_on", "days", "reason"},
+        "actions": actions,
+    }
 
 
 def _contacts_organization_cfg(user):

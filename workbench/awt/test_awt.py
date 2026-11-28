@@ -1186,6 +1186,17 @@ class AWTTest(TestCase):
                 self.assertTrue(visible(hr, url))
                 self.assertFalse(visible(colleague, url))
 
+        # Also in the history of the absence and of the user's absences
+        for url in [
+            f"/history/awt_absence/id/{absence.pk}/",
+            f"/history/awt_absence/user_id/{user.pk}/",
+        ]:
+            with self.subTest(url=url):
+                text = "Working time correction"
+                self.assertTrue(visible(user, url, text))
+                self.assertTrue(visible(hr, url, text))
+                self.assertFalse(visible(colleague, url, text))
+
     @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
     def test_everyone_sees_the_summary(self):
         """Everyone sees balances, vacations and planned absences of everyone,
