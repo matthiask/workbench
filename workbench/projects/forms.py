@@ -849,8 +849,8 @@ class ServiceMoveForm(ModelForm):
 
         if (
             data.get("project")
-            and self.instance.project.flat_rate is None
             and data["project"].flat_rate is not None
+            and data["project"].flat_rate != self.instance.effort_rate
         ):
             self.add_warning(
                 _(

@@ -1882,7 +1882,8 @@ def service_move(
     Invoiced services, services with invoiced hours or costs, services with
     logged hours or costs on closed projects and services bound to an offer
     stay where they are. A flat rate of the new project is
-    a warning (``new-project-has-flat-rate``) and applied to the service."""
+    applied to the service, a warning (``new-project-has-flat-rate``) when it
+    changes the service's rate."""
     service = get_object_or_404(Service, pk=service_id)
     return patch_with_form(
         ServiceMoveForm.__wrapped__,  # Without the "modal" prefix

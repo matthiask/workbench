@@ -657,6 +657,32 @@ class ProjectsTest(TestCase):
         service.refresh_from_db()
         self.assertEqual(service.effort_rate, 100)
 
+    def test_move_between_flat_rates(self):
+        """Moving a service warns whenever the flat rate of the new project
+        changes its rate"""
+        service = factories.ServiceFactory.create(
+            project=factories.ProjectFactory.create(flat_rate=100),
+            effort_type="flat rate",
+            effort_rate=100,
+        )
+        same = factories.ProjectFactory.create(flat_rate=100)
+        other = factories.ProjectFactory.create(flat_rate=150)
+        self.client.force_login(service.project.owned_by)
+
+        response = self.client.post(
+            service.urls["move"],
+            {"modal-project": other.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, 'value="new-project-has-flat-rate"')
+
+        response = self.client.post(
+            service.urls["move"],
+            {"modal-project": same.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+
     def test_move_service_bound_to_offer(self):
         """Moving a service bound to an offer should fail"""
         project = factories.ProjectFactory.create()
