@@ -247,6 +247,8 @@ Answers: what money is owed to the agency and what is expected to be invoiced, a
 | `work_not_invoiced.in_planned_invoicing_excl_tax` | "thereof planned" of the [project budget statistics](#project-budget-statistics). |
 | `work_not_invoiced.beyond_offers_excl_tax` | "thereof beyond offers" of the project budget statistics; doesn't overlap with the planned part. |
 
+Credits are invoices with a negative total and aren't applied to services: they lower what has been invoiced, so they raise `accepted_offers_not_invoiced` and `work_not_invoiced` of their project.
+
 Caveats from code: "The split into planned invoicing is an approximation (rates vs. gross margin)"; figures based on projects leave out internal projects, open invoices include all invoices; "Dates in the current week are evaluated at the time of the request so that invoices paid since monday do not show up as open anymore."
 
 ---
