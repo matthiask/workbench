@@ -34,7 +34,7 @@ dependencies = [
   "psycopg[binary]>=3.3.2",
   "qrbill>=1.2",
   "reportlab>=4.4.9",
-  "sentry-sdk<3",
+  "sentry-sdk<4",
   "speckenv>=6.2",
   "svglib<2.4",
   "time-machine>=3.2",
