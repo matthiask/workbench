@@ -135,8 +135,9 @@ def merge_people(*, duplicate, keep):
 
     Projects, deals, invoices, site contacts, the linked user and the contact details move
     (details the person to keep has already are dropped), groups are added
-    like in the person form, notes are appended and the date of birth is
-    taken over if the person to keep has none or one without the year. The person kept is archived
+    like in the person form, notes are appended, the job title is taken over
+    if the person to keep has none and the date of birth if the person to
+    keep has none or one without the year. The person kept is archived
     only if both were. Name and organization stay those of the person to
     keep, the primary contact too unless it's an inactive user and the
     duplicate's is active."""
@@ -170,6 +171,8 @@ def merge_people(*, duplicate, keep):
         ):
             keep.date_of_birth = duplicate.date_of_birth
             keep.year_of_birth_unknown = duplicate.year_of_birth_unknown
+        if not keep.job_title.strip():
+            keep.job_title = duplicate.job_title
         # Archived only if both were archived
         keep.is_archived = keep.is_archived and duplicate.is_archived
         _take_primary_contact(duplicate=duplicate, keep=keep)

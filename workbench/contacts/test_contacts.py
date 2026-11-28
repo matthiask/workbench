@@ -833,7 +833,9 @@ class ContactsTest(TestCase):
         and drops details the person to keep has already"""
         keep = factories.PersonFactory.create(notes="Keep")
         duplicate = factories.PersonFactory.create(
-            notes="Duplicate", date_of_birth=dt.date(1980, 1, 1)
+            notes="Duplicate",
+            date_of_birth=dt.date(1980, 1, 1),
+            job_title="Head of Communications",
         )
         project = factories.ProjectFactory.create(contact=duplicate)
         user = factories.UserFactory.create(person=duplicate)
@@ -861,7 +863,15 @@ class ContactsTest(TestCase):
         self.assertEqual(keep.phonenumbers.count(), 1)
         self.assertEqual(keep.notes, "Keep\n\nDuplicate")
         self.assertEqual(keep.date_of_birth, dt.date(1980, 1, 1))
+        self.assertEqual(keep.job_title, "Head of Communications")
         self.assertIn("other@example.com", keep._fts)
+
+        # The job title of the person kept stays
+        merge_people(
+            duplicate=factories.PersonFactory.create(job_title="CEO"), keep=keep
+        )
+        keep.refresh_from_db()
+        self.assertEqual(keep.job_title, "Head of Communications")
 
     def test_merge_primary_contact(self):
         """The primary contact of the duplicate replaces an inactive primary
