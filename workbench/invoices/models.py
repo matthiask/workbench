@@ -30,6 +30,18 @@ from workbench.tools.urls import model_urls
 from workbench.tools.validation import in_days, raise_if_errors
 
 
+def overdue_q():
+    """Sent invoices overdue for more than two weeks whose reminders haven't
+    been postponed, credits aren't paid by the customer"""
+    return Q(
+        Q(postpone_reminders_until__isnull=True)
+        | Q(postpone_reminders_until__lte=dt.date.today()),
+        status=Invoice.SENT,
+        due_on__isnull=False,
+        due_on__lte=in_days(-15),
+    ) & ~Q(type=Invoice.CREDIT)
+
+
 class InvoiceQuerySet(SearchQuerySet):
     def open(self):
         return self.filter(status__in=(Invoice.IN_PREPARATION, Invoice.SENT))
@@ -49,13 +61,7 @@ class InvoiceQuerySet(SearchQuerySet):
         )
 
     def overdue(self):
-        return self.filter(
-            Q(postpone_reminders_until__isnull=True)
-            | Q(postpone_reminders_until__lte=dt.date.today()),
-            status=Invoice.SENT,
-            due_on__isnull=False,
-            due_on__lte=in_days(-15),
-        ).exclude(type=Invoice.CREDIT)
+        return self.filter(overdue_q())
 
     def autodunning(self):
         return self.overdue().filter(
@@ -66,15 +72,7 @@ class InvoiceQuerySet(SearchQuerySet):
         return (
             self
             .filter(
-                Q(status=Invoice.IN_PREPARATION)
-                | (
-                    Q(
-                        status=Invoice.SENT,
-                        due_on__isnull=False,
-                        due_on__lte=in_days(-15),
-                    )
-                    & ~Q(type=Invoice.CREDIT)
-                ),
+                Q(status=Invoice.IN_PREPARATION) | overdue_q(),
                 # Invoices of people who left go to the owner of the open
                 # project and to those who worked on it recently
                 Q(owned_by=user)

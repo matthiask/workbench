@@ -91,6 +91,23 @@ class NeedsActionTest(TestCase):
             list(Invoice.objects.maybe_actionable(user=user)), [sent, preparing]
         )
 
+    def test_postponed_reminders(self):
+        """Overdue invoices whose reminders have been postponed aren't
+        listed until the postponement is over"""
+        user = factories.UserFactory.create()
+        invoice = factories.InvoiceFactory.create(
+            owned_by=user,
+            status=Invoice.SENT,
+            invoiced_on=in_days(-60),
+            due_on=in_days(-30),
+            postpone_reminders_until=in_days(10),
+        )
+        self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [])
+
+        invoice.postpone_reminders_until = dt.date.today()
+        invoice.save()
+        self.assertEqual(list(Invoice.objects.maybe_actionable(user=user)), [invoice])
+
     @override_settings(FEATURES={FEATURES.DEALS: F.ALWAYS})
     def test_offers_of_listed_deals(self):
         """Offers of deals listed already don't need to be listed again"""

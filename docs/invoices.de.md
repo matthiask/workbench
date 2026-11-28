@@ -147,6 +147,7 @@ Mit Zugriff auf die Buchhaltung:
 - **Zahlungserinnerungen** führt Rechnungen auf, die seit 15 Tagen oder
   länger fällig sind, nach Kundschaft, und erstellt oder verschickt die
   Erinnerung. «Zahlungserinnerungen aufschieben» bei einer Rechnung
-  schiebt sie bis zu 60 Tage auf.
+  schiebt sie bis zu 60 Tage auf; so lange führt auch die Startseite die
+  Rechnung nicht als überfällig auf.
 
 Wie Rechnungen beginnen: siehe [Offerten](offers.de.md).

@@ -133,6 +133,7 @@ With access to bookkeeping:
   invoice with the same total, which marks it as paid.
 - **Reminders** lists invoices overdue by 15 days or more, by customer,
   and creates or mails the reminder. "Postpone reminders" on an invoice
-  holds them off for up to 60 days.
+  holds them off for up to 60 days; the start page doesn't list the
+  invoice as overdue meanwhile either.
 
 How invoices start: see [Offers](offers.md).
