@@ -97,14 +97,24 @@ def accepted_deals(date_range, *, users=None):
 
     for invoice in maintenance:
         project = invoice.project
-        won = invoice.gross_margin
-        maintenance_by_user[project.owned_by][project] += won
-        maintenance_by_month[invoice.invoiced_on.replace(day=1)] += won
+        maintenance_by_user[project.owned_by][project] += Z2
         row = maintenance_by_project.setdefault(
             project, {"project": project, "sum": Z2, "invoices": []}
         )
-        row["sum"] += won
         row["invoices"].append(invoice)
+
+    # Final invoices repeat the third party costs of their down payments,
+    # deduct them once like the projects' invoiced gross margin: the growth
+    # of gross_margin_components() from month end to month end
+    for cutoff, before, after in maintenance_gross_margin(
+        maintenance_by_project, date_range
+    ):
+        for project, row in maintenance_by_project.items():
+            won = after[project.pk]["invoiced"] - before[project.pk]["invoiced"]
+            if won:
+                maintenance_by_user[project.owned_by][project] += won
+                maintenance_by_month[cutoff.replace(day=1)] += won
+                row["sum"] += won
 
     def user_row(user):
         user_deals = by_user.get(user, {})
@@ -194,6 +204,28 @@ def accepted_deals(date_range, *, users=None):
         "weeks": date_range_length / 7,
         "median_age": median(chain.from_iterable(age_by_valuetype.values())),
     }
+
+
+def maintenance_gross_margin(projects, date_range):
+    """The invoiced gross margin of the projects at the end of each month of
+    the date range as ``(month_end, before, after)`` triples, ``before`` is
+    the gross margin at the previous month's end (or the range's start)"""
+    from workbench.reporting.squeeze import gross_margin_components
+
+    if not projects:
+        return []
+    project_ids = [project.pk for project in projects]
+    cutoffs = [date_range[0] - dt.timedelta(days=1)]
+    month = date_range[0].replace(day=1)
+    while month <= date_range[1]:
+        next_month = (month + dt.timedelta(days=31)).replace(day=1)
+        cutoffs.append(min(next_month - dt.timedelta(days=1), date_range[1]))
+        month = next_month
+    margins = [
+        gross_margin_components(project_ids, invoiced_until=cutoff)
+        for cutoff in cutoffs
+    ]
+    return list(zip(cutoffs[1:], margins[:-1], margins[1:], strict=True))
 
 
 def declined_deals(date_range, *, users=None):

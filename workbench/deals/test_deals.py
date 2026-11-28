@@ -880,6 +880,31 @@ class DealsTest(TestCase):
         )
         self.assertEqual(data["by_month"][0]["maintenance_without_deal"], "300.00")
 
+    def test_maintenance_without_deal_third_party_costs(self):
+        """Third party costs repeated on the final invoice and its down
+        payment are deducted once"""
+        project = factories.ProjectFactory.create(type=Project.MAINTENANCE)
+        common = {
+            "project": project,
+            "customer": project.customer,
+            "status": Invoice.SENT,
+            "liable_to_vat": False,
+            "third_party_costs": 200,
+        }
+        down_payment = factories.InvoiceFactory.create(
+            **common, type=Invoice.DOWN_PAYMENT, subtotal=1000
+        )
+        final = factories.InvoiceFactory.create(
+            **common, subtotal=3000, down_payment_total=1000
+        )
+        down_payment.down_payment_applied_to = final
+        down_payment.save()
+
+        stats = accepted_deals([dt.date.today(), dt.date.today()])
+        self.assertEqual(stats["maintenance_sum"], Decimal(2800))
+        self.assertEqual(stats["maintenance"][0]["sum"], Decimal(2800))
+        self.assertEqual(stats["by_month_and_valuetype"][0]["maintenance"], 2800)
+
     def test_related_offers(self):
         """Offers can be linked to deals"""
         offer = factories.OfferFactory.create(
