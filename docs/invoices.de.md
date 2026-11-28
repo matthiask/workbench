@@ -17,7 +17,9 @@ Leistungsrechnungen gemischt werden, was dieselbe Arbeit doppelt
 verrechnen könnte.
 
 «Das ist die Schlussrechnung, schliesse das Projekt» schliesst das
-Projekt beim Speichern.
+Projekt beim Speichern. Es warnt vor versandten oder bezahlten
+Anzahlungen, die auf keine Rechnung angewendet sind, auch nicht auf
+diese.
 
 Die Kundschaft ist immer eine Organisation. Für eine Privatperson
 erstellst du eine Organisation und setzt «ist Privatperson»: Ihr Name

@@ -159,6 +159,56 @@ class InvoicesTest(TestCase):
         self.assertEqual(offer.status, Offer.DISCARDED)
         self.assertEqual(project.planned_work.count(), 0)
 
+    def test_final_invoice_down_payments_not_applied(self):
+        """Closing the project with its final invoice warns about sent down
+        payments which aren't applied to any invoice"""
+        project = factories.ProjectFactory.create()
+        common = {"project": project, "customer": project.customer}
+        down_payment = factories.InvoiceFactory.create(
+            **common, type=Invoice.DOWN_PAYMENT, subtotal=500, status=Invoice.SENT
+        )
+        # Applied to another invoice already
+        factories.InvoiceFactory.create(
+            **common,
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=300,
+            status=Invoice.PAID,
+            down_payment_applied_to=factories.InvoiceFactory.create(**common),
+        )
+        self.client.force_login(project.owned_by)
+
+        url = project.urls["createinvoice"] + "?type=fixed"
+        data = {
+            "contact": project.contact_id,
+            "title": project.title,
+            "owned_by": project.owned_by_id,
+            "discount": 0,
+            "liable_to_vat": "1",
+            "tax_rate": "8.10",
+            "postal_address": "Anything\nStreet\nCity",
+            "subtotal": 2500,
+            "third_party_costs": 0,
+            "close_project": "on",
+        }
+        response = self.client.post(url, data)
+        self.assertContains(response, 'value="down-payments-not-applied"')
+        self.assertContains(
+            response,
+            "Down payments of this project haven&#x27;t been applied to any"
+            f" invoice: {down_payment.code}",
+        )
+
+        # Not when not closing the project or when applying it
+        for extra in [
+            {"close_project": ""},
+            {"apply_down_payment": [down_payment.pk]},
+        ]:
+            with self.subTest(extra=extra):
+                response = self.client.post(url, {**data, **extra})
+                self.assertEqual(response.status_code, 302)
+        project.refresh_from_db()
+        self.assertTrue(project.closed_on)
+
     def test_accepted_offers_help_text(self):
         """The help text uses the accepted offers like the reports, budget
         retainers included"""

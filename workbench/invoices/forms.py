@@ -1519,6 +1519,28 @@ class CreateProjectInvoiceForm(InvoiceForm):
                     % {"services": ", ".join(service.title for service in invoiced)},
                     code="services-invoiced-already",
                 )
+        if data.get("close_project") and (
+            not_applied := Invoice.objects
+            .invoiced()
+            .filter(
+                project=self.project,
+                type=Invoice.DOWN_PAYMENT,
+                down_payment_applied_to__isnull=True,
+            )
+            .exclude(
+                pk__in=[invoice.pk for invoice in data.get("apply_down_payment") or ()]
+            )
+            .order_by("_code")
+        ):
+            self.add_warning(
+                _(
+                    "Down payments of this project haven't been applied to any"
+                    " invoice: %(invoices)s. Are you sure you want to close"
+                    " the project?"
+                )
+                % {"invoices": ", ".join(invoice.code for invoice in not_applied)},
+                code="down-payments-not-applied",
+            )
         return data
 
     def save(self):

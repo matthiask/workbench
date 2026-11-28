@@ -15,7 +15,8 @@ in preparation and when mixing fixed amount and services invoices, which
 risks invoicing the same work twice.
 
 "This is the final invoice, close the project" closes the project when
-saving.
+saving. It warns about sent or paid down payments which haven't been
+applied to any invoice, not even this one.
 
 Customers are always organizations. For a private person, create an
 organization and tick "is private person": its name is then left out of
