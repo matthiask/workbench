@@ -675,7 +675,8 @@ class StatisticsTest(TestCase):
 
     def test_third_party_costs_at_a_past_cutoff_date(self):
         """Third party costs which have been invoiced after the cutoff date
-        weren't invoiced yet at the cutoff date"""
+        weren't invoiced yet at the cutoff date, nor are those on invoices in
+        preparation"""
         service = factories.ServiceFactory.create()
         project = service.project
         factories.LoggedCostFactory.create(
@@ -699,5 +700,11 @@ class StatisticsTest(TestCase):
             )["statistics"]
             return row["third_party_costs"]
 
+        self.assertEqual(third_party_costs(in_days(-10)), 400)
+        self.assertEqual(third_party_costs(None), 400)
+
+        invoice.status = Invoice.SENT
+        invoice.due_on = in_days(25)
+        invoice.save()
         self.assertEqual(third_party_costs(in_days(-10)), 400)
         self.assertEqual(third_party_costs(None), 0)

@@ -322,7 +322,7 @@ Sorting: web by delta ascending; API by delta descending.
 | (hidden in table, API/XLSX) | `cost` | Σ `LoggedCost.cost`, `rendered_on <= cutoff` |
 | (hidden, API) | `effort_cost` | Σ `effort_rate × HOURS_FOR_INVOICING`, `rendered_on <= cutoff`, rate NULL skipped |
 | "(+x h)" undefined rate | `effort_hours_with_rate_undefined` | Σ `hours` on services with `effort_rate IS NULL`, `rendered_on <= cutoff` |
-| Third party costs | `third_party_costs` | Σ `LoggedCost.third_party_costs` (not NULL) not yet put on a services invoice on the cutoff date (`invoice_service IS NULL`, or its invoice is dated after the cutoff), `rendered_on <= cutoff`. Display only, not deducted from anything. |
+| Third party costs | `third_party_costs` | Σ `LoggedCost.third_party_costs` (not NULL) not yet invoiced on the cutoff date (not on a services invoice, or its invoice is in preparation, cancelled or dated after the cutoff), `rendered_on <= cutoff`. Display only, not deducted from anything. |
 | Invoiced | `invoiced` | Σ `Invoice.total_excl_tax`, status SENT/PAID, `invoiced_on <= cutoff`. Third party costs on invoices are **not** deducted. |
 | Budgeted hours: "logged / budgeted" | `hours` / `service_hours` | `hours` = Σ `LoggedHours.hours` (all services, incl. declined/optional/rate-less), `rendered_on <= cutoff`; `service_hours` = Σ `service_hours` of budgeted services (no cutoff). |
 | Δ | `delta` | `logbook − invoiced` (`cost + effort_cost − invoiced`). Positive = work not invoiced, negative = accruals. |
