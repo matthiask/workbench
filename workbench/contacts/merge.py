@@ -110,6 +110,10 @@ def merge_organizations(*, duplicate, keep):
             if not getattr(keep, field) and getattr(duplicate, field):
                 setattr(keep, field, getattr(duplicate, field))
                 changed = True
+        # Active people unarchive their organization, also merged ones
+        if keep.is_archived and duplicate.people.filter(is_archived=False).exists():
+            keep.is_archived = False
+            changed = True
         if changed:
             keep.save()
         substitute_with(to_delete=duplicate, keep=keep)

@@ -1551,6 +1551,25 @@ class ContactsTest(TestCase):
         keep.refresh_from_db()
         self.assertEqual(keep.phone_number, "+41441234567")
 
+    def test_merge_into_archived_organization(self):
+        """Merging active people into an archived organization unarchives it"""
+        keep = factories.OrganizationFactory.create(is_archived=True)
+        duplicate = factories.OrganizationFactory.create()
+        factories.PersonFactory.create(organization=duplicate)
+        merge_organizations(duplicate=duplicate, keep=keep)
+        keep.refresh_from_db()
+        self.assertFalse(keep.is_archived)
+
+        # Archived people leave it archived
+        keep.is_archived = True
+        keep.save()
+        keep.people.update(is_archived=True)
+        duplicate = factories.OrganizationFactory.create()
+        factories.PersonFactory.create(organization=duplicate, is_archived=True)
+        merge_organizations(duplicate=duplicate, keep=keep)
+        keep.refresh_from_db()
+        self.assertTrue(keep.is_archived)
+
     def test_organization_email_addresses(self):
         """Organizations have a central and an accounts payable address, the
         central one is shown on their people; merging takes them over"""
