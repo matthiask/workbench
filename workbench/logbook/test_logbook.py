@@ -554,6 +554,35 @@ class LogbookTest(TestCase):
             html=True,
         )
 
+    def test_late_logging_other_person(self):
+        """Hours in past weeks can't be moved to people without LATE_LOGGING"""
+        service = factories.ServiceFactory.create()
+        user = factories.UserFactory.create()
+        user._features.append(FEATURES.LATE_LOGGING)
+        user.save()
+        other = factories.UserFactory.create()
+        entry = factories.LoggedHoursFactory.create(
+            service=service, rendered_by=user, rendered_on=in_days(-10)
+        )
+        self.client.force_login(user)
+
+        response = self.client.post(
+            entry.urls["update"],
+            {
+                "modal-rendered_by": other.id,
+                "modal-rendered_on": entry.rendered_on.isoformat(),
+                "initial-modal-rendered_on": entry.rendered_on.isoformat(),
+                "modal-service": service.id,
+                "modal-hours": "0.1",
+                "modal-description": "Test",
+                WarningsForm.ignore_warnings_id: "hours-of-others",
+            },
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "Hours have to be logged in the same week.")
+        entry.refresh_from_db()
+        self.assertEqual(entry.rendered_by, user)
+
     def test_late_logging_future(self):
         """LATE_LOGGING only allows logging in the past, not in the future"""
         service = factories.ServiceFactory.create()

@@ -616,7 +616,10 @@ class LoggedHoursForm(ModelForm):
 
         if all(
             f in self.fields and data.get(f) for f in ["rendered_by", "rendered_on"]
-        ) and (not self.instance.pk or ("rendered_on" in self.changed_data)):
+        ) and (
+            not self.instance.pk
+            or {"rendered_on", "rendered_by"} & set(self.changed_data)
+        ):
             if (
                 data["rendered_on"] < logbook_lock()
                 and not data["rendered_by"].features[FEATURES.LATE_LOGGING]
