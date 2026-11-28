@@ -805,8 +805,21 @@ class ServiceMoveForm(ModelForm):
         data = super().clean()
         if data.get("project") and data.get("project").closed_on:
             self.add_error("project", _("This project is already closed."))
-        # The invoice stays with the project, its work has to stay too
+        moved = data.get("project") and data["project"] != self.instance.project
+        # Like LoggedMoveForm: the logbook of closed projects stays as it is,
+        # services without logged hours or costs may move
         if (
+            moved
+            and self.instance.project.closed_on
+            and (
+                self.instance.loggedhours.exists() or self.instance.loggedcosts.exists()
+            )
+        ):
+            self.add_error(
+                "project", _("Cannot move logbook entries of closed projects.")
+            )
+        # The invoice stays with the project, its work has to stay too
+        elif (
             data.get("project")
             and data["project"] != self.instance.project
             and (

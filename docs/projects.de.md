@@ -31,7 +31,8 @@ Stunden](hours.de.md). Das Menü einer Leistung weist ihre
 Logbucheinträge anderen Leistungen zu (ausser Einträgen auf einer
 Rechnung), führt sie mit einer anderen Leistung zusammen
 oder verschiebt sie in ein anderes Projekt (nur Leistungen ohne Offerte
-und nicht verrechnet). Verrechnete Leistungen lassen sich nicht löschen.
+und nicht verrechnet; auf geschlossenen Projekten nur Leistungen ohne
+erfasste Stunden oder Kosten). Verrechnete Leistungen lassen sich nicht löschen.
 
 ## Ein Projekt schliessen
 

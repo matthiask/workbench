@@ -704,6 +704,35 @@ class ProjectsTest(TestCase):
         service.refresh_from_db()
         self.assertNotEqual(service.project, other)
 
+    def test_move_service_out_of_closed_project(self):
+        """Logged hours and costs of closed projects stay there, like when
+        moving logbook entries; services without any may move"""
+        service = factories.ServiceFactory.create(
+            project=factories.ProjectFactory.create(closed_on=dt.date.today())
+        )
+        other = factories.ProjectFactory.create()
+        self.client.force_login(service.project.owned_by)
+
+        factories.LoggedHoursFactory.create(service=service)
+        response = self.client.post(
+            service.urls["move"],
+            {"modal-project": other.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertContains(response, "Cannot move logbook entries of closed projects.")
+        service.refresh_from_db()
+        self.assertNotEqual(service.project, other)
+
+        service.loggedhours.all().delete()
+        response = self.client.post(
+            service.urls["move"],
+            {"modal-project": other.pk},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        service.refresh_from_db()
+        self.assertEqual(service.project, other)
+
     def test_invoiced_service(self):
         """Services which have been invoiced (e.g. from the offer, without
         logged hours) are neither deleted nor moved to another project"""

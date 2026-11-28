@@ -1879,8 +1879,9 @@ def service_move(
     """Move a service with its logged hours and costs to another open
     project, validated with the form of the web interface
 
-    Invoiced services, services with invoiced hours or costs and services
-    bound to an offer stay where they are. A flat rate of the new project is
+    Invoiced services, services with invoiced hours or costs, services with
+    logged hours or costs on closed projects and services bound to an offer
+    stay where they are. A flat rate of the new project is
     a warning (``new-project-has-flat-rate``) and applied to the service."""
     service = get_object_or_404(Service, pk=service_id)
     return patch_with_form(
