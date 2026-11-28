@@ -14,6 +14,7 @@ from workbench.projects.models import BudgetTransfer
 from workbench.reporting.project_budget_statistics import project_budget_statistics
 from workbench.reporting.squeeze import project_gross_margin, squeeze_data
 from workbench.tools.forms import WarningsForm
+from workbench.tools.testing import messages
 from workbench.tools.validation import in_days
 
 
@@ -461,3 +462,31 @@ class BudgetTransferAPITest(TestCase):
         detail = self.client.get(f"/api/projects/{project.pk}/").json()
         self.assertIsNone(detail["budget_transfers"])
         self.assertIsNone(detail["budget_adjustment"])
+
+    def test_projects_with_transfers_are_not_deleted(self):
+        """Deleting a project would delete or orphan its budget transfers"""
+        user = factories.UserFactory.create()
+        source = factories.ProjectFactory.create(owned_by=user)
+        target = factories.ProjectFactory.create(owned_by=user)
+        transfer = BudgetTransfer.objects.create(
+            from_project=source, title="Reserved", amount=100, created_by=user
+        )
+        self.client.force_login(user)
+
+        response = self.client.post(source.urls["delete"])
+        self.assertRedirects(response, source.urls["detail"])
+        self.assertEqual(
+            messages(response),
+            ["This project has budget transfers, it cannot be deleted."],
+        )
+        response = self.client.delete(f"/api/projects/{source.pk}/")
+        self.assertEqual(response.status_code, 422, response.content)
+        self.assertEqual(BudgetTransfer.objects.count(), 1)
+
+        transfer.to_project = target
+        transfer.save()
+        response = self.client.post(target.urls["delete"])
+        self.assertEqual(
+            messages(response),
+            ["This project has budget transfers, it cannot be deleted."],
+        )

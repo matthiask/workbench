@@ -476,6 +476,21 @@ class Project(Model):
             )
         raise_if_errors(errors, exclude)
 
+    @classmethod
+    def allow_delete(cls, instance, request):
+        # Deleting the source would also delete its transfers and silently
+        # take the budget away from their target projects
+        if (
+            instance.budget_transfers_out.exists()
+            or instance.budget_transfers_in.exists()
+        ):
+            messages.error(
+                request,
+                _("This project has budget transfers, it cannot be deleted."),
+            )
+            return False
+        return super().allow_delete(instance, request)
+
     @property
     def is_outreach(self):
         return (
