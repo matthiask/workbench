@@ -12,8 +12,8 @@ from workbench.accounts.features import FEATURES, F
 from workbench.logbook.models import Break
 from workbench.timer.models import Timestamp
 from workbench.tools.forms import WarningsForm
-from workbench.tools.testing import check_code
-from workbench.tools.validation import in_days
+from workbench.tools.testing import check_code, messages
+from workbench.tools.validation import in_days, logbook_lock
 
 
 def c(day, time):
@@ -266,6 +266,33 @@ class BreaksTest(TestCase):
             brk.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
         )
         self.assertContains(response, "Cannot modify breaks of other users.")
+
+    def test_delete_old_break(self):
+        """Old breaks can't be deleted, like they can't be logged or changed"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        day = logbook_lock() - dt.timedelta(days=8)
+        brk = Break.objects.create(
+            user=user,
+            starts_at=c(day, dt.time(12, 0)),
+            ends_at=c(day, dt.time(13, 0)),
+        )
+        response = self.client.post(
+            brk.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(messages(response), ["Cannot delete old breaks."])
+        self.assertTrue(Break.objects.filter(pk=brk.pk).exists())
+
+        day = logbook_lock() - dt.timedelta(days=7)
+        brk = Break.objects.create(
+            user=user,
+            starts_at=c(day, dt.time(12, 0)),
+            ends_at=c(day, dt.time(13, 0)),
+        )
+        response = self.client.post(
+            brk.urls["delete"], headers={"x-requested-with": "XMLHttpRequest"}
+        )
+        self.assertEqual(response.status_code, 204)
 
     def test_break_warning(self):
         """Various places show a take-a-break warning if too much work and no break"""

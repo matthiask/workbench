@@ -97,14 +97,16 @@ def form_data(form):
     return data
 
 
-def check_allow_delete(instance, request, loc):
-    """Raise the reasons why ``allow_delete()`` refuses deleting the
-    instance like in the web interface, where they're messages
+def check_allow_delete(instance, request, loc, *, update=False):
+    """Raise the reasons why ``allow_delete()`` (``allow_update()`` with
+    ``update``) refuses deleting the instance like in the web interface,
+    where they're messages
 
     Returns ``True``, or ``None`` if the view's delete form decides."""
     storage = request._messages
     before = len(storage._queued_messages)
-    allow = instance.allow_delete(instance, request)
+    check = instance.allow_update if update else instance.allow_delete
+    allow = check(instance, request)
     if allow is False:
         raise NinjaValidationError([
             {"loc": loc, "msg": str(message)}

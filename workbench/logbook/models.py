@@ -259,4 +259,13 @@ class Break(Model):
         messages.error(request, _("Cannot modify breaks of other users."))
         return False
 
-    allow_delete = allow_update
+    @classmethod
+    def allow_delete(cls, instance, request):
+        if not cls.allow_update(instance, request):
+            return False
+        # The same lock as for logging and changing them (BreakForm.clean())
+        day = timezone.localtime(instance.starts_at).date()
+        if day < logbook_lock() - dt.timedelta(days=7):
+            messages.error(request, _("Cannot delete old breaks."))
+            return False
+        return True

@@ -12,7 +12,7 @@ from workbench.invoices.models import Invoice
 from workbench.logbook.models import Break, LoggedCost, LoggedHours
 from workbench.projects.models import Project
 from workbench.timer.models import Timestamp
-from workbench.tools.validation import in_days
+from workbench.tools.validation import in_days, logbook_lock
 
 
 class LogbookAPITest(TestCase):
@@ -838,3 +838,13 @@ class BreaksAPITest(TestCase):
         self.assertEqual(response.json()["description"], "Twice")
         self.assertFalse(Break.objects.filter(pk=brk.pk).exists())
         self.assertEqual(self.client.delete(url).status_code, 404)
+
+        # Old breaks are refused like in the web interface
+        old = self._break(user, day=logbook_lock() - dt.timedelta(days=8))
+        response = self.client.delete(f"/api/logbook/breaks/{old.pk}/")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"],
+            [{"loc": ["path", "break_id"], "msg": "Cannot delete old breaks."}],
+        )
+        self.assertTrue(Break.objects.filter(pk=old.pk).exists())

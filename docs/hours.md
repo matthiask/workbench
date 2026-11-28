@@ -108,6 +108,9 @@ needed. <kbd>Ctrl-Shift-B</kbd> lists your breaks. Where enabled,
 Workbench warns when you've worked more than 5.5, 7 or 9 hours a day
 with less than 15, 30 or 60 minutes of breaks.
 
+Breaks are logged, changed and deleted in the current or the previous
+week, up to a week in advance.
+
 ## Logging costs
 
 <kbd>Ctrl-K</kbd> (or the plus button) logs costs on a service of a

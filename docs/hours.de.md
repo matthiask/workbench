@@ -118,6 +118,9 @@ beides bei Bedarf an. <kbd>Ctrl-Shift-B</kbd> zeigt deine Pausen. Wo
 eingeschaltet, warnt Workbench, wenn du mehr als 5,5, 7 oder 9 Stunden am
 Tag mit weniger als 15, 30 oder 60 Minuten Pause gearbeitet hast.
 
+Pausen werden in der laufenden oder der vorherigen Woche erfasst,
+geändert und gelöscht, bis eine Woche im Voraus.
+
 ## Kosten erfassen
 
 <kbd>Ctrl-K</kbd> (oder der Plus-Knopf) erfasst Kosten auf einer Leistung

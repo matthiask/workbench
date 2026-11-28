@@ -673,7 +673,7 @@ def logbook_move(
 #
 # Breaks count for the working time. Everyone sees everyone's breaks like in
 # the web interface, but only changes and deletes their own
-# (``Break.allow_update``, which is also ``Break.allow_delete``).
+# (``Break.allow_update``; ``Break.allow_delete`` also refuses old breaks).
 
 
 class BreakOut(Schema):
@@ -787,10 +787,10 @@ def break_create(
     return result
 
 
-def _own_break(request, break_id):
+def _own_break(request, break_id, *, update):
     brk = get_object_or_404(Break.objects.select_related("user"), pk=break_id)
-    # Break.allow_delete is Break.allow_update: only own breaks
-    check_allow_delete(brk, request, ["path", "break_id"])
+    # Only own breaks; old ones aren't deleted (the form refuses changing them)
+    check_allow_delete(brk, request, ["path", "break_id"], update=update)
     return brk
 
 
@@ -804,7 +804,7 @@ def break_update(
     ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Change a break of your own, validated like in the web interface"""
-    brk = _own_break(request, break_id)
+    brk = _own_break(request, break_id, update=True)
     request = without_query(request)
     return patch_with_form(
         BreakForm.__wrapped__,
@@ -822,7 +822,7 @@ def break_delete(request, break_id: int, *, dry_run: DryRun = False):
     """Delete a break of your own like in the web interface
 
     Returns the deleted break."""
-    brk = _own_break(request, break_id)
+    brk = _own_break(request, break_id, update=False)
     result = _break_out(brk, request)
     delete_with_form(brk, request, loc=["path", "break_id"], dry_run=dry_run)
     return result
