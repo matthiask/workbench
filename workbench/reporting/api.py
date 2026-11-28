@@ -86,7 +86,11 @@ router = Router(
 def key_data(
     request,
     month: Query[
-        str | None, P(description="The month like 2026-09, last month by default.")
+        str | None,
+        P(
+            description="The month like 2026-09, last month by default"
+            " (not in the future)."
+        ),
     ] = None,
 ):
     """Key data of the given month (2026-09), the last month by default"""
@@ -99,6 +103,14 @@ def key_data(
             ]) from None
         if not DATES[0] <= first <= DATES[1]:
             raise dates_error(["query", "month"])
+        if first > dt.date.today():
+            # Open invoices and accruals are today's
+            raise ValidationError([
+                {
+                    "loc": ["query", "month"],
+                    "msg": _("Key data can't be computed for the future."),
+                }
+            ])
     else:
         first = last_month_range()[0]
     # The static token gets everything, users only the figures their

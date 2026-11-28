@@ -39,6 +39,18 @@ class KeyDataAPITest(TestCase):
             response = self.client.post(url, headers={"Authorization": "Bearer secret"})
             self.assertEqual(response.status_code, 405)
 
+    @travel("2026-07-15 12:00")
+    @override_settings(KEY_DATA_API_TOKEN="secret")
+    def test_future_month(self):
+        """Key data can't be computed for months which haven't started"""
+        auth = {"Authorization": "Bearer secret"}
+        url = "/api/reports/key-data/?month="
+        response = self.client.get(url + "2026-08", headers=auth)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["loc"], ["query", "month"])
+        response = self.client.get(url + "2026-07", headers=auth)
+        self.assertEqual(response.status_code, 200)
+
     @override_settings(KEY_DATA_API_TOKEN="secret")
     def test_key_data(self):
         """The key data API returns last month's figures"""

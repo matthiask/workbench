@@ -202,7 +202,7 @@ From `workbench/reporting/green_hours.py:green_hours_by_month` (SQL), all logged
 
 ### Key data API (JSON)
 
-`GET /api/reports/key-data/?month=YYYY-MM` (also `/api/key-data/`, hidden). Auth: static `ReportingToken` (settings.KEY_DATA_API_TOKEN) or user with CONTROLLING. Default month: last month. Decimals as floats (`jsonable()`). `workbench/reporting/api.py:key_data`, `workbench/reporting/key_data_api.py:key_data_for_month`
+`GET /api/reports/key-data/?month=YYYY-MM` (also `/api/key-data/`, hidden). Auth: static `ReportingToken` (settings.KEY_DATA_API_TOKEN) or user with CONTROLLING. Default month: last month; months which haven't started are an error (open invoices and accruals are today's). Decimals as floats (`jsonable()`). `workbench/reporting/api.py:key_data`, `workbench/reporting/key_data_api.py:key_data_for_month`
 Answers: the key figures of one month for integrations.
 
 Users get `squeeze_gross_margin` only with the productivity feature and
