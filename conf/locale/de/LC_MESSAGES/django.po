@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-27 08:20+0100\n"
+"POT-Creation-Date: 2026-11-28 13:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,13 @@ msgstr "Nicht verfügbar"
 #: workbench/accounts/admin.py
 msgid "feature"
 msgstr "Feature"
+
+#: workbench/accounts/api.py workbench/contacts/api.py workbench/deals/api.py
+#: workbench/hosting/api.py workbench/invoices/api.py workbench/planning/api.py
+#: workbench/projects/api.py workbench/tools/api.py
+#, python-format
+msgid "Unknown or inactive user %r."
+msgstr "Unbekannte:r oder inaktive:r Mitarbeiter:in %r."
 
 #: workbench/accounts/api.py
 msgid "This request wasn't authenticated with a token."
@@ -1074,26 +1081,6 @@ msgstr "Unbekannte Gruppe %r."
 msgid "%(name)s (ID %(id)s) has the same name. Merge them if they are the same."
 msgstr "%(name)s (ID %(id)s) hat denselben Namen. Falls es dieselben sind, zusammenführen."
 
-#: workbench/contacts/api.py workbench/deals/api.py workbench/invoices/api.py
-#: workbench/planning/api.py workbench/projects/api.py
-#, python-format
-msgid "Unknown or inactive user %r."
-msgstr "Unbekannte:r oder inaktive:r Mitarbeiter:in %r."
-
-#: workbench/tools/api.py
-msgid "This field cannot be changed."
-msgstr "Dieses Feld kann nicht geändert werden."
-
-#: workbench/tools/api.py
-#, python-format
-msgid "Expected one of %s."
-msgstr "Erlaubt sind: %s."
-
-#: workbench/tools/api.py
-#, python-format
-msgid "%(model)s %(value)r doesn't exist."
-msgstr "%(model)s %(value)r existiert nicht."
-
 #: workbench/contacts/api.py
 #, python-format
 msgid "%(organization)s (ID %(id)s) has been archived. Unarchive it instead, or allow duplicates."
@@ -1111,13 +1098,8 @@ msgstr "Die Gruppe %r ist archiviert."
 
 #: workbench/contacts/api.py
 #, python-format
-msgid "Already used by %(person)s (ID %(id)s)."
-msgstr "Wird bereits von %(person)s (ID %(id)s) verwendet."
-
-#: workbench/contacts/api.py
-#, python-format
-msgid "The central address of %(organization)s (ID %(id)s), it's shown on its people."
-msgstr "Die zentrale Adresse von %(organization)s (ID %(id)s), sie wird bei deren Personen angezeigt."
+msgid "%(person)s has this email address already."
+msgstr "%(person)s hat diese Emailadresse bereits."
 
 #: workbench/contacts/api.py
 #, python-format
@@ -1141,11 +1123,6 @@ msgstr "Die zentrale Telefonnummer von %(organization)s (ID %(id)s), sie wird be
 #: workbench/contacts/api.py
 msgid "Either use an existing organization or create a new one."
 msgstr "Verwende entweder eine existierende Organisation oder erstelle eine neue."
-
-#: workbench/contacts/api.py
-#, python-format
-msgid "%(person)s has this email address already."
-msgstr "%(person)s hat diese Emailadresse bereits."
 
 #: workbench/contacts/api.py
 #, python-format
@@ -1311,6 +1288,16 @@ msgstr "Verschiebt Projekte, Deals, Rechnungen, Kontaktangaben und Gruppen zu di
 #, python-format
 msgid "This person is the contact of the following related objects: %s. Modifying this record may be more confusing than archiving this one and creating a new record instead."
 msgstr "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und einen neuen zu erstellen als die Organisation zu ändern."
+
+#: workbench/contacts/forms.py
+#, python-format
+msgid "Already used by %(person)s (ID %(id)s)."
+msgstr "Wird bereits von %(person)s (ID %(id)s) verwendet."
+
+#: workbench/contacts/forms.py
+#, python-format
+msgid "The central address of %(organization)s (ID %(id)s), it's shown on its people."
+msgstr "Die zentrale Adresse von %(organization)s (ID %(id)s), sie wird bei deren Personen angezeigt."
 
 #: workbench/contacts/forms.py
 msgid "This does not look right. Please add a full salutation."
@@ -2398,6 +2385,18 @@ msgstr "%(object)s löschen"
 msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 
+#: workbench/hosting/api.py
+#, fuzzy, python-format
+#| msgid "Unknown user %r."
+msgid "Unknown server %r."
+msgstr "Unbekannte:r Mitarbeiter:in %r."
+
+#: workbench/hosting/api.py
+#, fuzzy, python-format
+#| msgid "The main domain of the site."
+msgid "%s isn't a contact of this site."
+msgstr "Die Hauptdomain der Site."
+
 #: workbench/hosting/forms.py
 msgid "With problems"
 msgstr "Mit Problemen"
@@ -2548,6 +2547,12 @@ msgstr "Leistung %s ist keine der Leistungen, die verrechnet werden."
 msgid "Select the services to invoice, or invoice an offer."
 msgstr "Wähle die zu verrechnenden Leistungen aus oder verrechne eine Offerte."
 
+#: workbench/invoices/api.py workbench/offers/api.py workbench/planning/api.py
+#: workbench/projects/api.py
+#, python-format
+msgid "Unknown service type %r."
+msgstr "Unbekannter Leistungstyp %r."
+
 #: workbench/invoices/api.py
 msgid "Only services invoices have services."
 msgstr "Nur Leistungsrechnungen haben Leistungen."
@@ -2557,6 +2562,15 @@ msgstr "Nur Leistungsrechnungen haben Leistungen."
 #, python-brace-format
 msgid "Unable to generate the PDF: {}"
 msgstr "Konnte das PDF nicht generieren: {}"
+
+#: workbench/invoices/api.py workbench/tools/api.py
+#, python-format
+msgid "%(model)s %(value)r doesn't exist."
+msgstr "%(model)s %(value)r existiert nicht."
+
+#: workbench/invoices/api.py workbench/tools/api.py
+msgid "This field cannot be changed."
+msgstr "Dieses Feld kann nicht geändert werden."
 
 #: workbench/invoices/forms.py
 msgid "Due"
@@ -2906,6 +2920,10 @@ msgstr "Kann Leistung von Rechnung, welche nicht mehr in Vorbereitung ist, nicht
 #: workbench/invoices/forms.py
 msgid "All ways of sending"
 msgstr "Alle Versandarten"
+
+#: workbench/invoices/forms.py
+msgid "Cannot be changed anymore once invoices have been created. End this recurring invoice and create a new one instead."
+msgstr "Lässt sich nicht mehr ändern, sobald Rechnungen erstellt wurden. Beende diese Stapelrechnung und erstelle stattdessen eine neue."
 
 #: workbench/invoices/forms.py workbench/invoices/sending.py
 #: workbench/templates/hosting/server_detail.html
@@ -3402,6 +3420,11 @@ msgstr "Diese Stunden können nicht mehr geändert werden."
 msgid "These costs cannot be changed anymore."
 msgstr "Diese Kosten können nicht mehr geändert werden."
 
+#: workbench/logbook/api.py workbench/logbook/forms.py
+#: workbench/projects/views.py
+msgid "Cannot move logbook entries of closed projects."
+msgstr "Kann Logbucheinträge von geschlossenen Projekten nicht verschieben."
+
 #: workbench/logbook/celebrations.py
 msgid "Week complete 🏁"
 msgstr "Wochensoll erreicht 🏁"
@@ -3546,10 +3569,6 @@ msgstr "Kann Logbucheinträge auf einer Rechnung nicht verschieben."
 #: workbench/logbook/forms.py
 msgid "Cannot move archived logbook entries."
 msgstr "Kann archivierte Logbucheinträge nicht verschieben."
-
-#: workbench/logbook/forms.py workbench/projects/views.py
-msgid "Cannot move logbook entries of closed projects."
-msgstr "Kann Logbucheinträge von geschlossenen Projekten nicht verschieben."
 
 #: workbench/logbook/forms.py
 #, python-format
@@ -3770,11 +3789,6 @@ msgstr "Du darfst diese Notiz nicht bearbeiten."
 msgid "Add note"
 msgstr "Notiz hinzufügen"
 
-#: workbench/offers/api.py workbench/planning/api.py workbench/projects/api.py
-#, python-format
-msgid "Unknown service type %r."
-msgstr "Unbekannter Leistungstyp %r."
-
 #: workbench/offers/api.py workbench/projects/forms.py
 msgid "This service has been invoiced already, its effort type and rate cannot be changed."
 msgstr "Diese Leistung wurde bereits verrechnet, ihr Aufwandtyp und ihr Stundensatz können nicht geändert werden."
@@ -3815,24 +3829,20 @@ msgid "Services of this offer have been invoiced already, they cannot be replace
 msgstr "Leistungen dieser Offerte wurden bereits verrechnet, sie können nicht ersetzt werden."
 
 #: workbench/offers/api.py
+msgid "The services of this offer cannot be deleted, they have logged hours or costs or have been invoiced."
+msgstr "Die Leistungen dieser Offerte können nicht gelöscht werden, sie haben erfasste Stunden oder Kosten oder wurden bereits verrechnet."
+
+#: workbench/offers/api.py
+msgid "The project has no offer with this ID or code."
+msgstr "Das Projekt hat keine Offerte mit dieser ID oder diesem Code."
+
+#: workbench/offers/api.py
 msgid "Only the headings of offers in preparation can be changed."
 msgstr "Nur die Zwischentitel von Offerten in Vorbereitung können geändert werden."
 
 #: workbench/offers/api.py
 msgid "The offer has no service with this ID."
 msgstr "Die Offerte hat keine Leistung mit dieser ID."
-
-#: workbench/offers/api.py
-msgid ""
-"The services of this offer cannot be deleted, they have logged hours or "
-"costs or have been invoiced."
-msgstr ""
-"Die Leistungen dieser Offerte können nicht gelöscht werden, sie haben "
-"erfasste Stunden oder Kosten oder wurden bereits verrechnet."
-
-#: workbench/offers/api.py
-msgid "The project has no offer with this ID or code."
-msgstr "Das Projekt hat keine Offerte mit dieser ID oder diesem Code."
 
 #: workbench/offers/apps.py workbench/offers/models.py
 #: workbench/templates/projects/object_list.html
@@ -7120,6 +7130,10 @@ msgstr "Heute gibt es keine Zeitmarken."
 msgid "Use a code like T1 or an ID."
 msgstr "Einen Code wie T1 oder eine ID verwenden."
 
+#: workbench/timer/api.py workbench/timer/views.py
+msgid "This timestamp cannot be split."
+msgstr "Diese Zeitmarke kann nicht geteilt werden."
+
 #: workbench/timer/models.py
 msgid "This project doesn't exist."
 msgstr "Dieses Projekt existiert nicht."
@@ -7148,16 +7162,17 @@ msgid "This timestamp can be split into at most %(parts)s parts."
 msgstr "Diese Zeitmarke kann in höchstens %(parts)s Teile geteilt werden."
 
 #: workbench/timer/views.py
-msgid "This timestamp cannot be split."
-msgstr "Diese Zeitmarke kann nicht geteilt werden."
-
-#: workbench/timer/views.py
 msgid "The timestamp has been split successfully."
 msgstr "Die Zeitmarke wurde erfolgreich geteilt."
 
 #: workbench/timer/views.py
 msgid "Split timestamp"
 msgstr "Zeitmarke teilen"
+
+#: workbench/tools/api.py
+#, python-format
+msgid "Expected one of %s."
+msgstr "Erlaubt sind: %s."
 
 #: workbench/tools/api.py
 #, python-format

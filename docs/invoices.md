@@ -113,8 +113,10 @@ their status and a few fields can be changed.
 periodically (yearly, quarterly, monthly or weekly), a number of days
 before each period begins. The periods recur from the start date: one
 starting on January 31st covers January 31st to February 28th, March 1st
-to 30th, March 31st to April 30th and so on. New invoices are created in preparation,
-marked as sent, or mailed automatically (the list filters by it); the
+to 30th, March 31st to April 30th and so on. Once invoices have been
+created, the start date and the periodicity are fixed; end the recurring
+invoice and create a new one to change them. New invoices are created in
+preparation, marked as sent, or mailed automatically (the list filters by it); the
 owner gets a mail. The recurring invoice shows the mail it sends, with
 placeholders for the values of each invoice. With
 "Create project?" each invoice gets its own maintenance project and is a

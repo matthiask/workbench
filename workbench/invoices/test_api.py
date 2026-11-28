@@ -369,6 +369,13 @@ class InvoicesAPITest(TestCase):
         recurring.refresh_from_db()
         self.assertEqual(recurring.ends_on, dt.date(2025, 6, 30))
 
+        # Once invoiced, the periods are fixed
+        response = patch({"periodicity": "monthly"})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["loc"], ["body", "data", "periodicity"]
+        )
+
     def test_recurring_invoice_create(self):
         """Recurring invoices are created through the web interface's form,
         with its defaults"""

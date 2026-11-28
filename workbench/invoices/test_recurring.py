@@ -279,6 +279,52 @@ class RecurringTest(TestCase):
         self.assertEqual(periods(at_once), expected)
         self.assertEqual(periods(monthly), expected)
 
+    def test_periods_fixed_once_invoiced(self):
+        """The start date and the periodicity can't be changed once invoices
+        have been created, the periods would get out of step with the
+        invoiced ones"""
+        ri = factories.RecurringInvoiceFactory.create(
+            starts_on=dt.date(2026, 1, 1),
+            periodicity="monthly",
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+        )
+        self.client.force_login(ri.owned_by)
+        data = {
+            "customer": ri.customer_id,
+            "contact": ri.contact_id,
+            "title": ri.title,
+            "owned_by": ri.owned_by_id,
+            "postal_address": ri.postal_address,
+            "starts_on": "2026-01-15",
+            "periodicity": "yearly",
+            "create_invoice_on_day": -20,
+            "subtotal": 100,
+            "discount": 0,
+            "liable_to_vat": "1",
+            "third_party_costs": 0,
+            "new_invoices": "prepare",
+        }
+        with travel("2026-01-01 12:00"):
+            # Not invoiced yet
+            response = self.client.post(ri.urls["update"], data)
+            self.assertRedirects(response, ri.urls["detail"])
+            ri.refresh_from_db()
+            self.assertEqual(ri.periodicity, "yearly")
+            self.assertEqual(ri.starts_on, dt.date(2026, 1, 15))
+
+            ri.periodicity = "monthly"
+            ri.starts_on = dt.date(2026, 1, 1)
+            ri.save()
+            ri.create_invoices()
+
+            response = self.client.post(ri.urls["update"], data | {"title": "Changed"})
+            self.assertRedirects(response, ri.urls["detail"])
+            ri.refresh_from_db()
+            self.assertEqual(ri.title, "Changed")
+            self.assertEqual(ri.periodicity, "monthly")
+            self.assertEqual(ri.starts_on, dt.date(2026, 1, 1))
+
     def test_reactivation_backlog(self):
         """Reactivating a recurring invoice which has ended warns about the
         invoices of the past periods it would create"""

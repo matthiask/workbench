@@ -1872,6 +1872,17 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
         else:
             self.fields["periodicity"].choices = RecurringInvoice.PERIODICITY_CHOICES
             self.fields["next_period_starts_on"].disabled = True
+            # The periods recur from the start date with the periodicity,
+            # changing them would put the next periods out of step with the
+            # invoiced ones
+            if self.instance.next_period_starts_on:
+                for field in ("starts_on", "periodicity"):
+                    self.fields[field].disabled = True
+                    self.fields[field].help_text = _(
+                        "Cannot be changed anymore once invoices have been"
+                        " created. End this recurring invoice and create a new"
+                        " one instead."
+                    )
 
             self.add_postal_address_selection_if_empty(
                 person=self.instance.contact or contact,

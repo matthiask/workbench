@@ -121,7 +121,12 @@ Nur noch ihr Status und wenige Felder lassen sich ändern.
 
 «Zahlungen» → «Stapelrechnungen» erstellt periodisch (jährlich,
 quartalsweise, monatlich oder wöchentlich) Fixbetragsrechnungen, einige
-Tage bevor die jeweilige Periode beginnt. Neue Rechnungen werden in
+Tage bevor die jeweilige Periode beginnt. Die Perioden wiederholen sich
+ab dem Startdatum: Eine Stapelrechnung ab dem 31. Januar umfasst den
+31. Januar bis 28. Februar, den 1. bis 30. März, den 31. März bis
+30. April und so weiter. Sobald Rechnungen erstellt wurden, lassen sich
+Startdatum und Periodizität nicht mehr ändern; beende die Stapelrechnung
+dafür und erstelle eine neue. Neue Rechnungen werden in
 Vorbereitung erstellt, als versendet markiert oder automatisch
 verschickt (die Liste filtert danach); die verantwortliche Person erhält eine Mail. Die Stapelrechnung zeigt die
 Mail, die sie verschickt, mit Platzhaltern für die Werte jeder Rechnung. Mit «Projekt
