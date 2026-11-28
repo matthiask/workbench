@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext, gettext_lazy as _, override
 
+from workbench.accounts.features import FEATURES
 from workbench.accounts.models import User
 from workbench.contacts.models import postal_address_choices
 from workbench.projects.models import Project, Service
@@ -85,9 +86,17 @@ class OfferQuerySet(SearchQuerySet):
     def maybe_actionable(self, *, user):
         """Offers sent first, those which aren't valid anymore first, then
         those in preparation, oldest first. Offers on closed projects can't
-        lead anywhere anymore."""
+        lead anywhere anymore, offers of deals listed already needn't be
+        listed again."""
+        from workbench.deals.models import Deal
+
+        queryset = self
+        if user.features[FEATURES.DEALS]:
+            queryset = queryset.exclude(
+                deals__in=Deal.objects.maybe_actionable(user=user).values("pk")
+            )
         return (
-            self
+            queryset
             .filter(
                 Q(status__in=[Offer.IN_PREPARATION, Offer.OFFERED]),
                 Q(project__closed_on__isnull=True),

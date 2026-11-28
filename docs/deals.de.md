@@ -30,7 +30,7 @@ normale und tiefe Wahrscheinlichkeit, jeweils mit ihrer Summe. Filtere
 nach Beitragenden, um deine Geschäfte zu sehen. Das Abzeichen eines
 Geschäfts wird orange, wenn der Entscheid überfällig ist oder es lange
 offen ist. Die Startseite führt offene Geschäfte auf, zu denen du
-beiträgst.
+beiträgst, ihre Offerten nicht noch einmal.
 
 ## Offerten
 

@@ -90,3 +90,17 @@ class NeedsActionTest(TestCase):
         self.assertEqual(
             list(Invoice.objects.maybe_actionable(user=user)), [sent, preparing]
         )
+
+    @override_settings(FEATURES={FEATURES.DEALS: F.ALWAYS})
+    def test_offers_of_listed_deals(self):
+        """Offers of deals listed already don't need to be listed again"""
+        user = factories.UserFactory.create()
+        offer = factories.OfferFactory.create(owned_by=user)
+        deal = factories.DealFactory.create(owned_by=user)
+        deal.related_offers.add(offer)
+        self.assertEqual(list(Offer.objects.maybe_actionable(user=user)), [])
+
+        # The deal of somebody else isn't listed
+        deal.owned_by = factories.UserFactory.create()
+        deal.save()
+        self.assertEqual(list(Offer.objects.maybe_actionable(user=user)), [offer])

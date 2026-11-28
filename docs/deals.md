@@ -25,7 +25,8 @@ decision: high in the next 4 weeks (overdue ones included), in the next
 12 weeks, later, then normal and low probability, each with its sum.
 Filter by contributor to see your deals. A deal's badge turns orange
 when its decision is overdue or when it has been open for long. The start
-page lists open deals you contribute to.
+page lists open deals you contribute to, their offers aren't listed
+again.
 
 ## Offers
 
