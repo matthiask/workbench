@@ -270,6 +270,8 @@ Sorting (web): by the list of monthly values descending (i.e. by the earliest mo
 
 Chart (web, `_projected_gross_margin_chart`): `monthly_overall` per month; months before the current month (projections not invoiced in time) as "overdue".
 
+Projected vs. invoiced chart of a project (projected invoices modal, `workbench/projects/charts.py:projected_vs_invoiced_chart`): cumulative Σ ProjectedInvoice.gross_margin by `invoiced_on`, and the cumulative invoiced gross margin at each invoice date (`gross_margin_components(invoiced_until=date)["invoiced"]`, so third party costs are deducted once, also those of down payments repeated on the final invoice).
+
 ---
 
 ### Open items list

@@ -1,8 +1,10 @@
 import datetime as dt
+from collections import defaultdict
 from decimal import Decimal
 from itertools import accumulate
 
 from workbench.invoices.models import Invoice
+from workbench.reporting.squeeze import gross_margin_components
 from workbench.tools.charts import nice_step
 from workbench.tools.formats import Z2, currency, local_date_format
 
@@ -18,10 +20,29 @@ def _months_between(first, last):
         month = (month + dt.timedelta(days=32)).replace(day=1)
 
 
+def _invoiced_gross_margin(project):
+    """Increases of the invoiced gross margin per invoice date, as computed by
+    the reports: third party costs are deducted once (the larger of invoiced
+    and logged), also when final invoices repeat those of down payments"""
+    days = defaultdict(list)
+    for invoice in (
+        Invoice.objects.invoiced().filter(project=project).order_by("invoiced_on", "pk")
+    ):
+        days[invoice.invoiced_on].append(invoice.title)
+    entries, previous = [], Z2
+    for day, titles in days.items():
+        total = gross_margin_components([project.pk], invoiced_until=day)[project.pk][
+            "invoiced"
+        ]
+        entries.append((day, total - previous, "\n".join(titles)))
+        previous = total
+    return entries
+
+
 def projected_vs_invoiced_chart(project, *, today=None):
     """Geometry of a step line chart of the cumulative projected and the
-    cumulative invoiced gross margin (invoices minus their third party costs),
-    or ``None`` if there is nothing to draw"""
+    cumulative invoiced gross margin (see ``_invoiced_gross_margin()``), or
+    ``None`` if there is nothing to draw"""
     today = today or dt.date.today()
     series = {
         "projected": [
@@ -30,17 +51,7 @@ def projected_vs_invoiced_chart(project, *, today=None):
                 project.projected_invoices.all(), key=lambda pi: pi.invoiced_on
             )
         ],
-        "invoiced": [
-            (
-                invoice.invoiced_on,
-                invoice.gross_margin,
-                invoice.title,
-            )
-            for invoice in Invoice.objects
-            .invoiced()
-            .filter(project=project)
-            .order_by("invoiced_on", "pk")
-        ],
+        "invoiced": _invoiced_gross_margin(project),
     }
     days = [day for entries in series.values() for day, _amount, _text in entries]
     if not days:

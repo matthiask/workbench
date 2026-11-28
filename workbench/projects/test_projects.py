@@ -1560,3 +1560,36 @@ class ProjectedInvoicesTimelineTest(TestCase):
             headers={"x-requested-with": "XMLHttpRequest"},
         )
         self.assertContains(response, "<svg")
+
+    def test_projected_vs_invoiced_down_payment(self):
+        """The invoiced gross margin deducts third party costs once, also those
+        of down payments repeated on the final invoice"""
+        project = factories.ProjectFactory.create()
+        common = {
+            "project": project,
+            "customer": project.customer,
+            "contact": project.contact,
+            "status": Invoice.SENT,
+        }
+        down_payment = factories.InvoiceFactory.create(
+            **common,
+            type=Invoice.DOWN_PAYMENT,
+            invoiced_on=dt.date(2026, 2, 10),
+            subtotal=5000,
+            third_party_costs=1000,
+        )
+        final = factories.InvoiceFactory.create(
+            **common,
+            type=Invoice.FIXED,
+            invoiced_on=dt.date(2026, 3, 10),
+            subtotal=10000,
+            third_party_costs=2000,
+            down_payment_total=5000,
+        )
+        down_payment.down_payment_applied_to = final
+        down_payment.save()
+
+        chart = projected_vs_invoiced_chart(project, today=dt.date(2026, 4, 15))
+        self.assertEqual(
+            [point["total"] for point in chart["invoiced"]["points"]], [4000, 8000]
+        )
