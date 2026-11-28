@@ -375,10 +375,8 @@ def _credit_control_creditentry_cfg(user):
 def _deals_contribution_cfg(user):
     if not user.features[FEATURES.DEALS]:
         raise Http404
-    return {
-        "fields": EVERYTHING,
-        "related": [(Value, "deal_id")],
-    }
+    # The deal's history lists its values and contributions
+    return {"fields": EVERYTHING}
 
 
 def _deals_deal_cfg(user):

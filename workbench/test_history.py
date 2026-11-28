@@ -473,6 +473,15 @@ class HistoryTest(TestCase):
         url = f"/history/deals_valuetype/id/{type.pk}/"
         self.assert_404_without_feature(url, feature=FEATURES.DEALS)
 
+    def test_deal_contribution_related(self):
+        """Contributions don't link the values of a deal with their ID"""
+        deal = factories.DealFactory.create()
+        contribution = deal.contributions.create(user=deal.owned_by)
+        self.client.force_login(deal.owned_by)
+        response = self.client.get(f"/history/deals_contribution/id/{contribution.pk}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "/history/deals_value/")
+
     def test_costcenter_visibility(self):
         """Cost centers are invisible without LABOR_COSTS"""
         self.client.force_login(factories.UserFactory.create())
