@@ -378,6 +378,35 @@ class PlanningTest(TestCase):
         other = factories.MilestoneFactory.create(date=in_days(10))
         self.assertFalse(form("#123456", instance=other).is_valid())
 
+    def test_milestone_before_external_work(self):
+        """Moving a milestone before its external work warns too"""
+        milestone = factories.MilestoneFactory.create(
+            date=monday() + dt.timedelta(days=16)
+        )
+        ew = ExternalWork.objects.create(
+            project=milestone.project,
+            milestone=milestone,
+            provided_by=factories.OrganizationFactory.create(),
+            created_by=milestone.project.owned_by,
+            title="Printing",
+            weeks=[monday() + dt.timedelta(days=7)],
+        )
+        request = RequestFactory().get("/")
+        request.user = milestone.project.owned_by
+
+        form = MilestoneForm(
+            {
+                "modal-date": monday().isoformat(),
+                "modal-title": milestone.title,
+                "modal-estimated_total_hours": "0",
+                "modal-color": "",
+            },
+            instance=milestone,
+            request=request,
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn(str(ew), form.warnings["work-after-milestone"])
+
     def test_planning_search_forms(self):
         """Planning request search form branch test"""
 

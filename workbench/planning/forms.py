@@ -96,9 +96,12 @@ class MilestoneForm(ModelForm):
             and (date := data.get("date"))
             and (
                 after := [
-                    pw
-                    for pw in self.instance.plannedwork_set.all()
-                    if max(pw.weeks) + dt.timedelta(days=6) >= date
+                    work
+                    for work in [
+                        *self.instance.plannedwork_set.all(),
+                        *self.instance.externalwork_set.all(),
+                    ]
+                    if max(work.weeks) + dt.timedelta(days=6) >= date
                 ]
             )
         ):
@@ -108,7 +111,7 @@ class MilestoneForm(ModelForm):
                     " the new milestone date: %(work)s."
                 )
                 % {
-                    "work": ", ".join(str(pw) for pw in after),
+                    "work": ", ".join(str(work) for work in after),
                 },
                 code="work-after-milestone",
             )

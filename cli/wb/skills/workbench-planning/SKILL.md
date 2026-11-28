@@ -110,8 +110,8 @@ interface:
     wb planning external-work update <id> --provided-by <organization_id>
     wb planning external-work delete <id>
 
-Moving a milestone before its planned work warns (`work-after-milestone`),
-external work in or after the week of its milestone too
+Moving a milestone before its planned or external work warns
+(`work-after-milestone`), external work in or after the week of its milestone too
 (`weeks-after-milestone`); show the warning to the user before passing
 `--ignore-warning`.
 
