@@ -139,7 +139,7 @@ def project_budget_statistics(projects, *, cutoff_date=None):
     def planned(s):
         projected = s["projected_gross_margin"]
         invoiced = gross_margins[s["project"].id]["invoiced"]
-        return min(s["delta"], projected, max(projected - invoiced, Z2))
+        return max(min(s["delta"], projected, projected - invoiced), Z2)
 
     def beyond_offer(s):
         if not s["sold"]:

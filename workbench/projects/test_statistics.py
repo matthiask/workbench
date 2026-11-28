@@ -468,6 +468,20 @@ class StatisticsTest(TestCase):
         self.assertEqual(overall["delta_positive"], 1000)
         self.assertEqual(overall["delta_planned"], 1000)
 
+    def test_project_budget_statistics_negative_projections(self):
+        """Negative projections don't make the planned part negative"""
+        service = factories.ServiceFactory.create(effort_type="Any", effort_rate=100)
+        factories.LoggedHoursFactory.create(service=service, hours=10)
+        factories.ProjectedInvoiceFactory.create(
+            project=service.project, gross_margin=Decimal(-500)
+        )
+
+        overall = project_budget_statistics.project_budget_statistics([
+            service.project
+        ])["overall"]
+        self.assertEqual(overall["delta_positive"], 1000)
+        self.assertEqual(overall["delta_planned"], 0)
+
     def create_projects(self):
         p_internal = factories.ProjectFactory.create(type=Project.INTERNAL)
         p_maintenance = factories.ProjectFactory.create(type=Project.MAINTENANCE)
