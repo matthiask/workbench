@@ -3190,6 +3190,34 @@ planned_work:
         open_deal.refresh_from_db()
         self.assertEqual(open_deal.status, Deal.OPEN)
 
+    def test_deals_update_removes_contact_and_decision_date(self):
+        """An empty --contact or --decision-expected-on removes it"""
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        deal = factories.DealFactory.create(
+            owned_by=self.user,
+            customer=person.organization,
+            contact=person,
+            probability=Deal.NORMAL,
+            decision_expected_on=dt.date(2026, 12, 31),
+        )
+        result = self.wb(
+            "deals",
+            "update",
+            deal.pk,
+            "--contact",
+            "",
+            "--decision-expected-on",
+            "",
+            "--ignore-warning",
+            "no-contact",
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        deal.refresh_from_db()
+        self.assertIsNone(deal.contact)
+        self.assertIsNone(deal.decision_expected_on)
+
     def test_deal_offers(self):
         """Offers are linked to deals and unlinked by ID or code"""
         offer = factories.OfferFactory.create(status=Offer.OFFERED)

@@ -610,7 +610,8 @@ list of the choices:
     wb deals create --title "Relaunch" --contact 345 --probability normal \
         --value Design=5000 --attribute Source=Referral --dry-run
 
-Change deals field by field, values by their type (`TYPE=` removes one), and
+Change deals field by field, values by their type (`TYPE=` removes one; an
+empty `--contact` or `--decision-expected-on` removes those), and
 close them like in Workbench: accepting or declining a deal also accepts or
 declines its related offers which haven't been accepted yet, unless you pick
 them with `--offer` or pass `--keep-offers`:

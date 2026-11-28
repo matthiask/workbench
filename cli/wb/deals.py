@@ -1,5 +1,7 @@
 """Deals"""
 
+import datetime as dt
+
 import click
 
 from wb.core import (
@@ -152,17 +154,34 @@ def _echo_saved_deal(data, *, dry_run, as_json):
         console.print("Dry run, nothing has been saved.")
 
 
+def _int_or_none(value, option):
+    if not value.strip():
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        terminate(f"{option} expects an ID or an empty string, got {value!r}.")
+
+
+def _date_or_none(value, option):
+    if not value.strip():
+        return None
+    try:
+        return dt.date.fromisoformat(value.strip()).isoformat()
+    except ValueError:
+        terminate(f"{option} expects YYYY-MM-DD or an empty string, got {value!r}.")
+
+
 @deals.command("update")
 @click.argument("deal_id", type=int)
 @click.option("--title")
 @click.option("--description", help="The text, or - to read it from stdin.")
 @click.option("--customer", type=int, help="Organization ID.")
-@click.option("--contact", type=int, help="Person ID.")
+@click.option("--contact", help="Person ID; an empty string removes the contact.")
 @click.option("--probability", type=click.Choice(["low", "normal", "high"]))
 @click.option(
     "--decision-expected-on",
-    type=click.DateTime(formats=["%Y-%m-%d"]),
-    help="Required for a high probability.",
+    help="YYYY-MM-DD, required for a high probability; an empty string removes it.",
 )
 @click.option(
     "--value",
@@ -216,14 +235,17 @@ def update_deal(
             ("title", title),
             ("description", text_or_stdin(description)),
             ("customer", customer),
-            ("contact", contact),
             ("probability", probability),
             ("owned_by", owned_by),
         ]
         if value is not None
     }
-    if decision_expected_on:
-        data["decision_expected_on"] = decision_expected_on.date().isoformat()
+    if contact is not None:
+        data["contact"] = _int_or_none(contact, "--contact")
+    if decision_expected_on is not None:
+        data["decision_expected_on"] = _date_or_none(
+            decision_expected_on, "--decision-expected-on"
+        )
     if values:
         data["values"] = {
             key: value or None for key, value in _key_values(values, "--value").items()
