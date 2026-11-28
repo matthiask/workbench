@@ -497,6 +497,19 @@ class OffersTest(TestCase):
         self.assertEqual(project.offers.count(), 1)
         self.assertEqual(project.services.count(), 1)
 
+    def test_offer_copying_logging_and_retainer(self):
+        """Copies allow logging (invoicing may have disabled it on the
+        original) and stay budget retainers"""
+        offer = factories.OfferFactory.create(is_budget_retainer=True)
+        factories.ServiceFactory.create(
+            project=offer.project, offer=offer, allow_logging=False
+        )
+        copy = offer.copy_to(
+            project=factories.ProjectFactory.create(), owned_by=offer.owned_by
+        )
+        self.assertTrue(copy.is_budget_retainer)
+        self.assertTrue(copy.services.get().allow_logging)
+
     def test_offer_copying_applies_flat_rate(self):
         """Copies of offers get the flat rate of their new project"""
         offer = factories.OfferFactory.create()

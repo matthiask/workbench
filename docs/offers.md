@@ -92,7 +92,8 @@ preparation and declines those sent before.
 ## Copies, PDFs and deals
 
 - "Copy" in the offer's menu copies it with its services and headings
-  into an open project, in preparation and without dates.
+  into an open project, in preparation and without dates; logging is
+  allowed on the copied services.
 - "PDF" shows the offer, its menu downloads it, also with a signature
   line. Offers which haven't been offered or accepted carry their status
   as a watermark. "Project offers" in the project's menu combines the

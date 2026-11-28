@@ -105,7 +105,8 @@ Offerte.
 ## Kopien, PDFs und Geschäfte
 
 - «Kopieren» im Menü der Offerte kopiert sie mit ihren Leistungen und
-  Zwischentiteln in ein offenes Projekt, in Vorbereitung und ohne Daten.
+  Zwischentiteln in ein offenes Projekt, in Vorbereitung und ohne Daten;
+  auf den kopierten Leistungen kann erfasst werden.
 - «PDF» zeigt die Offerte, ihr Menü lädt sie herunter, auch mit
   Unterschriftszeile. Offerten, die nicht offeriert oder akzeptiert sind,
   tragen ihren Status als Wasserzeichen. «Projektofferten» im Menü des

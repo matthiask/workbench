@@ -446,12 +446,14 @@ class Offer(ModelWithTotal):
             discount=self.discount,
             liable_to_vat=self.liable_to_vat,
             show_service_details=self.show_service_details,
+            is_budget_retainer=self.is_budget_retainer,
         )
         for service in self.services.all():
             new = Service(
                 project=project,
                 offer=offer,
-                allow_logging=service.allow_logging,
+                # Not copied: Invoicing may have disabled logging on the
+                # original
                 is_optional=service.is_optional,
                 title=service.title,
                 description=service.description,
