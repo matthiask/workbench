@@ -208,6 +208,29 @@ class ExternalWork(AbstractPlannedWork):
         return f"{self.title} ({self.provided_by})"
 
 
+def weeks_outside_employment(user, weeks):
+    """The weeks (mondays) without any employment of the user, e.g. after
+    they left; nothing for users without employments at all"""
+    employments = list(user.employments.values_list("date_from", "date_until"))
+    if not employments:
+        return []
+    return [
+        week
+        for week in weeks
+        if not any(
+            date_from <= week + dt.timedelta(days=4) and date_until >= week
+            for date_from, date_until in employments
+        )
+    ]
+
+
+def outside_employment_message(user, weeks):
+    return _("%(user)s isn't employed in the weeks of %(weeks)s.") % {
+        "user": user.get_full_name(),
+        "weeks": ", ".join(local_date_format(week) for week in weeks),
+    }
+
+
 def future_weeks_on_closed_project(project, old_weeks, new_weeks):
     """Whether planned work of a closed project would get weeks after the
     current one it didn't have before"""

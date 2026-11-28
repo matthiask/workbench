@@ -55,6 +55,8 @@ The remaining capacity per week is your working days times your
 "planning hours per day" (in your settings) and your percentage, minus
 holidays, absences and **all** your planned work, provisional work
 included. Negative capacity is shown in orange: someone is overbooked.
+Weeks outside someone's employment (e.g. after they left) have no
+capacity; planning work in them warns.
 The start page lists provisional work of the next weeks so that it gets
 decided.
 

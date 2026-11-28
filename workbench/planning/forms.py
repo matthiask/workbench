@@ -16,6 +16,8 @@ from workbench.planning.models import (
     PlannedWork,
     delete_emptied_milestones,
     future_weeks_on_closed_project,
+    outside_employment_message,
+    weeks_outside_employment,
 )
 from workbench.projects.models import Project
 from workbench.tools.formats import Z1, local_date_format
@@ -313,6 +315,17 @@ class PlannedWorkForm(ModelForm):
                 _("The selected offer is declined."), code="offer-is-declined"
             )
 
+        if (
+            (user := data.get("user"))
+            and (weeks := data.get("weeks"))
+            and (not self.instance.pk or {"user", "weeks"} & set(self.changed_data))
+            and (outside := weeks_outside_employment(user, weeks))
+        ):
+            self.add_warning(
+                outside_employment_message(user, outside),
+                code="weeks-outside-employment",
+            )
+
         return data
 
     def save(self):
@@ -563,6 +576,18 @@ class PlannedWorkBatchForm(Form):
                     % {"work": ", ".join(str(unit) for unit in after)},
                     code="weeks-after-milestone",
                 )
+
+        if move_by_weeks or data.get("assign_to"):
+            delta = dt.timedelta(days=7 * (move_by_weeks or 0))
+            outside = []
+            for unit in work:
+                user = data.get("assign_to") or unit.user
+                if weeks := weeks_outside_employment(
+                    user, [week + delta for week in unit.weeks]
+                ):
+                    outside.append(outside_employment_message(user, weeks))
+            if outside:
+                self.add_warning(" ".join(outside), code="weeks-outside-employment")
 
         if declined := [unit for unit in work if unit.offer and unit.offer.is_declined]:
             self.add_warning(

@@ -61,7 +61,8 @@ Die verbleibende Kapazität pro Woche sind deine Arbeitstage mal deine
 «Planungsstunden pro Tag» (in deinen Einstellungen) und dein Pensum,
 minus Feiertage, Abwesenheiten und **alle** deine geplante Arbeit, auch
 die provisorische. Negative Kapazität erscheint orange: Jemand ist
-überbucht. Die Startseite führt provisorische Arbeit der nächsten Wochen
+überbucht. Wochen ausserhalb einer Anstellung (z.B. nach dem Austritt)
+haben keine Kapazität; Workbench warnt, wenn dort Arbeit geplant wird. Die Startseite führt provisorische Arbeit der nächsten Wochen
 auf, damit sie entschieden wird.
 
 ## Eine Planung importieren

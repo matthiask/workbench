@@ -99,6 +99,8 @@ only after the user approves:
 replaces all weeks. New work is provisional unless `--definitive` is given.
 Planned work needs a service type. Planning work for a declined offer is a
 warning (`offer-is-declined`): ask the user before passing `--ignore-warning`.
+So is planning someone in weeks outside their employment, e.g. after they
+leave (`weeks-outside-employment`): plan someone else instead.
 
 Milestones and external work (done by the customer or someone else, e.g.
 content or photos) are changed the same way, validated like in the web

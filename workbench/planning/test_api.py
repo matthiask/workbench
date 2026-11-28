@@ -785,6 +785,38 @@ class PlanningAPITest(TestCase):
             ],
         )
 
+    def test_weeks_outside_employment(self):
+        """Planning work for weeks after someone's employment ends is a warning
+        which can be ignored, in the single endpoints and the batch update"""
+        pw = factories.PlannedWorkFactory.create(weeks=[monday()])
+        factories.EmploymentFactory.create(
+            user=pw.user,
+            date_from=dt.date(2020, 1, 1),
+            date_until=monday() + dt.timedelta(days=4),
+        )
+        self.client.force_login(pw.user)
+        url = f"/api/planning/work/{pw.pk}/"
+        next_week = (monday() + dt.timedelta(days=7)).isoformat()
+
+        response = self.client.patch(
+            url, {"weeks": [next_week]}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422, response.content)
+        (error,) = response.json()["detail"]
+        self.assertEqual(error["code"], "weeks-outside-employment")
+        self.assertEqual(error["loc"], ["body", "data", "weeks"])
+
+        response = self.batch({"work": [pw.pk], "move_by_weeks": 1})
+        self.assertEqual(response.status_code, 422, response.content)
+        (error,) = response.json()["detail"]
+        self.assertEqual(error["code"], "weeks-outside-employment")
+
+        response = self.batch(
+            {"work": [pw.pk], "move_by_weeks": 1},
+            "?ignore_warnings=weeks-outside-employment",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_batch_update_declined_offer(self):
         """Changing work of declined offers is a warning which can be ignored"""
         pw = factories.PlannedWorkFactory.create(

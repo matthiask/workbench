@@ -24,6 +24,8 @@ from workbench.planning.models import (
     Milestone,
     PlannedWork,
     future_weeks_on_closed_project,
+    outside_employment_message,
+    weeks_outside_employment,
 )
 from workbench.planning.reporting import Planning
 from workbench.planning.schemas import (
@@ -407,6 +409,18 @@ def _apply_planned_work(  # noqa: C901
                 "loc": [*loc, "user"],
                 "msg": _("Unknown or inactive user %r.") % values["user"],
             })
+
+    if (
+        ("weeks" in values or "user" in values)
+        and pw.user_id
+        and "weeks-outside-employment" not in ignore_warnings
+        and (outside := weeks_outside_employment(pw.user, pw.weeks or []))
+    ):
+        errors.append({
+            "loc": [*loc, "weeks"],
+            "msg": outside_employment_message(pw.user, outside),
+            "code": "weeks-outside-employment",
+        })
 
     if "service_type" in values:
         if values["service_type"] is None:

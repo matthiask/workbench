@@ -956,6 +956,42 @@ class CapacityTest(TestCase):
         planning.add_absences(Absence.objects.all())
         self.assertEqual(len(planning._absences[user][0]), 1)
 
+    def test_capacity_after_employment(self):
+        """Work planned after the employment ends reduces the capacity below
+        zero"""
+        week = dt.date(2026, 11, 2)
+        user = factories.UserFactory.create(planning_hours_per_day=8)
+        factories.EmploymentFactory.create(
+            user=user,
+            date_from=dt.date(2020, 1, 1),
+            date_until=week + dt.timedelta(days=4),
+            percentage=100,
+        )
+        factories.PlannedWorkFactory.create(
+            user=user, planned_hours=20, weeks=[week, week + dt.timedelta(days=7)]
+        )
+
+        planning = reporting.Planning(
+            weeks=[week, week + dt.timedelta(days=7)], users=[user]
+        )
+        self.assertEqual(planning.capacity()["total"], [30, -10])
+
+    def test_weeks_outside_employment(self):
+        """Weeks without any employment of people who have employments"""
+        from workbench.planning.models import weeks_outside_employment
+
+        week = dt.date(2026, 11, 2)
+        user = factories.UserFactory.create()
+        weeks = [week, week + dt.timedelta(days=7), week + dt.timedelta(days=14)]
+        self.assertEqual(weeks_outside_employment(user, weeks), [])
+
+        factories.EmploymentFactory.create(
+            user=user,
+            date_from=week + dt.timedelta(days=4),
+            date_until=week + dt.timedelta(days=7),
+        )
+        self.assertEqual(weeks_outside_employment(user, weeks), [weeks[2]])
+
     def test_weekend_absences(self):
         """Absences on weekends count in their week, in the capacity and the
         shown absences alike; longer absences starting on a weekend start

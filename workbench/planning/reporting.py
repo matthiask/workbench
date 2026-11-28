@@ -536,7 +536,7 @@ order by ph.date
 select
     week,
     user_id,
-    working_days * coalesce(planning_hours_per_day, 0)
+    coalesce(working_days, 0) * coalesce(planning_hours_per_day, 0)
         - coalesce(pw_hours, 0)
         - coalesce(abs_hours, 0)
         as capacity
@@ -548,6 +548,9 @@ cross join (
     where id = any (%s)
 ) as users
 
+--
+-- Weeks without employment (e.g. after someone left) have no working
+-- days, the work planned in them shows as overbooked.
 --
 -- The working days of each user and week: the weekdays covered by each
 -- employment (date_until is inclusive) less the holidays on those days,
@@ -583,7 +586,7 @@ join lateral (
     where awt_employment.user_id = users.user_id
       and date_from <= week + interval '4 days'
       and date_until >= week
-) as employment on employment.working_days is not null
+) as employment on true
 
 --
 -- Aggregate planned hours per week, distributing equally the planned_hours
