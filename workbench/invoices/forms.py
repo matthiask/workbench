@@ -36,7 +36,14 @@ from workbench.projects.forms import (
 from workbench.reporting.models import FreezeDate
 from workbench.reporting.utils import accepted_offers_by_project, sum_by
 from workbench.services.models import ServiceType
-from workbench.tools.formats import Z1, Z2, currency, hours, local_date_format
+from workbench.tools.formats import (
+    Z1,
+    Z2,
+    currency,
+    hours,
+    local_date_format,
+    round_5cents,
+)
 from workbench.tools.forms import (
     Autocomplete,
     DateInput,
@@ -401,7 +408,9 @@ def amount_help_text(invoice):
                         (
                             row.total_excl_tax
                             for row in down_payments
-                            if not row.down_payment_applied_to_id
+                            # Only sent down payments can be applied
+                            if row.status in Invoice.INVOICED_STATUSES
+                            and not row.down_payment_applied_to_id
                         ),
                         Z2,
                     )
@@ -434,7 +443,7 @@ def amount_help_text(invoice):
                 ", ",
                 '<a href="#" data-field-value="{}">{}%</a>',
                 (
-                    ((total / 100 * percentage).quantize(Z2), percentage)
+                    (round_5cents(total / 100 * percentage), percentage)
                     for percentage in (50, 100)
                 ),
             ),

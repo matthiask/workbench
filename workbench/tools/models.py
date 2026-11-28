@@ -1,5 +1,5 @@
 import datetime as dt
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from functools import partial
 from itertools import islice
 
@@ -10,7 +10,7 @@ from django.db.models import ProtectedError
 from django.db.models.deletion import Collector
 from django.utils.translation import gettext, gettext_lazy as _
 
-from workbench.tools.formats import Z2, currency
+from workbench.tools.formats import Z2, currency, round_5cents
 from workbench.tools.search import search
 
 
@@ -145,7 +145,7 @@ class ModelWithTotal(Model):
         )
 
     def _round_5cents(self, value):
-        return (value / 5).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP) * 5
+        return round_5cents(value)
 
     @property
     def tax_amount(self):

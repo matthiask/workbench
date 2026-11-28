@@ -286,6 +286,25 @@ class InvoicesTest(TestCase):
         self.assertContains(response, "Invoiced so far: 5’000.00")
         self.assertContains(response, 'data-field-value="15000.00"')
 
+        # Down payments in preparation can't be applied yet
+        factories.InvoiceFactory.create(
+            **{**common, "status": Invoice.IN_PREPARATION},
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=1000,
+        )
+        response = self.client.get(project.urls["createinvoice"] + "?type=fixed")
+        self.assertContains(
+            response, "down payments: 4’000.00 (not applied yet: 3’000.00)."
+        )
+
+        # Percentages are rounded to 5 cents
+        factories.ServiceFactory.create(
+            project=project, offer=offer, cost=Decimal("0.05")
+        )
+        offer.save()
+        response = self.client.get(project.urls["createinvoice"] + "?type=fixed")
+        self.assertContains(response, 'data-field-value="10000.05">50%</a>')
+
         # Projects without accepted offers have nothing to show
         other = factories.ProjectFactory.create(owned_by=project.owned_by)
         response = self.client.get(other.urls["createinvoice"] + "?type=fixed")

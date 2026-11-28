@@ -12,6 +12,10 @@ Z1 = Decimal("0.0")
 Z2 = Decimal("0.00")
 
 
+def round_5cents(value):
+    return (value / 5).quantize(Z2, rounding=ROUND_HALF_UP) * 5
+
+
 def local_date_format(dttm, *, fmt=None):
     if not dttm:
         return ""
