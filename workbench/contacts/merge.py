@@ -14,6 +14,7 @@ from workbench.contacts.models import (
     EmailAddress,
     Organization,
     Person,
+    archive_organization_without_people,
     unarchive_organization,
 )
 from workbench.tools.substitute_with import substitute_with
@@ -181,11 +182,16 @@ def merge_people(*, duplicate, keep):
         keep.is_archived = keep.is_archived and duplicate.is_archived
         _take_primary_contact(duplicate=duplicate, keep=keep)
 
+        organization = duplicate.organization
         substitute_with(to_delete=duplicate, keep=keep)
         # Updates the full text search with the moved details
         keep.save()
         keep.refresh_related_fts()
         unarchive_organization(keep)
+        # Like archiving the duplicate, its organization may have no active
+        # people anymore
+        if organization and organization != keep.organization:
+            archive_organization_without_people(organization)
 
 
 def _name():

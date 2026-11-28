@@ -565,28 +565,35 @@ def update_organization_archival(person):
     open projects or deals (someone will add a new contact), active sites or
     running recurring invoices, and unarchive
     it with one of its people. Returns the organization if it changed."""
-    from workbench.deals.models import Deal
-    from workbench.projects.models import Project
-
     organization = person.organization
     if not organization:
         return None
     if person.is_archived:
-        if (
-            organization.is_archived
-            or organization.people.active().exists()
-            or Project.objects.open().filter(customer=organization).exists()
-            or Deal.objects.filter(customer=organization, status=Deal.OPEN).exists()
-            or any(
-                queryset.exists()
-                for queryset in organization.active_sites_and_running_recurring_invoices()
-            )
-        ):
-            return None
-        organization.is_archived = True
-        organization.save()
-        return organization
+        return archive_organization_without_people(organization)
     return unarchive_organization(person)
+
+
+def archive_organization_without_people(organization):
+    """Archive the organization if it has no active people anymore, unless it
+    has open projects or deals, active sites or running recurring invoices.
+    Returns the organization if it changed."""
+    from workbench.deals.models import Deal
+    from workbench.projects.models import Project
+
+    if (
+        organization.is_archived
+        or organization.people.active().exists()
+        or Project.objects.open().filter(customer=organization).exists()
+        or Deal.objects.filter(customer=organization, status=Deal.OPEN).exists()
+        or any(
+            queryset.exists()
+            for queryset in organization.active_sites_and_running_recurring_invoices()
+        )
+    ):
+        return None
+    organization.is_archived = True
+    organization.save()
+    return organization
 
 
 def unarchive_organization(person):

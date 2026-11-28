@@ -59,7 +59,8 @@ Adressfelder folgen zum Sortieren und Filtern.
   Beim Archivieren einer
   Organisation bietet Workbench an, ihre Personen mitzuarchivieren, und
   warnt vor ihren aktiven Sites und laufenden Stapelrechnungen; wird
-  ihre letzte Person archiviert, wird auch die Organisation archiviert,
+  ihre letzte Person archiviert (oder mit einer Person einer anderen
+  Organisation zusammengeführt), wird auch die Organisation archiviert,
   ausser sie hat offene Projekte oder Geschäfte, aktive Sites oder laufende
   Stapelrechnungen. Workbench warnt, wenn die letzte Kontaktperson für
   Störungen einer aktiven Site archiviert wird.

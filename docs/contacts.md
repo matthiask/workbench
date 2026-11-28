@@ -55,7 +55,8 @@ fields follow for sorting and filtering.
   them again as customer or contact (e.g. through the API) unarchives them.
   Archiving an organization offers to archive its people and warns about
   its active sites and running recurring invoices; archiving its
-  last person archives the organization too, unless it has open projects
+  last person (or merging it into a person of another organization)
+  archives the organization too, unless it has open projects
   or deals, active sites or running recurring invoices. Archiving the last
   contact for outages of an active site warns.
 - Contacts unused for five years are archived automatically.

@@ -1007,6 +1007,18 @@ class ContactsTest(TestCase):
                 keep.refresh_from_db()
                 self.assertEqual(keep.is_archived, archived)
 
+    def test_merge_away_last_active_person(self):
+        """Merging away the last active person of another organization
+        archives it, like archiving the person"""
+        organization = factories.OrganizationFactory.create()
+        duplicate = factories.PersonFactory.create(organization=organization)
+        keep = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        merge_people(duplicate=duplicate, keep=keep)
+        organization.refresh_from_db()
+        self.assertTrue(organization.is_archived)
+
     def test_merge_people_linked_to_users(self):
         """People who are both linked to a user cannot be merged"""
         keep = factories.UserFactory.create(
