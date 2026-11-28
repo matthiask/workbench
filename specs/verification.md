@@ -311,21 +311,25 @@ after "Verification: Findings of the seventh round", up to wb 0.59.0).
   deal.
 - Copied offers allow logging and stay budget retainers.
 
-### Smaller risks and questions, not decided
+### Smaller risks and questions, done
 
-- A negative override of the vacation balance is taken by the first
-  vacation as a correction and has no effect without vacation
-  (`awt/reporting.py`); undocumented.
-- The key data API's `accepted_deals` lists deals only, the report also
-  counts offers and maintenance without deal.
-- The Hochrechnung's "Planned" leaves out last year's projections which
-  haven't been invoiced yet.
-- Credits raise "work not invoiced" and "accepted offers not invoiced"
-  (consistent with credits not being applied to services).
-- Cash data for a date in the current week but in the previous month mixes
-  today's open invoices with the previous month's planned invoicing.
-- `wb deals update` can't clear the contact or the expected decision date.
-- Group memberships aren't audited.
-- A timestamp linked to hours moved to another day shows on both days.
-- Merging away the last active person of an organization doesn't archive
-  it (unused organizations are archived after five years anyway).
+- Fixed: cash data for a date in the current week but in the previous
+  month starts planned invoicing with the month of the request, like the
+  open invoices.
+- Fixed: `wb deals update` removes the contact or the expected decision
+  date with an empty string.
+- Fixed: the Hochrechnung's "Planned" includes earlier years' projections
+  which haven't been invoiced yet.
+- Fixed: merging away the last active person of an organization archives
+  it, like archiving the person (unless it has open projects or deals,
+  active sites or running recurring invoices).
+- Documented: the key data API's `accepted_deals` lists deals only, the
+  report also counts offers and maintenance without deal.
+- Documented: credits raise "work not invoiced" and "accepted offers not
+  invoiced" (credits aren't applied to services).
+- Left alone: a negative override of the vacation balance is taken by the
+  first vacation as a correction and has no effect without vacation
+  (`awt/reporting.py`); overrides are only used to add vacation.
+- Left alone: group memberships aren't audited.
+- Left alone: a timestamp linked to hours moved to another day shows on
+  both days.
