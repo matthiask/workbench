@@ -78,15 +78,16 @@ class ContactsTest(TestCase):
         deactivate_all()
 
     def test_search_details(self):
-        """People are found by their organization and their details"""
+        """People are found by their organization, job title and details"""
         person = factories.PersonFactory.create(
-            organization=factories.OrganizationFactory.create(name="Gammaorg")
+            organization=factories.OrganizationFactory.create(name="Gammaorg"),
+            job_title="Kommunikationsleiterin",
         )
         person.emailaddresses.create(email="zeta@example.com", type="work")
         person.phonenumbers.create(phone_number="+41 79 555 12 34", type="work")
         person.save()
 
-        for term in ["Gammaorg", "zeta"]:
+        for term in ["Gammaorg", "zeta", "Kommunikationsleiterin"]:
             with self.subTest(term=term):
                 self.assertEqual(list(Person.objects.search(term)), [person])
 
@@ -692,14 +693,19 @@ class ContactsTest(TestCase):
             instance.pk: Person.objects.get(pk=instance.pk)._fts for instance in people
         }
         self.assertIn("Postfach 686", expected[person.pk])
+        # Job titles moved out of addresses are searchable too
+        job_title = factories.PersonFactory.create(job_title="Kommunikationsleiterin")
+        job_title.save()
+        expected[job_title.pk] = Person.objects.get(pk=job_title.pk)._fts
+        self.assertIn("Kommunikationsleiterin", expected[job_title.pk])
         Person.objects.update(_fts="stale")
-        # People without postal addresses weren't changed
-        without = factories.PersonFactory.create(_fts="stale")
-        expected[without.pk] = "stale"
 
         migration.forwards(apps, None)
         self.assertEqual(dict(Person.objects.values_list("pk", "_fts")), expected)
         self.assertEqual(list(Person.objects.search("Postfach 686")), [person])
+        self.assertEqual(
+            list(Person.objects.search("Kommunikationsleiterin")), [job_title]
+        )
 
     def test_detail_types_migration(self):
         """Spellings and synonyms of the suggested types are cleaned up, the

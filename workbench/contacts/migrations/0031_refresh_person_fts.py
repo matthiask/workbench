@@ -30,15 +30,13 @@ def _postal_address(address, person):
 
 
 def forwards(apps, schema_editor):
-    """0030 changed postal addresses with ``save(update_fields=...)``, which
-    doesn't update the search text of their people; like
-    ``Person.fts_text()``. Only ``_fts`` changes, which the audit log
+    """0030 changed postal addresses with ``save(update_fields=...)`` and job
+    titles with ``update()``, which doesn't update the search text of their
+    people; like ``Person.fts_text()``, which contains the job title now. Only ``_fts`` changes, which the audit log
     ignores; the search vector follows through its trigger."""
     Person = apps.get_model("contacts", "Person")
     people = (
         Person.objects
-        .filter(postaladdresses__isnull=False)
-        .distinct()
         .select_related("organization")
         .prefetch_related("phonenumbers", "emailaddresses", "postaladdresses")
         .order_by("pk")
@@ -48,6 +46,7 @@ def forwards(apps, schema_editor):
         fts = " ".join(
             itertools.chain(
                 [person.organization.name if person.organization else ""],
+                [person.job_title],
                 (detail.phone_number for detail in person.phonenumbers.all()),
                 (detail.email for detail in person.emailaddresses.all()),
                 (

@@ -524,6 +524,7 @@ class Person(Model):
         return " ".join(
             itertools.chain(
                 [self.organization.name if self.organization else ""],
+                [self.job_title],
                 (detail.phone_number for detail in self.phonenumbers.all()),
                 (detail.email for detail in self.emailaddresses.all()),
                 (detail.postal_address for detail in self.postaladdresses.all()),
