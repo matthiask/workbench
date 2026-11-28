@@ -1598,8 +1598,8 @@ def person_update(
     and postal addresses, change their types (e.g. home for private ones)
     or archive them, with the rules of the person form; contact details are
     added with ``details/``. Archiving the
-    last active person of an organization without open projects or deals
-    archives the organization too, unarchiving a person unarchives their
+    last active person of an organization without open projects or deals,
+    active sites or running recurring invoices archives the organization too, unarchiving a person unarchives their
     organization, so does moving an active person into it. A new primary
     contact also replaces the organization's if it isn't active anymore.
     Moving the contact of projects, deals or invoices is a warning

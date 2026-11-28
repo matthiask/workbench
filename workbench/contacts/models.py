@@ -189,6 +189,17 @@ class Organization(Model):
             ) % {"count": count}
         return None
 
+    def active_sites_and_running_recurring_invoices(self):
+        """Querysets of what still runs for the organization, which keep it
+        active"""
+        from workbench.hosting.models import Site
+        from workbench.invoices.models import RecurringInvoice
+
+        return (
+            Site.objects.active().filter(customer=self),
+            RecurringInvoice.objects.open().filter(customer=self),
+        )
+
     def archive_people(self):
         return self.people.active().update(is_archived=True)
 
@@ -527,7 +538,8 @@ class Person(Model):
 
 def update_organization_archival(person):
     """Archive the organization with its last active person, unless it has
-    open projects or deals (someone will add a new contact), and unarchive
+    open projects or deals (someone will add a new contact), active sites or
+    running recurring invoices, and unarchive
     it with one of its people. Returns the organization if it changed."""
     from workbench.deals.models import Deal
     from workbench.projects.models import Project
@@ -541,6 +553,10 @@ def update_organization_archival(person):
             or organization.people.active().exists()
             or Project.objects.open().filter(customer=organization).exists()
             or Deal.objects.filter(customer=organization, status=Deal.OPEN).exists()
+            or any(
+                queryset.exists()
+                for queryset in organization.active_sites_and_running_recurring_invoices()
+            )
         ):
             return None
         organization.is_archived = True

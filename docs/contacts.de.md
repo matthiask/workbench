@@ -57,7 +57,8 @@ Adressfelder folgen zum Sortieren und Filtern.
   und Rechnungen nicht mehr angeboten. Beim Archivieren einer
   Organisation bietet Workbench an, ihre Personen mitzuarchivieren; wird
   ihre letzte Person archiviert, wird auch die Organisation archiviert,
-  ausser sie hat offene Projekte oder Geschäfte.
+  ausser sie hat offene Projekte oder Geschäfte, aktive Sites oder laufende
+  Stapelrechnungen.
 - Kontakte, die fünf Jahre nicht verwendet wurden, werden automatisch
   archiviert.
 - Organisationen mit verknüpften Einträgen (Personen, Projekte, Rechnungen

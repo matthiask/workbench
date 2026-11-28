@@ -34,6 +34,7 @@ from workbench.contacts.models import (
     PhoneNumber,
     PostalAddress,
     organization_postal_addresses,
+    update_organization_archival,
 )
 from workbench.contacts.urls import autocomplete_filter
 from workbench.deals.models import Deal
@@ -1167,6 +1168,27 @@ class ContactsTest(TestCase):
             [f"{organization.name} has been unarchived."],
         )
         self.assertFalse(organization.is_archived)
+
+    def test_archive_organization_with_last_person_sites(self):
+        """Active sites and running recurring invoices also keep the
+        organization of the last person active"""
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create(), is_archived=True
+        )
+        organization = person.organization
+        site = factories.SiteFactory.create(customer=organization)
+        self.assertIsNone(update_organization_archival(person))
+
+        site.is_archived = True
+        site.save()
+        recurring = factories.RecurringInvoiceFactory.create(
+            customer=organization, contact=None
+        )
+        self.assertIsNone(update_organization_archival(person))
+
+        recurring.ends_on = dt.date.today() - dt.timedelta(days=1)
+        recurring.save()
+        self.assertEqual(update_organization_archival(person), organization)
 
     def test_active_person_unarchives_organization(self):
         """Creating or moving an active person into an archived organization

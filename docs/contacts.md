@@ -53,7 +53,7 @@ fields follow for sorting and filtering.
   history but aren't offered for new projects, deals and invoices.
   Archiving an organization offers to archive its people; archiving its
   last person archives the organization too, unless it has open projects
-  or deals.
+  or deals, active sites or running recurring invoices.
 - Contacts unused for five years are archived automatically.
 - Organizations with related records (people, projects, invoices and
   so on) can't be deleted: merge or archive them.
