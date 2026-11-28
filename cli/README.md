@@ -406,7 +406,8 @@ they are:
 
 Logged hours and costs are reassigned to another service of the project like
 in the web interface; invoiced entries stay with their service unless they are
-included:
+included. Projects closed too long ago (`logbook-locked`) and invoiced hours
+valued at another rate (`different-rate`) are warnings:
 
     wb services reassign-logbook 902 --to 905 --dry-run
     wb services reassign-logbook 902 --to 905 --include-invoiced

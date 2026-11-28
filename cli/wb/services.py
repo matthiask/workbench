@@ -3,6 +3,7 @@
 import click
 
 from wb.core import (
+    change_params,
     cli,
     console,
     echo_csv,
@@ -327,16 +328,23 @@ def reorder_services(service_ids, dry_run, as_json):
     " their invoice lines refer to.",
 )
 @click.option("--dry-run", is_flag=True, help="Validate and count only.")
+@ignore_warnings_option
 @click.option("--json", "as_json", is_flag=True)
-def reassign_logbook(service_id, to, include_invoiced, dry_run, as_json):
+def reassign_logbook(
+    service_id, to, include_invoiced, dry_run, ignore_warnings, as_json
+):
     """Reassign the logged hours and costs of a service to another service,
     like in the web interface (`wb services merge` also moves the invoice
-    lines and deletes the service)"""
+    lines and deletes the service)
+
+    Projects closed too long ago to change their logbook are a warning
+    (logbook-locked), so are invoiced hours valued with another effort type
+    or rate (different-rate)."""
     data = request(
         "POST",
         f"services/{service_id}/reassign-logbook/",
         json={"to": to, "include_invoiced": include_invoiced},
-        params={"dry_run": format_bool(dry_run)},
+        params=change_params(dry_run, ignore_warnings),
     )
     if as_json:
         echo_json(data)

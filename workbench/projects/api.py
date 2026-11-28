@@ -86,7 +86,6 @@ from workbench.tools.api import (
     form_data,
     object_pk,
     patch_with_form,
-    raise_form_errors,
     user_by_short_name,
     validate_form,
     without_query,
@@ -1876,20 +1875,27 @@ class ReassignLogbookOut(Schema):
     by_alias=True,
 )
 def service_reassign_logbook(
-    request, service_id: int, data: ReassignLogbookIn, *, dry_run: DryRun = False
+    request,
+    service_id: int,
+    data: ReassignLogbookIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
 ):
     """Reassign the logged hours and costs of a service to another service,
     validated with the form of the web interface
 
-    Merge services to also move the invoice lines and delete the service."""
+    Projects closed too long ago to change their logbook are a warning
+    (``logbook-locked``), so are invoiced hours valued with another effort
+    type or rate (``different-rate``). Merge services to also move the
+    invoice lines and delete the service."""
     service = get_object_or_404(Service, pk=service_id)
     form = ReassignLogbookForm(
         {"service": data.to, "include_invoiced": data.include_invoiced or ""},
         instance=service,
         request=request,
     )
-    if not form.is_valid(ignore_warnings=True):
-        raise_form_errors(form, fields={"service": ["to"]})
+    validate_form(form, fields={"service": ["to"]}, ignore_warnings=ignore_warnings)
 
     controlling = request.user.features[FEATURES.CONTROLLING]
     with transaction.atomic():
@@ -1962,7 +1968,9 @@ def service_merge(
     Services of offers which have been sent can't be merged (service groups
     can).
     Different effort types or rates are a warning (``different-rate``), the
-    logged hours are valued with the rate of the service kept."""
+    logged hours are valued with the rate of the service kept; so are
+    projects closed too long ago to change their logbook
+    (``logbook-locked``)."""
     service = get_object_or_404(Service, pk=service_id)
     form = ServiceMergeForm(
         {"into": data.into}, instance=service, request=request, prefix=""

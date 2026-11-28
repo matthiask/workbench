@@ -28,7 +28,9 @@ Hours and costs are always logged on a service. Create services with
 [logging hours](hours.md). A service's menu reassigns its logbook
 entries to other services (except entries on an invoice), merges it into another service or moves it to another project
 (only services without offer and not invoiced; on closed projects only
-services without logged hours or costs). Services which have
+services without logged hours or costs). Reassigning and merging warn on
+projects closed too long ago to change their logbook, and when invoiced
+hours would be valued at another rate. Services which have
 been invoiced can't be deleted.
 
 ## Closing a project

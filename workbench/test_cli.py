@@ -1185,7 +1185,16 @@ planned_work:
         )
         self.assertEqual(result.exit_code, 0, result.output)
         target = factories.ServiceFactory.create(project=project)
-        result = self.wb("services", "reassign-logbook", service.pk, "--to", target.pk)
+        # Projects closed too long ago warn
+        project.closed_on = dt.date.today() - dt.timedelta(days=60)
+        project.save()
+        reassign = ["services", "reassign-logbook", service.pk, "--to", target.pk]
+        result = self.wb(*reassign)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("--ignore-warning logbook-locked", result.output)
+        project.closed_on = None
+        project.save()
+        result = self.wb(*reassign)
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("1 logged hours", result.output)
         self.assertEqual(target.loggedhours.count(), 1)

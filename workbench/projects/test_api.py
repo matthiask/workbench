@@ -1104,6 +1104,59 @@ class ProjectsAPITest(TestCase):
                 [e["loc"] for e in response.json()["detail"]], [["body", "data", "to"]]
             )
 
+    def test_service_reassign_and_merge_warnings(self):
+        """Bulk moves stay possible for clean ups, but warn about projects
+        closed too long ago and invoiced hours valued at another rate"""
+        project = factories.ProjectFactory.create()
+        service = factories.ServiceFactory.create(
+            project=project, effort_type="Any", effort_rate=150
+        )
+        target = factories.ServiceFactory.create(
+            project=project, effort_type="Any", effort_rate=100
+        )
+        factories.LoggedHoursFactory.create(service=service, hours=10)
+        invoice = factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.SERVICES,
+        )
+        invoice.create_services_from_logbook([service])
+        project.closed_on = dt.date.today() - dt.timedelta(days=60)
+        project.save()
+        self.client.force_login(project.owned_by)
+
+        def post(path, data, query=""):
+            response = self.client.post(
+                f"/api/services/{service.pk}/{path}/{query}",
+                data,
+                content_type="application/json",
+            )
+            codes = (
+                sorted(e.get("code") for e in response.json()["detail"])
+                if response.status_code == 422
+                else []
+            )
+            return response.status_code, codes
+
+        self.assertEqual(
+            post("reassign-logbook", {"to": target.pk, "include_invoiced": True}),
+            (422, ["different-rate", "logbook-locked"]),
+        )
+        self.assertEqual(
+            post(
+                "reassign-logbook",
+                {"to": target.pk, "include_invoiced": True},
+                "?dry_run=1&ignore_warnings=different-rate"
+                "&ignore_warnings=logbook-locked",
+            ),
+            (200, []),
+        )
+        self.assertEqual(
+            post("merge", {"into": target.pk}),
+            (422, ["different-rate", "logbook-locked"]),
+        )
+
     def test_service_title(self):
         """Titles of services which aren't bound to sent offers can be changed,
         e.g. to the title of their issue; they are required"""

@@ -32,7 +32,10 @@ Logbucheinträge anderen Leistungen zu (ausser Einträgen auf einer
 Rechnung), führt sie mit einer anderen Leistung zusammen
 oder verschiebt sie in ein anderes Projekt (nur Leistungen ohne Offerte
 und nicht verrechnet; auf geschlossenen Projekten nur Leistungen ohne
-erfasste Stunden oder Kosten). Verrechnete Leistungen lassen sich nicht löschen.
+erfasste Stunden oder Kosten). Zuweisen und Zusammenführen warnen bei
+Projekten, die zu lange geschlossen sind, um ihr Logbuch noch zu ändern,
+und wenn verrechnete Stunden zu einem anderen Ansatz bewertet würden.
+Verrechnete Leistungen lassen sich nicht löschen.
 
 ## Ein Projekt schliessen
 

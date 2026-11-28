@@ -681,6 +681,17 @@ class ServiceForm(ModelForm):
         return data
 
 
+def logbook_locked_warning(project):
+    """Warning (``logbook-locked``) when moving logbook entries of a project
+    closed too long ago to change them, or None"""
+    if not project.is_logbook_locked:
+        return None
+    return _(
+        "This project has been closed too long ago, moving its logbook entries"
+        " changes its past figures."
+    )
+
+
 class ReassignLogbookForm(Form):
     service = forms.ModelChoiceField(
         Service.objects.all(), label=Service._meta.verbose_name
@@ -711,6 +722,30 @@ class ReassignLogbookForm(Form):
                 ),
                 required=False,
             )
+
+    def clean(self):
+        data = super().clean()
+        # Possible for clean ups, but changes the past figures
+        if warning := logbook_locked_warning(self.from_service.project):
+            self.add_warning(warning, code="logbook-locked")
+        if (
+            (service := data.get("service"))
+            and data.get("include_invoiced")
+            and (service.effort_type, service.effort_rate)
+            != (self.from_service.effort_type, self.from_service.effort_rate)
+            and self.from_service.loggedhours.filter(
+                invoice_service__isnull=False
+            ).exists()
+        ):
+            self.add_warning(
+                _(
+                    "The services have different effort types or rates, the"
+                    " invoiced hours will be valued with the rate of %(service)s."
+                )
+                % {"service": service},
+                code="different-rate",
+            )
+        return data
 
     def logbook_entries(self):
         """The logged hours and costs which are reassigned"""
@@ -761,6 +796,8 @@ class ServiceMergeForm(Form):
                     " which has been sent already."
                 ),
             )
+        if warning := logbook_locked_warning(self.instance.project):
+            self.add_warning(warning, code="logbook-locked")
         keep = data.get("into")
         if (
             keep
