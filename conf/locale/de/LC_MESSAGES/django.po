@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-28 15:27+0100\n"
+"POT-Creation-Date: 2026-11-28 16:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1291,6 +1291,11 @@ msgstr "Verschiebt Projekte, Deals, Rechnungen, Kontaktangaben und Gruppen zu di
 
 #: workbench/contacts/forms.py
 #, python-format
+msgid "%(person)s is the last active contact for outages of %(sites)s."
+msgstr "%(person)s ist die letzte aktive Kontaktperson für Störungen von %(sites)s."
+
+#: workbench/contacts/forms.py
+#, python-format
 msgid "This person is the contact of the following related objects: %s. Modifying this record may be more confusing than archiving this one and creating a new record instead."
 msgstr "Diese Person ist der Kontakt der folgenden zugehörigen Objekte: %s. Vielleicht ist es weniger verwirrend, diesen Eintrag zu archivieren und einen neuen zu erstellen als die Organisation zu ändern."
 
@@ -1322,7 +1327,7 @@ msgstr "%(user)s ist jetzt auch Hauptkontakt von %(organization)s."
 msgid "%(organization)s has been archived with its last person."
 msgstr "%(organization)s wurde mit der letzten Person archiviert."
 
-#: workbench/contacts/forms.py
+#: workbench/contacts/forms.py workbench/tools/forms.py
 #, python-format
 msgid "%(organization)s has been unarchived."
 msgstr "%(organization)s ist nicht mehr archiviert."
@@ -3526,7 +3531,8 @@ msgstr "Falls Du eine neue Leistung erstellen willst, darfst Du keine existieren
 msgid "Logging is not allowed on this service anymore."
 msgstr "Auf dieser Leistung kann nicht mehr erfasst werden."
 
-#: workbench/logbook/forms.py workbench/timer/api.py workbench/timer/models.py
+#: workbench/logbook/forms.py workbench/logbook/models.py
+#: workbench/timer/api.py workbench/timer/models.py
 msgid "This project has been closed too long ago."
 msgstr "Dieses Projekt ist schon zu lange geschlossen."
 
@@ -3937,6 +3943,11 @@ msgstr "Du hast den Offertenstatus auf 'Abgelehnt' gesetzt. Wenn Du nur einige D
 
 #: workbench/offers/forms.py
 #, python-format
+msgid "The deals of this offer have been declined: %(deals)s. Reopen and accept the deal if it has been won after all, otherwise the offer counts as accepted offer without deal."
+msgstr "Die Geschäfte dieser Offerte wurden abgelehnt: %(deals)s. Öffne und akzeptiere das Geschäft, wenn es doch gewonnen wurde, sonst zählt die Offerte als akzeptierte Offerte ohne Geschäft."
+
+#: workbench/offers/forms.py
+#, python-format
 msgid "The work of this offer has been completed, services added to it can't be logged on anymore: %(services)s."
 msgstr "Die Arbeit an dieser Offerte ist abgeschlossen, auf hinzugefügten Leistungen kann nicht mehr erfasst werden: %(services)s."
 
@@ -4277,6 +4288,11 @@ msgid "external work"
 msgstr "Kundenarbeit"
 
 #: workbench/planning/models.py
+#, python-format
+msgid "%(user)s isn't employed in the weeks of %(weeks)s."
+msgstr "%(user)s hat in den Wochen vom %(weeks)s kein Anstellungsverhältnis."
+
+#: workbench/planning/models.py
 #: workbench/templates/planning/planning_import.html
 msgid "is provisional"
 msgstr "ist provisorisch"
@@ -4588,12 +4604,21 @@ msgid "The work of the offer %(offer)s has been completed on %(date)s, its servi
 msgstr "Die Arbeit an der Offerte %(offer)s wurde am %(date)s abgeschlossen, auf ihren Leistungen kann nicht mehr erfasst werden."
 
 #: workbench/projects/forms.py
+msgid "This project has been closed too long ago, moving its logbook entries changes its past figures."
+msgstr "Dieses Projekt wurde vor zu langer Zeit geschlossen, das Verschieben seiner Logbucheinträge ändert seine vergangenen Zahlen."
+
+#: workbench/projects/forms.py
 msgid "Also reassign invoiced logbook entries"
 msgstr "Auch verrechnete Einträge umbuchen"
 
 #: workbench/projects/forms.py
 msgid "Otherwise they stay with this service, to which their invoice lines refer."
 msgstr "Sonst bleiben sie bei dieser Leistung, auf die ihre Rechnungszeilen verweisen."
+
+#: workbench/projects/forms.py
+#, python-format
+msgid "The services have different effort types or rates, the invoiced hours will be valued with the rate of %(service)s."
+msgstr "Die Leistungen haben unterschiedliche Aufwandarten oder Ansätze, die verrechneten Stunden werden mit dem Ansatz von %(service)s bewertet."
 
 #: workbench/projects/forms.py
 msgid "Merge into"
@@ -4888,6 +4913,10 @@ msgstr "Logbuch-Batch-Bearbeitung"
 #: workbench/reporting/api.py
 msgid "Expected a month like 2026-09."
 msgstr "Erwartet wird ein Monat wie 2026-09."
+
+#: workbench/reporting/api.py
+msgid "Key data can't be computed for the future."
+msgstr "Kennzahlen können nicht für die Zukunft berechnet werden."
 
 #: workbench/reporting/api.py
 msgid "Cash data can't be computed for the future."
