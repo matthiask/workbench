@@ -52,7 +52,8 @@ fields follow for sorting and filtering.
   lists and on people finds candidates.
 - **Archive** contacts which aren't needed anymore: they stay with their
   history but aren't offered for new projects, deals and invoices.
-  Archiving an organization offers to archive its people; archiving its
+  Archiving an organization offers to archive its people and warns about
+  its active sites and running recurring invoices; archiving its
   last person archives the organization too, unless it has open projects
   or deals, active sites or running recurring invoices.
 - Contacts unused for five years are archived automatically.

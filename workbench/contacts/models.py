@@ -200,6 +200,33 @@ class Organization(Model):
             RecurringInvoice.objects.open().filter(customer=self),
         )
 
+    def archive_running_warning(self, user):
+        """Archiving an organization warns about its active sites (only for
+        users with the ``HOSTING`` feature) and running recurring invoices"""
+        from workbench.accounts.features import FEATURES
+
+        sites, recurring = self.active_sites_and_running_recurring_invoices()
+        related = []
+        if user.features[FEATURES.HOSTING] and (count := sites.count()):
+            related.append(
+                ngettext("%(count)s active site", "%(count)s active sites", count)
+                % {"count": count}
+            )
+        if count := recurring.count():
+            related.append(
+                ngettext(
+                    "%(count)s running recurring invoice",
+                    "%(count)s running recurring invoices",
+                    count,
+                )
+                % {"count": count}
+            )
+        if not related:
+            return None
+        return _("This organization still has %(related)s.") % {
+            "related": ", ".join(related)
+        }
+
     def archive_people(self):
         return self.people.active().update(is_archived=True)
 

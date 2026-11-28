@@ -640,18 +640,25 @@ def organization_update(
     or archive it, with the rules of the organization form. The name of
     another active organization is a warning (``duplicate-name``). Archiving warns
     about active people (`archive-people`), ignoring the warning archives them
-    too."""
+    too, and about active sites and running recurring invoices
+    (`archive-running`)."""
     organization = get_object_or_404(Organization, pk=organization_id)
     name = organization.name
     archiving = data.is_archived and not organization.is_archived
-    if (
-        archiving
-        and "archive-people" not in ignore_warnings
-        and (warning := organization.archive_warning())
+    if archiving and (
+        warnings := [
+            {"loc": ["body", "data"], "msg": warning, "code": code}
+            for code, get in [
+                ("archive-people", organization.archive_warning),
+                (
+                    "archive-running",
+                    lambda: organization.archive_running_warning(request.user),
+                ),
+            ]
+            if code not in ignore_warnings and (warning := get())
+        ]
     ):
-        raise ValidationError([
-            {"loc": ["body", "data"], "msg": warning, "code": "archive-people"}
-        ])
+        raise ValidationError(warnings)
     errors = []
 
     def error(loc, msg):

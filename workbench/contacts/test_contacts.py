@@ -1335,6 +1335,47 @@ class ContactsTest(TestCase):
         response = self.client.post(organization.urls["update"], data)
         self.assertRedirects(response, organization.urls["detail"])
 
+    def test_archive_organization_with_sites(self):
+        """Archiving an organization warns about its active sites (with
+        HOSTING) and its running recurring invoices"""
+        organization = factories.OrganizationFactory.create()
+        factories.SiteFactory.create(customer=organization)
+        factories.RecurringInvoiceFactory.create(customer=organization, contact=None)
+        self.client.force_login(organization.primary_contact)
+
+        data = {
+            "name": organization.name,
+            "primary_contact": organization.primary_contact_id,
+            "is_archived": "on",
+        }
+        response = self.client.post(organization.urls["update"], data)
+        self.assertContains(response, "archive-running")
+        self.assertContains(
+            response,
+            "This organization still has 1 active site, 1 running recurring invoice.",
+        )
+
+        with override_settings(FEATURES={FEATURES.HOSTING: F.NEVER}):
+            response = self.client.post(organization.urls["update"], data)
+            self.assertContains(
+                response, "This organization still has 1 running recurring invoice."
+            )
+
+        url = f"/api/contacts/organizations/{organization.pk}/"
+        response = self.client.patch(
+            url, {"is_archived": True}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["code"], "archive-running")
+
+        response = self.client.post(
+            organization.urls["update"],
+            data | {WarningsForm.ignore_warnings_id: "archive-running"},
+        )
+        self.assertRedirects(response, organization.urls["detail"])
+        organization.refresh_from_db()
+        self.assertTrue(organization.is_archived)
+
     def test_copy_postal_address_from_colleague(self):
         """The person form offers the distinct addresses of active colleagues
         which the person doesn't have yet"""

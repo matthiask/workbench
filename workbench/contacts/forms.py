@@ -414,8 +414,11 @@ class OrganizationForm(ModelForm):
 
     def clean(self):
         data = super().clean()
-        if self._archiving() and (warning := self.instance.archive_warning()):
-            self.add_warning(warning, code="archive-people")
+        if self._archiving():
+            if warning := self.instance.archive_warning():
+                self.add_warning(warning, code="archive-people")
+            if warning := self.instance.archive_running_warning(self.request.user):
+                self.add_warning(warning, code="archive-running")
         return data
 
     def save(self, *, commit=True):

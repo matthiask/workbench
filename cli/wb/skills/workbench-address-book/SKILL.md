@@ -218,6 +218,10 @@ the rest:
 
     wb organizations update <organization_id> --archive --dry-run
 
+Active sites and running recurring invoices are a warning
+(`archive-running`): ask the user instead of ignoring it, the sites and
+invoices probably need a new customer or an end first.
+
 People who left an organization but are still worth keeping (e.g. former
 employees) aren't archived: move them to their new organization, or to none
 if it isn't known, and remove the old organization's email and postal

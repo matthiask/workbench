@@ -324,7 +324,8 @@ def create_organization(
     "is_archived",
     default=None,
     help="Archiving warns about active people (archive-people), ignoring the"
-    " warning archives them too.",
+    " warning archives them too, and about active sites and running recurring"
+    " invoices (archive-running).",
 )
 @click.option("--dry-run", is_flag=True, help="Validate only.")
 @ignore_warnings_option

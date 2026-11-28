@@ -55,7 +55,8 @@ Adressfelder folgen zum Sortieren und Filtern.
 - **Archiviere** Kontakte, die nicht mehr gebraucht werden: Sie bleiben
   mit ihrer Geschichte erhalten, werden aber für neue Projekte, Geschäfte
   und Rechnungen nicht mehr angeboten. Beim Archivieren einer
-  Organisation bietet Workbench an, ihre Personen mitzuarchivieren; wird
+  Organisation bietet Workbench an, ihre Personen mitzuarchivieren, und
+  warnt vor ihren aktiven Sites und laufenden Stapelrechnungen; wird
   ihre letzte Person archiviert, wird auch die Organisation archiviert,
   ausser sie hat offene Projekte oder Geschäfte, aktive Sites oder laufende
   Stapelrechnungen.
