@@ -37,6 +37,23 @@ class ReportingTest(TestCase):
             )
         self.assertEqual(Accruals.objects.accruals(dt.date.today()), -100)
 
+    @travel("2026-12-02 12:00")
+    def test_accruals_project_created_later(self):
+        """Invoices dated before their project was created count in the
+        accruals of their date"""
+        project = factories.ProjectFactory.create()
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.DOWN_PAYMENT,
+            invoiced_on=dt.date(2026, 11, 30),
+            due_on=dt.date(2026, 12, 30),
+            subtotal=100,
+            status=Invoice.SENT,
+        )
+        self.assertEqual(Accruals.objects.accruals(dt.date(2026, 11, 30)), -100)
+
     def test_key_data_without_data(self):
         """The key data view doesn't crash without any data"""
         self.client.force_login(factories.UserFactory.create())

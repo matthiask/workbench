@@ -209,12 +209,9 @@ class ProjectQuerySet(SearchQuerySet):
         return (
             self.filter(closed_on__isnull=True)
             if on is None
-            else self.filter(
-                Q(closed_on__isnull=True) | Q(closed_on__gt=on),
-                created_at__lte=timezone.make_aware(
-                    dt.datetime.combine(on, dt.time.max)
-                ),
-            )
+            # The creation date doesn't matter: Invoices and logbook entries
+            # may be dated before the project was created
+            else self.filter(Q(closed_on__isnull=True) | Q(closed_on__gt=on))
         )
 
     def external(self):
