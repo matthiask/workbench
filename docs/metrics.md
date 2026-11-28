@@ -239,8 +239,8 @@ Answers: what money is owed to the agency and what is expected to be invoiced, a
 | `open_invoices.overdue_incl_tax` | Σ total of those with `due_on < cutoff`. |
 | `receivables_by_due_week[]` | Same invoices grouped by ISO year/week of `due_on` (fallback `invoiced_on`): `amount_excl_tax`, `amount_incl_tax`; empty weeks dropped; past weeks included. |
 | `accruals` | `delta_negative` of project budget statistics over `Project.objects.open(on=cutoff).external()` at cutoff (negative; internal projects excluded, always computed live). |
-| `planned_invoicing_by_month[]` | `monthly_overall` of projected gross margin not yet invoiced of open **external** projects, from the month of `date`, at least 7 months, extended to the last month with projections. `amount_excl_tax` is gross margin (third party costs not included). |
-| `planned_invoicing_overdue_excl_tax` | Σ `monthly_overall` of months before the month of `date`. |
+| `planned_invoicing_by_month[]` | `monthly_overall` of projected gross margin not yet invoiced of open **external** projects, from the month of the cutoff (today's month also for a `date` in the current week's previous month, like the open invoices), at least 7 months, extended to the last month with projections. `amount_excl_tax` is gross margin (third party costs not included). |
+| `planned_invoicing_overdue_excl_tax` | Σ `monthly_overall` of months before the month of the cutoff. |
 | `accepted_offers_not_invoiced.total_excl_tax` | Revenue: Σ over open external projects of max(accepted offers total − Σ invoiced Invoice.total_excl_tax, 0). Accepted offers per project as defined above (budget retainers included). |
 | `accepted_offers_not_invoiced.not_in_planned_invoicing_excl_tax` | Gross margin: Σ over the same projects of max(max(offered GM − invoiced GM, 0) − projected-not-invoiced delta of the project, 0). |
 | `work_not_invoiced.total_excl_tax` | `delta_positive` (logged costs + effort cost − invoiced, positive projects only) of open external projects at cutoff. |

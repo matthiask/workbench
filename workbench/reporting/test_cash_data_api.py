@@ -304,3 +304,24 @@ class CashDataAPITest(TestCase):
             ],
         )
         self.assertEqual(data["planned_invoicing_overdue_excl_tax"], 500.0)
+
+    @travel("2026-12-02 08:00")
+    def test_date_in_the_current_week_but_previous_month(self):
+        """Planned invoicing starts with the month of the request, like the
+        open invoices, also for dates in the current week's previous month"""
+        project = factories.ProjectFactory.create()
+        factories.ProjectedInvoiceFactory.create(
+            project=project,
+            invoiced_on=dt.date(2026, 11, 15),
+            gross_margin=Decimal(1000),
+        )
+
+        data = self.client.get(
+            "/api/reports/cash-data/?date=2026-11-30", headers=AUTH
+        ).json()
+        self.assertEqual(data["date"], "2026-11-30")
+        self.assertEqual(
+            data["planned_invoicing_by_month"][0],
+            {"month": "2026-12", "amount_excl_tax": 0.0},
+        )
+        self.assertEqual(data["planned_invoicing_overdue_excl_tax"], 1000.0)

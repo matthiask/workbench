@@ -135,9 +135,11 @@ def cash_data(date):
     }
     if is_current:
         pgm = projected_gross_margin(Project.objects.open().external())
-        data["planned_invoicing_by_month"] = planned_invoicing(date, pgm)
+        # Months relative to the time of the request like the open invoices,
+        # also when the date is in the current week's previous month
+        data["planned_invoicing_by_month"] = planned_invoicing(cutoff_date, pgm)
         data["planned_invoicing_overdue_excl_tax"] = planned_invoicing_overdue(
-            date, pgm
+            cutoff_date, pgm
         )
         data["accepted_offers_not_invoiced"] = accepted_offers_not_invoiced(pgm)
         # Logged work valued at the effort rates which hasn't been invoiced
