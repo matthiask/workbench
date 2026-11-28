@@ -238,68 +238,46 @@ Decided:
 ## Round 6 (2026-11-28)
 
 Four agents (API write routes, planning/time, invoices/reports,
-contacts/hosting/audit).
+contacts/hosting/audit). The verified bugs and the decisions below have
+been implemented (the commits after "Verification: Findings of the sixth
+round", up to wb 0.58.0).
 
-### Verified bugs, open
+### Decided
 
-- Cancelling an applied down payment in the settle modal leaves the final
-  invoice (in preparation) deducting it (`SettleInvoiceForm` has no save
-  logic like `InvoiceForm.save()`).
-- `ServiceMoveForm` moves services (and their logged hours) out of closed
-  projects; the logbook move paths refuse.
-- `patch_with_form()` refuses `delete_planned_work` when the form doesn't
-  ask (no future planned work), also `false`.
-- Project and campaign planning only show external work inside the weeks
-  of the planned work and milestones.
-- The planning batch update crashes on huge `move_by_weeks`
-  (`OverflowError`).
-- `contact_of()` ignores site contacts: deleting or merging a person who is
-  a site contact neither warns nor names the sites.
-- `update_organization_archival()` archives organizations with active
-  sites or running recurring invoices (`_recent()` keeps them).
-- Merging people drops the duplicate's job title.
-- `without_complete_postal_address()` still requires a street or post
-  office box (postal code and city suffice since b61d1c9c).
-- Changing an email address to another address of the same person is
-  accepted (API and person form); two new rows with the same address in
-  one person form post are both saved.
-
-### Decided, to do
-
-- `LATE_LOGGING` doesn't skip the future checks.
-- Old breaks can't be deleted either (like logged hours).
-- Final invoices closing a project warn about sent down payments which
-  aren't applied.
-- Maintenance without deal in accepted deals deducts third party costs
-  once (like `gross_margin_components()`).
-- Needs action respects `postpone_reminders_until`; overdue invoices of
-  people who left without open project go to the project owner (closed
-  project) or to those with `CONTROLLING`.
-- The planning batch update warns about work after its milestone and of
-  declined offers, says "closed" only when moving; batch, API and import
-  deletions delete emptied future milestones; the milestone form warns
-  about external work after it.
-- Changing `create_invoice_on_day` warns about a backlog of invoices.
-- Moving a service warns whenever the target's flat rate changes its rate.
-- Working time corrections are only visible to the person and
-  `PERSONNEL_ADMINISTRATION`.
-- Absence days beyond the weekdays of the absence warn (not corrections).
-- Archiving an organization warns about active sites and running recurring
-  invoices.
-- Projects with budget transfers can't be deleted.
-- The planning API requires a service type and makes declined offers an
-  ignorable warning, like the form.
-- Site titles warn about duplicates, the recurring invoice form checks the
-  site against the new customer, histories show site contacts and sites.
-- The absence APIs accept the same users as the form.
-- Campaign planning is clamped to 10 years; people's search text is
-  refreshed after migration `0030`.
-- Closing a project through the API reports the offers it discarded or
-  declined.
-- Declined offers ask about their planned work only when the status
+- `LATE_LOGGING` only skips the logbook lock, not the future checks.
+- Old breaks can't be changed or deleted.
+- Final invoices closing a project warn about unapplied down payments.
+- Accepted deals' maintenance without deal uses the invoiced gross margin
+  of `gross_margin_components()`, so third party costs are deducted once
+  (the larger of invoiced and logged); a month can be negative when
+  logged costs grow without an invoice.
+- Needs action respects postponed reminders; overdue invoices of people
+  who left without open project go to the active owner of the closed
+  project, else to those with `CONTROLLING`. Invoices in preparation of
+  people who left stay unassigned.
+- The planning batch update warns like the planned work form; deleting
+  planned or external work deletes emptied future milestones; milestones
+  warn about external work after them; the planning API requires a service
+  type (null stays fine for legacy work without one) and warns about
+  declined offers (only when setting them, so re-imports aren't blocked).
+- Recurring invoices warn about a backlog when `create_invoice_on_day`
   changes.
-
-### Decided, no change
-
+- Moving a service warns whenever a flat rate changes its rate; services
+  with logged work don't move out of closed projects (empty ones do).
+- Working time corrections are only visible to the person and
+  `PERSONNEL_ADMINISTRATION`; absence days beyond the weekdays warn.
+- Archiving organizations warns about active sites and running recurring
+  invoices, which also keep organizations from being archived with their
+  last person; duplicate site titles warn.
+- Projects with budget transfers can't be deleted.
+- Declined and discarded offers ask about planned work and confirm
+  declining only when the status changes.
 - Projected invoices on or before the freeze date stay changeable and
   deletable (only dates are frozen).
+
+### Open
+
+- The audit history still shows other people's working time corrections
+  (user, dates, days, reason); the annual working time overview includes
+  them in totals.
+- Job titles aren't in the people's full text search.
