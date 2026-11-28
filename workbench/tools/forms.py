@@ -5,6 +5,7 @@ from functools import wraps
 from urllib.parse import urlencode
 
 from django import forms
+from django.contrib import messages
 from django.forms.utils import flatatt
 from django.urls import reverse
 from django.utils.encoding import force_str
@@ -337,6 +338,44 @@ class ModelForm(WarningsForm, forms.ModelForm):
                 self.add_warning(_("No contact selected."), code="no-contact")
 
         return data
+
+    def save(self, commit=True):  # noqa: FBT002
+        adding = self.instance._state.adding
+        instance = super().save(commit=commit)
+        self._unarchive_used_contacts(adding=adding)
+        return instance
+
+    def _unarchive_used_contacts(self, *, adding):
+        """Archived organizations and people are unarchived when they're used
+        again as customer or contact (also with ``commit=False``, the form is
+        valid)"""
+        from workbench.contacts.models import (
+            Organization,
+            Person,
+            unarchive_organization,
+        )
+
+        unarchived = []
+        for name in ["contact", "customer"]:
+            if name not in self.fields or not (adding or name in self.changed_data):
+                continue
+            value = self.cleaned_data.get(name)
+            if not isinstance(value, Organization | Person):
+                continue
+            value.refresh_from_db(fields=["is_archived"])
+            if value.is_archived:
+                value.is_archived = False
+                value.save()
+                unarchived.append(value)
+            if isinstance(value, Person) and (
+                organization := unarchive_organization(value)
+            ):
+                unarchived.append(organization)
+        for value in unarchived:
+            messages.info(
+                self.request,
+                _("%(organization)s has been unarchived.") % {"organization": value},
+            )
 
 
 def add_prefix(prefix):

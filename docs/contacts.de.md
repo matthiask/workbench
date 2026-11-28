@@ -54,7 +54,9 @@ Adressfelder folgen zum Sortieren und Filtern.
   Kandidaten.
 - **Archiviere** Kontakte, die nicht mehr gebraucht werden: Sie bleiben
   mit ihrer Geschichte erhalten, werden aber für neue Projekte, Geschäfte
-  und Rechnungen nicht mehr angeboten. Beim Archivieren einer
+  und Rechnungen nicht mehr angeboten. Werden sie wieder als Kunde oder
+  Kontakt verwendet (z.B. über die API), sind sie nicht mehr archiviert.
+  Beim Archivieren einer
   Organisation bietet Workbench an, ihre Personen mitzuarchivieren, und
   warnt vor ihren aktiven Sites und laufenden Stapelrechnungen; wird
   ihre letzte Person archiviert, wird auch die Organisation archiviert,

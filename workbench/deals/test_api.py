@@ -181,6 +181,38 @@ class DealsAPITest(TestCase):
         created = Deal.objects.get(pk=response.json()["id"])
         self.assertEqual(list(created.contributors.all()), [other])
 
+    def test_create_unarchives_contact(self):
+        """Archived customers and contacts are unarchived when they're used
+        again"""
+        organization = factories.OrganizationFactory.create(is_archived=True)
+        person = factories.PersonFactory.create(
+            organization=organization, is_archived=True
+        )
+        factories.ValueTypeFactory.create(title="Design")
+        self.client.force_login(factories.UserFactory.create())
+
+        deal = {
+            "title": "Relaunch",
+            "contact": person.pk,
+            "probability": "normal",
+            "values": {"design": 1},
+        }
+        response = self.client.post(
+            "/api/deals/?dry_run=true", deal, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        organization.refresh_from_db()
+        self.assertTrue(organization.is_archived)
+
+        response = self.client.post(
+            "/api/deals/", deal, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        organization.refresh_from_db()
+        person.refresh_from_db()
+        self.assertFalse(organization.is_archived)
+        self.assertFalse(person.is_archived)
+
     def test_create_errors(self):
         """Unknown value types and missing attributes list the choices"""
         group = factories.AttributeGroupFactory.create(title="Source")

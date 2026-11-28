@@ -51,7 +51,8 @@ fields follow for sorting and filtering.
   details and groups to the contact kept. "Possible duplicates" on the
   lists and on people finds candidates.
 - **Archive** contacts which aren't needed anymore: they stay with their
-  history but aren't offered for new projects, deals and invoices.
+  history but aren't offered for new projects, deals and invoices. Using
+  them again as customer or contact (e.g. through the API) unarchives them.
   Archiving an organization offers to archive its people and warns about
   its active sites and running recurring invoices; archiving its
   last person archives the organization too, unless it has open projects
