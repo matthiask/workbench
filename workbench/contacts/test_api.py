@@ -488,6 +488,15 @@ class ContactsAPITest(TestCase):
         response = patch({"type": "Home"})
         self.assertEqual(response.status_code, 200, response.content)
 
+        # Another address of the same person is an error, not a warning
+        person.emailaddresses.create(type="Home", email="hans@example.org")
+        response = patch({"email": "Hans@example.org"}, "?ignore_warnings=email-in-use")
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["msg"],
+            f"{person} has this email address already.",
+        )
+
     def test_remove_details(self):
         """Email addresses, phone numbers and postal addresses are removed by
         their ID, the person stays"""

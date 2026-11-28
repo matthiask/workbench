@@ -1797,12 +1797,27 @@ def person_change_email_address(
 ):
     """Change an email address of a person, like in the web interface: an
     address another person or an organization (centrally) uses already is a
-    warning (``email-in-use``)"""
+    warning (``email-in-use``), another address of the same person an
+    error"""
     email = get_object_or_404(
         EmailAddress.objects.select_related("person"), pk=email_id, person=person_id
     )
 
     def check(form):
+        if (
+            "email" in form.changed_data
+            and email.person.emailaddresses
+            .exclude(pk=email.pk)
+            .filter(email__iexact=form.cleaned_data["email"].strip())
+            .exists()
+        ):
+            raise ValidationError([
+                {
+                    "loc": ["body", "data", "email"],
+                    "msg": _("%(person)s has this email address already.")
+                    % {"person": email.person},
+                }
+            ])
         if (
             "email" in form.changed_data
             and "email-in-use" not in ignore_warnings

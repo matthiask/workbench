@@ -14,7 +14,8 @@ organizations; for a private person create an organization and tick
   added once the person has been saved. "Copy from colleague" takes over
   a colleague's address. A "Home" address leaves out the organization.
   An email address which another person or an organization (as its
-  central address) uses already is a warning.
+  central address) uses already is a warning; a person has each address
+  only once.
 - The **job title** (e.g. Head of Communications) belongs to the person,
   not into the address: addresses print without it.
 - Addresses print in the order of Swiss Post: the **address suffix**

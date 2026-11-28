@@ -168,6 +168,52 @@ class ContactsTest(TestCase):
         )
         self.assertRedirects(response, person.urls["detail"])
 
+    def test_update_email_addresses_twice(self):
+        """A person can't have the same email address twice, neither by
+        changing an address nor by adding it twice"""
+        person = factories.PersonFactory.create(salutation="Dear John")
+        email = person.emailaddresses.create(type="Work", email="hans@example.com")
+        home = person.emailaddresses.create(type="Home", email="hans@example.org")
+        self.client.force_login(person.primary_contact)
+
+        def data(*emails):
+            return person_to_dict(
+                person,
+                **{
+                    "emailaddresses-TOTAL_FORMS": len(emails),
+                    "emailaddresses-INITIAL_FORMS": 2,
+                },
+                **{
+                    f"emailaddresses-{index}-{field}": value
+                    for index, values in enumerate(emails)
+                    for field, value in values.items()
+                },
+            )
+
+        work = {"id": email.pk, "person": person.pk, "type": "Work"}
+        private = {"id": home.pk, "person": person.pk, "type": "Home"}
+        response = self.client.post(
+            person.urls["update"],
+            data(
+                work | {"email": "Hans@example.org"},
+                private | {"email": "hans@example.org"},
+            ),
+        )
+        self.assertContains(response, f"{person} has this email address already.")
+
+        new = {"person": person.pk, "type": "Work", "email": "new@example.com"}
+        response = self.client.post(
+            person.urls["update"],
+            data(
+                work | {"email": "hans@example.com"},
+                private | {"email": "hans@example.org"},
+                new,
+                new | {"email": "NEW@example.com "},
+            ),
+        )
+        self.assertContains(response, "Listed twice.")
+        self.assertEqual(person.emailaddresses.count(), 2)
+
     def test_update_primary_contact_takes_over_organization(self):
         """A new primary contact of a person also becomes the primary contact
         of the organization if the organization's isn't active anymore"""

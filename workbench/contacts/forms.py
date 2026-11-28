@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count, Func, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import Coalesce
-from django.forms.models import inlineformset_factory
+from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.http import Http404
 from django.template.defaultfilters import linebreaksbr
 from django.utils import timezone
@@ -857,9 +857,37 @@ PhoneNumberFormset = inlineformset_factory(
     },
 )
 
+
+class BaseEmailAddressFormset(BaseInlineFormSet):
+    def clean(self):
+        """A person has each email address once: changed and new addresses
+        may not repeat another one (existing duplicates are left alone)"""
+        super().clean()
+        forms = [
+            (form, form.cleaned_data["email"].strip().casefold())
+            for form in self.forms
+            if form.cleaned_data.get("email") and not self._should_delete_form(form)
+        ]
+        unchanged = {email for form, email in forms if "email" not in form.changed_data}
+        seen = set()
+        for form, email in forms:
+            if "email" not in form.changed_data:
+                continue
+            if email in unchanged:
+                form.add_error(
+                    "email",
+                    _("%(person)s has this email address already.")
+                    % {"person": self.instance},
+                )
+            elif email in seen:
+                form.add_error("email", _("Listed twice."))
+            seen.add(email)
+
+
 EmailAddressFormset = inlineformset_factory(
     Person,
     EmailAddress,
+    formset=BaseEmailAddressFormset,
     fields=("type", "email"),
     extra=0,
     widgets={
