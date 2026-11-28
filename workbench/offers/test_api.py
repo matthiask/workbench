@@ -850,6 +850,20 @@ class OfferServicesAPITest(TestCase):
         self.assertFalse(self.offer.planned_work.exists())
         self.assertEqual(self.offer.services.count(), 2)
 
+    def test_decline_without_planned_work(self):
+        """Answering the planned work question which isn't asked is fine"""
+        self.offer.status = Offer.OFFERED
+        self.offer.offered_on = self.offer.valid_until = dt.date.today()
+        self.offer.save()
+
+        response = self.patch(
+            {"status": "declined", "delete_planned_work": False},
+            ignore_warnings=["yes-please-decline"],
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.offer.refresh_from_db()
+        self.assertEqual(self.offer.status, Offer.DECLINED)
+
     def test_short_postal_address(self):
         """Only new or changed postal addresses are checked, old offers with
         short addresses still change without ignoring the warning"""

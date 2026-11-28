@@ -1076,7 +1076,7 @@ class ProjectPatch(InputSchema):
         default=None,
         description="Required when closing a project whose offers in"
         " preparation (which are discarded) have planned work: delete it or"
-        " keep it.",
+        " keep it. Ignored otherwise.",
     )
 
 

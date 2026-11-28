@@ -1335,6 +1335,20 @@ class ProjectsAPITest(TestCase):
         data = self.client.get("/api/services/").json()["items"]
         self.assertIsNone(data[0]["effort_rate"])
 
+    def test_close_without_planned_work(self):
+        """Answering the planned work question which isn't asked is fine"""
+        project = factories.ProjectFactory.create()
+        self.client.force_login(project.owned_by)
+
+        response = self.client.patch(
+            f"/api/projects/{project.pk}/",
+            {"closed_on": dt.date.today().isoformat(), "delete_planned_work": False},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        project.refresh_from_db()
+        self.assertEqual(project.closed_on, dt.date.today())
+
     def test_update(self):
         """Projects are changed field by field and closed like in the web
         interface"""

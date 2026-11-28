@@ -171,6 +171,11 @@ def _converted(patch, convert):
     return values, errors
 
 
+# Questions which forms only ask sometimes (e.g. only when there's planned
+# work after this week); answers to questions which aren't asked are ignored
+SOMETIMES_ASKED = {"delete_planned_work"}
+
+
 def patch_with_form(
     form_class,
     instance,
@@ -197,7 +202,9 @@ def patch_with_form(
     ``object_pk(queryset)``, raising Django's ``ValidationError`` for
     invalid values) or both as ``(name, converter)``. Errors are located at
     the API field, ``["body", "data", <api field>]``. Fields which the form
-    disables or leaves out are refused unless their value is empty."""
+    disables or leaves out are refused unless their value is empty, except
+    for answers to questions which the form doesn't ask
+    (``SOMETIMES_ASKED``)."""
     if isinstance(patch, Schema):
         patch = patch.model_dump(exclude_unset=True)
     names, convert = {}, {}
@@ -220,6 +227,12 @@ def patch_with_form(
     # checked in the web interface
     values[form_class.ignore_warnings_id] = " ".join(ignore_warnings)
     form = form_class(values, **form_kwargs)
+    converted = {
+        api_field: value
+        for api_field, value in converted.items()
+        if api_field not in SOMETIMES_ASKED
+        or names.get(api_field, api_field) in form.fields
+    }
     # The web interface doesn't offer fields which the form disables or
     # leaves out, don't ignore them silently (empty values are fine)
     if errors := [

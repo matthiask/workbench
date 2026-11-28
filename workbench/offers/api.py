@@ -731,7 +731,7 @@ class OfferPatch(InputSchema):
     delete_planned_work: bool | None = Field(
         default=None,
         description="Required when declining or discarding an offer with"
-        " planned work after this week: delete it or keep it.",
+        " planned work after this week: delete it or keep it. Ignored otherwise.",
     )
 
 
