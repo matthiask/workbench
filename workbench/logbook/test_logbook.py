@@ -554,6 +554,30 @@ class LogbookTest(TestCase):
             html=True,
         )
 
+    def test_late_logging_future(self):
+        """LATE_LOGGING only allows logging in the past, not in the future"""
+        service = factories.ServiceFactory.create()
+        user = factories.UserFactory.create()
+        user._features.append(FEATURES.LATE_LOGGING)
+        user.save()
+        self.client.force_login(user)
+
+        def send(rendered_on):
+            return self.client.post(
+                service.project.urls["createhours"],
+                {
+                    "modal-rendered_by": user.id,
+                    "modal-rendered_on": rendered_on.isoformat(),
+                    "modal-service": service.id,
+                    "modal-hours": "0.1",
+                    "modal-description": "Test",
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        self.assertContains(send(in_days(10)), "That&#x27;s too far in the future.")
+        self.assertContains(send(in_days(3)), "Logging (too) early is certainly better")
+
     def test_log_and_create_service(self):
         """Logging hours and creating a new service is possible at the same time"""
         project = factories.ProjectFactory.create()

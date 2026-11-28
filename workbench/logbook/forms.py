@@ -617,10 +617,11 @@ class LoggedHoursForm(ModelForm):
         if all(
             f in self.fields and data.get(f) for f in ["rendered_by", "rendered_on"]
         ) and (not self.instance.pk or ("rendered_on" in self.changed_data)):
-            if data["rendered_by"].features[FEATURES.LATE_LOGGING]:
-                # Fine
-                pass
-            elif data["rendered_on"] < logbook_lock():
+            if (
+                data["rendered_on"] < logbook_lock()
+                and not data["rendered_by"].features[FEATURES.LATE_LOGGING]
+            ):
+                # LATE_LOGGING only skips the check against the past
                 errors["rendered_on"] = _("Hours have to be logged in the same week.")
             elif data["rendered_on"] > in_days(7):
                 errors["rendered_on"] = _("That's too far in the future.")

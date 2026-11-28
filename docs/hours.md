@@ -36,8 +36,10 @@ invoices, the hours worked still count for everything about time
 
 Hours are logged in the current week (from Monday, not before the first
 of January); logging more than a day in advance asks whether that's
-right, more than a week isn't possible. Projects stay open for logging
-for 14 days after they have been closed.
+right, more than a week isn't possible. The hours of people allowed to log
+late (where enabled) can also be logged in past weeks, the limits in
+advance apply to them too. Projects stay open for logging for 14 days
+after they have been closed.
 
 The form warns about entries which look wrong: a duplicate of your
 previous entry, a project closed recently, an entry already invoiced,
