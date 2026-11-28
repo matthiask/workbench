@@ -14,7 +14,7 @@ Beschreibung.
 | Bezahlter Urlaub | Z.B. Zivildienst, Elternurlaub oder Zügeln. Zählt als Arbeitszeit, wird von der Personaladministration bestätigt. |
 | Schulbesuch durch Auszubildende | Zählt als Arbeitszeit. |
 | Andere Gründe (keine Arbeitszeit) | Erscheint im Kalender und in der Planung, zählt aber nicht als Arbeitszeit. |
-| Arbeitszeit-Korrektur | Wird nur von der Personaladministration erfasst. |
+| Arbeitszeit-Korrektur | Wird nur von der Personaladministration erfasst, kann negativ sein. Nur du und die Personaladministration sehen sie. |
 
 **Tage** sind Arbeitstage zu 100%, auch wenn du Teilzeit arbeitest: Wer
 80% arbeitet und eine Woche frei hat, erfasst 4 Tage, nicht 5. Unter dem

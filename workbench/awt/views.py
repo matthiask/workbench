@@ -179,12 +179,15 @@ def absence_calendar(request, form):
 
     absences = defaultdict(list)
     cutoff = form.cutoff()
-    queryset = Absence.objects.annotate(
-        _ends_on=Coalesce("ends_on", "starts_on")
-    ).filter(
-        starts_on__lte=cutoff + dt.timedelta(days=366),
-        _ends_on__gte=cutoff,
-        user__in=users,
+    queryset = (
+        Absence.objects
+        .visible_to(request.user)
+        .annotate(_ends_on=Coalesce("ends_on", "starts_on"))
+        .filter(
+            starts_on__lte=cutoff + dt.timedelta(days=366),
+            _ends_on__gte=cutoff,
+            user__in=users,
+        )
     )
 
     dates = set()
@@ -240,6 +243,13 @@ def absence_calendar(request, form):
             "form": form,
         },
     )
+
+
+class AbsenceDetailView(generic.DetailView):
+    model = Absence
+
+    def get_queryset(self):
+        return Absence.objects.visible_to(self.request.user)
 
 
 @feature_required(FEATURES.PERSONNEL_ADMINISTRATION)

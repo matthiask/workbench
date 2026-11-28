@@ -1105,6 +1105,46 @@ class AWTTest(TestCase):
         )
 
     @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
+    def test_corrections_are_private(self):
+        """Working time corrections are only visible to the absent person and
+        people administrating personnel"""
+        user = factories.UserFactory.create()
+        absence = Absence.objects.create(
+            user=user,
+            starts_on=dt.date.today(),
+            days=-3,
+            description="Overtime paid out",
+            reason=Absence.CORRECTION,
+        )
+        colleague = factories.UserFactory.create()
+        hr = factories.UserFactory.create()
+        hr._features.append(FEATURES.PERSONNEL_ADMINISTRATION)
+        hr.save()
+
+        def visible(viewer, url, text="Overtime paid out"):
+            self.client.force_login(viewer)
+            response = self.client.get(
+                url, headers={"x-requested-with": "XMLHttpRequest"}
+            )
+            if response.status_code == 404:
+                return False
+            self.assertEqual(response.status_code, 200)
+            return text in response.content.decode()
+
+        for url in [
+            absence.urls["detail"],
+            "/absences/",
+            "/absences/?reason=correction",
+            "/report/absence-calendar/",
+            "/api/absences/",
+            "/api/absences/?reason=correction",
+        ]:
+            with self.subTest(url=url):
+                self.assertTrue(visible(user, url))
+                self.assertTrue(visible(hr, url))
+                self.assertFalse(visible(colleague, url))
+
+    @override_settings(FEATURES={FEATURES.PERSONNEL_ADMINISTRATION: F.USER})
     def test_everyone_sees_the_summary(self):
         """Everyone sees balances, vacations and planned absences of everyone,
         but neither sickness days nor the details of others"""

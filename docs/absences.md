@@ -13,7 +13,7 @@ number of **days**, the reason and a description.
 | Paid leave | E.g. civil service, parental leave or moving house. Counts as working time, confirmed by personnel administration. |
 | School attendance of apprentices | Counts as working time. |
 | Other reasons (no working time) | Shown in the calendar and in planning, but doesn't count as working time. |
-| Working time correction | Entered by personnel administration only. |
+| Working time correction | Entered by personnel administration only, may be negative. Only you and personnel administration see it. |
 
 **Days** are working days at full time, also when you work part-time:
 someone working 80% who is off for a week enters 4 days, not 5. Below

@@ -47,6 +47,7 @@ class AbsenceSearchForm(Form):
 
     def filter(self, queryset):
         data = self.cleaned_data
+        queryset = queryset.visible_to(self.request.user)
         if data.get("u") == -1:
             queryset = queryset.filter(user=self.request.user)
         elif data.get("u"):

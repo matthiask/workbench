@@ -74,7 +74,7 @@ class AbsenceFilter(DateRangeFilter):
 def absence_list(request, filters: Query[AbsenceFilter]):
     """Absences overlapping the period (or from ``since`` until ``until``), oldest
     first"""
-    absences = Absence.objects.select_related("user")
+    absences = Absence.objects.visible_to(request.user).select_related("user")
     if filters.user:
         absences = absences.filter(user=user_by_short_name(filters.user, param="user"))
     if filters.reason:
@@ -184,7 +184,10 @@ class AbsencePatch(InputSchema):
 def _absence(request, absence_id):
     """The absence if the user may change or delete it like in the web
     interface (``Absence.allow_update``, which is ``allow_delete`` too)"""
-    absence = get_object_or_404(Absence.objects.select_related("user"), pk=absence_id)
+    absence = get_object_or_404(
+        Absence.objects.visible_to(request.user).select_related("user"),
+        pk=absence_id,
+    )
     check_allow_delete(absence, request, ["path", "absence_id"])
     return absence
 

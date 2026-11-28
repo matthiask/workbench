@@ -3,6 +3,7 @@ import datetime as dt
 from django.contrib import messages
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
@@ -148,6 +149,14 @@ class Employment(Model):
 class AbsenceQuerySet(models.QuerySet):
     def unconfirmed(self):
         return self.filter(reason=Absence.PAID, confirmed_at__isnull=True)
+
+    def visible_to(self, user):
+        """Working time corrections are only visible to the absent person and
+        people administrating personnel (``Absence.details_visible_to()``
+        hides the descriptions of sickness only)"""
+        if user.features[FEATURES.PERSONNEL_ADMINISTRATION]:
+            return self
+        return self.exclude(Q(reason=Absence.CORRECTION) & ~Q(user=user))
 
 
 @model_urls

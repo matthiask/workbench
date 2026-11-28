@@ -4,7 +4,12 @@ from workbench import generic
 from workbench.awt.changes import ABSENCE_WARNING
 from workbench.awt.forms import AbsenceForm, AbsenceSearchForm
 from workbench.awt.models import Absence, Holiday
-from workbench.awt.views import ReportedDeleteView, confirm_absence, suggested_days
+from workbench.awt.views import (
+    AbsenceDetailView,
+    ReportedDeleteView,
+    confirm_absence,
+    suggested_days,
+)
 
 
 urlpatterns = [
@@ -19,7 +24,7 @@ urlpatterns = [
     ),
     path(
         "<int:pk>/",
-        generic.DetailView.as_view(model=Absence),
+        AbsenceDetailView.as_view(),
         name="awt_absence_detail",
     ),
     path(
