@@ -122,6 +122,43 @@ class SiteTest(TestCase):
             ]),
         )
 
+    def test_delete_and_merge_site_contacts(self):
+        """Deleting a person who is a site contact warns, merging them into
+        someone of another organization names their sites (with HOSTING)"""
+        from workbench.tools.forms import WarningsForm
+
+        site = factories.SiteFactory.create()
+        person = factories.PersonFactory.create()
+        SiteContact.objects.create(site=site, person=person, role=SiteContact.OUTAGE)
+        SiteContact.objects.create(site=site, person=person, role=SiteContact.IT)
+        keep = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create()
+        )
+        self.client.force_login(person.primary_contact)
+        ajax = {"x-requested-with": "XMLHttpRequest"}
+
+        response = self.client.post(person.urls["delete"])
+        self.assertContains(response, "lose-contact")
+        self.assertContains(response, "is the contact of 1 site")
+
+        response = self.client.post(
+            person.urls["merge"], {"modal-into": keep.pk}, headers=ajax
+        )
+        self.assertContains(response, "other-organization")
+        self.assertContains(response, "1 site of")
+
+        with override_settings(FEATURES={FEATURES.HOSTING: F.NEVER}):
+            response = self.client.post(
+                person.urls["merge"], {"modal-into": keep.pk}, headers=ajax
+            )
+            self.assertEqual(response.status_code, 299)
+
+        response = self.client.post(
+            keep.urls["delete"], {WarningsForm.ignore_warnings_id: "lose-contact"}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(SiteContact.objects.exists())
+
     def test_active_sites_keep_contacts(self):
         """Contacts of active sites and the customers of active sites aren't
         archived as unused"""

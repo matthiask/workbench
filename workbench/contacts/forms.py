@@ -580,7 +580,7 @@ class PersonDeleteForm(ModelForm):
         data = super().clean()
         if self.protected:
             self.add_error(None, self.protected_message())
-        elif related := contact_of(self.instance):
+        elif related := contact_of(self.instance, user=self.request.user):
             self.add_warning(
                 _(
                     "%(person)s is the contact of %(related)s, which lose"
@@ -619,7 +619,9 @@ class PersonMergeForm(Form):
         if keep := data.get("into"):
             for error in merge_errors(duplicate=self.instance, keep=keep):
                 self.add_error("into", error)
-            for message, code in merge_warnings(duplicate=self.instance, keep=keep):
+            for message, code in merge_warnings(
+                duplicate=self.instance, keep=keep, user=self.request.user
+            ):
                 self.add_warning(message, code=code)
         return data
 

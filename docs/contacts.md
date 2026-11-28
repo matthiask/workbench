@@ -69,7 +69,7 @@ credentials themselves).
 - **Contacts** of a site: whom to inform about **outages and
   maintenance**, and whom to ask about **IT** matters like DNS records,
   e.g. at the customer's IT provider. Merging people moves their site
-  contacts.
+  contacts; deleting a person who is a site contact is a warning.
 - **Recurring invoices** name their site; a site may have several (e.g.
   another periodicity). "Recurring invoice" on the site creates one for
   it.

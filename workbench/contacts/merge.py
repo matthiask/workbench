@@ -38,25 +38,34 @@ def merge_errors(*, duplicate, keep):
     return []
 
 
-def contact_of(person):
+def contact_of(person, *, user):
     """``["2 projects", "1 deal"]`` of the objects the person is the contact
-    of, which lose their contact when deleting the person"""
+    of, which lose their contact when deleting the person; sites only for
+    users with the ``HOSTING`` feature"""
+    from workbench.accounts.features import FEATURES
     from workbench.deals.models import Deal
+    from workbench.hosting.models import Site
     from workbench.invoices.models import Invoice, RecurringInvoice
     from workbench.projects.models import Project
 
-    return [
-        f"{count} {ngettext(model._meta.verbose_name, model._meta.verbose_name_plural, count)}"
+    querysets = [
+        model.objects.filter(contact=person)
         for model in [Project, Deal, Invoice, RecurringInvoice]
-        if (count := model.objects.filter(contact=person).count())
+    ]
+    if user.features[FEATURES.HOSTING]:
+        querysets.append(Site.objects.filter(contacts__person=person).distinct())
+    return [
+        f"{count} {ngettext(meta.verbose_name, meta.verbose_name_plural, count)}"
+        for queryset in querysets
+        if (count := queryset.count()) and (meta := queryset.model._meta)
     ]
 
 
-def merge_warnings(*, duplicate, keep):
+def merge_warnings(*, duplicate, keep, user):
     """``(message, code)`` of things to confirm before merging"""
     if duplicate.organization_id == keep.organization_id:
         return []
-    if not (related := contact_of(duplicate)):
+    if not (related := contact_of(duplicate, user=user)):
         return []
     return [
         (

@@ -75,7 +75,8 @@ Zugangsdaten selbst).
 - **Kontakte** einer Site: wen wir über **Störungen und Wartungen**
   informieren und wen wir bei **IT**-Fragen wie DNS-Einträgen fragen,
   z.B. beim IT-Dienstleister der Kundschaft. Beim Zusammenführen von
-  Personen wandern ihre Site-Kontakte mit.
+  Personen wandern ihre Site-Kontakte mit; das Löschen einer Person, die
+  Site-Kontakt ist, gibt eine Warnung.
 - **Stapelrechnungen** nennen ihre Site; eine Site kann mehrere
   haben (z.B. mit anderer Periodizität). «Stapelrechnung» auf der
   Site erstellt eine für sie.

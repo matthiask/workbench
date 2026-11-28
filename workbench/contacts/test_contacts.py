@@ -887,7 +887,9 @@ class ContactsTest(TestCase):
         contact into someone of another organization is a warning too"""
         recurring = factories.RecurringInvoiceFactory.create()
         keep = factories.PersonFactory.create()
-        warnings = merge_warnings(duplicate=recurring.contact, keep=keep)
+        warnings = merge_warnings(
+            duplicate=recurring.contact, keep=keep, user=recurring.owned_by
+        )
         self.assertEqual([code for _message, code in warnings], ["other-organization"])
 
     def test_merge_into_archived_person(self):
