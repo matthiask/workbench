@@ -9,6 +9,7 @@ from workbench.accounts.features import FEATURES, F
 from workbench.contacts.merge import merge_people
 from workbench.hosting.models import Server, Site, SiteContact
 from workbench.invoices.models import RecurringInvoice
+from workbench.tools.forms import WarningsForm
 
 
 class SiteTest(TestCase):
@@ -125,8 +126,6 @@ class SiteTest(TestCase):
     def test_delete_and_merge_site_contacts(self):
         """Deleting a person who is a site contact warns, merging them into
         someone of another organization names their sites (with HOSTING)"""
-        from workbench.tools.forms import WarningsForm
-
         site = factories.SiteFactory.create()
         person = factories.PersonFactory.create()
         SiteContact.objects.create(site=site, person=person, role=SiteContact.OUTAGE)
@@ -340,6 +339,26 @@ class ViewsTest(TestCase):
                 response = self.client.get(url)
                 self.assertContains(response, "+41 79 123 45 67")
                 self.assertNotContains(response, ">+41791234567<")
+
+    def test_duplicate_title(self):
+        """Creating a site with the title of another site is a warning"""
+        site = factories.SiteFactory.create(title="www.example.com")
+        data = {
+            "title": "WWW.example.com",
+            "server": site.server.pk,
+            "customer": site.customer.pk,
+            "owned_by": self.user.pk,
+        }
+        response = self.client.post(Site.urls["create"], data)
+        self.assertContains(response, "duplicate-site")
+        self.assertContains(response, f"ID {site.pk}")
+
+        response = self.client.post(
+            Site.urls["create"],
+            data | {WarningsForm.ignore_warnings_id: "duplicate-site"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Site.objects.filter(title="www.example.com").count(), 2)
 
     @override_settings(FEATURES={FEATURES.HOSTING: F.NEVER})
     def test_without_feature(self):

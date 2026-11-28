@@ -2902,6 +2902,24 @@ planned_work:
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertIn("No recurring invoice", result.output)
 
+        # A title another site has already is a warning
+        duplicate = [
+            "sites",
+            "create",
+            "--title",
+            "www.beispiel.ch",
+            "--server",
+            "cluster",
+            "--customer",
+            organization.pk,
+            "--dry-run",
+        ]
+        result = self.wb(*duplicate)
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("duplicate-site", result.output)
+        result = self.wb(*duplicate, "--ignore-warning", "duplicate-site")
+        self.assertEqual(result.exit_code, 0, result.output)
+
         # Without a command: the sites with problems
         result = self.wb("sites")
         self.assertIn("www.beispiel.ch", result.output)

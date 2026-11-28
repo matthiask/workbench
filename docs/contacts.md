@@ -84,4 +84,5 @@ credentials themselves).
   notes say how to list the sites running on it (command, where to run
   it), never credentials.
 - Archive sites which don't run anymore instead of deleting them, and end
-  their recurring invoices.
+  their recurring invoices. A title which another site has already is a
+  warning: unarchive the site instead if it runs again.

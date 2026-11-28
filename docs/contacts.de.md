@@ -91,4 +91,6 @@ Zugangsdaten selbst).
   Notizen sagen, wie man die Sites auf ihm auflistet (Befehl, wo
   ausführen), nie Zugangsdaten.
 - Sites, die nicht mehr laufen, archivieren statt löschen, und ihre
-  Stapelrechnungen beenden.
+  Stapelrechnungen beenden. Ein Titel, den schon eine andere Site hat, gibt
+  eine Warnung: Läuft eine Site wieder, hebe stattdessen ihre Archivierung
+  auf.

@@ -193,11 +193,9 @@ def _site_options(fn):
             help="Why there's no recurring invoice, e.g. a maintenance contract.",
         ),
         click.option("--notes"),
-        click.option("--dry-run", is_flag=True, help="Validate only."),
-        click.option("--json", "as_json", is_flag=True),
     ]):
         fn = option(fn)
-    return fn
+    return change_options()(fn)
 
 
 def _site_data(**fields):
@@ -216,6 +214,7 @@ def create_site(
     password_manager_url,
     no_invoice_reason,
     notes,
+    ignore_warnings,
     dry_run,
     as_json,
 ):
@@ -235,7 +234,7 @@ def create_site(
             no_invoice_reason=no_invoice_reason,
             notes=notes,
         ),
-        params={"dry_run": format_bool(dry_run)},
+        params=change_params(dry_run, ignore_warnings),
     )
     if as_json:
         echo_json(data)
@@ -261,6 +260,7 @@ def update_site(
     password_manager_url,
     no_invoice_reason,
     notes,
+    ignore_warnings,
     dry_run,
     as_json,
     no_domains,
@@ -285,7 +285,7 @@ def update_site(
         "PATCH",
         f"hosting/sites/{site}/",
         json=data,
-        params={"dry_run": format_bool(dry_run)},
+        params=change_params(dry_run, ignore_warnings),
     )
     if as_json:
         echo_json(data)

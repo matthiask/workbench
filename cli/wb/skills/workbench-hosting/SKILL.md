@@ -96,7 +96,9 @@ sites to Workbench sites by host name, lowercased and ignoring a leading
 4. **Host names changed**: propose the new domains (`--domain` replaces all
    further domains, `--no-domains` removes them).
 5. **Archived in Workbench, but running**: ask; maybe unarchive it
-   (`--not-archived`).
+   (`--not-archived`) rather than creating it again: a title another site
+   has already is a warning (`duplicate-site`), and titles in commands find
+   the active site first.
 
 ### 3. Problems
 

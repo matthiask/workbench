@@ -129,6 +129,48 @@ class HostingAPITest(TestCase):
         response = self.client.get("/api/hosting/sites/?include_archived=1")
         self.assertEqual(response.json()["count"], 1)
 
+    def test_duplicate_titles(self):
+        """A title another site has already is a warning; titles find the
+        active site first"""
+        archived = factories.SiteFactory.create(
+            title="www.example.com", is_archived=True
+        )
+        other = factories.SiteFactory.create(title="shop.example.com")
+
+        def post(query=""):
+            return self.client.post(
+                f"/api/hosting/sites/{query}",
+                {
+                    "title": "WWW.example.com",
+                    "server": archived.server.title,
+                    "customer": archived.customer.pk,
+                },
+                content_type="application/json",
+            )
+
+        response = post()
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            [error["code"] for error in response.json()["detail"]],
+            ["duplicate-site"],
+        )
+        response = post("?ignore_warnings=duplicate-site")
+        self.assertEqual(response.status_code, 200, response.content)
+        site_id = response.json()["id"]
+
+        response = self.client.get("/api/hosting/sites/www.example.com/")
+        self.assertEqual(response.json()["id"], site_id)
+
+        url = f"/api/hosting/sites/{other.pk}/"
+        response = self.client.patch(
+            url, {"title": "www.example.com"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 422)
+        response = self.client.patch(
+            url, {"notes": "Unchanged title"}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_unknown_references(self):
         organization = factories.OrganizationFactory.create()
         response = self.client.post(

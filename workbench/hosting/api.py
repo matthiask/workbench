@@ -29,6 +29,7 @@ from workbench.hosting.forms import (
 from workbench.hosting.models import Server, Site, SiteContact
 from workbench.invoices.models import RecurringInvoice
 from workbench.tools.api import (
+    IGNORE_WARNINGS,
     DryRun,
     InputSchema,
     OrganizationID,
@@ -38,6 +39,7 @@ from workbench.tools.api import (
     form_data,
     patch_with_form,
     raise_form_errors,
+    validate_form,
 )
 
 
@@ -63,12 +65,15 @@ def _server(value, *, loc=None):
 
 
 def _site(value):
-    """The site with this ID or title (case-insensitive)"""
+    """The site with this ID or title (case-insensitive); of several sites
+    with the same title the active one, the newest of them"""
     value = value.strip()
     sites = _sites()
     if value.isascii() and value.isdigit():
         return get_object_or_404(sites, pk=int(value))
-    if site := sites.filter(title__iexact=value).first():
+    if site := (
+        sites.filter(title__iexact=value).order_by("is_archived", "-pk").first()
+    ):
         return site
     raise Http404
 
@@ -417,7 +422,7 @@ def _active_user(short_name, loc):
     ])
 
 
-def _save_site(request, site, data, *, dry_run):
+def _save_site(request, site, data, *, dry_run, ignore_warnings):
     values = form_data(SiteForm(instance=site, request=request))
     for field, value in data.items():
         if field == "domains":
@@ -429,8 +434,7 @@ def _save_site(request, site, data, *, dry_run):
         else:
             values[field] = "" if value is None else value
     form = SiteForm(values, instance=site, request=request)
-    if not form.is_valid(ignore_warnings=True):
-        raise_form_errors(form)
+    validate_form(form, ignore_warnings=ignore_warnings)
     with transaction.atomic():
         site = form.save()
         result = _site_out(_sites().get(pk=site.pk), request)
@@ -440,20 +444,43 @@ def _save_site(request, site, data, *, dry_run):
 
 
 @router.post("/hosting/sites/", response=SiteOut)
-def site_create(request, data: SiteIn, *, dry_run: DryRun = False):
+def site_create(
+    request,
+    data: SiteIn,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
     """Create a site, validated like in the web interface; the title and the
-    domains are lowercased"""
+    domains are lowercased. A title another site has already is a warning
+    (``duplicate-site``)."""
     values = data.dict()
     if not values["owned_by"]:
         values["owned_by"] = request.user.get_short_name()
-    return _save_site(request, Site(), values, dry_run=dry_run)
+    return _save_site(
+        request, Site(), values, dry_run=dry_run, ignore_warnings=ignore_warnings
+    )
 
 
 @router.patch("/hosting/sites/{site_id}/", response=SiteOut)
-def site_update(request, site_id: str, data: SitePatch, *, dry_run: DryRun = False):
-    """Change a site, e.g. move it to another server or archive it"""
+def site_update(
+    request,
+    site_id: str,
+    data: SitePatch,
+    *,
+    dry_run: DryRun = False,
+    ignore_warnings: list[str] = IGNORE_WARNINGS,
+):
+    """Change a site, e.g. move it to another server or archive it; a new
+    title another site has already is a warning (``duplicate-site``)"""
     site = _site(site_id)
-    return _save_site(request, site, data.dict(exclude_unset=True), dry_run=dry_run)
+    return _save_site(
+        request,
+        site,
+        data.dict(exclude_unset=True),
+        dry_run=dry_run,
+        ignore_warnings=ignore_warnings,
+    )
 
 
 @router.delete("/hosting/sites/{site_id}/", response=SiteOut)

@@ -118,6 +118,31 @@ class SiteForm(ModelForm):
     def clean_title(self):
         return self.cleaned_data["title"].strip().lower()
 
+    def clean(self):
+        data = super().clean()
+        if "title" in self.changed_data and (title := data.get("title")):
+            warnings = [
+                (
+                    _(
+                        "An archived site on %(server)s (ID %(id)s) has this"
+                        " title already."
+                    )
+                    if site.is_archived
+                    else _(
+                        "Another site on %(server)s (ID %(id)s) has this title already."
+                    )
+                )
+                % {"server": site.server, "id": site.pk}
+                for site in Site.objects
+                .filter(title__iexact=title)
+                .exclude(pk=self.instance.pk)
+                .select_related("server")
+                .order_by("is_archived", "pk")
+            ]
+            if warnings:
+                self.add_warning(" ".join(warnings), code="duplicate-site")
+        return data
+
     def clean_domains(self):
         return "\n".join(
             name.strip().lower()
