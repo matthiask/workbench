@@ -661,6 +661,46 @@ class ContactsTest(TestCase):
             (other.job_title, kept.address_suffix), ("CEO", "Geschäftsführer")
         )
 
+    def test_refresh_fts_migration(self):
+        """The search texts of people are recomputed after moving post
+        office boxes and job titles out of the addresses"""
+        migration = importlib.import_module(
+            "workbench.contacts.migrations.0031_refresh_person_fts"
+        )
+        person = factories.PersonFactory.create(
+            organization=factories.OrganizationFactory.create(name="Beispiel AG")
+        )
+        person.emailaddresses.create(email="hans@example.com")
+        person.phonenumbers.create(phone_number="+41441234567")
+        person.postaladdresses.create(
+            street="Musterweg",
+            house_number="1",
+            post_office_box="Postfach 686",
+            postal_code="8000",
+            city="Zürich",
+            country="DE",
+        )
+        person.postaladdresses.create(
+            type="Home", street="Beispielgasse", postal_code="3000", city="Bern"
+        )
+        override = factories.PersonFactory.create()
+        override.postaladdresses.create(postal_address_override="Postfach 1\nZug")
+        people = [person, override]
+        for instance in people:
+            instance.save()
+        expected = {
+            instance.pk: Person.objects.get(pk=instance.pk)._fts for instance in people
+        }
+        self.assertIn("Postfach 686", expected[person.pk])
+        Person.objects.update(_fts="stale")
+        # People without postal addresses weren't changed
+        without = factories.PersonFactory.create(_fts="stale")
+        expected[without.pk] = "stale"
+
+        migration.forwards(apps, None)
+        self.assertEqual(dict(Person.objects.values_list("pk", "_fts")), expected)
+        self.assertEqual(list(Person.objects.search("Postfach 686")), [person])
+
     def test_detail_types_migration(self):
         """Spellings and synonyms of the suggested types are cleaned up, the
         prefix of details copied from the organization stays"""
