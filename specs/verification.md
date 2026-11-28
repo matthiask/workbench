@@ -277,3 +277,74 @@ round", up to wb 0.58.0).
 - The annual working time overview includes working time corrections in
   everyone's balances (totals only, the corrections themselves are
   hidden).
+
+## Round 7 (2026-11-28)
+
+Four agents (offers to invoices, reports, time, contacts/deals/API). Fixed
+so far: hours in past weeks moved to people without `LATE_LOGGING`,
+negative projections in "thereof planned".
+
+### Open, to fix
+
+- Deleting logbook entries follows changing them: refused once the
+  project's logbook is locked (closed > 14 days), hours and costs,
+  regardless of `LATE_LOGGING` (`allow_delete()`, also the API).
+- Planning capacity outside an employment (after it ends, or none) is minus
+  the planned hours; the planned work form, the batch update and the
+  import warn about weeks outside an employment.
+- Bulk moves (reassigning the logbook, merging services) stay possible for
+  clean ups, but warn about projects whose logbook is locked and invoiced
+  entries changing their rate.
+- `Project.objects.open(on=)` drops the `created_at` condition: invoices
+  dated before their project was created are missing from that month's
+  accruals (budget statistics, cash data, snapshots).
+- Accepted offers whose deals are all declined count like offers without
+  deal; accepting an offer linked to a declined deal warns.
+- Using an archived organization (or person) as customer or contact
+  unarchives it (deals, projects, sites, recurring invoices, API too).
+- `PATCH /api/contacts/people/` carries the industry groups over to the new
+  organization like the web form.
+- The projected vs. invoiced chart deducts the down payments' third party
+  costs twice (`projects/charts.py`); use the invoiced gross margin of the
+  reports.
+- Copying an offer copies `allow_logging=False` (set by invoicing) and drops
+  `is_budget_retainer`.
+- Budget statistics drop third party costs on invoices in preparation
+  (only sent and paid invoices take them off).
+- The 50 % helper for down payments isn't rounded to 5 cents; "not applied
+  yet" counts down payments in preparation.
+- Merging an organization into an archived one with active people leaves
+  it archived.
+- The history of a deal contribution links to the values of the deal with
+  the contribution's ID (`_deals_contribution_cfg`).
+- "Projected invoices exceed the budgeted work and costs" ignores invoiced
+  surplus (`projects/views.py`).
+- Archiving a person who is the only outage contact of an active site
+  doesn't warn (deleting and merging do).
+- `suggested_days` accepts any period (millions of iterations).
+- The key data API accepts future months.
+
+### Decided
+
+- Recurring invoices with `create_project`: the project a deal links counts
+  with the deal, the projects of later periods count as maintenance without
+  deal.
+
+### Smaller risks and questions, not decided
+
+- A negative override of the vacation balance is taken by the first
+  vacation as a correction and has no effect without vacation
+  (`awt/reporting.py`); undocumented.
+- The key data API's `accepted_deals` lists deals only, the report also
+  counts offers and maintenance without deal.
+- The Hochrechnung's "Planned" leaves out last year's projections which
+  haven't been invoiced yet.
+- Credits raise "work not invoiced" and "accepted offers not invoiced"
+  (consistent with credits not being applied to services).
+- Cash data for a date in the current week but in the previous month mixes
+  today's open invoices with the previous month's planned invoicing.
+- `wb deals update` can't clear the contact or the expected decision date.
+- Group memberships aren't audited.
+- A timestamp linked to hours moved to another day shows on both days.
+- Merging away the last active person of an organization doesn't archive
+  it (unused organizations are archived after five years anyway).
