@@ -96,7 +96,10 @@ class ProjectDetailView(generic.DetailView):
         if not self.object.closed_on and grouped_services["total_service_cost"]:
             if not projected_invoices_total and not squeeze["invoiced"]:
                 projected_warning = "no_projected"
-            elif projected_invoices_total > services_gross_margin:
+            # What has been invoiced beyond the budget may have been projected
+            elif projected_invoices_total > max(
+                services_gross_margin, squeeze["invoiced"]
+            ):
                 projected_warning = "exceeds_service_cost"
             elif (
                 services_gross_margin - projected_invoices_total
@@ -106,7 +109,8 @@ class ProjectDetailView(generic.DetailView):
                 projected_warning = "incomplete"
             elif (
                 accepted_offers["total"]
-                and projected_invoices_total - squeeze["offered"]
+                and projected_invoices_total
+                - max(squeeze["offered"], squeeze["invoiced"])
                 > PROJECTED_INVOICE_LEEWAY
             ):
                 projected_warning = "exceeds_accepted_offer"

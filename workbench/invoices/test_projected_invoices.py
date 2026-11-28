@@ -215,6 +215,30 @@ class ProjectedInvoicesTest(TestCase):
             response, "Projected invoices exceed the budgeted work and costs"
         )
 
+    def test_projected_warning_invoiced_surplus(self):
+        """Projected invoices may exceed the budgeted work by what has been
+        invoiced beyond it"""
+        offer = factories.OfferFactory.create(status=Offer.ACCEPTED)
+        project = offer.project
+        factories.ServiceFactory.create(
+            project=project, offer=offer, cost=Decimal(1000)
+        )
+        offer.save()
+        factories.InvoiceFactory.create(
+            project=project,
+            customer=project.customer,
+            contact=project.contact,
+            type=Invoice.FIXED,
+            subtotal=1500,
+            status=Invoice.SENT,
+        )
+        factories.ProjectedInvoiceFactory.create(
+            project=project, gross_margin=Decimal(1500)
+        )
+        self.client.force_login(project.owned_by)
+        response = self.client.get(project.get_absolute_url())
+        self.assertIsNone(response.context["projected_warning"])
+
     def test_projected_warning_discount(self):
         """Projected invoices are compared to the gross margin after discounts"""
         offer = factories.OfferFactory.create(status=Offer.ACCEPTED)
