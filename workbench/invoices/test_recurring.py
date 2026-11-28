@@ -406,6 +406,43 @@ class RecurringTest(TestCase):
             )
             self.assertRedirects(response, ri.urls["detail"])
 
+    def test_site_of_new_customer(self):
+        """Sites are validated against the customer posted, not the one the
+        recurring invoice had before"""
+        old_site = factories.SiteFactory.create()
+        new_site = factories.SiteFactory.create()
+        ri = factories.RecurringInvoiceFactory.create(
+            customer=old_site.customer,
+            site=old_site,
+            subtotal=100,
+            postal_address="Name\nStreet\nCity",
+        )
+        self.client.force_login(ri.owned_by)
+        data = {
+            "customer": new_site.customer_id,
+            "contact": factories.PersonFactory.create(
+                organization=new_site.customer
+            ).pk,
+            "title": ri.title,
+            "owned_by": ri.owned_by_id,
+            "postal_address": ri.postal_address,
+            "starts_on": ri.starts_on.isoformat(),
+            "periodicity": ri.periodicity,
+            "create_invoice_on_day": -20,
+            "subtotal": 100,
+            "discount": 0,
+            "liable_to_vat": "1",
+            "third_party_costs": 0,
+            "new_invoices": "prepare",
+        }
+        response = self.client.post(ri.urls["update"], data | {"site": old_site.pk})
+        self.assertContains(response, "The site belongs to a different organization.")
+
+        response = self.client.post(ri.urls["update"], data | {"site": new_site.pk})
+        self.assertRedirects(response, ri.urls["detail"])
+        ri.refresh_from_db()
+        self.assertEqual((ri.customer, ri.site), (new_site.customer, new_site))
+
     @override_settings(RECURRING_INVOICES_CC=["hosting@example.com"])
     def test_create_and_notify(self):
         """The recurring invoices task notifies owners, replies reach the

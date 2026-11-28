@@ -1936,7 +1936,8 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
 
     def limit_sites(self, *, customer, contact):
         """Only the active sites of the customer (and the current site), and
-        only with the hosting feature (not in the pre-form)"""
+        only with the hosting feature (not in the pre-form). The customer
+        posted counts, it may change in the same post (clean() checks)"""
         if "site" not in self.fields:
             return
         if not self.request.user.features[FEATURES.HOSTING]:
@@ -1947,6 +1948,12 @@ class RecurringInvoiceForm(PostalAddressSelectionForm):
             or (customer and customer.pk)
             or (contact and contact.organization_id)
         )
+        if (
+            self.is_bound
+            and (posted := str(self.data.get(self.add_prefix("customer")) or ""))
+            and posted.isdigit()
+        ):
+            customer_id = int(posted)
         self.fields["site"].queryset = Site.objects.filter(
             Q(is_archived=False, customer=customer_id) | Q(pk=self.instance.site_id)
         ).select_related("server")
