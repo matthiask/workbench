@@ -539,6 +539,11 @@ class AWTTest(TestCase):
             {"days": None},
         )
         self.assertEqual(suggest(user="x", starts_on="2026-03-10"), {"days": None})
+        # Absences can't span the year end, longer periods aren't computed
+        self.assertEqual(
+            suggest(user=user.pk, starts_on="2026-03-01", ends_on="9999-12-31"),
+            {"days": None},
+        )
 
         response = self.client.get(
             "/absences/create/", headers={"x-requested-with": "XMLHttpRequest"}

@@ -275,6 +275,9 @@ class SuggestedDaysForm(forms.Form):
             data["ends_on"] = data["starts_on"]
         if data.get("starts_on") and data["ends_on"] < data["starts_on"]:
             raise forms.ValidationError("Absences cannot end before they began.")
+        if data.get("starts_on") and data["ends_on"].year != data["starts_on"].year:
+            # Like absences, which also keeps the computation cheap
+            raise forms.ValidationError("Absences cannot span the end of a year.")
         return data
 
 
