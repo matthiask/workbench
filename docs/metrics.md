@@ -220,7 +220,7 @@ web interface; the static reporting token gets everything.
 | `full_time_equivalents` | FTE of the month (see above). |
 | `squeeze_gross_margin` | `squeeze_data(month)["totals"]["gross_margin"]` (see squeeze documentation). |
 | `deals_funnel` | Open deals as of **today** (not the requested month, on purpose: the funnel looks ahead from today, and probabilities and expected decision dates aren't versioned), Σ Deal.value: `high_probability_next_4_weeks` (HIGH, decision_expected_on − today ≤ 28 days, overdue included), `_next_12_weeks` (≤ 84 days), `_later` (later or no date), `normal_probability` (NORMAL). LOW/UNKNOWN left out. `key_data_api.py:deals_funnel`, `templatetags/workbench.py:deal_group` |
-| `accepted_deals` | Deals with status ACCEPTED and `closed_on` in the month: id, title, customer name, value, closed_on. |
+| `accepted_deals` | Deals with status ACCEPTED and `closed_on` in the month: id, title, customer name, value, closed_on. Deals only, on purpose: unlike the accepted deals report, accepted offers and maintenance without deal aren't listed, so the sum can be lower than the report's total. |
 | `month`, `generated_at` | Month string, ISO timestamp. |
 
 ---
