@@ -274,10 +274,6 @@ round", up to wb 0.58.0).
   declining only when the status changes.
 - Projected invoices on or before the freeze date stay changeable and
   deletable (only dates are frozen).
-
-### Open
-
-- The audit history still shows other people's working time corrections
-  (user, dates, days, reason); the annual working time overview includes
-  them in totals.
-- Job titles aren't in the people's full text search.
+- The annual working time overview includes working time corrections in
+  everyone's balances (totals only, the corrections themselves are
+  hidden).
