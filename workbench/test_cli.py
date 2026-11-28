@@ -42,6 +42,7 @@ from workbench.projects.models import (
 )
 from workbench.reporting.models import FreezeDate
 from workbench.timer.models import Timestamp
+from workbench.tools.testing import weekday
 from workbench.tools.validation import in_days, monday
 
 
@@ -1583,9 +1584,9 @@ planned_work:
             "absences",
             "create",
             "--starts-on",
-            in_days(14),
+            weekday(in_days(14)),
             "--days",
-            2,
+            1,
             "--reason",
             "vacation",
             "--description",
@@ -1601,15 +1602,16 @@ planned_work:
         self.assertNotIn("Past", result.output)
 
     def test_absences_update_delete(self):
+        starts_on = weekday(in_days(7))
         absence = factories.AbsenceFactory.create(
-            user=self.user, starts_on=in_days(7), ends_on=in_days(8), days=2
+            user=self.user, starts_on=starts_on, ends_on=starts_on, days=1
         )
-        result = self.wb("absences", "update", absence.pk, "--days", "1.5", "--dry-run")
+        result = self.wb("absences", "update", absence.pk, "--days", "0.5", "--dry-run")
         self.assertEqual(result.exit_code, 0, result.output)
-        self.assertIn("1.50", result.output)
+        self.assertIn("0.50", result.output)
         self.assertIn("Dry run", result.output)
         absence.refresh_from_db()
-        self.assertEqual(absence.days, 2)
+        self.assertEqual(absence.days, 1)
 
         result = self.wb(
             "absences",
@@ -1646,7 +1648,7 @@ planned_work:
             "absences",
             "create",
             "--starts-on",
-            in_days(400),
+            weekday(in_days(400)),
             "--days",
             1,
             "--reason",

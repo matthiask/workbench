@@ -19,7 +19,8 @@ number of **days**, the reason and a description.
 someone working 80% who is off for a week enters 4 days, not 5. Below
 the field, the suggestion counts the weekdays without holidays times
 your percentage; check it when you don't work the same hours every day.
-"Enter hours" converts hours into days.
+"Enter hours" converts hours into days. The form warns about more days
+than weekdays (Monday to Friday) in the period, except for corrections.
 
 - An absence starts and ends in the same year. Split a vacation over New
   Year into two absences.

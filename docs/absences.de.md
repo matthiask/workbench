@@ -20,7 +20,8 @@ Beschreibung.
 80% arbeitet und eine Woche frei hat, erfasst 4 Tage, nicht 5. Unter dem
 Feld zählt der Vorschlag die Wochentage ohne Feiertage mal dein Pensum;
 prüfe ihn, wenn du nicht jeden Tag gleich viel arbeitest. «Stunden
-eingeben» rechnet Stunden in Tage um.
+eingeben» rechnet Stunden in Tage um. Das Formular warnt bei mehr Tagen
+als Wochentagen (Montag bis Freitag) im Zeitraum, ausser bei Korrekturen.
 
 - Eine Abwesenheit beginnt und endet im gleichen Jahr. Teile Ferien über
   Neujahr in zwei Abwesenheiten.

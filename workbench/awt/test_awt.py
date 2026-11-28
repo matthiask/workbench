@@ -31,7 +31,7 @@ from workbench.awt.tasks import (
 from workbench.awt.utils import monthly_days
 from workbench.tools.formats import Z1
 from workbench.tools.forms import WarningsForm
-from workbench.tools.testing import check_code, messages
+from workbench.tools.testing import check_code, messages, weekday
 from workbench.tools.validation import in_days
 
 
@@ -248,8 +248,8 @@ class AWTTest(TestCase):
             "/absences/create/",
             {
                 "modal-user": user.pk,
-                "modal-starts_on": dt.date.today().isoformat(),
-                "modal-days": 3,
+                "modal-starts_on": weekday().isoformat(),
+                "modal-days": 1,
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
             },
@@ -324,7 +324,7 @@ class AWTTest(TestCase):
             "/absences/create/",
             {
                 "modal-user": other.pk,
-                "modal-starts_on": dt.date.today().isoformat(),
+                "modal-starts_on": weekday().isoformat(),
                 "modal-days": 1,
                 "modal-reason": "vacation",
             },
@@ -348,8 +348,8 @@ class AWTTest(TestCase):
             absence.urls["update"],
             {
                 "modal-user": other.pk,
-                "modal-starts_on": dt.date.today().isoformat(),
-                "modal-days": 2,
+                "modal-starts_on": weekday().isoformat(),
+                "modal-days": "0.5",
                 "modal-reason": "vacation",
             },
             headers=headers,
@@ -377,7 +377,7 @@ class AWTTest(TestCase):
             {
                 "modal-user": user.pk,
                 "modal-starts_on": "2100-01-01",
-                "modal-days": 3,
+                "modal-days": 1,
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
             },
@@ -394,7 +394,7 @@ class AWTTest(TestCase):
             {
                 "modal-user": user.pk,
                 "modal-starts_on": "2100-01-01",
-                "modal-days": 3,
+                "modal-days": 1,
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
                 WarningsForm.ignore_warnings_id: "impressive-planning-skills",
@@ -419,7 +419,7 @@ class AWTTest(TestCase):
                     "modal-user": user.pk,
                     "modal-starts_on": starts_on.isoformat(),
                     "modal-ends_on": (starts_on + dt.timedelta(days=days)).isoformat(),
-                    "modal-days": days,
+                    "modal-days": 1,
                     "modal-reason": "vacation",
                 },
                 headers={"x-requested-with": "XMLHttpRequest"},
@@ -431,6 +431,48 @@ class AWTTest(TestCase):
         self.assertContains(response, "outside-employment")
         response = post(in_days(-5), 10)
         self.assertEqual(response.status_code, 201)
+
+    def test_more_days_than_weekdays(self):
+        """Absences with more days than the weekdays of their range warn,
+        corrections don't"""
+        user = factories.UserFactory.create()
+        self.client.force_login(user)
+        monday = dt.date(2021, 10, 4)
+
+        def post(ends_on, days, reason="vacation", **kwargs):
+            return self.client.post(
+                "/absences/create/",
+                {
+                    "modal-user": user.pk,
+                    "modal-starts_on": monday.isoformat(),
+                    "modal-ends_on": ends_on.isoformat(),
+                    "modal-days": days,
+                    "modal-reason": reason,
+                    **kwargs,
+                },
+                headers={"x-requested-with": "XMLHttpRequest"},
+            )
+
+        with travel(dt.date(2021, 10, 1)):
+            # Monday to Sunday has five weekdays
+            response = post(monday + dt.timedelta(days=6), 6)
+            self.assertContains(response, "more-days-than-weekdays")
+            self.assertContains(
+                response, "more days (6.00d) than its period has weekdays (5)"
+            )
+            response = post(
+                monday + dt.timedelta(days=6),
+                6,
+                **{WarningsForm.ignore_warnings_id: "more-days-than-weekdays"},
+            )
+            self.assertEqual(response.status_code, 201)
+            response = post(monday + dt.timedelta(days=6), 5)
+            self.assertEqual(response.status_code, 201)
+
+            user._features.append(FEATURES.PERSONNEL_ADMINISTRATION)
+            user.save()
+            response = post(monday, 3, reason="correction")
+            self.assertEqual(response.status_code, 201)
 
     def test_absence_in_open_ended_employment(self):
         """Employments without an end cover all absences after their start"""
@@ -801,7 +843,7 @@ class AWTTest(TestCase):
             {
                 "modal-user": user.pk,
                 "modal-starts_on": dt.date(2020, 1, 1).isoformat(),
-                "modal-days": 3,
+                "modal-days": 1,
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
             },
@@ -814,7 +856,7 @@ class AWTTest(TestCase):
             {
                 "modal-user": user.pk,
                 "modal-starts_on": dt.date(2020, 1, 1).isoformat(),
-                "modal-days": 3,
+                "modal-days": 1,
                 "modal-description": "Sick",
                 "modal-reason": "sickness",
                 WarningsForm.ignore_warnings_id: "past-years-absences",
@@ -1180,15 +1222,15 @@ class AWTTest(TestCase):
         error: the description would become visible to everyone. A new
         absence without the description replaces it."""
         absence = factories.AbsenceFactory.create(
+            starts_on=weekday(),
             reason=Absence.SICKNESS,
-            days=2,
             description="Doctor's appointment",
         )
         headers = {"x-requested-with": "XMLHttpRequest"}
         data = {
             "modal-user": absence.user.pk,
             "modal-starts_on": absence.starts_on.isoformat(),
-            "modal-days": 2,
+            "modal-days": 1,
             "modal-description": "Doctor's appointment",
             "modal-reason": "paid",
         }
@@ -1199,7 +1241,7 @@ class AWTTest(TestCase):
         replace_url = (
             Absence.urls["create"]
             + f"?user={absence.user.pk}&amp;starts_on={absence.starts_on.isoformat()}"
-            + f"&amp;days=2&amp;reason=paid&amp;replaces={absence.pk}"
+            + f"&amp;days=1&amp;reason=paid&amp;replaces={absence.pk}"
         )
         self.assertContains(response, f'href="{replace_url}"')
         absence.refresh_from_db()
@@ -1228,7 +1270,7 @@ class AWTTest(TestCase):
         replacement = Absence.objects.get()
         self.assertEqual(
             (replacement.user, replacement.reason, replacement.days),
-            (absence.user, "paid", 2),
+            (absence.user, "paid", 1),
         )
 
         # Clearing the description while changing the reason is fine
@@ -1304,7 +1346,7 @@ class AWTTest(TestCase):
                 Absence.urls["create"],
                 {
                     "modal-user": user.pk,
-                    "modal-starts_on": dt.date.today().isoformat(),
+                    "modal-starts_on": weekday().isoformat(),
                     "modal-days": 1,
                     "modal-reason": reason,
                     WarningsForm.ignore_warnings_id: "absence-of-others",
@@ -1344,8 +1386,8 @@ class AWTTest(TestCase):
             absence.urls["update"],
             {
                 "modal-user": user.pk,
-                "modal-starts_on": dt.date.today().isoformat(),
-                "modal-days": 2,
+                "modal-starts_on": weekday().isoformat(),
+                "modal-days": "0.5",
                 "modal-reason": Absence.PAID,
             },
             headers={"x-requested-with": "XMLHttpRequest"},
@@ -1360,8 +1402,8 @@ class AWTTest(TestCase):
             absence.urls["update"],
             {
                 "modal-user": user.pk,
-                "modal-starts_on": dt.date.today().isoformat(),
-                "modal-days": 2,
+                "modal-starts_on": weekday().isoformat(),
+                "modal-days": "0.5",
                 "modal-reason": Absence.PAID,
                 "modal-description": "Typo fixed",
             },
@@ -1475,12 +1517,12 @@ class AbsenceChangesByOthersTest(TestCase):
         """Changing someone else's absence warns that personnel administration
         is informed, except for working time corrections"""
         hr = factories.UserFactory.create(_features=[FEATURES.PERSONNEL_ADMINISTRATION])
-        absence = factories.AbsenceFactory.create()
+        absence = factories.AbsenceFactory.create(starts_on=weekday())
         headers = {"x-requested-with": "XMLHttpRequest"}
         data = {
             "modal-user": absence.user_id,
             "modal-starts_on": absence.starts_on.isoformat(),
-            "modal-days": "2",
+            "modal-days": "0.5",
             "modal-reason": "vacation",
         }
         self.client.force_login(hr)

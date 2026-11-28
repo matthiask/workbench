@@ -14,6 +14,7 @@ from workbench.awt.changes import (
     personnel_administration,
 )
 from workbench.awt.models import Absence, Year
+from workbench.tools.formats import days as format_days
 from workbench.tools.forms import Form, ModelForm, Textarea, WarningsForm, add_prefix
 from workbench.tools.validation import monday
 from workbench.tools.xlsx import WorkbenchXLSXDocument
@@ -68,6 +69,14 @@ class AbsenceSearchForm(Form):
             xlsx.table_from_queryset(queryset)
             return xlsx.to_response("absences.xlsx")
         return None
+
+
+def weekdays(starts_on, ends_on):
+    """Mondays to Fridays from ``starts_on`` to ``ends_on`` (inclusive)"""
+    return sum(
+        (starts_on + dt.timedelta(days=i)).weekday() < 5
+        for i in range((ends_on - starts_on).days + 1)
+    )
 
 
 def employed(user, starts_on, ends_on):
@@ -203,6 +212,24 @@ class AbsenceForm(ModelForm, WarningsForm):
                 % {"user": user},
                 code="outside-employment",
             )
+
+        if (
+            (starts_on := data.get("starts_on"))
+            and (days := data.get("days")) is not None
+            and data.get("reason") != Absence.CORRECTION
+            and {"starts_on", "ends_on", "days", "reason"} & set(self.changed_data)
+        ):
+            ends_on = data.get("ends_on") or starts_on
+            available = weekdays(starts_on, ends_on)
+            if ends_on >= starts_on and days > available:
+                self.add_warning(
+                    _(
+                        "The absence has more days (%(days)s) than its period has"
+                        " weekdays (%(weekdays)s)."
+                    )
+                    % {"days": format_days(days), "weekdays": available},
+                    code="more-days-than-weekdays",
+                )
 
         if self._reported_to_personnel_administration(data):
             self.add_warning(ABSENCE_WARNING, code="absence-of-others")

@@ -1,4 +1,5 @@
 import datetime as dt
+from decimal import Decimal
 
 from django.core import mail
 from django.test import TestCase
@@ -12,6 +13,7 @@ from workbench.accounts.features import FEATURES, F
 from workbench.accounts.middleware import set_user_name
 from workbench.awt.changes import changes_by_others
 from workbench.awt.models import Absence, Holiday
+from workbench.tools.testing import weekday
 
 
 class AbsencesAPITest(TestCase):
@@ -184,7 +186,7 @@ class AbsenceCreateAPITest(TestCase):
         user = factories.UserFactory.create(_short_name="ab")
         self.client.force_login(user)
         absence = {
-            "starts_on": dt.date.today().isoformat(),
+            "starts_on": weekday().isoformat(),
             "days": 1,
             "reason": "vacation",
             "description": "Holidays",
@@ -204,7 +206,16 @@ class AbsenceCreateAPITest(TestCase):
         self.assertEqual(Absence.objects.get().user, user)
 
         # Warnings of the web interface are errors
-        far = dt.date.today() + dt.timedelta(days=400)
+        response = self.client.post(
+            "/api/absences/",
+            absence | {"days": 2},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"][0]["code"], "more-days-than-weekdays"
+        )
+        far = weekday(dt.date.today() + dt.timedelta(days=400))
         response = self.client.post(
             "/api/absences/",
             absence | {"starts_on": far.isoformat()},
@@ -242,7 +253,7 @@ class AbsenceCreateAPITest(TestCase):
         user = factories.UserFactory.create(_short_name="ab")
         self.client.force_login(user)
         absence = {
-            "starts_on": dt.date.today().isoformat(),
+            "starts_on": weekday().isoformat(),
             "days": "-2",
             "reason": "vacation",
         }
@@ -292,20 +303,20 @@ class AbsenceChangeAPITest(TestCase):
         personnel administration changes it"""
         user = factories.UserFactory.create(_short_name="ab")
         absence = factories.AbsenceFactory.create(
-            user=user, starts_on=dt.date.today(), days=1, reason=Absence.VACATION
+            user=user, starts_on=weekday(), days=1, reason=Absence.VACATION
         )
         self.client.force_login(user)
 
-        response = self.patch(absence, {"days": "2"}, "?dry_run=true")
+        response = self.patch(absence, {"days": "0.5"}, "?dry_run=true")
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response.json()["days"], "2.00")
+        self.assertEqual(response.json()["days"], "0.50")
         absence.refresh_from_db()
         self.assertEqual(absence.days, 1)
 
-        response = self.patch(absence, {"days": "2", "description": "Beach"})
+        response = self.patch(absence, {"days": "0.5", "description": "Beach"})
         self.assertEqual(response.status_code, 200, response.content)
         absence.refresh_from_db()
-        self.assertEqual((absence.days, absence.description), (2, "Beach"))
+        self.assertEqual((absence.days, absence.description), (Decimal("0.5"), "Beach"))
 
         # The web interface doesn't hand absences over to others
         other = factories.UserFactory.create(_short_name="cd")
@@ -315,7 +326,7 @@ class AbsenceChangeAPITest(TestCase):
         self.assertIn("cannot be changed", response.content.decode())
 
         # Warnings are errors with a code
-        far = (dt.date.today() + dt.timedelta(days=400)).isoformat()
+        far = weekday(dt.date.today() + dt.timedelta(days=400)).isoformat()
         response = self.patch(absence, {"starts_on": far})
         self.assertEqual(response.status_code, 422)
         self.assertEqual(
@@ -339,13 +350,13 @@ class AbsenceChangeAPITest(TestCase):
         hr = factories.UserFactory.create(_features=[FEATURES.PERSONNEL_ADMINISTRATION])
         self.client.force_login(hr)
         response = self.patch(
-            absence, {"user": "cd", "starts_on": dt.date.today().isoformat()}
+            absence, {"user": "cd", "starts_on": weekday().isoformat()}
         )
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()["detail"][0]["code"], "absence-of-others")
         response = self.patch(
             absence,
-            {"user": "cd", "starts_on": dt.date.today().isoformat()},
+            {"user": "cd", "starts_on": weekday().isoformat()},
             "?ignore_warnings=absence-of-others",
         )
         self.assertEqual(response.status_code, 200, response.content)
@@ -361,7 +372,7 @@ class AbsenceChangeAPITest(TestCase):
         set_user_name(user)
         sick = factories.AbsenceFactory.create(
             user=user,
-            starts_on=dt.date.today(),
+            starts_on=weekday(),
             reason=Absence.SICKNESS,
             description="Doctor's appointment",
         )
@@ -385,7 +396,7 @@ class AbsenceChangeAPITest(TestCase):
             "/api/absences/",
             {
                 "user": "ab",
-                "starts_on": dt.date.today().isoformat(),
+                "starts_on": weekday().isoformat(),
                 "days": 1,
                 "reason": "sickness",
                 "description": "Flu",
@@ -416,7 +427,7 @@ class AbsenceChangeAPITest(TestCase):
         hr = factories.UserFactory.create(_features=[FEATURES.PERSONNEL_ADMINISTRATION])
         set_user_name(user)
         absence = factories.AbsenceFactory.create(
-            user=user, starts_on=dt.date.today(), days=1, reason=Absence.VACATION
+            user=user, starts_on=weekday(), days=1, reason=Absence.VACATION
         )
         url = f"/api/absences/{absence.pk}/"
 
