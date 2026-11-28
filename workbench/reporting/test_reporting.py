@@ -161,6 +161,24 @@ class ReportingTest(TestCase):
         )
         self.assertEqual(projection["gross_margin_incl_projected"], 1400)
 
+    @travel("2026-02-10 12:00")
+    def test_key_data_projection_includes_overdue_projections(self):
+        """Projections of last year which haven't been invoiced yet are
+        planned for this year, projections of next year aren't"""
+        self.client.force_login(factories.UserFactory.create())
+        project = factories.ProjectFactory.create()
+        for invoiced_on, gross_margin in [
+            (dt.date(2025, 12, 15), 1000),
+            (dt.date(2026, 6, 15), 2000),
+            (dt.date(2027, 1, 15), 4000),
+        ]:
+            factories.ProjectedInvoiceFactory.create(
+                project=project, invoiced_on=invoiced_on, gross_margin=gross_margin
+            )
+        response = self.client.get("/report/key-data/")
+        projection = response.context["gross_margin_projection"]
+        self.assertEqual(projection["gross_margin_incl_projected"], 3000)
+
     def test_labor_costs(self):
         """The labor costs report does a few things"""
         user1 = factories.EmploymentFactory.create().user

@@ -177,7 +177,7 @@ One row per month (`key_data.py:gross_margin_by_month`); a month is **left out**
 **Projection row** (current year extrapolation), factor f = 365.24 / (1 + days since 1 Jan). It only uses what is dated up to today: invoices and logged third party costs with a future date are shown in their month but neither extrapolated nor part of "so far".
 - Gross profit: gross profit so far × f
 - Gross margin: gross margin so far × f
-- Projected column: gross margin so far (not extrapolated) + Σ projected gross margin of the current year's months (projections not invoiced yet). Adding the projections to the extrapolation would count the rest of the year twice.
+- Projected column: gross margin so far (not extrapolated) + Σ projected gross margin not invoiced yet of the months up to the end of the current year, including earlier years' projections still expected (they're invoiced this year). Adding the projections to the extrapolation would count the rest of the year twice.
 - Margin / FTE: projected / mean FTE of the year
 
 **Chart "Revenue minus third party costs and accruals"**: gross margin per calendar month; current year as bars plus the current year's projected gross margin as an extra bar series ("Projected gross margin"), the three earlier years as lines. `views.py:_years_chart`

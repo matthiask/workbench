@@ -332,10 +332,21 @@ def key_data_view(request):
     so_far = key_data.gross_margin_by_month([dt.date(today.year, 1, 1), today])
     gross_profit_so_far = sum((row["gross_profit"] for row in so_far), Z2)
     gross_margin_so_far = sum((row["gross_margin"] for row in so_far), Z2)
-    # Planned: The gross margin so far and the projections which haven't been
-    # invoiced yet. The extrapolation covers the whole year already, adding
-    # the projections to it would count the rest of the year twice.
-    planned = gross_margin_so_far + gm["projected_gross_margin"]
+    # Planned: The gross margin so far and the projections up to the end of
+    # the year which haven't been invoiced yet, also those of earlier years
+    # (still expected, they're invoiced this year). The extrapolation covers
+    # the whole year already, adding the projections to it would count the
+    # rest of the year twice.
+    planned = gross_margin_so_far + sum(
+        (
+            amount
+            for (year, _month), amount in projected_gross_margin[
+                "monthly_overall"
+            ].items()
+            if year <= today.year
+        ),
+        Z2,
+    )
     gross_margin_projection = {
         "gross_profit": gross_profit_so_far * gmp_factor,
         "gross_margin": gross_margin_so_far * gmp_factor,
