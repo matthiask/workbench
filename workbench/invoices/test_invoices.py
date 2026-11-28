@@ -2439,6 +2439,37 @@ class InvoicesTest(TestCase):
         self.assertEqual(final.down_payment_total, 0)
         self.assertEqual(final.total_excl_tax, 2500)
 
+    def test_settle_down_payment_of_invoice_in_preparation(self):
+        """Cancelling a down payment in the settle modal releases it from
+        the final invoice in preparation too"""
+        project = factories.ProjectFactory.create()
+        kwargs = {"project": project, "customer": project.customer}
+        down_payment = factories.InvoiceFactory.create(
+            type=Invoice.DOWN_PAYMENT,
+            subtotal=100,
+            status=Invoice.SENT,
+            invoiced_on=in_days(0),
+            due_on=in_days(15),
+            **kwargs,
+        )
+        final = factories.InvoiceFactory.create(subtotal=2500, **kwargs)
+        down_payment.down_payment_applied_to = final
+        down_payment.save()
+        final.down_payment_total = down_payment.total_excl_tax
+        final.save()
+
+        self.client.force_login(project.owned_by)
+        response = self.client.post(
+            down_payment.urls["settle"],
+            {"modal-status": Invoice.CANCELED, "modal-payment_notice": "Oops"},
+            headers={"x-requested-with": "XMLHttpRequest"},
+        )
+        self.assertEqual(response.status_code, 202)
+        down_payment.refresh_from_db()
+        self.assertIsNone(down_payment.down_payment_applied_to)
+        final.refresh_from_db()
+        self.assertEqual(final.down_payment_total, 0)
+
     def test_services_invoice_with_ineligible_down_payment(self):
         """Saving releases down payments which can't be applied anymore"""
         project = factories.ProjectFactory.create()

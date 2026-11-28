@@ -324,6 +324,30 @@ class SettleInvoiceForm(ModelForm):
                 )
         return data
 
+    def save(self):
+        instance = super().save(commit=False)
+        save_with_final_invoice(instance)
+        return instance
+
+
+def save_with_final_invoice(instance):
+    """Saves the invoice and, for down payments, the final invoice deducting
+    it: down payments which aren't sent or paid anymore are released
+
+    Only final invoices in preparation follow, the forms' clean() doesn't
+    allow changing down payments applied to invoices which have been sent"""
+    if final := instance.down_payment_applied_to:
+        if instance.status in {Invoice.IN_PREPARATION, Invoice.CANCELED}:
+            instance.down_payment_applied_to = None
+        instance.save()
+        final.down_payment_total = sum(
+            (invoice.total_excl_tax for invoice in final.down_payment_invoices.all()),
+            Z2,
+        )
+        final.save()
+    else:
+        instance.save()
+
 
 def amount_help_text(invoice):
     """The accepted offers, what has been invoiced so far and percentages of
@@ -1018,22 +1042,7 @@ class InvoiceForm(PostalAddressSelectionForm):
                 Z2,
             )
 
-        if final := instance.down_payment_applied_to:
-            # Only final invoices in preparation, see clean()
-            if instance.status in {Invoice.IN_PREPARATION, Invoice.CANCELED}:
-                instance.down_payment_applied_to = None
-            instance.save()
-            final.down_payment_total = sum(
-                (
-                    invoice.total_excl_tax
-                    for invoice in final.down_payment_invoices.all()
-                ),
-                Z2,
-            )
-            final.save()
-            return instance
-
-        instance.save()
+        save_with_final_invoice(instance)
         return instance
 
 
