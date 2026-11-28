@@ -1103,7 +1103,7 @@ dev = [
 
 [[package]]
 name = "workbench-cli"
-version = "0.58.0"
+version = "0.59.0"
 source = { editable = "cli" }
 dependencies = [
     { name = "click" },
