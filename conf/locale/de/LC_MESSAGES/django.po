@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-28 13:34+0100\n"
+"POT-Creation-Date: 2026-11-28 15:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -657,6 +657,11 @@ msgid "%(user)s isn't employed during the whole absence. Absences outside employ
 msgstr "%(user)s ist nicht während der ganzen Abwesenheit angestellt. Abwesenheiten ausserhalb von Anstellungen zählen trotzdem als Arbeitszeit."
 
 #: workbench/awt/forms.py
+#, python-format
+msgid "The absence has more days (%(days)s) than its period has weekdays (%(weekdays)s)."
+msgstr "Die Absenz hat mehr Tage (%(days)s) als ihr Zeitraum Wochentage (%(weekdays)s)."
+
+#: workbench/awt/forms.py
 msgid "The description would become visible to everyone when the reason isn't sickness anymore."
 msgstr "Die Beschreibung würde für alle sichtbar, wenn der Grund nicht mehr Krankheit ist."
 
@@ -1096,7 +1101,7 @@ msgstr "%(organization)s (ID %(id)s) existiert bereits. Verwende ihre ID oder er
 msgid "The group %r is archived."
 msgstr "Die Gruppe %r ist archiviert."
 
-#: workbench/contacts/api.py
+#: workbench/contacts/api.py workbench/contacts/forms.py
 #, python-format
 msgid "%(person)s has this email address already."
 msgstr "%(person)s hat diese Emailadresse bereits."
@@ -1111,7 +1116,7 @@ msgstr "%(person)s (ID %(id)s) existiert bereits. Erlaube Duplikate, falls es si
 msgid "%(person)s (ID %(id)s) has been archived. Unarchive them instead, or allow duplicates if this is someone else."
 msgstr "%(person)s (ID %(id)s) wurde archiviert. Hole die Person aus dem Archiv, oder erlaube Duplikate, falls es sich um jemand anderes handelt."
 
-#: workbench/contacts/api.py
+#: workbench/contacts/api.py workbench/contacts/forms.py
 msgid "Listed twice."
 msgstr "Doppelt aufgeführt."
 
@@ -1174,7 +1179,7 @@ msgid "Either reassign to someone or to the suggestions."
 msgstr "Entweder einer Person oder gemäss den Vorschlägen zuweisen."
 
 #: workbench/contacts/api.py workbench/invoices/api.py
-#: workbench/projects/forms.py
+#: workbench/planning/api.py workbench/projects/forms.py
 msgid "This field is required."
 msgstr "Dieses Feld ist zwingend erforderlich."
 
@@ -1446,6 +1451,25 @@ msgid "%(count)s person of this organization is still active. Archive them too?"
 msgid_plural "%(count)s people of this organization are still active. Archive them too?"
 msgstr[0] "%(count)s Person dieser Organisation ist noch aktiv. Auch archivieren?"
 msgstr[1] "%(count)s Personen dieser Organisation sind noch aktiv. Auch archivieren?"
+
+#: workbench/contacts/models.py
+#, python-format
+msgid "%(count)s active site"
+msgid_plural "%(count)s active sites"
+msgstr[0] "%(count)s aktive Site"
+msgstr[1] "%(count)s aktive Sites"
+
+#: workbench/contacts/models.py
+#, python-format
+msgid "%(count)s running recurring invoice"
+msgid_plural "%(count)s running recurring invoices"
+msgstr[0] "%(count)s laufende Stapelrechnung"
+msgstr[1] "%(count)s laufende Stapelrechnungen"
+
+#: workbench/contacts/models.py
+#, python-format
+msgid "This organization still has %(related)s."
+msgstr "Diese Organisation hat noch %(related)s."
 
 #: workbench/contacts/models.py
 msgid "given name"
@@ -2386,16 +2410,14 @@ msgid "%(class)s '%(object)s' has been deleted successfully."
 msgstr "%(class)s '%(object)s' wurde erfolgreich gelöscht."
 
 #: workbench/hosting/api.py
-#, fuzzy, python-format
-#| msgid "Unknown user %r."
+#, python-format
 msgid "Unknown server %r."
-msgstr "Unbekannte:r Mitarbeiter:in %r."
+msgstr "Unbekannter Server %r."
 
 #: workbench/hosting/api.py
-#, fuzzy, python-format
-#| msgid "The main domain of the site."
+#, python-format
 msgid "%s isn't a contact of this site."
-msgstr "Die Hauptdomain der Site."
+msgstr "%s ist kein Kontakt dieser Site."
 
 #: workbench/hosting/forms.py
 msgid "With problems"
@@ -2404,6 +2426,16 @@ msgstr "Mit Problemen"
 #: workbench/hosting/forms.py
 msgid "All servers"
 msgstr "Alle Server"
+
+#: workbench/hosting/forms.py
+#, python-format
+msgid "An archived site on %(server)s (ID %(id)s) has this title already."
+msgstr "Eine archivierte Site auf %(server)s (ID %(id)s) hat diesen Titel bereits."
+
+#: workbench/hosting/forms.py
+#, python-format
+msgid "Another site on %(server)s (ID %(id)s) has this title already."
+msgstr "Eine andere Site auf %(server)s (ID %(id)s) hat diesen Titel bereits."
 
 #: workbench/hosting/forms.py
 msgid "This person is already a contact of the site with this role."
@@ -2504,7 +2536,7 @@ msgstr "Zahlungserinnerungen können höchstens %(days)s Tage aufgeschoben werde
 msgid "You are postponing reminders until %(date)s, which is more than %(days)s days from now. Are you sure?"
 msgstr "Du schiebst die Zahlungserinnerungen bis am %(date)s auf, das sind mehr als %(days)s Tage ab heute. Bist Du sicher?"
 
-#: workbench/invoices/api.py
+#: workbench/invoices/api.py workbench/planning/api.py
 #, python-format
 msgid "Unknown offer %r."
 msgstr "Unbekannte Offerte %r."
@@ -2898,6 +2930,11 @@ msgid "Some services have been invoiced already: %(services)s. Make sure the sam
 msgstr "Einige Leistungen wurden bereits verrechnet: %(services)s. Stelle sicher, dass dieselbe Arbeit nicht doppelt verrechnet wird."
 
 #: workbench/invoices/forms.py
+#, python-format
+msgid "Down payments of this project haven't been applied to any invoice: %(invoices)s. Are you sure you want to close the project?"
+msgstr "Anzahlungen dieses Projekts wurden noch mit keiner Rechnung verrechnet: %(invoices)s. Willst Du das Projekt wirklich schliessen?"
+
+#: workbench/invoices/forms.py
 msgid "Other invoice types must be created directly on a project."
 msgstr "Andere Rechnungstypen müssen direkt auf einem Projekt erstellt werden."
 
@@ -2944,6 +2981,11 @@ msgstr "Kann Stapelrechnung mit einem Startdatum von {} oder früher nicht mehr 
 #, python-format
 msgid "This creates %(count)s invoices for the periods since %(date)s. If the time in between shouldn't be invoiced, leave this recurring invoice ended and create a new one."
 msgstr "Damit werden %(count)s Rechnungen für die Perioden seit dem %(date)s erstellt. Falls die Zeit dazwischen nicht verrechnet werden soll, lass diese wiederkehrende Rechnung beendet und erstelle eine neue."
+
+#: workbench/invoices/forms.py
+#, python-format
+msgid "This creates %(count)s invoices for the periods since %(date)s at once. Are you sure?"
+msgstr "Damit werden auf einmal %(count)s Rechnungen für die Perioden seit %(date)s erstellt. Bist Du sicher?"
 
 #: workbench/invoices/migrations/0034_backfill_payment_notice.py
 #: workbench/invoices/models.py
@@ -3421,7 +3463,7 @@ msgid "These costs cannot be changed anymore."
 msgstr "Diese Kosten können nicht mehr geändert werden."
 
 #: workbench/logbook/api.py workbench/logbook/forms.py
-#: workbench/projects/views.py
+#: workbench/projects/forms.py workbench/projects/views.py
 msgid "Cannot move logbook entries of closed projects."
 msgstr "Kann Logbucheinträge von geschlossenen Projekten nicht verschieben."
 
@@ -3688,6 +3730,10 @@ msgstr "Pausen sollten später enden als beginnen."
 #: workbench/logbook/models.py
 msgid "Cannot modify breaks of other users."
 msgstr "Es ist nicht erlaubt, Pausen anderer Mitarbeiter:innen zu ändern."
+
+#: workbench/logbook/models.py
+msgid "Cannot delete old breaks."
+msgstr "Kann alte Pausen nicht löschen."
 
 #: workbench/logbook/reporting.py
 #, python-format
@@ -4044,10 +4090,9 @@ msgstr "Der Zeitraum darf höchstens zehn Jahre umfassen."
 msgid "This field cannot be null."
 msgstr "Dieses Feld darf nicht leer sein."
 
-#: workbench/planning/api.py
-#, python-format
-msgid "Unknown or declined offer %r."
-msgstr "Unbekannte oder abgelehnte Offerte %r."
+#: workbench/planning/api.py workbench/planning/forms.py
+msgid "The selected offer is declined."
+msgstr "Die ausgewählte Offerte ist abgelehnt."
 
 #: workbench/planning/api.py
 #, python-format
@@ -4152,10 +4197,6 @@ msgid "The milestone is scheduled on %(date)s, but work is planned in the same o
 msgstr "Der Meilenstein ist geplant am %(date)s, aber Arbeit ist geplant in der gleichen oder den folgenden Wochen: %(weeks)s"
 
 #: workbench/planning/forms.py
-msgid "The selected offer is declined."
-msgstr "Die ausgewählte Offerte ist abgelehnt."
-
-#: workbench/planning/forms.py
 msgid "Move by weeks"
 msgstr "Um Wochen verschieben"
 
@@ -4174,6 +4215,16 @@ msgstr "Ist die Arbeit provisorisch?"
 #: workbench/planning/forms.py
 msgid "Delete planned work entries?"
 msgstr "Geplante Arbeit löschen?"
+
+#: workbench/planning/forms.py
+#, python-format
+msgid "The following work would be planned in or after the week of its milestone: %(work)s"
+msgstr "Die folgenden Arbeiten würden in oder nach der Woche ihres Meilensteins geplant: %(work)s"
+
+#: workbench/planning/forms.py
+#, python-format
+msgid "The following work belongs to declined offers: %(work)s"
+msgstr "Die folgenden Arbeiten gehören zu abgelehnten Offerten: %(work)s"
 
 #: workbench/planning/models.py
 #: workbench/templates/planning/planning_import.html
@@ -4681,6 +4732,10 @@ msgstr "Budgetwarnung versendet am"
 #: workbench/projects/models.py
 msgid "Leave this empty if you do not want to close the project yet."
 msgstr "Bitte leer lassen, falls Du das Projekt noch nicht schliessen willst."
+
+#: workbench/projects/models.py
+msgid "This project has budget transfers, it cannot be deleted."
+msgstr "Dieses Projekt hat Budgetverschiebungen, es kann nicht gelöscht werden."
 
 #: workbench/projects/models.py workbench/templates/reporting/squeeze.html
 msgid "Outreach"
@@ -7388,6 +7443,10 @@ msgstr "Suchanfrage fehlt."
 #, python-format
 msgid "%(model)s with %(attribute)s=%(id)s"
 msgstr "%(model)s mit %(attribute)s=%(id)s"
+
+#, python-format
+#~ msgid "Unknown or declined offer %r."
+#~ msgstr "Unbekannte oder abgelehnte Offerte %r."
 
 #~ msgid "without third party costs"
 #~ msgstr "ohne Fremdkosten"
